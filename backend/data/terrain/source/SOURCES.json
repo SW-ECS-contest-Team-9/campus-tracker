@@ -1,0 +1,47 @@
+{
+  "extractedAt": "2026-10-02T08:00:27.650Z",
+  "bufferM": 400,
+  "extent5186": [
+    200569.6107931948,
+    556699.923844169,
+    201666.269140138,
+    557824.4200373928
+  ],
+  "extent5174": [
+    200450.0867938201,
+    456344.72424519685,
+    201646.77480336215,
+    457569.2499507267
+  ],
+  "sources": {
+    "contours": {
+      "file": "N3L_F001.shp",
+      "sha256": "729f9bb65f2a3ff869f79d2467ecdb285b7dc4486f90b023e4aa89c9a3f355d3",
+      "dbfSha256": "64a59b7c2dc0d1756c1d39c9c3b07e7b2f26cc2d7ef9ad65ba3fb054b6675f59",
+      "features": 39
+    },
+    "spots": {
+      "file": "N3P_F002.shp",
+      "sha256": "924e15ab05c62130f0f01a0eb3d056da38448e535704efe984a009b196ead612",
+      "dbfSha256": "25631af6ba157b8cb4a8730a0c65cc57f14ada726fb8e3c86c7964294e2673d6",
+      "features": 78
+    },
+    "geoid": {
+      "file": "KNGeoid18.dat",
+      "sha256": "9d88e22cb05387c6a07a342fd6b77c4221184d9f636a4b84687319d6dbd351b6",
+      "nodes": 36
+    },
+    "buildings": {
+      "file": "AL_D010_11_20260909.shp",
+      "sha256": "eb2d0b0972c8ec144e2043aa77ae47422f6b08336e75e73bbaa385154711cf52",
+      "features": 147
+    },
+    "campusMap": {
+      "url": "https://www.skuniv.ac.kr/campus-map",
+      "files": [
+        "skuniv_buildings.json",
+        "skuniv_places.json"
+      ]
+    }
+  }
+}

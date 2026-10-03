@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campus Collection Preview</title>
+    <!-- VWorld WebGL 3D 3.0 loader <script> is injected by vite.config.ts (vworld-loader plugin). -->
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Campus Collection Preview</h1>
+      <div class="mode" role="group" aria-label="Mode">
+        <button id="mode-live" class="active" type="button">Live</button>
+        <button id="mode-history" type="button">Historical</button>
+      </div>
+      <div class="layers">
+        <span class="layer-group raw">Raw
+          <label><input type="checkbox" id="layer-rawPoints" checked /> Points</label>
+          <label><input type="checkbox" id="layer-rawTrajectory" checked /> Trajectory</label>
+        </span>
+        <span class="layer-group fused">Fused
+          <label><input type="checkbox" id="layer-fusedPosition" checked /> Position</label>
+          <label><input type="checkbox" id="layer-fusedTrajectory" checked /> Trajectory</label>
+          <span id="fused-versions" class="versions" title="Fusion versions to draw (compare)"></span>
+        </span>
+        <label title="Radius = horizontalAccuracy reported by the phone's GPS (not a strict probability region)"><input type="checkbox" id="layer-accuracy" checked /> Accuracy</label>
+        <label><input type="checkbox" id="layer-markers" checked /> Markers</label>
+      </div>
+      <span id="socket-status" class="pill">connecting…</span>
+    </header>
+
+    <aside class="sidebar">
+      <section>
+        <h2>
+          Collectors
+          <button id="issue-open" type="button" class="text-button">+ ID 발급</button>
+        </h2>
+        <form id="issue-form" class="issue-form" hidden>
+          <input id="issue-input" maxlength="32" placeholder="비워두면 자동 (예: C06)" autocomplete="off" />
+          <button type="submit">발급</button>
+          <button id="issue-cancel" type="button">취소</button>
+        </form>
+        <div id="issue-result" class="issue-result"></div>
+        <ul id="collector-list" class="list"></ul>
+      </section>
+      <section class="sessions">
+        <h2>
+          Sessions
+          <button id="reload-sessions" type="button" title="Reload">↻</button>
+        </h2>
+        <ul id="session-list" class="list"></ul>
+      </section>
+      <section>
+        <h2>Detail</h2>
+        <div id="detail" class="detail muted">Select a collector, a session, or click a point on the map.</div>
+      </section>
+      <section class="legend">
+        Raw point color = horizontal accuracy:
+        <span class="dot" style="background:#22c55e"></span>&lt;5 m
+        <span class="dot" style="background:#eab308"></span>&lt;15 m
+        <span class="dot" style="background:#ef4444"></span>≥15 m<br />
+        Height = MSL (VWorld terrain/buildings are at MSL heights); fused = ellipsoidal − geoid (KNGeoid18). Markers snap to the fusion-v4 track.<br />
+        <b>Raw</b> = thin translucent line + small dots; a <b>faded</b> dot = fix rejected by the live fusion (still stored).
+        <b>Fused</b>: live version = thick solid line, other versions = dashed (compare); white dot = stationary.
+        Click any dot on the map to inspect it.
+        Accuracy circle = the GPS-reported horizontal accuracy radius, not a strict probability region.
+        Confidence = heuristic 0–1 score.
+      </section>
+    </aside>
+
+    <main class="map-wrap">
+      <div id="vmap"></div>
+      <div id="map-message" class="map-message" hidden></div>
+    </main>
+
+    <dialog id="delete-dialog" class="dialog">
+      <form id="delete-form">
+        <h3 id="delete-title">제거</h3>
+        <div id="delete-summary"></div>
+        <label for="delete-input">확인을 위해 <b class="confirm-text">제거하겠습니다.</b> 를 그대로 입력하세요.</label>
+        <input id="delete-input" autocomplete="off" placeholder="제거하겠습니다." />
+        <div id="delete-error" class="issue-result error"></div>
+        <div class="dialog-actions">
+          <button id="delete-cancel" type="button">취소</button>
+          <button id="delete-confirm" type="submit" class="danger" disabled>영구 제거</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

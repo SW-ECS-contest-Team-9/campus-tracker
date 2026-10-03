@@ -1,0 +1,46 @@
+{
+  "name": "backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seed.ts",
+    "spatial:import": "tsx scripts/spatial-import.ts",
+    "sim": "tsx scripts/simulate-iphone.ts",
+    "check:raw-ws": "tsx scripts/check-raw-ws.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "fusion:reprocess": "tsx scripts/fusion-reprocess.ts",
+    "fusion:diagnose": "tsx scripts/fusion-diagnose.ts",
+    "sessions:diagnose": "tsx scripts/sessions-diagnose.ts",
+    "check:delayed-upload": "tsx scripts/check-delayed-upload.ts",
+    "terrain:extract": "tsx scripts/terrain-extract.ts",
+    "terrain:import": "tsx scripts/terrain-import.ts",
+    "buildings:calibrate": "tsx scripts/buildings-calibrate.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "socket.io": "^4.8.4",
+    "ws": "^8.21.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.3",
+    "@types/pg": "^8.23.1",
+    "@types/ws": "^8.18.2",
+    "socket.io-client": "^4.8.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

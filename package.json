@@ -1,0 +1,39 @@
+{
+  "name": "campus-collector",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Internal sensor data collection server + VWorld 3D preview for campus iPhone collectors",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "db:psql": "docker compose exec db psql -U campus -d campus",
+    "db:migrate": "npm run db:migrate -w backend",
+    "db:seed": "npm run db:seed -w backend",
+    "spatial:import": "npm run spatial:import -w backend",
+    "sim": "npm run sim -w backend --",
+    "fusion:reprocess": "npm run fusion:reprocess -w backend --",
+    "fusion:diagnose": "npm run fusion:diagnose -w backend --",
+    "fusion:reprocess:v21": "npm run fusion:reprocess -w backend -- --all --version=fusion-v2.1 --force",
+    "sessions:diagnose": "npm run sessions:diagnose -w backend --",
+    "check:delayed-upload": "npm run check:delayed-upload -w backend --",
+    "terrain:extract": "npm run terrain:extract -w backend --",
+    "terrain:import": "npm run terrain:import -w backend --",
+    "buildings:calibrate": "npm run buildings:calibrate -w backend --"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}

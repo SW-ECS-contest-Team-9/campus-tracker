@@ -1,0 +1,27 @@
+services:
+  db:
+    # PostgreSQL 16 + PostGIS 3.5.
+    # imresamu/postgis is the multi-arch (amd64 + arm64) build of the official
+    # postgis/postgis Dockerfiles. The official image is amd64-only and runs under
+    # emulation on Apple Silicon. On an Intel/amd64 host you may set
+    # POSTGIS_IMAGE=postgis/postgis:16-3.5 in .env.
+    image: ${POSTGIS_IMAGE:-imresamu/postgis:16-3.5}
+    container_name: campus-collector-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-campus}
+      POSTGRES_USER: ${POSTGRES_USER:-campus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-campus}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - campus_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  campus_pgdata:
