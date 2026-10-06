@@ -11,6 +11,9 @@ import { realtimeState } from './realtime/realtime-state.service.js';
 import { sessionRepository } from './modules/sessions/session.repository.js';
 import { fusionService } from './modules/fusion/fusion.service.js';
 import { RAW_COLLECTOR_WS_PATH, registerRawCollectorGateway } from './realtime/raw-ws.gateway.js';
+import { listenMobilityChanges } from './modules/mobility/mobility.listener.js';
+import { listenEditorChanges } from './modules/editor/editor.listener.js';
+import { registerEditorGateway } from './realtime/editor.gateway.js';
 
 const app = createApp();
 const httpServer = http.createServer(app);
@@ -55,6 +58,7 @@ io.on('connection', (socket) => {
 
 registerCollectorGateway(io);
 registerPreviewGateway(io);
+registerEditorGateway(io);
 registerRawCollectorGateway(httpServer);
 
 function lanAddresses(): string[] {
@@ -71,6 +75,8 @@ async function main() {
     const active = await sessionRepository.activeSessionsByCollector();
     realtimeState.hydrate(active);
     await fusionService.recoverPending();
+    listenMobilityChanges(); // QGIS edits -> preview
+    listenEditorChanges(); // authored network edits -> collaborative editor
     logger.info('sessions.restored', { activeSessions: active.length });
   } else logger.error('db.unavailable', { hint: 'npm run db:up && npm run db:migrate' });
 

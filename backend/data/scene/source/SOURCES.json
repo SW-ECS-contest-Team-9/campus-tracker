@@ -1,0 +1,12 @@
+{
+  "importedFrom": "/Users/hoshi/Desktop/skuniv_shp/campus_3d",
+  "importedAt": "2026-10-04T08:17:13.368Z",
+  "sha256": {
+    "campus.gpkg": "26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13",
+    "building_heights.csv": "95053477e5f05d2caed0ea30ee4c52168ab7a4f653f4ea58d021caadcc99e3c9",
+    "validation.json": "94771326abe666700329f3215f2f1dad94fefe5c837be5c071cf043b7364467b",
+    "README.md": "3210dfda9fe5f3efcd0de3560d360162cb184f373893d32487d457ae06c57d72",
+    "build_campus.py": "edea8a9727fdc05a9812a5f0b8ae01cf997d1f27ed256366740130deaaaf49f3",
+    "campus_3d.qgz": "9cc1e81669d83badfafae3131272aaf8245ecea2e3c7add6002baa0c63a63640"
+  }
+}

@@ -1,5 +1,5 @@
 import { env } from '../../config/env.js';
-import { fusionConfigV1, fusionConfigV2, fusionConfigV21, fusionConfigV4 } from './fusion.config.js';
+import { fusionConfigV1, fusionConfigV2, fusionConfigV21, fusionConfigV4, type FusionConfigV4 } from './fusion.config.js';
 import { flushFusion, processObservation, type FusionEvent } from './fusion.engine.js';
 import { describeEventV2, flushFusionV2, processObservationV2, summarizeV2, type FusionEventV2 } from './fusion-v2.engine.js';
 import { createFusionState, type FusionState } from './fusion-state.js';
@@ -16,6 +16,7 @@ import type { FusionStateV31 } from './fusion-state-v31.js';
 import type { FusionEventV31 } from './fusion-v31.engine.js';
 import { createFusionStateV4, describeEventV4, finalizeFusionV4, flushFusionV4, processObservationV4, summarizeV4, type FusionEventV4 } from './fusion-v4.engine.js';
 import type { FusionStateV4 } from './fusion-state-v4.js';
+import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fusion.diagnostics.js';
 
 export interface AlgorithmSummary {
   gpsAccepted: number;
@@ -63,18 +64,24 @@ export interface FusionAlgorithm<S = any, E = any> {
   skippedLate(state: S): number;
   summarize(state: S, events: E[]): AlgorithmSummary;
   describeEvent(e: E): { event: string; fields: Record<string, unknown> } | null;
+  /** Run snapshot diagnostics after a replay (per-fix decisions, engine events); see fusion.diagnostics.ts. */
+  diagnostics?(state: S, events: E[]): RunDiagnostics;
+  /** Builds the same version with a modified config (experiment variants). Absent: the version has no variants. */
+  withConfig?(config: object): FusionAlgorithm<S, E>;
 }
 
 const r1 = (v: number) => Math.round(v * 10) / 10;
 
-const fusionV1: FusionAlgorithm<FusionState, FusionEvent> = {
+const makeV1 = (cfg: typeof fusionConfigV1): FusionAlgorithm<FusionState, FusionEvent> => ({
   version: 'fusion-v1',
   revision: 1,
   description: 'Complementary fusion: every valid fix pulls the position with an accuracy-dependent weight.',
-  config: fusionConfigV1,
+  config: cfg,
   createState: createFusionState,
-  process: (s, o) => processObservation(s, o, fusionConfigV1),
-  flush: (s) => flushFusion(s, fusionConfigV1),
+  process: (s, o) => processObservation(s, o, cfg),
+  flush: (s) => flushFusion(s, cfg),
+  withConfig: (c) => makeV1(c as typeof fusionConfigV1),
+  diagnostics: (_s, events) => diagnosticsFromEvents(events),
   skippedLate: (s) => s.skippedLateObservations,
   summarize(_s, events) {
     let accepted = 0;
@@ -105,33 +112,40 @@ const fusionV1: FusionAlgorithm<FusionState, FusionEvent> = {
         return null;
     }
   },
-};
+});
+const fusionV1 = makeV1(fusionConfigV1);
 
-const fusionV2: FusionAlgorithm<FusionStateV2, FusionEventV2> = {
+const makeV2 = (cfg: typeof fusionConfigV2): FusionAlgorithm<FusionStateV2, FusionEventV2> => ({
   version: 'fusion-v2',
   revision: 4,
   description: 'Conservative fusion: quality/innovation/physical-jump gates, stationary XY lock, uncertainty-based confidence.',
-  config: fusionConfigV2,
+  config: cfg,
   createState: createFusionStateV2,
-  process: (s, o) => processObservationV2(s, o, fusionConfigV2),
-  flush: (s) => flushFusionV2(s, fusionConfigV2),
+  process: (s, o) => processObservationV2(s, o, cfg),
+  flush: (s) => flushFusionV2(s, cfg),
   skippedLate: (s) => s.skippedLateObservations,
   summarize: summarizeV2,
   describeEvent: describeEventV2,
-};
+  diagnostics: (_s, events) => diagnosticsFromEvents(events),
+  withConfig: (c) => makeV2(c as typeof fusionConfigV2),
+});
+const fusionV2 = makeV2(fusionConfigV2);
 
-const fusionV21: FusionAlgorithm<FusionStateV21, FusionEventV21> = {
+const makeV21 = (cfg: typeof fusionConfigV21): FusionAlgorithm<FusionStateV21, FusionEventV21> => ({
   version: 'fusion-v2.1',
   revision: 6, // 3: motion gap / segment yaw baseline, altimeter + pedometer segment rebase; 4: vertical innovation gate; 5: pre-session GPS; 6: pedometer high-water mark
   description: 'v2 fixed: wider GPS classes, two-point heading bootstrap, GPS cluster/track re-anchor, divergence guard, anchor-based Z.',
-  config: fusionConfigV21,
+  config: cfg,
   createState: createFusionStateV21,
-  process: (s, o) => processObservationV21(s, o, fusionConfigV21),
-  flush: (s) => flushFusionV21(s, fusionConfigV21),
+  process: (s, o) => processObservationV21(s, o, cfg),
+  flush: (s) => flushFusionV21(s, cfg),
   skippedLate: (s) => s.skippedLateObservations,
   summarize: summarizeV21,
   describeEvent: describeEventV21,
-};
+  diagnostics: (_s, events) => diagnosticsFromEvents(events),
+  withConfig: (c) => makeV21(c as typeof fusionConfigV21),
+});
+const fusionV21 = makeV21(fusionConfigV21);
 
 const fusionV3: FusionAlgorithm<FusionStateV3, FusionEventV3> = {
   version: 'fusion-v3',
@@ -145,6 +159,7 @@ const fusionV3: FusionAlgorithm<FusionStateV3, FusionEventV3> = {
   skippedLate: (s) => s.inner.skippedLateObservations,
   summarize: summarizeV3,
   describeEvent: describeEventV3,
+  diagnostics: (_s, events) => diagnosticsFromEvents(events),
 };
 
 const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
@@ -159,22 +174,28 @@ const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
   skippedLate: (s) => s.skippedLateObservations,
   summarize: (s) => summarizeV31(s),
   describeEvent: describeEventV31,
+  diagnostics: (_s, events) => diagnosticsFromEvents(events),
 };
 
-const fusionV4: FusionAlgorithm<FusionStateV4, FusionEventV4> = {
+const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => ({
   version: 'fusion-v4',
-  revision: 3, // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors
+  // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors;
+  // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3
+  revision: 4,
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
-  config: fusionConfigV4,
+  config: cfg,
   createState: createFusionStateV4,
-  process: (s, o) => processObservationV4(s, o, fusionConfigV4),
-  flush: (s) => flushFusionV4(s, fusionConfigV4),
-  finalize: (s) => finalizeFusionV4(s, fusionConfigV4),
+  process: (s, o) => processObservationV4(s, o, cfg),
+  flush: (s) => flushFusionV4(s, cfg),
+  finalize: (s) => finalizeFusionV4(s, cfg),
   skippedLate: (s) => s.skippedLateObservations,
   summarize: (s) => summarizeV4(s),
   describeEvent: describeEventV4,
-};
+  diagnostics: diagnosticsV4,
+  withConfig: (c) => makeV4(c as FusionConfigV4),
+});
+const fusionV4 = makeV4(fusionConfigV4);
 
 export const FUSION_ALGORITHMS: Record<string, FusionAlgorithm> = {
   [fusionV1.version]: fusionV1,
@@ -185,10 +206,37 @@ export const FUSION_ALGORITHMS: Record<string, FusionAlgorithm> = {
   [fusionV4.version]: fusionV4,
 };
 
-/** Version computed live for collecting phones (ACTIVE_FUSION_VERSION, default fusion-v2.1). Only one is computed live. */
+/** Version computed live for collecting phones (ACTIVE_FUSION_VERSION, default fusion-v4). Only one is computed live. */
 export const REALTIME_FUSION_VERSION = env.ACTIVE_FUSION_VERSION;
 if (!(REALTIME_FUSION_VERSION in FUSION_ALGORITHMS)) {
   throw new Error(`ACTIVE_FUSION_VERSION=${REALTIME_FUSION_VERSION} is not registered (${Object.keys(FUSION_ALGORITHMS).join(', ')})`);
 }
 
 export type { FusedOutput };
+
+/** Deep-merges parameter overrides into a config; unknown keys are rejected (typos must not pass silently). */
+export function mergeConfig(base: object, overrides: Record<string, unknown>): object {
+  const out: Record<string, unknown> = structuredClone(base) as Record<string, unknown>;
+  for (const [path, value] of Object.entries(overrides)) {
+    const keys = path.split('.');
+    let node = out;
+    for (const k of keys.slice(0, -1)) {
+      if (typeof node[k] !== 'object' || node[k] === null) throw new Error(`Unknown config key ${path}`);
+      node = node[k] as Record<string, unknown>;
+    }
+    const last = keys.at(-1)!;
+    if (!(last in node)) throw new Error(`Unknown config key ${path}`);
+    if (typeof node[last] !== typeof value) throw new Error(`Config key ${path} expects a ${typeof node[last]}`);
+    node[last] = value;
+  }
+  return out;
+}
+
+/** The registered version, or a variant of it with parameter overrides (keys like "gpsGateChi2" or "a.b"). */
+export function resolveAlgorithm(version: string, overrides: Record<string, unknown> | null | undefined): FusionAlgorithm {
+  const algo = FUSION_ALGORITHMS[version];
+  if (!algo) throw new Error(`Unknown algorithm version ${version}`);
+  if (!overrides || Object.keys(overrides).length === 0) return algo;
+  if (!algo.withConfig) throw new Error(`${version} does not support parameter variants`);
+  return algo.withConfig(mergeConfig(algo.config, overrides));
+}

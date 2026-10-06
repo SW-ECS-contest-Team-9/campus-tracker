@@ -37,6 +37,10 @@ export interface SmoothedSummaryV4 {
   steps: number;
   stairSteps: number;
   walkedWithoutMotionM: number;
+  /** diagnostics (rev 4): robust weight and final residual of every fix (aligned with state.fixes), kept ground contacts */
+  fixWeights: number[];
+  fixResiduals: (number | null)[];
+  contactLog: ContactV4[];
 }
 
 export interface FusionStateV4 {

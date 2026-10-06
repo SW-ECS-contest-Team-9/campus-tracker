@@ -29,8 +29,8 @@ export class AppError extends Error {
   static notFound(code: string, message: string) {
     return new AppError(404, code, message);
   }
-  static conflict(code: string, message: string) {
-    return new AppError(409, code, message);
+  static conflict(code: string, message: string, details?: unknown) {
+    return new AppError(409, code, message, details);
   }
 }
 

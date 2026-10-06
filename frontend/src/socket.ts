@@ -16,6 +16,8 @@ export interface PreviewHandlers {
   onFusionReprocessed(payload: { sessionId: string; collectorId: string; algorithmVersion: string; count: number }): void;
   onSpatialGpsDecisions(payload: { sessionId: string; collectorId: string; algorithmVersion: string; decisions: import('./api').SpatialGpsDecision[] }): void;
   onFusionSensorEvents(payload: { sessionId: string; collectorId: string; algorithmVersion: string; events: import('./api').FusionSensorEvent[] }): void;
+  /** QGIS saved hand-drawn mobility spaces: reload them. */
+  onMobilityChanged(payload: { changes: number; tables: string[] }): void;
 }
 
 export function connectPreview(h: PreviewHandlers) {
@@ -44,5 +46,6 @@ export function connectPreview(h: PreviewHandlers) {
   socket.on('fusion:reprocessed', h.onFusionReprocessed);
   socket.on('spatial:gps-decisions', h.onSpatialGpsDecisions);
   socket.on('fusion:sensor-events', h.onFusionSensorEvents);
+  socket.on('mobility:changed', h.onMobilityChanged);
   return socket;
 }

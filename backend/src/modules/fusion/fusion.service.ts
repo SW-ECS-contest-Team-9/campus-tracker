@@ -6,14 +6,19 @@ import { logger } from '../../common/logger.js';
 import { previewBroadcast } from '../../realtime/preview.gateway.js';
 import { realtimeState } from '../../realtime/realtime-state.service.js';
 import { sessionRepository } from '../sessions/session.repository.js';
-import { buildTimeline, compareObservations, type Observation, type RawSamples } from './fusion.timeline.js';
-import { FUSION_ALGORITHMS, REALTIME_FUSION_VERSION, type FusionAlgorithm } from './fusion.algorithms.js';
+import { buildTimeline, type Observation, type RawSamples } from './fusion.timeline.js';
+import { FUSION_ALGORITHMS, REALTIME_FUSION_VERSION, resolveAlgorithm, type FusionAlgorithm } from './fusion.algorithms.js';
 import type { FusedOutput, SpatialGpsDecision } from './fusion.types.js';
 import { computeFusionMetrics } from './fusion.metrics.js';
 import { spatial } from '../../geo/spatial.js';
 import { fusionRepository } from './fusion.repository.js';
 import type { FusedPositionEvent } from './fusion.dto.js';
-import { terrain, type TerrainContext } from '../../geo/terrain.js';
+import { terrain } from '../../geo/terrain.js';
+import { CAMPUS_FRAME } from '../../geo/campus-frame.js';
+import { codeRef } from '../../common/code-ref.js';
+import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
+import { fusionRunsRepository, type ReplayMode } from './fusion-runs.repository.js';
+import { qcService } from '../qc/qc.service.js';
 
 /**
  * Orchestrates fusion around the raw pipeline. Fusion is DERIVED processing:
@@ -28,8 +33,7 @@ interface LiveSession {
   collectorId: string;
   state: unknown;
   /** realtime reorder buffer: observations wait FUSION_REORDER_WINDOW_MS so slightly late samples (GPS vs 50 Hz motion) stay in order */
-  buffer: Observation[];
-  maxSeenT: number;
+  reorder: ReorderBuffer;
   /** after a replay that realtime continues: observations up to here are already in the replayed state */
   replayedThroughT?: number;
 }
@@ -80,12 +84,6 @@ function sensorEventRows(version: string, events: unknown[]) {
     if (!persisted.has(e.type) && e.type !== 'pedometer-delta' && e.type !== 'altimeter-update') return [];
     return [{ timestamp: e.t, eventType: e.type, details: e }];
   });
-}
-
-/** Attaches the session terrain to every observation (a shared reference, like the spatial context). */
-function withTerrain(observations: Observation[], context: TerrainContext | null): Observation[] {
-  if (!context) return observations;
-  return observations.map((o) => ({ ...o, terrainContext: context }));
 }
 
 export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null): string {
@@ -164,28 +162,52 @@ function debugLog(algo: FusionAlgorithm, sessionId: string, events: unknown[]) {
   }
 }
 
-export type ReplayTrigger = 'api' | 'cli' | 'auto-finalize' | 'auto-rebuild';
+export type ReplayTrigger = 'api' | 'cli' | 'auto-finalize' | 'auto-rebuild' | 'lab' | 'bench';
+
+export interface ReplayOptions {
+  /** experiment variant label; with overrides the run is never published */
+  variant?: string | null;
+  overrides?: Record<string, unknown> | null;
+  mode?: ReplayMode;
+  /**
+   * Write the result to fused_positions (the version's published result) and track the session's fusion state.
+   * Default: true for a plain SENSOR_TIME replay of the registered config, false otherwise.
+   */
+  publish?: boolean;
+}
 
 /**
- * Replays one session with one algorithm version from ALL raw samples sorted by SENSOR timestamp (read-only)
- * and replaces that version's stored results in one transaction. Other versions are untouched. Recorded in
- * fusion_runs. Deterministic: same raw data + same config => same rows. Used by the API, the CLI and automatic
- * finalization; protected by a cross-process lock (one replay per session at a time).
- * For the realtime version it also maintains the session's fusion state (PROCESSING -> CLEAN / DIRTY / FAILED).
+ * Replays one session with one algorithm version from ALL raw samples (read-only) through the shared pipeline
+ * (fusion.pipeline.ts) and stores an immutable run snapshot (fusion_run_positions / fixes / events).
+ *  - published replay (default for the registered config): also replaces that version's fused_positions in one
+ *    transaction, protected by the cross-process lock; for the realtime version it maintains the session's fusion
+ *    state (PROCESSING -> CLEAN / DIRTY / FAILED). Used by the API, the CLI and automatic finalization.
+ *  - experiment replay (variant / overrides / AS_RECEIVED / publish=false): only the snapshot; nothing else changes.
+ * Deterministic: same raw data + same config => same rows. Recorded in fusion_runs.
  */
-export async function replaySession(sessionId: string, version: string, trigger: ReplayTrigger) {
-  const algo = FUSION_ALGORITHMS[version];
-  if (!algo) throw AppError.badRequest('UNKNOWN_ALGORITHM', `Unknown algorithm version ${version}`);
+export async function replaySession(sessionId: string, version: string, trigger: ReplayTrigger, opts: ReplayOptions = {}) {
+  if (!FUSION_ALGORITHMS[version]) throw AppError.badRequest('UNKNOWN_ALGORITHM', `Unknown algorithm version ${version}`);
+  let algo: FusionAlgorithm;
+  try {
+    algo = resolveAlgorithm(version, opts.overrides);
+  } catch (err) {
+    throw AppError.badRequest('INVALID_OVERRIDES', err instanceof Error ? err.message : 'Invalid overrides');
+  }
+  const mode: ReplayMode = opts.mode ?? 'SENSOR_TIME';
+  const isVariant = Boolean(opts.variant) || Boolean(opts.overrides && Object.keys(opts.overrides).length);
+  const publish = opts.publish ?? (!isVariant && mode === 'SENSOR_TIME');
+  if (publish && (isVariant || mode !== 'SENSOR_TIME')) {
+    throw AppError.badRequest('NOT_PUBLISHABLE', 'Only a SENSOR_TIME replay of the registered config can be published');
+  }
   const session = await sessionRepository.findView(sessionId);
   if (!session) throw AppError.notFound('SESSION_NOT_FOUND', 'Session not found');
-  const tracksState = version === REALTIME_FUSION_VERSION;
+  const tracksState = publish && version === REALTIME_FUSION_VERSION;
   const mapVersionId = session.spatialMapVersionId;
-  const spatialContext = await spatial.context(mapVersionId);
-  if (algo.requiresSpatialMap && !spatialContext) {
+  if (algo.requiresSpatialMap && !(await spatial.context(mapVersionId))) {
     throw AppError.conflict('SPATIAL_MAP_UNAVAILABLE', `${version} requires a valid spatial map pinned to this session`);
   }
-  const lock = await fusionRepository.tryLock(sessionId, LOCK_MS, tracksState);
-  if (!lock) throw new AppError(409, 'FUSION_BUSY', 'This session is being reprocessed right now', undefined, true);
+  const lock = publish ? await fusionRepository.tryLock(sessionId, LOCK_MS, tracksState) : null;
+  if (publish && !lock) throw new AppError(409, 'FUSION_BUSY', 'This session is being reprocessed right now', undefined, true);
 
   const started = Date.now();
   // An ACTIVE session continues in realtime from the replayed state, so its last partial tick is not flushed.
@@ -193,39 +215,38 @@ export async function replaySession(sessionId: string, version: string, trigger:
   let lastT = -Infinity;
   let outcome: 'success' | 'failed' = 'failed';
   const terrainVersionId = algo.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
-  const terrainContext = await terrain.context(terrainVersionId);
   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
     ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId }
     : algo.config;
-  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId));
+  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId), {
+    revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish,
+  });
   try {
-    const raw = await fusionRepository.loadRawSamples(sessionId);
-    const timeline = withTerrain(spatial.annotate(buildTimeline(raw, { sessionStartedAt: session.startedAt }), spatialContext), terrainContext);
+    const inputs = await loadReplayInputs(sessionId, algo);
+    const { raw, timeline, terrainContext } = inputs;
     lastT = timeline.at(-1)?.t ?? -Infinity;
-    const state = algo.createState();
-    const outputs: FusedOutput[] = [];
-    const events: unknown[] = [];
-    for (const o of timeline) {
-      const r = algo.process(state, o);
-      outputs.push(...r.outputs);
-      events.push(...r.events);
+    let r: ReplayResult;
+    if (mode === 'AS_RECEIVED') {
+      const spatialContext = await spatial.context(mapVersionId);
+      const batches = (await fusionRunsRepository.loadArrivalBatches(sessionId))
+        .map((b) => withTerrain(spatial.annotate(buildTimeline(b, { sessionStartedAt: session.startedAt }), spatialContext), terrainContext));
+      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS);
+    } else {
+      r = replayInMemory(algo, timeline, { finalize: !continuesLive });
     }
-    if (!continuesLive) {
-      const r = algo.flush(state);
-      outputs.push(...r.outputs);
-      events.push(...r.events);
-      if (algo.finalize) {
-        // e.g. fusion-v4: the smoothed trajectory replaces the forward (realtime-equivalent) outputs
-        const f = algo.finalize(state);
-        outputs.length = 0;
-        for (const o of f.outputs) outputs.push(o);
-        events.push(...f.events);
-      }
-    }
+    const { state, outputs, events } = r;
     const history = sensorEventRows(version, events);
     await withTransaction(async (client) => {
-      await fusionRepository.replaceOutputs(client, sessionId, version, outputs, spatialGpsDecisions(events));
-      if (version === 'fusion-v3.1') await fusionRepository.replaceSensorEvents(client, sessionId, version, history);
+      if (publish) {
+        await fusionRepository.replaceOutputs(client, sessionId, version, outputs, spatialGpsDecisions(events));
+        if (version === 'fusion-v3.1') await fusionRepository.replaceSensorEvents(client, sessionId, version, history);
+      }
+      await fusionRunsRepository.saveSnapshot(client, runId, {
+        forward: r.forward !== outputs ? r.forward : null,
+        final: outputs,
+        diagnostics: algo.diagnostics ? algo.diagnostics(state, events) : null,
+        geoidN: terrainContext?.geoidSeparation ?? CAMPUS_FRAME.geoidN,
+      });
     });
     const summary = algo.summarize(state, events);
     const metrics = computeFusionMetrics(timeline, outputs, summary);
@@ -240,14 +261,14 @@ export async function replaySession(sessionId: string, version: string, trigger:
       metrics,
       warnings: metrics.validation.warnings,
     });
-    for (const w of metrics.validation.warnings) logger.warn('fusion.validation', { sessionId, version, ...w });
+    if (publish) for (const w of metrics.validation.warnings) logger.warn('fusion.validation', { sessionId, version, ...w });
     outcome = 'success';
-    return { session, state, outputs, events, metrics, runId, continuesLive, lastT, observations: timeline.length, rawCounts, durationMs: Date.now() - started };
+    return { session, state, outputs, events, metrics, runId, continuesLive, lastT, observations: timeline.length, rawCounts, durationMs: Date.now() - started, published: publish };
   } catch (err) {
     await fusionRepository.failRun(runId, err instanceof Error ? err.message : String(err)).catch(() => undefined);
     throw err;
   } finally {
-    await fusionRepository.unlock(sessionId, tracksState ? outcome : 'none', lock, continuesLive).catch(() => undefined);
+    if (lock) await fusionRepository.unlock(sessionId, tracksState ? outcome : 'none', lock, continuesLive).catch(() => undefined);
   }
 }
 
@@ -256,7 +277,7 @@ async function reprocessNow(sessionId: string, version: string, trigger: ReplayT
   const r = await runLimited(() => replaySession(sessionId, version, trigger));
   const collectorId = r.session.collectorId;
   if (version === REALTIME_FUSION_VERSION) {
-    if (r.continuesLive) live.set(sessionId, { collectorId, state: r.state, buffer: [], maxSeenT: -Infinity, replayedThroughT: r.lastT });
+    if (r.continuesLive) live.set(sessionId, { collectorId, state: r.state, reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS), replayedThroughT: r.lastT });
     const last = r.outputs.at(-1);
     if (last) previewBroadcast.collectorStatus(realtimeState.fusedUpdated(collectorId, toFusedEvent(collectorId, sessionId, version, last)));
   }
@@ -284,7 +305,7 @@ export const fusionService = {
   /** session:start (new session): fresh state, uninitialized until the first usable GPS fix. */
   sessionStarted(sessionId: string, collectorId: string) {
     void enqueue(sessionId, 'start', async () => {
-      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(), buffer: [], maxSeenT: -Infinity });
+      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
     });
   },
 
@@ -310,26 +331,14 @@ export const fusionService = {
       const incoming = withTerrain(spatial.annotate(buildTimeline(samples, { sessionStartedAt }), context), terrainContext)
         .filter((o) => !(o.kind === 'gps' && o.preSession) && o.t > through);
       if (incoming.length === 0) return;
-      entry.buffer.push(...incoming);
-      entry.buffer.sort(compareObservations);
-      entry.maxSeenT = Math.max(entry.maxSeenT, incoming.at(-1)!.t); // buildTimeline output is sorted
-      const releaseUntil = entry.maxSeenT - env.FUSION_REORDER_WINDOW_MS;
-      let n = 0;
-      while (n < entry.buffer.length && entry.buffer[n].t <= releaseUntil) n++;
-      await this.applyLive(entry, sessionId, entry.buffer.splice(0, n));
+      await this.applyLive(entry, sessionId, entry.reorder.push(incoming));
     });
   },
 
   async applyLive(entry: LiveSession, sessionId: string, observations: Observation[]) {
     const algo = realtimeAlgo();
     const skippedBefore = algo.skippedLate(entry.state);
-    const outputs: FusedOutput[] = [];
-    const events: unknown[] = [];
-    for (const o of observations) {
-      const r = algo.process(entry.state, o);
-      outputs.push(...r.outputs);
-      events.push(...r.events);
-    }
+    const { outputs, events } = runObservations(algo, entry.state, observations);
     debugLog(algo, sessionId, events);
     const skipped = algo.skippedLate(entry.state) - skippedBefore;
     if (skipped > 0) {
@@ -344,7 +353,7 @@ export const fusionService = {
     void enqueue(sessionId, 'finish', async () => {
       const entry = live.get(sessionId);
       if (entry) {
-        await this.applyLive(entry, sessionId, entry.buffer.splice(0));
+        await this.applyLive(entry, sessionId, entry.reorder.drain());
         const algo = realtimeAlgo();
         const r = algo.flush(entry.state);
         debugLog(algo, sessionId, r.events);
@@ -371,6 +380,8 @@ export const fusionService = {
           if (!session || session.status === 'ACTIVE') return; // still collecting: realtime keeps going
           try {
             await reprocessNow(sessionId, REALTIME_FUSION_VERSION, 'auto-finalize');
+            // raw GPS quality decisions (qc-v1) for the Lab / mobility map; never blocks or fails finalization
+            await qcService.run(sessionId).catch((e) => logger.warn('qc.failed', { sessionId, message: e instanceof Error ? e.message : String(e) }));
           } catch (err) {
             if (err instanceof AppError && err.code === 'FUSION_BUSY') {
               this.finalizeSoon(sessionId); // a CLI / API replay holds the lock: try again later
@@ -464,7 +475,7 @@ export const fusionService = {
       stored,
       runs,
       live: entry ? { initialized: liveFusionState?.initialized ?? (liveFusionState?.trackingStatus === 'TRACKING'),
-        trackingStatus: liveFusionState?.trackingStatus ?? null, headingStatus: liveFusionState?.headingStatus ?? null, buffered: entry.buffer.length } : null,
+        trackingStatus: liveFusionState?.trackingStatus ?? null, headingStatus: liveFusionState?.headingStatus ?? null, buffered: entry.reorder.buffer.length } : null,
       finalizePending: finalizeTimers.has(sessionId),
     };
   },

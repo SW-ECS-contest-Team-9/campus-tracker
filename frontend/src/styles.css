@@ -12,6 +12,8 @@ body {
   padding: 6px 12px; background: #0b1220; border-bottom: 1px solid #1f2937;
 }
 .topbar h1 { font-size: 15px; margin: 0; font-weight: 600; white-space: nowrap; }
+.editor-nav { color: #bfdbfe; text-decoration: none; border: 1px solid #374151; border-radius: 6px; padding: 4px 9px; white-space: nowrap; }
+.editor-nav:hover { background: #1e293b; color: #fff; }
 .mode { display: flex; }
 .mode button {
   background: #1f2937; color: #cbd5e1; border: 1px solid #374151; padding: 4px 10px; cursor: pointer;
@@ -108,3 +110,41 @@ input, .issue-form button, .dialog button {
 .detail table.metrics th, .detail table.metrics td { padding: 2px 6px 2px 0; font-size: 12px; }
 .detail .small { font-size: 11px; margin-top: 4px; }
 .ok-text { color: #86efac; }
+
+/* Lab mode */
+.lab { display: none; }
+body.lab-mode .lab { display: block; }
+body.lab-mode .sidebar > section, body.lab-mode .layers { display: none; }
+.lab section { padding: 8px 12px; border-bottom: 1px solid #1f2937; }
+.lab h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin: 0 0 6px; font-weight: 600; }
+.lab select, .lab textarea { width: 100%; background: #1e293b; color: #e5e7eb; border: 1px solid #374151; border-radius: 6px; padding: 4px 6px; font: inherit; }
+.lab button { background: #1e293b; color: #e5e7eb; border: 1px solid #374151; border-radius: 6px; padding: 3px 8px; cursor: pointer; font: inherit; }
+.lab button.active { background: #2563eb; border-color: #2563eb; }
+.lab button:disabled { opacity: .5; cursor: wait; }
+.lab-tabs { display: flex; gap: 4px; padding: 8px 12px 0; }
+.lab-tabs button { flex: 1; }
+.lab-form { display: grid; gap: 4px; }
+.lab-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.lab-player { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.lab input[type=range] { width: 100%; margin: 6px 0; }
+.lab-layers { display: flex; gap: 4px 10px; flex-wrap: wrap; margin: 4px 0; font-size: 12px; }
+.lab-runs { max-height: 26vh; overflow-y: auto; }
+.lab-events { max-height: 24vh; overflow-y: auto; font-size: 12px; }
+.lab-events li { padding: 2px 4px; }
+.lab-link { color: #93c5fd; cursor: pointer; }
+.lab-busy { margin: 6px 12px 0; color: #fde68a; }
+.lab-msg { margin: 6px 12px 0; color: #bfdbfe; font-size: 12px; }
+.lab-table, .lab-kv { width: 100%; border-collapse: collapse; font-size: 12px; }
+.lab-table th { text-align: left; color: #94a3b8; font-weight: normal; }
+.lab-table td, .lab-table th { padding: 2px 4px 2px 0; vertical-align: top; }
+.lab-table tr.selected { background: #1e3a8a; }
+.lab-kv th { text-align: left; color: #94a3b8; font-weight: normal; padding: 2px 8px 2px 0; white-space: nowrap; vertical-align: top; }
+.lab .small { font-size: 11px; margin-top: 4px; }
+.lab .detail { margin-top: 6px; }
+.danger-text { color: #fca5a5 !important; }
+
+/* campus 3D scene controls */
+.layer-group.scene { background: #2b2f24; }
+.layer-group.scene[hidden] { display: none; }
+.layer-group.scene button { background: #1e293b; color: #e5e7eb; border: 1px solid #374151; border-radius: 6px; padding: 0 6px; cursor: pointer; font: inherit; }
+.cesium-viewer .cesium-widget-credits { display: none; }

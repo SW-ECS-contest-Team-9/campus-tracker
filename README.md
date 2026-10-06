@@ -11,7 +11,7 @@
 
 - Node.js **22 이상** (개발 확인: 24.x), npm 10+
 - Docker Desktop (Docker Compose v2)
-- VWorld API Key (3D 지도용, [vworld.kr](https://www.vworld.kr) 오픈API에서 발급). 키의 **서비스 URL에 `http://localhost:5173`** 을 등록해야 합니다.
+- (선택) VWorld API Key: 예전 VWorld 지도(`VITE_MAP_ENGINE=vworld`)를 쓸 때만 필요합니다. 기본 프리뷰 지도는 캠퍼스 3D 모델이라 키와 인터넷이 필요 없습니다.
 
 ## 설치
 
@@ -66,6 +66,10 @@ npm run dev          # backend(tsx watch) + frontend(vite) 동시 실행
 
 - Backend: `http://localhost:3000` (시작 로그에 iPhone용 LAN 주소가 출력됨)
 - **Preview: http://localhost:5173**
+- **3D 도로·장소 편집기: http://localhost:5173/editor.html** (기존 트랙커 계정 코드로 로그인)
+- **편집기 MCP(AI 에이전트용): http://127.0.0.1:3000/mcp** — 이 컴퓨터에서만 접속된다. 토큰 발급 후 환경 변수로 넘긴다.
+  `export CAMPUS_EDITOR_MCP_TOKEN=$(npm run mcp:token -- --collector C01 --agent claude-code)` (읽기 전용, 30일. 쓰기는 `--scope write`).
+  Claude Code는 저장소의 `.mcp.json`을 쓰고, Codex는 `~/.codex/config.toml`에 `url`과 `bearer_token_env_var`를 등록한다. 도구 30개(조회·점검, 도로/장소 편집, 묶음 적용, 되돌리기, 지도 그림)를 제공하며 AI의 커서·제안선·변경 이력이 편집기에 표시된다. 점검: `npm run check:editor-mcp`. 설계: [docs/EDITOR_MCP_PLAN.md](docs/EDITOR_MCP_PLAN.md)
 
 처음부터 전체 순서:
 
@@ -108,16 +112,18 @@ npm run check:raw-ws -w backend -- --server http://100.102.255.108:3000 --collec
 
 ## Preview 사용법
 
+- **3D 도로·장소 편집기**: 상단 `3D 도로·장소 편집기` 링크로 이동합니다. 보행로/차량 도로/보차 혼용 중심선과 장소를 저장하며, 기존 Fusion Run의 XY/유효한 XYZ 점을 참고·스냅할 수 있습니다. 저장된 도로·장소를 선택한 뒤 `선택 편집`을 눌러 Vertex와 속성을 수정합니다. 세부 범위는 [편집기 설계 문서](docs/CAMPUS_NETWORK_EDITOR_PLAN.md)를 참고하세요.
+
 - **Collector ID 발급**: Collectors 옆 `+ ID 발급` → 비워두고 발급하면 다음 번호(`C06` …) 자동, 원하는 ID(예: `TEAM-A1`)를 직접 입력해도 됩니다. 발급된 ID를 iPhone 앱의 Collector ID에 입력하면 바로 로그인할 수 있습니다.
 - **Collector ID 제거**: 목록 행의 `✕` → 삭제될 기기/세션/위치/마커 수를 확인하고 `제거하겠습니다.` 를 **직접 타이핑**해야(붙여넣기 불가) `영구 제거` 버튼이 활성화됩니다. 해당 ID의 모든 수집 데이터가 영구 삭제되고, 연결된 iPhone은 즉시 끊깁니다. 서버도 같은 확인 문구가 없으면 삭제를 거부합니다.
 
 - **Live**: ACTIVE 세션의 궤적과 collector별 현재 위치(정확도 원, 높이 라벨)를 실시간 표시. 새 point는 `location:update`로 받아 기존 궤적에 append(전체 재다운로드 없음).
 - **Historical**: 세션 목록에서 클릭하면 해당 세션만 REST로 로드해 표시하고 카메라 이동.
 - 레이어 토글: Trajectory / Raw points(수평 정확도 색: 초록<5m, 노랑<15m, 빨강≥15m) / Markers / Accuracy.
-- 높이는 `ellipsoidalAltitude`를 사용하고, 없으면 `altitude`(MSL)로 fallback하며 라벨과 상세 패널에 **MSL** 표시. 한국에서 MSL은 타원체고보다 약 20–30m 낮아 지면 아래로 보일 수 있습니다.
+- 지도 높이는 해발고(MSL) 기준입니다. 융합 높이는 타원체고 − KNGeoid18 N, raw는 폰 MSL 고도로 그립니다(아래 "지형 기준 높이" 참고).
 - Preview 소켓이 끊겼다 다시 연결되면 collector/세션 목록과 로드된 궤적을 REST로 다시 가져옵니다.
 
-## Sensor Fusion (fusion-v1 / v2 / v2.1 / v3 / v3.1)
+## Sensor Fusion (fusion-v1 / v2 / v2.1 / v3 / v3.1 / v4)
 
 Raw 센서 데이터는 **절대 수정하지 않고**, 파생 결과만 `fused_positions`에 **version별로** 저장합니다. 같은 raw 세션에 여러 알고리즘 결과가 동시에 존재하고 서로 비교할 수 있습니다.
 
@@ -125,12 +131,13 @@ Raw 센서 데이터는 **절대 수정하지 않고**, 파생 결과만 `fused_
 Raw (location/motion/altimeter/pedometer_samples, event_markers — 읽기 전용)
   ├─ fusion-v1   ─→ fused_positions (algorithm_version = 'fusion-v1')
   ├─ fusion-v2   ─→ fused_positions (algorithm_version = 'fusion-v2')
-  ├─ fusion-v2.1 ─→ fused_positions (algorithm_version = 'fusion-v2.1')  ← 실시간 기본값 (ACTIVE_FUSION_VERSION)
+  ├─ fusion-v2.1 ─→ fused_positions (algorithm_version = 'fusion-v2.1')
   ├─ fusion-v3   ─→ campus-gated GPS anchors + v2.1 pedestrian DR
-  └─ fusion-v3.1 ─→ sparse GPS anchors + sensor-led tracking + fusion_sensor_events
+  ├─ fusion-v3.1 ─→ sparse GPS anchors + sensor-led tracking + fusion_sensor_events
+  └─ fusion-v4   ─→ step-level PDR + Kalman/RTS + terrain Z datum  ← 실시간 기본값 (ACTIVE_FUSION_VERSION)
 ```
 
-### fusion-v2.1 (실시간 기본) — v2가 첫 위치에 고정되던 문제 수정
+### fusion-v2.1 (2026-10-02 v4 전환 전 실시간 기본) — v2가 첫 위치에 고정되던 문제 수정
 
 **v2 원인 분석 (실데이터·코드 확인 결과)**: 누적값 중복 합산(Z·pedometer), yaw/course 단위 혼동, 위경도에 미터 직접 더하기, motion마다 출력 같은 구현 오류는 **없었습니다**. 실제 원인은 정책: 실내/차량 GPS(중앙값 24–40 m)가 >15 m로 거의 전부 거부되고, heading anchor 조건(≤8 m course)도 한 번도 충족되지 않아 PDR까지 막혀 **XY가 첫 fix에 고정**됐습니다. 예: 세션 `4b7f4151`은 raw GPS가 차량 속도(24.7 m/s)로 4.2 km 이동하는 동안 v2는 원점에 고정 → "4.2 km offset"; XY는 그대로이고 Z만 barometer로 −16~0 m 변해 3D에서 **수직선**처럼 보였습니다 (Z 자체는 barometer 범위와 일치).
 
@@ -181,13 +188,80 @@ npm run fusion:reprocess -- --all --version=fusion-v4 --force
 - 마커는 fusion-v4 궤적에 스냅한다: 마커 시각의 앞뒤 융합 점을 보간한 위치·높이(`GET /sessions/:id/markers`의 `fused`, 10초 넘는 공백이면 가까운 점). 재처리가 끝나면 프리뷰가 다시 읽는다. 융합 결과가 없을 때만 폰 위치·고도로 그린다.
 - 지도 높이: VWorld는 지형·건물을 해발고(MSL) 값 그대로 장면 높이로 쓴다(샘플: VWorld 127.9/103.6/144.2 m vs DEM 해발 132.0/97.7/140.5 m). 그래서 프리뷰는 모든 점을 해발고로 그린다(융합 = 타원체고 − KNGeoid18 N, raw = 폰 MSL 고도). API의 `ellipsoidalAltitude`는 그대로 타원체고다.
 
+### 프리뷰 지도: 캠퍼스 3D 모델 (docs/CAMPUS_3D_PREVIEW_PLAN.md)
+
+프리뷰는 VWorld 대신 CesiumJS(npm)로 캠퍼스 단순 3D 모델을 그린다. 지형은 서버 지형 DEM(퓨전 높이 기준과 같은 면)이고, 건물은 QGIS에서 만든 박스 모델이다. 인터넷과 VWorld 키 없이 동작한다.
+
+```bash
+npm run scene:import -- --dir=/Users/hoshi/Desktop/skuniv_shp/campus_3d   # campus.gpkg → 검증 → 활성화 (원본은 backend/data/scene/source)
+npm run scene:import -- --dir=<폴더> --dry-run                            # 검증과 높이 표만 출력
+```
+
+- 건물 높이(`height_m`, 대장/추정 근거)는 GeoPackage 값을 쓴다. 기초·지붕 표고는 서버 DEM 위에서 다시 계산한다(기초 = 외곽 최저 − 1 m, 지붕 = 중앙값 + 높이, 최소 최고점 + 3 m). QGIS에서 지붕을 직접 고쳤다면 `--keep-absolute`.
+- 검사: EPSG:5186, 건물 도형이 퓨전의 캠퍼스 건물과 IoU ≥ 0.99, 모두 DEM 범위 안, 지붕 > 지면 > 기초. 하나라도 실패하면 활성화하지 않는다.
+- 상단 Buildings: X-ray(실내 궤적 보기), 이름, 추정 높이 색(따뜻한 색 = 층수 × 3.5 m 추정), 전체/위에서 보기. 건물을 클릭하면 높이 근거·층 보정이 Detail에 나온다.
+- API: `GET /api/v1/scene`(활성 장면), `GET /api/v1/terrain/grid`(DEM 격자, Float32 바이너리, ETag).
+- 예전 VWorld 지도: 루트 `.env`에 `VITE_MAP_ENGINE=vworld`와 키를 두고 dev 서버를 다시 시작한다.
+- **QGIS에서도 웹과 같은 높이로 보기:**
+  1. `npm run qgis:sync -- --dir=/Users/hoshi/Desktop/skuniv_shp/campus_3d`: QGIS 프로젝트를 닫고 실행한다. 프로젝트의 `terrain_dem_2m.tif`를 서버 DEM으로 바꾸고, `campus.gpkg` 건물의 기초·지붕을 활성 장면 값으로 맞춘다. 원본은 `*.codex.*`로 한 번 보관한다.
+  2. QGIS에서 프로젝트를 연 뒤 Python 콘솔에서 `backend/scripts/qgis/add_tracking_layers.py`를 실행한다. 스키마 `qgis`의 뷰(융합 궤적·마커·원본 GPS·대표 경로)를 고도 Absolute 3D 레이어로 추가한다. DB 접속은 루트 `.env`의 `POSTGRES_*`를 읽는다.
+  3. 원래 테이블(`public.fused_positions`, `location_samples`)을 3D로 직접 쓰지 않는다. 그 geom의 Z는 타원체고라 해발보다 약 23.4 m 높고, 궤적이 건물 한 채 높이만큼 떠 보인다. `qgis.*` 뷰는 웹과 같은 규칙이다(융합 = 타원체고 − N, 없으면 지면 + 1 m / 원본 = 폰 해발고 / 마커 = v4 궤적에 스냅).
+- 캠퍼스 밖(DEM 범위 밖)은 가장자리 높이로 평평하게 이어진다. 캠퍼스 밖 궤적의 지형 맥락은 없다.
+
+### OpenCities Map 퓨전 점 연결
+
+마이그레이션 적용(`npm run db:migrate`) 후 PostGIS의 `public.opencities_fused_positions`를 선택한다. OpenCities Map 2025에서 세션 외래키를 가진 원본 테이블이 피처 목록에서 제외되는 현상을 피하기 위한 외래키 없는 실제 테이블이다. 모든 알고리즘 버전의 기존 결과를 채우고, DB 트리거가 신규 저장·재처리·수정·삭제·세션 삭제에 따른 cascade·TRUNCATE를 원본과 같은 트랜잭션에서 반영한다. 서버 재시작은 필요 없다. 원본과 복사본 사이에 외래키를 추가하지 않는다.
+
+OpenCities에서는 읽기 용도로 사용하고 Write Access를 끈다. 원하는 궤적만 보려면 `algorithm_version = 'fusion-v4'`와 `session_id`로 필터링한다. 이 테이블의 geometry만 EPSG:5186 PointZ(미터)로 변환한다. 원본 `fused_positions.geom`은 EPSG:4326으로 유지하고 latitude/longitude 속성도 경위도 그대로다. Z는 원본 타원체고/로컬 높이를 유지한다(QGIS용 해발고 변환 뷰와 다름). DGN의 실제 모델 좌표계도 EPSG:5186이어야 한다. 기존 4326 레이어를 이미 불러왔다면 조회 결과를 제거하고 연결을 다시 만들어 5186 geometry로 재조회한다. 향후 원본에 열을 추가하면 이 테이블에도 대응하는 마이그레이션을 추가해야 새 속성이 노출된다. `ocm_diag_*` 테이블은 진단 당시 복사본이므로 실제 사용에는 선택하지 않는다.
+
+### 통로·광장·출입구 직접 그리기 (QGIS → DB → 프리뷰)
+
+QGIS에서 PostGIS 스키마 `mobility`를 직접 편집한다. 저장하면 DB에 바로 들어가고, 프리뷰의 Paths 레이어가 새로 고침 없이 갱신된다.
+
+1. QGIS에서 캠퍼스 프로젝트를 연다.
+2. Python 콘솔에서 `backend/scripts/qgis/add_mobility_layers.py`를 실행한다. 편집 가능한 레이어 3개가 생긴다. 종류는 한글 드롭다운으로 고르고, 꼭짓점 1 m 스냅이 켜진다.
+
+| 레이어 | 도형 | 용도 |
+|---|---|---|
+| `mobility.corridors` 통로·경로 | 선(중심선) | 보행로·인도·실내 복도·계단·경사로·횡단보도. `width_m` = 실제 폭(기본 3 m), `one_way` = 그린 방향만 |
+| `mobility.open_areas` 광장·개방 공간 | 면 | 광장·중정·로비·주차장 |
+| `mobility.portals` 출입구·연결점 | 점 | 건물/광장 출입구, 계단 시작·끝, 엘리베이터, 교차점 |
+
+3. 그린 뒤 "레이어 편집 저장"을 누른다.
+
+- `elevation_m`: 비우면 지형 위에 그린다. 실내·고가 시설은 해발 높이(m)를 넣는다.
+- 저장할 때 DB가 검사한다: EPSG:5186, 캠퍼스 지형 범위 안, 올바른 도형, 통로 1 m 이상, 면적 4 m² 이상. 실패하면 QGIS가 오류를 보여주고 편집 내용은 그대로 남는다.
+- 모든 추가·수정·삭제는 `mobility.edits`에 이전/이후 값과 함께 남는다(`GET /api/v1/mobility/edits`).
+- 흐름: 저장 → 트리거가 `NOTIFY mobility_changed` → 백엔드 → 소켓 `mobility:changed` → 프리뷰가 `GET /api/v1/mobility`를 다시 읽는다.
+- 프리뷰: 상단 Buildings 그룹의 Paths 토글. 통로는 실제 폭의 띠 + 중심선(일방통행은 화살표), 광장은 반투명 면, 출입구는 이름 붙은 점으로 그린다. 클릭하면 Detail에 속성이 나온다.
+
+### Lab · 반복 측정 이동 지도 (docs/MOBILITY_MAP_PLAN.md 묶음 1)
+
+여러 세션의 같은 길 반복을 하나의 대표 경로 + 신뢰 폭으로 만들고, 알고리즘 변경을 수치로 비교하는 도구다. 프리뷰 상단 **Lab** 모드에서 쓴다.
+
+```bash
+npm run fusion:replay -- --session=<id|앞 8자리> --set gpsGateChi2=9 --variant=chi9   # 실험 실행(게시 안 함, 기존 결과 보존)
+npm run fusion:replay -- --session=<id> --mode=as-received                         # 실시간에 보였던 결과 재현
+npm run qc:run -- --all                                                             # 원본 GPS 품질 판정(qc-v1)
+npm run routes:build -- --name="R1" --a=<x,y> --b=<x,y> --detect --build --validate # 경로 → 회차 → 대표 경로 → 검증
+npm run bench -- --suite=default --set gpsGateChi2=9                                # 등록된 설정 vs 후보 설정
+npm run sim:session -- --sessions=2 --passes=4 --route                              # 정답을 아는 합성 세션 + 경로
+npm run fusion:golden -- --out=/tmp/golden.json --write | --check                   # 리팩터링 회귀 확인(메모리 replay 해시)
+npm run fusion:prune -- --dry-run                                                   # 오래된 실행 스냅샷 정리
+```
+
+- 재처리마다 실행 스냅샷(전방·최종 궤적, GPS 픽스별 판정, 엔진 사건)이 남는다. `fused_positions`는 버전별 게시 결과로 그대로 쓴다.
+- 좌표는 캠퍼스 공통 좌표계 `skuniv-5186-v1`(EPSG:5186 − (201,100, 557,250) m, 높이 = 정표고)이다. `--a/--b`도 이 좌표(m)이고, `--wgs84`를 주면 위경도다.
+- 신뢰 폭은 회차 간 재현성이지 정확도가 아니다. 같은 장소의 공유 편향은 앵커(마커) 오차로만 드러난다.
+- bench 묶음은 `backend/bench/suites/*.json`(경로 이름 목록)이다. 현장 수집 뒤 경로를 추가한다.
+
 ### fusion-v3.1 — 센서 중심 시험 버전
 
 `fusion-v3`의 v2.1 내부 엔진 래퍼를 사용하지 않는 독립 엔진입니다. 보행 센서 누적 거리를 수평 이동의 기본값으로 사용하고, 거리 관측이 빠진 구간은 걸음 수 × 설정 보폭으로 보완합니다. 가속도·걸음 변화를 정지 판정에 함께 사용하며, 최초 방향이 잡힌 뒤에는 자세 yaw 변화로 방향을 진행합니다. roll/pitch·중력·회전 속도로 큰 휴대폰 자세 변화와 불연속 구간을 감지해 방향이 안정될 때까지 이동 적용을 보류합니다. 기압계는 상대 높이를 직접 갱신합니다. 보수계 누적값은 v2.1과 같은 high-water mark 규칙으로 처리합니다(rev 3).
 
 GPS는 캠퍼스 내부·정확도 5 m 이하 관측 5개·최소 3초 연속 조건을 통과한 초기 앵커나 30초 이상 간격을 둔 재앵커로만 위치를 잡습니다. 개별 GPS 갱신은 보행 위치·방향·높이를 수정하지 않습니다. 위치가 없는 세션은 `UNANCHORED` 상태와 센서/앵커 진단을 기록하고 절대 좌표를 만들지 않습니다. 수동/고정 앵커 엔진 연결 지점은 준비되어 있지만 QR·기준점 화면은 후속 범위입니다.
 
-기존 19개 세션을 v3.1로 재처리했습니다. 원본 GPS 632건 중 적격 앵커가 없어 fused 위치는 0건이며, 보행·자세·기압·GPS 판정 이벤트는 `fusion_sensor_events`와 실행 지표에 기록됩니다. v1/v2/v2.1 결과와 실시간 기본값 v2.1은 유지됩니다.
+기존 19개 세션을 v3.1로 재처리했습니다. 원본 GPS 632건 중 적격 앵커가 없어 fused 위치는 0건이며, 보행·자세·기압·GPS 판정 이벤트는 `fusion_sensor_events`와 실행 지표에 기록됩니다. v1/v2/v2.1 결과와 당시 실시간 기본값이던 v2.1은 유지했습니다(현재 실시간 기본값은 v4).
 
 ```bash
 npm run fusion:reprocess -- --all --version=fusion-v3.1 --force
@@ -288,11 +362,11 @@ backend/src
 │   ├── telemetry                 telemetry:batch (unnest batch insert, idempotency)
 │   ├── markers                   marker:create, 마커 REST
 │   └── fusion                    fusion-v1: engine(순수 로직)·state·config·algorithms·repository·service·controller
-├── realtime/                     /collector(Socket.IO) · /ws/collector(raw WS) · /preview gateway, 메모리 상태
+├── realtime/                     /collector(Socket.IO) · /ws/collector(raw WS) · /preview · /editor gateway
 ├── geo/                          WGS84 ↔ local ENU 변환, 각도 utility
 └── db/                           migrate.ts, seed.ts, migrations/*.sql
 backend/scripts/simulate-iphone.ts
-frontend/src                      main(UI·상태), api(REST), socket(/preview), vworld(초기화), trajectory(Cesium 엔티티)
+frontend/src                      Preview UI와 Cesium 캠퍼스 지도, 별도 editor.html 도로·장소 편집기
 ```
 
 ## 데이터 신뢰성 요약

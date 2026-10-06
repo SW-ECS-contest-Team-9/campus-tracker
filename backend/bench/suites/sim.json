@@ -1,0 +1,4 @@
+{
+  "description": "Synthetic routes from npm run sim:session -- --route (known ground truth).",
+  "routes": ["SIM 직선 경로"]
+}

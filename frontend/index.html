@@ -9,9 +9,11 @@
   <body>
     <header class="topbar">
       <h1>Campus Collection Preview</h1>
+      <a class="editor-nav" href="/editor.html">3D 도로·장소 편집기</a>
       <div class="mode" role="group" aria-label="Mode">
         <button id="mode-live" class="active" type="button">Live</button>
         <button id="mode-history" type="button">Historical</button>
+        <button id="mode-lab" type="button" title="Replay runs, routes, canonical paths (docs/MOBILITY_MAP_PLAN.md)">Lab</button>
       </div>
       <div class="layers">
         <span class="layer-group raw">Raw
@@ -26,10 +28,19 @@
         <label title="Radius = horizontalAccuracy reported by the phone's GPS (not a strict probability region)"><input type="checkbox" id="layer-accuracy" checked /> Accuracy</label>
         <label><input type="checkbox" id="layer-markers" checked /> Markers</label>
       </div>
+      <span id="scene-controls" class="layer-group scene" hidden title="Campus 3D model (docs/CAMPUS_3D_PREVIEW_PLAN.md)">Buildings
+        <label title="See-through buildings: indoor tracks stay visible"><input type="checkbox" id="scene-xray" /> X-ray</label>
+        <label><input type="checkbox" id="scene-labels" checked /> Names</label>
+        <label title="Warm tint = height estimated (floors × 3.5 m), not from the building register"><input type="checkbox" id="scene-estimate" checked /> Estimated</label>
+        <label title="Corridors / open areas / portals drawn in QGIS (schema mobility); updates live when QGIS saves"><input type="checkbox" id="scene-mobility" checked /> Paths</label>
+        <button id="scene-home" type="button" title="Whole campus">⌂</button>
+        <button id="scene-top" type="button" title="Top view">⊤</button>
+      </span>
       <span id="socket-status" class="pill">connecting…</span>
     </header>
 
     <aside class="sidebar">
+      <div id="lab-panel" class="lab"></div>
       <section>
         <h2>
           Collectors
@@ -59,7 +70,7 @@
         <span class="dot" style="background:#22c55e"></span>&lt;5 m
         <span class="dot" style="background:#eab308"></span>&lt;15 m
         <span class="dot" style="background:#ef4444"></span>≥15 m<br />
-        Height = MSL (VWorld terrain/buildings are at MSL heights); fused = ellipsoidal − geoid (KNGeoid18). Markers snap to the fusion-v4 track.<br />
+        Height = MSL: the map's terrain is the server DEM and the buildings are the rough campus 3D model (warm tint = estimated height; click a building for its basis); fused = ellipsoidal − geoid (KNGeoid18). Markers snap to the fusion-v4 track.<br />
         <b>Raw</b> = thin translucent line + small dots; a <b>faded</b> dot = fix rejected by the live fusion (still stored).
         <b>Fused</b>: live version = thick solid line, other versions = dashed (compare); white dot = stationary.
         Click any dot on the map to inspect it.

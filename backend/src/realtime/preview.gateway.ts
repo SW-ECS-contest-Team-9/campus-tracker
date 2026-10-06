@@ -52,4 +52,6 @@ export const previewBroadcast = {
   fusionSensorEvents: (payload: { sessionId: string; collectorId: string; algorithmVersion: string; events: unknown[] }) =>
     emit('fusion:sensor-events', payload),
   markerCreated: (marker: unknown) => emit('marker:created', marker),
+  /** Hand-drawn mobility spaces changed (QGIS save): clients reload GET /api/v1/mobility. */
+  mobilityChanged: (payload: { changes: number; tables: string[] }) => emit('mobility:changed', payload),
 };

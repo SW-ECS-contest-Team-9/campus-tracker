@@ -33,6 +33,10 @@ const EnvSchema = z.object({
   SYNC_DELAYED_WINDOW_MS: z.coerce.number().int().min(0).default(120_000),
   /** Sensor timestamps further in the future than this (client clock error) are rejected. */
   MAX_FUTURE_TIMESTAMP_MS: z.coerce.number().int().min(0).default(86_400_000),
+  /** Editor MCP endpoint (POST /mcp, docs/EDITOR_MCP_PLAN.md). off = not mounted. */
+  EDITOR_MCP: z.enum(['on', 'off']).default('on'),
+  /** false = /mcp answers loopback clients only (the server itself listens on the LAN for phones). */
+  MCP_ALLOW_REMOTE: z.stringbool().default(false),
   PUBLIC_BASE_URL: z.url().optional().or(z.literal('').transform(() => undefined)),
 });
 

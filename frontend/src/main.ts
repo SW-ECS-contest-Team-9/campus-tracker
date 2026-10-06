@@ -13,7 +13,13 @@ import {
   type Session,
 } from './api';
 import { connectPreview } from './socket';
+import { Lab } from './lab';
 import { initVWorld, type Viewer } from './vworld';
+import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campus-map';
+import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
+
+/** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
+const MAP_ENGINE: 'campus' | 'vworld' = import.meta.env.VITE_MAP_ENGINE === 'vworld' ? 'vworld' : 'campus';
 import {
   CollectorVisualization,
   describeFloor,
@@ -30,10 +36,10 @@ import {
 } from './trajectory';
 
 // ---------------- state ----------------
-type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | null;
+type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | { kind: 'building'; id: string } | { kind: 'mobility'; pick: MobilityPick } | null;
 
 const state = {
-  mode: 'live' as 'live' | 'history',
+  mode: 'live' as 'live' | 'history' | 'lab',
   selected: null as Selection,
   layers: { rawPoints: true, rawTrajectory: true, fusedPosition: true, fusedTrajectory: true, accuracy: true, markers: true, fusedVersions: {} } as LayerVisibility,
   /** From GET /api/v1/fusion/versions: the live (realtime) version and all versions available for comparison. */
@@ -48,7 +54,10 @@ const state = {
 };
 
 let viewer: Viewer | null = null;
+const lab = new Lab(document.getElementById('lab-panel')!, () => viewer);
 let spatialMapOverlay: SpatialMapOverlay | null = null;
+let campusScene: CampusSceneLayer | null = null;
+let mobilityLayer: MobilityLayer | null = null;
 const tracks = new Map<string, SessionTrack>(); // sessionId -> track
 const trackLoads = new Map<string, Promise<void>>();
 const liveSessionIds = new Set<string>(); // sessions drawn in Live mode
@@ -143,9 +152,11 @@ function applyVisibility() {
   for (const [id, track] of tracks) {
     track.setLayers(state.layers);
     const selectedSession = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
-    track.setVisible(state.mode === 'live' ? liveSessionIds.has(id) : selectedSession === id);
+    track.setVisible(state.mode === 'live' ? liveSessionIds.has(id) : state.mode === 'history' && selectedSession === id);
   }
   for (const v of collectorViz.values()) v.setVisible(state.mode === 'live', state.layers);
+  document.body.classList.toggle('lab-mode', state.mode === 'lab');
+  void lab.setActive(state.mode === 'lab', state.fusion.versions);
 }
 
 async function loadRuns(sessionId: string) {
@@ -185,6 +196,7 @@ async function loadInitial() {
 
 /** After a preview socket reconnect: reload lists and re-fetch loaded tracks (fills any gap). */
 async function onReconnect() {
+  void mobilityLayer?.reload().catch(() => undefined); // QGIS edits made while disconnected
   await loadInitial();
   await Promise.all([...tracks.keys()].map((id) => reloadTrack(id, true)));
 }
@@ -260,6 +272,9 @@ function startRealtime() {
     },
     onSpatialGpsDecisions({ sessionId, algorithmVersion, decisions }) {
       if (algorithmVersion === 'fusion-v3') tracks.get(sessionId)?.setSpatialGpsDecisions(decisions, algorithmVersion);
+    },
+    onMobilityChanged() {
+      void mobilityLayer?.reload().then(() => scheduleRender()).catch((err) => console.error('mobility reload failed', err));
     },
     onFusionSensorEvents({ sessionId, algorithmVersion, events }) {
       if (algorithmVersion !== 'fusion-v3.1') return;
@@ -427,6 +442,7 @@ function render() {
   status.className = `pill ${state.connected ? 'ok' : 'bad'}`;
   $('mode-live').classList.toggle('active', state.mode === 'live');
   $('mode-history').classList.toggle('active', state.mode === 'history');
+  $('mode-lab').classList.toggle('active', state.mode === 'lab');
 
   const collectors = [...state.collectors.values()].sort((a, b) => a.collectorId.localeCompare(b.collectorId));
   setHtml(
@@ -477,6 +493,8 @@ function renderDetail() {
   }
   if (sel.kind === 'collector') return renderCollectorDetail(el, sel.id);
   if (sel.kind === 'session') return renderSessionDetail(el, sel.id);
+  if (sel.kind === 'building') return renderBuildingDetail(el, sel.id);
+  if (sel.kind === 'mobility') return renderMobilityDetail(el, sel.pick);
   return renderPointDetail(el, sel.pick);
 }
 
@@ -576,6 +594,46 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
       .join('')}
     <span class="muted">${esc(versions.map((v) => state.reprocessResult.get(`${s.sessionId}|${v}`)).filter(Boolean).join(' · ') || 'Recompute from raw data (raw is never modified)')}</span>
   </div>`;
+}
+
+/** A building of the campus 3D model: height and its basis, floors, base/roof, floor calibration. */
+function renderBuildingDetail(el: HTMLElement, buildingId: string) {
+  const b = campusScene?.building(buildingId);
+  if (!b) return;
+  const c = b.calibration;
+  el.innerHTML = `<table>
+    ${row('Building', `<b>${esc(b.name ?? buildingId)}</b>`)}
+    ${row('Height', `${b.heightM.toFixed(1)} m <span class="tag ${b.heightSource === 'REGISTER' ? '' : 'warn'}">${b.heightSource === 'REGISTER' ? 'building register' : 'estimate'}</span>`)}
+    ${row('Ground floors', b.groundFloors == null ? '–' : `${b.groundFloors}${b.heightSource === 'REGISTER' ? '' : ' (assumed)'}`)}
+    ${row('Base / roof', `${b.baseM.toFixed(1)} / ${b.roofM.toFixed(1)} m MSL`)}
+    ${row('Ground under it', b.terrainMinM == null ? '–' : `${b.terrainMinM.toFixed(1)} – ${b.terrainMaxM?.toFixed(1)} m MSL`)}
+    ${c ? row('Calibration', `entrance floor ${c.entranceFloorOrthometricM.toFixed(2)} m · floor height ${c.floorHeightM.toFixed(2)} m`) : ''}
+    ${row('Register id', esc(b.registerId ?? '–'))}
+    ${row('Note', `<span class="muted">${esc(b.note ?? '')}</span>`)}
+  </table>
+  <div class="small muted">Rough block model (docs/CAMPUS_3D_PREVIEW_PLAN.md): flat roof; base and roof on the same terrain DEM fusion uses.</div>`;
+}
+
+/** A hand-drawn corridor / open area / portal (edited in QGIS, schema mobility). */
+function renderMobilityDetail(el: HTMLElement, pick: MobilityPick) {
+  const f = mobilityLayer?.feature(pick);
+  if (!f) {
+    el.textContent = 'This feature was deleted in QGIS.';
+    return;
+  }
+  const table = { corridors: 'mobility.corridors', openAreas: 'mobility.open_areas', portals: 'mobility.portals' }[pick.table];
+  const extra = 'widthM' in f ? row('Width / length', `${f.widthM.toFixed(1)} m / ${f.lengthM.toFixed(1)} m${f.oneWay ? ' · one-way (drawing direction)' : ''}`)
+    : 'areaM2' in f ? row('Area', `${f.areaM2.toFixed(0)} m²`) : '';
+  el.innerHTML = `<table>
+    ${row('Name', `<b>${esc(f.name ?? '(unnamed)')}</b>`)}
+    ${row('Kind', `${esc(MOBILITY_KIND_LABELS[f.kind] ?? f.kind)} <span class="muted">${esc(f.kind)}</span>`)}
+    ${extra}
+    ${row('Height', f.elevationM == null ? 'on the ground' : `${f.elevationM.toFixed(2)} m MSL`)}
+    ${f.buildingId || f.floor ? row('Building / floor', `${esc(f.buildingId ?? '–')} / ${esc(f.floor ?? '–')}`) : ''}
+    ${f.note ? row('Note', esc(f.note)) : ''}
+    ${row('Source', `${table} #${f.id} · edited ${new Date(f.updatedAt).toLocaleString()}`)}
+  </table>
+  <div class="small muted">Edit it in QGIS (layer "${table}") and save: the preview updates by itself.</div>`;
 }
 
 function renderPointDetail(el: HTMLElement, pick: PickId) {
@@ -688,6 +746,11 @@ $('mode-live').addEventListener('click', () => {
 });
 $('mode-history').addEventListener('click', () => {
   state.mode = 'history';
+  applyVisibility();
+  scheduleRender();
+});
+$('mode-lab').addEventListener('click', () => {
+  state.mode = 'lab';
   applyVisibility();
   scheduleRender();
 });
@@ -842,9 +905,39 @@ function enablePicking(v: Viewer) {
     const id = hits.map((h) => h.id as PickId | undefined).find((x) => x?.kind === 'raw' || x?.kind === 'fused');
     if (id) {
       state.selected = { kind: 'point', pick: id };
+      campusScene?.select(null);
+      scheduleRender();
+      return;
+    }
+    // hand-drawn mobility spaces (entities carry their pick on entity.mobilityPick)
+    const mob = hits.map((h) => (h.id as { mobilityPick?: MobilityPick } | undefined)?.mobilityPick).find(Boolean);
+    if (mob && state.mode !== 'lab') {
+      state.selected = { kind: 'mobility', pick: mob };
+      campusScene?.select(null);
+      scheduleRender();
+      return;
+    }
+    // campus 3D building (after the dots, so a dot in front of a wall still wins)
+    const building = hits.map((h) => h.id as BuildingPick | undefined).find((x) => x?.kind === 'building');
+    if (building && state.mode !== 'lab') {
+      state.selected = { kind: 'building', id: building.buildingId };
+      campusScene?.select(building.buildingId);
       scheduleRender();
     }
   }, C.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+/** Header controls of the campus 3D scene (x-ray, labels, estimated heights, camera). */
+function setupSceneControls() {
+  const group = $('scene-controls');
+  group.hidden = !campusScene;
+  if (!campusScene) return;
+  const s = campusScene;
+  $<HTMLInputElement>('scene-xray').addEventListener('change', (e) => s.setOpacity((e.target as HTMLInputElement).checked ? 0.35 : 1));
+  $<HTMLInputElement>('scene-labels').addEventListener('change', (e) => s.setShowLabels((e.target as HTMLInputElement).checked));
+  $<HTMLInputElement>('scene-estimate').addEventListener('change', (e) => s.setShowEstimate((e.target as HTMLInputElement).checked));
+  $('scene-home').addEventListener('click', () => s.home());
+  $('scene-top').addEventListener('click', () => s.top());
 }
 
 async function boot() {
@@ -871,14 +964,30 @@ async function boot() {
     })
     .catch(() => setGeoidSeparation(null));
 
-  initVWorld('vmap')
+  const start: Promise<Viewer> = MAP_ENGINE === 'campus'
+    ? initCampusMap('vmap').then((r) => {
+        campusScene = r.scene;
+        if (r.warning) showMessage(r.warning);
+        setupSceneControls();
+        return r.viewer;
+      })
+    : initVWorld('vmap');
+  start
     .then((v) => {
       viewer = v;
+      if (import.meta.env.DEV) (window as any).__previewViewer = v; // debugging in the browser console
       enablePicking(v);
-      void api.spatialMap().then((map) => {
-        spatialMapOverlay?.destroy();
-        spatialMapOverlay = map.mapVersionId ? new SpatialMapOverlay(v, map) : null;
-      }).catch((err) => console.error('Spatial map unavailable', err));
+      mobilityLayer = new MobilityLayer(v);
+      void mobilityLayer.reload().catch((err) => console.error('mobility spaces unavailable', err));
+      $<HTMLInputElement>('scene-mobility').addEventListener('change', (e) => mobilityLayer?.setVisible((e.target as HTMLInputElement).checked));
+      $('scene-controls').hidden = false;
+      // the campus model draws its own buildings and campus outline; the VWorld map needs the 2D overlay
+      if (MAP_ENGINE === 'vworld') {
+        void api.spatialMap().then((map) => {
+          spatialMapOverlay?.destroy();
+          spatialMapOverlay = map.mapVersionId ? new SpatialMapOverlay(v, map) : null;
+        }).catch((err) => console.error('Spatial map unavailable', err));
+      }
       // Entities could not be created before the viewer existed: rebuild from current state.
       for (const c of state.collectors.values()) syncCollectorViz(c);
       for (const id of liveSessionIds) {

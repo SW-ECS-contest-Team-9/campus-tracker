@@ -1,0 +1,28 @@
+{
+  "contour_only_spot_median_error_m": 0.3089266499325021,
+  "contour_only_spot_p90_abs_error_m": 3.4128425808718306,
+  "validation_spots": 78,
+  "qgis_version": "3.44.14-Solothurn",
+  "buildings": 12,
+  "height_registered": 6,
+  "height_estimated": 6,
+  "excluded": [],
+  "dem_resolution_m": 2,
+  "dem_elevation_range_m": [
+    64.99999999999999,
+    165.00000000000003
+  ],
+  "dem_cells": 60960,
+  "dem_nodata_cells": 0,
+  "interpolation": "linear triangulation of densified contours and spot heights",
+  "vertical_exaggeration": 1,
+  "reopen_validation": {
+    "all_layers_valid": true,
+    "valid_building_geometries": 12,
+    "building_renderer_3d_present": true,
+    "all_roofs_above_sampled_terrain": true,
+    "all_bases_below_sampled_terrain": true
+  },
+  "source_register_checked": "AL_D010_11_20260909 original SHP",
+  "postgis_read_only_checked": true
+}

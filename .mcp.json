@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "campus-editor": {
+      "type": "http",
+      "url": "http://127.0.0.1:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0b3JJZCI6IkMwMSIsImNvbGxlY3RvckRhdGFiYXNlSWQiOiIzZDNiOTFlZS0wMTVkLTRjYzMtYmUxNy0xZDk0MWNjNTI4ODMiLCJkZXZpY2VEYXRhYmFzZUlkIjoiMTFmM2I1NzItYWMxNi00YzkxLWJkZjktM2UyYzRiMDYzZmJhIiwiY2xpZW50RGV2aWNlSWQiOiJtY3A6Y2xhdWRlLWRlc2t0b3AiLCJhZ2VudCI6ImNsYXVkZS1kZXNrdG9wIiwic2NvcGUiOiJlZGl0b3I6cmVhZCBlZGl0b3I6d3JpdGUiLCJpYXQiOjE3OTEyODg1NDIsImV4cCI6MTc5Mzg4MDU0Miwic3ViIjoiM2QzYjkxZWUtMDE1ZC00Y2MzLWJlMTctMWQ5NDFjYzUyODgzIn0.6TkJlDfmx0S8juI-JZb_02nrHYcJyqu1qc9FJvgAWAg"
+      }
+    }
+  }
+}

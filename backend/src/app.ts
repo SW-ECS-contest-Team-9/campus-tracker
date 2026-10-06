@@ -9,6 +9,11 @@ import { sessionRoutes } from './modules/sessions/session.routes.js';
 import { fusionRoutes } from './modules/fusion/fusion.routes.js';
 import { spatialRoutes } from './modules/spatial/spatial.routes.js';
 import { terrainRoutes } from './modules/terrain/terrain.routes.js';
+import { labRoutes } from './modules/lab/lab.routes.js';
+import { sceneRoutes } from './modules/scene/scene.routes.js';
+import { mobilityRoutes } from './modules/mobility/mobility.routes.js';
+import { editorRoutes } from './modules/editor/editor.routes.js';
+import { mcpRoutes } from './modules/editor-mcp/mcp.routes.js';
 
 export function createApp() {
   const app = express();
@@ -35,6 +40,11 @@ export function createApp() {
   app.use('/api/v1/fusion', fusionRoutes);
   app.use('/api/v1/spatial', spatialRoutes);
   app.use('/api/v1/terrain', terrainRoutes);
+  app.use('/api/v1', sceneRoutes);
+  app.use('/api/v1', mobilityRoutes); // hand-drawn corridors / open areas / portals (edited in QGIS) // campus 3D scene + terrain grid for the preview map
+  app.use('/api/v1/editor', editorRoutes); // passwordless tracker-account road/place editor and collaboration
+  if (env.EDITOR_MCP === 'on') app.use('/mcp', mcpRoutes); // AI agents edit the network as collaborators (docs/EDITOR_MCP_PLAN.md)
+  app.use('/api/v1', labRoutes); // runs, qc, routes, canonical paths, validation, bench (docs/MOBILITY_MAP_PLAN.md)
 
   app.use(notFoundHandler);
   app.use(errorHandler);

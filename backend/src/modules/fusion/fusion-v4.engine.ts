@@ -733,6 +733,12 @@ const KIND_RANK: Record<SmootherEvent['kind'], number> = { segment: 0, step: 1, 
  * Replay only: the authoritative trajectory. Uses future fixes too (RTS smoother), so a correction is spread
  * along the walk instead of a jump, and bad indoor fixes are down-weighted by their residual to the whole track.
  */
+function finalResiduals(s: FusionStateV4, points: { x: Vec3; event: SmootherEvent }[]): (number | null)[] {
+  const out: (number | null)[] = s.fixes.map(() => null);
+  for (const p of points) if (p.event.kind === 'fix' && p.event.index < s.fixes.length) out[p.event.index] = Math.hypot(p.x[0] - p.event.x, p.x[1] - p.event.y);
+  return out;
+}
+
 export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4 {
   if (!s.initialized || !s.origin) return { outputs: [], events: [] };
   let weights = s.fixes.map(() => 1);
@@ -804,6 +810,9 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     steps: s.steps.length,
     stairSteps: s.steps.filter((p) => p.stairs).length,
     walkedWithoutMotionM: s.walked.reduce((a, w) => a + w.distance, 0),
+    fixWeights: weights,
+    fixResiduals: finalResiduals(s, points),
+    contactLog: kept ?? [],
   };
 
   // 1 Hz outputs from the smoothed states (state of the latest event at or before each tick)

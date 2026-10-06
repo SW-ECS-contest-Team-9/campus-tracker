@@ -205,12 +205,14 @@ export const fusionRepository = {
     trigger: string,
     config: object,
     configHash: string,
+    extra: { revision: number; variant: string | null; overrides: object | null; mode: string; codeRef: string | null; published: boolean } | null = null,
     db: DbClient = pool,
   ): Promise<string> {
     const { rows } = await db.query<{ id: string }>(
-      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash)
-       VALUES ($1, $2, 'RUNNING', $3, $4, $5) RETURNING id`,
-      [sessionId, version, trigger, JSON.stringify(config), configHash],
+      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash, revision, variant, overrides, mode, code_ref, published)
+       VALUES ($1, $2, 'RUNNING', $3, $4, $5, $6, $7, $8, COALESCE($9, 'SENSOR_TIME'), $10, COALESCE($11, true)) RETURNING id`,
+      [sessionId, version, trigger, JSON.stringify(config), configHash, extra?.revision ?? null, extra?.variant ?? null,
+        extra?.overrides ? JSON.stringify(extra.overrides) : null, extra?.mode ?? null, extra?.codeRef ?? null, extra?.published ?? null],
     );
     return rows[0].id;
   },
@@ -254,7 +256,7 @@ export const fusionRepository = {
               started_at AS "startedAt", completed_at AS "completedAt", output_count AS "outputCount",
               gps_accepted_count AS "gpsAccepted", gps_rejected_count AS "gpsRejected", metrics, error,
               reanchor_count AS "reanchors", divergence_count AS "divergences", warnings
-         FROM fusion_runs WHERE session_id = $1
+         FROM fusion_runs WHERE session_id = $1 AND published
         ORDER BY algorithm_version, created_at DESC`,
       [sessionId],
     );
@@ -263,7 +265,7 @@ export const fusionRepository = {
 
   async hasCompletedRun(sessionId: string, version: string, configHash: string, db: DbClient = pool): Promise<boolean> {
     const { rowCount } = await db.query(
-      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3 AND status = 'COMPLETED' LIMIT 1`,
+      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3 AND status = 'COMPLETED' AND published LIMIT 1`,
       [sessionId, version, configHash],
     );
     return (rowCount ?? 0) > 0;
