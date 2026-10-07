@@ -26,7 +26,16 @@ type JunctionPreview = { coordinate: XYZ; levelId: string | null; alreadyConnect
 
 // Most lookups are form controls (.value/.disabled); HTMLInputElement also covers the plain-element members used here.
 const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
-const uuid = () => crypto.randomUUID();
+// crypto.randomUUID exists only in secure contexts (https or localhost); over plain http on a LAN/Tailscale
+// address build the v4 UUID from getRandomValues, which is available everywhere.
+const uuid = () => {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+};
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const COLORS: Record<string, string> = { pedestrian: '#0b8f70', vehicle: '#dc6a24', shared: '#7856b7', place: '#cc3f64', junction: '#192c25' };
 const ORIGIN = { x: 201100, y: 557250 };
@@ -62,7 +71,7 @@ root.innerHTML = `
         <section class="editor-section" id="road-fields">
           <h2>도로 속성</h2>
           <label class="editor-field">이름<input id="road-name" maxlength="160" placeholder="예: 북악관 보행로"></label>
-          <label class="editor-field">구조<select id="road-structure"><option value="ordinary">일반 도로/통로</option><option value="sidewalk">인도</option><option value="crossing">횡단보도</option><option value="stairs">계단</option><option value="ramp">경사로</option><option value="indoor_corridor">실내 통로</option></select></label>
+          <label class="editor-field">구조<select id="road-structure"><option value="ordinary">일반 도로/통로</option><option value="sidewalk">인도</option><option value="crossing">횡단보도</option><option value="stairs">계단</option><option value="ramp">경사로</option><option value="indoor_corridor">실내 통로</option><option value="elevator">엘리베이터(수직)</option></select></label>
           <div class="editor-row"><label class="editor-field">보행 통행<select id="ped-access"><option>unknown</option><option>allowed</option><option>prohibited</option><option>restricted</option></select></label><label class="editor-field">차량 통행<select id="veh-access"><option>unknown</option><option>allowed</option><option>prohibited</option><option>restricted</option></select></label></div>
           <div class="editor-row"><label class="editor-field">보행 방향<select id="ped-dir"><option>both</option><option>forward</option><option>backward</option><option>unknown</option></select></label><label class="editor-field">차량 방향<select id="veh-dir"><option>both</option><option>forward</option><option>backward</option><option>unknown</option></select></label></div>
           <div class="editor-row"><label class="editor-field">폭(m)<input id="road-width" type="number" min="0.1" max="100" step="0.1" placeholder="미확인"></label><label class="editor-field">휠체어<select id="wheelchair"><option>unknown</option><option>allowed</option><option>prohibited</option><option>restricted</option></select></label></div>
@@ -945,6 +954,9 @@ async function saveCurrent() {
       const attrs = attrsFromUI((roadDraft.attrs.roadClass as RoadClass) ?? (tool as RoadClass));
       const coords = selectedRoad && selectedVertex >= 0 ? roadDraft.coordinates : roadDraft.coordinates;
       if (coords.length < 2) throw new Error('도로를 저장하려면 Space로 두 점 이상 추가하세요.');
+      if (attrs.structure === 'elevator' && (coords.length !== 2 || Math.hypot(coords[1][0] - coords[0][0], coords[1][1] - coords[0][1]) > 0.3 || Math.abs(coords[1][2] - coords[0][2]) < 0.5)) {
+        throw new Error('엘리베이터는 같은 위치에서 높이만 다른 두 점입니다. Space로 첫 점을 찍고 R/F로 높이를 바꾼 뒤 Space로 둘째 점을 찍으세요(층 사이마다 하나씩).');
+      }
       const preview = await request<{ crossings: any[]; selfCrossings: any[]; needsLease: { id: string; revision: number }[] }>('/api/v1/editor/topology-preview', { method: 'POST',
         body: JSON.stringify({ coordinates: coords, levelId: attrs.levelId, branchFrom: roadDraft.branchFrom }) });
       acquiredAffected = [];

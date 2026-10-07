@@ -13,6 +13,8 @@ export const SessionStartRequest = z.object({
   systemVersion: OptionalString(32),
   appVersion: OptionalString(32),
   sensorCapabilities: z.record(z.string(), z.unknown()).default({}),
+  /** Optional HealthKit summary; fusion.stride validates it separately so malformed priors never block raw capture. */
+  strideCalibration: z.unknown().nullish(),
   /** When the phone actually started collecting (session started offline => sent later). Defaults to server time. */
   startedAt: SensorTimestamp.nullish(),
   /** alias of startedAt */

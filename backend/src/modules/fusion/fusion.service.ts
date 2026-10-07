@@ -19,6 +19,7 @@ import { codeRef } from '../../common/code-ref.js';
 import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
 import { fusionRunsRepository, type ReplayMode } from './fusion-runs.repository.js';
 import { qcService } from '../qc/qc.service.js';
+import { strideCalibrationConfig, strideCalibrationHash, type FusionSessionContext } from './fusion.stride.js';
 
 /**
  * Orchestrates fusion around the raw pipeline. Fusion is DERIVED processing:
@@ -86,11 +87,17 @@ function sensorEventRows(version: string, events: unknown[]) {
   });
 }
 
-export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null): string {
+function sessionInputHash(algo: FusionAlgorithm, context: FusionSessionContext): string | null {
+  if (algo.version !== 'fusion-v4' || (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false) return null;
+  return strideCalibrationHash(context.strideCalibration);
+}
+
+export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null, inputHash: string | null = null): string {
   // version + engine revision + exact config: identical hash => identical results for the same raw data
   const hash = createHash('sha256').update(`${algo.version}#${algo.revision}`);
   if (algo.requiresSpatialMap) hash.update(`#${mapVersionId ?? 'NO_MAP'}`);
   if (algo.usesTerrain) hash.update(`#terrain:${terrainVersionId ?? 'NONE'}`);
+  if (inputHash) hash.update(`#input:${inputHash}`);
   return hash.update(JSON.stringify(algo.config)).digest('hex').slice(0, 16);
 }
 
@@ -215,11 +222,14 @@ export async function replaySession(sessionId: string, version: string, trigger:
   let lastT = -Infinity;
   let outcome: 'success' | 'failed' = 'failed';
   const terrainVersionId = algo.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
+  const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
+  const inputHash = sessionInputHash(algo, context);
   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
-    ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId }
+    ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId,
+      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), inputHash } } : {}) }
     : algo.config;
-  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId), {
-    revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish,
+  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId, inputHash), {
+    revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
   });
   try {
     const inputs = await loadReplayInputs(sessionId, algo);
@@ -230,9 +240,9 @@ export async function replaySession(sessionId: string, version: string, trigger:
       const spatialContext = await spatial.context(mapVersionId);
       const batches = (await fusionRunsRepository.loadArrivalBatches(sessionId))
         .map((b) => withTerrain(spatial.annotate(buildTimeline(b, { sessionStartedAt: session.startedAt }), spatialContext), terrainContext));
-      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS);
+      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS, context);
     } else {
-      r = replayInMemory(algo, timeline, { finalize: !continuesLive });
+      r = replayInMemory(algo, timeline, { finalize: !continuesLive, context });
     }
     const { state, outputs, events } = r;
     const history = sensorEventRows(version, events);
@@ -303,9 +313,9 @@ async function reprocessNow(sessionId: string, version: string, trigger: ReplayT
 
 export const fusionService = {
   /** session:start (new session): fresh state, uninitialized until the first usable GPS fix. */
-  sessionStarted(sessionId: string, collectorId: string) {
+  sessionStarted(sessionId: string, collectorId: string, context: FusionSessionContext = { strideCalibration: null }) {
     void enqueue(sessionId, 'start', async () => {
-      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
+      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(context), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
     });
   },
 
@@ -431,7 +441,9 @@ export const fusionService = {
       throw AppError.conflict('SPATIAL_MAP_UNAVAILABLE', `${version} requires a valid spatial map pinned to this session`);
     }
     const terrainVersionId = algo?.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
-    if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId)))) {
+    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
+    const inputHash = algo ? sessionInputHash(algo, context) : null;
+    if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId, inputHash), inputHash))) {
       const run = (await fusionRepository.latestRuns(sessionId)).find((r) => r.algorithmVersion === version);
       return { sessionId, algorithmVersion: version, skipped: true, reason: 'already processed with the same code and config (use force)', run };
     }

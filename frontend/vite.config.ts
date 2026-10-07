@@ -43,6 +43,8 @@ export default defineConfig(({ mode }) => {
       rollupOptions: { input: { preview: path.resolve(import.meta.dirname, 'index.html'), editor: path.resolve(import.meta.dirname, 'editor.html') } },
     },
     server: {
+      host: true, // all interfaces, so the preview is reachable over LAN / Tailscale (Vite's default is localhost only)
+      allowedHosts: ['.ts.net'], // Tailscale MagicDNS names; IP addresses are always allowed
       port: 5173,
       strictPort: true,
       proxy: {

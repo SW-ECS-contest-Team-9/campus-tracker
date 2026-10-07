@@ -1,5 +1,6 @@
 import { env } from '../../config/env.js';
 import { fusionConfigV1, fusionConfigV2, fusionConfigV21, fusionConfigV4, type FusionConfigV4 } from './fusion.config.js';
+import type { FusionSessionContext } from './fusion.stride.js';
 import { flushFusion, processObservation, type FusionEvent } from './fusion.engine.js';
 import { describeEventV2, flushFusionV2, processObservationV2, summarizeV2, type FusionEventV2 } from './fusion-v2.engine.js';
 import { createFusionState, type FusionState } from './fusion-state.js';
@@ -36,9 +37,14 @@ export interface AlgorithmSummary {
   // v4
   stepsDetected?: number;
   stairSteps?: number;
+  slopeSteps?: number;
+  verticalUnknownSteps?: number;
   headingSegments?: number;
   headingSegmentsWithHeading?: number | null;
   strideM?: number | null;
+  strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
+  healthStrideM?: number | null;
+  healthStrideBlend?: number | null;
   terrain?: { versionId: string | null; datumSource: string; contacts: number; datumSigmaM: number | null; driftRangeM: number | null; geoidSeparationM: number | null } | null;
 }
 
@@ -56,7 +62,7 @@ export interface FusionAlgorithm<S = any, E = any> {
   requiresSpatialMap?: boolean;
   /** Uses the session's terrain version (DEM) when there is one: part of the reproducibility hash. */
   usesTerrain?: boolean;
-  createState(): S;
+  createState(context?: FusionSessionContext): S;
   process(state: S, obs: Observation): { outputs: FusedOutput[]; events: E[] };
   flush(state: S): { outputs: FusedOutput[]; events: E[] };
   /** Replay only (not for a session that continues live): replaces all outputs, e.g. with a smoothed trajectory. */
@@ -180,12 +186,14 @@ const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
 const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => ({
   version: 'fusion-v4',
   // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors;
-  // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3
-  revision: 4,
+  // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3;
+  // 5: long straight ramps retain a calibrated stride; 6: Health stride prior + uncertain vertical movement uses stride,
+  //    confirmed stair classification is separated from barometric vertical-motion detection.
+  revision: 6,
   usesTerrain: true,
-  description: 'Step-level PDR (50 Hz steps, stair-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
+  description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,
-  createState: createFusionStateV4,
+  createState: (context) => createFusionStateV4(cfg.healthStrideEnabled ? context : undefined),
   process: (s, o) => processObservationV4(s, o, cfg),
   flush: (s) => flushFusionV4(s, cfg),
   finalize: (s) => finalizeFusionV4(s, cfg),

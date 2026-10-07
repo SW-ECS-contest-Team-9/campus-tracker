@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var coordinator = CollectionCoordinator()
     @StateObject private var authentication = AuthenticationManager()
+    @StateObject private var healthStride = HealthStrideService()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -12,6 +13,7 @@ struct ContentView: View {
                 AuthenticatedRootView()
                     .environmentObject(coordinator)
                     .environmentObject(authentication)
+                    .environmentObject(healthStride)
             } else if authentication.state == .unknown {
                 ProgressView("Restoring account…")
             } else {
@@ -24,7 +26,9 @@ struct ContentView: View {
         }
         .onChange(of: scenePhase) { phase in
             switch phase {
-            case .active: coordinator.handleAppState(.foreground)
+            case .active:
+                coordinator.handleAppState(.foreground)
+                healthStride.refreshOnForegroundEntry()
             case .background: coordinator.handleAppState(.background)
             case .inactive: coordinator.handleAppState(.inactive)
             @unknown default: coordinator.handleAppState(.inactive)
@@ -57,6 +61,7 @@ private struct AuthenticatedRootView: View {
 private struct CollectionView: View {
     @EnvironmentObject private var coordinator: CollectionCoordinator
     @EnvironmentObject private var authentication: AuthenticationManager
+    @EnvironmentObject private var healthStride: HealthStrideService
     @AppStorage("motionSamplingRate") private var motionSamplingRate = MotionSamplingRate.hz20.rawValue
     @AppStorage("locationProfile") private var locationProfile = LocationCollectionProfile.highAccuracy.rawValue
     @AppStorage("locationDistanceFilter") private var locationDistanceFilter = 0.0
@@ -89,7 +94,8 @@ private struct CollectionView: View {
                             collectorId: collector.collectorId,
                             motionRate: MotionSamplingRate(rawValue: motionSamplingRate) ?? .hz20,
                             locationProfile: LocationCollectionProfile(rawValue: locationProfile) ?? .highAccuracy,
-                            distanceFilter: locationDistanceFilter
+                            distanceFilter: locationDistanceFilter,
+                            healthStride: healthStride
                         )
                     } else {
                         print("[Start] stopping local collection")
@@ -268,6 +274,7 @@ private struct SessionsView: View {
 
 private struct SettingsView: View {
     @EnvironmentObject private var authentication: AuthenticationManager
+    @EnvironmentObject private var healthStride: HealthStrideService
     @AppStorage("motionSamplingRate") private var motionSamplingRate = MotionSamplingRate.hz20.rawValue
     @AppStorage("locationProfile") private var locationProfile = LocationCollectionProfile.highAccuracy.rawValue
     @AppStorage("locationDistanceFilter") private var locationDistanceFilter = 0.0
@@ -296,8 +303,53 @@ private struct SettingsView: View {
                 }
                 Stepper("Distance filter: \(Int(locationDistanceFilter)) m", value: $locationDistanceFilter, in: 0...100, step: 1)
             }
+            healthStrideSection
         }
         .navigationTitle("Settings")
+    }
+
+    private var healthStrideSection: some View {
+        Section(header: Text("보폭 보정")) {
+            Toggle("건강 앱 보폭으로 보정", isOn: Binding(
+                get: { healthStride.isEnabled },
+                set: { healthStride.setEnabled($0) }
+            ))
+            Text("건강 앱의 걷기 보폭을 이용해 이동거리 추정의 초기값을 보정합니다. 개별 건강 기록 대신 보폭 요약이 추적 서버로 전송됩니다. 연결하지 않아도 기록할 수 있습니다.")
+                .font(.caption)
+            if healthStride.isEnabled {
+                healthStrideStatusView
+                Button("보폭 새로고침") {
+                    healthStride.refresh()
+                }
+                Text("새로고침이나 설정 변경은 다음 세션부터 적용됩니다. 진행 중인 세션의 보폭은 바뀌지 않습니다.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var healthStrideStatusView: some View {
+        switch healthStride.status {
+        case .disabled:
+            EmptyView()
+        case .loading:
+            HStack {
+                ProgressView()
+                Text("건강 데이터를 확인하는 중…")
+            }
+            .font(.caption)
+        case let .ready(calibration):
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(format: "보폭: %.2f m (표본 %d개, %d일)", calibration.stepLengthM, calibration.sampleCount, calibration.observedDays))
+                Text("최신 관측: \(calibration.latestSampleAt.formatted())")
+            }
+            .font(.caption)
+        case let .unavailable(message):
+            Text(message)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
     }
 }
 

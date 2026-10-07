@@ -31,7 +31,18 @@ export interface FusionMetrics {
     fallbackStepDistanceM: number;
     horizontalUncertaintyM: number | null;
   } | null;
-  pdr: { stepsDetected: number; stairSteps: number; headingSegments: number; headingSegmentsWithHeading: number | null; strideM: number | null } | null;
+  pdr: {
+    stepsDetected: number;
+    stairSteps: number;
+    slopeSteps: number;
+    verticalUnknownSteps: number;
+    headingSegments: number;
+    headingSegmentsWithHeading: number | null;
+    strideM: number | null;
+    strideSource: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT' | null;
+    healthStrideM: number | null;
+    healthStrideBlend: number | null;
+  } | null;
   terrain: AlgorithmSummary['terrain'] | null;
   validation: FusionValidation;
 }
@@ -82,9 +93,14 @@ export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutp
     pdr: summary.stepsDetected === undefined ? null : {
       stepsDetected: summary.stepsDetected,
       stairSteps: summary.stairSteps ?? 0,
+      slopeSteps: summary.slopeSteps ?? 0,
+      verticalUnknownSteps: summary.verticalUnknownSteps ?? 0,
       headingSegments: summary.headingSegments ?? 0,
       headingSegmentsWithHeading: summary.headingSegmentsWithHeading ?? null,
       strideM: summary.strideM ?? null,
+      strideSource: summary.strideSource ?? null,
+      healthStrideM: summary.healthStrideM ?? null,
+      healthStrideBlend: summary.healthStrideBlend ?? null,
     },
     terrain: summary.terrain ?? null,
     validation: validateFusion(timeline, outputs.map((o) => ({ latitude: o.latitude, longitude: o.longitude, height: o.geomZ }))),

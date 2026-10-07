@@ -205,14 +205,14 @@ export const fusionRepository = {
     trigger: string,
     config: object,
     configHash: string,
-    extra: { revision: number; variant: string | null; overrides: object | null; mode: string; codeRef: string | null; published: boolean } | null = null,
+    extra: { revision: number; variant: string | null; overrides: object | null; mode: string; codeRef: string | null; published: boolean; inputHash?: string | null } | null = null,
     db: DbClient = pool,
   ): Promise<string> {
     const { rows } = await db.query<{ id: string }>(
-      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash, revision, variant, overrides, mode, code_ref, published)
-       VALUES ($1, $2, 'RUNNING', $3, $4, $5, $6, $7, $8, COALESCE($9, 'SENSOR_TIME'), $10, COALESCE($11, true)) RETURNING id`,
+      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash, revision, variant, overrides, mode, code_ref, published, input_hash)
+       VALUES ($1, $2, 'RUNNING', $3, $4, $5, $6, $7, $8, COALESCE($9, 'SENSOR_TIME'), $10, COALESCE($11, true), $12) RETURNING id`,
       [sessionId, version, trigger, JSON.stringify(config), configHash, extra?.revision ?? null, extra?.variant ?? null,
-        extra?.overrides ? JSON.stringify(extra.overrides) : null, extra?.mode ?? null, extra?.codeRef ?? null, extra?.published ?? null],
+        extra?.overrides ? JSON.stringify(extra.overrides) : null, extra?.mode ?? null, extra?.codeRef ?? null, extra?.published ?? null, extra?.inputHash ?? null],
     );
     return rows[0].id;
   },
@@ -263,10 +263,11 @@ export const fusionRepository = {
     return rows;
   },
 
-  async hasCompletedRun(sessionId: string, version: string, configHash: string, db: DbClient = pool): Promise<boolean> {
+  async hasCompletedRun(sessionId: string, version: string, configHash: string, inputHash: string | null = null, db: DbClient = pool): Promise<boolean> {
     const { rowCount } = await db.query(
-      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3 AND status = 'COMPLETED' AND published LIMIT 1`,
-      [sessionId, version, configHash],
+      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3
+        AND input_hash IS NOT DISTINCT FROM $4 AND status = 'COMPLETED' AND published LIMIT 1`,
+      [sessionId, version, configHash, inputHash],
     );
     return (rowCount ?? 0) > 0;
   },

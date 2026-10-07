@@ -1,5 +1,6 @@
 import { pool, type DbClient } from '../../config/database.js';
 import type { ListSessionsQuery, LocationPointView, SessionStatus, SessionView } from './session.dto.js';
+import type { StrideCalibration, StrideCalibrationReason } from '../fusion/fusion.stride.js';
 
 export interface SessionRow {
   id: string;
@@ -9,9 +10,12 @@ export interface SessionRow {
   started_at: Date;
   ended_at: Date | null;
   status: SessionStatus;
+  stride_calibration: StrideCalibration | null;
+  stride_calibration_status: 'ACCEPTED' | 'FALLBACK';
+  stride_calibration_reason: StrideCalibrationReason | null;
 }
 
-const SESSION_COLUMNS = 'id, client_session_id, collector_id, device_id, started_at, ended_at, status';
+const SESSION_COLUMNS = 'id, client_session_id, collector_id, device_id, started_at, ended_at, status, stride_calibration, stride_calibration_status, stride_calibration_reason';
 
 // Shared SELECT for SessionView. Counts are correlated subqueries: fine for a dev tool's data volume.
 const SESSION_VIEW_SELECT = `
@@ -38,6 +42,14 @@ const SESSION_VIEW_SELECT = `
     JOIN devices d    ON d.id = s.device_id`;
 
 export const sessionRepository = {
+  async getStrideCalibration(id: string, db: DbClient = pool): Promise<StrideCalibration | null> {
+    const { rows } = await db.query<{ stride_calibration: StrideCalibration | null; stride_calibration_status: string }>(
+      'SELECT stride_calibration, stride_calibration_status FROM collection_sessions WHERE id = $1', [id],
+    );
+    const row = rows[0];
+    return row?.stride_calibration_status === 'ACCEPTED' ? row.stride_calibration : null;
+  },
+
   async findById(id: string, db: DbClient = pool): Promise<SessionRow | null> {
     const { rows } = await db.query<SessionRow>(`SELECT ${SESSION_COLUMNS} FROM collection_sessions WHERE id = $1`, [id]);
     return rows[0] ?? null;
@@ -54,15 +66,26 @@ export const sessionRepository = {
   /** Returns null when client_session_id already exists (idempotent start). */
   async insert(
     db: DbClient,
-    data: { clientSessionId: string; collectorId: string; deviceId: string; startedAt: string | null; sensorCapabilities: unknown },
+    data: {
+      clientSessionId: string;
+      collectorId: string;
+      deviceId: string;
+      startedAt: string | null;
+      sensorCapabilities: unknown;
+      strideCalibration: StrideCalibration | null;
+      strideCalibrationStatus: 'ACCEPTED' | 'FALLBACK';
+      strideCalibrationReason: StrideCalibrationReason | null;
+    },
   ): Promise<SessionRow | null> {
     const { rows } = await db.query<SessionRow>(
-      `INSERT INTO collection_sessions (client_session_id, collector_id, device_id, started_at, sensor_capabilities, spatial_map_version_id)
+      `INSERT INTO collection_sessions (client_session_id, collector_id, device_id, started_at, sensor_capabilities,
+                                       spatial_map_version_id, stride_calibration, stride_calibration_status, stride_calibration_reason)
        VALUES ($1, $2, $3, COALESCE($4::timestamptz, now()), $5,
-               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1))
+               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1), $6::jsonb, $7, $8)
        ON CONFLICT (client_session_id) DO NOTHING
        RETURNING ${SESSION_COLUMNS}`,
-      [data.clientSessionId, data.collectorId, data.deviceId, data.startedAt, JSON.stringify(data.sensorCapabilities)],
+      [data.clientSessionId, data.collectorId, data.deviceId, data.startedAt, JSON.stringify(data.sensorCapabilities),
+        data.strideCalibration ? JSON.stringify(data.strideCalibration) : null, data.strideCalibrationStatus, data.strideCalibrationReason],
     );
     return rows[0] ?? null;
   },

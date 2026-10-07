@@ -11,7 +11,9 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
     description: 'Draw a new DRAFT road centerline. path mixes free points {xy}, exact positions on existing objects {at}, and stretches of recorded '
       + 'tracks {run}/{canonical}. Reference roads with {at:{roadId,...}} wherever it must connect: coordinates typed by hand do not connect reliably. '
       + 'Access defaults follow roadClass (pedestrian: walking allowed, vehicles prohibited; vehicle: the reverse; shared: both). '
-      + 'Crossing an existing road on the same level and height splits both and joins them at a node. Returns the saved pieces, crossings and whether each reference connected.' },
+      + 'Crossing an existing road on the same level and height splits both and joins them at a node. '
+      + 'An elevator is structure "elevator" with exactly two path points at the same x,y and different z (one road per pair of floors; zMode "explicit" or {at:{nodeId}} ends). '
+      + 'Returns the saved pieces, crossings and whether each reference connected.' },
   update_road: { title: 'Change a road',
     description: 'Change attributes and/or geometry of a DRAFT road. Needs expectedRevision from get_feature/list_features. Geometry: replace it all with path, '
       + 'or edit vertices with vertexOps (move/insert/delete/replaceRange), reverse, simplifyM, drapeToTerrain. If the new shape crosses other roads it is replaced by new pieces with new ids.' },

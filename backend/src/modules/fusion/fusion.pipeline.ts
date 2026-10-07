@@ -6,6 +6,7 @@ import { spatial } from '../../geo/spatial.js';
 import { terrain, type TerrainContext } from '../../geo/terrain.js';
 import { buildTimeline, compareObservations, type Observation, type RawSamples } from './fusion.timeline.js';
 import type { FusionAlgorithm } from './fusion.algorithms.js';
+import type { FusionSessionContext } from './fusion.stride.js';
 import type { FusedOutput } from './fusion.types.js';
 import { fusionRepository } from './fusion.repository.js';
 
@@ -65,8 +66,8 @@ export interface ReplayResult {
 }
 
 /** Authoritative replay of a sensor-time-ordered timeline. continuesLive: no flush / finalize (realtime goes on). */
-export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], opts: { finalize: boolean; state?: unknown }): ReplayResult {
-  const state = opts.state ?? algo.createState();
+export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], opts: { finalize: boolean; state?: unknown; context?: FusionSessionContext }): ReplayResult {
+  const state = opts.state ?? algo.createState(opts.context);
   const r = runObservations(algo, state, timeline);
   const forward = r.outputs;
   const events = r.events;
@@ -86,8 +87,8 @@ export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], o
  * one created_at) and fed in arrival order through the realtime reorder buffer, then the live finish (flush).
  * Reproduces what the realtime result looked like, including samples dropped because they arrived too late.
  */
-export function replayAsReceived(algo: FusionAlgorithm, batches: Observation[][], windowMs: number): ReplayResult & { skippedLate: number } {
-  const state = algo.createState();
+export function replayAsReceived(algo: FusionAlgorithm, batches: Observation[][], windowMs: number, context?: FusionSessionContext): ReplayResult & { skippedLate: number } {
+  const state = algo.createState(context);
   const buffer = new ReorderBuffer(windowMs);
   const forward: FusedOutput[] = [];
   const events: unknown[] = [];

@@ -19,7 +19,11 @@ function rng(seed: number) {
   return { u, n: () => Math.sqrt(-2 * Math.log(u())) * Math.cos(2 * Math.PI * u()) };
 }
 
-interface Leg { durationS: number; headingDeg: number; walking: boolean; vzMps?: number }
+/**
+ * vzMps: the barometer moves while walking = stairs (0.3 m tread; CMPedometer keeps its flat stride), or with slope a
+ * ramp / hill road (full steps of strideM). uncounted: steps CMPedometer does not count (fidgeting on the spot).
+ */
+interface Leg { durationS: number; headingDeg: number; walking: boolean; vzMps?: number; slope?: boolean; strideM?: number; uncounted?: boolean }
 /** Truth + raw observations: 50 Hz motion (2 steps/s), CMPedometer every 2.5 s, 1 Hz barometer, GPS every 2 s. */
 function simulate(legs: Leg[], opts: { gpsSigma?: number; gpsAccuracy?: number; seed?: number; stride?: number } = {}) {
   const r = rng(opts.seed ?? 7);
@@ -41,9 +45,10 @@ function simulate(legs: Leg[], opts: { gpsSigma?: number; gpsAccuracy?: number; 
       obs.push({ kind: 'motion', t: ms, seq: seq++, yaw: -(heading - THETA_TRUE), ax: 0.005 * r.n(), ay: 0.005 * r.n(), az, gx: 0, gy: 0, gz: -1 });
       if (leg.walking && Math.floor(t * 2) !== lastStepAt) {
         lastStepAt = Math.floor(t * 2);
-        const L = leg.vzMps ? 0.3 : stride;
+        const stairs = Boolean(leg.vzMps) && !leg.slope;
+        const L = leg.uncounted ? 0 : stairs ? 0.3 : (leg.strideM ?? stride);
         x += L * Math.sin(heading); y += L * Math.cos(heading);
-        steps++; dist += leg.vzMps ? stride : L; // CMPedometer uses a flat stride even on stairs
+        if (!leg.uncounted) { steps++; dist += stairs ? stride : L; } // CMPedometer uses a flat stride even on stairs
       }
       z += (leg.vzMps ?? 0) * dt;
       truth.push({ t: ms, x, y });
@@ -114,11 +119,43 @@ test('smoothed replay follows the true L-shaped walk better than the raw GPS', (
 });
 
 test('stairs: barometer descent while stepping uses the stair tread, not the flat stride', () => {
-  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 0, walking: true, vzMps: -0.3 }]);
+  // one straight flight (3.6 m): shorter than a storey and a half, so not a slope
+  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 12, headingDeg: 0, walking: true, vzMps: -0.3 }]);
   const { s } = run(obs);
   const stairs = s.steps.filter((p) => p.stairs);
-  assert.ok(stairs.length >= 30, `stair steps ${stairs.length}`);
+  assert.ok(stairs.length >= 18, `stair steps ${stairs.length}`);
   assert.ok(stairs.every((p) => p.length === cfg.stairTreadM));
+  assert.equal(s.steps.filter((p) => p.slope).length, 0);
+});
+
+test('stairwell: a long descent that folds back (dog-leg flights, no pause on the landings) stays stairs', () => {
+  const flights: Leg[] = [0, 180, 0, 180, 0].map((headingDeg) => ({ durationS: 6, headingDeg, walking: true, vzMps: -0.3 }));
+  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, ...flights]); // 9 m down without a break
+  const { s } = run(obs);
+  const stairs = s.steps.filter((p) => p.stairs);
+  assert.ok(stairs.length >= 50, `stair steps ${stairs.length}`);
+  assert.ok(stairs.every((p) => p.length === cfg.stairTreadM));
+  assert.equal(s.steps.filter((p) => p.slope).length, 0);
+});
+
+test('slope: a long straight descent (ramp / hill road) keeps the stride, taken from the pedometer on that slope', () => {
+  // 60 s down a 0.2 m/s slope with 0.6 m steps (level stride 0.75): 12 m of descent, 72 m of walking
+  const legs: Leg[] = [{ durationS: 30, headingDeg: 0, walking: true }, { durationS: 60, headingDeg: 0, walking: true, vzMps: -0.2, slope: true, strideM: 0.6 }];
+  const { obs, truth } = simulate(legs, { gpsSigma: 10, gpsAccuracy: 15 });
+  const fwd = run(obs);
+  const onSlope = fwd.s.steps.filter((p) => p.t > T0 + 30_000);
+  const slope = onSlope.filter((p) => p.slope);
+  assert.ok(slope.length >= 110, `slope steps ${slope.length} of ${onSlope.length}`); // the 4 s barometer window lags the start
+  assert.equal(onSlope.filter((p) => p.stairs).length, 0, 'the first 5 m were filed as stairs and are reclassified');
+  assert.ok(slope.every((p) => Math.abs(p.length - 0.6) < 0.05), `slope stride ${slope[0].length}..${slope.at(-1)!.length}`);
+  // the level stride is not disturbed by the slope
+  assert.ok(Math.abs(fwd.s.strideA / fwd.s.strideB - 0.75) < 0.03, `level stride ${fwd.s.strideA / fwd.s.strideB}`);
+  // live position caught up when the slope was recognised; the replay covers the whole distance
+  const live = errors(fwd.s, fwd.outputs.slice(-5), truth);
+  assert.ok(Math.max(...live) < 12, `live error at the end ${Math.max(...live).toFixed(1)} m`);
+  const fin = finalizeFusionV4(fwd.s, cfg).outputs.filter((o) => o.timestamp > T0 + 30_000);
+  const walked = Math.hypot(fin.at(-1)!.x - fin[0].x, fin.at(-1)!.y - fin[0].y);
+  assert.ok(Math.abs(walked - 72) < 8, `slope length ${walked.toFixed(1)} m of 72`);
 });
 
 test('stride is calibrated from CMPedometer distance per detected level step', () => {
@@ -126,6 +163,16 @@ test('stride is calibrated from CMPedometer distance per detected level step', (
   const { s } = run(obs);
   const level = s.steps.filter((p) => !p.stairs).at(-1)!;
   assert.ok(Math.abs(level.length - 0.9) < 0.08, `stride ${level.length}`);
+});
+
+test('stride calibration ignores stairs (CMPedometer flat stride) and steps CMPedometer does not count', () => {
+  const flights: Leg[] = [0, 180, 0].map((headingDeg) => ({ durationS: 6, headingDeg, walking: true, vzMps: 0.3 }));
+  const { obs } = simulate([
+    { durationS: 40, headingDeg: 0, walking: true }, ...flights, { durationS: 20, headingDeg: 0, walking: true },
+    { durationS: 30, headingDeg: 0, walking: true, uncounted: true }, { durationS: 5, headingDeg: 0, walking: true },
+  ]);
+  const { s } = run(obs);
+  assert.ok(Math.abs(s.strideA / s.strideB - 0.75) < 0.03, `stride ${s.strideA / s.strideB}`);
 });
 
 test('standing still with jittery indoor GPS: the position barely moves', () => {

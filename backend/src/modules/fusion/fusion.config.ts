@@ -547,15 +547,30 @@ export const fusionConfigV4 = {
   stepMaxIntervalS: 1.3,
   stepConfirmPeaks: 3, // periodic peaks in a row before they count as walking (phone handling is not periodic)
   motionGapMs: 2000, // longer motion gap => new heading segment
-  // stride: CMPedometer distance per detected level step, flat-ground default until calibrated
+  // stride: CMPedometer distance per detected step (level and slope walking), flat-ground default until calibrated
   defaultStrideM: 0.72,
   strideMinM: 0.35,
   strideMaxM: 1.1,
   strideCalibrationMinSteps: 20,
   strideForgetting: 0.97, // per pedometer update
-  stairVerticalSpeedMps: 0.13, // barometric |dz/dt| while stepping => stairs
+  healthStrideEnabled: true, // optional session-scoped HealthKit prior; false for paired-control variants
+  healthStrideBlendSteps: 40, // accepted level steps to transition from the Health prior to this-session pedometer stride
+  healthStrideSigmaFloorM: 0.1, // do not treat an aggregate from HealthKit as a precise per-step measurement
+  strideStepMismatch: 0.3, // a stride sample needs CMPedometer's step count within this fraction (or 1 step) of ours
+  strideSampleMaxUpdates: 3, // ...over at most this many pedometer updates (it reports in bursts: 0, 0, 10 steps)
+  stairVerticalSpeedMps: 0.13, // barometric |dz/dt| while stepping => vertical movement; pattern decides stairs/slope
   stairWindowMs: 4000,
   stairTreadM: 0.3, // horizontal progress per stair step
+  // slope (ramp / hill road) vs stairs: same barometric speed and rise per step; stairs fold back or end after a storey
+  slopeMinClimbM: 5, // a climb longer than this (more than one storey) in one direction, along a straight path, is a slope
+  slopeMinStraightness: 0.7, // net / walked length of the steps over that climb (stairwells measured <= 0.35, slopes >= 0.87)
+  slopeRunGapMs: 4000, // vertical steps further apart are separate climbs (a landing or level stretch in between)
+  slopeMaxRiseM: 0.25, // per step: steeper than a 25-30 % grade is not walked (elevator / escalator with a few steps)
+  slopeStrideSigmaFraction: 0.15,
+  verticalUnknownStrideSigmaFraction: 0.35,
+  stairConfirmMinRiseM: 1.0,
+  stairConfirmMaxStraightness: 0.55,
+  stairConfirmMinTurnDeg: 120,
   // heading = -yaw + theta (yaw is relative); theta is estimated per heading segment
   poseChangeDeg: 50, // gravity direction change in the phone frame (hand <-> pocket) => new segment
   poseChangeHoldMs: 1000,

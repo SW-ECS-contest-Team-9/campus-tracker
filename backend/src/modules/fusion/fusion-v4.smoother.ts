@@ -201,7 +201,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
 
 export type SmootherEvent =
   | { kind: 'segment'; t: number; theta: number | null; thetaVar: number }
-  | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean }
+  | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean }
   | { kind: 'walked'; t: number; distance: number } // pedometer distance while motion was missing
   | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean };
 
@@ -243,7 +243,9 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
     } else if (e.kind === 'step') {
       vehicle = false;
       const p2 = thetaKnown
-        ? predictStep(pred.x, e.length, e.rel, e.stairs ? c.stairStrideSigmaFraction : c.strideSigmaFraction, rw)
+        ? predictStep(pred.x, e.length, e.rel, e.stairs ? c.stairStrideSigmaFraction
+          : e.slope ? c.slopeStrideSigmaFraction
+            : e.verticalUnknown ? c.verticalUnknownStrideSigmaFraction : c.strideSigmaFraction, rw)
         : predictUnheaded(pred.x, Pk, e.length);
       Pk = applyPrediction(Pk, p2);
       F = mul3(p2.F, F);

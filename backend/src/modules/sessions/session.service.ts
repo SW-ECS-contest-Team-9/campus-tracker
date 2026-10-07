@@ -8,6 +8,7 @@ import { previewBroadcast } from '../../realtime/preview.gateway.js';
 import { collectorRepository } from '../collectors/collector.repository.js';
 import { sessionRepository, type SessionRow } from './session.repository.js';
 import { fusionService } from '../fusion/fusion.service.js';
+import { evaluateStrideCalibration } from '../fusion/fusion.stride.js';
 import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
 import type {
   DiagnosticEventsRequest,
@@ -95,6 +96,7 @@ export const sessionService = {
       throw AppError.forbidden('DEVICE_MISMATCH', 'deviceId does not match the authenticated device');
     }
     const startedAt = req.startedAt ?? req.clientStartedAt ?? null;
+    const strideDecision = evaluateStrideCalibration(req.strideCalibration, startedAt);
 
     const result = await withTransaction(async (client) => {
       await collectorRepository.upsertDevice(identity.collectorDatabaseId, identity.clientDeviceId, req, client);
@@ -104,6 +106,9 @@ export const sessionService = {
         deviceId: identity.deviceDatabaseId,
         startedAt,
         sensorCapabilities: req.sensorCapabilities,
+        strideCalibration: strideDecision.calibration,
+        strideCalibrationStatus: strideDecision.status,
+        strideCalibrationReason: strideDecision.reason,
       });
       if (inserted) {
         // A device collects one session at a time: other ACTIVE sessions of this device were left behind.
@@ -135,7 +140,9 @@ export const sessionService = {
     if (session.status === 'ACTIVE') {
       previewBroadcast.collectorStatus(realtimeState.sessionStarted(identity.collectorId, session.id));
       if (created) {
-        fusionService.sessionStarted(session.id, identity.collectorId);
+        fusionService.sessionStarted(session.id, identity.collectorId, {
+          strideCalibration: session.stride_calibration_status === 'ACCEPTED' ? session.stride_calibration : null,
+        });
         await broadcastSession('started', session.id);
       }
     }
@@ -147,6 +154,10 @@ export const sessionService = {
       status: session.status,
       collectionState: session.status,
       resumed: !created,
+      strideCalibration: {
+        status: session.stride_calibration_status,
+        reason: session.stride_calibration_reason,
+      },
     };
   },
 

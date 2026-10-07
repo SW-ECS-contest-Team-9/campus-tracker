@@ -6,7 +6,8 @@
  * flat-ground stride on stairs; yaw is in an arbitrary frame, so the absolute heading is unknown.
  *
  *  - steps:   detected from 50 Hz vertical user acceleration, each applied with the yaw at its own time;
- *             stride = CMPedometer distance per detected level step; barometric |dz/dt| => stair tread
+ *             stride starts from the session Health prior (when valid), then this-session pedometer samples;
+ *             barometric vertical movement stays uncertain until a long straight ramp or folded stair run is clear
  *  - heading: walking direction = -yaw + theta. theta is one unknown per heading segment (new segment on a
  *             phone pose change / motion gap). It is found by fitting the walked shape to GPS fixes (robust grid
  *             search) or carried over a segment change by assuming the walking direction continues.
@@ -111,8 +112,63 @@ function verticalSpeed(s: FusionStateV4, t: number, c: FusionConfigV4): number {
 }
 
 function stride(s: FusionStateV4, c: FusionConfigV4) {
-  if (s.strideB < c.strideCalibrationMinSteps) return c.defaultStrideM;
-  return Math.min(c.strideMaxM, Math.max(c.strideMinM, s.strideA / s.strideB));
+  const learned = s.strideB >= c.strideCalibrationMinSteps
+    ? Math.min(c.strideMaxM, Math.max(c.strideMinM, s.strideA / s.strideB))
+    : null;
+  const health = s.healthStrideCalibration?.stepLengthM;
+  if (health === undefined) return learned ?? c.defaultStrideM;
+  const blend = Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps);
+  return learned === null ? health : (1 - blend) * health + blend * learned;
+}
+
+/** The stride on a slope is not the level one (0.59 m down an 18 % road, 0.81 m level): the pedometer distance of this climb. */
+function slopeStride(s: FusionStateV4, c: FusionConfigV4) {
+  const k = s.climb;
+  if (!k || k.strideB < c.strideCalibrationMinSteps) return stride(s, c);
+  return Math.min(c.strideMaxM, Math.max(c.strideMinM, k.strideA / k.strideB));
+}
+
+function reclassifySteps(s: FusionStateV4, from: number, toMode: 'stairs' | 'slope', rel: number, c: FusionConfigV4) {
+  const k = s.climb;
+  if (!k) return;
+  if (toMode === 'slope') {
+    for (const h of k.held) {
+      if (h.from < from) continue;
+      k.strideA = c.strideForgetting * k.strideA + h.distance;
+      k.strideB = c.strideForgetting * k.strideB + (h.to - h.from);
+    }
+    k.held = [];
+  } else {
+    // The held pedometer spans belong to stairs and must not become either a level or slope stride sample.
+    k.held = [];
+  }
+  const length = toMode === 'stairs' ? c.stairTreadM : slopeStride(s, c);
+  let dx = 0, dy = 0, q0 = 0, q1 = 0, q3 = 0;
+  let turn = 0, next = { rel, segment: s.segments.length - 1 };
+  for (let i = s.steps.length - 1; i >= from; i--) {
+    const p = s.steps[i];
+    if (p.segment !== next.segment) turn += next.rel - p.rel;
+    next = p;
+    if (!(p.stairs || p.slope || p.verticalUnknown)) continue;
+    const d = length - p.length;
+    p.stairs = toMode === 'stairs';
+    p.slope = toMode === 'slope';
+    p.verticalUnknown = false;
+    p.length = length;
+    if (i < s.reckonedFrom) continue;
+    const sn = Math.sin(p.rel + turn + s.x[2]), cs = Math.cos(p.rel + turn + s.x[2]);
+    const fraction = toMode === 'stairs' ? c.stairStrideSigmaFraction : c.slopeStrideSigmaFraction;
+    const variance = (fraction * d) ** 2;
+    dx += d * sn; dy += d * cs;
+    q0 += variance * sn * sn; q1 += variance * sn * cs; q3 += variance * cs * cs;
+  }
+  const open = s.steps.slice(s.steps.length - s.stepsSinceUpdate);
+  s.stairStepsSinceUpdate = open.filter((p) => p.stairs).length;
+  s.slopeStepsSinceUpdate = open.filter((p) => p.slope).length;
+  s.verticalUnknownStepsSinceUpdate = open.filter((p) => p.verticalUnknown).length;
+  if (!dx && !dy) return;
+  s.P = applyPrediction(s.P, { x: s.x, F: [1, 0, dy, 0, 1, -dx, 0, 0, 1], Q: [q0, q1, 0, q1, q3, 0, 0, 0, 0] });
+  s.x = [s.x[0] + dx, s.x[1] + dy, s.x[2]];
 }
 
 function startSegment(s: FusionStateV4, t: number, reason: string, r: StepResultV4, c: FusionConfigV4) {
@@ -142,12 +198,89 @@ function resetStepDetector(s: FusionStateV4) {
 // sensors
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * Stairs or slope? Both have the same barometric speed (a 15 % hill road and a stair flight: 0.2-0.3 m/s); rise per
+ * detected step and steadiness overlap. A long straight climb supports a slope; a climb with a sustained foldback
+ * supports stairs. A vertical climb without either pattern stays unknown and uses the walking stride with greater
+ * uncertainty. Long straight stairs and tight switchback ramps remain ambiguous with these sensors.
+ */
+function slopeFrom(s: FusionStateV4, t: number, rel: number, dir: number, c: FusionConfigV4): number | null {
+  let k = s.climb;
+  if (k && k.dir === dir && t - k.lastT <= c.slopeRunGapMs) k.lastT = t;
+  else k = s.climb = { first: s.steps.length, dir, lastT: t, mode: 'unknown', strideA: 0, strideB: 0, held: [] };
+  if (k.mode === 'slope') return k.first;
+  if (s.z === undefined) return null;
+  // the last slopeMinClimbM of the climb (+10 %: the barometer advances in ~1 s samples, several steps share one)
+  let east = Math.sin(rel), north = Math.cos(rel), from = s.steps.length, reached = false;
+  let turn = 0, next = { rel, segment: s.segments.length - 1 };
+  for (let i = s.steps.length - 1; i >= k.first; i--) {
+    const p = s.steps[i];
+    if (p.z === undefined || dir * (s.z - p.z) > 1.1 * c.slopeMinClimbM) break;
+    if (p.segment !== next.segment) turn += next.rel - p.rel; // the walking direction continues over a heading segment change
+    east += Math.sin(p.rel + turn);
+    north += Math.cos(p.rel + turn);
+    from = i;
+    next = p;
+    reached ||= dir * (s.z - p.z) >= c.slopeMinClimbM;
+  }
+  // walked (not an elevator or escalator ride with a few steps) and straight: net / walked length of the unit steps
+  const n = s.steps.length - from + 1;
+  if (reached && n * c.slopeMaxRiseM >= c.slopeMinClimbM && Math.hypot(east, north) / n >= c.slopeMinStraightness) {
+    k.mode = 'slope';
+    return from;
+  }
+  return null;
+}
+
+/** A sustained foldback during an active vertical climb is positive stair evidence. */
+function stairsFrom(s: FusionStateV4, rel: number, c: FusionConfigV4): number | null {
+  const k = s.climb;
+  if (!k) return null;
+  if (k.mode === 'stairs') return k.first;
+  const run = s.steps.slice(k.first);
+  const firstZ = run.find((p) => p.z !== undefined)?.z;
+  if (firstZ === undefined || s.z === undefined || k.dir * (s.z - firstZ) < c.stairConfirmMinRiseM) return null;
+  let east = 0, north = 0, turn = 0, walked = 0;
+  let prior = { rel, segment: s.segments.length - 1 };
+  let previousHeading: number | undefined;
+  for (const p of run) {
+    if (p.z === undefined) continue;
+    if (p.segment !== prior.segment) turn += prior.rel - p.rel;
+    const heading = p.rel + turn;
+    if (previousHeading !== undefined) walked += Math.abs(normalizeAngleRad(heading - previousHeading));
+    east += Math.sin(heading);
+    north += Math.cos(heading);
+    previousHeading = heading;
+    prior = p;
+  }
+  if (run.length < 8 || walked < c.stairConfirmMinTurnDeg * DEG
+      || Math.hypot(east, north) / run.length > c.stairConfirmMaxStraightness) return null;
+  k.mode = 'stairs';
+  return k.first;
+}
+
 function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4, r: StepResultV4) {
-  const stairs = Math.abs(verticalSpeed(s, t, c)) >= c.stairVerticalSpeedMps;
-  const length = stairs ? c.stairTreadM : stride(s, c);
-  s.steps.push({ t, rel, length, stairs, segment: s.segments.length - 1 });
+  const vz = verticalSpeed(s, t, c);
+  const vertical = Math.abs(vz) >= c.stairVerticalSpeedMps;
+  const straightFrom = vertical ? slopeFrom(s, t, rel, Math.sign(vz), c) : null;
+  const stairStart = vertical && straightFrom === null ? stairsFrom(s, rel, c) : null;
+  if (straightFrom !== null) reclassifySteps(s, straightFrom, 'slope', rel, c);
+  else if (stairStart !== null) reclassifySteps(s, stairStart, 'stairs', rel, c);
+  const mode = vertical ? s.climb?.mode ?? 'unknown' : 'unknown';
+  const stairs = vertical && mode === 'stairs';
+  const slope = vertical && mode === 'slope';
+  const verticalUnknown = vertical && mode === 'unknown';
+  const walkingStride = stride(s, c);
+  const length = stairs ? c.stairTreadM : slope ? slopeStride(s, c) : walkingStride;
+  s.strideEffectiveM = walkingStride;
+  s.healthStrideBlend = s.healthStrideCalibration ? Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps) : undefined;
+  s.strideSource = s.healthStrideCalibration && (s.healthStrideBlend ?? 0) < 1 ? 'APPLE_HEALTH'
+    : s.strideB >= c.strideCalibrationMinSteps ? 'SESSION_PEDOMETER' : 'DEFAULT';
+  s.steps.push({ t, rel, length, stairs, ...(slope ? { slope } : {}), ...(verticalUnknown ? { verticalUnknown } : {}), segment: s.segments.length - 1, z: s.z });
   s.stepsSinceUpdate++;
-  if (!stairs) s.levelStepsSinceUpdate++;
+  if (stairs) s.stairStepsSinceUpdate++;
+  else if (slope) s.slopeStepsSinceUpdate++;
+  else if (verticalUnknown) s.verticalUnknownStepsSinceUpdate++;
   s.lastStepT = t;
   s.vehicle = false;
   if (s.pendingContinuity) {
@@ -157,16 +290,26 @@ function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4, 
     s.pendingContinuity = undefined;
   }
   s.lastStepRel = rel;
+  if (!s.initialized || !s.headingKnown) s.reckonedFrom = s.steps.length;
   if (!s.initialized) return;
   advance(s, t, c);
+  const healthWeight = s.healthStrideCalibration ? 1 - Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps) : 0;
+  const healthSigmaFraction = s.healthStrideCalibration
+    ? Math.max(s.healthStrideCalibration.dispersionM, c.healthStrideSigmaFloorM) / length
+    : 0;
+  const strideSigma = stairs ? c.stairStrideSigmaFraction
+    : slope ? c.slopeStrideSigmaFraction
+      : verticalUnknown ? c.verticalUnknownStrideSigmaFraction
+        : Math.max(c.strideSigmaFraction, healthWeight * healthSigmaFraction);
   const p = s.headingKnown
-    ? predictStep(s.x, length, rel, stairs ? c.stairStrideSigmaFraction : c.strideSigmaFraction, c.headingRandomWalkDegPerStep * DEG)
+    ? predictStep(s.x, length, rel, strideSigma, c.headingRandomWalkDegPerStep * DEG)
     : predictUnheaded(s.x, s.P, length);
   s.P = applyPrediction(s.P, p);
   s.x = p.x;
   s.window.steps++;
   if (!s.headingKnown) s.window.unheadedSteps++;
-  if (s.terrain && s.headingKnown && !stairs && s.z !== undefined) {
+  // a slope may be a garage ramp below the DEM surface: like stairs, it is not a ground contact
+  if (s.terrain && s.headingKnown && !vertical && s.z !== undefined) {
     const k = groundContact(s, t, s.x, s.P, s.z, c);
     if (k) s.contacts.push(k);
   }
@@ -259,6 +402,15 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
   s.f1 = { v: y, t: o.t, rel: s.rel };
 }
 
+/** Starts the next stride sample at this pedometer reading. */
+function restartStrideSample(s: FusionStateV4, steps: number | null, distance: number) {
+  s.strideSample = { steps, distance, updates: 0 };
+  s.stairStepsSinceUpdate = 0;
+  s.slopeStepsSinceUpdate = 0;
+  s.verticalUnknownStepsSinceUpdate = 0;
+  s.stepsSinceUpdate = 0;
+}
+
 function applyPedometer(s: FusionStateV4, o: Extract<Observation, { kind: 'pedometer' }>, c: FusionConfigV4) {
   if (!finite(o.distance)) return;
   const steps = finite(o.steps) ? o.steps : null;
@@ -267,33 +419,55 @@ function applyPedometer(s: FusionStateV4, o: Extract<Observation, { kind: 'pedom
   if (!s.pedometerStarted || segChanged) {
     restartPedometerCounter(s.pedometerCounter, steps, o.distance);
     s.pedometerStarted = true;
-    s.levelStepsSinceUpdate = 0;
-    s.stepsSinceUpdate = 0;
+    restartStrideSample(s, steps, o.distance);
     return;
   }
   const before = s.pedometerCounter.maxDistance ?? o.distance;
   const verdict = checkPedometerCounter(s.pedometerCounter, steps, o.distance);
-  if (verdict === 'COUNTER_RESTARTED') {
-    s.levelStepsSinceUpdate = 0;
-    s.stepsSinceUpdate = 0;
-  }
+  if (verdict === 'COUNTER_RESTARTED') restartStrideSample(s, steps, o.distance);
   if (verdict !== 'OK') return;
   const d = o.distance - before;
-  if (d <= 0) return;
+  const detected = s.stepsSinceUpdate;
+  // the stretch since the last stride sample: its pedometer distance and steps against the steps detected here
+  const from = s.strideSample ?? { steps, distance: before, updates: 0 };
+  const updates = from.updates + 1;
+  if (d <= 0) {
+    if (detected) s.strideSample = { ...from, updates };
+    else restartStrideSample(s, steps, o.distance);
+    return;
+  }
+  const distance = o.distance - from.distance;
+  const counted = steps === null || from.steps === null ? null : steps - from.steps;
+  const sameSteps = counted === null || Math.abs(counted - detected) <= Math.max(1, c.strideStepMismatch * detected);
   const motionMissing = s.lastMotionT === undefined || o.t - s.lastMotionT > c.motionGapMs;
-  if (motionMissing || s.stepsSinceUpdate === 0) {
+  if (motionMissing || detected === 0) {
     // walked, but no detected step can carry it (app suspended / steps too soft to detect): only uncertainty grows
     s.walked.push({ t: o.t, distance: d });
     if (s.initialized) {
       advance(s, o.t, c);
       s.P = applyPrediction(s.P, predictUnheaded(s.x, s.P, d));
     }
-  } else if (Math.abs(verticalSpeed(s, o.t, c)) < c.stairVerticalSpeedMps && s.levelStepsSinceUpdate > 0) {
-    s.strideA = c.strideForgetting * s.strideA + d;
-    s.strideB = c.strideForgetting * s.strideB + s.levelStepsSinceUpdate;
+  } else if (!sameSteps && updates < c.strideSampleMaxUpdates) {
+    // CMPedometer reports in bursts (4 steps, then 7): the stretch grows by the next update until the counts meet
+    s.strideSample = { ...from, updates };
+    return;
+  } else if (!sameSteps || updates > c.strideSampleMaxUpdates) {
+    // steps CMPedometer does not count (fidgeting, a shuffle in a room) are not walking strides: no sample
+  } else if (s.stairStepsSinceUpdate > 0 || s.verticalUnknownStepsSinceUpdate > 0) {
+    // Mixed/uncertain vertical spans cannot train either the flat or slope stride until the climb is classified.
+    if (s.climb && s.climb.mode !== 'stairs') s.climb.held.push({ from: s.steps.length - detected, to: s.steps.length, distance });
+  } else {
+    const k = s.slopeStepsSinceUpdate > 0 ? s.climb : undefined;
+    if (k) {
+      k.strideA = c.strideForgetting * k.strideA + distance;
+      k.strideB = c.strideForgetting * k.strideB + detected;
+    } else {
+      s.strideA = c.strideForgetting * s.strideA + distance;
+      s.strideB = c.strideForgetting * s.strideB + detected;
+      s.strideLevelSteps += detected;
+    }
   }
-  s.levelStepsSinceUpdate = 0;
-  s.stepsSinceUpdate = 0;
+  restartStrideSample(s, steps, o.distance);
 }
 
 function applyAltimeter(s: FusionStateV4, o: Extract<Observation, { kind: 'altimeter' }>, c: FusionConfigV4) {
@@ -349,6 +523,7 @@ function maybeReanchor(s: FusionStateV4, t: number, c: FusionConfigV4, r: StepRe
   }
   const shift = Math.hypot(mx - s.x[0], my - s.x[1]);
   s.x = [mx, my, s.x[2]];
+  s.reckonedFrom = s.steps.length;
   const theta = s.P[8] + (20 * DEG) ** 2;
   s.P = diag3(ms * ms, ms * ms, theta);
   s.counters.reanchors++;
@@ -368,6 +543,7 @@ function tryHeadingFit(s: FusionStateV4, t: number, c: FusionConfigV4, r: StepRe
   const fit = fitHeading(steps, fixes, c);
   if (!fit) return;
   s.x = [fit.endX, fit.endY, fit.theta];
+  s.reckonedFrom = s.steps.length;
   const pos = Math.max(fit.medianResidual, c.positionSigmaFloorM) ** 2;
   s.P = diag3(pos, pos, fit.sigma ** 2);
   s.headingKnown = true;
@@ -417,6 +593,8 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
   if (used) {
     s.x = u.x;
     s.P = floorPosition(u.P, c.positionSigmaFloorM);
+    // Do not add a later reclassification delta to steps already reconciled by an accepted GPS fix.
+    s.reckonedFrom = s.steps.length;
     s.rejectRun = [];
     acceptGps(s, o, r, innovation);
   } else {
@@ -749,7 +927,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     headings = segmentHeadings(s, weights, c);
     const events: SmootherEvent[] = [
       ...s.segments.map((g, k): SmootherEvent => ({ kind: 'segment', t: g.startT, theta: headings[k].theta, thetaVar: headings[k].variance })),
-      ...s.steps.map((p): SmootherEvent => ({ kind: 'step', t: p.t, rel: p.rel, length: p.length, stairs: p.stairs })),
+      ...s.steps.map((p): SmootherEvent => ({ kind: 'step', t: p.t, rel: p.rel, length: p.length, stairs: p.stairs,
+        slope: p.slope === true, verticalUnknown: p.verticalUnknown === true })),
       ...s.walked.map((w): SmootherEvent => ({ kind: 'walked', t: w.t, distance: w.distance })),
       ...s.fixes.map((f, i): SmootherEvent => ({ kind: 'fix', t: f.t, index: i, x: f.x, y: f.y, sigma: f.sigma, vehicle: f.vehicle })),
     ].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
@@ -787,7 +966,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     let known = false;
     for (const p of points) {
       if (p.event.kind === 'segment') known = p.event.theta !== null;
-      if (p.event.kind !== 'step' || !known || p.event.stairs) continue;
+      if (p.event.kind !== 'step' || !known || p.event.stairs || p.event.slope || p.event.verticalUnknown) continue;
       const z = zAt(p.t);
       if (z === null) continue;
       const k = groundContact(s, p.t, p.x, p.P, z, c);
@@ -809,6 +988,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     segmentsWithHeading: headings.filter((h) => h.theta !== null).length,
     steps: s.steps.length,
     stairSteps: s.steps.filter((p) => p.stairs).length,
+    slopeSteps: s.steps.filter((p) => p.slope).length,
+    verticalUnknownSteps: s.steps.filter((p) => p.verticalUnknown).length,
     walkedWithoutMotionM: s.walked.reduce((a, w) => a + w.distance, 0),
     fixWeights: weights,
     fixResiduals: finalResiduals(s, points),
@@ -901,9 +1082,14 @@ export function summarizeV4(s: FusionStateV4) {
     altimeterRebases: s.counters.altimeterRebases,
     stepsDetected: s.steps.length,
     stairSteps: s.steps.filter((p) => p.stairs).length,
+    slopeSteps: s.steps.filter((p) => p.slope).length,
+    verticalUnknownSteps: s.steps.filter((p) => p.verticalUnknown).length,
     headingSegments: s.segments.length,
     headingSegmentsWithHeading: s.smoothed?.segmentsWithHeading ?? null,
-    strideM: s.strideB >= 20 ? Math.round((s.strideA / s.strideB) * 100) / 100 : null,
+    strideM: s.strideEffectiveM === undefined ? null : Math.round(s.strideEffectiveM * 100) / 100,
+    strideSource: s.strideSource,
+    healthStrideM: s.healthStrideCalibration?.stepLengthM ?? null,
+    healthStrideBlend: s.healthStrideBlend ?? null,
     terrain: s.smoothed
       ? { versionId: s.terrain?.versionId ?? null, datumSource: s.smoothed.datumSource, contacts: s.smoothed.contacts, datumSigmaM: s.smoothed.datumSigma, driftRangeM: s.smoothed.driftRangeM, geoidSeparationM: s.terrain?.geoidSeparation ?? null }
       : null,

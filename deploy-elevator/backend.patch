@@ -1,0 +1,121 @@
+diff --git a/backend/src/modules/editor-mcp/network-validate.ts b/backend/src/modules/editor-mcp/network-validate.ts
+index c5d4671..5f8db56 100644
+--- a/backend/src/modules/editor-mcp/network-validate.ts
++++ b/backend/src/modules/editor-mcp/network-validate.ts
+@@ -108,7 +108,7 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
+ 
+   if (on('OFF_TERRAIN') && o.ground) {
+     for (const r of roads) {
+-      if (r.levelId !== null || r.structure === 'indoor_corridor') continue; // only outdoor ground roads are expected on the DEM
++      if (r.levelId !== null || r.structure === 'indoor_corridor' || r.structure === 'elevator') continue; // only outdoor ground roads are expected on the DEM
+       let worst = 0, at: XYZ | null = null;
+       for (const p of r.coordinates) {
+         const g = o.ground(p[0], p[1]);
+diff --git a/backend/src/modules/editor-mcp/tools/write.ts b/backend/src/modules/editor-mcp/tools/write.ts
+index 0dc997d..9fa337d 100644
+--- a/backend/src/modules/editor-mcp/tools/write.ts
++++ b/backend/src/modules/editor-mcp/tools/write.ts
+@@ -11,7 +11,9 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
+     description: 'Draw a new DRAFT road centerline. path mixes free points {xy}, exact positions on existing objects {at}, and stretches of recorded '
+       + 'tracks {run}/{canonical}. Reference roads with {at:{roadId,...}} wherever it must connect: coordinates typed by hand do not connect reliably. '
+       + 'Access defaults follow roadClass (pedestrian: walking allowed, vehicles prohibited; vehicle: the reverse; shared: both). '
+-      + 'Crossing an existing road on the same level and height splits both and joins them at a node. Returns the saved pieces, crossings and whether each reference connected.' },
++      + 'Crossing an existing road on the same level and height splits both and joins them at a node. '
++      + 'An elevator is structure "elevator" with exactly two path points at the same x,y and different z (one road per pair of floors; zMode "explicit" or {at:{nodeId}} ends). '
++      + 'Returns the saved pieces, crossings and whether each reference connected.' },
+   update_road: { title: 'Change a road',
+     description: 'Change attributes and/or geometry of a DRAFT road. Needs expectedRevision from get_feature/list_features. Geometry: replace it all with path, '
+       + 'or edit vertices with vertexOps (move/insert/delete/replaceRange), reverse, simplifyM, drapeToTerrain. If the new shape crosses other roads it is replaced by new pieces with new ids.' },
+diff --git a/backend/src/modules/editor/editor.dto.ts b/backend/src/modules/editor/editor.dto.ts
+index 1b87be2..056b350 100644
+--- a/backend/src/modules/editor/editor.dto.ts
++++ b/backend/src/modules/editor/editor.dto.ts
+@@ -10,7 +10,7 @@ export const XYZ = z.tuple([
+ const RoadFields = z.object({
+   name: z.string().trim().max(160).nullish(),
+   roadClass: z.enum(['pedestrian', 'vehicle', 'shared']),
+-  structure: z.enum(['ordinary', 'sidewalk', 'crossing', 'stairs', 'ramp', 'indoor_corridor']).default('ordinary'),
++  structure: z.enum(['ordinary', 'sidewalk', 'crossing', 'stairs', 'ramp', 'indoor_corridor', 'elevator']).default('ordinary'),
+   pedestrianAccess: z.enum(['allowed', 'prohibited', 'restricted', 'unknown']).default('unknown'),
+   vehicleAccess: z.enum(['allowed', 'prohibited', 'restricted', 'unknown']).default('unknown'),
+   pedestrianDirection: z.enum(['both', 'forward', 'backward', 'unknown']).default('unknown'),
+diff --git a/backend/src/modules/editor/editor.service.ts b/backend/src/modules/editor/editor.service.ts
+index 522d296..6f072ed 100644
+--- a/backend/src/modules/editor/editor.service.ts
++++ b/backend/src/modules/editor/editor.service.ts
+@@ -11,6 +11,9 @@ const LEASE_MS = 30_000;
+ export const LEVEL_TOLERANCE_M = 1.25;
+ export const JUNCTION_ENDPOINT_M = 0.15;
+ export const JUNCTION_RADIUS_M = 0.75;
++/** An elevator is two vertices stacked in plan; endpoint snapping may pull each one up to a node 0.15 m away. */
++export const ELEVATOR_MAX_XY_M = 0.3;
++export const ELEVATOR_MIN_RISE_M = 0.5;
+ export type ObjectType = 'road' | 'place';
+ 
+ /** Who made a change besides the collector account: the browser editor, or an AI agent through MCP. Recorded in editor_changes.payload.actor. */
+@@ -59,6 +62,22 @@ export function attrsFromRow(r: RoadRow): RoadAttrs {
+   };
+ }
+ 
++/** Elevators only change height; every other road needs a plan length, which all the XY-measure topology relies on. */
++export function assertRoadShape(attrs: Pick<RoadAttrs, 'structure' | 'vehicleAccess'>, coordinates: XYZ[]) {
++  const xy = coordinates.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1]), 0);
++  if (attrs.structure !== 'elevator') {
++    if (xy < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'A road needs at least 5 cm of plan length; use structure "elevator" for a vertical connection');
++    return;
++  }
++  if (coordinates.length !== 2 || xy > ELEVATOR_MAX_XY_M || Math.abs(coordinates[1][2] - coordinates[0][2]) < ELEVATOR_MIN_RISE_M) {
++    throw AppError.badRequest('INVALID_ELEVATOR', `An elevator is exactly two vertices at the same x,y whose heights differ by at least ${ELEVATOR_MIN_RISE_M} m; draw one per pair of floors`);
++  }
++  if (attrs.vehicleAccess === 'allowed') throw AppError.badRequest('ATTRIBUTE_CONFLICT', 'An elevator cannot allow vehicles');
++}
++
++/** One node per cut location. Height is part of the key: an elevator's two ends share x,y. */
++const cutKey = (h: { x: number; y: number; z: number }) => `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}:${Math.round(h.z * 100)}`;
++
+ function branchAnchorHit(road: RoadRow, coordinates: XYZ[], branch: BranchFrom, levelId: string | null): Hit {
+   const point = road.coordinates[branch.vertexIndex];
+   if (!point || road.level_id !== levelId) throw AppError.conflict('BRANCH_SOURCE_CHANGED', 'The source road or level changed; choose its vertex again');
+@@ -219,7 +238,8 @@ export async function snapPieceEndpoints(db: PoolClient, points: XYZ[], levelId:
+   const coordinates = points.map((p) => [...p] as XYZ);
+   coordinates[0] = from.point;
+   coordinates[coordinates.length - 1] = to.point;
+-  const length = coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1]), 0);
++  // 3D: an elevator piece has no plan length (assertRoadShape keeps every other road from being vertical)
++  const length = coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1], p[2] - coordinates[i][2]), 0);
+   if (length < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'Snapping endpoints would create a road segment shorter than 5 cm');
+   return { fromNodeId: from.id, toNodeId: to.id, coordinates };
+ }
+@@ -428,6 +448,7 @@ export const editorService = {
+   },
+ 
+   async saveRoad(body: RoadSave, identity: CollectorIdentity, outer?: PoolClient) {
++    assertRoadShape(body, body.coordinates);
+     await assertInsideTerrain(body.coordinates);
+     return inTx(outer, async (db) => {
+       await db.query('SELECT pg_advisory_xact_lock(5186001)'); // serialize network topology edits
+@@ -478,13 +499,13 @@ export const editorService = {
+       const changeSetId = body.mutationId;
+       const nodesForCuts = new Map<string, { id: string; point: XYZ }>();
+       for (const hit of allCuts) {
+-        const key = `${Math.round(hit.x * 100)}:${Math.round(hit.y * 100)}`;
++        const key = cutKey(hit);
+         if (!nodesForCuts.has(key)) nodesForCuts.set(key, await ensureNode(db, [hit.x, hit.y, hit.z], body.levelId ?? null, 'junction'));
+       }
+       const events: unknown[] = [];
+       for (const { road, hits } of hitsByRoad.values()) {
+         const cuts = hits.map((h) => {
+-          const key = `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}`;
++          const key = cutKey(h);
+           const node = nodesForCuts.get(key)!;
+           return { measure: h.otherMeasure, x: node.point[0], y: node.point[1], z: node.point[2] };
+         });
+@@ -507,7 +528,7 @@ export const editorService = {
+       }
+ 
+       const ownCuts = allCuts.map((h) => {
+-        const key = `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}`;
++        const key = cutKey(h);
+         const node = nodesForCuts.get(key)!;
+         return { measure: h.sourceMeasure, x: node.point[0], y: node.point[1], z: node.point[2] };
+       });

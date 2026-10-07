@@ -115,10 +115,16 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 { "clientSessionId": "uuid", "deviceId": "device-uuid", "platform": "ios", "deviceModel": "iPhone15,2",
   "systemVersion": "18.0", "appVersion": "1.0",
   "sensorCapabilities": { "location": true, "motion": true, "altimeter": true, "pedometer": true },
-  "startedAt": "2026-10-01T12:00:00.000Z" }
+  "startedAt": "2026-10-01T12:00:00.000Z",
+  "strideCalibration": { "schemaVersion": 1, "source": "APPLE_HEALTH_WALKING_STEP_LENGTH",
+    "aggregationVersion": "median_mad_v1", "sourcePolicy": "IPHONE_AUTOMATIC_V1", "stepLengthM": 0.74,
+    "sampleCount": 84, "observedDays": 12, "dispersionM": 0.06,
+    "windowStart": "2026-09-09T05:55:00.000Z", "windowEnd": "2026-10-07T05:55:00.000Z",
+    "latestSampleAt": "2026-10-07T03:40:00.000Z", "computedAt": "2026-10-07T05:55:00.000Z" } }
 ```
 - `startedAt`은 **선택(추가 필드)**: 오프라인에서 시작해 나중에 전송되는 경우 실제 시작 시각 보존용. 없으면 서버 시각.
 - 같은 `clientSessionId` 재전송 → 기존 세션 반환 (idempotent).
+- `strideCalibration`은 선택 입력이다. 서버가 평지 보폭 요약을 검사해 세션 시작 시 고정하며 오류·누락·오래된 자료는 fallback 처리한다. 같은 `clientSessionId` 재전송은 최초 결정을 유지한다. 성공 ACK의 `strideCalibration.status/reason`은 `ACCEPTED` 또는 `FALLBACK` 판정이다. `ACCEPTED`는 모든 걸음에 적용됐다는 뜻이 아니다.
 - 같은 device의 다른 ACTIVE 세션은 `INTERRUPTED`로 바뀜 (앱 크래시 후 새 세션 대비).
 - ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE" }`
 - 에러: `DEVICE_MISMATCH`(403), `SESSION_CONFLICT`(409, 다른 collector가 쓴 clientSessionId)

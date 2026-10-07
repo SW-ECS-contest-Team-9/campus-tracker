@@ -36,6 +36,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>건강 앱의 걷기 보폭을 이용해 이동거리 추정의 초기값을 보정합니다. 개별 건강 기록 대신 보폭 요약이 추적 서버로 전송됩니다. 연결하지 않아도 기록할 수 있습니다.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>캠퍼스 수집 서버에 연결하기 위해 로컬 네트워크 접근이 필요합니다.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

@@ -10,7 +10,7 @@ export const XYZ = z.tuple([
 const RoadFields = z.object({
   name: z.string().trim().max(160).nullish(),
   roadClass: z.enum(['pedestrian', 'vehicle', 'shared']),
-  structure: z.enum(['ordinary', 'sidewalk', 'crossing', 'stairs', 'ramp', 'indoor_corridor']).default('ordinary'),
+  structure: z.enum(['ordinary', 'sidewalk', 'crossing', 'stairs', 'ramp', 'indoor_corridor', 'elevator']).default('ordinary'),
   pedestrianAccess: z.enum(['allowed', 'prohibited', 'restricted', 'unknown']).default('unknown'),
   vehicleAccess: z.enum(['allowed', 'prohibited', 'restricted', 'unknown']).default('unknown'),
   pedestrianDirection: z.enum(['both', 'forward', 'backward', 'unknown']).default('unknown'),

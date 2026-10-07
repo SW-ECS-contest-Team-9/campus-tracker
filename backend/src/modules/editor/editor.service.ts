@@ -11,6 +11,9 @@ const LEASE_MS = 30_000;
 export const LEVEL_TOLERANCE_M = 1.25;
 export const JUNCTION_ENDPOINT_M = 0.15;
 export const JUNCTION_RADIUS_M = 0.75;
+/** An elevator is two vertices stacked in plan; endpoint snapping may pull each one up to a node 0.15 m away. */
+export const ELEVATOR_MAX_XY_M = 0.3;
+export const ELEVATOR_MIN_RISE_M = 0.5;
 export type ObjectType = 'road' | 'place';
 
 /** Who made a change besides the collector account: the browser editor, or an AI agent through MCP. Recorded in editor_changes.payload.actor. */
@@ -58,6 +61,22 @@ export function attrsFromRow(r: RoadRow): RoadAttrs {
     levelId: r.level_id,
   };
 }
+
+/** Elevators only change height; every other road needs a plan length, which all the XY-measure topology relies on. */
+export function assertRoadShape(attrs: Pick<RoadAttrs, 'structure' | 'vehicleAccess'>, coordinates: XYZ[]) {
+  const xy = coordinates.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1]), 0);
+  if (attrs.structure !== 'elevator') {
+    if (xy < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'A road needs at least 5 cm of plan length; use structure "elevator" for a vertical connection');
+    return;
+  }
+  if (coordinates.length !== 2 || xy > ELEVATOR_MAX_XY_M || Math.abs(coordinates[1][2] - coordinates[0][2]) < ELEVATOR_MIN_RISE_M) {
+    throw AppError.badRequest('INVALID_ELEVATOR', `An elevator is exactly two vertices at the same x,y whose heights differ by at least ${ELEVATOR_MIN_RISE_M} m; draw one per pair of floors`);
+  }
+  if (attrs.vehicleAccess === 'allowed') throw AppError.badRequest('ATTRIBUTE_CONFLICT', 'An elevator cannot allow vehicles');
+}
+
+/** One node per cut location. Height is part of the key: an elevator's two ends share x,y. */
+const cutKey = (h: { x: number; y: number; z: number }) => `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}:${Math.round(h.z * 100)}`;
 
 function branchAnchorHit(road: RoadRow, coordinates: XYZ[], branch: BranchFrom, levelId: string | null): Hit {
   const point = road.coordinates[branch.vertexIndex];
@@ -219,7 +238,8 @@ export async function snapPieceEndpoints(db: PoolClient, points: XYZ[], levelId:
   const coordinates = points.map((p) => [...p] as XYZ);
   coordinates[0] = from.point;
   coordinates[coordinates.length - 1] = to.point;
-  const length = coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1]), 0);
+  // 3D: an elevator piece has no plan length (assertRoadShape keeps every other road from being vertical)
+  const length = coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - coordinates[i][0], p[1] - coordinates[i][1], p[2] - coordinates[i][2]), 0);
   if (length < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'Snapping endpoints would create a road segment shorter than 5 cm');
   return { fromNodeId: from.id, toNodeId: to.id, coordinates };
 }
@@ -428,6 +448,7 @@ export const editorService = {
   },
 
   async saveRoad(body: RoadSave, identity: CollectorIdentity, outer?: PoolClient) {
+    assertRoadShape(body, body.coordinates);
     await assertInsideTerrain(body.coordinates);
     return inTx(outer, async (db) => {
       await db.query('SELECT pg_advisory_xact_lock(5186001)'); // serialize network topology edits
@@ -478,13 +499,13 @@ export const editorService = {
       const changeSetId = body.mutationId;
       const nodesForCuts = new Map<string, { id: string; point: XYZ }>();
       for (const hit of allCuts) {
-        const key = `${Math.round(hit.x * 100)}:${Math.round(hit.y * 100)}`;
+        const key = cutKey(hit);
         if (!nodesForCuts.has(key)) nodesForCuts.set(key, await ensureNode(db, [hit.x, hit.y, hit.z], body.levelId ?? null, 'junction'));
       }
       const events: unknown[] = [];
       for (const { road, hits } of hitsByRoad.values()) {
         const cuts = hits.map((h) => {
-          const key = `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}`;
+          const key = cutKey(h);
           const node = nodesForCuts.get(key)!;
           return { measure: h.otherMeasure, x: node.point[0], y: node.point[1], z: node.point[2] };
         });
@@ -507,7 +528,7 @@ export const editorService = {
       }
 
       const ownCuts = allCuts.map((h) => {
-        const key = `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}`;
+        const key = cutKey(h);
         const node = nodesForCuts.get(key)!;
         return { measure: h.sourceMeasure, x: node.point[0], y: node.point[1], z: node.point[2] };
       });

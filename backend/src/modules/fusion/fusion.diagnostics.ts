@@ -41,7 +41,7 @@ export function diagnosticsFromEvents(events: unknown[]): RunDiagnostics {
   return { fixes: [...fixes.values()], events: out };
 }
 
-/** v4: forward decisions + smoother weights/residuals, steps (with stairs), kept ground contacts. */
+/** v4: forward decisions + smoother weights/residuals, stair/slope/uncertain steps, kept ground contacts. */
 export function diagnosticsV4(s: FusionStateV4, events: FusionEventV4[]): RunDiagnostics {
   const d = diagnosticsFromEvents(events);
   if (s.smoothed) {
@@ -55,7 +55,7 @@ export function diagnosticsV4(s: FusionStateV4, events: FusionEventV4[]): RunDia
     d.fixes = [...bySeq.values()];
     for (const k of s.smoothed.contactLog) d.events.push({ t: k.t, type: 'ground-contact', details: { offset: k.offset, sigma: Math.sqrt(k.variance) } });
   }
-  for (const p of s.steps) d.events.push({ t: p.t, type: p.stairs ? 'stair-step' : 'step', details: { length: p.length, segment: p.segment } });
+  for (const p of s.steps) d.events.push({ t: p.t, type: p.stairs ? 'stair-step' : 'step', details: { length: p.length, segment: p.segment, ...(p.slope ? { slope: true } : {}) } });
   d.events.sort((a, b) => a.t - b.t);
   d.fixes.sort((a, b) => a.t - b.t || a.seq - b.seq);
   return d;

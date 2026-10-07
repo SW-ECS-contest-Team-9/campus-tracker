@@ -108,7 +108,7 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
 
   if (on('OFF_TERRAIN') && o.ground) {
     for (const r of roads) {
-      if (r.levelId !== null || r.structure === 'indoor_corridor') continue; // only outdoor ground roads are expected on the DEM
+      if (r.levelId !== null || r.structure === 'indoor_corridor' || r.structure === 'elevator') continue; // only outdoor ground roads are expected on the DEM
       let worst = 0, at: XYZ | null = null;
       for (const p of r.coordinates) {
         const g = o.ground(p[0], p[1]);

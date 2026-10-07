@@ -2,9 +2,16 @@ import type { TerrainContext } from '../../geo/terrain.js';
 import type { LocalOrigin } from '../../geo/wgs84.js';
 import { createPedometerCounter, type PedometerCounter } from './fusion.pedometer.js';
 import { diag3, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
+import type { StrideCalibration } from './fusion.stride.js';
 
-/** One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk. */
-export interface StepV4 { t: number; rel: number; length: number; stairs: boolean; segment: number }
+/**
+ * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
+ * Vertical movement can be confirmed as stairs (tread) or a slope (full stride), or retained as verticalUnknown
+ * until there is enough path evidence; z = barometric Z at the step.
+ */
+export interface StepV4 {
+  t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean; segment: number; z?: number;
+}
 /** A usable GPS fix in local ENU meters (kept for the smoother). */
 export interface FixV4 {
   t: number;
@@ -36,6 +43,8 @@ export interface SmoothedSummaryV4 {
   segmentsWithHeading: number;
   steps: number;
   stairSteps: number;
+  slopeSteps: number;
+  verticalUnknownSteps: number;
   walkedWithoutMotionM: number;
   /** diagnostics (rev 4): robust weight and final residual of every fix (aligned with state.fixes), kept ground contacts */
   fixWeights: number[];
@@ -44,6 +53,11 @@ export interface SmoothedSummaryV4 {
 }
 
 export interface FusionStateV4 {
+  healthStrideCalibration?: StrideCalibration;
+  strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
+  healthStrideBlend?: number;
+  strideLevelSteps: number;
+  strideEffectiveM?: number;
   origin?: LocalOrigin;
   initialized: boolean;
   /** [x East m, y North m, theta rad] and its covariance */
@@ -75,11 +89,30 @@ export interface FusionStateV4 {
   accelWindow: { t: number; m2: number }[];
   stationary: boolean;
 
-  // ---- stride calibration (CMPedometer distance per detected level step) ----
+  // ---- stride calibration (CMPedometer distance per detected step, from pedometer updates of level walking) ----
   strideA: number;
   strideB: number;
-  levelStepsSinceUpdate: number;
+  /** pedometer reading at the last stride sample and the pedometer updates since */
+  strideSample?: { steps: number | null; distance: number; updates: number };
+  stairStepsSinceUpdate: number;
+  slopeStepsSinceUpdate: number;
+  verticalUnknownStepsSinceUpdate: number;
   stepsSinceUpdate: number;
+  /**
+   * current climb: vertical steps in one direction, at most slopeRunGapMs apart (stairs or slope: see slopeFrom),
+   * the stride of its slope walking, and the pedometer updates held back because their steps count as stairs
+   */
+  climb?: {
+    first: number;
+    dir: number;
+    lastT: number;
+    mode: 'unknown' | 'stairs' | 'slope';
+    strideA: number;
+    strideB: number;
+    held: { from: number; to: number; distance: number }[];
+  };
+  /** steps from this index on moved the live position by dead reckoning (not before a fix / heading fit set it) */
+  reckonedFrom: number;
   pedometerCounter: PedometerCounter;
   pedometerStarted: boolean;
   lastPedometerSegment?: string | null;
@@ -140,8 +173,12 @@ export const emptyWindowV4 = (): FusionStateV4['window'] => ({
   gpsUsed: null, gpsReason: null, gpsSeq: null, gpsAccuracy: null, innovation: null, steps: 0, unheadedSteps: 0, anchored: false, reanchored: false,
 });
 
-export function createFusionStateV4(): FusionStateV4 {
+export function createFusionStateV4(context?: { strideCalibration: StrideCalibration | null }): FusionStateV4 {
   return {
+    ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
+    ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),
+    strideLevelSteps: 0,
+    strideEffectiveM: context?.strideCalibration?.stepLengthM,
     initialized: false,
     x: [0, 0, 0],
     P: diag3(1e8, 1e8, 1),
@@ -157,8 +194,11 @@ export function createFusionStateV4(): FusionStateV4 {
     stationary: false,
     strideA: 0,
     strideB: 0,
-    levelStepsSinceUpdate: 0,
+    stairStepsSinceUpdate: 0,
+    slopeStepsSinceUpdate: 0,
+    verticalUnknownStepsSinceUpdate: 0,
     stepsSinceUpdate: 0,
+    reckonedFrom: 0,
     pedometerCounter: createPedometerCounter(),
     pedometerStarted: false,
     altWindow: [],

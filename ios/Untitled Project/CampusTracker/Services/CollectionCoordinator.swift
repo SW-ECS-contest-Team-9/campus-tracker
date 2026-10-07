@@ -80,7 +80,13 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         pendingUploadCount = sync.pendingCount
     }
 
-    func startSession(collectorId: String, motionRate: MotionSamplingRate, locationProfile: LocationCollectionProfile, distanceFilter: Double) {
+    func startSession(
+        collectorId: String,
+        motionRate: MotionSamplingRate,
+        locationProfile: LocationCollectionProfile,
+        distanceFilter: Double,
+        healthStride: HealthStrideService? = nil
+    ) {
         guard activeSession == nil else {
             print("[Start] blocked: a local session is already active")
             return
@@ -96,18 +102,23 @@ final class CollectionCoordinator: NSObject, ObservableObject {
             pausesLocationUpdatesAutomatically: false
         )
         let device = DeviceInfoProvider.current(capabilities: capabilities)
+        // Fixed once, here, from whatever was ready in-memory at this instant. Never revisited
+        // for this session even if a HealthKit query still in flight completes afterward.
+        let startedAt = Date()
+        let strideCalibration = healthStride?.readyCandidateForNewSession(sessionStartedAt: startedAt)
         let session = CollectionSession(
             id: UUID(),
             collectorId: collectorId.isEmpty ? "Unassigned" : collectorId,
             deviceId: device.deviceId,
-            startedAt: Date(),
+            startedAt: startedAt,
             endedAt: nil,
             status: .recording,
             serverSessionId: nil,
             deviceModel: device.deviceModel,
             systemVersion: device.systemVersion,
             sensorCapabilities: capabilities,
-            sampleCounts: SampleCounts()
+            sampleCounts: SampleCounts(),
+            strideCalibration: strideCalibration
         )
         activeSession = session
         uiCounts = SampleCounts()
@@ -567,10 +578,17 @@ nonisolated private struct SessionStartPayload: Codable {
     let appVersion: String
     let sensorCapabilities: SensorCapabilities
     let startedAt: Date
+    // Top-level per the server contract (docs/HEALTH_STRIDE_SERVER_PLAN.md), not nested under
+    // sensorCapabilities. Omitted (nil) when no fresh candidate was ready at session start.
+    let strideCalibration: StrideCalibration?
 }
 
 private struct SessionStartResponse: Decodable {
     let sessionId: String
+    // Decoded as plain strings (see StrideCalibrationAck) so a future status/reason value this
+    // build doesn't know about still decodes instead of failing the whole ACK. Absent on old
+    // servers, which is also just `nil` here, not an error.
+    let strideCalibration: StrideCalibrationAck?
 }
 
 nonisolated private struct AxisPayload: Codable {
@@ -875,7 +893,8 @@ final class TelemetrySyncCoordinator {
             systemVersion: device.systemVersion,
             appVersion: device.appVersion,
             sensorCapabilities: session.sensorCapabilities,
-            startedAt: session.startedAt
+            startedAt: session.startedAt,
+            strideCalibration: session.strideCalibration
         )
         queue.state.sessionStarts[session.id.uuidString] = payload
         queue.save()
@@ -1037,6 +1056,9 @@ final class TelemetrySyncCoordinator {
             self.queue.state.serverSessionIds[key] = response.sessionId
             self.queue.save()
             print("[UploadQueue] session:start ACK serverSessionId=\(response.sessionId)")
+            if let ack = response.strideCalibration {
+                print("[UploadQueue] session:start ACK strideCalibration status=\(ack.status) reason=\(ack.reason ?? "—")")
+            }
             if let uuid = UUID(uuidString: key) { self.onServerSessionStarted?(uuid, response.sessionId) }
             self.sendStatus()
             self.synchronize()
