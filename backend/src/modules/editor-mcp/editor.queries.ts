@@ -7,7 +7,7 @@ import { roundXYZ, round2, simplifyIndices } from './geometry.js';
 export interface NetworkRoad {
   id: string; name: string | null; roadClass: string; structure: string;
   pedestrianAccess: string; vehicleAccess: string; pedestrianDirection: string; vehicleDirection: string;
-  widthM: number | null; wheelchairAccess: string; buildingId: string | null; levelId: string | null;
+  widthM: number | null; wheelchairAccess: string; buildingId: string | null; levelId: string | null; displayColor?: string | null;
   status: string; revision: number; fromNodeId: string; toNodeId: string; parentId: string | null;
   createdBy: string; updatedBy: string; updatedAt: string; coordinates: XYZ[];
 }
@@ -21,7 +21,7 @@ const ACTIVE = `status IN ('DRAFT','APPROVED')`;
 const ROAD_COLUMNS = `id, name, road_class "roadClass", structure, pedestrian_access "pedestrianAccess", vehicle_access "vehicleAccess",
   pedestrian_direction "pedestrianDirection", vehicle_direction "vehicleDirection", width_m "widthM", wheelchair_access "wheelchairAccess",
   building_id "buildingId", level_id "levelId", status, revision, from_node_id "fromNodeId", to_node_id "toNodeId", parent_id "parentId",
-  created_by "createdBy", updated_by "updatedBy", updated_at "updatedAt", (ST_AsGeoJSON(geom)::json->'coordinates') coordinates`;
+  created_by "createdBy", updated_by "updatedBy", updated_at "updatedAt", display_color "displayColor", (ST_AsGeoJSON(geom)::json->'coordinates') coordinates`;
 const PLACE_COLUMNS = `id, name, category, description, building_id "buildingId", level_id "levelId", status, revision, parent_id "parentId",
   updated_by "updatedBy", updated_at "updatedAt", (ST_AsGeoJSON(geom)::json->'coordinates') coordinate`;
 

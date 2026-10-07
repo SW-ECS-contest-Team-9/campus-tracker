@@ -181,7 +181,7 @@ const renderMap = defineTool({
     const picture = renderMapSvg({
       bbox,
       buildings: buildings.rows.map((b) => ({ name: b.name, rings: b.geometry.coordinates.flat() })),
-      roads: roads.map((r) => ({ id: r.id, name: r.name, roadClass: r.roadClass, status: r.status, coordinates: r.coordinates, highlighted: highlight.has(r.id) })),
+      roads: roads.map((r) => ({ id: r.id, name: r.name, roadClass: r.roadClass, status: r.status, coordinates: r.coordinates, highlighted: highlight.has(r.id), displayColor: r.displayColor ?? null })),
       nodes: nodes.map((n) => ({ kind: n.kind, coordinate: n.coordinate, degree: degree.get(n.id) ?? 1 })),
       places: places.map((p) => ({ name: p.name, coordinate: p.coordinate })), tracks, marks,
     }, a.widthPx, a.labels);

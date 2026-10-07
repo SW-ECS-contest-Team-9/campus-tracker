@@ -46,13 +46,17 @@ export interface ResolveOptions {
   runZ: 'terrain' | 'run_h';
   /** Level of the line being drawn; referenced roads must be on it */
   levelId: string | null;
+  /** Stairs/elevators join levels: they may reference roads of another level */
+  crossLevel: boolean;
 }
-export const DEFAULT_RESOLVE: ResolveOptions = { zMode: 'terrain', terrainOffsetM: 0, densify: true, runZ: 'terrain', levelId: null };
+export const DEFAULT_RESOLVE: ResolveOptions = { zMode: 'terrain', terrainOffsetM: 0, densify: true, runZ: 'terrain', levelId: null, crossLevel: false };
 
-interface Vertex { p: XYZ; draped: boolean; anchor?: { roadId: string; measureM: number } }
+interface Vertex { p: XYZ; draped: boolean; anchor?: { roadId: string; measureM: number }; nodeId?: string }
 export interface ResolvedPath {
   coordinates: XYZ[];
   anchors: Anchor[];
+  /** vertices given as {at:{nodeId}}: the caller checks that the saved road really ends on that node */
+  nodeRefs: { vertexIndex: number; nodeId: string }[];
   sources: Record<string, unknown>[];
   warnings: string[];
 }
@@ -100,7 +104,7 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
       if (at.roadId) {
         const road = await deps.road(at.roadId);
         if (road.status !== 'DRAFT' && road.status !== 'APPROVED') throw AppError.conflict('ROAD_NOT_FOUND', `path[${i}]: road ${at.roadId} was removed or replaced`);
-        if (road.levelId !== o.levelId) throw AppError.badRequest('LEVEL_MISMATCH', `path[${i}]: road ${at.roadId} is on level ${JSON.stringify(road.levelId)}, this line on ${JSON.stringify(o.levelId)}; they would not connect`, { roadLevelId: road.levelId });
+        if (road.levelId !== o.levelId && !o.crossLevel) throw AppError.badRequest('LEVEL_MISMATCH', `path[${i}]: road ${at.roadId} is on level ${JSON.stringify(road.levelId)}, this line on ${JSON.stringify(o.levelId)}; they would not connect`, { roadLevelId: road.levelId });
         let measureM: number;
         if (at.vertexIndex !== undefined) {
           if (!road.coordinates[at.vertexIndex]) throw AppError.badRequest('INVALID_VERTEX', `path[${i}]: road has ${road.coordinates.length} vertices`);
@@ -112,7 +116,7 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
           else throw AppError.badRequest('INVALID_PATH_ITEM', `path[${i}].at with roadId needs vertexIndex, measureM or nearest`);
           vertices.push({ p: pointAt(road.coordinates, measureM), draped: false, anchor: { roadId: road.id, measureM } });
         }
-      } else if (at.nodeId) vertices.push({ p: [...(await deps.node(at.nodeId)).coordinate] as XYZ, draped: false });
+      } else if (at.nodeId) vertices.push({ p: [...(await deps.node(at.nodeId)).coordinate] as XYZ, draped: false, nodeId: at.nodeId });
       else if (at.placeId) vertices.push({ p: [...(await deps.place(at.placeId)).coordinate] as XYZ, draped: false });
       else if (at.cursorOf) {
         const cursor = deps.cursorOf(at.cursorOf.toUpperCase());
@@ -154,7 +158,7 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
   const merged: Vertex[] = [];
   for (const v of vertices) {
     const last = merged.at(-1);
-    if (last && Math.hypot(last.p[0] - v.p[0], last.p[1] - v.p[1], last.p[2] - v.p[2]) < 0.02) { if (v.anchor && !last.anchor) merged[merged.length - 1] = v; }
+    if (last && Math.hypot(last.p[0] - v.p[0], last.p[1] - v.p[1], last.p[2] - v.p[2]) < 0.02) { if ((v.anchor && !last.anchor) || (v.nodeId && !last.nodeId && !last.anchor)) merged[merged.length - 1] = v; }
     else merged.push(v);
   }
 
@@ -185,6 +189,7 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
   return {
     coordinates: out.map((v) => v.p),
     anchors: out.flatMap((v, vertexIndex) => (v.anchor ? [{ ...v.anchor, vertexIndex }] : [])),
+    nodeRefs: out.flatMap((v, vertexIndex) => (v.nodeId ? [{ vertexIndex, nodeId: v.nodeId }] : [])),
     sources, warnings,
   };
 }

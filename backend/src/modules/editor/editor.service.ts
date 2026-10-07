@@ -4,7 +4,7 @@ import type { PoolClient } from 'pg';
 import { pool, withTransaction, type DbClient } from '../../config/database.js';
 import { AppError } from '../../common/errors/app-error.js';
 import type { CollectorIdentity } from '../../common/auth/jwt.js';
-import type { Anchor, BranchFrom, JunctionSave, LeaseReleaseData, LeaseRequestData, PlaceSave, RoadSave } from './editor.dto.js';
+import type { Anchor, BranchFrom, JunctionSave, LeaseReleaseData, LeaseRequestData, PlaceSave, RoadSave, RoadStyleSave } from './editor.dto.js';
 import { coincidentVertices, crossings, projectOnLine, splitAt, type Hit, type XYZ } from './topology.js';
 
 const LEASE_MS = 30_000;
@@ -14,6 +14,14 @@ export const JUNCTION_RADIUS_M = 0.75;
 /** An elevator is two vertices stacked in plan; endpoint snapping may pull each one up to a node 0.15 m away. */
 export const ELEVATOR_MAX_XY_M = 0.3;
 export const ELEVATOR_MIN_RISE_M = 0.5;
+/**
+ * Stairs and elevators are the only roads that join different levels. Their ends reuse a node of any level that sits at
+ * the same place and height (within CONNECTOR_Z_M), and an ordinary road reuses such a connector node too. Ordinary roads
+ * of different levels still never share a node, so stacked corridors do not connect by accident.
+ */
+export const CONNECTOR_STRUCTURES = ['stairs', 'elevator'] as const;
+export const CONNECTOR_Z_M = 0.3;
+export const isConnector = (structure: string | null | undefined) => (CONNECTOR_STRUCTURES as readonly string[]).includes(structure ?? '');
 export type ObjectType = 'road' | 'place';
 
 /** Who made a change besides the collector account: the browser editor, or an AI agent through MCP. Recorded in editor_changes.payload.actor. */
@@ -31,14 +39,14 @@ export interface RoadRow {
   pedestrian_direction: RoadSave['pedestrianDirection']; vehicle_direction: RoadSave['vehicleDirection'];
   width_m: number | null; wheelchair_access: RoadSave['wheelchairAccess'];
   building_id: string | null; level_id: string | null; status: 'DRAFT' | 'APPROVED'; revision: number;
-  created_by: string; coordinates: XYZ[];
+  created_by: string; display_color: string | null; coordinates: XYZ[];
 }
 
-export type RoadAttrs = Pick<RoadSave, 'name' | 'roadClass' | 'structure' | 'pedestrianAccess' | 'vehicleAccess' | 'pedestrianDirection' | 'vehicleDirection' | 'widthM' | 'wheelchairAccess' | 'buildingId' | 'levelId'>;
+export type RoadAttrs = Pick<RoadSave, 'name' | 'roadClass' | 'structure' | 'pedestrianAccess' | 'vehicleAccess' | 'pedestrianDirection' | 'vehicleDirection' | 'widthM' | 'wheelchairAccess' | 'buildingId' | 'levelId' | 'displayColor'>;
 
 export const roadSelect = `SELECT id, parent_id, from_node_id, to_node_id, name, road_class, structure,
   pedestrian_access, vehicle_access, pedestrian_direction, vehicle_direction, width_m, wheelchair_access,
-  building_id, level_id, status, revision, created_by,
+  building_id, level_id, status, revision, created_by, display_color,
   (ST_AsGeoJSON(geom)::json->'coordinates') coordinates FROM mobility.road_segments`;
 
 /** What an in-place edit overwrites; enough to restore the road exactly. */
@@ -59,6 +67,7 @@ export function attrsFromRow(r: RoadRow): RoadAttrs {
     wheelchairAccess: r.wheelchair_access,
     buildingId: r.building_id,
     levelId: r.level_id,
+    displayColor: r.display_color,
   };
 }
 
@@ -78,9 +87,9 @@ export function assertRoadShape(attrs: Pick<RoadAttrs, 'structure' | 'vehicleAcc
 /** One node per cut location. Height is part of the key: an elevator's two ends share x,y. */
 const cutKey = (h: { x: number; y: number; z: number }) => `${Math.round(h.x * 100)}:${Math.round(h.y * 100)}:${Math.round(h.z * 100)}`;
 
-function branchAnchorHit(road: RoadRow, coordinates: XYZ[], branch: BranchFrom, levelId: string | null): Hit {
+function branchAnchorHit(road: RoadRow, coordinates: XYZ[], branch: BranchFrom, levelId: string | null, crossLevel = false): Hit {
   const point = road.coordinates[branch.vertexIndex];
-  if (!point || road.level_id !== levelId) throw AppError.conflict('BRANCH_SOURCE_CHANGED', 'The source road or level changed; choose its vertex again');
+  if (!point || (!crossLevel && road.level_id !== levelId)) throw AppError.conflict('BRANCH_SOURCE_CHANGED', 'The source road or level changed; choose its vertex again');
   if (Math.hypot(point[0] - coordinates[0][0], point[1] - coordinates[0][1]) > 0.02 || Math.abs(point[2] - coordinates[0][2]) > 0.05) {
     throw AppError.conflict('BRANCH_VERTEX_MOVED', 'The branch no longer starts at the selected road vertex');
   }
@@ -108,10 +117,10 @@ export function pointAtMeasure(points: XYZ[], measure: number): XYZ {
  * An explicit connection: vertex `vertexIndex` of the line being saved sits on `roadId` at `measureM`. Unlike a crossing found
  * geometrically, it also connects a line that only touches the road (a T junction drawn up to it, or leaving it in parallel).
  */
-function anchorHit(road: RoadRow, coordinates: XYZ[], anchor: Anchor, levelId: string | null): Hit {
+function anchorHit(road: RoadRow, coordinates: XYZ[], anchor: Anchor, levelId: string | null, crossLevel = false): Hit {
   const source = coordinates[anchor.vertexIndex];
   const total = road.coordinates.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - road.coordinates[i][0], p[1] - road.coordinates[i][1]), 0);
-  if (!source || road.level_id !== levelId || anchor.measureM > total + 0.01) throw AppError.conflict('ANCHOR_SOURCE_CHANGED', 'The anchored road or level changed; resolve the connection again', { roadId: road.id });
+  if (!source || (!crossLevel && road.level_id !== levelId) || anchor.measureM > total + 0.01) throw AppError.conflict('ANCHOR_SOURCE_CHANGED', 'The anchored road or level changed; resolve the connection again', { roadId: road.id });
   const point = pointAtMeasure(road.coordinates, Math.min(anchor.measureM, total));
   if (Math.hypot(point[0] - source[0], point[1] - source[1]) > 0.02 || Math.abs(point[2] - source[2]) > 0.05) {
     throw AppError.conflict('ANCHOR_MOVED', 'The line no longer touches the anchored road at that vertex', { roadId: road.id });
@@ -121,12 +130,16 @@ function anchorHit(road: RoadRow, coordinates: XYZ[], anchor: Anchor, levelId: s
   return { x: point[0], y: point[1], z: point[2], sourceMeasure, otherMeasure: Math.min(anchor.measureM, total), zDelta: 0 };
 }
 
-/** Geometric hits plus the caller's explicit connections (branch start, anchors) for one existing road. */
+/**
+ * Geometric hits plus the caller's explicit connections (branch start, anchors) for one existing road. A road of another
+ * level (only offered to stairs/elevators) contributes its explicit connections only, never geometric crossings.
+ */
 function hitsWithAnchors(coordinates: XYZ[], road: RoadRow, levelId: string | null, branchFrom?: BranchFrom, anchors: Anchor[] = []): Hit[] {
-  const hits = roadHits(coordinates, road);
+  const otherLevel = road.level_id !== levelId;
+  const hits = otherLevel ? [] : roadHits(coordinates, road);
   const explicit = [
-    ...(branchFrom?.roadId === road.id ? [branchAnchorHit(road, coordinates, branchFrom, levelId)] : []),
-    ...anchors.filter((a) => a.roadId === road.id).map((a) => anchorHit(road, coordinates, a, levelId)),
+    ...(branchFrom?.roadId === road.id ? [branchAnchorHit(road, coordinates, branchFrom, levelId, otherLevel)] : []),
+    ...anchors.filter((a) => a.roadId === road.id).map((a) => anchorHit(road, coordinates, a, levelId, otherLevel)),
   ];
   for (const anchor of explicit) {
     const duplicate = hits.findIndex((hit) => Math.abs(hit.sourceMeasure - anchor.sourceMeasure) < 0.01 && Math.abs(hit.otherMeasure - anchor.otherMeasure) < 0.01);
@@ -215,15 +228,22 @@ export async function requireLease(db: PoolClient, kind: ObjectType, id: string,
   if (!rows.length) throw AppError.conflict('EDITOR_LEASE_REQUIRED', `Active ${kind} edit lease is required for ${id}`);
 }
 
-export async function ensureNode(db: PoolClient, p: XYZ, levelId: string | null, kind: 'endpoint' | 'junction') {
+/**
+ * The node at a point, created when missing. Same level within LEVEL_TOLERANCE_M as before; additionally a node of any level
+ * within CONNECTOR_Z_M when the road being saved is a connector (stairs/elevator) or the node already ends one. A connector
+ * uses the tight height tolerance on its own level too, so the two ends of a short elevator never collapse into one node.
+ */
+export async function ensureNode(db: PoolClient, p: XYZ, levelId: string | null, kind: 'endpoint' | 'junction', connector = false) {
   const { rows } = await db.query<{ id: string; x: number; y: number; z: number }>(
     `SELECT id, ST_X(geom)::float8 x, ST_Y(geom)::float8 y, ST_Z(geom)::float8 z
-       FROM mobility.network_nodes
-      WHERE level_id IS NOT DISTINCT FROM $1
-        AND ST_DWithin(ST_Force2D(geom), ST_SetSRID(ST_MakePoint($2,$3),5186), 0.15)
-        AND abs(ST_Z(geom)-$4) <= $5
-      ORDER BY CASE kind WHEN 'junction' THEN 0 ELSE 1 END, ST_Distance(ST_Force2D(geom),ST_SetSRID(ST_MakePoint($2,$3),5186))
-      LIMIT 1 FOR UPDATE`, [levelId, p[0], p[1], p[2], LEVEL_TOLERANCE_M],
+       FROM mobility.network_nodes n
+      WHERE ST_DWithin(ST_Force2D(geom), ST_SetSRID(ST_MakePoint($2,$3),5186), 0.15)
+        AND ((level_id IS NOT DISTINCT FROM $1 AND abs(ST_Z(geom)-$4) <= CASE WHEN $7::boolean THEN $6::float8 ELSE $5::float8 END)
+          OR (abs(ST_Z(geom)-$4) <= $6::float8 AND ($7::boolean OR EXISTS (SELECT 1 FROM mobility.road_segments r
+                WHERE r.status IN ('DRAFT','APPROVED') AND r.structure IN ('stairs','elevator') AND (r.from_node_id=n.id OR r.to_node_id=n.id)))))
+      ORDER BY abs(ST_Z(geom)-$4) > $6::float8, CASE kind WHEN 'junction' THEN 0 ELSE 1 END,
+               ST_Distance(ST_Force2D(geom),ST_SetSRID(ST_MakePoint($2,$3),5186)) + abs(ST_Z(geom)-$4)
+      LIMIT 1 FOR UPDATE OF n`, [levelId, p[0], p[1], p[2], LEVEL_TOLERANCE_M, CONNECTOR_Z_M, connector],
   );
   if (rows[0]) return { id: rows[0].id, point: [rows[0].x, rows[0].y, rows[0].z] as XYZ, created: false };
   const id = randomUUID();
@@ -232,9 +252,9 @@ export async function ensureNode(db: PoolClient, p: XYZ, levelId: string | null,
   return { id, point: p, created: true };
 }
 
-export async function snapPieceEndpoints(db: PoolClient, points: XYZ[], levelId: string | null) {
-  const from = await ensureNode(db, points[0], levelId, 'endpoint');
-  const to = await ensureNode(db, points.at(-1)!, levelId, 'endpoint');
+export async function snapPieceEndpoints(db: PoolClient, points: XYZ[], levelId: string | null, connector = false) {
+  const from = await ensureNode(db, points[0], levelId, 'endpoint', connector);
+  const to = await ensureNode(db, points.at(-1)!, levelId, 'endpoint', connector);
   const coordinates = points.map((p) => [...p] as XYZ);
   coordinates[0] = from.point;
   coordinates[coordinates.length - 1] = to.point;
@@ -251,12 +271,12 @@ export async function insertRoad(db: PoolClient, p: {
   await db.query(
     `INSERT INTO mobility.road_segments
       (id,parent_id,from_node_id,to_node_id,name,road_class,structure,pedestrian_access,vehicle_access,
-       pedestrian_direction,vehicle_direction,width_m,wheelchair_access,building_id,level_id,status,geom,created_by,updated_by)
-     VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,${geoJSONLine(17)},$18,$19)`,
+       pedestrian_direction,vehicle_direction,width_m,wheelchair_access,building_id,level_id,status,geom,created_by,updated_by,display_color)
+     VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,${geoJSONLine(17)},$18,$19,$20)`,
     [p.id, p.parentId, p.fromNode, p.toNode, p.attrs.name ?? null, p.attrs.roadClass, p.attrs.structure,
       p.attrs.pedestrianAccess, p.attrs.vehicleAccess, p.attrs.pedestrianDirection, p.attrs.vehicleDirection,
       p.attrs.widthM ?? null, p.attrs.wheelchairAccess, p.attrs.buildingId ?? null, p.attrs.levelId ?? null,
-      p.status, JSON.stringify(p.coordinates), p.createdBy, p.owner],
+      p.status, JSON.stringify(p.coordinates), p.createdBy, p.owner, p.attrs.displayColor ?? null],
   );
 }
 
@@ -284,7 +304,7 @@ export const editorService = {
         road_class "roadClass", structure, pedestrian_access "pedestrianAccess", vehicle_access "vehicleAccess",
         pedestrian_direction "pedestrianDirection", vehicle_direction "vehicleDirection", width_m "widthM",
         wheelchair_access "wheelchairAccess", building_id "buildingId", level_id "levelId", status, revision,
-        ST_AsGeoJSON(geom)::json geometry FROM mobility.road_segments WHERE ${where} ORDER BY created_at,id`, params),
+        display_color "displayColor", ST_AsGeoJSON(geom)::json geometry FROM mobility.road_segments WHERE ${where} ORDER BY created_at,id`, params),
       pool.query(`SELECT id,parent_id "parentId",name,category,description,building_id "buildingId",level_id "levelId",status,revision,
         ST_AsGeoJSON(geom)::json geometry FROM mobility.places WHERE ${status === 'all' ? "status IN ('DRAFT','APPROVED')" : 'status = $1'} ORDER BY name,id`, params),
       pool.query(`SELECT id,kind,level_id "levelId",revision,ST_AsGeoJSON(geom)::json geometry
@@ -337,13 +357,15 @@ export const editorService = {
     return { released: rowCount === 1 };
   },
 
-  async previewTopology(coordinates: XYZ[], levelId: string | null, branchFrom?: BranchFrom, anchors: Anchor[] = [], db: DbClient = pool) {
+  async previewTopology(coordinates: XYZ[], levelId: string | null, branchFrom?: BranchFrom, anchors: Anchor[] = [], db: DbClient = pool, structure?: string | null) {
     const xs = coordinates.map((p) => p[0]), ys = coordinates.map((p) => p[1]);
+    // A connector may reference (anchor/branch) roads of other levels; those join only at the referenced points.
+    const crossLevelIds = isConnector(structure) ? [...anchors.map((a) => a.roadId), ...(branchFrom ? [branchFrom.roadId] : [])] : [];
     const { rows } = await db.query<RoadRow>(`${roadSelect}
-      WHERE status IN ('DRAFT','APPROVED') AND level_id IS NOT DISTINCT FROM $1
+      WHERE status IN ('DRAFT','APPROVED') AND (level_id IS NOT DISTINCT FROM $1 OR id = ANY($6::uuid[]))
         AND geom && ST_MakeEnvelope($2,$3,$4,$5,5186)`,
-      [levelId, Math.min(...xs) - 0.01, Math.min(...ys) - 0.01, Math.max(...xs) + 0.01, Math.max(...ys) + 0.01]);
-    const found = rows.flatMap((road) => {
+      [levelId, Math.min(...xs) - 0.01, Math.min(...ys) - 0.01, Math.max(...xs) + 0.01, Math.max(...ys) + 0.01, crossLevelIds]);
+    const found = rows.filter((road) => road.level_id === levelId).flatMap((road) => {
       const total = road.coordinates.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - road.coordinates[i][0], p[1] - road.coordinates[i][1]), 0);
       return roadHits(coordinates, road).map((hit) => ({ roadId: road.id, revision: road.revision, name: road.name, roadClass: road.road_class, status: road.status,
         requiresLease: hit.otherMeasure > 0.01 && hit.otherMeasure < total - 0.01,
@@ -352,7 +374,7 @@ export const editorService = {
     for (const anchor of anchors) {
       const road = rows.find((item) => item.id === anchor.roadId);
       if (!road) throw AppError.conflict('ANCHOR_SOURCE_CHANGED', 'The anchored road is no longer there', { roadId: anchor.roadId });
-      const hit = anchorHit(road, coordinates, anchor, levelId);
+      const hit = anchorHit(road, coordinates, anchor, levelId, road.level_id !== levelId);
       const total = road.coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - road.coordinates[i][0], p[1] - road.coordinates[i][1]), 0);
       const interior = hit.otherMeasure > 0.01 && hit.otherMeasure < total - 0.01;
       if (!found.some((item) => item.roadId === road.id && Math.hypot(item.coordinate[0] - hit.x, item.coordinate[1] - hit.y) < 0.01 && (!interior || item.requiresLease))) {
@@ -362,7 +384,7 @@ export const editorService = {
     if (branchFrom) {
       const road = rows.find((item) => item.id === branchFrom.roadId);
       if (!road) throw AppError.conflict('BRANCH_SOURCE_CHANGED', 'The source road is no longer near the branch vertex');
-      const hit = branchAnchorHit(road, coordinates, branchFrom, levelId);
+      const hit = branchAnchorHit(road, coordinates, branchFrom, levelId, road.level_id !== levelId);
       const total = road.coordinates.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - road.coordinates[i][0], p[1] - road.coordinates[i][1]), 0);
       const anchorRequiresLease = hit.otherMeasure > 0.01 && hit.otherMeasure < total - 0.01;
       if (!found.some((item) => item.roadId === road.id && Math.hypot(item.coordinate[0] - hit.x, item.coordinate[1] - hit.y) < 0.01
@@ -430,7 +452,7 @@ export const editorService = {
           WHERE id=$1`, [road.id, identity.collectorId]);
         const childIds: string[] = [];
         for (const piece of pieces) {
-          const snapped = await snapPieceEndpoints(db, piece, road.level_id);
+          const snapped = await snapPieceEndpoints(db, piece, road.level_id, isConnector(road.structure));
           const id = randomUUID(); childIds.push(id);
           await insertRoad(db, { id, parentId: road.id, coordinates: snapped.coordinates, attrs: attrsFromRow(road),
             fromNode: snapped.fromNodeId, toNode: snapped.toNodeId, owner: identity.collectorId, createdBy: road.created_by, status: road.status });
@@ -461,11 +483,15 @@ export const editorService = {
       if (!prior && body.expectedRevision != null) throw AppError.conflict('ROAD_NOT_FOUND', 'Road was removed or replaced');
       if (body.branchFrom?.roadId === body.id) throw AppError.badRequest('INVALID_BRANCH_SOURCE', 'A road cannot branch from itself');
 
+      const connector = isConnector(body.structure);
+      const levelId = body.levelId ?? null;
+      const displayColor = body.displayColor === undefined ? (prior?.display_color ?? null) : body.displayColor;
       const xs = body.coordinates.map((p) => p[0]), ys = body.coordinates.map((p) => p[1]);
+      const crossLevelIds = connector ? [...body.anchors.map((a) => a.roadId), ...(body.branchFrom ? [body.branchFrom.roadId] : [])] : [];
       const { rows: candidates } = await db.query<RoadRow>(`${roadSelect}
-        WHERE status IN ('DRAFT','APPROVED') AND id<>$1 AND level_id IS NOT DISTINCT FROM $2
+        WHERE status IN ('DRAFT','APPROVED') AND id<>$1 AND (level_id IS NOT DISTINCT FROM $2 OR id = ANY($7::uuid[]))
           AND geom && ST_MakeEnvelope($3,$4,$5,$6,5186) FOR UPDATE`,
-        [body.id, body.levelId ?? null, Math.min(...xs) - 0.01, Math.min(...ys) - 0.01, Math.max(...xs) + 0.01, Math.max(...ys) + 0.01]);
+        [body.id, levelId, Math.min(...xs) - 0.01, Math.min(...ys) - 0.01, Math.max(...xs) + 0.01, Math.max(...ys) + 0.01, crossLevelIds]);
       if (body.branchFrom && !candidates.some((road) => road.id === body.branchFrom!.roadId)) {
         throw AppError.conflict('BRANCH_SOURCE_CHANGED', 'The source road is no longer near the branch vertex');
       }
@@ -473,8 +499,10 @@ export const editorService = {
       if (lostAnchor) throw AppError.conflict('ANCHOR_SOURCE_CHANGED', 'The anchored road is no longer there', { roadId: lostAnchor.roadId });
       const hitsByRoad = new Map<string, { road: RoadRow; hits: Hit[] }>();
       const allCuts: { x: number; y: number; z: number; sourceMeasure: number; roadId: string; otherMeasure: number }[] = [];
+      const cutLevel = new Map<string, string | null>(); // node level for a cut: the other road's level (it may differ for a connector)
       for (const road of candidates) {
-        const hits = hitsWithAnchors(body.coordinates, road, body.levelId ?? null, body.branchFrom, body.anchors);
+        const hits = hitsWithAnchors(body.coordinates, road, levelId, body.branchFrom, body.anchors);
+        for (const h of hits) if (!cutLevel.has(cutKey(h))) cutLevel.set(cutKey(h), road.level_id);
         if (!hits.length) continue;
         const total = road.coordinates.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - road.coordinates[i][0], p[1] - road.coordinates[i][1]), 0);
         const interior = hits.filter((h) => h.otherMeasure > 0.01 && h.otherMeasure < total - 0.01);
@@ -500,7 +528,7 @@ export const editorService = {
       const nodesForCuts = new Map<string, { id: string; point: XYZ }>();
       for (const hit of allCuts) {
         const key = cutKey(hit);
-        if (!nodesForCuts.has(key)) nodesForCuts.set(key, await ensureNode(db, [hit.x, hit.y, hit.z], body.levelId ?? null, 'junction'));
+        if (!nodesForCuts.has(key)) nodesForCuts.set(key, await ensureNode(db, [hit.x, hit.y, hit.z], cutLevel.has(key) ? cutLevel.get(key)! : levelId, 'junction', connector));
       }
       const events: unknown[] = [];
       for (const { road, hits } of hitsByRoad.values()) {
@@ -516,7 +544,7 @@ export const editorService = {
           WHERE id=$1`, [road.id, identity.collectorId]);
         const childIds: string[] = [];
         for (const piece of pieces) {
-          const snapped = await snapPieceEndpoints(db, piece, road.level_id);
+          const snapped = await snapPieceEndpoints(db, piece, road.level_id, isConnector(road.structure));
           const id = randomUUID(); childIds.push(id);
           await insertRoad(db, { id, parentId: road.id, coordinates: snapped.coordinates, attrs: attrsFromRow(road),
             fromNode: snapped.fromNodeId, toNode: snapped.toNodeId, owner: identity.collectorId, createdBy: road.created_by, status: road.status });
@@ -539,29 +567,29 @@ export const editorService = {
       let resultRoadId = resultId;
       const ownPieces = splitAt(body.coordinates, ownCuts);
       if (prior && ownPieces.length === 1 && !preserveApproved) {
-        const piece = await snapPieceEndpoints(db, ownPieces[0], body.levelId ?? null);
+        const piece = await snapPieceEndpoints(db, ownPieces[0], levelId, connector);
         await db.query(`UPDATE mobility.road_segments SET from_node_id=$2,to_node_id=$3,name=$4,road_class=$5,structure=$6,
           pedestrian_access=$7,vehicle_access=$8,pedestrian_direction=$9,vehicle_direction=$10,width_m=$11,wheelchair_access=$12,
-          building_id=$13,level_id=$14,geom=${geoJSONLine(16)},revision=revision+1,updated_by=$15,updated_at=now()
+          building_id=$13,level_id=$14,geom=${geoJSONLine(16)},display_color=$17,revision=revision+1,updated_by=$15,updated_at=now()
           WHERE id=$1`, [body.id, piece.fromNodeId, piece.toNodeId, body.name ?? null, body.roadClass, body.structure, body.pedestrianAccess,
           body.vehicleAccess, body.pedestrianDirection, body.vehicleDirection, body.widthM ?? null, body.wheelchairAccess,
-          body.buildingId ?? null, body.levelId ?? null, identity.collectorId, JSON.stringify(piece.coordinates)]);
+          body.buildingId ?? null, levelId, identity.collectorId, JSON.stringify(piece.coordinates), displayColor]);
         events.push(await addChange(db, changeSetId, 'road', body.id, 'updated', prior.revision + 1, identity.collectorId, { mutationId: body.mutationId, before: roadBefore(prior) }));
       } else {
-        const from = await ensureNode(db, body.coordinates[0], body.levelId ?? null, 'endpoint');
-        const to = await ensureNode(db, body.coordinates.at(-1)!, body.levelId ?? null, 'endpoint');
+        const from = await ensureNode(db, body.coordinates[0], levelId, 'endpoint', connector);
+        const to = await ensureNode(db, body.coordinates.at(-1)!, levelId, 'endpoint', connector);
         if (prior && !preserveApproved) {
           await db.query(`UPDATE mobility.road_segments SET status='REPLACED',revision=revision+1,updated_by=$2,updated_at=now() WHERE id=$1`, [body.id, identity.collectorId]);
         }
         // Keep a non-routable parent row as lineage when one drawn feature becomes several network edges.
-        const attrs: RoadAttrs = body;
+        const attrs: RoadAttrs = { ...body, displayColor };
         if (ownPieces.length > 1 && (!prior || preserveApproved)) {
           await insertRoad(db, { id: resultId, parentId: preserveApproved ? prior!.id : null, coordinates: body.coordinates, attrs, fromNode: from.id, toNode: to.id,
             owner: identity.collectorId, createdBy: identity.collectorId, status: 'REPLACED' });
         }
         const ids: string[] = [];
         for (const piece of ownPieces) {
-          const snapped = await snapPieceEndpoints(db, piece, body.levelId ?? null);
+          const snapped = await snapPieceEndpoints(db, piece, levelId, connector);
           const id = ownPieces.length === 1 ? resultId : randomUUID(); ids.push(id);
           if (ownPieces.length === 1) {
             await insertRoad(db, { id, parentId: preserveApproved ? prior!.id : null, coordinates: snapped.coordinates, attrs, fromNode: snapped.fromNodeId, toNode: snapped.toNodeId,
@@ -583,6 +611,25 @@ export const editorService = {
       const result = { changeSetId, roadId: resultRoadId, events };
       await db.query('INSERT INTO mobility.editor_mutations(mutation_id,owner_code,result) VALUES($1,$2,$3::jsonb)',
         [body.mutationId, identity.collectorId, JSON.stringify(result)]);
+      return result;
+    });
+  },
+
+  /** Shared display colour of one active road. Visual only: no lease, no revision bump; logged so other editors reload and it can be reverted. */
+  async setRoadStyle(id: string, body: RoadStyleSave, identity: CollectorIdentity, outer?: PoolClient) {
+    return inTx(outer, async (db) => {
+      const duplicate = await db.query<{ result: any }>(`SELECT result FROM mobility.editor_mutations WHERE mutation_id=$1 AND owner_code=$2`, [body.mutationId, identity.collectorId]);
+      if (duplicate.rows[0]) return duplicate.rows[0].result;
+      const { rows } = await db.query<{ revision: number; display_color: string | null }>(
+        `SELECT revision, display_color FROM mobility.road_segments WHERE id=$1 AND status IN ('DRAFT','APPROVED') FOR UPDATE`, [id]);
+      const road = rows[0];
+      if (!road) throw AppError.notFound('ROAD_NOT_FOUND', `Road ${id} does not exist or was removed/replaced`);
+      if (road.display_color === body.displayColor) return { changeSetId: null, roadId: id, displayColor: body.displayColor, unchanged: true };
+      await db.query('UPDATE mobility.road_segments SET display_color=$2,updated_by=$3,updated_at=now() WHERE id=$1', [id, body.displayColor, identity.collectorId]);
+      const event = await addChange(db, body.mutationId, 'road', id, 'updated', road.revision, identity.collectorId,
+        { style: { displayColor: body.displayColor }, mutationId: body.mutationId, before: { style: { displayColor: road.display_color } } });
+      const result = { changeSetId: body.mutationId, roadId: id, displayColor: body.displayColor, event };
+      await db.query('INSERT INTO mobility.editor_mutations(mutation_id,owner_code,result) VALUES($1,$2,$3::jsonb)', [body.mutationId, identity.collectorId, JSON.stringify(result)]);
       return result;
     });
   },

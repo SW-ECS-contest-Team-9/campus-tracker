@@ -13,7 +13,10 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
       + 'Access defaults follow roadClass (pedestrian: walking allowed, vehicles prohibited; vehicle: the reverse; shared: both). '
       + 'Crossing an existing road on the same level and height splits both and joins them at a node. '
       + 'An elevator is structure "elevator" with exactly two path points at the same x,y and different z (one road per pair of floors; zMode "explicit" or {at:{nodeId}} ends). '
-      + 'Returns the saved pieces, crossings and whether each reference connected.' },
+      + 'Stairs and elevators join levels: their ends reuse any node at the same place and height (within 0.3 m) whatever its levelId, they may reference roads of '
+      + 'another level with {at:{roadId}}, and later roads of any level that end there reuse the node. Ordinary roads of different levels never share a node. '
+      + 'Stacked flights / shaft pieces at other heights are not duplicates; only the same 3D line is. '
+      + 'Returns the saved pieces, crossings, whether each reference connected, and nodeRefs (whether each {at:{nodeId}} end really landed on that node).' },
   update_road: { title: 'Change a road',
     description: 'Change attributes and/or geometry of a DRAFT road. Needs expectedRevision from get_feature/list_features. Geometry: replace it all with path, '
       + 'or edit vertices with vertexOps (move/insert/delete/replaceRange), reverse, simplifyM, drapeToTerrain. If the new shape crosses other roads it is replaced by new pieces with new ids.' },
@@ -26,10 +29,21 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
     description: 'Remove a DRAFT road or place from the active network (status RETIRED; the row is kept and revert_changeset can restore it). Needs expectedRevision.' },
   move_node: { title: 'Move a junction',
     description: 'Move a network node together with the end of every road attached to it, so they stay connected. Use this instead of moving one road end with update_road.' },
+  merge_nodes: { title: 'Join two nodes at one spot',
+    description: 'Move every road on removeNodeId onto keepNodeId (within 0.15 m in plan and 0.3 m in height). Nodes of different levels may be joined only where stairs or '
+      + 'an elevator end: use it for LEVEL_NODES_NOT_JOINED / DUPLICATE_NODES findings of validate_network, e.g. corridors saved under another levelId at a stair top.' },
   split_road: { title: 'Split a road',
     description: 'Cut one DRAFT road in two at a distance from its start (or at the point nearest to a location). Both pieces keep its attributes; use it before giving part of a road different attributes.' },
   merge_roads: { title: 'Merge two roads',
     description: 'Join two DRAFT roads that meet at a node no other road uses and that have the same attributes into one road.' },
+  set_road_style: { title: 'Set a road colour',
+    description: 'Set or clear the display colour ("#rrggbb" or null) of a road for every editor. Visual only: no lease, no revision change, works on DRAFT and APPROVED roads, '
+      + 'revert_changeset undoes it. null returns the road to the automatic floor / road-type colouring.' },
+  create_corridor: { title: 'Corridor from recorded tracks',
+    description: 'Turn several recorded walks of one passage (fusion runs, optional seq ranges) into ONE road: centerline = median of the tracks, width = spread of the tracks '
+      + '+ margin (unless widthM is given), heights = median track height minus phoneHeightM (zSource "run") or the terrain. Default structure "indoor_corridor" '
+      + '(the editor draws it as a rectangular tube). startAt/endAt connect it to existing roads or nodes. Returns the road plus corridor stats (coverage, used/reversed tracks). '
+      + 'Use dryRun first and check coverage and heights.' },
   revert_changeset: { title: 'Undo a change set', destructive: true,
     description: 'Undo one earlier change set (id from get_changes or from a tool result) with a new change set: created objects are retired, replaced/retired ones restored, edited ones reset. '
       + 'Refused if those objects were changed again later. Revert a batch in reverse order of its change sets.' },

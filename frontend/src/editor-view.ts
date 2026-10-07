@@ -4,8 +4,17 @@
 
 export type NavPreset = 'cesium' | 'blender' | 'cad';
 export type EndpointMode = 'selected' | 'all' | 'off';
+export type ColorMode = 'floor' | 'type';
 export type ViewPrefs = {
+  /** legacy browser-only colours (before colours were shared); no longer used */
   roadColors: Record<string, string>;
+  /** automatic colour when a road has no shared colour: by floor (default) or by road class */
+  colorMode: ColorMode;
+  /** floor height used to estimate a floor from Z when the levelId names none */
+  floorHeightM: number;
+  /** draw indoor corridors as rectangular tubes and elevators as shafts */
+  solids: boolean;
+  tubeHeightM: number;
   dimOthers: boolean; dimAlpha: number;
   depthFade: boolean; fadeNear: number; fadeFar: number; fadeMin: number;
   endpoints: EndpointMode;
@@ -16,7 +25,7 @@ export type ViewPrefs = {
 
 const PREFS_KEY = 'campus.editor.viewPrefs';
 export const DEFAULT_PREFS: ViewPrefs = {
-  roadColors: {}, dimOthers: true, dimAlpha: 0.25,
+  roadColors: {}, colorMode: 'floor', floorHeightM: 3, solids: true, tubeHeightM: 2.4, dimOthers: true, dimAlpha: 0.25,
   depthFade: true, fadeNear: 80, fadeFar: 700, fadeMin: 0.3,
   endpoints: 'selected', hoverHighlight: true,
   preset: 'cesium', zoomToPointer: false, invertZoom: false,

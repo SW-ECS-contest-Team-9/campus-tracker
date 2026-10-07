@@ -19,6 +19,8 @@ const RoadFields = z.object({
   wheelchairAccess: z.enum(['allowed', 'prohibited', 'restricted', 'unknown']).default('unknown'),
   buildingId: z.string().max(80).nullish(),
   levelId: z.string().max(80).nullish(),
+  /** Shared display colour (#rrggbb). Omitted = keep the current one; null = clear it. Visual only. */
+  displayColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).transform((c) => c.toLowerCase()).nullish(),
 });
 
 export const BranchFrom = z.object({ roadId: Uuid, vertexIndex: z.number().int().nonnegative() });
@@ -64,6 +66,14 @@ export const PlaceSave = z.object({
   mutationId: Uuid,
 });
 export type PlaceSave = z.infer<typeof PlaceSave>;
+
+/** Changes only how a road is drawn for everyone; no lease, no revision bump, revertible like any change set. */
+export const RoadStyleSave = z.object({
+  displayColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).transform((c) => c.toLowerCase()).nullable(),
+  sessionId: Uuid,
+  mutationId: Uuid,
+});
+export type RoadStyleSave = z.infer<typeof RoadStyleSave>;
 
 export const LeaseRequest = z.object({
   objectType: z.enum(['road', 'place']),

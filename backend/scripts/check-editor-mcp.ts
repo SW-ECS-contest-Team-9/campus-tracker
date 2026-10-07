@@ -95,7 +95,7 @@ async function readChecks(token: string) {
   const names = toolList.map((t) => t.name);
   const read = ['get_editor_context', 'list_features', 'get_feature', 'find_nearby', 'get_collaborators', 'get_changes', 'validate_network',
     'sample_terrain', 'list_fusion_runs', 'get_run_track', 'list_routes', 'get_canonical_path', 'list_buildings', 'convert_coordinates', 'check_reachability', 'render_map'];
-  const write = ['create_road', 'update_road', 'connect_roads', 'create_place', 'update_place', 'retire_feature', 'move_node', 'split_road', 'merge_roads', 'revert_changeset', 'apply_changes'];
+  const write = ['create_road', 'update_road', 'connect_roads', 'create_place', 'update_place', 'retire_feature', 'move_node', 'split_road', 'merge_roads', 'revert_changeset', 'set_road_style', 'create_corridor', 'merge_nodes', 'apply_changes'];
   check('tools/list has every tool', [...read, ...write, 'show_overlay', 'clear_overlay', 'focus_view'].every((n) => names.includes(n)), { count: names.length });
   check('read tools are annotated read-only, write tools are not',
     toolList.filter((t) => read.includes(t.name)).every((t) => t.annotations?.readOnlyHint === true) && toolList.filter((t) => write.includes(t.name)).every((t) => t.annotations?.readOnlyHint === false));

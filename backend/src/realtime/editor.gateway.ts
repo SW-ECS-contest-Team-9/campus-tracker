@@ -213,7 +213,9 @@ export const editorAgents = {
 export const editorBroadcast = {
   change: (event: unknown) => {
     if (event && typeof event === 'object' && 'objectType' in event && 'objectId' in event
-      && typeof event.objectType === 'string' && typeof event.objectId === 'string') {
+      && typeof event.objectType === 'string' && typeof event.objectId === 'string'
+      // a colour change does not end someone's live geometry draft of that road
+      && !(event as { payload?: { style?: unknown } }).payload?.style) {
       activeDrafts.delete(`${event.objectType}:${event.objectId}`);
     }
     namespace?.to(room).emit('editor:feature:changed', event);

@@ -424,3 +424,17 @@ backend/test/editor-mcp.*.test.ts
 - `check_reachability`는 시작·끝을 가장 가까운 노드에 맞춘다. 도로 중간 지점에서 출발하는 경우는 다루지 않는다.
 - Codex에서의 연결은 확인하지 않았다. Claude Code(데스크톱)에서는 도구 30개가 보이고 호출된다.
 - 현재 데이터의 `validate_network` 결과: 도로 4개가 모두 지면에서 5.8~12.4 m 떠 있다(Fusion 높이로 그린 것으로 보인다).
+
+## 층간 연결·중복 판정·색·동선 통로 (2026-10-07)
+
+MCP 사용 중 보고된 "층별 경로 중복 판정 문제"를 반영한 변경이다.
+
+- **중복 판정은 3D로 한다.** 평면 Hausdorff 0.05 m 안의 후보 중, 높이 범위(±0.3 m)와 높이 단면까지 같은 경우만 `DUPLICATE_GEOMETRY`다(역방향 포함, levelId 무관). 같은 계단실의 위·아래 층 계단, 같은 샤프트의 다른 층 엘리베이터 구간은 별개 도로다(`corridor.ts`의 `sameRoad3D`).
+- **계단·엘리베이터(connector)가 층을 잇는다.** connector의 끝은 같은 위치(평면 0.15 m, 높이 0.3 m)의 노드를 levelId와 상관없이 재사용하고, 일반 도로도 connector 끝 노드는 다른 층이어도 재사용한다. 일반 도로끼리는 층이 다르면 여전히 연결되지 않는다. connector는 같은 층에서도 높이 허용치 0.3 m를 쓰므로 짧은 엘리베이터의 두 끝이 한 노드로 합쳐지지 않는다(`ensureNode`).
+- connector는 `{at:{roadId}}`로 다른 층 도로를 참조할 수 있고(`LEVEL_MISMATCH` 면제), 참조 지점에서만 그 도로를 분할·연결한다. 기하 교차는 같은 층 도로와만 계산한다.
+- `create_road` 결과의 `nodeRefs`: `{at:{nodeId}}` 끝점이 실제로 그 노드에 붙었는지. 아니면 `NODE_NOT_REUSED` 경고.
+- `merge_nodes`: 같은 위치의 두 노드를 하나로 합친다. 층이 다르면 connector 끝에서만 허용. 이전 우회 저장분(층마다 다른 levelId로 따로 생긴 노드)을 잇는 데 쓴다. `validate_network`의 `LEVEL_NODES_NOT_JOINED`가 대상을 찾아 준다. 엘리베이터 양 끝은 `DUPLICATE_NODES`에서 제외했다.
+- `move_node`가 엘리베이터 끝을 움직일 때 평면 길이 대신 수직·높이차 조건으로 검사한다(전에는 항상 거부됐다).
+- **표시 색 공유**: `road_segments.display_color`(migration 026), `PUT /api/v1/editor/roads/:id/style`, MCP `set_road_style`. lease·revision 없이 바뀌고 changeset으로 기록되어 다른 편집기가 다시 읽으며 `revert_changeset`으로 되돌린다. 분할·병합·저장 때 유지된다. 진행 중인 다른 사람의 초안은 지우지 않는다.
+- **동선 → 통로**: `POST /api/v1/editor/corridor-preview`(저장 없음, 편집기가 초안으로 띄움), MCP `create_corridor`(저장). 가장 긴 실행을 기준으로 1 m 간격 단면에서 각 실행의 횡방향 위치 중앙값 = 중앙선, 실행 간 퍼짐의 80% 분위 + 0.8 m = 폭, 높이 = 실행 높이 중앙값 − 폰 높이(기본 1.1 m, 가정값) 또는 지형. 기본 구조는 `indoor_corridor`.
+- 편집기 표시: 자동 색은 층별 고정 팔레트(B3 어두운 남색 → 10F 원색 빨강, `floor-colors.ts`)가 기본이고 도로 유형별로 바꿀 수 있다. 층은 levelId에서 읽고, 없으면 지형 위 높이 ÷ 층고(기본 3 m)로 추정해 범례에 "추정"으로 표시한다. 유형은 색 대신 형상으로 구분한다: 횡단보도 지브라 점선, 경사로 긴 점선, 계단 오르막 방향 갈매기표, 인도 밝은 테두리, 실내 통로 사각 튜브(폭 = widthM, 높이 설정값), 엘리베이터 샤프트 상자, 두께 보행 < 혼용 < 차량.

@@ -4,7 +4,8 @@ import { API_BASE_URL } from './api';
 import { initCampusMap } from './campus-map';
 import { tmForward, tmInverse } from './tm';
 import type { TerrainGrid } from './api';
-import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode } from './editor-view';
+import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode, type ColorMode } from './editor-view';
+import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -13,6 +14,8 @@ type Road = {
   id: string; name: string | null; roadClass: RoadClass; structure: string; pedestrianAccess: string; vehicleAccess: string;
   pedestrianDirection: string; vehicleDirection: string; widthM: number | null; wheelchairAccess: string;
   buildingId: string | null; levelId: string | null; status: string; revision: number;
+  /** shared display colour (#rrggbb) set by any editor or agent; null = automatic */
+  displayColor?: string | null;
   geometry: { coordinates: XYZ[] };
 };
 type Place = { id: string; parentId: string | null; name: string; category: string; description: string | null; buildingId: string | null; levelId: string | null; status: string; revision: number; geometry: { coordinates: XYZ } };
@@ -118,6 +121,12 @@ root.innerHTML = `
           <div id="snap-status" class="editor-hint">스냅할 점 종류를 선택하세요.</div>
           <div class="editor-hint">도로 Vertex와 높이까지 정확히 연결하려면 XYZ를 선택하세요. XY는 현재 Z를 유지합니다.</div>
           <div class="editor-hint">Fusion 높이는 폰 높이를 포함할 수 있습니다. Z/XYZ 적용 전 노면 높이를 확인하세요.</div>
+          <h3 class="editor-subhead">동선 묶음 → 통로 변환</h3>
+          <div class="feature-actions"><button id="corridor-add" type="button" title="위에서 고른 Fusion 실행을 변환 대상에 추가">현재 실행 추가</button><button id="corridor-clear" type="button">비우기</button></div>
+          <div id="corridor-list" class="corridor-list"></div>
+          <div class="editor-row"><label class="editor-field">높이 기준<select id="corridor-z"><option value="run">기록 높이 − 폰 높이</option><option value="terrain">지형 높이</option></select></label><label class="editor-field">폰 높이 m<input id="corridor-phone" type="number" min="0" max="2.5" step="0.1" value="1.1"></label></div>
+          <div class="feature-actions"><button id="corridor-preview" type="button">미리보기</button><button id="corridor-draft" type="button" disabled>통로로 작도</button></div>
+          <div id="corridor-info" class="editor-hint">같은 통로를 걸은 실행 여러 개를 추가하면 중앙선·폭을 추정해 하나의 실내 통로로 만듭니다.</div>
         </section>
         <section class="editor-section"><h2>함께 작업 중</h2><div id="presence-list" class="presence-list"></div></section>
       </aside>
@@ -136,7 +145,11 @@ root.innerHTML = `
           <div id="selected-info" class="editor-hint" style="margin-top:8px"></div>
         </section>
         <section class="editor-section"><h2>경로 표시</h2>
-          <div id="road-color-row" class="editor-color-row" hidden><label class="editor-field">선택 경로 색 · 이 브라우저만<input id="road-color" type="color"></label><button id="road-color-reset" type="button">기본색</button></div>
+          <div id="road-color-row" class="editor-color-row" hidden><label class="editor-field">선택 경로 색 · 모든 편집자와 공유<input id="road-color" type="color"></label><button id="road-color-reset" type="button" title="공유 색을 지우고 자동 색으로">자동</button></div>
+          <label class="editor-field">자동 색 기준<select id="color-mode"><option value="floor">층별 (낮을수록 어둡게)</option><option value="type">도로 유형별</option></select></label>
+          <div class="editor-row"><label class="editor-field">층고 m (층 추정)<input id="floor-height" type="number" min="2" max="8" step="0.1"></label><label class="editor-field">통로 높이 m<input id="tube-height" type="number" min="1" max="6" step="0.1"></label></div>
+          <label class="inline-check"><input id="solids" type="checkbox"> 실내 통로 사각튜브 · 엘리베이터 샤프트 표시</label>
+          <div id="route-legend" class="route-legend"></div>
           <label class="inline-check"><input id="dim-others" type="checkbox"> 선택 시 다른 경로 흐리게</label>
           <label class="editor-field">다른 경로 불투명도 <b id="dim-alpha-v"></b><input id="dim-alpha" type="range" min="0.05" max="1" step="0.05"></label>
           <label class="editor-field">시작 / 도착점<select id="endpoint-mode"><option value="selected">선택 경로만</option><option value="all">모든 경로</option><option value="off">숨김</option></select></label>
@@ -144,7 +157,6 @@ root.innerHTML = `
           <div class="editor-row"><label class="editor-field">선명 거리 m<input id="fade-near" type="number" min="0" step="10"></label><label class="editor-field">흐림 거리 m<input id="fade-far" type="number" min="1" step="10"></label></div>
           <label class="editor-field">최소 명도 <b id="fade-min-v"></b><input id="fade-min" type="range" min="0.05" max="1" step="0.05"></label>
           <label class="inline-check"><input id="hover-highlight" type="checkbox"> 마우스 오버 미리 강조</label>
-          <div class="feature-actions"><button id="road-color-clear" type="button">로컬 색 모두 초기화</button></div>
         </section>
         <section class="editor-section"><h2>편집 Vertex</h2><div class="feature-actions"><button id="vertex-prev" disabled>이전</button><button id="vertex-next" disabled>다음</button><button id="vertex-delete" disabled>점 삭제</button></div><div class="feature-actions"><button id="vertex-undo-last" disabled>마지막 점 취소</button><span class="editor-hint">작도 중 Backspace</span></div><div id="vertex-info" class="editor-hint" style="margin-top:8px"></div></section>
         <section class="editor-section"><h2>캠퍼스 도로</h2><div id="road-list" class="feature-list"></div></section>
@@ -302,6 +314,14 @@ type RoadStyle = { line: any; casing: any; fail: any; glow: any };
 const roadStyles = new Map<string, RoadStyle>();
 const cssColorCache = new Map<string, any>();
 const fadeScratch = { a: null as any, b: null as any };
+const previewColors = new Map<string, string>(); // colour picker drag, before the shared colour is saved
+type CorridorTrack = { runId: string; label: string };
+type CorridorResult = { coordinates: XYZ[]; widthM: number | null; stations: number; coverage: number; usedTracks: number; reversedTracks: number; zSource: string; warnings: string[] };
+let corridorTracks: CorridorTrack[] = [];
+let corridorResult: CorridorResult | null = null;
+let corridorEntities: any[] = [];
+type FloorInfo = { floor: number; estimated: boolean };
+const floorCache = new Map<string, FloorInfo>();
 
 function say(message: string, kind: 'hint' | 'warning' | 'error' | 'success' = 'hint') {
   $('editor-message').className = kind;
@@ -409,7 +429,29 @@ function updateCursorGraphics() {
     cursorGroundPoint.position = groundPosition;
   }
 }
-function roadCss(r: Road) { return prefs.roadColors[r.id] ?? COLORS[r.roadClass] ?? '#64748b'; }
+const isConnectorRoad = (r: Road) => r.structure === 'stairs' || r.structure === 'elevator';
+/** Floor of a road: the levelId when it names one, otherwise estimated from its height above the terrain (lowest point for stairs/elevators). */
+function roadFloor(r: Road): FloorInfo {
+  const key = `${r.id}:${r.revision}:${r.levelId}:${prefs.floorHeightM}`;
+  const cached = floorCache.get(key);
+  if (cached) return cached;
+  let info: FloorInfo = { floor: 1, estimated: true };
+  const named = floorFromLevelId(r.levelId);
+  if (named !== null) info = { floor: named, estimated: false };
+  else {
+    const c = r.geometry.coordinates;
+    const p = isConnectorRoad(r) ? c.reduce((lo, q) => (q[2] < lo[2] ? q : lo), c[0]) : [...c].sort((a, b) => a[2] - b[2])[c.length >> 1];
+    const ground = terrain ? terrainAt(p[0], p[1]) : null;
+    if (ground !== null && Number.isFinite(ground)) info = { floor: floorFromHeight(p[2], ground, prefs.floorHeightM), estimated: true };
+  }
+  floorCache.set(key, info);
+  return info;
+}
+/** Shared colour first, then the picker preview, then the automatic colour (floor or road class). */
+function roadCss(r: Road) {
+  return previewColors.get(r.id) ?? r.displayColor ?? (prefs.colorMode === 'floor' ? floorColor(roadFloor(r).floor) : COLORS[r.roadClass] ?? '#64748b');
+}
+const CLASS_WIDTH: Record<string, number> = { pedestrian: 4, shared: 5, vehicle: 7 };
 function cssColor(css: string) {
   let c = cssColorCache.get(css);
   if (!c) { c = C.Color.fromCssColorString(css) ?? C.Color.GRAY; cssColorCache.set(css, c); }
@@ -448,21 +490,84 @@ function styleProperty(id: string, key: keyof RoadStyle) {
     return s ? C.Color.clone(s[key], result) : C.Color.clone(C.Color.GRAY, result);
   }, false));
 }
+function colorCallback(id: string, key: keyof RoadStyle) {
+  return new C.CallbackProperty((_t: any, result: any) => {
+    const s = roadStyles.get(id);
+    return s ? C.Color.clone(s[key], result) : C.Color.clone(C.Color.GRAY, result);
+  }, false);
+}
+/**
+ * Line material by road type (shape channel; colour is the floor): crossing = zebra dashes, ramp = long dashes,
+ * everything else solid. Stairs add uphill chevrons, sidewalks a light edge, elevators a shaft, corridors a tube.
+ */
+function roadMaterial(r: Road, key: 'line' | 'fail') {
+  if (r.structure === 'crossing') return new C.PolylineDashMaterialProperty({ color: colorCallback(r.id, key), gapColor: C.Color.WHITE.withAlpha(0.95), dashLength: 10 });
+  if (r.structure === 'ramp') return new C.PolylineDashMaterialProperty({ color: colorCallback(r.id, key), dashLength: 22, dashPattern: 0b1111111111110000 });
+  return styleProperty(r.id, key);
+}
+/** Plan-view chevrons every ~1.2 m pointing uphill (toward the higher end), lifted 5 cm so they sit on the line. */
+function stairChevrons(c: XYZ[]): XYZ[][] {
+  const up = c.at(-1)![2] >= c[0][2] ? c : [...c].reverse();
+  const out: XYZ[][] = [];
+  for (let i = 1; i < up.length; i++) {
+    const a = up[i - 1], b = up[i], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 0.3) continue;
+    const tx = (b[0] - a[0]) / len, ty = (b[1] - a[1]) / len, nx = -ty, ny = tx;
+    for (let d = 0.6; d < len; d += 1.2) {
+      const f = d / len, x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f, z = a[2] + (b[2] - a[2]) * f + 0.05;
+      out.push([[x - tx * 0.35 + nx * 0.4, y - ty * 0.35 + ny * 0.4, z], [x, y, z], [x - tx * 0.35 - nx * 0.4, y - ty * 0.35 - ny * 0.4, z]]);
+    }
+  }
+  return out;
+}
 function drawRoad(r: Road) {
-  if (r.geometry.coordinates.length < 2) return;
-  const positions = r.geometry.coordinates.map(drawPoint);
+  const coords = r.geometry.coordinates;
+  if (coords.length < 2) return;
+  const positions = coords.map(drawPoint);
   roadWorld.set(r.id, positions);
   computeRoadStyle(r);
   const common = { positions, arcType: C.ArcType.NONE };
   const focus = selectedRoad?.id === r.id;
-  const width = focus ? 8 : 5;
+  const base = r.structure === 'elevator' ? 8 : CLASS_WIDTH[r.roadClass] ?? 5;
+  const width = focus ? base + 3 : base;
+  const css = roadCss(r);
   if (focus) {
     const s = roadStyles.get(r.id)!;
     const glow = new C.PolylineGlowMaterialProperty({ glowPower: 0.22, taperPower: 1, color: s.glow.clone() });
-    addEntity({ polyline: { ...common, width: 26, material: glow, depthFailMaterial: glow } });
+    addEntity({ polyline: { ...common, width: width + 20, material: glow, depthFailMaterial: glow } });
   }
-  addEntity({ polyline: { ...common, width: width + 4, material: styleProperty(r.id, 'casing'), depthFailMaterial: styleProperty(r.id, 'casing') } });
-  addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: styleProperty(r.id, 'line'), depthFailMaterial: styleProperty(r.id, 'fail') } });
+  // sidewalks get a light edge instead of the dark casing
+  const casing = r.structure === 'sidewalk' ? new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(0.95)) : styleProperty(r.id, 'casing');
+  addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 5 : 4), material: casing, depthFailMaterial: casing } });
+  addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: roadMaterial(r, 'line'), depthFailMaterial: roadMaterial(r, 'fail') } });
+  if (r.structure === 'stairs') for (const chevron of stairChevrons(coords)) {
+    addEntity({ polyline: { positions: chevron.map(drawPoint), width: 2.5, arcType: C.ArcType.NONE, material: C.Color.WHITE.withAlpha(0.95), depthFailMaterial: C.Color.WHITE.withAlpha(0.6) } });
+  }
+  if (!prefs.solids) return;
+  const tint = cssColor(css);
+  if (r.structure === 'indoor_corridor') {
+    // rectangular tube: floor at the centerline, widthM wide, tubeHeightM high
+    const w = (r.widthM ?? 2.5) / 2, h = prefs.tubeHeightM;
+    addEntity({ id: `editor:road:${r.id}:tube`, polylineVolume: { positions, cornerType: C.CornerType.MITERED,
+      shape: [new C.Cartesian2(-w, 0), new C.Cartesian2(w, 0), new C.Cartesian2(w, h), new C.Cartesian2(-w, h)],
+      material: tint.withAlpha(focus ? 0.28 : 0.16), outline: true, outlineColor: tint.withAlpha(0.85) } });
+  } else if (r.structure === 'elevator') {
+    const lo = coords[0][2] <= coords.at(-1)![2] ? coords[0] : coords.at(-1)!, rise = Math.abs(coords.at(-1)![2] - coords[0][2]);
+    addEntity({ id: `editor:road:${r.id}:shaft`, position: drawPoint([lo[0], lo[1], lo[2] + rise / 2]),
+      box: { dimensions: new C.Cartesian3(1.8, 1.8, rise), material: tint.withAlpha(focus ? 0.3 : 0.18), outline: true, outlineColor: tint.withAlpha(0.9) } });
+  }
+}
+/** Floors present (with estimated ones marked) and the line-shape key. */
+function renderLegend() {
+  const floors = new Map<number, boolean>();
+  for (const r of roads) { const f = roadFloor(r); floors.set(f.floor, (floors.get(f.floor) ?? true) && f.estimated); }
+  const floorItems = prefs.colorMode === 'floor'
+    ? [...floors.entries()].sort((a, b) => b[0] - a[0]).map(([f, est]) => `<span class="legend-item"><i style="background:${floorColor(f)}"></i>${floorLabel(f)}${est ? '<span class="muted">·추정</span>' : ''}</span>`).join('')
+    : (['pedestrian', 'shared', 'vehicle'] as const).map((k) => `<span class="legend-item"><i style="background:${COLORS[k]}"></i>${({ pedestrian: '보행', shared: '혼용', vehicle: '차량' })[k]}</span>`).join('');
+  $('route-legend').innerHTML = `<div class="legend-row">${floorItems || '<span class="muted">경로 없음</span>'}</div>
+    <div class="legend-row legend-shapes"><span class="legend-item"><b class="shape solid"></b>일반</span><span class="legend-item"><b class="shape sidewalk"></b>인도</span><span class="legend-item"><b class="shape zebra"></b>횡단보도</span>
+    <span class="legend-item"><b class="shape dash"></b>경사로</span><span class="legend-item"><b class="shape chevron">›››</b>계단(오르막)</span><span class="legend-item"><b class="shape tube"></b>실내 통로</span><span class="legend-item"><b class="shape shaft"></b>엘리베이터</span>
+    <span class="legend-item muted">두께: 보행 &lt; 혼용 &lt; 차량</span></div>`;
 }
 /** Start/end markers: large labelled rings for the focused road or draft, small dots for the rest ('all'). */
 function drawEndpoints(coords: XYZ[], labelled: boolean) {
@@ -481,6 +586,7 @@ function drawAll() {
   cleanMapEntities();
   roadWorld.clear();
   for (const r of roads) drawRoad(r);
+  renderLegend();
   if (prefs.endpoints === 'all') for (const r of roads) if (r.id !== selectedRoad?.id) drawEndpoints(r.geometry.coordinates, false);
   for (const p of places) {
     addEntity({ id: `editor:place:${p.id}`, position: drawPoint(p.geometry.coordinates), point: { pixelSize: 11,
@@ -1176,7 +1282,7 @@ function handleViewKey(e: KeyboardEvent): boolean {
   return true;
 }
 function onHover(id: string | null, screen: { x: number; y: number } | null) {
-  const active = tool === 'select' && !roadDraft && !placeDraft ? id : null;
+  const active = tool === 'select' && !roadDraft && !placeDraft ? id?.replace(/:(tube|shaft)$/, '') ?? null : null;
   const tip = $('editor-hover-tip');
   if (active !== hoverId) { hoverId = active; viewer.scene.canvas.style.cursor = active ? 'pointer' : ''; }
   if (!active || !screen) { tip.hidden = true; return; }
@@ -1192,6 +1298,84 @@ function onHover(id: string | null, screen: { x: number; y: number } | null) {
   tip.textContent = text;
   tip.style.left = `${screen.x + 14}px`; tip.style.top = `${screen.y + 14}px`;
 }
+async function saveRoadColor(roadId: string, color: string | null) {
+  try {
+    await request(`/api/v1/editor/roads/${roadId}/style`, { method: 'PUT', body: JSON.stringify({ displayColor: color, sessionId: EDITOR_SESSION, mutationId: uuid() }) });
+    const road = roads.find((r) => r.id === roadId);
+    if (road) road.displayColor = color; // the change feed reloads everyone, this one included
+    say(color ? '경로 색을 모든 편집자와 공유했습니다.' : '공유 색을 지웠습니다. 자동 색으로 표시합니다.', 'success');
+  } catch (err) { say(`색을 저장하지 못했습니다: ${(err as Error).message}`, 'error'); }
+  previewColors.delete(roadId);
+  drawAll();
+}
+
+// ---- recorded walks -> one corridor (backend corridor-preview; saving goes through the normal draft/save path) ----
+function renderCorridorList() {
+  $('corridor-list').innerHTML = corridorTracks.map((t, i) => `<div class="corridor-item"><span>${esc(t.label)}</span><button type="button" data-corridor-remove="${i}" title="빼기">×</button></div>`).join('')
+    || '<span class="editor-hint">추가된 실행이 없습니다.</span>';
+  $('corridor-list').querySelectorAll<HTMLButtonElement>('[data-corridor-remove]').forEach((b) => b.onclick = () => {
+    corridorTracks.splice(Number(b.dataset.corridorRemove), 1); clearCorridorPreview(); renderCorridorList();
+  });
+  $('corridor-draft').toggleAttribute('disabled', !corridorResult);
+}
+function addCorridorTrack() {
+  const runId = $('fusion-run').value;
+  if (!runId) { say('먼저 수집 세션과 Fusion 실행을 고르세요.', 'warning'); return; }
+  if (corridorTracks.some((t) => t.runId === runId)) { say('이미 추가된 실행입니다.'); return; }
+  const session = $<HTMLSelectElement>('fusion-session'), run = $<HTMLSelectElement>('fusion-run');
+  corridorTracks.push({ runId, label: `${session.selectedOptions[0]?.textContent ?? ''} · ${run.selectedOptions[0]?.textContent ?? runId.slice(0, 8)}` });
+  clearCorridorPreview(); renderCorridorList();
+}
+function clearCorridorPreview() {
+  for (const e of corridorEntities) viewer?.entities.remove(e);
+  corridorEntities = []; corridorResult = null;
+  if ($('corridor-draft')) $('corridor-draft').toggleAttribute('disabled', true);
+}
+async function previewCorridor() {
+  if (!corridorTracks.length) { say('변환할 실행을 하나 이상 추가하세요.', 'warning'); return; }
+  clearCorridorPreview();
+  $('corridor-info').textContent = '중앙선 계산 중…';
+  try {
+    const result = await request<CorridorResult>('/api/v1/editor/corridor-preview', { method: 'POST', body: JSON.stringify({
+      tracks: corridorTracks.map((t) => ({ runId: t.runId })), zSource: $('corridor-z').value, phoneHeightM: Number($('corridor-phone').value) || 0 }) });
+    corridorResult = result;
+    const positions = result.coordinates.map(drawPoint);
+    const magenta = C.Color.fromCssColorString('#d946ef');
+    corridorEntities.push(viewer.entities.add({ polyline: { positions, width: 5, arcType: C.ArcType.NONE,
+      material: new C.PolylineDashMaterialProperty({ color: magenta, dashLength: 14 }), depthFailMaterial: new C.PolylineDashMaterialProperty({ color: magenta.withAlpha(0.6), dashLength: 14 }) } }));
+    const w = (result.widthM ?? 2.5) / 2, h = prefs.tubeHeightM;
+    corridorEntities.push(viewer.entities.add({ polylineVolume: { positions, cornerType: C.CornerType.MITERED,
+      shape: [new C.Cartesian2(-w, 0), new C.Cartesian2(w, 0), new C.Cartesian2(w, h), new C.Cartesian2(-w, h)],
+      material: magenta.withAlpha(0.14), outline: true, outlineColor: magenta.withAlpha(0.8) } }));
+    $('corridor-info').textContent = `실행 ${result.usedTracks}개(${result.reversedTracks}개 역방향 정렬) · 꼭지점 ${result.coordinates.length}개 · 폭 ${result.widthM ?? '추정 불가(2.5 m로 표시)'} m · 2개 이상 겹친 구간 ${Math.round(result.coverage * 100)}%`
+      + (result.warnings.length ? ` · ${result.warnings.join(' / ')}` : '');
+    nav?.frame(positions);
+    lastFollowTarget = null;
+  } catch (err) { $('corridor-info').textContent = `변환 실패: ${(err as Error).message}`; }
+  renderCorridorList();
+}
+async function corridorToDraft() {
+  const result = corridorResult;
+  if (!result) return;
+  if (roadDraft || placeDraft) { say('편집 중인 초안을 먼저 저장하거나 취소하세요.', 'warning'); return; }
+  tool = 'pedestrian';
+  document.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) => b.classList.toggle('active', b.dataset.tool === 'pedestrian'));
+  $('editor-tool-label').textContent = '통로 작도 (동선 변환)';
+  $('road-fields').hidden = false; $('place-fields').hidden = true; $('junction-fields').hidden = true;
+  await startRoadDraft('pedestrian');
+  if (!roadDraft) return;
+  const draft = roadDraft as Draft;
+  $('road-structure').value = 'indoor_corridor';
+  if (result.widthM) $('road-width').value = String(result.widthM);
+  draft.coordinates = result.coordinates.map((c) => [...c] as XYZ);
+  draft.attrs = attrsFromUI('pedestrian');
+  dirty = true;
+  ownCursor = [...draft.coordinates.at(-1)!]; rebaseSnapGuide();
+  clearCorridorPreview(); renderCorridorList();
+  updateControls(); drawAll(); publishDraft();
+  say('동선에서 만든 통로 초안입니다. 이름·층을 정하고 꼭지점을 확인한 뒤 저장(Enter)하세요. 끝을 기존 도로에 이으려면 그 Vertex로 옮기세요.');
+}
+
 function bindViewPrefs() {
   const persist = () => { savePrefs(prefs); updateRoadStyles(); };
   const range = (id: string, get: () => number, set: (v: number) => void, fmt = (v: number) => `×${v.toFixed(1)}`) => {
@@ -1231,13 +1415,21 @@ function bindViewPrefs() {
   $('fade-near').addEventListener('change', fadeRange); $('fade-far').addEventListener('change', fadeRange);
   $('endpoint-mode').value = prefs.endpoints;
   $('endpoint-mode').addEventListener('change', () => { prefs.endpoints = $('endpoint-mode').value as EndpointMode; persist(); drawAll(); });
-  $('road-color').addEventListener('input', () => {
-    if (!selectedRoad) return;
-    prefs.roadColors[selectedRoad.id] = $('road-color').value; // local only: no draft publish, no socket emit
-    persist(); drawAll();
-  });
-  $('road-color-reset').onclick = () => { if (selectedRoad) { delete prefs.roadColors[selectedRoad.id]; persist(); drawAll(); } };
-  $('road-color-clear').onclick = () => { prefs.roadColors = {}; persist(); drawAll(); say('이 브라우저의 경로 색 지정을 모두 지웠습니다.'); };
+  // Shared colour: preview while the picker moves, save on release; every editor reloads through the change feed.
+  $('road-color').addEventListener('input', () => { if (selectedRoad) { previewColors.set(selectedRoad.id, $('road-color').value); updateRoadStyles(); } });
+  $('road-color').addEventListener('change', () => { if (selectedRoad) void saveRoadColor(selectedRoad.id, $('road-color').value); });
+  $('road-color-reset').onclick = () => { if (selectedRoad) void saveRoadColor(selectedRoad.id, null); };
+  $('color-mode').value = prefs.colorMode;
+  $('color-mode').addEventListener('change', () => { prefs.colorMode = $('color-mode').value as ColorMode; persist(); drawAll(); });
+  $('floor-height').value = String(prefs.floorHeightM); $('tube-height').value = String(prefs.tubeHeightM);
+  $('floor-height').addEventListener('change', () => { prefs.floorHeightM = Math.min(8, Math.max(2, Number($('floor-height').value) || 3)); $('floor-height').value = String(prefs.floorHeightM); persist(); drawAll(); });
+  $('tube-height').addEventListener('change', () => { prefs.tubeHeightM = Math.min(6, Math.max(1, Number($('tube-height').value) || 2.4)); $('tube-height').value = String(prefs.tubeHeightM); persist(); drawAll(); });
+  check('solids', () => prefs.solids, (v) => { prefs.solids = v; }, true);
+  $('corridor-add').onclick = addCorridorTrack;
+  $('corridor-clear').onclick = () => { corridorTracks = []; clearCorridorPreview(); renderCorridorList(); };
+  $('corridor-preview').onclick = () => void previewCorridor();
+  $('corridor-draft').onclick = () => void corridorToDraft();
+  renderCorridorList();
   $('nav-help-btn').onclick = () => toggleHelp(true);
   $('editor-help-close').onclick = () => toggleHelp(false);
   $('editor-help').addEventListener('click', (e) => { if (e.target === $('editor-help')) toggleHelp(false); });
@@ -1255,7 +1447,7 @@ async function saveCurrent() {
         throw new Error('엘리베이터는 같은 위치에서 높이만 다른 두 점입니다. Space로 첫 점을 찍고 R/F로 높이를 바꾼 뒤 Space로 둘째 점을 찍으세요(층 사이마다 하나씩).');
       }
       const preview = await request<{ crossings: any[]; selfCrossings: any[]; needsLease: { id: string; revision: number }[] }>('/api/v1/editor/topology-preview', { method: 'POST',
-        body: JSON.stringify({ coordinates: coords, levelId: attrs.levelId, branchFrom: roadDraft.branchFrom }) });
+        body: JSON.stringify({ coordinates: coords, levelId: attrs.levelId, branchFrom: roadDraft.branchFrom, structure: attrs.structure }) });
       acquiredAffected = [];
       for (const item of preview.needsLease) {
         const lease = await acquire('road', item.id); heartbeat(lease); acquiredAffected.push(lease);
@@ -1437,9 +1629,8 @@ function installSocket() {
   socket.on('editor:draft:clear', (p: any) => { const key = `${p.objectType}:${p.objectId}`; const e = remoteDrafts.get(key); if (e) viewer.entities.remove(e); remoteDrafts.delete(key); });
   socket.on('editor:lease:changed', (p: any) => { if (p.action === 'released') leases = leases.filter((l) => !(l.objectType === p.objectType && l.objectId === p.objectId)); else { leases = leases.filter((l) => !(l.objectType === p.objectType && l.objectId === p.objectId)); leases.push(p); } renderLists(); });
   socket.on('editor:feature:changed', (p: any) => {
-    const draft = remoteDrafts.get(`${p.objectType}:${p.objectId}`);
-    if (draft) viewer.entities.remove(draft);
-    remoteDrafts.delete(`${p.objectType}:${p.objectId}`);
+    const draft = p.payload?.style ? undefined : remoteDrafts.get(`${p.objectType}:${p.objectId}`);
+    if (draft) { viewer.entities.remove(draft); remoteDrafts.delete(`${p.objectType}:${p.objectId}`); }
     if (reloadTimer) clearTimeout(reloadTimer);
     reloadTimer = setTimeout(() => { void loadSnapshot().then(() => { if (tool === 'junction') scheduleJunctionPreview(); }).catch(() => undefined); }, 180);
   });
@@ -1570,7 +1761,7 @@ function installControls() {
   mouseHandler.setInputAction((movement: any) => {
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
     const feature = tool === 'select' ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
-      typeof id === 'string' && /^editor:(road|place):/.test(id)) : null;
+      typeof id === 'string' && /^editor:(road|place):/.test(id))?.replace(/:(tube|shaft)$/, '') : null;
     if (feature?.startsWith('editor:road:')) { selectRoad(feature.slice('editor:road:'.length)); setTool('select'); return; }
     if (feature?.startsWith('editor:place:')) { selectPlace(feature.slice('editor:place:'.length)); setTool('select'); return; }
     const ray = viewer.camera.getPickRay(movement.position);

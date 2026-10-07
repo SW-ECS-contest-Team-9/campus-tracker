@@ -7,7 +7,7 @@ import { withTransaction } from '../../config/database.js';
 import { AppError } from '../../common/errors/app-error.js';
 import type { CollectorIdentity } from '../../common/auth/jwt.js';
 import {
-  addChange, assertPointInsideTerrain, attrsFromRow, ensureNode, geoJSONLine, insertRoad, pointAtMeasure, roadBefore, roadSelect, snapPieceEndpoints,
+  CONNECTOR_Z_M, ELEVATOR_MAX_XY_M, ELEVATOR_MIN_RISE_M, addChange, assertPointInsideTerrain, attrsFromRow, ensureNode, geoJSONLine, insertRoad, isConnector, pointAtMeasure, roadBefore, roadSelect, snapPieceEndpoints,
   type RoadAttrs, type RoadRow,
 } from './editor.service.js';
 import { splitAt, type XYZ } from './topology.js';
@@ -84,13 +84,58 @@ export const editorOps = {
         const coordinates = road.coordinates.map((p) => [...p] as XYZ);
         if (road.from_node_id === node.id) coordinates[0] = [...body.coordinate];
         if (road.to_node_id === node.id) coordinates[coordinates.length - 1] = [...body.coordinate];
-        if (xyLength(coordinates) < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'Moving the node here would collapse a road', { roadId: road.id });
+        // an elevator has no plan length by design; it must stay vertical with enough rise instead
+        if (road.structure === 'elevator') {
+          if (xyLength(coordinates) > ELEVATOR_MAX_XY_M || Math.abs(coordinates.at(-1)![2] - coordinates[0][2]) < ELEVATOR_MIN_RISE_M) {
+            throw AppError.badRequest('INVALID_ELEVATOR', 'Moving the node here would make an attached elevator slanted or too short; move both of its ends', { roadId: road.id });
+          }
+        } else if (xyLength(coordinates) < 0.05) throw AppError.badRequest('ROAD_SEGMENT_TOO_SHORT', 'Moving the node here would collapse a road', { roadId: road.id });
         await db.query(`UPDATE mobility.road_segments SET geom=${geoJSONLine(2)},revision=revision+1,updated_by=$3,updated_at=now() WHERE id=$1`,
           [road.id, JSON.stringify(coordinates), owner]);
         events.push(await addChange(db, body.mutationId, 'road', road.id, 'updated', road.revision + 1, owner, { movedNodeId: node.id, before: roadBefore(road) }));
         result.push({ id: road.id, revision: road.revision + 1 });
       }
       return finish(db, body.mutationId, owner, { changeSetId: body.mutationId, nodeId: node.id, coordinate: body.coordinate, roads: result, events });
+    });
+  },
+
+  /**
+   * Joins two nodes at the same place (within 0.15 m in plan, CONNECTOR_Z_M in height): every road on `removeNodeId` is moved onto
+   * `keepNodeId`. Nodes of different levels may only be joined when one of them ends a stairs/elevator road, so stacked
+   * corridors are never fused. Repairs networks saved before connectors could join levels.
+   */
+  async mergeNodes(body: OpBase & { keepNodeId: string; removeNodeId: string }, identity: CollectorIdentity, outer?: PoolClient) {
+    return inTx(outer, async (db) => {
+      const owner = identity.collectorId;
+      const done = await begin(db, body.mutationId, owner);
+      if (done) return done;
+      if (body.keepNodeId === body.removeNodeId) throw AppError.badRequest('MERGE_SAME_NODE', 'Give two different nodes');
+      const { rows: nodes } = await db.query<{ id: string; level_id: string | null; c: XYZ }>(
+        `SELECT id, level_id, (ST_AsGeoJSON(geom)::json->'coordinates') c FROM mobility.network_nodes WHERE id = ANY($1::uuid[]) FOR UPDATE`, [[body.keepNodeId, body.removeNodeId]]);
+      const keep = nodes.find((n) => n.id === body.keepNodeId), remove = nodes.find((n) => n.id === body.removeNodeId);
+      if (!keep || !remove) throw AppError.notFound('NODE_NOT_FOUND', 'Both nodes must exist');
+      if (Math.hypot(keep.c[0] - remove.c[0], keep.c[1] - remove.c[1]) > 0.15 || Math.abs(keep.c[2] - remove.c[2]) > CONNECTOR_Z_M) {
+        throw AppError.conflict('NODES_TOO_FAR', `Nodes must be within 0.15 m in plan and ${CONNECTOR_Z_M} m in height; use move_node first`);
+      }
+      const { rows: roads } = await db.query<RoadRow>(`${roadSelect} WHERE status IN ('DRAFT','APPROVED') AND (from_node_id = ANY($1::uuid[]) OR to_node_id = ANY($1::uuid[])) ORDER BY id FOR UPDATE`,
+        [[keep.id, remove.id]]);
+      if (keep.level_id !== remove.level_id && !roads.some((r) => isConnector(r.structure))) {
+        throw AppError.conflict('LEVEL_MISMATCH', 'Nodes of different levels can only be joined where stairs or an elevator end');
+      }
+      const moving = roads.filter((r) => r.from_node_id === remove.id || r.to_node_id === remove.id);
+      if (moving.some((r) => r.from_node_id === keep.id || r.to_node_id === keep.id)) throw AppError.conflict('MERGE_COLLAPSES_ROAD', 'A road runs between the two nodes; it would collapse');
+      await assertNotLockedByOthers(db, moving.map((r) => r.id), owner, body.sessionId);
+      const events: unknown[] = [];
+      for (const road of moving) {
+        const coordinates = road.coordinates.map((p) => [...p] as XYZ);
+        const from = road.from_node_id === remove.id ? keep.id : road.from_node_id, to = road.to_node_id === remove.id ? keep.id : road.to_node_id;
+        if (road.from_node_id === remove.id) coordinates[0] = [...keep.c];
+        if (road.to_node_id === remove.id) coordinates[coordinates.length - 1] = [...keep.c];
+        await db.query(`UPDATE mobility.road_segments SET from_node_id=$2,to_node_id=$3,geom=${geoJSONLine(4)},revision=revision+1,updated_by=$5,updated_at=now() WHERE id=$1`,
+          [road.id, from, to, JSON.stringify(coordinates), owner]);
+        events.push(await addChange(db, body.mutationId, 'road', road.id, 'updated', road.revision + 1, owner, { mergedNode: { kept: keep.id, removed: remove.id }, before: roadBefore(road) }));
+      }
+      return finish(db, body.mutationId, owner, { changeSetId: body.mutationId, nodeId: keep.id, removedNodeId: remove.id, coordinate: keep.c, roads: moving.map((r) => r.id), events });
     });
   },
 
@@ -104,14 +149,14 @@ export const editorOps = {
       await assertNotLockedByOthers(db, [road.id], owner, body.sessionId);
       const total = xyLength(road.coordinates);
       if (body.measureM < 0.05 || body.measureM > total - 0.05) throw AppError.badRequest('SPLIT_OUT_OF_RANGE', `measureM must be between 0.05 and ${(total - 0.05).toFixed(2)}`);
-      const node = await ensureNode(db, pointAtMeasure(road.coordinates, body.measureM), road.level_id, 'endpoint');
+      const node = await ensureNode(db, pointAtMeasure(road.coordinates, body.measureM), road.level_id, 'endpoint', isConnector(road.structure));
       const pieces = splitAt(road.coordinates, [{ measure: body.measureM, x: node.point[0], y: node.point[1], z: node.point[2] }]);
       if (pieces.length !== 2) throw AppError.conflict('SPLIT_FAILED', 'The split point is too close to an end of the road');
       const events: unknown[] = [];
       if (node.created) events.push(await addChange(db, body.mutationId, 'node', node.id, 'created', 1, owner, { kind: 'endpoint' }));
       const childIds: string[] = [];
       for (const piece of pieces) {
-        const snapped = await snapPieceEndpoints(db, piece, road.level_id);
+        const snapped = await snapPieceEndpoints(db, piece, road.level_id, isConnector(road.structure));
         const id = randomUUID(); childIds.push(id);
         await insertRoad(db, { id, parentId: road.id, coordinates: snapped.coordinates, attrs: attrsFromRow(road), fromNode: snapped.fromNodeId, toNode: snapped.toNodeId,
           owner, createdBy: road.created_by, status: road.status });
@@ -140,13 +185,14 @@ export const editorOps = {
       const plain = (r: RoadRow) => ({ coordinates: r.coordinates, attrs: attrsFromRow(r), from: r.from_node_id, to: r.to_node_id });
       const first = a.to_node_id === nodeId ? plain(a) : reversed(plain(a));   // ends at the shared node
       const second = b.from_node_id === nodeId ? plain(b) : reversed(plain(b)); // starts at the shared node
-      const { name: nameA, ...restA } = first.attrs, { name: nameB, ...restB } = second.attrs;
+      // Name and display colour may differ; the merged road keeps the first one that is set.
+      const { name: nameA, displayColor: colorA, ...restA } = first.attrs, { name: nameB, displayColor: colorB, ...restB } = second.attrs;
       const differing = (Object.keys(restA) as (keyof typeof restA)[]).filter((k) => (restA[k] ?? null) !== (restB[k] ?? null));
       if (differing.length || a.status !== b.status) throw AppError.conflict('MERGE_ATTRIBUTES_DIFFER', 'Roads must have the same status and attributes to be merged', { differing });
       if (nameA && nameB && nameA !== nameB) throw AppError.conflict('MERGE_ATTRIBUTES_DIFFER', 'The roads have different names', { differing: ['name'] });
       const id = randomUUID();
       const coordinates = [...first.coordinates, ...second.coordinates.slice(1)];
-      await insertRoad(db, { id, parentId: a.id, coordinates, attrs: { ...first.attrs, name: nameA ?? nameB ?? null } as RoadAttrs, fromNode: first.from, toNode: second.to,
+      await insertRoad(db, { id, parentId: a.id, coordinates, attrs: { ...first.attrs, name: nameA ?? nameB ?? null, displayColor: colorA ?? colorB ?? null } as RoadAttrs, fromNode: first.from, toNode: second.to,
         owner, createdBy: a.created_by, status: a.status });
       const events: unknown[] = [await addChange(db, body.mutationId, 'road', id, 'created', 1, owner, { mergedFrom: [a.id, b.id] })];
       for (const road of [a, b]) events.push(await replaceWith(db, road, [id], body.mutationId, owner, { mergedInto: id }));
@@ -205,14 +251,19 @@ export const editorOps = {
             }
             await db.query(`UPDATE mobility.road_segments SET status=$2,replaced_by='{}',revision=revision+1,updated_by=$3,updated_at=now() WHERE id=$1`, [road.id, before.status, owner]);
             await log(c, 'created', road.revision + 1, { status: road.status });
+          } else if (c.operation === 'updated' && before?.style) {
+            // a display-colour change (setRoadStyle): put the old colour back, geometry and revision untouched
+            await db.query('UPDATE mobility.road_segments SET display_color=$2,updated_by=$3,updated_at=now() WHERE id=$1', [road.id, before.style.displayColor ?? null, owner]);
+            await log(c, 'updated', road.revision, { style: { displayColor: road.display_color } });
           } else if (c.operation === 'updated') {
             if (!before?.coordinates) throw unsupported(c);
             const a: RoadAttrs = before.attrs;
             await db.query(`UPDATE mobility.road_segments SET from_node_id=$2,to_node_id=$3,name=$4,road_class=$5,structure=$6,pedestrian_access=$7,vehicle_access=$8,
                 pedestrian_direction=$9,vehicle_direction=$10,width_m=$11,wheelchair_access=$12,building_id=$13,level_id=$14,geom=${geoJSONLine(15)},
-                revision=revision+1,updated_by=$16,updated_at=now() WHERE id=$1`,
+                display_color=CASE WHEN $17 THEN $18 ELSE display_color END,revision=revision+1,updated_by=$16,updated_at=now() WHERE id=$1`,
               [road.id, before.fromNodeId, before.toNodeId, a.name ?? null, a.roadClass, a.structure, a.pedestrianAccess, a.vehicleAccess, a.pedestrianDirection, a.vehicleDirection,
-                a.widthM ?? null, a.wheelchairAccess, a.buildingId ?? null, a.levelId ?? null, JSON.stringify(before.coordinates), owner]);
+                a.widthM ?? null, a.wheelchairAccess, a.buildingId ?? null, a.levelId ?? null, JSON.stringify(before.coordinates), owner,
+                'displayColor' in a, a.displayColor ?? null]);
             await log(c, 'updated', road.revision + 1, roadBefore(road));
           }
           continue;

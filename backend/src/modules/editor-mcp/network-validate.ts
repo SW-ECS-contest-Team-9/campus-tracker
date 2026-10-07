@@ -28,7 +28,7 @@ export interface QaOptions {
 }
 export const DEFAULT_QA: QaOptions = { danglingRadiusM: 2, levelToleranceM: 1.25, duplicateNodeM: 0.15, offTerrainM: 1.5, smallComponentM: 10 };
 
-export const QA_CHECKS = ['DANGLING_END_NEAR_ROAD', 'UNCONNECTED_CROSSING', 'DUPLICATE_NODES', 'OVERLAPPING_ROADS', 'OFF_TERRAIN', 'ATTRIBUTE_CONFLICT', 'ISOLATED_COMPONENT'] as const;
+export const QA_CHECKS = ['DANGLING_END_NEAR_ROAD', 'UNCONNECTED_CROSSING', 'DUPLICATE_NODES', 'LEVEL_NODES_NOT_JOINED', 'OVERLAPPING_ROADS', 'OFF_TERRAIN', 'ATTRIBUTE_CONFLICT', 'ISOLATED_COMPONENT'] as const;
 export type QaCheck = (typeof QA_CHECKS)[number];
 
 const length = (c: XYZ[]) => c.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - c[i][0], p[1] - c[i][1]), 0);
@@ -95,14 +95,25 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
     }
   }
 
-  if (on('DUPLICATE_NODES')) {
+  if (on('DUPLICATE_NODES') || on('LEVEL_NODES_NOT_JOINED')) {
     const used = nodes.filter((n) => degree.has(n.id));
+    const byId = new Map(roads.map((r) => [r.id, r]));
+    // the two ends of one elevator share x,y by design
+    const elevatorEnds = (a: QaNode, b: QaNode) => roads.some((r) => r.structure === 'elevator' && ((r.fromNodeId === a.id && r.toNodeId === b.id) || (r.fromNodeId === b.id && r.toNodeId === a.id)));
+    const onConnector = (n: QaNode) => degree.get(n.id)!.some((id) => ['stairs', 'elevator'].includes(byId.get(id)?.structure ?? ''));
     for (let i = 0; i < used.length; i++) for (let j = i + 1; j < used.length; j++) {
       const a = used[i], b = used[j];
-      if (a.levelId !== b.levelId || Math.hypot(a.coordinate[0] - b.coordinate[0], a.coordinate[1] - b.coordinate[1]) > o.duplicateNodeM
-        || Math.abs(a.coordinate[2] - b.coordinate[2]) > o.levelToleranceM) continue;
-      findings.push({ code: 'DUPLICATE_NODES', severity: 'error', roadIds: [...new Set([...degree.get(a.id)!, ...degree.get(b.id)!])], nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
-        message: 'Two separate nodes sit at the same place, so their roads are not connected', suggestion: 'connect_roads at this location' });
+      if (Math.hypot(a.coordinate[0] - b.coordinate[0], a.coordinate[1] - b.coordinate[1]) > o.duplicateNodeM) continue;
+      const dz = Math.abs(a.coordinate[2] - b.coordinate[2]);
+      const roadIds = [...new Set([...degree.get(a.id)!, ...degree.get(b.id)!])];
+      if (a.levelId === b.levelId) {
+        if (on('DUPLICATE_NODES') && dz <= o.levelToleranceM && !elevatorEnds(a, b)) findings.push({ code: 'DUPLICATE_NODES', severity: 'error', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
+          message: 'Two separate nodes sit at the same place, so their roads are not connected', suggestion: 'connect_roads at this location, or merge_nodes' });
+      } else if (on('LEVEL_NODES_NOT_JOINED') && dz <= 0.3 && (onConnector(a) || onConnector(b))) {
+        findings.push({ code: 'LEVEL_NODES_NOT_JOINED', severity: 'warning', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
+          message: `Stairs/elevator end and a road of level ${JSON.stringify(a.levelId === b.levelId ? a.levelId : (onConnector(a) ? b.levelId : a.levelId))} meet here on separate nodes, so the floors are not connected`,
+          suggestion: 'merge_nodes with these two nodes' });
+      }
     }
   }
 

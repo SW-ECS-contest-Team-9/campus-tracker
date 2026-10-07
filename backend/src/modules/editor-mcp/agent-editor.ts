@@ -12,13 +12,14 @@ import { terrain, type TerrainContext } from '../../geo/terrain.js';
 import { editorAgents, editorPresence, type OverlayItem } from '../../realtime/editor.gateway.js';
 import { PlaceSave, RoadSave } from '../editor/editor.dto.js';
 import { editorOps } from '../editor/editor.ops.js';
-import { JUNCTION_RADIUS_M, LEVEL_TOLERANCE_M, attrsFromRow, editorService, geoJSONLine, roadSelect, withEditorActor, type RoadAttrs, type RoadRow } from '../editor/editor.service.js';
+import { JUNCTION_RADIUS_M, attrsFromRow, editorService, geoJSONLine, isConnector, roadSelect, withEditorActor, type RoadAttrs, type RoadRow } from '../editor/editor.service.js';
 import { projectOnLine, type XYZ } from '../editor/topology.js';
 import { fusionRunsRepository } from '../fusion/fusion-runs.repository.js';
 import { pathfusionService } from '../pathfusion/pathfusion.service.js';
 import { SCOPE_APPROVED, type AgentContext } from './mcp.context.js';
 import { lineLength, round2, roundXYZ, simplifyIndices } from './geometry.js';
 import { PathItem, resolvePath, type ResolveDeps } from './path-resolver.js';
+import { corridorCenterline, sameRoad3D } from './corridor.js';
 import { terrainContext } from './terrain-access.js';
 
 export const LIMITS = { vertices: 2000, lengthM: 2000, affectedRoads: 20, mutationsPerMinute: 60, opsPerBatch: 25 };
@@ -29,7 +30,7 @@ const road = RoadSave.shape, place = PlaceSave.shape;
 const RoadAttrsInput = z.object({
   name: road.name, structure: road.structure.unwrap().optional(), pedestrianAccess: road.pedestrianAccess.unwrap().optional(), vehicleAccess: road.vehicleAccess.unwrap().optional(),
   pedestrianDirection: road.pedestrianDirection.unwrap().optional(), vehicleDirection: road.vehicleDirection.unwrap().optional(), widthM: road.widthM,
-  wheelchairAccess: road.wheelchairAccess.unwrap().optional(), buildingId: road.buildingId, levelId: road.levelId,
+  wheelchairAccess: road.wheelchairAccess.unwrap().optional(), buildingId: road.buildingId, levelId: road.levelId, displayColor: road.displayColor,
 });
 const PathOptions = {
   zMode: z.enum(['terrain', 'explicit']).default('terrain').describe('terrain: points without z take the ground height. explicit: every xy needs z'),
@@ -70,14 +71,29 @@ export const UpdatePlace = z.object({
 });
 export const RetireFeature = z.object({ type: z.enum(['road', 'place']), id: Uuid, expectedRevision: z.number().int().positive() });
 export const MoveNode = z.object({ nodeId: Uuid, to: Position });
+export const MergeNodes = z.object({ keepNodeId: Uuid, removeNodeId: Uuid });
 export const SplitRoad = z.object({ roadId: Uuid, expectedRevision: z.number().int().positive(),
   measureM: z.number().positive().optional().describe('Distance from the start of the road'), nearest: z.tuple([z.number(), z.number()]).optional().describe('Or: split at the point closest to this [x, y]') });
 export const MergeRoads = z.object({ roads: z.tuple([z.object({ id: Uuid, expectedRevision: z.number().int().positive() }), z.object({ id: Uuid, expectedRevision: z.number().int().positive() })]) });
 export const RevertChangeSet = z.object({ changeSetId: Uuid });
+const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/).transform((c) => c.toLowerCase());
+export const SetRoadStyle = z.object({ id: Uuid, displayColor: HexColor.nullable().describe('"#rrggbb" shown to every editor, or null to go back to the automatic floor/type colour') });
+export const CreateCorridor = z.object({
+  tracks: z.array(z.object({ runId: Uuid, fromSeq: z.number().int().optional(), toSeq: z.number().int().optional() })).min(1).max(30)
+    .describe('Recorded walks of the same passage (fusion runs, optionally a seq range each). Direction does not matter'),
+  roadClass: road.roadClass.default('pedestrian'),
+  ...RoadAttrsInput.shape,
+  zSource: z.enum(['run', 'terrain']).default('run').describe('run: median track height minus phoneHeightM (indoor floors). terrain: ground height'),
+  phoneHeightM: z.number().min(0).max(2.5).default(1.1),
+  stepM: z.number().min(0.25).max(10).default(1), searchRadiusM: z.number().min(0.5).max(30).default(6), simplifyM: z.number().min(0).max(5).default(0.3),
+  startAt: PathItem.optional().describe('Optional exact start, e.g. {at:{roadId,...}} or {at:{nodeId}}, prepended so the corridor connects there'),
+  endAt: PathItem.optional().describe('Optional exact end, appended likewise'),
+});
 
 export const OP_SCHEMAS = {
   create_road: CreateRoad, update_road: UpdateRoad, connect_roads: ConnectRoads, create_place: CreatePlace, update_place: UpdatePlace,
   retire_feature: RetireFeature, move_node: MoveNode, split_road: SplitRoad, merge_roads: MergeRoads, revert_changeset: RevertChangeSet,
+  set_road_style: SetRoadStyle, create_corridor: CreateCorridor, merge_nodes: MergeNodes,
 } as const;
 export type OpName = keyof typeof OP_SCHEMAS;
 export interface Op { op: OpName; args: any }
@@ -135,12 +151,12 @@ async function position(run: Run, item: PathItem, levelId: string | null = null)
   return resolved.coordinates[0];
 }
 
-/** Do all roads passing through this point end at one shared node there? */
-async function connectedAt(db: PoolClient, p: XYZ, levelId: string | null) {
+/** Do all roads passing through this point end at one shared node there? anyLevel: a connector meeting another level's road. */
+async function connectedAt(db: PoolClient, p: XYZ, levelId: string | null, anyLevel = false) {
   const { rows } = await db.query<{ id: string; from: string; to: string; ds: number; de: number }>(
     `SELECT id, from_node_id "from", to_node_id "to", ST_Distance(ST_Force2D(ST_StartPoint(geom)), pt)::float8 ds, ST_Distance(ST_Force2D(ST_EndPoint(geom)), pt)::float8 de
        FROM mobility.road_segments, (SELECT ST_SetSRID(ST_MakePoint($1,$2),5186) pt, ST_SetSRID(ST_MakePoint($1,$2,$3),5186) pz) q
-      WHERE status IN ('DRAFT','APPROVED') AND level_id IS NOT DISTINCT FROM $4 AND ST_3DDWithin(geom, q.pz, 0.3) AND ST_DWithin(ST_Force2D(geom), q.pt, 0.03)`, [...p, levelId]);
+      WHERE status IN ('DRAFT','APPROVED') AND ($5 OR level_id IS NOT DISTINCT FROM $4) AND ST_3DDWithin(geom, q.pz, 0.3) AND ST_DWithin(ST_Force2D(geom), q.pt, 0.03)`, [...p, levelId, anyLevel]);
   const nodes = rows.flatMap((r) => [...(r.ds < 0.16 ? [r.from] : []), ...(r.de < 0.16 ? [r.to] : [])]);
   const through = rows.filter((r) => r.ds >= 0.16 && r.de >= 0.16).map((r) => r.id);
   return { connected: rows.length >= 2 && !through.length && new Set(nodes).size === 1, nodeId: nodes[0] ?? null, roadIds: rows.map((r) => r.id), passingThrough: through };
@@ -170,6 +186,14 @@ async function summarize(run: Run, result: { changeSetId: string; events?: any[]
   };
 }
 
+/** Did each {at:{nodeId}} end vertex really land on that node? Interior node references are only positions. */
+function nodeRefStates(summary: Awaited<ReturnType<typeof summarize>>, refs: { vertexIndex: number; nodeId: string }[], vertexCount: number) {
+  return refs.map((ref) => {
+    const used = ref.vertexIndex === 0 ? summary.roads[0]?.start.nodeId : ref.vertexIndex === vertexCount - 1 ? summary.roads.at(-1)?.end.nodeId : undefined;
+    return { vertexIndex: ref.vertexIndex, nodeId: ref.nodeId, usedNodeId: used ?? null, connected: used === ref.nodeId || used === undefined };
+  });
+}
+
 function presets(roadClass: RoadAttrs['roadClass']) {
   // Same starting values the editor UI applies when a drawing tool is picked.
   return roadClass === 'pedestrian' ? { pedestrianAccess: 'allowed', vehicleAccess: 'prohibited' }
@@ -186,15 +210,16 @@ async function saveRoadGeometry(run: Run, id: string, expectedRevision: number |
   if (attrs.roadClass === 'pedestrian' && attrs.vehicleAccess === 'allowed') throw AppError.badRequest('ATTRIBUTE_CONFLICT', 'A pedestrian road cannot allow vehicles; use roadClass "shared"');
   if (attrs.roadClass === 'vehicle' && attrs.pedestrianAccess === 'allowed') throw AppError.badRequest('ATTRIBUTE_CONFLICT', 'A vehicle road cannot allow pedestrians; use roadClass "shared"');
   const levelId = attrs.levelId ?? null;
-  const { rows: twins } = await run.db.query<{ id: string }>(
-    `SELECT id FROM mobility.road_segments WHERE status IN ('DRAFT','APPROVED') AND id<>$1 AND level_id IS NOT DISTINCT FROM $2
-        AND ST_HausdorffDistance(ST_Force2D(geom), ST_Force2D(${geoJSONLine(3)})) < 0.05
-        AND abs(ST_ZMin(geom) - $4) < ${LEVEL_TOLERANCE_M} AND abs(ST_ZMax(geom) - $5) < ${LEVEL_TOLERANCE_M} LIMIT 1`,
-    // Same plan shape at another height is a different road (stair flights stacked in one stairwell).
-    [id, levelId, JSON.stringify(coordinates), Math.min(...coordinates.map((c) => c[2])), Math.max(...coordinates.map((c) => c[2]))]);
-  if (twins.length) throw AppError.conflict('DUPLICATE_GEOMETRY', 'An active road with the same geometry already exists', { roadId: twins[0].id });
+  const connector = isConnector(attrs.structure);
+  // A duplicate is the same road in 3D, on any level and in either direction. The plan shape alone is not enough:
+  // stair flights stacked in one stairwell and elevator pieces of one shaft share it and differ only in height.
+  const { rows: planTwins } = await run.db.query<RoadRow>(
+    `${roadSelect} WHERE status IN ('DRAFT','APPROVED') AND id<>$1 AND ST_HausdorffDistance(ST_Force2D(geom), ST_Force2D(${geoJSONLine(2)})) < 0.05`,
+    [id, JSON.stringify(coordinates)]);
+  const twin = planTwins.find((r) => sameRoad3D(r.coordinates, coordinates));
+  if (twin) throw AppError.conflict('DUPLICATE_GEOMETRY', 'An active road with the same 3D geometry already exists', { roadId: twin.id, levelId: twin.level_id });
 
-  const preview = await editorService.previewTopology(coordinates, levelId, undefined, anchors, run.db);
+  const preview = await editorService.previewTopology(coordinates, levelId, undefined, anchors, run.db, attrs.structure);
   const crossings = preview.crossings.filter((c) => c.roadId !== id);
   const needsLease = preview.needsLease.filter((n) => n.id !== id);
   if (needsLease.length > LIMITS.affectedRoads) throw AppError.badRequest('TOO_MANY_AFFECTED_ROADS', `This would split ${needsLease.length} existing roads (limit ${LIMITS.affectedRoads}); draw it in shorter pieces`);
@@ -207,7 +232,7 @@ async function saveRoadGeometry(run: Run, id: string, expectedRevision: number |
   const connections = [];
   for (const anchor of anchors) {
     const at = coordinates[anchor.vertexIndex];
-    const state = await connectedAt(run.db, at, levelId);
+    const state = await connectedAt(run.db, at, levelId, connector);
     connections.push({ toRoadId: anchor.roadId, at: roundXYZ(at), connected: state.connected, nodeId: state.connected ? state.nodeId : null });
   }
   return { saved, lengthM: round2(length), crossings: crossings.map((c) => ({ roadId: c.roadId, at: roundXYZ(c.coordinate), splitsThatRoad: c.requiresLease, zDeltaM: round2(c.zDeltaM) })),
@@ -220,14 +245,48 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     const { path, zMode, terrainOffsetM, densify, runZ, roadClass, ...given } = a;
     const attrs = { roadClass, structure: 'ordinary', pedestrianDirection: 'both', vehicleDirection: 'both', wheelchairAccess: 'unknown', ...presets(roadClass),
       ...Object.fromEntries(Object.entries(given).filter(([, v]) => v !== undefined)) } as RoadAttrs;
-    const resolved = await resolvePath(path, deps(run), { zMode, terrainOffsetM, densify, runZ, levelId: attrs.levelId ?? null });
+    const resolved = await resolvePath(path, deps(run), { zMode, terrainOffsetM, densify, runZ, levelId: attrs.levelId ?? null, crossLevel: isConnector(attrs.structure) });
     const id = randomUUID();
     const r = await saveRoadGeometry(run, id, null, attrs, resolved.coordinates, resolved.anchors);
     const summary = await summarize(run, r.saved);
+    const nodeRefs = nodeRefStates(summary, resolved.nodeRefs, resolved.coordinates.length);
     const failed = r.connections.filter((c) => !c.connected);
-    return { ...summary, crossings: r.crossings, selfCrossings: r.selfCrossings, connections: r.connections, sources: resolved.sources,
+    return { ...summary, crossings: r.crossings, selfCrossings: r.selfCrossings, connections: r.connections, nodeRefs, sources: resolved.sources,
       warnings: [...resolved.warnings, ...(failed.length ? [`NOT CONNECTED at ${failed.length} referenced point(s): inspect with find_nearby, then use connect_roads there`] : []),
+        ...nodeRefs.filter((n) => !n.connected).map((n) => `NODE_NOT_REUSED: path vertex ${n.vertexIndex} referenced node ${n.nodeId}, but the road ${n.vertexIndex === 0 ? 'starts' : 'ends'} on node ${n.usedNodeId ?? '(interior vertex)'}; it is NOT connected to the referenced node (different level or height?)`),
         ...(summary.roads.length > 1 ? ['The line crosses itself or other roads, so it was saved as several road pieces'] : [])] };
+  },
+
+  async create_corridor(run, a) {
+    const { tracks, zSource, phoneHeightM, stepM, searchRadiusM, simplifyM, startAt, endAt, roadClass, ...given } = a;
+    const loaded = [];
+    for (const t of tracks) {
+      const lo = Math.min(t.fromSeq ?? -Infinity, t.toSeq ?? Infinity), hi = Math.max(t.fromSeq ?? -Infinity, t.toSeq ?? Infinity);
+      const points = (await deps(run).runTrack(t.runId)).filter((q) => q.seq >= lo && q.seq <= hi);
+      if (points.length < 2) throw AppError.badRequest('TRACK_RANGE_EMPTY', `Run ${t.runId}: fewer than two track points in that range`);
+      loaded.push(points.map((q) => ({ x: q.x, y: q.y, h: q.h })));
+    }
+    let corridor;
+    try {
+      corridor = corridorCenterline(loaded, { zSource, phoneHeightM, stepM, searchRadiusM, simplifyM }, (x, y) => terrain.sampleXY(run.terrain, x, y)?.height ?? null);
+    } catch (err) { throw AppError.badRequest('CORRIDOR_FAILED', (err as Error).message); }
+    const attrs = { roadClass, structure: 'indoor_corridor', pedestrianDirection: 'both', vehicleDirection: 'both', wheelchairAccess: 'unknown', ...presets(roadClass),
+      ...Object.fromEntries(Object.entries(given).filter(([, v]) => v !== undefined)) } as RoadAttrs;
+    if (attrs.widthM == null && corridor.widthM != null) attrs.widthM = corridor.widthM;
+    const path: PathItem[] = [...(startAt ? [startAt] : []), ...corridor.coordinates.map((c) => ({ xy: [c[0], c[1]] as [number, number], z: c[2] })), ...(endAt ? [endAt] : [])];
+    const resolved = await resolvePath(path, deps(run), { zMode: 'explicit', terrainOffsetM: 0, densify: false, runZ: 'terrain', levelId: attrs.levelId ?? null, crossLevel: isConnector(attrs.structure) });
+    const r = await saveRoadGeometry(run, randomUUID(), null, attrs, resolved.coordinates, resolved.anchors);
+    const summary = await summarize(run, r.saved);
+    const { coordinates: _c, warnings: corridorWarnings, ...stats } = corridor;
+    return { ...summary, corridor: { ...stats, widthM: attrs.widthM ?? null, estimatedWidthM: corridor.widthM, vertexCount: resolved.coordinates.length },
+      crossings: r.crossings, connections: r.connections,
+      warnings: [...corridorWarnings, ...resolved.warnings, ...(corridor.coverage < 0.6 ? [`Only ${Math.round(corridor.coverage * 100)}% of the passage is covered by two or more tracks`] : [])] };
+  },
+
+  async set_road_style(run, a) {
+    await loadRoad(run.db, a.id);
+    const saved = await editorService.setRoadStyle(a.id, { displayColor: a.displayColor, sessionId: run.ctx.sessionId, mutationId: randomUUID() }, run.ctx.identity, run.db);
+    return { changeSetId: saved.changeSetId, roadId: a.id, displayColor: a.displayColor, ...(saved.unchanged ? { note: 'The road already had this colour' } : {}) };
   },
 
   async update_road(run, a) {
@@ -236,7 +295,7 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     expectRevision('Road', a.id, current.revision, a.expectedRevision);
     protectApproved(run.ctx, current.status, 'This road');
     let attrs: RoadAttrs = { ...attrsFromRow(current), ...Object.fromEntries(Object.entries(a.attrs ?? {}).filter(([, v]) => v !== undefined)) } as RoadAttrs;
-    const options = { zMode: a.zMode, terrainOffsetM: a.terrainOffsetM, densify: a.densify, runZ: a.runZ, levelId: attrs.levelId ?? null };
+    const options = { zMode: a.zMode, terrainOffsetM: a.terrainOffsetM, densify: a.densify, runZ: a.runZ, levelId: attrs.levelId ?? null, crossLevel: isConnector(attrs.structure) };
     type V = { p: XYZ; anchor?: { roadId: string; measureM: number } };
     const resolveMany = async (items: PathItem[]): Promise<V[]> => {
       const r = await resolvePath(items, deps(run), options);
@@ -356,6 +415,13 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     for (const r of rows) protectApproved(run.ctx, r.status, 'A road on this node');
     const saved = await editorOps.moveNode({ nodeId: a.nodeId, coordinate: await position(run, a.to), sessionId: run.ctx.sessionId, mutationId: randomUUID() }, run.ctx.identity, run.db);
     return { ...(await summarize(run, saved)), nodeId: saved.nodeId, at: roundXYZ(saved.coordinate), note: 'Crossings created by the move are not connected automatically: run validate_network' };
+  },
+
+  async merge_nodes(run, a) {
+    const { rows } = await run.db.query<{ status: string }>(`SELECT status FROM mobility.road_segments WHERE status IN ('DRAFT','APPROVED') AND (from_node_id=$1 OR to_node_id=$1)`, [a.removeNodeId]);
+    for (const r of rows) protectApproved(run.ctx, r.status, 'A road on the removed node');
+    const saved = await editorOps.mergeNodes({ ...a, sessionId: run.ctx.sessionId, mutationId: randomUUID() }, run.ctx.identity, run.db);
+    return { ...(await summarize(run, saved)), nodeId: saved.nodeId, removedNodeId: saved.removedNodeId, at: roundXYZ(saved.coordinate) };
   },
 
   async split_road(run, a) {

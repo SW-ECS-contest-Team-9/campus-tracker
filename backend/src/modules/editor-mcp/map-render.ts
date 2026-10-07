@@ -4,7 +4,7 @@ import type { XYZ } from '../editor/topology.js';
 export interface MapScene {
   bbox: [number, number, number, number];
   buildings: { name: string | null; rings: number[][][] }[];
-  roads: { id: string; name: string | null; roadClass: string; status: string; coordinates: XYZ[]; highlighted?: boolean }[];
+  roads: { id: string; name: string | null; roadClass: string; status: string; coordinates: XYZ[]; highlighted?: boolean; displayColor?: string | null }[];
   nodes: { kind: string; coordinate: XYZ; degree: number }[];
   places: { name: string; coordinate: XYZ }[];
   tracks: { label: string; points: [number, number][] }[];
@@ -44,7 +44,7 @@ export function renderMapSvg(scene: MapScene, widthPx: number, labels: boolean):
   for (const r of scene.roads) {
     if (r.highlighted) out.push(`<polyline points="${line(r.coordinates)}" fill="none" stroke="#facc15" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>`);
     out.push(`<polyline points="${line(r.coordinates)}" fill="none" stroke="#14251d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`,
-      `<polyline points="${line(r.coordinates)}" fill="none" stroke="${COLORS[r.roadClass] ?? '#64748b'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"${r.status === 'DRAFT' ? '' : ' stroke-opacity="1"'}/>`);
+      `<polyline points="${line(r.coordinates)}" fill="none" stroke="${r.displayColor ?? COLORS[r.roadClass] ?? '#64748b'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"${r.status === 'DRAFT' ? '' : ' stroke-opacity="1"'}/>`);
   }
   for (const n of scene.nodes) {
     // Dead ends are hollow so missing connections stand out.
