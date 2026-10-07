@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Required: the development server is plain HTTP on a user-entered LAN/Tailscale address (prompt §2). -->
+    <issue id="InsecureBaseConfiguration" severity="ignore" />
+</lint>
