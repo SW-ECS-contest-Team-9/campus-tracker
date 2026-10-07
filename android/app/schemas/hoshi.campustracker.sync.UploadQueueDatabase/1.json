@@ -1,0 +1,146 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "17336933cc197df6f3b007ac17137e94",
+    "entities": [
+      {
+        "tableName": "queue_sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`clientSessionId` TEXT NOT NULL, `collectorId` TEXT NOT NULL, `serverKey` TEXT NOT NULL, `startPayload` TEXT NOT NULL, `serverSessionId` TEXT, `finishAcked` INTEGER NOT NULL, PRIMARY KEY(`clientSessionId`))",
+        "fields": [
+          {
+            "fieldPath": "clientSessionId",
+            "columnName": "clientSessionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectorId",
+            "columnName": "collectorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverKey",
+            "columnName": "serverKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startPayload",
+            "columnName": "startPayload",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverSessionId",
+            "columnName": "serverSessionId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "finishAcked",
+            "columnName": "finishAcked",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "clientSessionId"
+          ]
+        }
+      },
+      {
+        "tableName": "queue_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seq` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kind` TEXT NOT NULL, `itemId` TEXT NOT NULL, `clientSessionId` TEXT NOT NULL, `payload` TEXT NOT NULL, `state` TEXT NOT NULL, `lastErrorCode` TEXT, `needsLocation` INTEGER NOT NULL, `sessionRetried` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "seq",
+            "columnName": "seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientSessionId",
+            "columnName": "clientSessionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payload",
+            "columnName": "payload",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastErrorCode",
+            "columnName": "lastErrorCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "needsLocation",
+            "columnName": "needsLocation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionRetried",
+            "columnName": "sessionRetried",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "seq"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_queue_items_kind_state",
+            "unique": false,
+            "columnNames": [
+              "kind",
+              "state"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_queue_items_kind_state` ON `${TABLE_NAME}` (`kind`, `state`)"
+          },
+          {
+            "name": "index_queue_items_clientSessionId",
+            "unique": false,
+            "columnNames": [
+              "clientSessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_queue_items_clientSessionId` ON `${TABLE_NAME}` (`clientSessionId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '17336933cc197df6f3b007ac17137e94')"
+    ]
+  }
+}
