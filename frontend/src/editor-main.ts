@@ -4,7 +4,6 @@ import { API_BASE_URL } from './api';
 import { initCampusMap } from './campus-map';
 import { tmForward, tmInverse } from './tm';
 import type { TerrainGrid } from './api';
-import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode } from './editor-view';
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -52,7 +51,7 @@ root.innerHTML = `
     <header class="editor-header">
       <a class="editor-brand" href="/" title="캠퍼스 Preview로 돌아가기">Campus Network Editor</a>
       <span id="editor-tool-label" class="editor-status">선택 도구</span>
-      <span class="editor-status">WASD 이동 · Q/E 회전 · Space 꼭지점 · R/F 높이 · Enter 저장 · Esc 취소 · ? 단축키</span>
+      <span class="editor-status">WASD 이동 · Q/E 회전 · Space 꼭지점 · R/F 높이</span>
       <span class="spacer"></span><span id="editor-user" class="editor-status"></span>
       <span id="editor-connection" class="editor-status offline">연결 중…</span>
       <label class="inline-check" title="AI 에이전트가 요청하면 카메라를 그 위치로 이동합니다"><input id="editor-ai-follow" type="checkbox"> AI 화면 안내</label>
@@ -94,19 +93,6 @@ root.innerHTML = `
           <div class="editor-hint">켜면 지도 드래그가 커서를 중심으로 회전하고, 커서 이동 시 회전 중심도 따라갑니다.</div>
           <div class="editor-hint"><span class="keycap">W</span>/<span class="keycap">S</span> 전후진 · <span class="keycap">A</span>/<span class="keycap">D</span> 좌우 · <span class="keycap">Q</span>/<span class="keycap">E</span> 머리 회전 · <span class="keycap">R</span>/<span class="keycap">F</span> Z 이동 · 동시 입력 가능</div>
         </section>
-        <section class="editor-section"><h2>보기 · 조작</h2>
-          <label class="editor-field">마우스 조작 방식<select id="nav-preset">
-            <option value="cesium">기본 · 좌 이동 / 중·Ctrl+좌 회전 / 우·휠 줌</option>
-            <option value="blender">Blender · 중 회전 / Shift+중 이동 / Ctrl+중 줌</option>
-            <option value="cad">CAD · 중 이동 / Shift+중 회전 / 중 더블클릭 전체</option></select></label>
-          <label class="editor-field">회전 감도 <b id="sens-rotate-v"></b><input id="sens-rotate" type="range" min="0.1" max="3" step="0.1"></label>
-          <label class="editor-field">이동 감도 <b id="sens-pan-v"></b><input id="sens-pan" type="range" min="0.1" max="3" step="0.1"></label>
-          <label class="editor-field">줌 감도 <b id="sens-zoom-v"></b><input id="sens-zoom" type="range" min="0.1" max="3" step="0.1"></label>
-          <label class="inline-check"><input id="zoom-pointer" type="checkbox"> 마우스 위치로 줌</label>
-          <label class="inline-check"><input id="zoom-invert" type="checkbox"> 줌 방향 반전</label>
-          <div class="editor-hint">Blender/CAD 방식에서는 Alt+좌 드래그가 가운데 버튼을 대신합니다(노트북용). 설정은 이 브라우저에만 저장됩니다.</div>
-          <div class="feature-actions"><button id="nav-help-btn" type="button">단축키 보기 (?)</button></div>
-        </section>
         <section class="editor-section"><h2>점 참고 / 스냅</h2>
           <label class="editor-field">수집 세션<select id="fusion-session"><option value="">세션 선택</option></select></label>
           <label class="editor-field">Fusion 실행<select id="fusion-run"><option value="">실행 선택</option></select></label>
@@ -121,30 +107,11 @@ root.innerHTML = `
         </section>
         <section class="editor-section"><h2>함께 작업 중</h2><div id="presence-list" class="presence-list"></div></section>
       </aside>
-      <main id="editor-map-wrap" class="editor-map"><div id="editor-map" tabindex="0"></div><div class="editor-crosshair"></div><div id="editor-heading" class="editor-heading" aria-label="커서 진행 방향"><span id="editor-heading-arrow" class="editor-heading-arrow">↑</span><span id="editor-heading-value">북 0°</span></div><div id="coordinate-bar" class="editor-coordinate-bar">지도를 클릭하여 커서 위치 지정</div>
-        <div class="editor-viewbar" aria-label="보기 전환">
-          <button data-view="top" title="위에서 보기 (7)">위</button><button data-view="front" title="앞에서 보기 (1)">앞</button>
-          <button data-view="right" title="오른쪽에서 보기 (3)">우</button><button data-view="flip" title="반대편에서 보기 (9)">반대</button>
-          <button id="view-ortho" data-view="ortho" title="원근/정사영 전환 (5)">원근</button>
-          <button data-view="frame-selected" title="선택 맞춤 (. / Numpad .)">선택 맞춤</button><button data-view="frame-all" title="전체 맞춤 (Home)">전체</button>
-          <button id="view-isolate" data-view="isolate" title="선택 경로만 보기 (/)">단독</button>
-        </div>
-        <div id="editor-hover-tip" class="editor-hover-tip" hidden></div></main>
+      <main id="editor-map-wrap" class="editor-map"><div id="editor-map" tabindex="0"></div><div class="editor-crosshair"></div><div id="editor-heading" class="editor-heading" aria-label="커서 진행 방향"><span id="editor-heading-arrow" class="editor-heading-arrow">↑</span><span id="editor-heading-value">북 0°</span></div><div id="coordinate-bar" class="editor-coordinate-bar">지도를 클릭하여 커서 위치 지정</div></main>
       <aside class="editor-inspector">
         <section class="editor-section"><h2>작업</h2><div id="editor-message" class="editor-hint">도로/장소 도구를 고르고 지도를 클릭한 뒤 Space로 점을 추가하세요.</div>
           <div class="feature-actions"><button id="editor-edit" disabled>선택 편집</button><button id="editor-save" class="active" disabled>저장</button><button id="editor-delete" disabled>삭제</button></div>
           <div id="selected-info" class="editor-hint" style="margin-top:8px"></div>
-        </section>
-        <section class="editor-section"><h2>경로 표시</h2>
-          <div id="road-color-row" class="editor-color-row" hidden><label class="editor-field">선택 경로 색 · 이 브라우저만<input id="road-color" type="color"></label><button id="road-color-reset" type="button">기본색</button></div>
-          <label class="inline-check"><input id="dim-others" type="checkbox"> 선택 시 다른 경로 흐리게</label>
-          <label class="editor-field">다른 경로 불투명도 <b id="dim-alpha-v"></b><input id="dim-alpha" type="range" min="0.05" max="1" step="0.05"></label>
-          <label class="editor-field">시작 / 도착점<select id="endpoint-mode"><option value="selected">선택 경로만</option><option value="all">모든 경로</option><option value="off">숨김</option></select></label>
-          <label class="inline-check"><input id="depth-fade" type="checkbox"> 카메라 거리별 선 명도</label>
-          <div class="editor-row"><label class="editor-field">선명 거리 m<input id="fade-near" type="number" min="0" step="10"></label><label class="editor-field">흐림 거리 m<input id="fade-far" type="number" min="1" step="10"></label></div>
-          <label class="editor-field">최소 명도 <b id="fade-min-v"></b><input id="fade-min" type="range" min="0.05" max="1" step="0.05"></label>
-          <label class="inline-check"><input id="hover-highlight" type="checkbox"> 마우스 오버 미리 강조</label>
-          <div class="feature-actions"><button id="road-color-clear" type="button">로컬 색 모두 초기화</button></div>
         </section>
         <section class="editor-section"><h2>편집 Vertex</h2><div class="feature-actions"><button id="vertex-prev" disabled>이전</button><button id="vertex-next" disabled>다음</button><button id="vertex-delete" disabled>점 삭제</button></div><div class="feature-actions"><button id="vertex-undo-last" disabled>마지막 점 취소</button><span class="editor-hint">작도 중 Backspace</span></div><div id="vertex-info" class="editor-hint" style="margin-top:8px"></div></section>
         <section class="editor-section"><h2>캠퍼스 도로</h2><div id="road-list" class="feature-list"></div></section>
@@ -153,30 +120,6 @@ root.innerHTML = `
       </aside>
     </div>
   </div>
-  <div id="editor-help" class="editor-help" hidden><div class="editor-help-card">
-    <h2>단축키 · 마우스</h2>
-    <table>
-      <tr><th colspan="2">편집</th></tr>
-      <tr><td><span class="keycap">W A S D</span> <span class="keycap">Q E</span> <span class="keycap">R F</span></td><td>커서 이동 · 머리 회전 · 높이</td></tr>
-      <tr><td><span class="keycap">Space</span></td><td>꼭지점 추가</td></tr>
-      <tr><td><span class="keycap">Backspace</span> / <span class="keycap">Delete</span></td><td>마지막 점 취소 / 선택 점 삭제</td></tr>
-      <tr><td><span class="keycap">Enter</span> · <span class="keycap">Ctrl S</span></td><td>저장 (작도 종료)</td></tr>
-      <tr><td><span class="keycap">Esc</span></td><td>작도 취소(변경 시 두 번) · 도구 해제 · 선택 해제</td></tr>
-      <tr><td><span class="keycap">Ctrl Z</span> / <span class="keycap">Ctrl Y</span></td><td>실행 취소 / 다시 실행</td></tr>
-      <tr><th colspan="2">보기 (숫자패드 또는 숫자열)</th></tr>
-      <tr><td><span class="keycap">7</span> <span class="keycap">1</span> <span class="keycap">3</span></td><td>위 · 앞(북쪽 보기) · 오른쪽 · Shift / Ctrl+숫자패드는 반대편</td></tr>
-      <tr><td><span class="keycap">9</span> · <span class="keycap">5</span></td><td>반대편 보기 · 원근/정사영 전환</td></tr>
-      <tr><td><span class="keycap">4</span> <span class="keycap">6</span> <span class="keycap">8</span> <span class="keycap">2</span></td><td>15° 궤도 회전</td></tr>
-      <tr><td><span class="keycap">.</span> · <span class="keycap">Home</span> · <span class="keycap">0</span></td><td>선택 맞춤 · 전체 맞춤 · 커서로 이동</td></tr>
-      <tr><td><span class="keycap">/</span></td><td>선택 경로만 보기 (단독)</td></tr>
-      <tr><th colspan="2">마우스</th></tr>
-      <tr><td>기본</td><td>좌 드래그 이동 · 중 / Ctrl+좌 회전 · 우 드래그 · 휠 줌</td></tr>
-      <tr><td>Blender</td><td>중 회전 · Shift+중 이동 · Ctrl+중 줌 · 휠 줌 (Alt+좌 = 중)</td></tr>
-      <tr><td>CAD</td><td>중 이동 · Shift+중 회전 · 중 더블클릭 전체 · 휠 마우스 위치 줌</td></tr>
-      <tr><td>공통</td><td>목록 항목 더블클릭 = 해당 경로로 이동 · 회전 중심은 마우스 아래 지점(커서 고정 시 커서)</td></tr>
-    </table>
-    <div class="feature-actions"><button id="editor-help-close" type="button">닫기 (Esc)</button></div>
-  </div></div>
   <div id="editor-login" class="editor-login"><form id="editor-login-form" class="editor-login-card">
     <h1>트랙커 계정으로 로그인</h1><p>기존 트랙커 계정 코드를 사용합니다. 비밀번호는 필요하지 않으며 브라우저를 편집 기기로 등록합니다.</p>
     <label class="editor-field">트랙커 계정<select id="login-account" required><option value="">계정 불러오는 중…</option></select></label>
@@ -290,18 +233,6 @@ let changeSets: ChangeSet[] = [];
 const remoteDrafts = new Map<string, any>();
 const undoStack: XYZ[][] = [];
 const redoStack: XYZ[][] = [];
-// Local-only view state (editor-view.ts): never emitted over the socket or saved on the server.
-const prefs: ViewPrefs = loadPrefs();
-let nav: NavController | null = null;
-let hoverId: string | null = null;
-let isolate = false;
-let escArmedAt = 0;
-let lastListClick = { id: '', at: 0 };
-const roadWorld = new Map<string, any[]>();
-type RoadStyle = { line: any; casing: any; fail: any; glow: any };
-const roadStyles = new Map<string, RoadStyle>();
-const cssColorCache = new Map<string, any>();
-const fadeScratch = { a: null as any, b: null as any };
 
 function say(message: string, kind: 'hint' | 'warning' | 'error' | 'success' = 'hint') {
   $('editor-message').className = kind;
@@ -409,79 +340,14 @@ function updateCursorGraphics() {
     cursorGroundPoint.position = groundPosition;
   }
 }
-function roadCss(r: Road) { return prefs.roadColors[r.id] ?? COLORS[r.roadClass] ?? '#64748b'; }
-function cssColor(css: string) {
-  let c = cssColorCache.get(css);
-  if (!c) { c = C.Color.fromCssColorString(css) ?? C.Color.GRAY; cssColorCache.set(css, c); }
-  return c;
-}
-function hoveredRoadId() { return hoverId?.startsWith('editor:road:') ? hoverId.slice('editor:road:'.length) : null; }
-/** Road colour for this frame: local colour × status × camera-distance fade × dimming when another road is selected. */
-function computeRoadStyle(r: Road) {
-  let s = roadStyles.get(r.id);
-  if (!s) { s = { line: new C.Color(), casing: new C.Color(), fail: new C.Color(), glow: new C.Color() }; roadStyles.set(r.id, s); }
-  const focus = selectedRoad?.id ?? null;
-  const isFocus = r.id === focus;
-  let alpha = r.status === 'APPROVED' ? 1 : 0.8;
-  if (!isFocus) {
-    const pts = roadWorld.get(r.id);
-    if (prefs.depthFade && pts?.length) {
-      const d = distanceToPolyline(C, viewer.camera.positionWC, pts, fadeScratch);
-      alpha *= 1 - (1 - prefs.fadeMin) * smoothstep(prefs.fadeNear, prefs.fadeFar, d);
-    }
-    if (focus && (prefs.dimOthers || isolate)) alpha *= isolate ? 0.04 : prefs.dimAlpha;
-  }
-  C.Color.clone(cssColor(roadCss(r)), s.line);
-  if (r.id === hoveredRoadId() && !isFocus) { C.Color.lerp(s.line, C.Color.WHITE, 0.35, s.line); alpha = Math.max(alpha, 0.95); }
-  if (isFocus) alpha = 1;
-  // Always below 1: Cesium keeps these lines in one translucent batch, so alpha changes only update attributes.
-  alpha = Math.min(0.99, Math.max(0.03, alpha));
-  s.line.alpha = alpha;
-  C.Color.clone(s.line, s.fail); s.fail.alpha = alpha * 0.8;
-  C.Color.clone(cssColor('#14251d'), s.casing); s.casing.alpha = Math.min(0.99, 0.9 * alpha);
-  C.Color.lerp(cssColor(roadCss(r)), C.Color.WHITE, 0.45, s.glow); s.glow.alpha = 0.9;
-}
-function updateRoadStyles() { if (viewer) for (const r of roads) if (roadWorld.has(r.id)) computeRoadStyle(r); }
-function styleProperty(id: string, key: keyof RoadStyle) {
-  return new C.ColorMaterialProperty(new C.CallbackProperty((_t: any, result: any) => {
-    const s = roadStyles.get(id);
-    return s ? C.Color.clone(s[key], result) : C.Color.clone(C.Color.GRAY, result);
-  }, false));
-}
-function drawRoad(r: Road) {
-  if (r.geometry.coordinates.length < 2) return;
-  const positions = r.geometry.coordinates.map(drawPoint);
-  roadWorld.set(r.id, positions);
-  computeRoadStyle(r);
-  const common = { positions, arcType: C.ArcType.NONE };
-  const focus = selectedRoad?.id === r.id;
-  const width = focus ? 8 : 5;
-  if (focus) {
-    const s = roadStyles.get(r.id)!;
-    const glow = new C.PolylineGlowMaterialProperty({ glowPower: 0.22, taperPower: 1, color: s.glow.clone() });
-    addEntity({ polyline: { ...common, width: 26, material: glow, depthFailMaterial: glow } });
-  }
-  addEntity({ polyline: { ...common, width: width + 4, material: styleProperty(r.id, 'casing'), depthFailMaterial: styleProperty(r.id, 'casing') } });
-  addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: styleProperty(r.id, 'line'), depthFailMaterial: styleProperty(r.id, 'fail') } });
-}
-/** Start/end markers: large labelled rings for the focused road or draft, small dots for the rest ('all'). */
-function drawEndpoints(coords: XYZ[], labelled: boolean) {
-  if (!coords.length) return;
-  const marker = (p: XYZ, css: string, text: string) => addEntity({ position: drawPoint(p),
-    point: { pixelSize: labelled ? 22 : 8, color: cssColor(css).withAlpha(labelled ? 0.85 : 0.9), outlineColor: C.Color.WHITE,
-      outlineWidth: labelled ? 3 : 1.5, disableDepthTestDistance: Number.POSITIVE_INFINITY },
-    label: labelled ? { text, font: 'bold 12px system-ui', pixelOffset: new C.Cartesian2(0, -26), fillColor: C.Color.WHITE,
-      showBackground: true, backgroundColor: cssColor(css).withAlpha(0.92), backgroundPadding: new C.Cartesian2(6, 3),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY } : undefined });
-  marker(coords[0], '#16a34a', '시작');
-  if (coords.length >= 2) marker(coords.at(-1)!, '#dc2626', '도착');
-}
 function drawAll() {
   if (!viewer) return;
   cleanMapEntities();
-  roadWorld.clear();
-  for (const r of roads) drawRoad(r);
-  if (prefs.endpoints === 'all') for (const r of roads) if (r.id !== selectedRoad?.id) drawEndpoints(r.geometry.coordinates, false);
+  for (const r of roads) {
+    const css = COLORS[r.roadClass] ?? '#64748b';
+    const color = C.Color.fromCssColorString(css).withAlpha(r.status === 'APPROVED' ? 1 : 0.8);
+    drawLine(r.geometry.coordinates, color, 5, true, false, `editor:road:${r.id}`);
+  }
   for (const p of places) {
     addEntity({ id: `editor:place:${p.id}`, position: drawPoint(p.geometry.coordinates), point: { pixelSize: 11,
       color: C.Color.fromCssColorString(COLORS.place), outlineColor: C.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY },
@@ -505,8 +371,6 @@ function drawAll() {
     const coords = selectedRoad.geometry.coordinates.map((p, i) => i === selectedVertex ? ownCursor : p);
     drawLine(coords, C.Color.YELLOW, 6);
   }
-  const focusCoords = roadDraft?.coordinates ?? selectedRoad?.geometry.coordinates;
-  if (focusCoords && prefs.endpoints !== 'off') drawEndpoints(focusCoords, true);
   const editVertices = roadDraft?.coordinates ?? (selectedRoad ? selectedRoad.geometry.coordinates : []);
   editVertices.forEach((p, i) => addEntity({ id: selectedRoad ? `editor:vertex:${selectedRoad.id}:${i}` : roadDraft ? `editor:draft-vertex:${i}` : undefined,
     position: drawPoint(p), point: { pixelSize: i === selectedVertex ? 13 : 9,
@@ -907,23 +771,13 @@ function updateControls() {
   $('vertex-undo-last').toggleAttribute('disabled', !roadDraft || !!selectedRoad || roadDraft.coordinates.length <= (roadDraft.branchFrom ? 1 : 0));
   $('junction-save').toggleAttribute('disabled', !socket?.connected || junctionSaving || tool !== 'junction'
     || !junctionPreview || junctionPreview.roads.length < 2 || junctionPreview.roads.length > 32 || junctionPreview.alreadyConnected);
-  $('road-color-row').hidden = !selectedRoad;
-  if (selectedRoad && !$('road-color').matches(':focus')) $('road-color').value = toHexColor(roadCss(selectedRoad));
-  $('view-isolate').classList.toggle('active', isolate);
   $('selected-info').textContent = selectedRoad ? `${selectedRoad.name || '이름 없는 도로'} · ${selectedRoad.roadClass} · ${selectedRoad.status} r${selectedRoad.revision}` : selectedPlace ? `${selectedPlace.name} · ${selectedPlace.category} · ${selectedPlace.status} r${selectedPlace.revision}` : dirty ? '저장되지 않은 변경' : '';
 }
 function renderLists() {
-  $('road-list').innerHTML = roads.map((r) => `<button class="feature-item ${selectedRoad?.id === r.id ? 'selected' : ''}" data-road-id="${esc(r.id)}"><span class="swatch" style="background:${esc(roadCss(r))}"></span><span>${esc(r.name || '이름 없는 도로')}<br><span class="muted">${esc(r.roadClass)} · ${esc(r.status)}</span></span></button>`).join('') || '<span class="editor-hint">저장된 도로가 없습니다.</span>';
+  $('road-list').innerHTML = roads.map((r) => `<button class="feature-item ${selectedRoad?.id === r.id ? 'selected' : ''}" data-road-id="${esc(r.id)}"><span class="swatch" style="background:${COLORS[r.roadClass]}"></span><span>${esc(r.name || '이름 없는 도로')}<br><span class="muted">${esc(r.roadClass)} · ${esc(r.status)}</span></span></button>`).join('') || '<span class="editor-hint">저장된 도로가 없습니다.</span>';
   $('place-list').innerHTML = places.map((p) => `<button class="feature-item ${selectedPlace?.id === p.id ? 'selected' : ''}" data-place-id="${esc(p.id)}"><span class="swatch" style="background:${COLORS.place}"></span><span>${esc(p.name)}<br><span class="muted">${esc(p.category)}</span></span></button>`).join('') || '<span class="editor-hint">저장된 장소가 없습니다.</span>';
-  // The list re-renders on every redraw, so a native dblclick rarely survives; detect the second click by id/time.
-  const listClick = (id: string, select: () => void, frame: () => void) => {
-    const now = Date.now(), again = lastListClick.id === id && now - lastListClick.at < 450;
-    lastListClick = { id: again ? '' : id, at: now };
-    select();
-    if (again) frame();
-  };
-  $('road-list').querySelectorAll<HTMLButtonElement>('[data-road-id]').forEach((b) => b.onclick = () => listClick(`road:${b.dataset.roadId}`, () => selectRoad(b.dataset.roadId!), () => frameRoad(b.dataset.roadId!)));
-  $('place-list').querySelectorAll<HTMLButtonElement>('[data-place-id]').forEach((b) => b.onclick = () => listClick(`place:${b.dataset.placeId}`, () => selectPlace(b.dataset.placeId!), () => { const p = places.find((x) => x.id === b.dataset.placeId); if (p) nav?.frame([drawPoint(p.geometry.coordinates)]); }));
+  $('road-list').querySelectorAll<HTMLButtonElement>('[data-road-id]').forEach((b) => b.onclick = () => selectRoad(b.dataset.roadId!));
+  $('place-list').querySelectorAll<HTMLButtonElement>('[data-place-id]').forEach((b) => b.onclick = () => selectPlace(b.dataset.placeId!));
   const peers = [...connectedPeers.values()].filter((p) => p.sessionId !== EDITOR_SESSION);
   $('presence-list').innerHTML = [...new Map(peers.map((p) => [`${p.collectorId}|${p.agent ?? ''}`, p])).values()].map((p) => {
     if (p.agent) return `<div><i class="presence-dot ai"></i>🤖 ${esc(p.agent)} <span class="muted">(${esc(p.collectorId)}) · AI 작업 중</span></div>`;
@@ -1083,165 +937,14 @@ function followCursor() {
 // Cesium's default zoom scales with the picked building/terrain distance. Use only
 // camera height (or cursor range in orbit mode) so geometry under the pointer
 // cannot change the editor's zoom speed.
-function zoomCamera(steps: number, screen?: { x: number; y: number }) {
+function zoomCamera(steps: number) {
   if (!viewer || !Number.isFinite(steps) || steps === 0) return;
   const camera = viewer.camera;
   const cursorRange = C.Cartesian3.distance(camera.positionWC, drawPoint(ownCursor));
   const height = Math.abs(camera.positionCartographic.height);
   const reference = Math.max(5, Math.min(20_000, orbitCursor ? cursorRange : height));
-  let amount = reference * (1 - Math.exp(-Math.max(-3, Math.min(3, steps)) * 0.18));
-  // Zoom toward the pointer (CAD style): same height-scaled speed, only the direction follows the mouse ray;
-  // the picked distance merely stops the camera short of the surface.
-  const ray = screen && !orbitCursor ? camera.getPickRay(new C.Cartesian2(screen.x, screen.y)) : undefined;
-  if (ray) {
-    const hit = nav?.pickWorld(screen!);
-    if (amount > 0 && hit) amount = Math.min(amount, Math.max(0, C.Cartesian3.distance(camera.positionWC, hit) - 2));
-    const dir = C.Matrix4.multiplyByPointAsVector(camera.inverseTransform, ray.direction, new C.Cartesian3());
-    camera.move(C.Cartesian3.normalize(dir, dir), amount);
-    return;
-  }
+  const amount = reference * (1 - Math.exp(-Math.max(-3, Math.min(3, steps)) * 0.18));
   camera.zoomIn(orbitCursor && amount > 0 ? Math.min(amount, Math.max(0, cursorRange - 2)) : amount);
-}
-
-function toHexColor(css: string) {
-  const c = cssColor(css), h = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
-  return `#${h(c.red)}${h(c.green)}${h(c.blue)}`;
-}
-function focusPointsWorld(): any[] {
-  if (roadDraft?.coordinates.length) return roadDraft.coordinates.map(drawPoint);
-  if (selectedRoad) return selectedRoad.geometry.coordinates.map(drawPoint);
-  if (selectedPlace) return [drawPoint(selectedPlace.geometry.coordinates)];
-  return [];
-}
-function frameRoad(id: string) {
-  const road = roads.find((r) => r.id === id);
-  if (road) { nav?.frame(road.geometry.coordinates.map(drawPoint)); lastFollowTarget = null; }
-}
-function frameSelection() {
-  if (!nav?.frame(focusPointsWorld())) say('맞출 선택 객체가 없습니다. 도로나 장소를 먼저 선택하세요.');
-  lastFollowTarget = null;
-}
-function frameAll() {
-  const pts = [...roads.flatMap((r) => r.geometry.coordinates.map(drawPoint)), ...places.map((p) => drawPoint(p.geometry.coordinates))];
-  if (!nav?.frame(pts.length ? pts : [drawPoint(ownCursor)])) return;
-  lastFollowTarget = null;
-}
-function toggleIsolate() {
-  isolate = !isolate;
-  if (isolate && !selectedRoad) say('단독 보기는 경로를 선택했을 때 적용됩니다.');
-  updateControls();
-}
-function toggleHelp(open = $('editor-help').hidden) { $('editor-help').hidden = !open; }
-function viewCommand(kind: string) {
-  if (!nav) return;
-  if (kind === 'top' || kind === 'bottom' || kind === 'front' || kind === 'back' || kind === 'right' || kind === 'left') nav.standardView(kind);
-  else if (kind === 'flip') nav.flipView();
-  else if (kind === 'ortho') nav.toggleOrtho();
-  else if (kind === 'frame-selected') frameSelection();
-  else if (kind === 'frame-all') frameAll();
-  else if (kind === 'isolate') toggleIsolate();
-  else if (kind === 'cursor') nav.frame([drawPoint(ownCursor)]);
-  lastFollowTarget = null;
-  $('view-ortho').textContent = nav.isOrtho() ? '정사영' : '원근';
-  $('view-ortho').classList.toggle('active', nav.isOrtho());
-}
-/** Blender numpad / CAD view keys. Ctrl+digit is left to the browser (tab switching); Shift+digit gives the opposite view. */
-function handleViewKey(e: KeyboardEvent): boolean {
-  if (!nav || e.metaKey || e.altKey) return false;
-  const digit = /^(Numpad|Digit)(\d)$/.exec(e.code);
-  if (e.ctrlKey && !(digit && digit[1] === 'Numpad')) return false;
-  const opposite = e.shiftKey || e.ctrlKey;
-  let command: string | null = null;
-  if (digit) {
-    const n = Number(digit[2]);
-    if (n === 7) command = opposite ? 'bottom' : 'top';
-    else if (n === 1) command = opposite ? 'back' : 'front';
-    else if (n === 3) command = opposite ? 'left' : 'right';
-    else if (n === 9) command = 'flip';
-    else if (n === 5) command = 'ortho';
-    else if (n === 0) command = 'cursor';
-    else if (n === 4 || n === 6 || n === 8 || n === 2) {
-      e.preventDefault();
-      nav.orbitStep(n === 4 ? -15 : n === 6 ? 15 : 0, n === 8 ? 15 : n === 2 ? -15 : 0);
-      lastFollowTarget = null;
-      return true;
-    }
-  } else if (e.code === 'NumpadDecimal' || e.code === 'Period') command = 'frame-selected';
-  else if (e.code === 'Home') command = 'frame-all';
-  else if (e.code === 'NumpadDivide' || (e.code === 'Slash' && !e.shiftKey)) command = 'isolate';
-  else if (e.key === '?') { e.preventDefault(); toggleHelp(); return true; }
-  if (!command) return false;
-  e.preventDefault();
-  viewCommand(command);
-  return true;
-}
-function onHover(id: string | null, screen: { x: number; y: number } | null) {
-  const active = tool === 'select' && !roadDraft && !placeDraft ? id : null;
-  const tip = $('editor-hover-tip');
-  if (active !== hoverId) { hoverId = active; viewer.scene.canvas.style.cursor = active ? 'pointer' : ''; }
-  if (!active || !screen) { tip.hidden = true; return; }
-  let text = '';
-  if (active.startsWith('editor:road:')) {
-    const r = roads.find((x) => x.id === active.slice('editor:road:'.length));
-    if (r) text = `${r.name || '이름 없는 도로'} · ${r.roadClass} · ${r.structure} · 점 ${r.geometry.coordinates.length}개`;
-  } else if (active.startsWith('editor:place:')) {
-    const p = places.find((x) => x.id === active.slice('editor:place:'.length));
-    if (p) text = `${p.name} · ${p.category}`;
-  } else if (active.startsWith('editor:vertex:')) text = '더블클릭: 이 Vertex에서 분기';
-  tip.hidden = !text;
-  tip.textContent = text;
-  tip.style.left = `${screen.x + 14}px`; tip.style.top = `${screen.y + 14}px`;
-}
-function bindViewPrefs() {
-  const persist = () => { savePrefs(prefs); updateRoadStyles(); };
-  const range = (id: string, get: () => number, set: (v: number) => void, fmt = (v: number) => `×${v.toFixed(1)}`) => {
-    const input = $(id), out = $(`${id}-v`);
-    input.value = String(get()); out.textContent = fmt(get());
-    input.addEventListener('input', () => { set(Number(input.value)); out.textContent = fmt(get()); persist(); });
-  };
-  const check = (id: string, get: () => boolean, set: (v: boolean) => void, redraw = false) => {
-    const input = $(id);
-    input.checked = get();
-    input.addEventListener('change', () => { set(input.checked); persist(); if (redraw) drawAll(); });
-  };
-  $('nav-preset').value = prefs.preset;
-  $('nav-preset').addEventListener('change', () => {
-    prefs.preset = $('nav-preset').value as NavPreset;
-    prefs.zoomToPointer = prefs.preset === 'cad';
-    $('zoom-pointer').checked = prefs.zoomToPointer;
-    persist();
-    say({ cesium: '기본 조작: 좌 드래그 이동, 가운데·Ctrl+좌 회전, 우 드래그·휠 줌.', blender: 'Blender 조작: 가운데 회전, Shift+가운데 이동, Ctrl+가운데 줌. 노트북은 Alt+좌.',
-      cad: 'CAD 조작: 가운데 이동, Shift+가운데 회전, 가운데 더블클릭 전체 보기, 휠은 마우스 위치로 줌.' }[prefs.preset]);
-  });
-  range('sens-rotate', () => prefs.sens.rotate, (v) => { prefs.sens.rotate = v; });
-  range('sens-pan', () => prefs.sens.pan, (v) => { prefs.sens.pan = v; });
-  range('sens-zoom', () => prefs.sens.zoom, (v) => { prefs.sens.zoom = v; });
-  check('zoom-pointer', () => prefs.zoomToPointer, (v) => { prefs.zoomToPointer = v; });
-  check('zoom-invert', () => prefs.invertZoom, (v) => { prefs.invertZoom = v; });
-  check('dim-others', () => prefs.dimOthers, (v) => { prefs.dimOthers = v; });
-  range('dim-alpha', () => prefs.dimAlpha, (v) => { prefs.dimAlpha = v; }, (v) => `${Math.round(v * 100)}%`);
-  check('depth-fade', () => prefs.depthFade, (v) => { prefs.depthFade = v; });
-  range('fade-min', () => prefs.fadeMin, (v) => { prefs.fadeMin = v; }, (v) => `${Math.round(v * 100)}%`);
-  check('hover-highlight', () => prefs.hoverHighlight, (v) => { prefs.hoverHighlight = v; if (!v) onHover(null, null); });
-  $('fade-near').value = String(prefs.fadeNear); $('fade-far').value = String(prefs.fadeFar);
-  const fadeRange = () => {
-    const near = Math.max(0, Number($('fade-near').value) || 0), far = Math.max(near + 1, Number($('fade-far').value) || near + 1);
-    prefs.fadeNear = near; prefs.fadeFar = far; $('fade-far').value = String(far); persist();
-  };
-  $('fade-near').addEventListener('change', fadeRange); $('fade-far').addEventListener('change', fadeRange);
-  $('endpoint-mode').value = prefs.endpoints;
-  $('endpoint-mode').addEventListener('change', () => { prefs.endpoints = $('endpoint-mode').value as EndpointMode; persist(); drawAll(); });
-  $('road-color').addEventListener('input', () => {
-    if (!selectedRoad) return;
-    prefs.roadColors[selectedRoad.id] = $('road-color').value; // local only: no draft publish, no socket emit
-    persist(); drawAll();
-  });
-  $('road-color-reset').onclick = () => { if (selectedRoad) { delete prefs.roadColors[selectedRoad.id]; persist(); drawAll(); } };
-  $('road-color-clear').onclick = () => { prefs.roadColors = {}; persist(); drawAll(); say('이 브라우저의 경로 색 지정을 모두 지웠습니다.'); };
-  $('nav-help-btn').onclick = () => toggleHelp(true);
-  $('editor-help-close').onclick = () => toggleHelp(false);
-  $('editor-help').addEventListener('click', (e) => { if (e.target === $('editor-help')) toggleHelp(false); });
-  document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) => b.onclick = () => { viewCommand(b.dataset.view!); viewer.scene.canvas.focus(); });
 }
 
 async function saveCurrent() {
@@ -1502,23 +1205,6 @@ function installControls() {
   keyHandler = (e: KeyboardEvent) => {
     if (['ControlLeft','ControlRight','MetaLeft','MetaRight','AltLeft','AltRight'].includes(e.code)) { clearHeldKeys(); return; }
     if (!$('editor-login').hidden || e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable || e.isComposing) return;
-    if (e.code === 'Escape' && !$('editor-help').hidden) { e.preventDefault(); toggleHelp(false); return; }
-    if (handleViewKey(e)) return;
-    if (e.code === 'Escape' && !e.repeat) {
-      e.preventDefault();
-      if (roadDraft || placeDraft) {
-        // CAD-style cancel; a draft with changes needs a second Esc so one keystroke cannot discard work.
-        if (dirty && Date.now() - escArmedAt > 1500) { escArmedAt = Date.now(); say('Esc를 한 번 더 누르면 작성 중인 초안을 취소합니다.', 'warning'); return; }
-        escArmedAt = 0; clearDraft(); setTool('select'); say('편집 초안을 취소했습니다.'); return;
-      }
-      if (tool !== 'select') { setTool('select'); return; }
-      if (selectedRoad || selectedPlace) { selectedRoad = null; selectedPlace = null; selectedVertex = -1; isolate = false; setTool('select'); }
-      return;
-    }
-    if ((e.code === 'Enter' || e.code === 'NumpadEnter') && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      if (roadDraft || placeDraft) { e.preventDefault(); void saveCurrent(); }
-      return;
-    }
     const shortcut = (e.metaKey || e.ctrlKey) && ['KeyZ','KeyY','KeyS'].includes(e.code);
     const handled = movementKeys.has(e.code) || e.code === 'Space' || shortcut || e.code === 'Delete' || e.code === 'Backspace';
     if (!handled) return;
@@ -1553,20 +1239,19 @@ function installControls() {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement) clearHeldKeys();
   });
 
-  // Mouse navigation (orbit / pan / zoom with sensitivity and Blender/CAD presets) lives in editor-view.ts.
-  nav = new NavController(viewer, C, {
-    prefs: () => prefs,
-    cursorWorld: () => drawPoint(ownCursor),
-    orbitLocked: () => orbitCursor,
-    zoom: (steps, screen) => zoomCamera(steps, screen),
-    zoomExtents: () => viewCommand('frame-all'),
-    onHover,
-    onUserCamera: () => { if (!$('editor-hover-tip').hidden) $('editor-hover-tip').hidden = true; },
-  });
-  nav.install();
-  bindViewPrefs();
-  viewer.scene.preRender.addEventListener(updateRoadStyles);
   mouseHandler = new C.ScreenSpaceEventHandler(viewer.scene.canvas);
+  let rightDragging = false;
+  mouseHandler.setInputAction(() => { rightDragging = true; }, C.ScreenSpaceEventType.RIGHT_DOWN);
+  mouseHandler.setInputAction(() => { rightDragging = false; }, C.ScreenSpaceEventType.RIGHT_UP);
+  mouseHandler.setInputAction((movement: any) => {
+    if (rightDragging) zoomCamera((movement.endPosition.y - movement.startPosition.y) / 70);
+  }, C.ScreenSpaceEventType.MOUSE_MOVE);
+  window.addEventListener('mouseup', (event) => { if (event.button === 2) rightDragging = false; });
+  viewer.scene.canvas.addEventListener('wheel', (event: WheelEvent) => {
+    event.preventDefault();
+    const pixels = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewer.scene.canvas.clientHeight : 1);
+    zoomCamera(-pixels / 100);
+  }, { passive: false });
   mouseHandler.setInputAction((movement: any) => {
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
     const feature = tool === 'select' ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
@@ -1616,7 +1301,6 @@ async function startEditor() {
   } catch { /* the DEM is a cursor-height aid; map rendering can still continue */ }
   viewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
   viewer.scene.screenSpaceCameraController.enableZoom = false;
-  fadeScratch.a = new C.Cartesian3(); fadeScratch.b = new C.Cartesian3();
   viewer.scene.screenSpaceCameraController.minimumPickingTerrainHeight = -1_000_000;
   viewer.scene.canvas.setAttribute('tabindex', '0');
   ownCursor[2] = terrainAt(ownCursor[0], ownCursor[1]) ?? ownCursor[2];
