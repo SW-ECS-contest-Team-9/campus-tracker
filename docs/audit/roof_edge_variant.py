@@ -101,9 +101,23 @@ def scope_metrics(g):
 
 
 ch_a, ring_scope, _, m_a = scope_metrics(cand_a)
+# exclusion masks (no wall top/bottom values are generated; masks only remove cells from the walkable-surface statistic)
+wall_mask = np.zeros_like(ch_a); unknown_mask = np.zeros_like(ch_a)
+for j, i in np.argwhere(ring_scope):
+    pt = Point(meta['originX'] + (i + 0.5) * res, meta['originY'] + (j + 0.5) * res)
+    if all_foot.distance(pt) <= 1.6: wall_mask[j, i] = True  # footprint (roof/building) or wall-front strip
+    elif not F.contains(pt) and edge_run[int(np.argmin([pt.distance(q) for q in edge_pts]))] in blocked_runs and F.distance(pt) < BAND_M + 2: unknown_mask[j, i] = True
+walk_mask = ring_scope & ~wall_mask & ~unknown_mask
 ch_b, _, sl_b, m_b = scope_metrics(cand_b)
 # same scope = A's change ring for both
 gy, gx = np.gradient(cand_b, res); m_b['maxSlopePctInScopeA'] = round(float((np.hypot(gx, gy) * 100)[ring_scope].max()), 1)
+for m, g in ((m_a, cand_a), (m_b, cand_b)):
+    gy, gx = np.gradient(g, res); sl = np.hypot(gx, gy) * 100
+    m['allCells'] = {'maxSlopePct': round(float(sl[ring_scope].max()), 1), 'over100pct': int((sl[ring_scope] > 100).sum())}
+    m['walkableSurfaceOnly'] = {'maxSlopePct': round(float(sl[walk_mask].max()), 1), 'over100pct': int((sl[walk_mask] > 100).sum()), 'cells': int(walk_mask.sum())}
+masks = {'scope': 'candidate-A changed cells + 1-cell neighbours', 'wallOrFootprintCells': int(wall_mask.sum()),
+         'unknownRoofSideCells': int(unknown_mask.sum()), 'walkableCells': int(walk_mask.sum()),
+         'definition': 'wall = within 1.6 m of any provided footprint (incl. inside); unknown = band of run(s) marked unknown; walkable = rest'}
 
 con = sqlite3.connect(f'file:{gpkg}?mode=ro', uri=True)
 gcol = con.execute("SELECT column_name FROM gpkg_geometry_columns WHERE table_name='buildings_3d'").fetchone()[0]
@@ -126,22 +140,25 @@ for rid in unresolved:
     d = lambda g: [round(min(c[2] - bilinear(g, c[0], c[1]) for c in cs), 2), round(max(c[2] - bilinear(g, c[0], c[1]) for c in cs), 2)]
     road_cmp.append({'id': rid, 'name': roads[rid]['name'], 'roadMinusTerrainA': d(cand_a), 'roadMinusTerrainB': d(cand_b)})
 
-# ---------------------------------------------------------- 4. roof-as-ground check
+# ---------------------------------------------------------- 4. provided-footprint interpolation check (limited scope, see 'scope')
 viol = 0
 for j, i in np.argwhere(np.abs(cand_b - dem) > 1e-6):
     lo, hi = min(FIELD_Z, dem[j, i]), max(FIELD_Z, dem[j, i])
     if not (lo - 1e-4 <= cand_b[j, i] <= hi + 1e-4): viol += 1
-roof_check = {'changedCellsInsideAnyFootprint': m_b['changedCellsInsideFootprints'], 'cellsOutsideFieldToDemRange': viol,
+footprint_check = {'changedCellsInsideAnyFootprint': m_b['changedCellsInsideFootprints'], 'cellsOutsideFieldToDemRange': viol,
               'blockedRunBandCellsLeft': int(sum(1 for j, i in np.argwhere(np.abs(cand_b - dem) > 1e-6) if not F.contains(Point(meta['originX'] + (i + 0.5) * res, meta['originY'] + (j + 0.5) * res))
                                                  and edge_run[int(np.argmin([Point(meta['originX'] + (i + 0.5) * res, meta['originY'] + (j + 0.5) * res).distance(q) for q in edge_pts]))] in blocked_runs)),
               'pass': None}
-roof_check['pass'] = roof_check['changedCellsInsideAnyFootprint'] == 0 and viol == 0 and roof_check['blockedRunBandCellsLeft'] == 0
+footprint_check['pass'] = footprint_check['changedCellsInsideAnyFootprint'] == 0 and viol == 0 and footprint_check['blockedRunBandCellsLeft'] == 0
+footprint_check['scope'] = 'PROVIDED footprints and the blocked run only: no change inside provided footprints, values between field Z and original DEM, no transition left on the blocked run. NOT a proof for the whole real roof area.'
 
 report = {'candidate': 'c02-integrated-v1 variant B (roof-side transition blocked)', 'operationallyApplicable': False,
           'inputsUnchanged': {n: sha(p) == s for (n, s), p in zip(sha_before.items(), (dem_path, a_path))},
           'variantB': {'file': out_b.name, 'sha256': sha(out_b), 'revertedBandCells': reverted},
           'edgeRunTable': table, '은주관FootprintParts': eunju_parts,
           'note': "no '은주2관' footprint exists in building-outlines-5186.json or the scene; the roof's footprint and which F edge it borders stay unknown",
-          'compare': {'A': m_a, 'B': m_b}, 'buildingBaseRoof': bld, 'unresolvedRoadsVsTerrain': road_cmp, 'roofAsGroundCheck': roof_check}
+          'compare': {'A': m_a, 'B': m_b}, 'buildingBaseRoof': bld, 'unresolvedRoadsVsTerrain': road_cmp, 'providedFootprintInterpolationCheck': footprint_check, 'exclusionMasks': masks,
+          'missingRoofFootprint': True, 'fullRoofExclusionVerified': False, 'originalDemRoofContaminationChecked': False,
+          'run3IsHypothesis': 'run 3 is a location hypothesis; other runs are NOT confirmed non-roof'}
 pathlib.Path(sys.argv[3]).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
-print('blocked runs', sorted(blocked_runs), 'reverted', reverted, 'A', m_a, 'B', m_b, 'roofCheck', roof_check['pass'], 'inputsUnchanged', report['inputsUnchanged'])
+print('blocked runs', sorted(blocked_runs), 'reverted', reverted, 'A', m_a, 'B', m_b, 'providedFootprintCheck', footprint_check['pass'], 'walkable A/B', m_a['walkableSurfaceOnly'], m_b['walkableSurfaceOnly'], 'inputsUnchanged', report['inputsUnchanged'])
