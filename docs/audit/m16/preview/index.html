@@ -35,6 +35,9 @@
     <label><input type="radio" name="yd" id="ydCand"> 분리 후보</label>
     <label><input type="radio" name="yd" id="ydSurf"> 분리 후보(Y-A 표면 상단)</label>
     <label><input type="radio" name="yd" id="ydRoof"> 분리 후보(Y-A 건물 지붕 후보)</label><br>
+    <b>문예관 고층부</b>
+    <label><input type="radio" name="my" id="myOrig" checked> 원본</label>
+    <label><input type="radio" name="my" id="myCand"> 문예관 고층부 후보</label><br>
     <label><input type="radio" name="occ" id="occOn" checked> 가림 적용</label>
     <label><input type="radio" name="occ" id="occOff"> 후보 항상 보기</label>
   </p>
@@ -103,6 +106,7 @@ for (const o of outlines) {
     const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xd8cfc0, transparent: true, opacity: 0.55 }));
     m.userData.info = `원본 건물 ${o.name}\nbaseM ${h.baseM} / roofM ${h.roofM}`;
     if (o.name === '유담관') m.userData.yudamOrig = true;
+    if (o.name === '문예관') m.userData.munyeOrig = true;
     groups.bld.add(m);
   }
 }
@@ -184,6 +188,37 @@ document.getElementById('ydOrig').onchange = () => setYudam('orig');
 document.getElementById('ydCand').onchange = () => setYudam('flat');
 document.getElementById('ydSurf').onchange = () => setYudam('surf');
 document.getElementById('ydRoof').onchange = () => setYudam('roof');
+
+// 문예관 고층부 후보(미리보기 전용): 매스 분리(MY-T 상단=S-MAP 지붕 표본 중앙값, 나머지=원본 roofM, 하단=원본 baseM 미확정) + 지붕 표본 표면(정점 원값)
+const myGroup = new THREE.Group(); myGroup.visible = false; groups.bld.add(myGroup);
+{
+  const mc = await (await get('data/munye-massing-candidate-5186.geojson')).json();
+  for (const f of mc.features) {
+    const p = f.properties, polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const poly of polys) {
+      const shape = new THREE.Shape(poly[0].map(([e, n]) => new THREE.Vector2(e - OX, n - OY)));
+      for (const hole of poly.slice(1)) shape.holes.push(new THREE.Path(hole.map(([e, n]) => new THREE.Vector2(e - OX, n - OY))));
+      const g = new THREE.ExtrudeGeometry(shape, { depth: p.topZ - p.baseM, bevelEnabled: false });
+      g.rotateX(-Math.PI / 2); g.translate(0, p.baseM, 0);
+      const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: p.id === 'MY-T' ? 0x5a7fb0 : 0xbbbbbb, transparent: true, opacity: 0.6 }));
+      m.userData.info = `${p.id} ${p.part} (추정)
+상단 ${p.topZ} (${p.top_source}) / 하단 ${p.baseM} 미확정
+accuracyVerified=false`;
+      myGroup.add(m);
+    }
+  }
+  const ms = await (await get('data/munye-roof-surface-5186.geojson')).json();
+  const pos = [];
+  for (const poly of ms.features[0].geometry.coordinates) for (const [e, n, h] of poly[0].slice(0, 3)) { const v = w(e, n, h); pos.push(v.x, v.y, v.z); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xd04a20, side: THREE.DoubleSide }));
+  m.userData.info = `MY-T 지붕 표본 표면(정점 x,y,z 원값)
+|dz|<=3m 인접 셀만, accuracyVerified=false`;
+  myGroup.add(m);
+}
+function setMunye(on) { groups.bld.children.forEach(o => { if (o.userData.munyeOrig) o.visible = !on; }); myGroup.visible = on; document.getElementById(on ? 'myCand' : 'myOrig').checked = true; }
+document.getElementById('myOrig').onchange = () => setMunye(false);
+document.getElementById('myCand').onchange = () => setMunye(true);
 
 // 사용자 S-MAP 사진 표본(2026-10-10): 점 = 화면값 z, 면 = 은주2관 상·하부 독립 평탄면(각자 중앙값 z). 서로 잇지 않음.
 const usrGroup = new THREE.Group(); usrGroup.visible = false; scene.add(usrGroup);
@@ -301,6 +336,7 @@ function projectVertices() {
   });
 }
 window.preview = { setUser: on => { document.getElementById('tUsr').checked = on; usrGroup.visible = on; }, setYudam: c => { const md = c === true ? 'flat' : (c || 'orig'); document.getElementById({ orig: 'ydOrig', flat: 'ydCand', surf: 'ydSurf', roof: 'ydRoof' }[md]).checked = true; setYudam(md); }, surfaceVertexCheck, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
+window.preview.setMunye = setMunye;
 setCam([201000, 557150, 220], [201050, 557250, 115]);
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
