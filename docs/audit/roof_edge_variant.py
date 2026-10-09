@@ -101,7 +101,7 @@ def scope_metrics(g):
 
 
 ch_a, ring_scope, _, m_a = scope_metrics(cand_a)
-# exclusion masks (no wall top/bottom values are generated; masks only remove cells from the walkable-surface statistic)
+# exclusion masks (no wall top/bottom values are generated; masks only remove cells from the residual-surface statistic)
 wall_mask = np.zeros_like(ch_a); unknown_mask = np.zeros_like(ch_a)
 for j, i in np.argwhere(ring_scope):
     pt = Point(meta['originX'] + (i + 0.5) * res, meta['originY'] + (j + 0.5) * res)
@@ -114,10 +114,10 @@ gy, gx = np.gradient(cand_b, res); m_b['maxSlopePctInScopeA'] = round(float((np.
 for m, g in ((m_a, cand_a), (m_b, cand_b)):
     gy, gx = np.gradient(g, res); sl = np.hypot(gx, gy) * 100
     m['allCells'] = {'maxSlopePct': round(float(sl[ring_scope].max()), 1), 'over100pct': int((sl[ring_scope] > 100).sum())}
-    m['walkableSurfaceOnly'] = {'maxSlopePct': round(float(sl[walk_mask].max()), 1), 'over100pct': int((sl[walk_mask] > 100).sum()), 'cells': int(walk_mask.sum())}
+    m['residualSurfaceCandidates'] = {'maxSlopePct': round(float(sl[walk_mask].max()), 1), 'over100pct': int((sl[walk_mask] > 100).sum()), 'cells': int(walk_mask.sum())}
 masks = {'scope': 'candidate-A changed cells + 1-cell neighbours', 'wallOrFootprintCells': int(wall_mask.sum()),
-         'unknownRoofSideCells': int(unknown_mask.sum()), 'walkableCells': int(walk_mask.sum()),
-         'definition': 'wall = within 1.6 m of any provided footprint (incl. inside); unknown = band of run(s) marked unknown; walkable = rest'}
+         'unknownRoofSideCells': int(unknown_mask.sum()), 'residualCells': int(walk_mask.sum()), 'walkabilityVerified': False,
+         'definition': 'wall = within 1.6 m of any provided footprint (incl. inside); unknown = band of run(s) marked unknown; residual = rest (NOT verified walkable; no field check)'}
 
 con = sqlite3.connect(f'file:{gpkg}?mode=ro', uri=True)
 gcol = con.execute("SELECT column_name FROM gpkg_geometry_columns WHERE table_name='buildings_3d'").fetchone()[0]
@@ -161,4 +161,4 @@ report = {'candidate': 'c02-integrated-v1 variant B (roof-side transition blocke
           'missingRoofFootprint': True, 'fullRoofExclusionVerified': False, 'originalDemRoofContaminationChecked': False,
           'run3IsHypothesis': 'run 3 is a location hypothesis; other runs are NOT confirmed non-roof'}
 pathlib.Path(sys.argv[3]).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
-print('blocked runs', sorted(blocked_runs), 'reverted', reverted, 'A', m_a, 'B', m_b, 'providedFootprintCheck', footprint_check['pass'], 'walkable A/B', m_a['walkableSurfaceOnly'], m_b['walkableSurfaceOnly'], 'inputsUnchanged', report['inputsUnchanged'])
+print('blocked runs', sorted(blocked_runs), 'reverted', reverted, 'A', m_a, 'B', m_b, 'providedFootprintCheck', footprint_check['pass'], 'residual A/B', m_a['residualSurfaceCandidates'], m_b['residualSurfaceCandidates'], 'inputsUnchanged', report['inputsUnchanged'])
