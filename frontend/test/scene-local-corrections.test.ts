@@ -11,14 +11,15 @@ const { parseCorrections, CORRECTION_FILES } = await import('../src/scene-local-
 const { tmForward, tmInverse } = await import('../src/tm.ts');
 
 const DIR = new URL('../public/corrections/', import.meta.url);
-const present = CORRECTION_FILES.filter((f: string) => fs.existsSync(new URL(f, DIR)));
+const groupOf = new Map(CORRECTION_FILES.map((c: any) => [c.file, c.group]));
+const present = CORRECTION_FILES.map((c: any) => c.file).filter((f: string) => fs.existsSync(new URL(f, DIR)));
 const read = (f: string) => JSON.parse(fs.readFileSync(new URL(f, DIR), 'utf8'));
 
 test('EPSG:5186 1 m = 1 m: 변환 왕복 오차 < 1 mm, 동서·남북 1 m 간격의 측지 거리 1 m ± 1 mm', () => {
   for (const f of present) {
     for (const feat of read(f).features) {
       const polys = feat.geometry.type === 'Polygon' ? [feat.geometry.coordinates] : feat.geometry.coordinates;
-      for (const [x, y] of polys.flat(2)) {
+      for (const [x, y] of (feat.geometry.type === 'LineString' ? feat.geometry.coordinates : polys.flat(2))) {
         const { latitude, longitude } = tmInverse(x, y);
         const back = tmForward(latitude, longitude);
         assert.ok(Math.hypot(back.x - x, back.y - y) < 1e-3, `${f} ${x},${y}`);
@@ -37,7 +38,7 @@ test('모든 보정 피처는 source가 있고 거부 없이 읽힌다', () => {
   for (const f of present) {
     const fc = read(f);
     assert.ok(fc.provenance?.source && /^[0-9a-f]{64}$/.test(fc.provenance.sha256), `${f} provenance`);
-    const r = parseCorrections(f, fc);
+    const r = parseCorrections(f, fc, groupOf.get(f));
     assert.deepEqual(r.errors, []);
     assert.equal(r.features.length, fc.features.length);
   }
@@ -84,4 +85,13 @@ test('운동장 표면: 서로 다른 표면이 정점을 공유하지 않음(�
   const pave = Math.max(...pts(byId.get('SF-DAEIL-ENTRY-PAVE')).map((p) => p[2]));
   assert.ok(canopy - pave >= 2, `${canopy} - ${pave}`);
   assert.equal(byId.get('SF-DAEIL-CANOPY').properties.walkable, false);
+});
+
+test('추정 구조: 별도 파일, 모든 피처 estimated=true·assumption·source, 표시 그룹 estimated', { skip: !present.includes('field-structures-est-v1.geojson') }, () => {
+  assert.equal(groupOf.get('field-structures-est-v1.geojson'), 'estimated');
+  const fc = read('field-structures-est-v1.geojson');
+  for (const f of fc.features) assert.ok(f.properties.estimated === true && f.properties.assumption && f.properties.source, f.properties.id);
+  const bad = structuredClone(fc);
+  delete bad.features[0].properties.assumption;
+  assert.equal(parseCorrections('x', bad, 'estimated').errors.length, 1);
 });

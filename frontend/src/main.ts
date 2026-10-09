@@ -973,6 +973,7 @@ async function boot() {
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
+          $<HTMLInputElement>('scene-estimated').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'estimated'));
           if (import.meta.env.DEV) (window as any).__localCorrections = c;
         });
         return r.viewer;
