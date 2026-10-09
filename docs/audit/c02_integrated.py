@@ -244,7 +244,11 @@ report = {
     'v1BoundaryNodeEvidence': node_table, 'roadMinusTerrain': road_terrain,
     'checks': {'xyUnchanged': xy_same, 'maxNodeGapM': node_gap, 'stairsKeepDirection': all(a * b > 0 for a, b in stairs_dir.values()),
                'stairs': {k: [round(a, 2), round(b, 2)] for k, (a, b) in stairs_dir.items()}, 'unresolvedRoads': len(unresolved),
-               'operationallyApplicable': len(unresolved) == 0},
+               'fieldBoundaryVerified': False,
+               'operationallyApplicable': False,
+               'applicationBlockers': ['field boundary and open-edge transition are not surveyed',
+                                       'building foundation/roof effects need review']
+                                      + ([f'{len(unresolved)} unresolved boundary roads'] if unresolved else [])},
 }
 pathlib.Path(sys.argv[2]).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
 
