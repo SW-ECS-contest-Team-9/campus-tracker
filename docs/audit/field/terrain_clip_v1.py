@@ -144,7 +144,7 @@ feats2 = [{'type': 'Feature', 'properties': {'id': 'CHEONGUN-BODY', 'type': 'bui
 N_LV = 4
 for k in range(1, N_LV + 1):
     z = round(FIELD_Z + (CH_TOP - FIELD_Z) * k / N_LV, 2)
-    feats2.append({'type': 'Feature', 'properties': {'id': f'EST-CHEONGUN-SLAB-{k}', 'type': 'open_slab', 'kind': 'extrude', 'fromM': round(z - 0.3, 2), 'toM': z, 'estimated': True,
+    feats2.append({'type': 'Feature', 'properties': {'id': f'EST-CHEONGUN-SLAB-{k}', 'type': 'open_slab', 'kind': 'extrude', 'fromM': round(z - 0.3, 2), 'toM': z, 'estimated': True, **({'replaces': 'SF-CHEONGUN-CANOPY'} if k == N_LV else {}),
                    'assumption': f'수평 슬래브(두께 0.3 m): {N_LV}층 균등 분할 가정, {k}/{N_LV}' + (' = 지붕 높이 163.8' if k == N_LV else '') + '. 평면 = 연속 절단 범위(직선 면), 벽 없음', 'source': SRC_C},
                    'geometry': {'type': 'Polygon', 'coordinates': [openring]}})
 for k, s_ in enumerate((u0 + 0.4, (u0 + u1) / 2, u1 - 0.4), 1):

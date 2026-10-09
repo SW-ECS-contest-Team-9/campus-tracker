@@ -34,6 +34,9 @@
         <label title="Warm tint = height estimated (floors × 3.5 m), not from the building register"><input type="checkbox" id="scene-estimate" checked /> Estimated</label>
         <label title="국소 표면 보정(추정, 검토용): 문예관 고층부 등. 원본 모델·실내 경로는 그대로"><input type="checkbox" id="scene-corrected" /> Corrected (추정)</label>
         <label title="추정 구조(옹벽·화단·계단·청운관 열린 돌출부, 가정 치수): 원천 확정값 아님. 초록 표지 = 표면 후보 대응(실제 계단 끝점 확인 아님), 빨강 = 연결 미검증, 노랑 선 = 제안 계단(참고)"><input type="checkbox" id="scene-estimated" /> 추정 구조</label>
+        <label title="DRAFT 계단 노출 비교: 기존 운영 DRAFT 기반 추정 계단 자리만 사잇길 면 절단(고정 기준 아님). Corrected 위에서만, v6 계단 후보가 켜져 있으면 무시"><input type="checkbox" id="scene-stair-candidate" /> DRAFT 계단 노출 비교</label>
+        <label title="경쟁 후보: v6 표면 후보 끝점에 맞춘 새 추정 계단(출구 옆·A14) + 그 자리 사잇길 면 대체. 끄면 S-MAP 경사면. Corrected 위에서만, 켜면 DRAFT 계단 숨김. 연결 미검증"><input type="checkbox" id="scene-stair-v6" /> v6 계단 후보</label>
+        <label title="길 사슬 후보(건물 내외 연결 길). 그래프 상태(아래 선): 초록 = 그래프상 연결, 회색 = 그림만, 주황 = 미검증·보류·끊김, 보라 막대 = 그래프 후보 노드(미검증). 표면 접속(위 선): 노랑 = 미검증(후보 노드 포함), 파랑 = 운영 노드만(물리 접속 별도 검증)"><input type="checkbox" id="scene-path-graph" /> 길 사슬 후보</label>
         <label title="Corridors / open areas / portals drawn in QGIS (schema mobility); updates live when QGIS saves"><input type="checkbox" id="scene-mobility" checked /> Paths</label>
         <button id="scene-home" type="button" title="Whole campus">⌂</button>
         <button id="scene-top" type="button" title="Top view">⊤</button>
