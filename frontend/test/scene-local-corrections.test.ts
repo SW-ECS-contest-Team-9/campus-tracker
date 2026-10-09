@@ -107,3 +107,13 @@ test('추정 구조: 별도 파일, 모든 피처 estimated=true·assumption·so
   delete bad.features[0].properties.assumption;
   assert.equal(parseCorrections('x', bad, 'estimated').errors.length, 1);
 });
+
+test('v4: 평지 경계는 참고선만(직선화 면 미사용), 계단 끝점 표지는 계단 z 그대로·미검증 표시', { skip: !present.includes('stair-endpoints-v4.geojson') }, () => {
+  const fb = read('field-boundary-v4.geojson');
+  assert.deepEqual(fb.features.map((f: any) => [f.properties.id, f.properties.kind]), [['REF-PHOTO15-V4-EDGE', 'line']]);
+  const ep = read('stair-endpoints-v4.geojson').features;
+  const est = read('field-structures-est-v1.geojson').features;
+  const zs = new Set(est.flatMap((f: any) => [f.properties.fromM, f.properties.toM, f.properties.z_bottom, f.properties.z_top]));
+  for (const f of ep) assert.ok(zs.has(f.geometry.coordinates[0][2]), `${f.properties.id} z가 추정 계단 z와 다름`);
+  assert.ok(ep.some((f: any) => f.properties.type === 'endpoint_unverified'));
+});

@@ -92,7 +92,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, base = '/cor
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a' };
 const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa' };
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
