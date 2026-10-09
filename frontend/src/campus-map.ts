@@ -3,7 +3,9 @@
 // and the rough campus 3D buildings (extruded footprints) from GET /api/v1/scene.
 // Scene heights are orthometric (Incheon MSL), exactly like the former VWorld scene, so trajectory.ts is unchanged.
 import 'cesium/Build/Cesium/Widgets/widgets.css';
+import './elevation-colors.css';
 import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './api';
+import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
 import { tmForward } from './tm';
 import type { Viewer } from './vworld';
 
@@ -168,6 +170,7 @@ export class CampusSceneLayer {
   private opacity = 1;
   private showEstimate = true;
   private selected: string | null = null;
+  private elevation: { range: ElevationRange; image: string } | null = null;
   readonly picks = new Map<string, BuildingPick>();
 
   constructor(private readonly C: CesiumNS, private readonly viewer: any, readonly scene: CampusScene) {
@@ -194,6 +197,11 @@ export class CampusSceneLayer {
 
   setShowLabels(show: boolean) {
     this.labels.show = show;
+  }
+
+  setElevationColors(value: { range: ElevationRange; image: string } | null) {
+    this.elevation = value;
+    this.rebuild();
   }
 
   select(buildingId: string | null) {
@@ -236,13 +244,16 @@ export class CampusSceneLayer {
       const color = C.Color.fromCssColorString(css).withAlpha(this.opacity);
       for (const poly of b.geometry.coordinates) {
         const ring = (r: number[][]) => C.Cartesian3.fromDegreesArray(r.slice(0, -1).flat());
+        const polygon = new C.PolygonGeometry({
+          polygonHierarchy: new C.PolygonHierarchy(ring(poly[0]), poly.slice(1).map((h) => new C.PolygonHierarchy(ring(h)))),
+          height: b.baseM,
+          extrudedHeight: b.roofM,
+          vertexFormat: this.elevation ? C.MaterialAppearance.MaterialSupport.TEXTURED.vertexFormat : C.PerInstanceColorAppearance.VERTEX_FORMAT,
+        });
+        const geometry = this.elevation ? C.PolygonGeometry.createGeometry(polygon)! : polygon;
+        if (this.elevation) colorizeGeometry(C, geometry as import('cesium').Geometry, this.elevation.range);
         instances.push(new C.GeometryInstance({
-          geometry: new C.PolygonGeometry({
-            polygonHierarchy: new C.PolygonHierarchy(ring(poly[0]), poly.slice(1).map((h) => new C.PolygonHierarchy(ring(h)))),
-            height: b.baseM,
-            extrudedHeight: b.roofM,
-            vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT,
-          }),
+          geometry,
           id: this.picks.get(b.buildingId),
           attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color) },
         }));
@@ -250,11 +261,22 @@ export class CampusSceneLayer {
     }
     const next = new C.Primitive({
       geometryInstances: instances,
-      appearance: new C.PerInstanceColorAppearance({ translucent: this.opacity < 1, closed: true }),
+      appearance: this.elevation ? new C.MaterialAppearance({
+        material: elevationMaterial(C, this.elevation.image, this.elevation.range, false, this.opacity),
+        flat: true, translucent: this.opacity < 1, closed: true,
+        materialSupport: C.MaterialAppearance.MaterialSupport.TEXTURED,
+      }) : new C.PerInstanceColorAppearance({ translucent: this.opacity < 1, closed: true }),
       asynchronous: false,
     });
     if (this.primitive) this.viewer.scene.primitives.remove(this.primitive);
     this.primitive = this.viewer.scene.primitives.add(next);
+    // Selection remains visible without replacing the altitude colour of the selected surface.
+    for (let i = 0; i < this.edges.length; i++) {
+      const edge = this.edges.get(i);
+      const selected = !!this.elevation && edge.id.buildingId === this.selected;
+      edge.material = C.Material.fromType('Color', { color: C.Color.fromCssColorString(selected ? '#2563eb' : COLORS.edge) });
+      edge.width = selected ? 3 : edge.positions.length === 2 ? 1 : 1.5;
+    }
   }
 
   private drawEdgesAndLabels() {
@@ -356,11 +378,18 @@ export async function initCampusMap(containerId: string): Promise<{ viewer: View
       viewer.entities.add({ polyline: { positions: C.Cartesian3.fromDegreesArray(poly[0].flat()), width: 2, clampToGround: true, material: C.Color.fromCssColorString('#b3ae94') } });
     }
   }
+  const layer = sceneData instanceof Error ? null : new CampusSceneLayer(C, viewer, sceneData);
+  const range = elevationRange(grid.heights, layer?.scene.buildings ?? []);
+  const image = elevationRamp();
+  const terrainColors = elevationMaterial(C, image, range, true);
+  elevationControl(viewer.container, image, range, (enabled) => {
+    scene.globe.material = enabled ? terrainColors : undefined;
+    layer?.setElevationColors(enabled ? { range, image } : null);
+  });
   if (sceneData instanceof Error) {
     viewer.camera.setView({ destination: C.Rectangle.fromDegrees(grid.bounds.west, grid.bounds.south, grid.bounds.east, grid.bounds.north) });
     return { viewer, scene: null, warning: `Campus 3D buildings unavailable: ${sceneData.message} (npm run scene:import)` };
   }
-  const layer = new CampusSceneLayer(C, viewer, sceneData);
-  layer.home(0);
+  layer!.home(0);
   return { viewer, scene: layer, warning: null };
 }

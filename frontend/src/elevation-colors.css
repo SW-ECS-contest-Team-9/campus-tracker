@@ -1,0 +1,7 @@
+.campus-elevation { position: absolute; right: 12px; bottom: 48px; z-index: 2; padding: 9px 12px; border: 1px solid #cbd5d1; border-radius: 9px; background: #fffffff2; color: #253c32; font: 12px/1.5 system-ui, sans-serif; box-shadow: 0 2px 10px #183d3120; }
+.campus-elevation-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; }
+.campus-elevation-toggle input { margin: 0; accent-color: #126346; }
+.campus-elevation-legend { width: 190px; margin-top: 8px; }
+.campus-elevation-legend img { display: block; width: 100%; height: 12px; margin: 5px 0 2px; border-radius: 3px; }
+.campus-elevation-ticks { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.campus-elevation-legend small { color: #65756d; font-size: 10px; }
