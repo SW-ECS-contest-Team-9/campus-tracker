@@ -54,7 +54,7 @@ const T = new Map<string, Tri[]>(v3.map((f: any) => [f.id, triangles(f)]));
 
 // 1) 사잇길 절단 면: 새 경계 정점 z를 원 면 렌더 z로(--fix-cut), 내부 삼각형 z 비교
 // 사잇길 면 = corridor-surface-v5(내부 S-MAP 표본 TIN 조각, 앱 Corrected에서 v3 SF-CORRIDOR 대체)
-const v4f = parseCorrections('corridor-surface-v5.geojson', read('corridor-surface-v5.geojson'), 'corrected').features.find((f: any) => f.id === 'SF-CORRIDOR-TIN');
+const v4f = parseCorrections('corridor-surface-v5.1.geojson', read('corridor-surface-v5.1.geojson'), 'corrected').features.find((f: any) => f.id === 'SF-CORRIDOR-TIN');
 const corridor = triangles(v4f);
 const dumpIdx = process.argv.indexOf('--dump-tris');
 if (dumpIdx > 0) { // 원 SF-CORRIDOR 렌더 삼각형(EPSG:5186 x,y,z)을 내보내 같은 삼각형으로 절단 면을 만들게 함(cut_from_render_tris.py)
@@ -62,7 +62,7 @@ if (dumpIdx > 0) { // 원 SF-CORRIDOR 렌더 삼각형(EPSG:5186 x,y,z)을 내�
   console.log(`dumped ${corridor.length} triangles`);
   process.exit(0);
 }
-const v4raw = read('corridor-surface-v5.geojson').features.find((f: any) => f.properties.id === 'SF-CORRIDOR-TIN');
+const v4raw = read('corridor-surface-v5.1.geojson').features.find((f: any) => f.properties.id === 'SF-CORRIDOR-TIN');
 const origXY = new Set(v4raw.geometry.coordinates.flatMap((p: number[][][]) => p[0]).map((c: number[]) => `${c[0]},${c[1]}`));
 // 표본 재현: TIN 꼭짓점(S-MAP 표본) 위치의 렌더 z = 표본 z
 { let n = 0, worst = 0; const seen = new Set<string>();

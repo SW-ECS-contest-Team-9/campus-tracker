@@ -12,7 +12,7 @@ export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'st
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
-  { file: 'corridor-surface-v5.geojson', group: 'corrected' }, // 사잇길 = 내부 S-MAP 표본 TIN v5(경계에서 실제로 잘린 조각, v3 SF-CORRIDOR 대체), 빈칸은 선만. v4 파일은 비교용 보존
+  { file: 'corridor-surface-v5.1.geojson', group: 'corrected' }, // 사잇길 = 내부 S-MAP 표본 TIN v5.1(경계에서 실제로 잘린 조각, v3 SF-CORRIDOR 대체), 빈칸은 선만. v4 파일은 비교용 보존
   { file: 'terrain-clip-v1.geojson', group: 'corrected' }, // 표면 구역 안 지형 잘라냄 + 경계 렌더 연결면
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
   { file: 'field-boundary-v4.geojson', group: 'estimated' }, // 사진15 재대응 경계(참고선)
