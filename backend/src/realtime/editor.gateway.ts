@@ -211,6 +211,7 @@ export const editorAgents = {
 };
 
 export const editorBroadcast = {
+  areasChanged: () => namespace?.to(room).emit('editor:areas:changed'),
   change: (event: unknown) => {
     if (event && typeof event === 'object' && 'objectType' in event && 'objectId' in event
       && typeof event.objectType === 'string' && typeof event.objectId === 'string'

@@ -6,7 +6,10 @@ import { tmForward, tmInverse } from './tm';
 import type { TerrainGrid } from './api';
 import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode, type ColorMode } from './editor-view';
 import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
+import { AreaEditor } from './editor-areas';
 import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
+
+let areaEditor: AreaEditor | null = null;
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -661,6 +664,7 @@ async function loadSnapshot() {
   const data = await request<{ roads: Road[]; places: Place[]; nodes: any[]; leases: any[] }>('/api/v1/editor/snapshot');
   roads = data.roads; places = data.places; nodes = data.nodes; leases = data.leases;
   drawAll();
+  if (areaEditor) await areaEditor.load();
   void loadChanges();
 }
 async function loadChanges() {
@@ -779,6 +783,10 @@ async function defineJunction() {
   }
 }
 function setTool(next: string) {
+  if (areaEditor?.active && next !== 'select') {
+    if (!confirm('공간 초안을 취소하고 도구를 바꿀까요?')) return;
+    areaEditor.cancel();
+  }
   tool = next;
   if (next !== 'junction') clearJunctionPreview();
   document.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) => b.classList.toggle('active', b.dataset.tool === next));
@@ -1074,6 +1082,7 @@ function renderLists() {
   }).join('') || '<span class="muted">다른 작업자가 없습니다.</span>';
 }
 function selectRoad(id: string) {
+  if (areaEditor?.active) { say('공간 초안을 저장하거나 취소한 뒤 도로를 선택하세요.', 'warning'); return; }
   if (roadDraft || placeDraft) return;
   selectedRoad = roads.find((r) => r.id === id) ?? null; selectedPlace = null; selectedVertex = -1;
   $('road-fields').hidden = false; $('place-fields').hidden = true;
@@ -1081,6 +1090,7 @@ function selectRoad(id: string) {
   updateControls(); drawAll();
 }
 function selectPlace(id: string) {
+  if (areaEditor?.active) { say('공간 초안을 저장하거나 취소한 뒤 장소를 선택하세요.', 'warning'); return; }
   if (roadDraft || placeDraft) return;
   selectedPlace = places.find((p) => p.id === id) ?? null; selectedRoad = null; selectedVertex = -1;
   $('road-fields').hidden = true; $('place-fields').hidden = false;
@@ -1632,6 +1642,7 @@ function setRemoteDraft(p: any) {
 
 function installSocket() {
   socket = io(`${API_BASE_URL}/editor`, { transports: ['websocket', 'polling'], auth: { token: token(), sessionId: EDITOR_SESSION } });
+  socket.on('editor:areas:changed', () => void areaEditor?.load().catch(err => say((err as Error).message, 'warning')));
   socket.on('connect', () => { $('editor-connection').textContent = '협업 연결됨'; $('editor-connection').classList.remove('offline'); sendCursor(); publishDraft();
     void loadSnapshot().then(() => { if (tool === 'junction') scheduleJunctionPreview(); })
       .catch((err) => say(`도로 목록을 불러오지 못했습니다: ${(err as Error).message}`, 'warning')); });
@@ -1677,8 +1688,16 @@ function installSocket() {
 }
 
 function installControls() {
+  areaEditor = new AreaEditor({ viewer, C, point: drawPoint, cursor: () => ownCursor, terrain: terrainAt,
+    request, say: (text) => say(text), start: () => {
+      if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 공간을 그릴까요?')) return false;
+      clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); return true;
+    } });
   document.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) => b.onclick = () => { setTool(b.dataset.tool!); viewer.scene.canvas.focus(); });
-  $('editor-cancel').onclick = () => { clearDraft(); setTool('select'); say('편집 초안을 취소했습니다.'); };
+  $('editor-cancel').onclick = () => {
+    if (areaEditor?.active) { if (confirm('공간 초안을 취소할까요?')) areaEditor.cancel(); return; }
+    clearDraft(); setTool('select'); say('편집 초안을 취소했습니다.');
+  };
   $('editor-save').onclick = () => void saveCurrent(); $('editor-delete').onclick = () => void deleteSelection();
   $('editor-edit').onclick = () => void startEditingSelection();
   $('editor-follow').onclick = () => { followMode = followMode === 'off' ? 'position' : followMode === 'position' ? 'direction' : 'off'; $('editor-follow').textContent = `카메라 추적 ${followMode === 'off' ? '꺼짐' : followMode === 'position' ? '위치' : '위치+방향'}`; if (followMode !== 'off' || orbitCursor) followCursor(); else lastFollowTarget = null; };
@@ -1735,6 +1754,7 @@ function installControls() {
     if (!$('editor-login').hidden || e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable || e.isComposing) return;
     if (e.code === 'Escape' && !$('editor-help').hidden) { e.preventDefault(); toggleHelp(false); return; }
     if (handleViewKey(e)) return;
+    if (areaEditor?.handleKey(e)) return;
     if (e.code === 'Escape' && !e.repeat) {
       e.preventDefault();
       if (roadDraft || placeDraft) {
@@ -1800,7 +1820,7 @@ function installControls() {
   mouseHandler = new C.ScreenSpaceEventHandler(viewer.scene.canvas);
   mouseHandler.setInputAction((movement: any) => {
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
-    const feature = tool === 'select' ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
+    const feature = tool === 'select' && !areaEditor?.active ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
       typeof id === 'string' && /^editor:(road|place):/.test(id))?.replace(/:(tube|shaft)$/, '') : null;
     if (feature?.startsWith('editor:road:')) { selectRoad(feature.slice('editor:road:'.length)); setTool('select'); return; }
     if (feature?.startsWith('editor:place:')) { selectPlace(feature.slice('editor:place:'.length)); setTool('select'); return; }
