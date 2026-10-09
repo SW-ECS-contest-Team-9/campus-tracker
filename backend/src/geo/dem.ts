@@ -86,13 +86,51 @@ export function buildDem(grid: Grid, contours: ContourRun[], spots: SpotHeight[]
   // a broad one for the regional bias (spots are > 60 m apart; plateaus between contours come out ~2 m high),
   // then a local one for summits / saddles near a spot. Leave-one-out residuals measure the corrected surface.
   const spotResiduals: number[] = [];
-  let usable: (SpotHeight & { r: number; loo: number })[] = [];
+  let usable: (SpotHeight & { r: number })[] = [];
   for (const s of spots) {
     const h = bilinear(g, heights, s.x, s.y);
     if (h === null) continue;
     spotResiduals.push(s.height - h);
-    usable.push({ ...s, r: s.height - h, loo: s.height - h });
+    usable.push({ ...s, r: s.height - h });
   }
+  // Hold each point out of EVERY pass, including the residual updates of the training points.
+  // Only its four interpolation cells are needed; the contour distance transforms are reused.
+  const spotLooResiduals = usable.map((held, heldIndex) => {
+    const fx = (held.x - g.originX) / g.resolution - 0.5;
+    const fy = (held.y - g.originY) / g.resolution - 0.5;
+    const ix = Math.floor(fx), iy = Math.floor(fy);
+    const tx = fx - ix, ty = fy - iy;
+    const cells = [[ix, iy], [ix + 1, iy], [ix, iy + 1], [ix + 1, iy + 1]];
+    const values = cells.map(([x, y]) => heights[idx(g, x, y)]);
+    let training = usable.filter((_, i) => i !== heldIndex);
+    for (const [kernel, radius] of opts.passes) {
+      const weight = (dx: number, dy: number) => {
+        const d2 = dx * dx + dy * dy;
+        return d2 > radius ** 2 ? 0 : Math.exp(-d2 / (2 * kernel ** 2));
+      };
+      cells.forEach(([x, y], i) => {
+        let wsum = 0, rsum = 0;
+        for (const s of training) {
+          const w = weight(g.originX + (x + 0.5) * g.resolution - s.x,
+            g.originY + (y + 0.5) * g.resolution - s.y);
+          wsum = Math.fround(wsum + w);
+          rsum = Math.fround(rsum + w * s.r);
+        }
+        if (wsum > 0) values[i] = Math.fround(values[i] + rsum / (wsum + 0.3));
+      });
+      training = training.map((s) => {
+        let wsum = 0, rsum = 0;
+        for (const other of training) {
+          const w = weight(other.x - s.x, other.y - s.y);
+          wsum += w;
+          rsum += w * other.r;
+        }
+        return { ...s, r: s.r - (wsum > 0 ? rsum / (wsum + 0.3) : 0) };
+      });
+    }
+    return held.height - (values[0] * (1 - tx) * (1 - ty) + values[1] * tx * (1 - ty)
+      + values[2] * (1 - tx) * ty + values[3] * tx * ty);
+  });
   const nearest = new Float32Array(n).fill(Infinity);
   for (const [kernel, radius] of opts.passes) {
     const k2 = 2 * kernel ** 2;
@@ -116,22 +154,21 @@ export function buildDem(grid: Grid, contours: ContourRun[], spots: SpotHeight[]
         }
       }
     }
-    const predict = (s: { x: number; y: number }, skip: number, field: 'r' | 'loo') => {
+    const predict = (s: { x: number; y: number }) => {
       let w = 0;
       let wr = 0;
-      usable.forEach((o, j) => {
+      usable.forEach((o) => {
         const d2 = (o.x - s.x) ** 2 + (o.y - s.y) ** 2;
-        if (j === skip || d2 > radius ** 2) return;
+        if (d2 > radius ** 2) return;
         const k = Math.exp(-d2 / k2);
         w += k;
-        wr += k * o[field];
+        wr += k * o.r;
       });
       return w > 0 ? wr / (w + 0.3) : 0;
     };
-    usable = usable.map((s, i) => ({ ...s, r: s.r - predict(s, -1, 'r'), loo: s.loo - predict(s, i, 'loo') }));
+    usable = usable.map((s) => ({ ...s, r: s.r - predict(s) }));
     for (let i = 0; i < n; i++) if (wsum[i] > 0) heights[i] += rsum[i] / (wsum[i] + 0.3);
   }
-  const spotLooResiduals = usable.map((s) => s.loo);
   for (let i = 0; i < n; i++) if (Number.isFinite(nearest[i])) sigma[i] = Math.min(sigma[i], 0.5 + nearest[i] / 20);
 
   // slope (central differences) and its contribution to the height uncertainty (2 m registration error)
