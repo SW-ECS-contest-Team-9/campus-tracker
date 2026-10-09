@@ -11,8 +11,8 @@ import json, os, sys, math, shutil
 import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-V = sys.argv[1]
+if len(sys.argv) != 3: sys.exit("사용법: analyze_panels.py <m17 입출력 폴더> <미리보기 data 폴더>")
+V, PREVIEW = sys.argv[1], sys.argv[2]
 S = json.load(open(os.path.join(V, "tower-sample-class.json"), encoding="utf-8"))
 CAM = json.load(open(os.path.join(V, "ortho-camera-recovery.json"), encoding="utf-8"))
 roof = [s for s in S if s["class"] == "지붕"]
@@ -136,7 +136,7 @@ fc = {"type": "FeatureCollection", "name": "yudam-building-roof-candidate", "crs
                      "vertices": [{"x": k[0], "y": k[1], **v} for k, v in sorted(P_new.items())]},
                     "geometry": {"type": "MultiPolygon", "coordinates": [[[[q[0], q[1], P_new[q]["z"]] for q in (*t, t[0])]] for t in T_new]}}]}
 json.dump(fc, open(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), "w", encoding="utf-8"), ensure_ascii=False)
-shutil.copy(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), os.path.join(HERE, "..", "m16", "preview", "data", "yudam-building-roof-candidate-5186.geojson"))
+shutil.copy(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), os.path.join(PREVIEW, "yudam-building-roof-candidate-5186.geojson"))
 json.dump({"ortho": {"source": "ortho-camera-recovery.json 역투영", "strip_dir_deg_from_east": round(strip_dir, 1), "period_m": round(ortho_period, 2),
                      "panel_polygon_5186": [[round(a, 2), round(b, 2)] for a, b in poly.exterior.coords], "panel_polygon_area_m2": round(poly.area, 1)},
            "grid_sawtooth": {"best_dir_deg_from_east": th_best, "best_period_m": round(P_best, 2), "R2_panel_area": round(R2, 3), "angle_diff_deg": round(ang_diff, 1)},

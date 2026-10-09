@@ -1,7 +1,8 @@
 # CT-M16 후보 도형 작성 + 검사. 입력: S-MAP 원문 응답, 2015 DEM, 운영 스냅샷2 도로, 건물 외곽선. 쓰기: claude-m16/ 만.
 import sys
 import json, struct, math, os
-B = sys.argv[1]; A = os.path.dirname(B)  # B = vault claude-m16 folder, A = 3d-map-audit-20261009
+if len(sys.argv) != 3: sys.exit("사용법: build_and_check.py <m16 입출력 폴더> <3d-map-audit 입력 폴더>")
+B, A = sys.argv[1], sys.argv[2]  # B: smap-elevation-raw 입력·결과 출력, A: terrain-grid·claude-live·building-outlines 입력
 raw = json.load(open(os.path.join(B, "smap-elevation-raw-20261009.json"), encoding="utf-8"))
 Z = {r["name"].split()[0]: json.loads(r["raw"])["result"] for r in raw}
 P = {r["name"].split()[0]: (r["x"], r["y"]) for r in raw}

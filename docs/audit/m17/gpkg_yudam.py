@@ -1,6 +1,7 @@
 # 읽기 전용: campus.gpkg 유담관 footprint 정점 추출 + SHA 확인
 import sqlite3, struct, hashlib, json, sys
-SRC = r"C:/campus-tracker/backend/data/scene/source/campus.gpkg"
+if len(sys.argv) != 3: sys.exit("사용법: gpkg_yudam.py <campus.gpkg> <출력 yudam-gpkg.json>")
+SRC = sys.argv[1]
 sha = hashlib.sha256(open(SRC, "rb").read()).hexdigest()
 assert sha == "26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13", sha
 c = sqlite3.connect("file:" + SRC + "?mode=ro", uri=True)
@@ -24,5 +25,5 @@ for t in ("buildings_3d", "source_buildings"):
     res[t] = wkb_rings(g)
 row = c.execute("select name,height_m,height_source,ground_floors,base_m,roof_m,terrain_min,terrain_max,note from buildings_3d where fid=2").fetchone()
 res["attrs"] = dict(zip(["name","height_m","height_source","ground_floors","base_m","roof_m","terrain_min","terrain_max","note"], row))
-json.dump(res, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+json.dump(res, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(json.dumps(res["attrs"], ensure_ascii=False)); print(len(res["buildings_3d"][0][0]), res["buildings_3d"] == res["source_buildings"])

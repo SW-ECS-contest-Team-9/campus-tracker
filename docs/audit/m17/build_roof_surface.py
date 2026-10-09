@@ -8,8 +8,8 @@ import json, os, sys, shutil
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 
-HERE = os.path.dirname(os.path.abspath(__file__)); V = sys.argv[1]
-PREVIEW = os.path.join(HERE, "..", "m16", "preview", "data")
+if len(sys.argv) != 3: sys.exit("사용법: build_roof_surface.py <m17 입출력 폴더> <미리보기 data 폴더>")
+V, PREVIEW = sys.argv[1], sys.argv[2]
 JUMP = 3.0
 S = json.load(open(os.path.join(V, "tower-sample-class.json"), encoding="utf-8"))
 roof = {(s["i"], s["j"]): s for s in S if s["class"] == "지붕"}

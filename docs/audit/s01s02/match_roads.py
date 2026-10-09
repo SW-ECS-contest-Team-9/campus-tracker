@@ -1,8 +1,9 @@
 # S01·S02 후보 위치(뷰어 역투영 좌표)와 운영 스냅샷2 도로 객체 대응(읽기 전용). 출력: vault claude-s01s02/model-match.json
 import json, sys, os
 from shapely.geometry import Point, LineString, Polygon
-V = sys.argv[1]; A = os.path.join(V, "..")
-roads = json.load(open(os.path.join(A, "claude-live", "roads-live-2.json"), encoding="utf-8")); roads = roads["items"] if isinstance(roads, dict) else roads
+if len(sys.argv) != 3: sys.exit("사용법: match_roads.py <출력 폴더> <roads-live-2.json>")
+V = sys.argv[1]
+roads = json.load(open(sys.argv[2], encoding="utf-8")); roads = roads["items"] if isinstance(roads, dict) else roads
 C = {  # id: (설명, [(x,y,z_mesh)...]) — S-MAP getCoordinate3dFromPixel 2026-10-09
  "S01-A": ("남측 차량 진입부(횡단보도·분기)", [(201125.86, 557121.04, 107.10), (201133.08, 557105.39, 107.04), (201135.49, 557099.37, 107.04), (201130.69, 557089.73, 106.49)]),
  "S01-B": ("대일관 돌출 출입부 앞 포장면", [(201151.93, 557309.04, 149.37), (201155.70, 557308.75, 149.95), (201159.81, 557307.42, 150.10), (201155.79, 557306.38, 149.08)]),

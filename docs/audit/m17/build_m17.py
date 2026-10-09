@@ -1,5 +1,5 @@
 # CT-M17 유담관 덩어리 분리 후보 작성 + 검사 (미리보기 전용).
-# 입력(읽기): vault claude-m17/smap-surface-grid-2m.txt, smap-modelid-grid-2m.txt, smap-elevation-raw-m17.json,
+# 입력(읽기): vault claude-m17/smap-surface-grid-2m.txt, smap-modelid-grid-2m.txt,
 #            docs/audit/m17/yudam-gpkg.json (gpkg_yudam.py가 campus.gpkg 읽기 전용으로 추출, SHA 검증)
 # 출력: vault claude-m17/yudam-split-candidates-5186.geojson, gpkg-vertex-check.json, checks.txt
 #       preview 폴더 data/yudam-split-candidates-5186.geojson (복사)
@@ -7,9 +7,8 @@ import json, os, sys, statistics, shutil
 from shapely.geometry import Polygon, box, Point, mapping
 from shapely.ops import unary_union
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-V = sys.argv[1]
-PREVIEW = os.path.join(HERE, "..", "m16", "preview", "data")
+if len(sys.argv) != 4: sys.exit("사용법: build_m17.py <m17 입출력 폴더> <yudam-gpkg.json> <미리보기 data 폴더>")
+V, GPKG_JSON, PREVIEW = sys.argv[1], sys.argv[2], sys.argv[3]
 NX, NY, X0, Y0, R = 52, 84, 200984, 557214, 2
 
 z = [None] * (NX * NY)
@@ -25,7 +24,7 @@ for ln in open(os.path.join(V, "smap-modelid-grid-2m.txt"), encoding="utf-8"):
     for i, ch in enumerate(s): mid[int(j) * NX + i] = ch
 assert mid.count("Y") == 517 and mid.count("M") == 389 and mid.count("N") == 280, "model id counts differ from browser"
 
-g = json.load(open(os.path.join(HERE, "yudam-gpkg.json"), encoding="utf-8"))
+g = json.load(open(GPKG_JSON, encoding="utf-8"))
 SHA = g["sha256"]; assert SHA == "26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13"
 ring = g["buildings_3d"][0][0]; attrs = g["attrs"]
 GP = Polygon(ring); assert GP.is_valid

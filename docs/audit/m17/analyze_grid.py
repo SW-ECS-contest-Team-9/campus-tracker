@@ -1,6 +1,7 @@
 # S-MAP 메시 표면 z 2m 격자(브라우저 픽 결과) 분석. 읽기: vault b64, yudam-gpkg.json. 출력: 인자 폴더.
 import json, sys, os
-V = sys.argv[1]  # vault claude-m17
+if len(sys.argv) != 3: sys.exit("사용법: analyze_grid.py <m17 입출력 폴더> <yudam-gpkg.json>")
+V = sys.argv[1]  # smap-surface-grid-2m.txt 입력, surface-class-map.txt 출력
 NX, NY, X0, Y0, R = 52, 84, 200984, 557214, 2
 z = [None] * (NX * NY)
 for ln in open(os.path.join(V, "smap-surface-grid-2m.txt"), encoding="utf-8"):
@@ -8,7 +9,7 @@ for ln in open(os.path.join(V, "smap-surface-grid-2m.txt"), encoding="utf-8"):
     j, sm, vals = ln.strip().split(":"); vals = [int(t) for t in vals.split(",")]
     assert len(vals) == NX and sum(vals) == int(sm), ("checksum", j)
     for i, t in enumerate(vals): z[int(j) * NX + i] = t / 10 if t > 0 else None
-ring = json.load(open(os.path.join(os.path.dirname(__file__), "yudam-gpkg.json"), encoding="utf-8"))["buildings_3d"][0][0]
+ring = json.load(open(sys.argv[2], encoding="utf-8"))["buildings_3d"][0][0]
 def inside(x, y, r=ring):
     c = False
     for (x1, y1), (x2, y2) in zip(r, r[1:]):
