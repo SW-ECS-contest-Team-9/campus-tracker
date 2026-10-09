@@ -67,12 +67,23 @@ for zid in ZONES:
     pts.append(pts[0])
     top = [round(z(x, y), 3) for x, y in pts]
     other = [round(dem_bilinear(x, y), 3) for x, y in pts]
-    feats.append({'type': 'Feature', 'properties': {'id': f'SKIRT-{zid}', 'type': 'skirt', 'kind': 'skirt', 'estimated': True, 'otherZ': other,
-                                                    'assumption': '경계선 ≤1 m 간격마다 표면 z와 DEM(쌍선형) z 사이 세로 면 — 실제 사면·옹벽 형상 미측정, 틈 메움용',
+    feats.append({'type': 'Feature', 'properties': {'id': f'SKIRT-{zid}', 'type': 'render_connection_face', 'kind': 'skirt', 'estimated': True, 'verifiedWall': False, 'otherZ': other,
+                                                    'assumption': '렌더 연결면(옹벽·사면 아님, 검증된 벽 아님): 경계선 ≤1 m 간격마다 보정 면 z와 기존 DEM(쌍선형) z 사이를 잇는 표시용 세로 면. 실제 전이 형상 미측정',
                                                     'source': f'field-surfaces-v3.geojson {zid} z(S-MAP) + DEM 스냅샷 terrain-grid.f32'},
                   'geometry': {'type': 'LineString', 'coordinates': [[round(x, 3), round(y, 3), t] for (x, y), t in zip(pts, top)]}})
     diffs = [abs(a - b) for a, b in zip(top, other)]
-    lines.append(f'SKIRT-{zid}: 점 {len(pts)}, |면−DEM| 중앙 {np.median(diffs):.2f} 최대 {max(diffs):.2f} m')
+    runs, cur = [], None
+    for (x, y), d in zip(pts, diffs):
+        if d > 3.0:
+            cur = cur or [(x, y), (x, y), 0, 0.0]
+            cur[1] = (x, y); cur[2] += 1; cur[3] = max(cur[3], d)
+        elif cur:
+            runs.append(cur); cur = None
+    if cur:
+        runs.append(cur)
+    for r in sorted(runs, key=lambda r: -r[2])[:6]:
+        lines.append(f'  재검토 구간 {zid}: ({r[0][0]:.0f},{r[0][1]:.0f})→({r[1][0]:.0f},{r[1][1]:.0f}) {r[2]} m, 높이차 최대 {r[3]:.1f} m')
+    lines.append(f'렌더 연결면 SKIRT-{zid}: 점 {len(pts)}, |면−DEM| 중앙 {np.median(diffs):.2f} 최대 {max(diffs):.2f} m')
 
 fc = {'type': 'FeatureCollection', 'name': 'terrain-clip-v1', 'crs': v3['crs'],
       'provenance': {'source': 'frontend/public/corrections/field-surfaces-v3.geojson + docs/audit/m16/preview/data/terrain-grid.f32', 'sha256': hashlib.sha256(grid_raw).hexdigest(),

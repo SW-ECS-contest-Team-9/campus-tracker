@@ -131,7 +131,7 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
       const zs = r.map((c) => c[2]);
       walls.push(new C.GeometryInstance({
         geometry: new C.WallGeometry({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat, z]) => [lon, lat, z])), minimumHeights: zs.map((z, k) => Math.min(z, f.otherZ![k])), maximumHeights: zs.map((z, k) => Math.max(z, f.otherZ![k])), vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT }),
-        id: { kind: 'correction', id: f.id, source: f.source }, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString('#a8a29e')) },
+        id: { kind: 'correction', id: f.id, source: f.source }, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString('#a8a29e').withAlpha(0.45)) }, // 렌더 연결면(벽 아님): 중립색 반투명
       }));
       return;
     }
@@ -160,5 +160,5 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
     }))
     : null;
   // 보정 면은 불투명: 잘라낸 지형 자리를 면이 덮음(깊이 검사는 그대로)
-  return [add(surfaces, estimated, true), add(extrudes, !estimated, false), add(walls, false, false), viewer.scene.primitives.add(outlines)].filter(Boolean);
+  return [add(surfaces, estimated, true), add(extrudes, !estimated, false), add(walls, true, false), viewer.scene.primitives.add(outlines)].filter(Boolean);
 }

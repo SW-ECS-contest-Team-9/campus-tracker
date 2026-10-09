@@ -131,6 +131,7 @@ test('지형 잘라냄: 구역 = 검증된 표면 5개 경계 그대로, 경계 
   const r = parseCorrections('terrain-clip-v1.geojson', fc, 'corrected');
   assert.deepEqual(r.errors, []);
   assert.equal(r.features.filter((f: any) => f.kind === 'skirt').length, 5);
+  for (const f of fc.features.filter((f: any) => f.properties.kind === 'skirt')) assert.ok(f.properties.type === 'render_connection_face' && f.properties.verifiedWall === false && /렌더 연결면/.test(f.properties.assumption));
 });
 
 test('청운관 분리: 본체 override 하나(buildingId 청운관), 돌출부 평면은 빠짐', () => {
