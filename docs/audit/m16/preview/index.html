@@ -32,7 +32,8 @@
     <b>유담관(CT-M17)</b>
     <label><input type="radio" name="yd" id="ydOrig" checked> 원본</label>
     <label><input type="radio" name="yd" id="ydCand"> 분리 후보</label>
-    <label><input type="radio" name="yd" id="ydSurf"> 분리 후보(Y-A 표면 상단)</label><br>
+    <label><input type="radio" name="yd" id="ydSurf"> 분리 후보(Y-A 표면 상단)</label>
+    <label><input type="radio" name="yd" id="ydRoof"> 분리 후보(Y-A 건물 지붕 후보)</label><br>
     <label><input type="radio" name="occ" id="occOn" checked> 가림 적용</label>
     <label><input type="radio" name="occ" id="occOff"> 후보 항상 보기</label>
   </p>
@@ -147,12 +148,28 @@ const surfSrc = [];
     surfGroup.add(m);
   }
 }
+// 건물 지붕 후보(패널 제외): 같은 방식으로 삼각형만
+const roofGroup = new THREE.Group(); roofGroup.visible = false; groups.bld.add(roofGroup);
+{
+  const rf = await (await get('data/yudam-building-roof-candidate-5186.geojson')).json();
+  for (const f of rf.features) {
+    const pos = [];
+    for (const poly of f.geometry.coordinates) for (const [e, n, h] of poly[0].slice(0, 3)) { const v = w(e, n, h); pos.push(v.x, v.y, v.z); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0x2a8a5a, side: THREE.DoubleSide }));
+    m.userData.info = `${f.properties.id}
+건물 지붕 표본 원값 + 패널 위치는 양쪽 간극 표본 사이 보간
+accuracyVerified=false`;
+    roofGroup.add(m);
+  }
+}
 function setYudam(mode) {  // mode: false/'orig', true/'flat', 'surf'
   const md = mode === true ? 'flat' : (mode || 'orig');
   groups.bld.children.forEach(o => { if (o.userData.yudamOrig) o.visible = md === 'orig'; });
   ydGroup.visible = md !== 'orig';
-  ydGroup.children.forEach(o => { o.visible = !(md === 'surf' && o.userData.ydPart === 'Y-A'); });
+  ydGroup.children.forEach(o => { o.visible = !((md === 'surf' || md === 'roof') && o.userData.ydPart === 'Y-A'); });
   surfGroup.visible = md === 'surf';
+  roofGroup.visible = md === 'roof';
 }
 // 검증용: 렌더 버퍼 정점을 EPSG:5186으로 되돌려 원본 좌표와 최대 차이
 function surfaceVertexCheck() {
@@ -165,6 +182,7 @@ function surfaceVertexCheck() {
 document.getElementById('ydOrig').onchange = () => setYudam('orig');
 document.getElementById('ydCand').onchange = () => setYudam('flat');
 document.getElementById('ydSurf').onchange = () => setYudam('surf');
+document.getElementById('ydRoof').onchange = () => setYudam('roof');
 
 // 현재 도로
 const roads = await (await get('data/roads-live-2.json')).json();
@@ -257,7 +275,7 @@ function projectVertices() {
     return { ...v, sx: Math.round((q.x + 1) / 2 * W), sy: Math.round((1 - q.y) / 2 * H), inView: Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && q.z < 1 };
   });
 }
-window.preview = { setYudam: c => { const md = c === true ? 'flat' : (c || 'orig'); document.getElementById({ orig: 'ydOrig', flat: 'ydCand', surf: 'ydSurf' }[md]).checked = true; setYudam(md); }, surfaceVertexCheck, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
+window.preview = { setYudam: c => { const md = c === true ? 'flat' : (c || 'orig'); document.getElementById({ orig: 'ydOrig', flat: 'ydCand', surf: 'ydSurf', roof: 'ydRoof' }[md]).checked = true; setYudam(md); }, surfaceVertexCheck, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
 setCam([201000, 557150, 220], [201050, 557250, 115]);
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
