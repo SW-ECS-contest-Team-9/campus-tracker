@@ -8,7 +8,7 @@ import { tmInverse } from './tm';
 
 type CesiumNS = typeof import('cesium');
 
-export type CorrectionGroup = 'corrected' | 'estimated';
+export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate';
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
@@ -17,7 +17,9 @@ export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   // 다른 작업자 산출 예정(아직 없으면 pending): 평지 경계·계단 끝점 v4
   { file: 'field-boundary-v4.geojson', group: 'estimated' },
   // stair-endpoints-v4.geojson은 v5로 대체(파일만 보존)
-  { file: 'cheongun-split-v1.geojson', group: 'estimated' }, // 청운관 본체/돌출부 분리(원본 건물 평면 대체)
+  { file: 'cheongun-split-v1.geojson', group: 'estimated' },
+  // 비교 후보 '계단 후보': 추정 계단 자리만 사잇길 면을 잘라낸 대체 면(켜면 SF-CORRIDOR 원 면 대신 표시, Corrected가 켜져 있을 때만)
+  { file: 'corridor-stair-cut-v1.geojson', group: 'stairCandidate' }, // 청운관 본체/돌출부 분리(원본 건물 평면 대체)
   { file: 'stair-endpoints-v6.geojson', group: 'estimated' }, // 계단 끝점 상태 v6 + 제안 계단 선(v4·v5는 파일만 보존)
 ];
 
@@ -26,6 +28,7 @@ export type CorrectionFeature = {
   file: string;
   kind: 'extrude' | 'surface' | 'line' | 'clip' | 'skirt' | 'override';
   type?: string;
+  replaces?: string;
   buildingId?: string;
   otherZ?: number[];
   /** EPSG:5186 원 좌표(override용, campus-map 평면 대체는 WGS84 polygons 사용) */
@@ -45,7 +48,7 @@ export function parseCorrections(file: string, fc: any, group: CorrectionGroup =
     const id = String(p.id ?? '?');
     const kind = ['extrude', 'surface', 'line', 'clip', 'skirt', 'override'].includes(p.kind) ? p.kind as CorrectionFeature['kind'] : null;
     if (!p.source) { errors.push(`${file}:${id} source 없음`); continue; }
-    if (group === 'estimated' && !(p.estimated === true && p.assumption)) { errors.push(`${file}:${id} estimated/assumption 없음`); continue; }
+    if (group !== 'corrected' && !(p.estimated === true && p.assumption)) { errors.push(`${file}:${id} estimated/assumption 없음`); continue; }
     if (!kind) { errors.push(`${file}:${id} kind 알 수 없음`); continue; }
     if (kind === 'extrude' && !(Number.isFinite(p.fromM) && Number.isFinite(p.toM) && p.toM > p.fromM)) { errors.push(`${file}:${id} fromM/toM 잘못됨`); continue; }
     const g = f.geometry;
@@ -58,7 +61,7 @@ export function parseCorrections(file: string, fc: any, group: CorrectionGroup =
       const { latitude, longitude } = tmInverse(x, y);
       return z === undefined ? [longitude, latitude] : [longitude, latitude, z];
     })));
-    features.push({ id, file, kind, type: p.type, buildingId: p.buildingId, otherZ: p.otherZ, source: String(p.source), fromM: p.fromM, toM: p.toM, polygons });
+    features.push({ replaces: p.replaces, id, file, kind, type: p.type, buildingId: p.buildingId, otherZ: p.otherZ, source: String(p.source), fromM: p.fromM, toM: p.toM, polygons });
   }
   return { features, errors };
 }
@@ -79,7 +82,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   const loaded: string[] = [];
   const pending: string[] = [];
   const errors: string[] = [];
-  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [] };
+  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [] };
   for (const { file, group } of CORRECTION_FILES) {
     const fc = await loadFile(base, file);
     if (!fc) { pending.push(file); continue; }
@@ -88,7 +91,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
     byGroup[group].push(...r.features);
     errors.push(...r.errors);
   }
-  const prims = { corrected: draw(C, viewer, byGroup.corrected, false), estimated: draw(C, viewer, byGroup.estimated, true) };
+  const prims = { corrected: draw(C, viewer, byGroup.corrected, false), estimated: draw(C, viewer, byGroup.estimated, true), stairCandidate: draw(C, viewer, byGroup.stairCandidate, false) };
   // 지형 잘라냄: 보정 면 구역 안 렌더 지형만 숨김(DEM 자료 불변). 끄면 clippingPolygons를 비활성화해 원본 그대로.
   const clips = byGroup.corrected.filter((f) => f.kind === 'clip');
   const clipping = clips.length ? new C.ClippingPolygonCollection({
@@ -96,12 +99,22 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
     polygons: clips.map((f) => new C.ClippingPolygon({ positions: C.Cartesian3.fromDegreesArray(f.polygons[0][0].slice(0, -1).flatMap(([lon, lat]) => [lon, lat])) })),
   }) : null;
   if (clipping) viewer.scene.globe.clippingPolygons = clipping;
-  const overrides = { corrected: byGroup.corrected, estimated: byGroup.estimated };
+  const overrides = { corrected: byGroup.corrected, estimated: byGroup.estimated, stairCandidate: [] as CorrectionFeature[] };
+  const replaced = new Set(byGroup.stairCandidate.map((f) => f.replaces).filter(Boolean) as string[]);
+  const state = { corrected: false, estimated: false, stairCandidate: false };
   if (errors.length) console.warn('local corrections rejected', errors);
   return {
-    loaded, pending, errors, ids: [...byGroup.corrected, ...byGroup.estimated].map((f) => f.id),
+    loaded, pending, errors, ids: [...byGroup.corrected, ...byGroup.estimated, ...byGroup.stairCandidate].map((f) => f.id),
     setVisible(show: boolean, group: CorrectionGroup = 'corrected') {
-      for (const p of prims[group]) p.show = show;
+      state[group] = show;
+      for (const g of ['corrected', 'estimated'] as const) for (const p of prims[g]) p.show = state[g];
+      const cand = state.corrected && state.stairCandidate; // 후보는 Corrected 위에서만 의미
+      for (const p of prims.stairCandidate) p.show = cand;
+      for (const p of prims.corrected) for (const id of replaced) {
+        const pid = INSTANCE_IDS.get(id);
+        const a = pid && p.getGeometryInstanceAttributes ? p.getGeometryInstanceAttributes(pid) : null;
+        if (a?.show) a.show = C.ShowGeometryInstanceAttribute.toValue(!cand, a.show);
+      }
       if (group === 'corrected' && clipping) clipping.enabled = show;
       for (const f of overrides[group]) if (f.kind === 'override') sceneLayer?.setFootprintOverride(f.buildingId!, show ? f.polygons : null);
       viewer.scene.requestRender?.();
@@ -112,9 +125,10 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 // 면마다 다른 색(띠/평지/지붕 구분) + 테두리선. surface는 지형과 같은 높이에서 깜박이지 않게 polygon offset으로 앞쪽에 그림.
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
+const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }>();
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
 const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15' };
-const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa' };
+const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
   const extrudes: any[] = [];
@@ -122,7 +136,7 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
   const walls: any[] = [];
   const outlines = new C.PolylineCollection({ show: false });
   features.forEach((f, i) => {
-    const css = estimated ? EST_COLORS[f.type ?? ''] ?? '#fb923c' : f.kind === 'extrude' ? TYPE_COLORS[f.type ?? ''] ?? '#60a5fa' : PALETTE[i % PALETTE.length];
+    const css = estimated ? EST_COLORS[f.type ?? ''] ?? '#fb923c' : f.kind === 'extrude' ? TYPE_COLORS[f.type ?? ''] ?? '#60a5fa' : TYPE_COLORS[f.type ?? ''] ?? PALETTE[i % PALETTE.length];
     const color = C.Color.fromCssColorString(css).withAlpha(estimated ? 1 : f.kind === 'extrude' ? 0.55 : 1);
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(css).darken(0.35, new C.Color()) });
     if (f.kind === 'clip' || f.kind === 'override') return;
@@ -148,7 +162,9 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
       const geometry = f.kind === 'extrude'
         ? new C.PolygonGeometry({ polygonHierarchy: hierarchy, height: f.fromM, extrudedHeight: f.toM, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT })
         : new C.PolygonGeometry({ polygonHierarchy: hierarchy, perPositionHeight: true, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT });
-      (f.kind === 'extrude' ? extrudes : surfaces).push(new C.GeometryInstance({ geometry, id: { kind: 'correction', id: f.id, source: f.source }, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color) } }));
+      const pickId = INSTANCE_IDS.get(f.id) ?? { kind: 'correction', id: f.id, source: f.source };
+      INSTANCE_IDS.set(f.id, pickId); // 같은 객체로 개별 표시/숨김(getGeometryInstanceAttributes는 참조 비교)
+      (f.kind === 'extrude' ? extrudes : surfaces).push(new C.GeometryInstance({ geometry, id: pickId, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color), show: new C.ShowGeometryInstanceAttribute(true) } }));
       outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(outer.flatMap(([lon, lat, z]) => [lon, lat, z + 0.05])), width: estimated ? 1 : 2, material: edge });
     }
   });

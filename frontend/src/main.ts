@@ -974,6 +974,7 @@ async function boot() {
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
           $<HTMLInputElement>('scene-estimated').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'estimated'));
+          $<HTMLInputElement>('scene-stair-candidate').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'stairCandidate'));
           if (import.meta.env.DEV) (window as any).__localCorrections = c;
         });
         return r.viewer;

@@ -152,3 +152,13 @@ test('v6: 계단 끝점 상태(표면 후보 대응/미검증) 표지와 제안 
   for (const f of fc.features.filter((f: any) => f.properties.type === 'endpoint_surface_match')) assert.ok(/실제 계단 끝점 확인 아님/.test(f.properties.legend));
   assert.ok(!present.includes('stair-endpoints-v4.geojson') && !present.includes('stair-endpoints-v5.geojson'));
 });
+
+test('계단 후보: 사잇길 절단 면은 원 면 대체용, 추정 계단 평면과 겹치지 않음(검사 파일), 출처·가정 있음', () => {
+  const fc = read('corridor-stair-cut-v1.geojson');
+  const r = parseCorrections('corridor-stair-cut-v1.geojson', fc, 'stairCandidate');
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR');
+  const chk = fs.readFileSync(new URL('../../docs/audit/field/corridor-stair-cut-checks.txt', import.meta.url), 'utf8');
+  assert.match(chk, /불일치 0/);
+  assert.match(chk, /겹침: 0\.000 m²/);
+});
