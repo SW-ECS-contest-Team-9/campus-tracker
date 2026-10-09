@@ -181,3 +181,11 @@ test('렌더 삼각형 검사: 사잇길 절단 면 내부·경계 z가 원 면 
   for (const w of worst) assert.ok(w <= 0.002, `${w}`);
   assert.match(chk, /출구 문턱 면 없음/);
 });
+
+test('길 사슬 후보: 상태별 type만(연결/그림만/미검증), 원천 SHA·기준 도로 SHA 일치, 모두 추정 표시', { skip: !present.includes('path-graph-candidate.geojson') }, () => {
+  const fc = read('path-graph-candidate.geojson');
+  const r = parseCorrections('path-graph-candidate.geojson', fc, 'pathGraph');
+  assert.deepEqual(r.errors, []);
+  assert.equal(fc.provenance.base_roads_sha_match, true);
+  assert.ok(fc.features.every((f: any) => ['path_connected', 'path_drawn_only', 'path_unverified'].includes(f.properties.type)));
+});
