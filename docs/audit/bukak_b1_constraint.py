@@ -1,6 +1,7 @@
 """CT-M15 — user statement "북악관 B1 is clearly lower than the walking path behind the building" vs model floor hypotheses.
 
-The path is not located: every footprint side is a candidate. Ground beside each side comes from the 2015 DEM only
+The path is not located; DEM beside each footprint side is kept as a reference only and no consistency
+verdict is made (pathLocationVerified=false, phoneHeightAssumed=true, absoluteFloorVerified=false). Ground beside each side comes from the 2015 DEM only
 (known to be 5-10 m off near the sports field), so results are tendencies, not values. No step height is generated.
   H0  model label: '북악관 B1' corridors at Z 132.8 (= raw phone height of walk level L1) are B1.
   H1  BM-1: Z 132.8 is 1F; B1 is a lower level not in the walk (CX-04 GS25 '지하 1층' door below the side path).
@@ -42,11 +43,12 @@ l1_floor = MODEL_B1_Z - PHONE_M
 hyp = {'H0_modelB1_is_L1': {'b1FloorApprox': round(l1_floor, 1), 'note': 'B1 = walk level L1'},
        'H1_BM1_L1_is_1F': {'b1FloorApprox': None, 'note': 'B1 below L1 by one storey (value not generated)'}}
 rows = []
-for s in sides:
-    path = min(s['demOutward3_8_15m'][:2])  # nearest 3-8 m strip, lower value (conservative)
-    h0 = '모순' if l1_floor >= path else ('약함(차 <1.5 m)' if path - l1_floor < 1.5 else '일치')
-    rows.append({**s, 'pathGroundUsed': path, 'H0': h0, 'H1': '일치 (B1이 L1보다 한 층 아래면 어느 쪽보다도 낮음)'})
-report = {'statement': 'B1 < 뒤편 산책로 (사용자, 정성적)', 'pathLocation': 'unknown — 모든 면을 후보로 둠', 'demCaveat': '2015 DEM, 운동장 주변 5-10 m 오차 사례 있음',
-          'hypotheses': hyp, 'sides': rows}
+for s in sides:  # surrounding-DEM reference only: the real path is not located, so no consistency verdict is produced
+    rows.append({**s, 'H0': '미판정 (산책로 위치 미대응; 주변 DEM 표본은 길 높이가 아님)',
+                 'H1': '미판정 (B1 고도 없음; 한 층 아래라는 가정은 증명 아님)'})
+report = {'statement': 'B1 < 실제 뒤편 산책로 (사용자, 정성적) — 제약 그대로 유지', 'pathLocationVerified': False, 'phoneHeightAssumed': True,
+          'absoluteFloorVerified': False, 'thresholdUsed': None,
+          'demCaveat': '2015 DEM, 운동장 주변 5-10 m 오차 사례 있음. 표본은 조사 참고용이며 BM-1 지지/기각 증거가 아님',
+          'hypotheses': hyp, 'sidesSurroundingDemReference': rows}
 pathlib.Path(sys.argv[2]).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
-print([(r['side'], r['pathGroundUsed'], r['H0']) for r in rows])
+print('verdict: 미판정', [(r['side'], r['demOutward3_8_15m']) for r in rows])
