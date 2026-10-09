@@ -1,11 +1,12 @@
 import './editor.css';
 import { io, type Socket } from 'socket.io-client';
 import { API_BASE_URL } from './api';
-import { initCampusMap } from './campus-map';
+import { initCampusMap, type CampusSceneLayer } from './campus-map';
 import { tmForward, tmInverse } from './tm';
 import type { TerrainGrid } from './api';
 import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode, type ColorMode } from './editor-view';
 import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
+import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -149,6 +150,9 @@ root.innerHTML = `
           <label class="editor-field">자동 색 기준<select id="color-mode"><option value="floor">층별 (낮을수록 어둡게)</option><option value="type">도로 유형별</option></select></label>
           <div class="editor-row"><label class="editor-field">층고 m (층 추정)<input id="floor-height" type="number" min="2" max="8" step="0.1"></label><label class="editor-field">통로 높이 m<input id="tube-height" type="number" min="1" max="6" step="0.1"></label></div>
           <label class="inline-check"><input id="solids" type="checkbox"> 실내 통로 사각튜브 · 엘리베이터 샤프트 표시</label>
+          <label class="editor-field">건물 불투명도 <b id="building-opacity-v"></b><input id="building-opacity" type="range" min="0" max="1" step="0.05"></label>
+          <label class="inline-check"><input id="xray-paths" type="checkbox"> 건물·지형 너머 통로 표시</label>
+          <div class="editor-hint">관통 표시를 켜면 먼 거리에서도 통로 중심선이 보입니다. 앞·뒤·좌·우는 커서 머리 방향 기준이며 각 축은 4m입니다.</div>
           <div id="route-legend" class="route-legend"></div>
           <label class="inline-check"><input id="dim-others" type="checkbox"> 선택 시 다른 경로 흐리게</label>
           <label class="editor-field">다른 경로 불투명도 <b id="dim-alpha-v"></b><input id="dim-alpha" type="range" min="0.05" max="1" step="0.05"></label>
@@ -253,6 +257,9 @@ let cursorArrowOutline: any;
 let cursorDepthLine: any;
 let cursorDepthOutline: any;
 let cursorGroundPoint: any;
+let cursorAxisEntities: any[] = [];
+let buildingScene: CampusSceneLayer | null = null;
+let xrayPaths: XrayPaths | null = null;
 let ownCursor: XYZ = [ORIGIN.x, ORIGIN.y, 135];
 let heading = 0;
 let tool = 'select';
@@ -408,6 +415,21 @@ function updateCursorGraphics() {
     cursorArrowOutline.polyline.positions = arrowPositions;
     cursorArrow.polyline.positions = arrowPositions;
   }
+  cursorAxes(ownCursor, heading).forEach((axis, i) => {
+    const end = drawPoint(axis.end);
+    const color = cssColor(axis.color);
+    const labelOffsets = [[0, -32], [55, 0], [0, 32], [-55, 0]];
+    if (!cursorAxisEntities[i]) cursorAxisEntities[i] = viewer.entities.add({ position: end,
+      polyline: { positions: [position, end], width: 3, material: color, depthFailMaterial: color, arcType: C.ArcType.NONE },
+      label: { text: axis.label, font: 'bold 12px system-ui', fillColor: color, showBackground: true,
+        backgroundColor: cssColor('#14251d').withAlpha(0.9), backgroundPadding: new C.Cartesian2(4, 3),
+        pixelOffset: new C.Cartesian2(...labelOffsets[i]), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        distanceDisplayCondition: new C.DistanceDisplayCondition(0, 500) } });
+    else {
+      cursorAxisEntities[i].position = end;
+      cursorAxisEntities[i].polyline.positions = [position, end];
+    }
+  });
   if (!cursorDepthLine) {
     const line = new C.PolylineDashMaterialProperty({ color: C.Color.WHITE, dashLength: 12 });
     cursorDepthOutline = viewer.entities.add({ show: false, polyline: { positions: [position, position], width: 8,
@@ -483,7 +505,16 @@ function computeRoadStyle(r: Road) {
   C.Color.clone(cssColor('#14251d'), s.casing); s.casing.alpha = Math.min(0.99, 0.9 * alpha);
   C.Color.lerp(cssColor(roadCss(r)), C.Color.WHITE, 0.45, s.glow); s.glow.alpha = 0.9;
 }
-function updateRoadStyles() { if (viewer) for (const r of roads) if (roadWorld.has(r.id)) computeRoadStyle(r); }
+function updateRoadStyles() {
+  if (!viewer) return;
+  xrayPaths?.setVisible(prefs.xrayPaths);
+  for (const r of roads) if (roadWorld.has(r.id)) {
+    computeRoadStyle(r);
+    const dimmed = !!selectedRoad && selectedRoad.id !== r.id;
+    const style = roadStyles.get(r.id)!;
+    xrayPaths?.update(r.id, style.line, xrayAlpha(style.line.alpha, dimmed && prefs.dimOthers, dimmed && isolate));
+  }
+}
 function styleProperty(id: string, key: keyof RoadStyle) {
   return new C.ColorMaterialProperty(new C.CallbackProperty((_t: any, result: any) => {
     const s = roadStyles.get(id);
@@ -586,6 +617,11 @@ function drawAll() {
   cleanMapEntities();
   roadWorld.clear();
   for (const r of roads) drawRoad(r);
+  xrayPaths?.replace(roads.filter((r) => roadWorld.has(r.id)).map((r) => ({
+    id: r.id, positions: roadWorld.get(r.id)!, width: selectedRoad?.id === r.id ? 6 : 4,
+    color: roadStyles.get(r.id)!.line,
+  })));
+  xrayPaths?.setVisible(prefs.xrayPaths);
   renderLegend();
   if (prefs.endpoints === 'all') for (const r of roads) if (r.id !== selectedRoad?.id) drawEndpoints(r.geometry.coordinates, false);
   for (const p of places) {
@@ -1425,6 +1461,10 @@ function bindViewPrefs() {
   $('floor-height').addEventListener('change', () => { prefs.floorHeightM = Math.min(8, Math.max(2, Number($('floor-height').value) || 3)); $('floor-height').value = String(prefs.floorHeightM); persist(); drawAll(); });
   $('tube-height').addEventListener('change', () => { prefs.tubeHeightM = Math.min(6, Math.max(1, Number($('tube-height').value) || 2.4)); $('tube-height').value = String(prefs.tubeHeightM); persist(); drawAll(); });
   check('solids', () => prefs.solids, (v) => { prefs.solids = v; }, true);
+  range('building-opacity', () => prefs.buildingOpacity, (v) => {
+    prefs.buildingOpacity = v; buildingScene?.setOpacity(v);
+  }, (v) => `${Math.round(v * 100)}%`);
+  check('xray-paths', () => prefs.xrayPaths, (v) => { prefs.xrayPaths = v; });
   $('corridor-add').onclick = addCorridorTrack;
   $('corridor-clear').onclick = () => { corridorTracks = []; clearCorridorPreview(); renderCorridorList(); };
   $('corridor-preview').onclick = () => void previewCorridor();
@@ -1799,6 +1839,9 @@ async function startEditor() {
   }
   const result = await initCampusMap('editor-map');
   viewer = result.viewer; C = (window as any).Cesium;
+  buildingScene = result.scene;
+  buildingScene?.setOpacity(prefs.buildingOpacity);
+  xrayPaths = new XrayPaths(C, viewer);
   // The terrain-grid endpoint is binary; read it directly, matching the Preview's grid DTO.
   try {
     const res = await fetch(`${API_BASE_URL}/api/v1/terrain/grid`);

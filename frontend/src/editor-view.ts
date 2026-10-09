@@ -15,6 +15,8 @@ export type ViewPrefs = {
   /** draw indoor corridors as rectangular tubes and elevators as shafts */
   solids: boolean;
   tubeHeightM: number;
+  buildingOpacity: number;
+  xrayPaths: boolean;
   dimOthers: boolean; dimAlpha: number;
   depthFade: boolean; fadeNear: number; fadeFar: number; fadeMin: number;
   endpoints: EndpointMode;
@@ -26,6 +28,7 @@ export type ViewPrefs = {
 const PREFS_KEY = 'campus.editor.viewPrefs';
 export const DEFAULT_PREFS: ViewPrefs = {
   roadColors: {}, colorMode: 'floor', floorHeightM: 3, solids: true, tubeHeightM: 2.4, dimOthers: true, dimAlpha: 0.25,
+  buildingOpacity: 1, xrayPaths: true,
   depthFade: true, fadeNear: 80, fadeFar: 700, fadeMin: 0.3,
   endpoints: 'selected', hoverHighlight: true,
   preset: 'cesium', zoomToPointer: false, invertZoom: false,
