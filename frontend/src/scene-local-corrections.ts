@@ -16,9 +16,9 @@ export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
   // 다른 작업자 산출 예정(아직 없으면 pending): 평지 경계·계단 끝점 v4
   { file: 'field-boundary-v4.geojson', group: 'estimated' },
-  { file: 'stair-endpoints-v4.geojson', group: 'estimated' },
+  // stair-endpoints-v4.geojson은 v5로 대체(파일만 보존)
   { file: 'cheongun-split-v1.geojson', group: 'estimated' }, // 청운관 본체/돌출부 분리(원본 건물 평면 대체)
-  { file: 'stair-endpoints-v5.geojson', group: 'estimated' }, // 다른 작업자 산출 예정(없으면 pending)
+  { file: 'stair-endpoints-v5.geojson', group: 'estimated' }, // 계단 끝점 상태 v5 + 제안 계단 선
 ];
 
 export type CorrectionFeature = {
@@ -113,7 +113,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', stair_proposal: '#facc15' };
 const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa' };
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {

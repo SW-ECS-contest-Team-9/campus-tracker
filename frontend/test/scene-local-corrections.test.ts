@@ -109,7 +109,7 @@ test('추정 구조: 별도 파일, 모든 피처 estimated=true·assumption·so
   assert.equal(parseCorrections('x', bad, 'estimated').errors.length, 1);
 });
 
-test('v4: 평지 경계는 참고선만(직선화 면 미사용), 계단 끝점 표지는 계단 z 그대로·미검증 표시', { skip: !present.includes('stair-endpoints-v4.geojson') }, () => {
+test('v4: 평지 경계는 참고선만(직선화 면 미사용), 계단 끝점 표지는 계단 z 그대로·미검증 표시', { skip: !fs.existsSync(new URL('stair-endpoints-v4.geojson', DIR)) }, () => {
   const fb = read('field-boundary-v4.geojson');
   assert.deepEqual(fb.features.map((f: any) => [f.properties.id, f.properties.kind]), [['REF-PHOTO15-V4-EDGE', 'line']]);
   const ep = read('stair-endpoints-v4.geojson').features;
@@ -138,4 +138,13 @@ test('청운관 분리: 본체 override 하나(buildingId 청운관), 돌출부 
   const r = parseCorrections('cheongun-split-v1.geojson', fc, 'estimated');
   assert.deepEqual(r.errors, []);
   assert.deepEqual(r.features.map((f: any) => [f.kind, f.buildingId]), [['override', '청운관']]);
+});
+
+test('v5: 계단 끝점 상태(확인/미검증) 표지와 제안 계단 선, 기존 추정 계단은 그대로', { skip: !present.includes('stair-endpoints-v5.geojson') }, () => {
+  const fc = read('stair-endpoints-v5.geojson');
+  const r = parseCorrections('stair-endpoints-v5.geojson', fc, 'estimated');
+  assert.deepEqual(r.errors, []);
+  const t = fc.features.map((f: any) => f.properties.type);
+  assert.ok(t.includes('endpoint_unverified') && t.includes('endpoint_confirmed') && t.includes('stair_proposal'));
+  assert.ok(!present.includes('stair-endpoints-v4.geojson'));
 });
