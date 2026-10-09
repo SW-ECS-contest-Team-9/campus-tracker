@@ -2,7 +2,7 @@
 
 render_z_check.ts --dump-tris 로 내보낸 삼각형(EPSG:5186 x,y,z)마다 구멍(계단 평면 + 0.3 m)을 빼고, 남은 조각 정점 z는 그 삼각형 평면에서 계산.
 각 조각은 평면이라 Cesium이 어떻게 삼각화해도 z가 원 면과 같다.
-사용: python cut_from_render_tris.py <tris.json> <repo-root> [대상 면 id, 기본 SF-CORRIDOR; v4는 SF-CORRIDOR-V4]
+사용: python cut_from_render_tris.py <tris.json> <repo-root> [대상 면 id, 기본 SF-CORRIDOR; 내부 표본 TIN은 SF-CORRIDOR-TIN; 입력은 삼각형 또는 평면 조각 꼭짓점 목록]
 """
 import json, sys
 from pathlib import Path
@@ -17,7 +17,16 @@ REPLACES = sys.argv[3] if len(sys.argv) > 3 else 'SF-CORRIDOR'  # 잘라낼 대�
 
 
 def plane(t):
-    a, b, c = map(np.array, t)
+    """조각 꼭짓점 중 넓이가 가장 큰 세 점의 평면(조각은 평면이라 어느 세 점이든 같음, 수치 안정용)."""
+    P = np.array(t, float)
+    best, tri = 0, None
+    for i in range(len(P)):
+        for j in range(i + 1, len(P)):
+            for k in range(j + 1, len(P)):
+                ar = abs(np.cross(P[j] - P[i], P[k] - P[i])[2])
+                if ar > best:
+                    best, tri = ar, (P[i], P[j], P[k])
+    a, b, c = tri
     n = np.cross(b - a, c - a)
     return lambda x, y: float(a[2] - (n[0] * (x - a[0]) + n[1] * (y - a[1])) / n[2])
 
@@ -38,7 +47,7 @@ for file, pick in (('corridor-stair-cut-v1.geojson', lambda f, est: [Polygon(g['
             if g.geom_type != 'Polygon' or g.area < 1e-6:
                 continue
             pieces.append([[[round(x, 3), round(y, 3), round(z(x, y), 3)] for x, y in ring.coords] for ring in [g.exterior, *g.interiors]])
-    cut = [f for f in fc['features'] if f['properties'].get('replaces') in ('SF-CORRIDOR', 'SF-CORRIDOR-V4')][0]
+    cut = [f for f in fc['features'] if f['properties'].get('replaces') in ('SF-CORRIDOR', 'SF-CORRIDOR-V4', 'SF-CORRIDOR-TIN')][0]
     cut['properties']['replaces'] = REPLACES
     cut['geometry'] = {'type': 'MultiPolygon', 'coordinates': pieces}
     cut['properties']['assumption'] = (cut['properties']['assumption'].split(' | ')[0] +

@@ -157,7 +157,7 @@ test('계단 후보: 사잇길 절단 면은 원 면 대체용, 추정 계단 �
   const fc = read('corridor-stair-cut-v1.geojson');
   const r = parseCorrections('corridor-stair-cut-v1.geojson', fc, 'stairCandidate');
   assert.deepEqual(r.errors, []);
-  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR-V4');
+  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR-TIN');
   const chk = fs.readFileSync(new URL('../../docs/audit/field/corridor-stair-cut-checks.txt', import.meta.url), 'utf8');
   assert.match(chk, /불일치 0/);
   assert.match(chk, /겹침: 0\.000 m²/);
@@ -169,7 +169,7 @@ test('v6 계단 후보: 새 계단·참·사잇길 대체 면 모두 추정·미
   assert.deepEqual(r.errors, []);
   assert.deepEqual(fc.provenance.hides, ['ST-DAEIL-EXIT-SIDE', 'ST-A14']);
   assert.ok(fc.features.filter((f: any) => ['stair_step', 'landing'].includes(f.properties.type)).every((f: any) => f.properties.status === '미검증'));
-  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR-V4');
+  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR-TIN');
   const ch = read('cheongun-split-v1.geojson').features.filter((f: any) => f.properties.replaces);
   assert.deepEqual(ch.map((f: any) => f.properties.replaces), ['SF-CHEONGUN-CANOPY']);
 });
@@ -187,15 +187,25 @@ test('길 사슬 후보: 상태별 type만(연결/그림만/미검증), 원천 S
   const r = parseCorrections('path-graph-candidate.geojson', fc, 'pathGraph');
   assert.deepEqual(r.errors, []);
   assert.equal(fc.provenance.base_roads_sha_match, true);
-  assert.ok(fc.features.every((f: any) => ['path_connected', 'path_drawn_only', 'path_unverified'].includes(f.properties.type)));
+  const T = ['path_graph_connected', 'path_drawn_only', 'path_unverified', 'path_candidate_node', 'surface_unverified', 'surface_operational_only'];
+  assert.ok(fc.features.every((f: any) => T.includes(f.properties.type) && f.properties.legend));
+  const ids = fc.features.map((f: any) => f.properties.id);
+  assert.equal(new Set(ids).size, ids.length); // 분할 부품마다 고유 ID, 원 도로 중복 없음
+  assert.ok(!ids.some((i: string) => i.startsWith('PG-R-618385b9') || i.startsWith('PG-R-3910b4a5'))); // 분할된 원 도로 전체는 그리지 않음
+  assert.ok(ids.includes('PG-P-618385b9#B#A'));
 });
 
-test('사잇길 v4: TIN 면이 v3 SF-CORRIDOR 대체, 빈칸은 선(미검증)만, 렌더 표본 재현 0', () => {
-  const fc = read('corridor-surface-v4.geojson');
-  const r = parseCorrections('corridor-surface-v4.geojson', fc, 'corrected');
+test('사잇길 TIN v5: v3 SF-CORRIDOR 대체, 빈칸은 선(미검증)만, 렌더 표본 재현 0, 빈칸·구역 밖·겹침 0', () => {
+  const fc = read('corridor-surface-v5.geojson');
+  const r = parseCorrections('corridor-surface-v5.geojson', fc, 'corrected');
   assert.deepEqual(r.errors, []);
   assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR');
   assert.ok(r.features.filter((f: any) => f.type === 'gap_unverified').every((f: any) => f.kind === 'line'));
   const chk = fs.readFileSync(new URL('../../docs/audit/field/render-z-checks.txt', import.meta.url), 'utf8');
-  assert.match(chk, /표본 재현\(렌더 삼각형 z vs 표본 z\): 표본 \d+개, 최대 차 0\.000\d m/);
+  assert.match(chk, /표본 재현\(렌더 삼각형 z vs 꼭짓점 z\): 표본 \d+개, 최대 차 0\.000\d m/);
+  const tin = fs.readFileSync(new URL('../../docs/audit/field/corridor-tin-checks.txt', import.meta.url), 'utf8');
+  assert.match(tin, /겹침 0\.000 m²/);
+  assert.match(tin, /∩ 조각 0\.000 m²/);
+  assert.match(tin, /밖 조각 면적 0\.000 m²/);
+  for (const f of fc.features) for (const c of (f.geometry.type === 'LineString' ? f.geometry.coordinates : f.geometry.coordinates.flat(2))) assert.ok(c.length >= 3);
 });

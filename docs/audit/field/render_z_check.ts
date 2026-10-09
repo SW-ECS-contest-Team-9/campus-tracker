@@ -53,8 +53,8 @@ const v3 = surf('field-surfaces-v3.geojson', 'corrected');
 const T = new Map<string, Tri[]>(v3.map((f: any) => [f.id, triangles(f)]));
 
 // 1) 사잇길 절단 면: 새 경계 정점 z를 원 면 렌더 z로(--fix-cut), 내부 삼각형 z 비교
-// 사잇길 면 = corridor-surface-v4(내부 S-MAP 표본 TIN, 앱 Corrected에서 v3 SF-CORRIDOR 대체)
-const v4f = parseCorrections('corridor-surface-v4.geojson', read('corridor-surface-v4.geojson'), 'corrected').features.find((f: any) => f.id === 'SF-CORRIDOR-V4');
+// 사잇길 면 = corridor-surface-v5(내부 S-MAP 표본 TIN 조각, 앱 Corrected에서 v3 SF-CORRIDOR 대체)
+const v4f = parseCorrections('corridor-surface-v5.geojson', read('corridor-surface-v5.geojson'), 'corrected').features.find((f: any) => f.id === 'SF-CORRIDOR-TIN');
 const corridor = triangles(v4f);
 const dumpIdx = process.argv.indexOf('--dump-tris');
 if (dumpIdx > 0) { // 원 SF-CORRIDOR 렌더 삼각형(EPSG:5186 x,y,z)을 내보내 같은 삼각형으로 절단 면을 만들게 함(cut_from_render_tris.py)
@@ -62,20 +62,16 @@ if (dumpIdx > 0) { // 원 SF-CORRIDOR 렌더 삼각형(EPSG:5186 x,y,z)을 내�
   console.log(`dumped ${corridor.length} triangles`);
   process.exit(0);
 }
-const v4raw = read('corridor-surface-v4.geojson').features.find((f: any) => f.properties.id === 'SF-CORRIDOR-V4');
+const v4raw = read('corridor-surface-v5.geojson').features.find((f: any) => f.properties.id === 'SF-CORRIDOR-TIN');
 const origXY = new Set(v4raw.geometry.coordinates.flatMap((p: number[][][]) => p[0]).map((c: number[]) => `${c[0]},${c[1]}`));
 // 표본 재현: TIN 꼭짓점(S-MAP 표본) 위치의 렌더 z = 표본 z
 { let n = 0, worst = 0; const seen = new Set<string>();
   for (const p of v4raw.geometry.coordinates) for (const c of p[0]) { const k = `${c[0]},${c[1]}`; if (seen.has(k)) continue; seen.add(k); const z = zAt(corridor, c[0], c[1]); if (z == null) continue; n++; worst = Math.max(worst, Math.abs(z - c[2])); }
-  lines.push(`사잇길 v4 표본 재현(렌더 삼각형 z vs 표본 z): 표본 ${n}개, 최대 차 ${worst.toFixed(4)} m`); }
-// 빈칸: 빈칸 다각형 안 점은 어느 사잇길 삼각형에도 들지 않아야 함(보간 없음)
-{ const gaps = read('corridor-surface-v4.geojson').features.filter((f: any) => f.properties.type === 'gap_unverified');
-  let inside = 0, tested = 0;
-  for (const g of gaps) { const r = g.geometry.coordinates; const cx = r.slice(0, -1).reduce((s: number, c: number[]) => s + c[0], 0) / (r.length - 1), cy = r.slice(0, -1).reduce((s: number, c: number[]) => s + c[1], 0) / (r.length - 1); tested++; if (zAt(corridor, cx, cy) != null) inside++; }
-  lines.push(`빈칸 ${tested}곳 중심점이 사잇길 렌더 삼각형 안: ${inside}곳 (0이어야 보간 없음; 오목 빈칸은 중심이 밖일 수 있어 참고값)`); }
+  lines.push(`사잇길 TIN 표본 재현(렌더 삼각형 z vs 꼭짓점 z): 표본 ${n}개, 최대 차 ${worst.toFixed(4)} m`); }
+// 빈칸·구역 밖·겹침 면적 검사는 integrate_corridor_v4.py(shapely, corridor-tin-checks.txt)
 for (const file of ['corridor-stair-cut-v1.geojson', 'stairs-v6-est.geojson']) {
   const fc = read(file);
-  const cutF = fc.features.find((f: any) => f.properties.replaces === 'SF-CORRIDOR-V4');
+  const cutF = fc.features.find((f: any) => f.properties.replaces === 'SF-CORRIDOR-TIN');
   let changed = 0, miss = 0, maxFix = 0;
   for (const poly of cutF.geometry.coordinates) for (const ring of poly) for (const c of ring) {
     if (origXY.has(`${c[0]},${c[1]}`)) continue;
@@ -89,7 +85,7 @@ for (const file of ['corridor-stair-cut-v1.geojson', 'stairs-v6-est.geojson']) {
     fs.writeFileSync(new URL(file, DIR), JSON.stringify(fc), 'utf8');
   }
   lines.push(`${file}: 새 경계 정점 z 원 면 렌더 z와 최대 차 ${maxFix.toFixed(3)} m${FIX ? `, ${changed}개 교체` : ''}, 원 면 밖 ${miss}`);
-  const cutTris = triangles(parseCorrections(file, fc, file.startsWith('stairs') ? 'stairV6' : 'stairCandidate').features.find((f: any) => f.replaces === 'SF-CORRIDOR-V4'));
+  const cutTris = triangles(parseCorrections(file, fc, file.startsWith('stairs') ? 'stairV6' : 'stairCandidate').features.find((f: any) => f.replaces === 'SF-CORRIDOR-TIN'));
   // 내부 비교: 절단 면 삼각형 무게중심마다 원 면 렌더 z
   let n = 0, worst = 0;
   for (const { a, b, c } of cutTris) {
@@ -103,8 +99,8 @@ for (const file of ['corridor-stair-cut-v1.geojson', 'stairs-v6-est.geojson']) {
 
 // 2) 계단 접속: v6 후보 기준 렌더 z(보이는 면 = 절단 사잇길 + 나머지 v3 보행면, 지붕 제외)
 const v6 = read('stairs-v6-est.geojson');
-const cut6 = triangles(parseCorrections('stairs-v6-est.geojson', v6, 'stairV6').features.find((f: any) => f.replaces === 'SF-CORRIDOR-V4'));
-const walk = new Map<string, Tri[]>([['SF-CORRIDOR-V4(v6 절단)', cut6], ...[...T].filter(([k]) => k !== 'SF-CORRIDOR' && !k.includes('CANOPY'))]);
+const cut6 = triangles(parseCorrections('stairs-v6-est.geojson', v6, 'stairV6').features.find((f: any) => f.replaces === 'SF-CORRIDOR-TIN'));
+const walk = new Map<string, Tri[]>([['SF-CORRIDOR-TIN(v6 절단)', cut6], ...[...T].filter(([k]) => k !== 'SF-CORRIDOR' && !k.includes('CANOPY'))]);
 const visibleZ = (x: number, y: number) => [...walk].map(([k, t]) => [k, zAt(t, x, y)] as const).filter(([, z]) => z != null) as [string, number][];
 const steps = v6.features.filter((f: any) => ['stair_step', 'landing'].includes(f.properties.type));
 const TOL = 0.15;

@@ -12,7 +12,7 @@ export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'st
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
-  { file: 'corridor-surface-v4.geojson', group: 'corrected' }, // 사잇길 = 내부 S-MAP 표본 TIN(경계 정점만이던 v3 SF-CORRIDOR 대체), 빈칸은 선만
+  { file: 'corridor-surface-v5.geojson', group: 'corrected' }, // 사잇길 = 내부 S-MAP 표본 TIN v5(경계에서 실제로 잘린 조각, v3 SF-CORRIDOR 대체), 빈칸은 선만. v4 파일은 비교용 보존
   { file: 'terrain-clip-v1.geojson', group: 'corrected' }, // 표면 구역 안 지형 잘라냄 + 경계 렌더 연결면
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
   { file: 'field-boundary-v4.geojson', group: 'estimated' }, // 사진15 재대응 경계(참고선)
@@ -22,7 +22,7 @@ export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'corridor-stair-cut-v1.geojson', group: 'stairCandidate' },
   // 경쟁 후보 'v6 계단 후보': v6 끝점에 맞춘 새 추정 계단 + 그 자리 사잇길 대체(Corrected 위에서만, 켜면 DRAFT 비교보다 우선, 기존 DRAFT 계단 숨김)
   { file: 'stairs-v6-est.geojson', group: 'stairV6' },
-  // '길 사슬 후보': 다른 작업자의 path-graph-candidate.json을 integrate_path_graph.py로 변환한 파일(없으면 pending). 상태별 색: 그림만/그래프 연결/미검증·보류
+  // '길 사슬 후보': path-graph-candidate-v2.json을 integrate_path_graph.py로 변환. 그래프 상태(+0.3 m)와 표면 접속 상태(+1.0 m)를 따로 표시
   { file: 'path-graph-candidate.geojson', group: 'pathGraph' },
 ];
 
@@ -144,7 +144,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }[]>(); // 피처 id → 인스턴스별 pick id(다각형마다 하나)
 const OUTLINES = new Map<string, any[]>(); // 면 테두리선(대체 시 함께 숨김)
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc', path_drawn_only: '#9ca3af', path_connected: '#22c55e', path_unverified: '#f97316', gap_unverified: '#ef4444' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc', path_drawn_only: '#9ca3af', path_connected: '#22c55e', path_graph_connected: '#22c55e', path_unverified: '#f97316', path_candidate_node: '#a855f7', surface_unverified: '#facc15', surface_operational_only: '#3b82f6', gap_unverified: '#ef4444' };
 const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc', corridor_tin: '#818cf8', gap_unverified: '#ef4444' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
