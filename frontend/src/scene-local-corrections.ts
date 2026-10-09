@@ -12,6 +12,7 @@ export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'st
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
+  { file: 'corridor-surface-v4.geojson', group: 'corrected' }, // 사잇길 = 내부 S-MAP 표본 TIN(경계 정점만이던 v3 SF-CORRIDOR 대체), 빈칸은 선만
   { file: 'terrain-clip-v1.geojson', group: 'corrected' }, // 표면 구역 안 지형 잘라냄 + 경계 렌더 연결면
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
   { file: 'field-boundary-v4.geojson', group: 'estimated' }, // 사진15 재대응 경계(참고선)
@@ -113,12 +114,12 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
     const draft = state.corrected && state.stairCandidate && !v6;
     const vis: Record<CorrectionGroup, boolean> = { corrected: state.corrected, estimated: state.estimated, stairCandidate: draft, stairV6: v6, pathGraph: state.pathGraph };
     for (const g of Object.keys(prims) as CorrectionGroup[]) for (const p of prims[g]) p.show = vis[g];
-    const hidden = new Set<string>([...(draft ? replacedBy('stairCandidate') : []), ...(v6 ? replacedBy('stairV6') : []), ...(state.estimated ? replacedBy('estimated') : [])]);
+    const hidden = new Set<string>([...(state.corrected ? replacedBy('corrected') : []), ...(draft ? replacedBy('stairCandidate') : []), ...(v6 ? replacedBy('stairV6') : []), ...(state.estimated ? replacedBy('estimated') : [])]);
     const prefixes = v6 ? hidesByGroup.stairV6 : [];
-    for (const [id, pid] of INSTANCE_IDS) {
+    for (const [id, pids] of INSTANCE_IDS) {
       const hide = hidden.has(id) || prefixes.some((x) => id.startsWith(x));
       for (const l of OUTLINES.get(id) ?? []) l.show = !hide;
-      for (const p of [...prims.corrected, ...prims.estimated]) {
+      for (const pid of pids) for (const p of [...prims.corrected, ...prims.estimated]) {
         const a = p.getGeometryInstanceAttributes ? p.getGeometryInstanceAttributes(pid) : undefined;
         if (a?.show) a.show = C.ShowGeometryInstanceAttribute.toValue(!hide, a.show);
       }
@@ -140,11 +141,11 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 // 면마다 다른 색(띠/평지/지붕 구분) + 테두리선. surface는 지형과 같은 높이에서 깜박이지 않게 polygon offset으로 앞쪽에 그림.
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
-const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }>();
+const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }[]>(); // 피처 id → 인스턴스별 pick id(다각형마다 하나)
 const OUTLINES = new Map<string, any[]>(); // 면 테두리선(대체 시 함께 숨김)
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc', path_drawn_only: '#9ca3af', path_connected: '#22c55e', path_unverified: '#f97316' };
-const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc', path_drawn_only: '#9ca3af', path_connected: '#22c55e', path_unverified: '#f97316', gap_unverified: '#ef4444' };
+const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc', corridor_tin: '#818cf8', gap_unverified: '#ef4444' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
   const extrudes: any[] = [];
@@ -178,9 +179,10 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
       const geometry = f.kind === 'extrude'
         ? new C.PolygonGeometry({ polygonHierarchy: hierarchy, height: f.fromM, extrudedHeight: f.toM, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT })
         : new C.PolygonGeometry({ polygonHierarchy: hierarchy, perPositionHeight: true, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT });
-      const pickId = INSTANCE_IDS.get(f.id) ?? { kind: 'correction', id: f.id, source: f.source };
-      INSTANCE_IDS.set(f.id, pickId); // 같은 객체로 개별 표시/숨김(getGeometryInstanceAttributes는 참조 비교)
+      const pickId = { kind: 'correction', id: f.id, source: f.source };
+      INSTANCE_IDS.set(f.id, [...(INSTANCE_IDS.get(f.id) ?? []), pickId]); // 다각형마다 별도 객체(getGeometryInstanceAttributes는 참조 비교, 첫 인스턴스만 찾음)
       (f.kind === 'extrude' ? extrudes : surfaces).push(new C.GeometryInstance({ geometry, id: pickId, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color), show: new C.ShowGeometryInstanceAttribute(true) } }));
+      if (f.type === 'corridor_tin' || f.type === 'corridor_cut') continue; // 삼각형 조각 테두리는 그리지 않음(면만)
       const line = outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(outer.flatMap(([lon, lat, z]) => [lon, lat, z + 0.05])), width: estimated ? 1 : 2, material: edge });
       OUTLINES.set(f.id, [...(OUTLINES.get(f.id) ?? []), line]);
     }
