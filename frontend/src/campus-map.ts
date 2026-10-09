@@ -172,6 +172,7 @@ export class CampusSceneLayer {
   private selected: string | null = null;
   private elevation: { range: ElevationRange; image: string } | null = null;
   readonly picks = new Map<string, BuildingPick>();
+  private readonly overrides = new Map<string, number[][][][]>(); // 표시용 평면 대체(scene-local-corrections, 끄면 원본)
 
   constructor(private readonly C: CesiumNS, private readonly viewer: any, readonly scene: CampusScene) {
     this.edges = viewer.scene.primitives.add(new C.PolylineCollection());
@@ -183,6 +184,15 @@ export class CampusSceneLayer {
 
   building(id: string): SceneBuilding | undefined {
     return this.scene.buildings.find((b) => b.buildingId === id);
+  }
+
+  /** Local display-only footprint replacement for one building (null restores the original geometry). */
+  setFootprintOverride(buildingId: string, coordinates: number[][][][] | null) {
+    if (coordinates) this.overrides.set(buildingId, coordinates); else this.overrides.delete(buildingId);
+    this.edges.removeAll(); // roof/corner edges follow the replaced footprint (no floating original rim)
+    this.labels.removeAll();
+    this.drawEdgesAndLabels();
+    this.rebuild();
   }
 
   setOpacity(opacity: number) {
@@ -242,7 +252,7 @@ export class CampusSceneLayer {
     for (const b of this.scene.buildings) {
       const css = b.buildingId === this.selected ? COLORS.selected : this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall;
       const color = C.Color.fromCssColorString(css).withAlpha(this.opacity);
-      for (const poly of b.geometry.coordinates) {
+      for (const poly of this.overrides.get(b.buildingId) ?? b.geometry.coordinates) {
         const ring = (r: number[][]) => C.Cartesian3.fromDegreesArray(r.slice(0, -1).flat());
         const polygon = new C.PolygonGeometry({
           polygonHierarchy: new C.PolygonHierarchy(ring(poly[0]), poly.slice(1).map((h) => new C.PolygonHierarchy(ring(h)))),
@@ -284,7 +294,7 @@ export class CampusSceneLayer {
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(COLORS.edge) });
     for (const b of this.scene.buildings) {
       let best: number[][] = [];
-      for (const poly of b.geometry.coordinates) {
+      for (const poly of this.overrides.get(b.buildingId) ?? b.geometry.coordinates) {
         const r = poly[0];
         if (r.length > best.length) best = r;
         // roof outline, slightly above the roof so it is not z-fighting

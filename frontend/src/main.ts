@@ -16,6 +16,7 @@ import { connectPreview } from './socket';
 import { Lab } from './lab';
 import { initVWorld, type Viewer } from './vworld';
 import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campus-map';
+import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 
 /** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
@@ -969,6 +970,12 @@ async function boot() {
         campusScene = r.scene;
         if (r.warning) showMessage(r.warning);
         setupSceneControls();
+        // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
+        void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
+          $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
+          $<HTMLInputElement>('scene-estimated').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'estimated'));
+          if (import.meta.env.DEV) (window as any).__localCorrections = c;
+        });
         return r.viewer;
       })
     : initVWorld('vmap');

@@ -1,0 +1,439 @@
+{
+ "type": "FeatureCollection",
+ "name": "user-smap-samples-20261010",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P6-151.3",
+    "surface": "높은 가장자리(벽 위 띠)",
+    "value": 151.3,
+    "err_m": 3.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201172.5,
+     557306.0,
+     151.3
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P6-151.6",
+    "surface": "높은 가장자리(벽 위 띠)",
+    "value": 151.6,
+    "err_m": 3.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201183.0,
+     557302.7,
+     151.6
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P6-148.9a",
+    "surface": "운동장",
+    "value": 148.9,
+    "err_m": 3.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201176.0,
+     557297.4,
+     148.9
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P6-148.9b",
+    "surface": "운동장",
+    "value": 148.9,
+    "err_m": 3.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201183.8,
+     557292.2,
+     148.9
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-141.4",
+    "surface": "사잇길(낮은 길)",
+    "value": 141.4,
+    "err_m": 15.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201118,
+     557312,
+     141.4
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-141.9",
+    "surface": "사잇길(낮은 길)",
+    "value": 141.9,
+    "err_m": 15.2,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201134,
+     557302,
+     141.9
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-144.2",
+    "surface": "문예관 쪽 면",
+    "value": 144.2,
+    "err_m": 6.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201120,
+     557322,
+     144.2
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-145.4",
+    "surface": "대일관 벽 앞 면",
+    "value": 145.4,
+    "err_m": 3.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201134,
+     557324,
+     145.4
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-144.9",
+    "surface": "화단/경계",
+    "value": 144.9,
+    "err_m": 17.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201128,
+     557316,
+     144.9
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-150.2",
+    "surface": "높은 대일관 측",
+    "value": 150.2,
+    "err_m": 8.5,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201166,
+     557306,
+     150.2
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-149.3",
+    "surface": "높은 대일관 측",
+    "value": 149.3,
+    "err_m": 2.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201168,
+     557304,
+     149.3
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-148.1",
+    "surface": "높은 대일관 측",
+    "value": 148.1,
+    "err_m": 18.1,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201144,
+     557306,
+     148.1
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P8-148.9",
+    "surface": "운동장",
+    "value": 148.9,
+    "err_m": 0.0,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201170,
+     557296,
+     148.9
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "E9-upper",
+    "surface": "은주2관 앞 상부(독립)",
+    "value": 132.1,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201110,
+       557186,
+       132.1
+      ],
+      [
+       201118,
+       557170,
+       132.1
+      ],
+      [
+       201142,
+       557130,
+       132.1
+      ],
+      [
+       201150,
+       557122,
+       132.1
+      ],
+      [
+       201168,
+       557122,
+       132.1
+      ],
+      [
+       201178,
+       557130,
+       132.1
+      ],
+      [
+       201186,
+       557138,
+       132.1
+      ],
+      [
+       201186,
+       557142,
+       132.1
+      ],
+      [
+       201168,
+       557164,
+       132.1
+      ],
+      [
+       201134,
+       557196,
+       132.1
+      ],
+      [
+       201130,
+       557198,
+       132.1
+      ],
+      [
+       201126,
+       557198,
+       132.1
+      ],
+      [
+       201120,
+       557196,
+       132.1
+      ],
+      [
+       201110,
+       557190,
+       132.1
+      ],
+      [
+       201110,
+       557186,
+       132.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "E9-lower-0",
+    "surface": "하부 도로(독립)",
+    "value": 109.1,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201096,
+       557170,
+       109.1
+      ],
+      [
+       201098,
+       557164,
+       109.1
+      ],
+      [
+       201104,
+       557160,
+       109.1
+      ],
+      [
+       201106,
+       557160,
+       109.1
+      ],
+      [
+       201106,
+       557166,
+       109.1
+      ],
+      [
+       201098,
+       557188,
+       109.1
+      ],
+      [
+       201096,
+       557190,
+       109.1
+      ],
+      [
+       201096,
+       557170,
+       109.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "E9-lower-1",
+    "surface": "하부 도로(독립)",
+    "value": 110.1,
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201156,
+       557092,
+       110.1
+      ],
+      [
+       201158,
+       557090,
+       110.1
+      ],
+      [
+       201162,
+       557090,
+       110.1
+      ],
+      [
+       201162,
+       557094,
+       110.1
+      ],
+      [
+       201158,
+       557094,
+       110.1
+      ],
+      [
+       201156,
+       557092,
+       110.1
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
