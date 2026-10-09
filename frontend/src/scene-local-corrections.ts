@@ -66,10 +66,17 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, base = '/cor
     features.push(...r.features);
     errors.push(...r.errors);
   }
-  const instances: any[] = [];
-  for (const f of features) {
-    const color = C.Color.fromCssColorString(f.kind === 'extrude' ? '#60a5fa' : '#f59e0b').withAlpha(0.85);
+  // 면마다 다른 색(띠/평지/지붕 구분) + 테두리선. surface는 지형과 같은 높이에서 깜박이지 않게 polygon offset으로 앞쪽에 그림.
+  // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
+  const palette = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
+  const extrudes: any[] = [];
+  const surfaces: any[] = [];
+  const outlines = new C.PolylineCollection({ show: false });
+  features.forEach((f, i) => {
+    const css = f.kind === 'extrude' ? '#60a5fa' : palette[i % palette.length];
+    const color = C.Color.fromCssColorString(css).withAlpha(f.kind === 'extrude' ? 0.55 : 0.8);
     for (const poly of f.polygons) {
+      const outer = poly[0].map(([lon, lat, z]) => [lon, lat, f.kind === 'surface' ? z : f.toM!]);
       const ring = (r: number[][]) => f.kind === 'surface'
         ? C.Cartesian3.fromDegreesArrayHeights(r.slice(0, -1).flat())
         : C.Cartesian3.fromDegreesArray(r.slice(0, -1).flatMap(([lon, lat]) => [lon, lat]));
@@ -77,17 +84,23 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, base = '/cor
       const geometry = f.kind === 'extrude'
         ? new C.PolygonGeometry({ polygonHierarchy: hierarchy, height: f.fromM, extrudedHeight: f.toM, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT })
         : new C.PolygonGeometry({ polygonHierarchy: hierarchy, perPositionHeight: true, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT });
-      instances.push(new C.GeometryInstance({ geometry, id: { kind: 'correction', id: f.id, source: f.source }, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color) } }));
+      (f.kind === 'extrude' ? extrudes : surfaces).push(new C.GeometryInstance({ geometry, id: { kind: 'correction', id: f.id, source: f.source }, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color) } }));
+      outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(outer.flatMap(([lon, lat, z]) => [lon, lat, z + 0.05])), width: 2, material: C.Material.fromType('Color', { color: C.Color.fromCssColorString(css).darken(0.35, new C.Color()) }) });
     }
-  }
-  const primitive = instances.length
-    ? viewer.scene.primitives.add(new C.Primitive({ geometryInstances: instances, appearance: new C.PerInstanceColorAppearance({ translucent: false, closed: false }), asynchronous: false, show: false }))
+  });
+  const add = (instances: any[], translucent: boolean, offset: boolean) => instances.length
+    ? viewer.scene.primitives.add(new C.Primitive({
+      geometryInstances: instances,
+      appearance: new C.PerInstanceColorAppearance({ translucent, closed: false, renderState: offset ? { polygonOffset: { enabled: true, factor: -1, units: -4 } } : undefined }),
+      asynchronous: false, show: false,
+    }))
     : null;
+  const prims = [add(surfaces, true, true), add(extrudes, true, false), viewer.scene.primitives.add(outlines)].filter(Boolean);
   if (errors.length) console.warn('local corrections rejected', errors);
   return {
     loaded, pending, errors, ids: features.map((f) => f.id),
     setVisible(show: boolean) {
-      if (primitive) primitive.show = show;
+      for (const p of prims) p.show = show;
       viewer.scene.requestRender?.();
     },
   };
