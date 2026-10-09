@@ -1,0 +1,5014 @@
+{
+ "type": "road",
+ "total": 128,
+ "offset": 0,
+ "items": [
+  {
+   "id": "c52095ad-8e31-48ee-98b3-e3f925318fed",
+   "name": null,
+   "roadClass": "shared",
+   "structure": "ramp",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "allowed",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 5,
+   "fromNodeId": "4f294196-1128-4f28-a093-9033dcaca073",
+   "toNodeId": "04044da5-753f-4440-a870-17bf0c359b0e",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 54.5,
+   "vertexCount": 30,
+   "coordinates": [
+    [
+     201106.22,
+     557324.73,
+     141.73
+    ],
+    [
+     201103.5,
+     557325.99,
+     141.07
+    ],
+    [
+     201101.24,
+     557327.05,
+     140.53
+    ],
+    [
+     201098.97,
+     557328.11,
+     139.98
+    ],
+    [
+     201097.61,
+     557328.74,
+     139.65
+    ],
+    [
+     201096.71,
+     557329.16,
+     139.43
+    ],
+    [
+     201095.35,
+     557329.8,
+     139.1
+    ],
+    [
+     201093.99,
+     557330.43,
+     138.77
+    ],
+    [
+     201092.63,
+     557331.07,
+     138.44
+    ],
+    [
+     201091.27,
+     557331.7,
+     138.11
+    ],
+    [
+     201089.91,
+     557332.33,
+     137.78
+    ],
+    [
+     201088.55,
+     557332.97,
+     137.45
+    ],
+    [
+     201087.19,
+     557333.6,
+     137.13
+    ],
+    [
+     201085.83,
+     557334.24,
+     136.8
+    ],
+    [
+     201084.47,
+     557334.87,
+     136.47
+    ],
+    [
+     201082.66,
+     557335.71,
+     136.03
+    ],
+    [
+     201081.3,
+     557336.35,
+     135.7
+    ],
+    [
+     201079.49,
+     557337.19,
+     135.26
+    ],
+    [
+     201078.13,
+     557337.83,
+     134.93
+    ],
+    [
+     201076.31,
+     557338.67,
+     134.49
+    ],
+    [
+     201074.95,
+     557339.31,
+     134.16
+    ],
+    [
+     201073.14,
+     557340.15,
+     133.73
+    ],
+    [
+     201071.78,
+     557340.79,
+     133.4
+    ],
+    [
+     201069.97,
+     557341.63,
+     132.96
+    ],
+    [
+     201068.16,
+     557342.48,
+     132.52
+    ],
+    [
+     201066.34,
+     557343.32,
+     132.08
+    ],
+    [
+     201064.53,
+     557344.17,
+     131.64
+    ],
+    [
+     201062.27,
+     557345.22,
+     131.1
+    ],
+    [
+     201060,
+     557346.28,
+     130.55
+    ],
+    [
+     201056.83,
+     557347.76,
+     129.78
+    ]
+   ]
+  },
+  {
+   "id": "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 3,
+   "fromNodeId": "f54bc91a-2973-484d-8bf6-0ca15d6ccbcf",
+   "toNodeId": "0092f501-c575-48aa-89af-f6418748d2ca",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 41.55,
+   "vertexCount": 7,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     140.6
+    ],
+    [
+     201046.46,
+     557381.26,
+     140.6
+    ],
+    [
+     201037.41,
+     557385.88,
+     140.6
+    ],
+    [
+     201028.43,
+     557390.27,
+     140.6
+    ],
+    [
+     201022.64,
+     557393.44,
+     140.6
+    ],
+    [
+     201014.37,
+     557396.23,
+     140.6
+    ],
+    [
+     201016.9,
+     557399.83,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "00ad9781-fdd7-4f3f-ac4f-5397eb0c7d8d",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "0092f501-c575-48aa-89af-f6418748d2ca",
+   "toNodeId": "f4a2f4e6-4d8b-404b-b662-7a85b8c2b074",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 16.64,
+   "vertexCount": 6,
+   "coordinates": [
+    [
+     201016.9,
+     557399.83,
+     140.6
+    ],
+    [
+     201016.69,
+     557401.03,
+     140.6
+    ],
+    [
+     201019.42,
+     557406.82,
+     138.7
+    ],
+    [
+     201020.69,
+     557406.23,
+     138.7
+    ],
+    [
+     201017.96,
+     557400.44,
+     136.84
+    ],
+    [
+     201016.9,
+     557399.83,
+     136.84
+    ]
+   ]
+  },
+  {
+   "id": "83109850-3fb2-407f-aabb-2310040310a4",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "df658c8d-ec0a-4b11-ba39-3d2cb32bb5d0",
+   "toNodeId": "d3dd8247-f7d6-4248-8b09-9447df4f6d34",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 39.86,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     143.47
+    ],
+    [
+     201015.35,
+     557396.54,
+     143.5
+    ],
+    [
+     201016.9,
+     557399.83,
+     143.5
+    ]
+   ]
+  },
+  {
+   "id": "bb1a4cfc-ca3f-43f0-8b18-37c071fdbdb3",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "d3dd8247-f7d6-4248-8b09-9447df4f6d34",
+   "toNodeId": "0092f501-c575-48aa-89af-f6418748d2ca",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 16.64,
+   "vertexCount": 6,
+   "coordinates": [
+    [
+     201016.9,
+     557399.83,
+     143.5
+    ],
+    [
+     201016.69,
+     557401.03,
+     143.5
+    ],
+    [
+     201019.42,
+     557406.82,
+     142.05
+    ],
+    [
+     201020.69,
+     557406.23,
+     142.05
+    ],
+    [
+     201017.96,
+     557400.44,
+     140.6
+    ],
+    [
+     201016.9,
+     557399.83,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "71335ce0-2a26-47ff-8871-e0c6c38e1809",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "69181a72-b1ad-4dc0-947b-1b91241d810c",
+   "toNodeId": "3d601a75-fd3d-44ad-82d0-65ed26be9204",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 15.29,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201057.31,
+     557382.34,
+     140.6
+    ],
+    [
+     201058.8,
+     557385.51,
+     141.26
+    ],
+    [
+     201051.76,
+     557388.83,
+     142.72
+    ],
+    [
+     201050.05,
+     557385.21,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "2ecf4f90-57a9-49c8-9e04-a46c7da7b659",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "3d601a75-fd3d-44ad-82d0-65ed26be9204",
+   "toNodeId": "df658c8d-ec0a-4b11-ba39-3d2cb32bb5d0",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 4.54,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     143.47
+    ],
+    [
+     201048.12,
+     557381.1,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "bfabfade-cdf0-4b0c-9f3a-06b4c3103d73",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5207d3df-9b83-4e32-8fb6-5eecc36bf3df",
+   "toNodeId": "2d7e2141-69be-4d86-bbe4-c6f8f6e8b7c2",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 13.69,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201059.65,
+     557387.32,
+     136.7
+    ],
+    [
+     201060.72,
+     557389.58,
+     137.41
+    ],
+    [
+     201053.68,
+     557392.9,
+     139.63
+    ],
+    [
+     201052.23,
+     557389.82,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "9be4bca2-ebf2-4b2b-8283-d766200a2254",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "2d7e2141-69be-4d86-bbe4-c6f8f6e8b7c2",
+   "toNodeId": "f54bc91a-2973-484d-8bf6-0ca15d6ccbcf",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 9.64,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201052.23,
+     557389.82,
+     140.6
+    ],
+    [
+     201048.12,
+     557381.1,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "0d88669d-bd1a-4417-aaf4-8938b64073e4",
+   "name": "혜인관 1층 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "579af30c-faaa-4518-97f4-cb5813279bc5",
+   "toNodeId": "ba1296cf-38cc-47e3-8d5e-151320c8f3c1",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 20.18,
+   "vertexCount": 5,
+   "coordinates": [
+    [
+     201239.98,
+     557221.3,
+     155.09
+    ],
+    [
+     201233.05,
+     557224.59,
+     154.76
+    ],
+    [
+     201231.54,
+     557228.67,
+     154.71
+    ],
+    [
+     201225.76,
+     557230.48,
+     154.47
+    ],
+    [
+     201223.93,
+     557229.44,
+     154.25
+    ]
+   ]
+  },
+  {
+   "id": "0ed024f9-e1dd-4b3d-b82e-1668bac21c74",
+   "name": "북악관 2F 엘리베이터 앞 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "f54bc91a-2973-484d-8bf6-0ca15d6ccbcf",
+   "toNodeId": "5aa5dddf-e783-41d0-84df-87e852e4b6a6",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 7.17,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     140.6
+    ],
+    [
+     201053.66,
+     557385.65,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+   "name": "북악관 B1 좌측 공간 통합 주동선 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 3,
+   "fromNodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d",
+   "toNodeId": "f645a7b9-b468-45af-9098-6a99c283e524",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 37.15,
+   "vertexCount": 6,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     132.8
+    ],
+    [
+     201046.46,
+     557381.26,
+     132.8
+    ],
+    [
+     201037.41,
+     557385.88,
+     132.8
+    ],
+    [
+     201028.43,
+     557390.27,
+     132.8
+    ],
+    [
+     201022.64,
+     557393.44,
+     132.8
+    ],
+    [
+     201014.37,
+     557396.23,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "20277429-1d12-4a0d-9c23-dad4b3574de5",
+   "name": "혜인관 1층-B1 계단 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "ba1296cf-38cc-47e3-8d5e-151320c8f3c1",
+   "toNodeId": "6532adf0-ae69-4de2-b5a7-4a8c48135cda",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 8.19,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201223.93,
+     557229.44,
+     154.25
+    ],
+    [
+     201222.22,
+     557226.02,
+     153.26
+    ],
+    [
+     201220.15,
+     557225.57,
+     151.59
+    ],
+    [
+     201219.81,
+     557227.79,
+     150.84
+    ]
+   ]
+  },
+  {
+   "id": "23283481-90c5-4985-a86e-0fa00cd9b902",
+   "name": "북악관 B1 엘리베이터 앞 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d",
+   "toNodeId": "7698e723-d076-4323-bd60-4e2533d73417",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 7.17,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     132.8
+    ],
+    [
+     201053.66,
+     557385.65,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "5aea9b42-15e8-4fa1-be44-50e22922d65a",
+   "name": "혜인관 B1-지하주차장 계단 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "888ba81d-89d4-403d-8d6e-2af438f68368",
+   "toNodeId": "79988154-51eb-4e57-bff2-a78064906646",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 12.81,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201232.14,
+     557227.82,
+     150.71
+    ],
+    [
+     201227.28,
+     557228.94,
+     149.78
+    ],
+    [
+     201222.75,
+     557231.03,
+     147.1
+    ],
+    [
+     201220.61,
+     557232.88,
+     146.94
+    ]
+   ]
+  },
+  {
+   "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
+   "name": "지하주차장-북악관 B1 연결 (추정)",
+   "roadClass": "vehicle",
+   "structure": "ordinary",
+   "pedestrianAccess": "prohibited",
+   "vehicleAccess": "allowed",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "81ff89df-6ba0-4847-b19e-2ddd5e6e8b31",
+   "toNodeId": "18b2d87e-ad27-49b1-84d7-3357dcd817da",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 16.06,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.9,
+     557349.2,
+     126.82
+    ],
+    [
+     201047.33,
+     557363.86,
+     131.1
+    ]
+   ]
+  },
+  {
+   "id": "95632bb8-5143-4de5-8633-e894697a3841",
+   "name": "북악관 B1 진입 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "7c22ff7d-b71e-449e-b023-f09de53089e6",
+   "toNodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 10.92,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.79,
+     557370.2,
+     132.8
+    ],
+    [
+     201048.12,
+     557381.1,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "3e22ef54-36d0-44b7-9212-d451abe3f400",
+   "name": "북악관 엘리베이터 B1-1F (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "7698e723-d076-4323-bd60-4e2533d73417",
+   "toNodeId": "5b6e2c78-3bd5-4e43-b2a5-bb9f7f0ba6b8",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     132.8
+    ],
+    [
+     201053.66,
+     557385.65,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "de66c1f1-54f1-47f7-8388-f60a96d671f6",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "fa92a412-3004-4414-b40b-a683653ccad2",
+   "toNodeId": "5207d3df-9b83-4e32-8fb6-5eecc36bf3df",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 6.48,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201056.1,
+     557382.12,
+     136.7
+    ],
+    [
+     201057.73,
+     557383.25,
+     136.7
+    ],
+    [
+     201059.65,
+     557387.32,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "4800e550-71c4-46f3-8aea-fc5002df6d80",
+   "name": "북악관 엘리베이터 1F-2F (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5b6e2c78-3bd5-4e43-b2a5-bb9f7f0ba6b8",
+   "toNodeId": "5aa5dddf-e783-41d0-84df-87e852e4b6a6",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     136.7
+    ],
+    [
+     201053.66,
+     557385.65,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "2677d707-2eec-4cf4-839a-acc83d3faa1b",
+   "name": "북악관 1F 엘리베이터 앞 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5b6e2c78-3bd5-4e43-b2a5-bb9f7f0ba6b8",
+   "toNodeId": "1b3868d8-5fd6-431f-942c-0f15c165fe23",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 6.45,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     136.7
+    ],
+    [
+     201050.97,
+     557379.79,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "384246b2-f7bb-4afb-aeb7-707a6265847e",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "596405f1-d19b-4c69-8801-fafd209e409a",
+   "toNodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 13.72,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201047,
+     557367.62,
+     136.29
+    ],
+    [
+     201048.72,
+     557370.91,
+     136.7
+    ],
+    [
+     201052.98,
+     557379.96,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "5e2f8114-5be6-4674-90d0-73e6d2119828",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "f4a2f4e6-4d8b-404b-b662-7a85b8c2b074",
+   "toNodeId": "c8fce788-5494-4baf-a967-b8ba0dc24fb1",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 4.4,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201016.9,
+     557399.83,
+     136.84
+    ],
+    [
+     201014.37,
+     557396.23,
+     136.6
+    ]
+   ]
+  },
+  {
+   "id": "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+   "name": "북악관 1F 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 3,
+   "fromNodeId": "1b3868d8-5fd6-431f-942c-0f15c165fe23",
+   "toNodeId": "c8fce788-5494-4baf-a967-b8ba0dc24fb1",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 40.29,
+   "vertexCount": 7,
+   "coordinates": [
+    [
+     201050.97,
+     557379.79,
+     136.7
+    ],
+    [
+     201048.12,
+     557381.1,
+     136.7
+    ],
+    [
+     201046.46,
+     557381.26,
+     136.7
+    ],
+    [
+     201037.41,
+     557385.88,
+     136.7
+    ],
+    [
+     201028.43,
+     557390.27,
+     136.7
+    ],
+    [
+     201022.64,
+     557393.44,
+     136.65
+    ],
+    [
+     201014.37,
+     557396.23,
+     136.6
+    ]
+   ]
+  },
+  {
+   "id": "a648c084-deeb-42c0-821f-1acebf23746d",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "c8fce788-5494-4baf-a967-b8ba0dc24fb1",
+   "toNodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 12.38,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201014.37,
+     557396.23,
+     136.6
+    ],
+    [
+     201011.3,
+     557391.22,
+     136.6
+    ],
+    [
+     201008.38,
+     557387.02,
+     136.45
+    ],
+    [
+     201007.65,
+     557385.84,
+     136.2
+    ]
+   ]
+  },
+  {
+   "id": "aa988488-d892-4632-bae4-55dc0a42de91",
+   "name": "북악관 1F 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142",
+   "toNodeId": "1b3868d8-5fd6-431f-942c-0f15c165fe23",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 2.02,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201052.98,
+     557379.96,
+     136.7
+    ],
+    [
+     201050.97,
+     557379.79,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "c683f1f8-be42-4daf-ad25-513b5586402e",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142",
+   "toNodeId": "fa92a412-3004-4414-b40b-a683653ccad2",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 3.8,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201052.98,
+     557379.96,
+     136.7
+    ],
+    [
+     201056.1,
+     557382.12,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+   "name": "혜인관 방향 지상 경사로 연장 (추정)",
+   "roadClass": "shared",
+   "structure": "ramp",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "allowed",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 6,
+   "fromNodeId": "4f294196-1128-4f28-a093-9033dcaca073",
+   "toNodeId": "ef5a3c9c-2aa4-43f0-8d2b-09f60e561b84",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 36.24,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201106.22,
+     557324.73,
+     141.73
+    ],
+    [
+     201122.5,
+     557317.2,
+     141.73
+    ],
+    [
+     201139.1,
+     557309.5,
+     141.73
+    ]
+   ]
+  },
+  {
+   "id": "5544cab2-86e9-4cf6-94b1-ea319606e83b",
+   "name": "혜인관 B1 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "6532adf0-ae69-4de2-b5a7-4a8c48135cda",
+   "toNodeId": "db8b4e68-99fc-4aad-a375-2c2ec84d2bbd",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 3.21,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201219.81,
+     557227.79,
+     150.84
+    ],
+    [
+     201221.75,
+     557230.35,
+     150.83
+    ]
+   ]
+  },
+  {
+   "id": "96511fe1-a1f0-4326-8c04-7dc1b6746d7d",
+   "name": "혜인관 B1 오른쪽 통로–엘리베이터 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "888ba81d-89d4-403d-8d6e-2af438f68368",
+   "toNodeId": "c1bb2116-7cfe-4869-a53d-96890bd2d51b",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 9.59,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201232.14,
+     557227.82,
+     150.71
+    ],
+    [
+     201234.16,
+     557221.73,
+     150.8
+    ],
+    [
+     201234.22,
+     557218.56,
+     150.8
+    ]
+   ]
+  },
+  {
+   "id": "2e0d36ec-82bc-47ca-8870-30384eebdfee",
+   "name": "혜인관 엘리베이터 B1–6F (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "c1bb2116-7cfe-4869-a53d-96890bd2d51b",
+   "toNodeId": "f70f4996-7b60-47cf-93cf-4d2f859aa5a1",
+   "updatedBy": "C01",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201234.22,
+     557218.56,
+     150.8
+    ],
+    [
+     201234.22,
+     557218.56,
+     171
+    ]
+   ]
+  },
+  {
+   "id": "02d30f2b-98f7-4832-94d6-57dbdd781498",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "62a3ac5d-513c-475f-8d46-e6018e39757a",
+   "toNodeId": "9fb1fd71-befe-43b7-ba37-62bfb5658fa8",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 17.07,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201203,
+     557280.5,
+     150.8
+    ],
+    [
+     201208,
+     557278,
+     150.8
+    ],
+    [
+     201210,
+     557273,
+     150.8
+    ],
+    [
+     201214.63,
+     557269.03,
+     150.66
+    ]
+   ]
+  },
+  {
+   "id": "05378724-6530-4c5e-8918-c8c2bad2f4f5",
+   "name": "북악관 B1 진입 계단 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70",
+   "toNodeId": "7c22ff7d-b71e-449e-b023-f09de53089e6",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.65,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201047.75,
+     557365.67,
+     132.08
+    ],
+    [
+     201048.79,
+     557370.2,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "4ee99835-2ccb-424c-9415-8370f290156d",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "435187c0-ea06-454e-86e5-8796e094b28a",
+   "toNodeId": "9fb1fd71-befe-43b7-ba37-62bfb5658fa8",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 52.57,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201224.38,
+     557230.25,
+     150.26
+    ],
+    [
+     201230.4,
+     557239.47,
+     149.73
+    ],
+    [
+     201234.01,
+     557258.76,
+     150.44
+    ],
+    [
+     201214.63,
+     557269.03,
+     150.66
+    ]
+   ]
+  },
+  {
+   "id": "66f166a8-f9fc-49ea-b5ef-ec4b45cfd145",
+   "name": "문예관 지하–지하 통로 수평 직결 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "문예관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 11,
+   "fromNodeId": "8437e401-a2e7-4ebd-8a83-18d47083dedd",
+   "toNodeId": "55a87aa0-3b19-42fb-8efb-77416a22dc3e",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 13.57,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201105.71,
+     557340.03,
+     136.39
+    ],
+    [
+     201100.3,
+     557327.58,
+     136.39
+    ]
+   ]
+  },
+  {
+   "id": "89ce1806-d956-4d8e-93b0-9a52f517187d",
+   "name": "혜인관 B1 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "db8b4e68-99fc-4aad-a375-2c2ec84d2bbd",
+   "toNodeId": "435187c0-ea06-454e-86e5-8796e094b28a",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.64,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201221.75,
+     557230.35,
+     150.83
+    ],
+    [
+     201224.38,
+     557230.25,
+     150.26
+    ]
+   ]
+  },
+  {
+   "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
+   "name": "지하주차장 경사로 (추정)",
+   "roadClass": "vehicle",
+   "structure": "ramp",
+   "pedestrianAccess": "prohibited",
+   "vehicleAccess": "allowed",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 4,
+   "fromNodeId": "55a87aa0-3b19-42fb-8efb-77416a22dc3e",
+   "toNodeId": "81ff89df-6ba0-4847-b19e-2ddd5e6e8b31",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 51.19,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201100.3,
+     557327.58,
+     136.39
+    ],
+    [
+     201081.2,
+     557336.5,
+     132.21
+    ],
+    [
+     201056.2,
+     557348.2,
+     127.21
+    ],
+    [
+     201053.9,
+     557349.2,
+     126.82
+    ]
+   ]
+  },
+  {
+   "id": "a789c985-e419-4509-a709-76422a37ad0e",
+   "name": "지하주차장 통로 (추정)",
+   "roadClass": "vehicle",
+   "structure": "ordinary",
+   "pedestrianAccess": "prohibited",
+   "vehicleAccess": "allowed",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "79988154-51eb-4e57-bff2-a78064906646",
+   "toNodeId": "70261794-123d-4f91-88f1-ad91717acdcd",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 52.19,
+   "vertexCount": 5,
+   "coordinates": [
+    [
+     201220.61,
+     557232.88,
+     146.94
+    ],
+    [
+     201220.4,
+     557235.4,
+     146.94
+    ],
+    [
+     201222.1,
+     557240.2,
+     146.94
+    ],
+    [
+     201230.5,
+     557260.5,
+     146.91
+    ],
+    [
+     201210.58,
+     557271.18,
+     146.33
+    ]
+   ]
+  },
+  {
+   "id": "b17424ba-23eb-427f-b651-ba390b405e7f",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "9fb1fd71-befe-43b7-ba37-62bfb5658fa8",
+   "toNodeId": "70261794-123d-4f91-88f1-ad91717acdcd",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.58,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201214.63,
+     557269.03,
+     150.66
+    ],
+    [
+     201214.46,
+     557269.12,
+     150.53
+    ],
+    [
+     201210.9,
+     557271.01,
+     145.83
+    ],
+    [
+     201210.58,
+     557271.18,
+     146.33
+    ]
+   ]
+  },
+  {
+   "id": "f99540e3-b6fe-47c7-994d-469bf008c8f6",
+   "name": "북악관 B1 진입 계단 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "18b2d87e-ad27-49b1-84d7-3357dcd817da",
+   "toNodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 1.86,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201047.33,
+     557363.86,
+     131.1
+    ],
+    [
+     201047.75,
+     557365.67,
+     132.08
+    ]
+   ]
+  },
+  {
+   "id": "fa7d28d0-2aee-4d69-b872-eed9c1221284",
+   "name": "혜인관 B1 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "건물5",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "435187c0-ea06-454e-86e5-8796e094b28a",
+   "toNodeId": "888ba81d-89d4-403d-8d6e-2af438f68368",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 8.36,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201224.38,
+     557230.25,
+     150.26
+    ],
+    [
+     201228.13,
+     557230.1,
+     150.94
+    ],
+    [
+     201232.14,
+     557227.82,
+     150.71
+    ]
+   ]
+  },
+  {
+   "id": "bc582299-13e2-458d-a8a2-58acfc8c5df6",
+   "name": "C01·C02 북악관 승강기 앞 연결 143.47m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "3d601a75-fd3d-44ad-82d0-65ed26be9204",
+   "toNodeId": "8ad36f57-f84e-4a8d-a424-2e999cd1e17f",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 3.64,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     143.47
+    ],
+    [
+     201053.66,
+     557385.65,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "d25e1c6d-839d-478f-9cf0-ac66fabbd573",
+   "name": "C01·C02 공통 북악관 동측 복도 143.47m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "df658c8d-ec0a-4b11-ba39-3d2cb32bb5d0",
+   "toNodeId": "34ad3d69-38ad-4a4e-9872-869037e9f208",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     143.47
+    ],
+    [
+     201080,
+     557366,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+   "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "b9854aa3-fe03-462e-b035-e0727d830a65",
+   "toNodeId": "8d47f845-3159-4d24-8d6d-f1a7de9e01f5",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     146.18
+    ],
+    [
+     201053.66,
+     557385.65,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+   "name": "북악관 151.79m 엘리베이터 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "457cc960-64d6-44bc-b13e-607ba3443ef9",
+   "toNodeId": "577d75ff-6421-42f3-bb29-c0f2bd77ee69",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.93,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201057.31,
+     557382.34,
+     151.79
+    ],
+    [
+     201053.66,
+     557385.65,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+   "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e57f45e3-f457-4004-ae0b-91e33563b8b1",
+   "toNodeId": "7f7fb1a8-df9b-4170-b2e2-b82a435202d3",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 15.29,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     148.92
+    ],
+    [
+     201051.76,
+     557388.83,
+     149.88
+    ],
+    [
+     201058.8,
+     557385.51,
+     150.83
+    ],
+    [
+     201057.31,
+     557382.34,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+   "name": "북악관 148.92m 엘리베이터 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e57f45e3-f457-4004-ae0b-91e33563b8b1",
+   "toNodeId": "8d47f845-3159-4d24-8d6d-f1a7de9e01f5",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 3.64,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     148.92
+    ],
+    [
+     201053.66,
+     557385.65,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+   "name": "북악관 151.79m 계단 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "82c5e128-0fdc-4091-9c09-bc78e64da3dd",
+   "toNodeId": "457cc960-64d6-44bc-b13e-607ba3443ef9",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 9.27,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     151.79
+    ],
+    [
+     201057.31,
+     557382.34,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+   "name": "북악관 154.51m 계단 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z154.51_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e90ce3a9-bf42-43cf-964c-2e4e5a17ab6b",
+   "toNodeId": "2c228325-1083-4ac4-a46f-72cc1e073fdf",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.54,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     154.51
+    ],
+    [
+     201050.05,
+     557385.21,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "981f886c-9429-4f48-aa71-701a741d0241",
+   "name": "북악관 146.18m 동측 복도 (C01·C02 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "083a9fbd-dd57-4618-b34e-c426a1fe97fe",
+   "toNodeId": "ab79bb5d-8528-45dc-b498-f9df2c4a51eb",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     146.18
+    ],
+    [
+     201080,
+     557366,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+   "name": "북악관 151.79m 동측 복도 (C01·C02 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "82c5e128-0fdc-4091-9c09-bc78e64da3dd",
+   "toNodeId": "19fad869-1f57-463e-8f1c-2d7d830052b2",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     151.79
+    ],
+    [
+     201080,
+     557366,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+   "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z143.47_추정",
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "8ad36f57-f84e-4a8d-a424-2e999cd1e17f",
+   "toNodeId": "b9854aa3-fe03-462e-b035-e0727d830a65",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     143.47
+    ],
+    [
+     201053.66,
+     557385.65,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "b5895273-5301-4145-9073-50f94199db29",
+   "name": "북악관 146.18m 엘리베이터 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "961562f7-52aa-4b29-8c5a-d1052c019c32",
+   "toNodeId": "b9854aa3-fe03-462e-b035-e0727d830a65",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.93,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201057.31,
+     557382.34,
+     146.18
+    ],
+    [
+     201053.66,
+     557385.65,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "b6003357-d22d-494c-b66c-600be0fdf83c",
+   "name": "북악관 154.51m 동측 복도 (C01·C02 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z154.51_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e90ce3a9-bf42-43cf-964c-2e4e5a17ab6b",
+   "toNodeId": "4b9f3d20-2a10-4591-ac50-5801cc7e2206",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     154.51
+    ],
+    [
+     201080,
+     557366,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+   "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z143.47_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "27aa7e45-0453-4242-a2bf-e56abe03b5db",
+   "toNodeId": "ad3b4f4e-c3e0-4b3b-beed-738a517108d0",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 15.29,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     143.47
+    ],
+    [
+     201051.76,
+     557388.83,
+     144.37
+    ],
+    [
+     201058.8,
+     557385.51,
+     145.28
+    ],
+    [
+     201057.31,
+     557382.34,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+   "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "8d47f845-3159-4d24-8d6d-f1a7de9e01f5",
+   "toNodeId": "577d75ff-6421-42f3-bb29-c0f2bd77ee69",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     148.92
+    ],
+    [
+     201053.66,
+     557385.65,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "d21b1693-a659-41c4-aedc-d98191848484",
+   "name": "북악관 148.92m 동측 복도 (C01·C02 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "16137e42-e6d4-4a8b-bd00-4d37eb1d009f",
+   "toNodeId": "a8c3227c-d98d-4630-9913-a7b26882f362",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     148.92
+    ],
+    [
+     201080,
+     557366,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+   "name": "북악관 148.92m 계단 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "16137e42-e6d4-4a8b-bd00-4d37eb1d009f",
+   "toNodeId": "e57f45e3-f457-4004-ae0b-91e33563b8b1",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.54,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     148.92
+    ],
+    [
+     201050.05,
+     557385.21,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "e518e939-8007-410f-a9ea-40066525647a",
+   "name": "북악관 154.51m 엘리베이터 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z154.51_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "2c228325-1083-4ac4-a46f-72cc1e073fdf",
+   "toNodeId": "62c49cff-ddee-4180-aec2-1afd0156cf30",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 3.64,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201050.05,
+     557385.21,
+     154.51
+    ],
+    [
+     201053.66,
+     557385.65,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "ec2088ac-3376-427f-8f19-b68842675430",
+   "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "577d75ff-6421-42f3-bb29-c0f2bd77ee69",
+   "toNodeId": "62c49cff-ddee-4180-aec2-1afd0156cf30",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     151.79
+    ],
+    [
+     201053.66,
+     557385.65,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+   "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "961562f7-52aa-4b29-8c5a-d1052c019c32",
+   "toNodeId": "963167e1-3f3a-495b-8b67-bdf4b40c69f0",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 15.29,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201057.31,
+     557382.34,
+     146.18
+    ],
+    [
+     201058.8,
+     557385.51,
+     147.09
+    ],
+    [
+     201051.76,
+     557388.83,
+     148.01
+    ],
+    [
+     201050.05,
+     557385.21,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+   "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "457cc960-64d6-44bc-b13e-607ba3443ef9",
+   "toNodeId": "ce704289-d6f0-4e23-ab11-ac82621818c3",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 15.29,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201057.31,
+     557382.34,
+     151.79
+    ],
+    [
+     201058.8,
+     557385.51,
+     152.7
+    ],
+    [
+     201051.76,
+     557388.83,
+     153.6
+    ],
+    [
+     201050.05,
+     557385.21,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+   "name": "북악관 146.18m 계단 앞 복도 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "083a9fbd-dd57-4618-b34e-c426a1fe97fe",
+   "toNodeId": "961562f7-52aa-4b29-8c5a-d1052c019c32",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 9.27,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     146.18
+    ],
+    [
+     201057.31,
+     557382.34,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "1d983e3a-7994-467c-8798-d6d20babff1e",
+   "name": "유담관 9층 입구 통로 (두 C01 종합·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 5,
+   "fromNodeId": "6aef72a9-302d-4cc5-9783-3cc503cb24cd",
+   "toNodeId": "6404f1ee-fc55-447f-9f8a-bcae0af0f211",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 12.44,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201018.15,
+     557313.89,
+     130.97
+    ],
+    [
+     201019.59,
+     557301.53,
+     130.97
+    ]
+   ]
+  },
+  {
+   "id": "699d0cbc-b66b-411d-898a-f02e32f74d9a",
+   "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 5,
+   "fromNodeId": "6404f1ee-fc55-447f-9f8a-bcae0af0f211",
+   "toNodeId": "43a7f874-9382-496b-ad7c-62953e1ac02f",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 11.68,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201019.59,
+     557301.53,
+     130.97
+    ],
+    [
+     201025.2,
+     557291.29,
+     129.38
+    ]
+   ]
+  },
+  {
+   "id": "6b1caa1e-f87a-42c8-a923-1dee7551fcbe",
+   "name": "유담관 하부 복도–좌회전 홀 (배치 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 11,
+   "fromNodeId": "43a7f874-9382-496b-ad7c-62953e1ac02f",
+   "toNodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 22.02,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201025.2,
+     557291.29,
+     129.38
+    ],
+    [
+     201034,
+     557282,
+     129.48
+    ],
+    [
+     201040,
+     557275,
+     129.6
+    ]
+   ]
+  },
+  {
+   "id": "ccdf841c-c47e-43d2-8242-5991cf86e0cd",
+   "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 3,
+   "fromNodeId": "7a96cfec-f28c-4df2-9222-fe40122ce2dd",
+   "toNodeId": "6aef72a9-302d-4cc5-9783-3cc503cb24cd",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 64.04,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201006.82,
+     557375.82,
+     134.4
+    ],
+    [
+     201017.71,
+     557345.18,
+     131.25
+    ],
+    [
+     201019.84,
+     557330.32,
+     130.37
+    ],
+    [
+     201018.15,
+     557313.89,
+     130.97
+    ]
+   ]
+  },
+  {
+   "id": "307a8b1b-6c76-405e-be09-e35f7227148d",
+   "name": "유담관 상부 복도 (파란 탑다운 스케치 반영·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 13,
+   "fromNodeId": "9996fe24-ccd2-40cb-a7f4-5c4564e13d1d",
+   "toNodeId": "e69e6eaf-bc70-459a-be95-1f639a92cc3a",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 50.28,
+   "vertexCount": 4,
+   "coordinates": [
+    [
+     201041.6,
+     557278.6,
+     152.84
+    ],
+    [
+     201060,
+     557265,
+     152.84
+    ],
+    [
+     201055,
+     557258,
+     152.84
+    ],
+    [
+     201070,
+     557246.67,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "41f8f6bb-5799-49b9-ac96-5b7662f24438",
+   "name": "유담관 2호기 상부 진입 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "a5e73293-3242-4f34-8f6c-8ec50e34da6b",
+   "toNodeId": "08027816-91ca-4216-b5d3-3621ccb230e9",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.95,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201039.9,
+     557282.05,
+     152.84
+    ],
+    [
+     201042.6,
+     557280.85,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "455d51e2-e380-47cd-9442-0487af1bdf63",
+   "name": "유담관 1호기 상부 진입 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "8edf3ec8-15e1-40e0-b940-ce6fa601c2e4",
+   "toNodeId": "9996fe24-ccd2-40cb-a7f4-5c4564e13d1d",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.95,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201038.9,
+     557279.8,
+     152.84
+    ],
+    [
+     201041.6,
+     557278.6,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "8cb797d8-618d-4a41-8583-76e7bc2e3840",
+   "name": "유담관 1호기 하부 진입 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "e87f1dc7-9a59-424d-97f3-8c3c612775a8",
+   "toNodeId": "579de68b-630e-4383-8f48-bbde6c2081e4",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.95,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201041.6,
+     557278.6,
+     129.6
+    ],
+    [
+     201038.9,
+     557279.8,
+     129.6
+    ]
+   ]
+  },
+  {
+   "id": "939842ce-bf43-489d-a54e-551abf89a57e",
+   "name": "유담관 상부 엘리베이터 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "9996fe24-ccd2-40cb-a7f4-5c4564e13d1d",
+   "toNodeId": "08027816-91ca-4216-b5d3-3621ccb230e9",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.46,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201041.6,
+     557278.6,
+     152.84
+    ],
+    [
+     201042.6,
+     557280.85,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "99c5e3df-b265-427c-8aa2-a153b161261a",
+   "name": "유담관 하부 엘리베이터 홀 (배치 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c",
+   "toNodeId": "e87f1dc7-9a59-424d-97f3-8c3c612775a8",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 3.94,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201040,
+     557275,
+     129.6
+    ],
+    [
+     201041.6,
+     557278.6,
+     129.6
+    ]
+   ]
+  },
+  {
+   "id": "b6f48838-d3d6-434b-84a4-948ad46c6a4d",
+   "name": "유담관 2호기 하부 진입 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "d2d874c1-f904-46c6-ba5c-3158ecb3649c",
+   "toNodeId": "f0ea58d8-af3c-4f3d-831f-c3fe50871cf1",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.95,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201042.6,
+     557280.85,
+     129.6
+    ],
+    [
+     201039.9,
+     557282.05,
+     129.6
+    ]
+   ]
+  },
+  {
+   "id": "d468a7c5-6c73-4f97-b014-480365d8e67d",
+   "name": "유담관 하부 엘리베이터 홀 (배치 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 9,
+   "fromNodeId": "e87f1dc7-9a59-424d-97f3-8c3c612775a8",
+   "toNodeId": "d2d874c1-f904-46c6-ba5c-3158ecb3649c",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.46,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201041.6,
+     557278.6,
+     129.6
+    ],
+    [
+     201042.6,
+     557280.85,
+     129.6
+    ]
+   ]
+  },
+  {
+   "id": "32bfe8b6-7697-459a-9a85-cb77bec9333c",
+   "name": "유담관 1호기 129.6–145.22m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "579de68b-630e-4383-8f48-bbde6c2081e4",
+   "toNodeId": "fc8de57f-0e6b-42ad-b701-b5c4e921016e",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201038.9,
+     557279.8,
+     129.6
+    ],
+    [
+     201038.9,
+     557279.8,
+     145.22
+    ]
+   ]
+  },
+  {
+   "id": "807392da-a5f4-4c8e-99e8-22b823126d03",
+   "name": "유담관 2호기 129.6–145.22m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "f0ea58d8-af3c-4f3d-831f-c3fe50871cf1",
+   "toNodeId": "62056113-04b2-43c3-ba37-cc0bbb949f74",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201039.9,
+     557282.05,
+     129.6
+    ],
+    [
+     201039.9,
+     557282.05,
+     145.22
+    ]
+   ]
+  },
+  {
+   "id": "b95a79a7-cbe1-4fc4-8c0a-9e774ed8c742",
+   "name": "유담관 1호기 145.22–152.84m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "fc8de57f-0e6b-42ad-b701-b5c4e921016e",
+   "toNodeId": "8edf3ec8-15e1-40e0-b940-ce6fa601c2e4",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201038.9,
+     557279.8,
+     145.22
+    ],
+    [
+     201038.9,
+     557279.8,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "cc578ff6-1324-493c-9649-f8f1a29fc96f",
+   "name": "유담관 2호기 145.22–152.84m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "유담관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "62056113-04b2-43c3-ba37-cc0bbb949f74",
+   "toNodeId": "a5e73293-3242-4f34-8f6c-8ec50e34da6b",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201039.9,
+     557282.05,
+     145.22
+    ],
+    [
+     201039.9,
+     557282.05,
+     152.84
+    ]
+   ]
+  },
+  {
+   "id": "344d1f3f-6175-4932-9f27-59aa120fdace",
+   "name": "북악관 1F 1·2호기 공용 홀 (배치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5b6e2c78-3bd5-4e43-b2a5-bb9f7f0ba6b8",
+   "toNodeId": "c3ef5cd4-fe22-4ebe-8fe7-d408d2073a3b",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     136.7
+    ],
+    [
+     201055.92,
+     557384.59,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "427ac753-4c1e-4c0a-a404-8217058f3ca2",
+   "name": "북악관 2F 1·2호기 공용 홀 (배치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5aa5dddf-e783-41d0-84df-87e852e4b6a6",
+   "toNodeId": "9798b171-74b2-4f58-bbb0-a4d076b611e3",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     140.6
+    ],
+    [
+     201055.92,
+     557384.59,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "cc1b136f-ea3f-4975-bb88-8ac6ac9e6925",
+   "name": "북악관 B1 1·2호기 공용 홀 (배치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "7698e723-d076-4323-bd60-4e2533d73417",
+   "toNodeId": "84c00557-ed14-4bfb-9a4a-b5477ae7ff17",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     132.8
+    ],
+    [
+     201055.92,
+     557384.59,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "c14a8753-ae0a-4650-ac2b-57b0c9373a69",
+   "name": "북악관 2호기 1F–2F (배치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "c3ef5cd4-fe22-4ebe-8fe7-d408d2073a3b",
+   "toNodeId": "9798b171-74b2-4f58-bbb0-a4d076b611e3",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     136.7
+    ],
+    [
+     201055.92,
+     557384.59,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "d0ee3d82-b9cd-4b69-82a9-f246d9eface7",
+   "name": "북악관 2호기 B1–1F (배치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "84c00557-ed14-4bfb-9a4a-b5477ae7ff17",
+   "toNodeId": "c3ef5cd4-fe22-4ebe-8fe7-d408d2073a3b",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     132.8
+    ],
+    [
+     201055.92,
+     557384.59,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+   "name": "북악관 148.92m 1·2호기 공용 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "8d47f845-3159-4d24-8d6d-f1a7de9e01f5",
+   "toNodeId": "2f378d78-5eea-42e7-a838-f3550bdd8781",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     148.92
+    ],
+    [
+     201055.92,
+     557384.59,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "0dc5293d-646f-413d-af95-324716677939",
+   "name": "북악관 143.47m 1·2호기 공용 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "8ad36f57-f84e-4a8d-a424-2e999cd1e17f",
+   "toNodeId": "0cb15ed1-e2b4-4c0c-af66-2a074112e810",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     143.47
+    ],
+    [
+     201055.92,
+     557384.59,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "53bd7d38-a552-48bb-8310-cb6803e9ba34",
+   "name": "북악관 1호기 2F–143.47m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "5aa5dddf-e783-41d0-84df-87e852e4b6a6",
+   "toNodeId": "8ad36f57-f84e-4a8d-a424-2e999cd1e17f",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     140.6
+    ],
+    [
+     201053.66,
+     557385.65,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+   "name": "북악관 146.18m 1·2호기 공용 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "b9854aa3-fe03-462e-b035-e0727d830a65",
+   "toNodeId": "b9d8e78f-cdb1-4676-a5b8-af5ac2cbb9bc",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     146.18
+    ],
+    [
+     201055.92,
+     557384.59,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+   "name": "북악관 154.51m 1·2호기 공용 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z154.51_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "62c49cff-ddee-4180-aec2-1afd0156cf30",
+   "toNodeId": "51e1f4f1-4df0-4d60-ae87-9dc747ad36b5",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     154.51
+    ],
+    [
+     201055.92,
+     557384.59,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "d71001fc-4918-48b3-ad45-8eba5f6c6b91",
+   "name": "북악관 151.79m 1·2호기 공용 홀 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "577d75ff-6421-42f3-bb29-c0f2bd77ee69",
+   "toNodeId": "9f48b4d8-971f-467b-b917-1d51a235a659",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.5,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201053.66,
+     557385.65,
+     151.79
+    ],
+    [
+     201055.92,
+     557384.59,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+   "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "2f378d78-5eea-42e7-a838-f3550bdd8781",
+   "toNodeId": "9f48b4d8-971f-467b-b917-1d51a235a659",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     148.92
+    ],
+    [
+     201055.92,
+     557384.59,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+   "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "b9d8e78f-cdb1-4676-a5b8-af5ac2cbb9bc",
+   "toNodeId": "2f378d78-5eea-42e7-a838-f3550bdd8781",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     146.18
+    ],
+    [
+     201055.92,
+     557384.59,
+     148.92
+    ]
+   ]
+  },
+  {
+   "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+   "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "9f48b4d8-971f-467b-b917-1d51a235a659",
+   "toNodeId": "51e1f4f1-4df0-4d60-ae87-9dc747ad36b5",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     151.79
+    ],
+    [
+     201055.92,
+     557384.59,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "6e61a9c3-4403-49d7-adb0-3c35d530795b",
+   "name": "북악관 2호기 140.6–143.47m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "9798b171-74b2-4f58-bbb0-a4d076b611e3",
+   "toNodeId": "0cb15ed1-e2b4-4c0c-af66-2a074112e810",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     140.6
+    ],
+    [
+     201055.92,
+     557384.59,
+     143.47
+    ]
+   ]
+  },
+  {
+   "id": "bfc76c5f-d0e8-4ac9-87a1-6055d8710787",
+   "name": "북악관 2호기 143.47–146.18m (층·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "elevator",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "0cb15ed1-e2b4-4c0c-af66-2a074112e810",
+   "toNodeId": "b9d8e78f-cdb1-4676-a5b8-af5ac2cbb9bc",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 0,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.92,
+     557384.59,
+     143.47
+    ],
+    [
+     201055.92,
+     557384.59,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "23de6a42-cec7-4f92-b856-c1c043944a95",
+   "name": "문예관 상부 진입 통로 (C02 seq 839–855·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "문예관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 10,
+   "fromNodeId": "0c198093-87b2-43ce-a737-399c4532cee3",
+   "toNodeId": "c6e0f72b-040f-43bb-8d10-78f9c396ed52",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 15.21,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201107.67,
+     557339.65,
+     142.44
+    ],
+    [
+     201111.98,
+     557347.78,
+     142.44
+    ],
+    [
+     201112.56,
+     557341.8,
+     142.44
+    ]
+   ]
+  },
+  {
+   "id": "48061bd1-f52a-4457-a604-0f58e82a9503",
+   "name": "문예관 내부 하행계단 (C02 seq 855–878·단차 약6m 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": "문예관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 10,
+   "fromNodeId": "c6e0f72b-040f-43bb-8d10-78f9c396ed52",
+   "toNodeId": "5a91f23c-a2cf-4d24-97b2-081268c9021e",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 14.37,
+   "vertexCount": 5,
+   "coordinates": [
+    [
+     201112.56,
+     557341.8,
+     142.44
+    ],
+    [
+     201118.77,
+     557337.55,
+     140.76
+    ],
+    [
+     201115.75,
+     557338.02,
+     139.92
+    ],
+    [
+     201116.15,
+     557338.87,
+     139.12
+    ],
+    [
+     201118.67,
+     557337.53,
+     136.39
+    ]
+   ]
+  },
+  {
+   "id": "131616f9-8371-4661-80d1-4e13fc0b5609",
+   "name": "문예관 계단 아래 공간 동선 (C02 seq 878–893·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "문예관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 10,
+   "fromNodeId": "5a91f23c-a2cf-4d24-97b2-081268c9021e",
+   "toNodeId": "8437e401-a2e7-4ebd-8a83-18d47083dedd",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 16.31,
+   "vertexCount": 5,
+   "coordinates": [
+    [
+     201118.67,
+     557337.53,
+     136.39
+    ],
+    [
+     201111.92,
+     557342.42,
+     136.39
+    ],
+    [
+     201109.85,
+     557342.44,
+     136.39
+    ],
+    [
+     201109.06,
+     557340.01,
+     136.39
+    ],
+    [
+     201105.71,
+     557340.03,
+     136.39
+    ]
+   ]
+  },
+  {
+   "id": "1f32cde9-0620-497f-b795-20371e9373c5",
+   "name": "대일관 1층 높이 접근 통로 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "201ea83a-116e-4b16-88e8-3e353b191ef1",
+   "toNodeId": "bd4051c1-3e4b-44e1-b96f-8198f6ed67d4",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 23.81,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201192.29,
+     557323.23,
+     145.8
+    ],
+    [
+     201175.81,
+     557327.17,
+     145.8
+    ],
+    [
+     201169.23,
+     557329.12,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "3ab80c19-6983-43c8-a561-2542daf2d82d",
+   "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 6,
+   "fromNodeId": "6cf7b843-5322-4500-b70b-3b0d124bd9e7",
+   "toNodeId": "0c198093-87b2-43ce-a737-399c4532cee3",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 1.91,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201109.5,
+     557339.1,
+     142.44
+    ],
+    [
+     201107.67,
+     557339.65,
+     142.44
+    ]
+   ]
+  },
+  {
+   "id": "9112314a-18aa-4821-821b-22528d8dcf91",
+   "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 7,
+   "fromNodeId": "b5e0b6b5-4ec8-4064-82c0-0f848faf2ed4",
+   "toNodeId": "6cf7b843-5322-4500-b70b-3b0d124bd9e7",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 6.76,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201115.99,
+     557337.2,
+     142.44
+    ],
+    [
+     201109.5,
+     557339.1,
+     142.44
+    ]
+   ]
+  },
+  {
+   "id": "9a3cce3f-8640-430e-9ab8-41806697359f",
+   "name": "대일관 1층 내부 통로 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "대일관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 2,
+   "fromNodeId": "bd4051c1-3e4b-44e1-b96f-8198f6ed67d4",
+   "toNodeId": "016416b6-3d6d-4c03-80c1-ba09b1856066",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 14.51,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201169.23,
+     557329.12,
+     145.8
+    ],
+    [
+     201166.38,
+     557326.88,
+     145.8
+    ],
+    [
+     201162.8,
+     557316.6,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "a03d33c3-08b0-4bc6-ae9f-40b83c3296de",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "7895ac0d-084b-467f-a57d-75a35e02c435",
+   "toNodeId": "05b7fa85-1674-4f68-9e15-19734386be6f",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 192.29,
+   "vertexCount": 19,
+   "coordinates": [
+    [
+     201018.47,
+     557413.32,
+     128.13
+    ],
+    [
+     201027.46,
+     557408.82,
+     130.66
+    ],
+    [
+     201031.05,
+     557407.02,
+     131.4
+    ],
+    [
+     201110.12,
+     557367.43,
+     131.14
+    ],
+    [
+     201111.91,
+     557366.53,
+     133.63
+    ],
+    [
+     201113.71,
+     557365.63,
+     135.46
+    ],
+    [
+     201122.69,
+     557361.13,
+     136.16
+    ],
+    [
+     201124.49,
+     557360.23,
+     137.8
+    ],
+    [
+     201128.09,
+     557358.43,
+     137.83
+    ],
+    [
+     201129.88,
+     557357.53,
+     138.61
+    ],
+    [
+     201131.68,
+     557356.63,
+     138.31
+    ],
+    [
+     201133.48,
+     557355.73,
+     138.9
+    ],
+    [
+     201135.27,
+     557354.83,
+     140.21
+    ],
+    [
+     201138.87,
+     557353.03,
+     140.82
+    ],
+    [
+     201151.15,
+     557351.75,
+     140.71
+    ],
+    [
+     201157.3,
+     557351.11,
+     141.85
+    ],
+    [
+     201161.39,
+     557350.68,
+     143.44
+    ],
+    [
+     201179.82,
+     557348.76,
+     141.55
+    ],
+    [
+     201196.2,
+     557347.05,
+     142.8
+    ]
+   ]
+  },
+  {
+   "id": "a7a51d3c-af49-4127-83ef-d4157247f27b",
+   "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 8,
+   "fromNodeId": "59f9ab35-4014-406b-8b55-c743b768d9ca",
+   "toNodeId": "85a0ed07-cb3a-4821-9961-93931f37e876",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 11.13,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201125.78,
+     557324.57,
+     143.8
+    ],
+    [
+     201115.65,
+     557329.17,
+     142.44
+    ]
+   ]
+  },
+  {
+   "id": "fdb059c4-bf4d-47fb-9596-c54bc0bae613",
+   "name": "문예관 하행계단 아래 평탄부 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 8,
+   "fromNodeId": "85a0ed07-cb3a-4821-9961-93931f37e876",
+   "toNodeId": "b5e0b6b5-4ec8-4064-82c0-0f848faf2ed4",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 8.04,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201115.65,
+     557329.17,
+     142.44
+    ],
+    [
+     201115.99,
+     557337.2,
+     142.44
+    ]
+   ]
+  },
+  {
+   "id": "1d10b963-7f99-4879-bbf3-71ea9006d64f",
+   "name": "대일관 측면 주 상행계단 (스케치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "b4b71955-4282-4f9b-a31a-5bf70beeb76a",
+   "toNodeId": "ae9643cf-d920-418c-ae93-0bb74647d137",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2.66,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201194.52,
+     557336.81,
+     142.8
+    ],
+    [
+     201194.09,
+     557334.19,
+     145.35
+    ]
+   ]
+  },
+  {
+   "id": "64c08202-c303-4049-a633-a27797fcb287",
+   "name": "대일관 측면 중간 계단참 (스케치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "ae9643cf-d920-418c-ae93-0bb74647d137",
+   "toNodeId": "2b281741-aacd-4c3b-972a-c28d17cff285",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 6.52,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201194.09,
+     557334.19,
+     145.35
+    ],
+    [
+     201193.03,
+     557327.76,
+     145.35
+    ]
+   ]
+  },
+  {
+   "id": "9c73ebe5-590c-455d-8c72-15a125e413af",
+   "name": "대일관 측면 상부 평탄 연결부 (스케치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "52dc5dbd-7dcf-45f7-a4d7-6611e8f0cc82",
+   "toNodeId": "201ea83a-116e-4b16-88e8-3e353b191ef1",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 3.14,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201192.8,
+     557326.33,
+     145.8
+    ],
+    [
+     201192.29,
+     557323.23,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "a714275b-1647-4e6b-b5ba-067820204bd3",
+   "name": "대일관 측면 짧은 상행계단 (스케치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "2b281741-aacd-4c3b-972a-c28d17cff285",
+   "toNodeId": "52dc5dbd-7dcf-45f7-a4d7-6611e8f0cc82",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 1.45,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201193.03,
+     557327.76,
+     145.35
+    ],
+    [
+     201192.8,
+     557326.33,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "d8ae25f8-0598-470e-9a61-020e473e1267",
+   "name": "대일관 측면 하부 평탄 접근부 (스케치·고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "05b7fa85-1674-4f68-9e15-19734386be6f",
+   "toNodeId": "b4b71955-4282-4f9b-a31a-5bf70beeb76a",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 10.38,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201196.2,
+     557347.05,
+     142.8
+    ],
+    [
+     201194.52,
+     557336.81,
+     142.8
+    ]
+   ]
+  },
+  {
+   "id": "3910b4a5-0b5f-4226-bdf5-8f2c8eca99fb",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "unknown",
+   "vehicleDirection": "unknown",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "561a12b4-2022-431c-ad95-b979b396be16",
+   "toNodeId": "435187c0-ea06-454e-86e5-8796e094b28a",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 148.9,
+   "vertexCount": 13,
+   "coordinates": [
+    [
+     201157.33,
+     557301.3,
+     141.73
+    ],
+    [
+     201150.87,
+     557262.58,
+     141.75
+    ],
+    [
+     201157.08,
+     557248.59,
+     141.73
+    ],
+    [
+     201171.32,
+     557237.27,
+     140.66
+    ],
+    [
+     201191.88,
+     557220.92,
+     140
+    ],
+    [
+     201193.46,
+     557219.66,
+     141.13
+    ],
+    [
+     201195.04,
+     557218.4,
+     143.54
+    ],
+    [
+     201198.2,
+     557215.89,
+     145.04
+    ],
+    [
+     201209.27,
+     557207.08,
+     145.29
+    ],
+    [
+     201212.61,
+     557212.2,
+     145.44
+    ],
+    [
+     201213.72,
+     557213.9,
+     148.09
+    ],
+    [
+     201214.83,
+     557215.6,
+     149.5
+    ],
+    [
+     201224.38,
+     557230.25,
+     150.26
+    ]
+   ]
+  },
+  {
+   "id": "45682ee7-491c-46b6-a339-2583adc191f2",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "unknown",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "ef5a3c9c-2aa4-43f0-8d2b-09f60e561b84",
+   "toNodeId": "561a12b4-2022-431c-ad95-b979b396be16",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 19.99,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201139.1,
+     557309.5,
+     141.73
+    ],
+    [
+     201157.33,
+     557301.3,
+     141.73
+    ]
+   ]
+  },
+  {
+   "id": "19800cee-5ba4-4471-bbc9-4f903d383a0c",
+   "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "016416b6-3d6d-4c03-80c1-ba09b1856066",
+   "toNodeId": "0e650ceb-f600-4048-b8c6-7edf5b60b450",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 7.56,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201162.8,
+     557316.6,
+     145.8
+    ],
+    [
+     201160.58,
+     557309.37,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "88ba01e6-7ed5-4b85-a757-fd0fc1416c75",
+   "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "0e650ceb-f600-4048-b8c6-7edf5b60b450",
+   "toNodeId": "561a12b4-2022-431c-ad95-b979b396be16",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 8.7,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201160.58,
+     557309.37,
+     145.8
+    ],
+    [
+     201157.33,
+     557301.3,
+     141.73
+    ]
+   ]
+  },
+  {
+   "id": "00cd9c0f-a60e-45b1-b32b-ea44a769face",
+   "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "552b685d-7357-480b-be53-b002346170a4",
+   "toNodeId": "e0591f2c-9328-415b-bed5-76aa36ded999",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 2,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201151.12,
+     557313.48,
+     144.8
+    ],
+    [
+     201149.29,
+     557314.28,
+     144.8
+    ]
+   ]
+  },
+  {
+   "id": "2f206e6c-6a72-473a-a455-d1ef2acc62f1",
+   "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e0591f2c-9328-415b-bed5-76aa36ded999",
+   "toNodeId": "d85f61a5-7015-4845-bc4b-a4d38d3808ba",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4.01,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201149.29,
+     557314.28,
+     144.8
+    ],
+    [
+     201145.62,
+     557315.89,
+     143.8
+    ]
+   ]
+  },
+  {
+   "id": "618385b9-0078-485b-856e-772d6e4a0b1e",
+   "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "d85f61a5-7015-4845-bc4b-a4d38d3808ba",
+   "toNodeId": "59f9ab35-4014-406b-8b55-c743b768d9ca",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 21.66,
+   "vertexCount": 3,
+   "coordinates": [
+    [
+     201145.62,
+     557315.89,
+     143.8
+    ],
+    [
+     201140.78,
+     557318.02,
+     143.8
+    ],
+    [
+     201125.78,
+     557324.57,
+     143.8
+    ]
+   ]
+  },
+  {
+   "id": "8e03aa9e-e2c9-4202-99ce-dba5e31228c7",
+   "name": "대일관 전면 상단 평탄부 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "ordinary",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "0e650ceb-f600-4048-b8c6-7edf5b60b450",
+   "toNodeId": "f0cca79e-f83f-4dfd-81cb-acd2e3d48890",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 6.32,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201160.58,
+     557309.37,
+     145.8
+    ],
+    [
+     201154.78,
+     557311.87,
+     145.8
+    ]
+   ]
+  },
+  {
+   "id": "b14ac1da-f26e-4fa7-a953-ed55397bbfa9",
+   "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+   "roadClass": "pedestrian",
+   "structure": "stairs",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "prohibited",
+   "buildingId": null,
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "f0cca79e-f83f-4dfd-81cb-acd2e3d48890",
+   "toNodeId": "552b685d-7357-480b-be53-b002346170a4",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 4,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201154.78,
+     557311.87,
+     145.8
+    ],
+    [
+     201151.12,
+     557313.48,
+     144.8
+    ]
+   ]
+  },
+  {
+   "id": "499d8625-25f7-4045-96bf-508f66d89a3d",
+   "name": "북악관 B1 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d",
+   "toNodeId": "49120230-1d4a-4cfe-810a-891c3c3744d8",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 36.99,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     132.8
+    ],
+    [
+     201081.87,
+     557365.97,
+     132.8
+    ]
+   ]
+  },
+  {
+   "id": "51001632-02d7-4852-8f8e-2f4feb06cfda",
+   "name": "북악관 1F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142",
+   "toNodeId": "58765a5e-a69f-4d8d-a700-76a455da4bff",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 30.41,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201052.98,
+     557379.96,
+     136.7
+    ],
+    [
+     201080,
+     557366,
+     136.7
+    ]
+   ]
+  },
+  {
+   "id": "0d4b3980-e030-4de9-bd32-b0408882c9d4",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "f54bc91a-2973-484d-8bf6-0ca15d6ccbcf",
+   "toNodeId": "cd46ee99-7f1c-40e4-8b4c-1d25dc1b2534",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 7.78,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     140.6
+    ],
+    [
+     201055.16,
+     557377.78,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "2b3d1698-726e-4122-840d-24928872a8ad",
+   "name": null,
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "allowed",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "cd46ee99-7f1c-40e4-8b4c-1d25dc1b2534",
+   "toNodeId": "69181a72-b1ad-4dc0-947b-1b91241d810c",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 5.04,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.16,
+     557377.78,
+     140.6
+    ],
+    [
+     201057.31,
+     557382.34,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "fbfd71bc-f33c-41ad-94a7-aed53ee23e99",
+   "name": "북악관 2F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": null,
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "cd46ee99-7f1c-40e4-8b4c-1d25dc1b2534",
+   "toNodeId": "86b5d51c-9bf5-4aa7-86e9-2056245a9cec",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 29.2,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201055.16,
+     557377.78,
+     140.6
+    ],
+    [
+     201081.87,
+     557365.97,
+     140.6
+    ]
+   ]
+  },
+  {
+   "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+   "name": "북악관 146.18m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z146.18_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "083a9fbd-dd57-4618-b34e-c426a1fe97fe",
+   "toNodeId": "ef425170-a279-4207-a519-6f8291153702",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     146.18
+    ],
+    [
+     201016.24,
+     557396.2,
+     146.18
+    ]
+   ]
+  },
+  {
+   "id": "bb3ea136-968e-41be-a002-198998286f87",
+   "name": "북악관 151.79m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z151.79_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "82c5e128-0fdc-4091-9c09-bc78e64da3dd",
+   "toNodeId": "a58bd182-b563-425c-a156-94a464393db7",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     151.79
+    ],
+    [
+     201016.24,
+     557396.2,
+     151.79
+    ]
+   ]
+  },
+  {
+   "id": "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+   "name": "북악관 154.51m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z154.51_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "e90ce3a9-bf42-43cf-964c-2e4e5a17ab6b",
+   "toNodeId": "779151af-018d-41c4-9ae0-4de210bb38f6",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     154.51
+    ],
+    [
+     201016.24,
+     557396.2,
+     154.51
+    ]
+   ]
+  },
+  {
+   "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+   "name": "북악관 148.92m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+   "roadClass": "pedestrian",
+   "structure": "indoor_corridor",
+   "pedestrianAccess": "unknown",
+   "vehicleAccess": "prohibited",
+   "pedestrianDirection": "both",
+   "vehicleDirection": "both",
+   "widthM": null,
+   "wheelchairAccess": "unknown",
+   "buildingId": "북악관",
+   "levelId": "북악관_Z148.92_추정",
+   "status": "DRAFT",
+   "revision": 1,
+   "fromNodeId": "16137e42-e6d4-4a8b-bd00-4d37eb1d009f",
+   "toNodeId": "511e0acf-8f66-4bd4-81e1-4b1b5581f580",
+   "updatedBy": "C02",
+   "displayColor": null,
+   "lengthM": 35.28,
+   "vertexCount": 2,
+   "coordinates": [
+    [
+     201048.12,
+     557381.1,
+     148.92
+    ],
+    [
+     201016.24,
+     557396.2,
+     148.92
+    ]
+   ]
+  }
+ ]
+}

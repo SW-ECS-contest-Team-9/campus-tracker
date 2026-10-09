@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>CT-M16 후보 미리보기</title>
+<!-- 미리보기 전용. 좌표는 EPSG:5186 미터 그대로(원점 201100,557250만 뺌). 저장·업로드 기능 없음. -->
+<style>
+  body { margin: 0; font: 13px sans-serif; display: flex; height: 100vh; }
+  #side { width: 300px; overflow: auto; padding: 8px; background: #f4f4f4; border-right: 1px solid #ccc; }
+  #view { flex: 1; position: relative; }
+  #tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid #333; padding: 4px; max-width: 360px; display: none; font-size: 12px; }
+  .c { margin: 6px 0; padding: 4px; background: #fff; border-left: 6px solid; }
+  .warn { color: #b00; font-weight: bold; }
+  #cam { font-family: monospace; font-size: 11px; white-space: pre; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="side">
+  <b>CT-M16 후보 3D 미리보기</b>
+  <div class="warn">미리보기 전용 · accuracyVerified=false · 운영 반영 아님</div>
+  <p>
+    <label><input type="checkbox" id="tTerrain" checked> 지형(DEM 2015)</label><br>
+    <label><input type="checkbox" id="tBld" checked> 원본 건물(baseM~roofM)</label><br>
+    <label><input type="checkbox" id="tRoads" checked> 현재 도로(roads-live-2)</label><br>
+    <label><input type="checkbox" id="tCand" checked> 후보 4개</label>
+  </p>
+  <div>현재 도로: 회색=차량 허용, 초록=보행 전용(폭 표시 없음)</div>
+  <div id="list"></div>
+  <div id="cam"></div>
+</div>
+<div id="view"><div id="tip"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+const OX = 201100, OY = 557250;
+// EPSG:5186 (E,N,H) -> three (x=E-OX, y=H, z=-(N-OY))
+const w = (e, n, h) => new THREE.Vector3(e - OX, h, -(n - OY));
+
+const view = document.getElementById('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdde6ee);
+const camera = new THREE.PerspectiveCamera(50, 1, 0.5, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x888866, 1.2));
+const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(-200, 400, 300); scene.add(sun);
+
+const groups = { terrain: new THREE.Group(), bld: new THREE.Group(), roads: new THREE.Group(), cand: new THREE.Group() };
+Object.values(groups).forEach(g => scene.add(g));
+const fatMats = [];
+const get = p => fetch(p).then(r => { if (!r.ok) throw new Error(p); return r; });
+
+// 지형: 행0=남쪽, 셀중심 = origin + (i+0.5)*res
+const meta = await (await get('data/terrain-grid-meta.json')).json();
+const grid = new Float32Array(await (await get('data/terrain-grid.f32')).arrayBuffer());
+{
+  const { width: W, height: H, originX, originY, resolution: R } = meta;
+  const pos = new Float32Array(W * H * 3);
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+    const v = w(originX + (c + 0.5) * R, originY + (r + 0.5) * R, grid[r * W + c]);
+    pos.set([v.x, v.y, v.z], (r * W + c) * 3);
+  }
+  const idx = [];
+  for (let r = 0; r < H - 1; r++) for (let c = 0; c < W - 1; c++) {
+    const a = r * W + c, b = a + 1, d = a + W, e = d + 1;
+    idx.push(a, b, e, a, e, d);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  groups.terrain.add(new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xb9c79a, side: THREE.DoubleSide })));
+}
+
+// 원본 건물: 5186 외곽선 + scene-live baseM/roofM (이름 매칭)
+const outlines = await (await get('data/building-outlines-5186.json')).json();
+const sceneLive = await (await get('data/scene-live.json')).json();
+const hByName = Object.fromEntries(sceneLive.buildings.map(b => [b.name, b]));
+for (const o of outlines) {
+  const h = hByName[o.name]; if (!h) continue;
+  for (const poly of o.coordinates) {
+    const shape = new THREE.Shape(poly[0].map(([e, n]) => new THREE.Vector2(e - OX, n - OY)));
+    for (const hole of poly.slice(1)) shape.holes.push(new THREE.Path(hole.map(([e, n]) => new THREE.Vector2(e - OX, n - OY))));
+    const g = new THREE.ExtrudeGeometry(shape, { depth: h.roofM - h.baseM, bevelEnabled: false });
+    g.rotateX(-Math.PI / 2); g.translate(0, h.baseM, 0);
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xd8cfc0, transparent: true, opacity: 0.55 }));
+    m.userData.info = `원본 건물 ${o.name}\nbaseM ${h.baseM} / roofM ${h.roofM}`;
+    groups.bld.add(m);
+  }
+}
+
+// 현재 도로
+const roads = await (await get('data/roads-live-2.json')).json();
+for (const r of roads.items) {
+  if (!r.coordinates || r.coordinates.length < 2) continue;
+  const g = new THREE.BufferGeometry().setFromPoints(r.coordinates.map(([e, n, h]) => w(e, n, h + 0.1)));
+  const veh = r.vehicleAccess === 'allowed';
+  const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: veh ? 0x555555 : 0x2e9e4f }));
+  l.userData.info = `현재 도로 ${r.id.slice(0, 8)} ${r.roadClass}/${r.structure}`;
+  groups.roads.add(l);
+}
+
+// 후보 4개 (화면 픽셀 두께 선, 물리 폭 아님)
+const STYLE = {
+  'S06-C1': { color: 0xd01010, label: '차도 중심선 후보', dashed: false },
+  'S06-C2': { color: 0xff8c00, label: '단 경계 상단선 후보', dashed: false },
+  'S06-C3': { color: 0x1060e0, label: '단 경계 하단선 후보', dashed: false },
+  'S07-C1': { color: 0xc000c0, label: '지상측 문턱선 후보', dashed: true },
+};
+const cand = await (await get('data/candidates-5186.geojson')).json();
+const list = document.getElementById('list');
+const vtxInfo = [];
+for (const f of cand.features) {
+  const p = f.properties, s = STYLE[p.id];
+  const pts = f.geometry.coordinates.map(([e, n, h]) => w(e, n, h));
+  const lg = new LineGeometry(); lg.setPositions(pts.flatMap(v => [v.x, v.y, v.z]));
+  const mat = new LineMaterial({ color: s.color, linewidth: 5, dashed: s.dashed, dashSize: 1, gapSize: 0.6, depthTest: false });
+  fatMats.push(mat);
+  const line = new Line2(lg, mat); line.computeLineDistances(); line.renderOrder = 10;
+  line.userData.info = `${p.id} ${s.label}\nsurface: ${p.surface}\naccuracyVerified=false (추정)`;
+  groups.cand.add(line);
+  p.vertices.forEach((v, i) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), new THREE.MeshBasicMaterial({ color: s.color, depthTest: false }));
+    m.position.copy(w(v.x, v.y, v.z)); m.renderOrder = 11;
+    m.userData.info = `${p.id} 정점${i}\nE ${v.x} N ${v.y} z ${v.z}\nsrc: ${v.src}\nerr_xy_m_assumed ${v.err_xy_m_assumed}, err_z_m_assumed ${v.err_z_m_assumed}\naccuracyVerified=${v.accuracyVerified}`;
+    groups.cand.add(m);
+    vtxInfo.push({ id: p.id, i, x: v.x, y: v.y, z: v.z });
+  });
+  const div = document.createElement('div'); div.className = 'c';
+  div.style.borderColor = '#' + s.color.toString(16).padStart(6, '0');
+  div.innerHTML = `<b>${p.id}</b> ${s.label}${s.dashed ? ' (점선)' : ''}<br>surface: ${p.surface}<br>${p.kind}<br>` +
+    `<small>출처: ${p.vertices[0].src}</small><br><span class="warn">accuracyVerified=false</span> · 정점 ${p.vertices.length}개 · ` +
+    `err_xy ${p.vertices[0].err_xy_m_assumed}m / err_z ${p.vertices[0].err_z_m_assumed}m (가정)`;
+  list.appendChild(div);
+}
+
+for (const [id, key] of [['tTerrain', 'terrain'], ['tBld', 'bld'], ['tRoads', 'roads'], ['tCand', 'cand']])
+  document.getElementById(id).onchange = e => { groups[key].visible = e.target.checked; };
+
+// hover
+const tip = document.getElementById('tip'), ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+ray.params.Line.threshold = 1;
+renderer.domElement.addEventListener('pointermove', ev => {
+  const rc = renderer.domElement.getBoundingClientRect();
+  mouse.set(((ev.clientX - rc.left) / rc.width) * 2 - 1, -((ev.clientY - rc.top) / rc.height) * 2 + 1);
+  ray.setFromCamera(mouse, camera);
+  // 후보는 항상 위에 그려지므로 후보 적중을 먼저 사용
+  const hit = [groups.cand, groups.bld, groups.roads].filter(g => g.visible)
+    .map(g => ray.intersectObject(g, true).find(h => h.object.userData.info)).find(Boolean);
+  if (!hit) { tip.style.display = 'none'; return; }
+  tip.textContent = hit.object.userData.info; tip.style.whiteSpace = 'pre-wrap';
+  tip.style.left = (ev.clientX - rc.left + 12) + 'px'; tip.style.top = (ev.clientY - rc.top + 12) + 'px'; tip.style.display = 'block';
+});
+
+function resize() {
+  const W = view.clientWidth, H = view.clientHeight;
+  renderer.setSize(W, H); camera.aspect = W / H; camera.updateProjectionMatrix();
+  fatMats.forEach(m => m.resolution.set(W, H));
+}
+window.addEventListener('resize', resize); resize();
+
+// 카메라를 EPSG:5186 좌표로 지정 (검증용)
+function setCam(pos, tgt) { camera.position.copy(w(...pos)); controls.target.copy(w(...tgt)); controls.update(); }
+function camText() {
+  const p = camera.position, t = controls.target, f = v => `${(v.x + OX).toFixed(1)}, ${(-v.z + OY).toFixed(1)}, ${v.y.toFixed(1)}`;
+  return `camera E,N,H: ${f(p)}\ntarget E,N,H: ${f(t)}`;
+}
+// 정점 화면 투영 (검증용, 렌더러 픽셀 좌표)
+function projectVertices() {
+  renderer.render(scene, camera);
+  const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
+  return vtxInfo.map(v => {
+    const q = w(v.x, v.y, v.z).project(camera);
+    return { ...v, sx: Math.round((q.x + 1) / 2 * W), sy: Math.round((1 - q.y) / 2 * H), inView: Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && q.z < 1 };
+  });
+}
+window.preview = { setCam, camText, projectVertices };
+setCam([201000, 557150, 220], [201050, 557250, 115]);
+
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
+</script>
+</body>
+</html>

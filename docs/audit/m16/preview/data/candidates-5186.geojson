@@ -1,0 +1,236 @@
+{
+ "type": "FeatureCollection",
+ "name": "claude-m16-preview-candidates",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "properties": {
+  "status": "미리보기 후보 전용, 운영 반영 금지",
+  "created": "2026-10-09",
+  "accuracyVerified": false,
+  "errorNote": "err_*_assumed는 추정 오차/검토 허용치. 본관 모서리 1점(0.60 m) 일치로 전 지점 정확도를 보장하지 않음"
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "S06-C1",
+    "surface": "ground",
+    "kind": "차도 중심선 후보(유담관-본관 주 오르막)",
+    "note": "평면 위치는 정사 화면 차선·횡단보도로 판독. z는 S-MAP DEM(메시와 같은 계열로 추정, 독립 측량 아님). 보도·계단 보행로는 위치 띠만 확인되어 미작성.",
+    "vertices": [
+     {
+      "x": 201091.11,
+      "y": 557241.71,
+      "z": 117.7,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) + z=S-MAP dem_z(S06-R1)",
+      "err_xy_m_assumed": 1.5,
+      "err_z_m_assumed": 0.5,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201075.75,
+      "y": 557270.59,
+      "z": 121.8,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) + z=S-MAP dem_z(S06-R2)",
+      "err_xy_m_assumed": 1.5,
+      "err_z_m_assumed": 0.5,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201062.18,
+      "y": 557281.71,
+      "z": 123.76,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) + z=S-MAP dem_z(S06-R3)",
+      "err_xy_m_assumed": 1.5,
+      "err_z_m_assumed": 0.5,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201052.66,
+      "y": 557287.23,
+      "z": 125.25,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) + z=S-MAP dem_z(S06-R4)",
+      "err_xy_m_assumed": 1.5,
+      "err_z_m_assumed": 0.5,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201043.19,
+      "y": 557293.51,
+      "z": 126.76,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) + z=S-MAP dem_z(S06-R5)",
+      "err_xy_m_assumed": 1.5,
+      "err_z_m_assumed": 0.5,
+      "accuracyVerified": false
+     }
+    ]
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201091.11,
+      557241.71,
+      117.7
+     ],
+     [
+      201075.75,
+      557270.59,
+      121.8
+     ],
+     [
+      201062.18,
+      557281.71,
+      123.76
+     ],
+     [
+      201052.66,
+      557287.23,
+      125.25
+     ],
+     [
+      201043.19,
+      557293.51,
+      126.76
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "S06-C2",
+    "surface": "ground-upper(분수광장 약114m)",
+    "kind": "단 경계 상단선 후보",
+    "note": "단면 2개에서 메시 z가 수평 6~7m 안에 약18~20m 급변. 상단·하단은 별도 표면, 사이 사면 생성 금지.",
+    "vertices": [
+     {
+      "x": 201048.68,
+      "y": 557218.16,
+      "z": 113.45,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 단면A 급변 직전 + S-MAP dem_z(S06-W1)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.0,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201058.77,
+      "y": 557211.86,
+      "z": 113.69,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 단면B 급변 직전(메시 z)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.0,
+      "accuracyVerified": false
+     }
+    ]
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201048.68,
+      557218.16,
+      113.45
+     ],
+     [
+      201058.77,
+      557211.86,
+      113.69
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "S06-C3",
+    "surface": "ground-lower(낮은 길 약93~96m)",
+    "kind": "단 경계 하단선 후보",
+    "note": "S06-C2와 쌍. 벽면 텍스처가 번져 계단·재질 판독 불가.",
+    "vertices": [
+     {
+      "x": 201041.84,
+      "y": 557216.92,
+      "z": 94.03,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 단면A 급변 직후 + S-MAP dem_z(S06-W2)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.0,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201056.46,
+      "y": 557206.24,
+      "z": 96.19,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 단면B 급변 직후(메시 z)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.0,
+      "accuracyVerified": false
+     }
+    ]
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201041.84,
+      557216.92,
+      94.03
+     ],
+     [
+      201056.46,
+      557206.24,
+      96.19
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "S07-C1",
+    "surface": "ground(포털 문턱, 지상 측)",
+    "kind": "P1 지하주차장 입구 문턱선 후보",
+    "note": "포털 위 화단 S-MAP dem_z 131.45(S07-K2). 메시는 하강 바닥을 표현 못함. 지하 표면은 별도 객체, 높이 미상. 951c157d 끝점(201053.9,557349.2)과 약50m 떨어져 연결 근거 없음.",
+    "vertices": [
+     {
+      "x": 201021.09,
+      "y": 557305.03,
+      "z": 127.39,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 곡선 석축 화단 아래 하강 차로 왼쪽 끝(메시 z)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.5,
+      "accuracyVerified": false
+     },
+     {
+      "x": 201022.81,
+      "y": 557309.11,
+      "z": 128.5,
+      "src": "S-MAP 3D 메시 getCoordinate3dFromPixel 픽(2026-10-09, 정사 근사 fov0.12 약0.16m/화면px 또는 경사 시점) 오른쪽 끝(메시 z)",
+      "err_xy_m_assumed": 2.0,
+      "err_z_m_assumed": 1.5,
+      "accuracyVerified": false
+     }
+    ]
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201021.09,
+      557305.03,
+      127.39
+     ],
+     [
+      201022.81,
+      557309.11,
+      128.5
+     ]
+    ]
+   }
+  }
+ ]
+}
