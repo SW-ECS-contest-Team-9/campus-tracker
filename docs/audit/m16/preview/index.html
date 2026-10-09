@@ -29,6 +29,7 @@
     <label><input type="checkbox" id="tBld" checked> 원본 건물(baseM~roofM)</label><br>
     <label><input type="checkbox" id="tRoads" checked> 현재 도로(roads-live-2)</label><br>
     <label><input type="checkbox" id="tCand" checked> 후보 4개</label><br>
+    <label><input type="checkbox" id="tUsr"> 사용자 S-MAP 표본(2026-10-10)</label><br>
     <b>유담관(CT-M17)</b>
     <label><input type="radio" name="yd" id="ydOrig" checked> 원본</label>
     <label><input type="radio" name="yd" id="ydCand"> 분리 후보</label>
@@ -184,6 +185,30 @@ document.getElementById('ydCand').onchange = () => setYudam('flat');
 document.getElementById('ydSurf').onchange = () => setYudam('surf');
 document.getElementById('ydRoof').onchange = () => setYudam('roof');
 
+// 사용자 S-MAP 사진 표본(2026-10-10): 점 = 화면값 z, 면 = 은주2관 상·하부 독립 평탄면(각자 중앙값 z). 서로 잇지 않음.
+const usrGroup = new THREE.Group(); usrGroup.visible = false; scene.add(usrGroup);
+{
+  const us = await (await get('data/user-smap-samples-5186.geojson')).json();
+  for (const f of us.features) {
+    const p = f.properties;
+    if (f.geometry.type === 'Point') {
+      const [e, n, h] = f.geometry.coordinates;
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.8, 12, 8), new THREE.MeshBasicMaterial({ color: p.err_m > 8 ? 0xaaaaaa : 0xff2020 }));
+      m.position.copy(w(e, n, h)); m.userData.info = `${p.id} ${p.surface}
+화면값 ${p.value} m, 대응 오차 ${p.err_m} m
+accuracyVerified=false`; usrGroup.add(m);
+    } else {
+      const ring = f.geometry.coordinates[0];
+      const shape = new THREE.Shape(ring.map(([e, n]) => new THREE.Vector2(e - OX, n - OY)));
+      const g = new THREE.ShapeGeometry(shape); g.rotateX(-Math.PI / 2); g.translate(0, p.value, 0);
+      const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xff8800, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+      m.userData.info = `${p.id} ${p.surface}
+z ${p.value} (메시 중앙값)`; usrGroup.add(m);
+    }
+  }
+}
+document.getElementById('tUsr').onchange = e => { usrGroup.visible = e.target.checked; };
+
 // 현재 도로
 const roads = await (await get('data/roads-live-2.json')).json();
 for (const r of roads.items) {
@@ -275,7 +300,7 @@ function projectVertices() {
     return { ...v, sx: Math.round((q.x + 1) / 2 * W), sy: Math.round((1 - q.y) / 2 * H), inView: Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && q.z < 1 };
   });
 }
-window.preview = { setYudam: c => { const md = c === true ? 'flat' : (c || 'orig'); document.getElementById({ orig: 'ydOrig', flat: 'ydCand', surf: 'ydSurf', roof: 'ydRoof' }[md]).checked = true; setYudam(md); }, surfaceVertexCheck, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
+window.preview = { setUser: on => { document.getElementById('tUsr').checked = on; usrGroup.visible = on; }, setYudam: c => { const md = c === true ? 'flat' : (c || 'orig'); document.getElementById({ orig: 'ydOrig', flat: 'ydCand', surf: 'ydSurf', roof: 'ydRoof' }[md]).checked = true; setYudam(md); }, surfaceVertexCheck, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
 setCam([201000, 557150, 220], [201050, 557250, 115]);
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
