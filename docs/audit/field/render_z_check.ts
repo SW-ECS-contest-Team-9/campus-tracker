@@ -36,16 +36,29 @@ function triangles(f: any): Tri[] {
   }
   return out;
 }
-function zAt(tris: Tri[], x: number, y: number): number | null {
+// 렌더 삼각형 안 판정. 삼각형 밖이면 가장 가까운 삼각형 점까지 XY 거리를 재고, EPS(아래에서 측정값으로 정함) 이하일 때만 그 점의 z.
+let EPS = 0; // m. 측정 전에는 0(엄격)
+function nearest(tris: Tri[], x: number, y: number): { z: number; d: number } | null {
+  let best: { z: number; d: number } | null = null;
   for (const { a, b, c } of tris) {
     const d = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
     if (Math.abs(d) < 1e-12) continue;
     const l1 = ((b[1] - c[1]) * (x - c[0]) + (c[0] - b[0]) * (y - c[1])) / d;
     const l2 = ((c[1] - a[1]) * (x - c[0]) + (a[0] - c[0]) * (y - c[1])) / d;
     const l3 = 1 - l1 - l2;
-    if (l1 >= -1e-9 && l2 >= -1e-9 && l3 >= -1e-9) return l1 * a[2] + l2 * b[2] + l3 * c[2];
+    if (l1 >= 0 && l2 >= 0 && l3 >= 0) return { z: l1 * a[2] + l2 * b[2] + l3 * c[2], d: 0 };
+    for (const [p, q] of [[a, b], [b, c], [c, a]]) { // 변까지 최근접점
+      const vx = q[0] - p[0], vy = q[1] - p[1], L = vx * vx + vy * vy;
+      const t = L > 0 ? Math.max(0, Math.min(1, ((x - p[0]) * vx + (y - p[1]) * vy) / L)) : 0;
+      const px = p[0] + vx * t, py = p[1] + vy * t, dd = Math.hypot(x - px, y - py);
+      if (!best || dd < best.d) best = { z: p[2] + (q[2] - p[2]) * t, d: dd };
+    }
   }
-  return null;
+  return best;
+}
+function zAt(tris: Tri[], x: number, y: number): number | null {
+  const n = nearest(tris, x, y);
+  return n && n.d <= EPS ? n.z : null;
 }
 const lines: string[] = [];
 const surf = (file: string, group: string) => parseCorrections(file, read(file), group).features.filter((f: any) => f.kind === 'surface');
@@ -64,11 +77,33 @@ if (dumpIdx > 0) { // 원 SF-CORRIDOR 렌더 삼각형(EPSG:5186 x,y,z)을 내�
 }
 const v4raw = read('corridor-surface-v5.1.geojson').features.find((f: any) => f.properties.id === 'SF-CORRIDOR-TIN');
 const origXY = new Set(v4raw.geometry.coordinates.flatMap((p: number[][][]) => p[0]).map((c: number[]) => `${c[0]},${c[1]}`));
+// 빈칸·구역 밖·겹침 면적 검사는 integrate_corridor_v4.py(shapely, corridor-tin-checks.txt)
+// 허용치 측정: (a) 저장된 절단 경계점의 원 면 XY 거리(파이썬 shapely, cut-precision-checks.txt),
+// (b) 같은 점을 앱과 같은 변환(tmInverse→Cartesian→Cartographic→tmForward)으로 보낸 뒤 원 면 렌더 삼각형까지 XY 거리.
+{
+  let bMax = 0, rtMax = 0, n = 0;
+  for (const file of ['corridor-stair-cut-v1.geojson', 'stairs-v6-est.geojson']) {
+    const cutF = read(file).features.find((f: any) => f.properties.replaces === 'SF-CORRIDOR-TIN');
+    for (const poly of cutF.geometry.coordinates) for (const ring of poly) for (const c of ring) {
+      if (origXY.has(`${c[0]},${c[1]}`)) continue;
+      const g = tmInverse(c[0], c[1]);
+      const cg = C.Cartographic.fromCartesian(C.Cartesian3.fromDegrees(g.longitude, g.latitude, c[2]));
+      const t = tmForward(C.Math.toDegrees(cg.latitude), C.Math.toDegrees(cg.longitude));
+      rtMax = Math.max(rtMax, Math.hypot(t.x - c[0], t.y - c[1]));
+      const nb = nearest(corridor, c[0], c[1]);
+      if (nb) { bMax = Math.max(bMax, nb.d); n++; }
+    }
+  }
+  const a = fs.readFileSync(new URL('docs/audit/field/cut-precision-checks.txt', ROOT), 'utf8').trim().split(String.fromCharCode(10)).map((l: string) => l.trim());
+  EPS = Math.max(1e-6, 2 * Math.max(bMax, rtMax)); // 측정 최대의 2배, 최소 1 µm. 0.5 mm 반올림 이탈은 이보다 훨씬 커서 안으로 치지 않음
+  lines.push(...a, `(b) Cesium 변환 왕복 XY 잔차 최대 ${rtMax.toExponential(3)} m, 경계점 ${n}개 → 원 면 렌더 삼각형 XY 거리 최대 ${bMax.toExponential(3)} m`);
+  lines.push(`판정 허용치 EPS = max(1 µm, 2 × 측정 최대) = ${EPS.toExponential(3)} m (물리 접속 허용 ±0.15 m와 별개)`);
+  lines.push(`대조: 이전 3자리 반올림 이탈 최대 0.516 mm = 5.16e-4 m > EPS → 반올림 이탈점은 안으로 치지 않음`);
+}
 // 표본 재현: TIN 꼭짓점(S-MAP 표본) 위치의 렌더 z = 표본 z
 { let n = 0, worst = 0; const seen = new Set<string>();
   for (const p of v4raw.geometry.coordinates) for (const c of p[0]) { const k = `${c[0]},${c[1]}`; if (seen.has(k)) continue; seen.add(k); const z = zAt(corridor, c[0], c[1]); if (z == null) continue; n++; worst = Math.max(worst, Math.abs(z - c[2])); }
   lines.push(`사잇길 TIN 표본 재현(렌더 삼각형 z vs 꼭짓점 z): 표본 ${n}개, 최대 차 ${worst.toFixed(4)} m`); }
-// 빈칸·구역 밖·겹침 면적 검사는 integrate_corridor_v4.py(shapely, corridor-tin-checks.txt)
 for (const file of ['corridor-stair-cut-v1.geojson', 'stairs-v6-est.geojson']) {
   const fc = read(file);
   const cutF = fc.features.find((f: any) => f.properties.replaces === 'SF-CORRIDOR-TIN');

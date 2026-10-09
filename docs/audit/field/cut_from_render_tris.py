@@ -13,6 +13,7 @@ from shapely.ops import unary_union
 TRIS, ROOT = json.loads(Path(sys.argv[1]).read_text()), Path(sys.argv[2])
 OUT = ROOT / 'frontend/public/corrections'
 MARGIN = 0.3
+MEAS = []
 REPLACES = sys.argv[3] if len(sys.argv) > 3 else 'SF-CORRIDOR'  # 잘라낼 대상 면 id(삼각형 입력과 같은 면)
 
 
@@ -46,7 +47,7 @@ for file, pick in (('corridor-stair-cut-v1.geojson', lambda f, est: [Polygon(g['
         for g in getattr(r, 'geoms', [r]):
             if g.geom_type != 'Polygon' or g.area < 1e-6:
                 continue
-            pieces.append([[[round(x, 3), round(y, 3), round(z(x, y), 3)] for x, y in ring.coords] for ring in [g.exterior, *g.interiors]])
+            pieces.append([[[x, y, z(x, y)] for x, y in ring.coords] for ring in [g.exterior, *g.interiors]])  # XY 반올림 없음(원 면과 같은 정밀도), z = 원 조각 평면
     cut = [f for f in fc['features'] if f['properties'].get('replaces') in ('SF-CORRIDOR', 'SF-CORRIDOR-V4', 'SF-CORRIDOR-TIN')][0]
     cut['properties']['replaces'] = REPLACES
     cut['geometry'] = {'type': 'MultiPolygon', 'coordinates': pieces}
@@ -63,6 +64,12 @@ for file, pick in (('corridor-stair-cut-v1.geojson', lambda f, est: [Polygon(g['
             for c in f['geometry']['coordinates']:
                 z = zr(c[0], c[1])
                 if z is not None:
-                    c[2] = round(z, 3)
+                    c[2] = z
     (OUT / file).write_text(json.dumps(fc, ensure_ascii=False), encoding='utf-8')
-    print(file, 'pieces', len(pieces), 'hole area', round(holes.area, 1))
+    U = unary_union([Polygon([p[:2] for p in t]) for t in TRIS])
+    from shapely.geometry import Point as _P
+    orig = {(p[0], p[1]) for t in TRIS for p in t}
+    dmax = max((U.distance(_P(x, y)) for pc in pieces for ring in pc for x, y, _ in ring if (x, y) not in orig), default=0.0)
+    MEAS.append(f'{file}: (a) 저장된 절단 경계점 → 원 면 XY 거리 최대 {dmax:.3e} m')
+    print(file, 'pieces', len(pieces), 'hole area', round(holes.area, 1), '(a) max', dmax)
+(ROOT / 'docs/audit/field/cut-precision-checks.txt').write_text(chr(10).join(MEAS) + chr(10), encoding='utf-8')
