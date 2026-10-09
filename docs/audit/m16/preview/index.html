@@ -28,7 +28,9 @@
     <label><input type="checkbox" id="tTerrain" checked> 지형(DEM 2015)</label><br>
     <label><input type="checkbox" id="tBld" checked> 원본 건물(baseM~roofM)</label><br>
     <label><input type="checkbox" id="tRoads" checked> 현재 도로(roads-live-2)</label><br>
-    <label><input type="checkbox" id="tCand" checked> 후보 4개</label>
+    <label><input type="checkbox" id="tCand" checked> 후보 4개</label><br>
+    <label><input type="radio" name="occ" id="occOn" checked> 가림 적용</label>
+    <label><input type="radio" name="occ" id="occOff"> 후보 항상 보기</label>
   </p>
   <div>현재 도로: 회색=차량 허용, 초록=보행 전용(폭 표시 없음)</div>
   <div id="list"></div>
@@ -123,13 +125,13 @@ for (const f of cand.features) {
   const p = f.properties, s = STYLE[p.id];
   const pts = f.geometry.coordinates.map(([e, n, h]) => w(e, n, h));
   const lg = new LineGeometry(); lg.setPositions(pts.flatMap(v => [v.x, v.y, v.z]));
-  const mat = new LineMaterial({ color: s.color, linewidth: 5, dashed: s.dashed, dashSize: 1, gapSize: 0.6, depthTest: false });
+  const mat = new LineMaterial({ color: s.color, linewidth: 5, dashed: s.dashed, dashSize: 1, gapSize: 0.6 });
   fatMats.push(mat);
   const line = new Line2(lg, mat); line.computeLineDistances(); line.renderOrder = 10;
   line.userData.info = `${p.id} ${s.label}\nsurface: ${p.surface}\naccuracyVerified=false (추정)`;
   groups.cand.add(line);
   p.vertices.forEach((v, i) => {
-    const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), new THREE.MeshBasicMaterial({ color: s.color, depthTest: false }));
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), new THREE.MeshBasicMaterial({ color: s.color }));
     m.position.copy(w(v.x, v.y, v.z)); m.renderOrder = 11;
     m.userData.info = `${p.id} 정점${i}\nE ${v.x} N ${v.y} z ${v.z}\nsrc: ${v.src}\nerr_xy_m_assumed ${v.err_xy_m_assumed}, err_z_m_assumed ${v.err_z_m_assumed}\naccuracyVerified=${v.accuracyVerified}`;
     groups.cand.add(m);
@@ -146,6 +148,12 @@ for (const f of cand.features) {
 for (const [id, key] of [['tTerrain', 'terrain'], ['tBld', 'bld'], ['tRoads', 'roads'], ['tCand', 'cand']])
   document.getElementById(id).onchange = e => { groups[key].visible = e.target.checked; };
 
+// 가림 모드: 후보 선·정점 모두 같은 depthTest
+const candMats = () => groups.cand.children.map(o => o.material);
+function setOcclusion(on) { candMats().forEach(m => { m.depthTest = on; m.needsUpdate = true; }); }
+document.getElementById('occOn').onchange = () => setOcclusion(true);
+document.getElementById('occOff').onchange = () => setOcclusion(false);
+
 // hover
 const tip = document.getElementById('tip'), ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
 ray.params.Line.threshold = 1;
@@ -153,7 +161,7 @@ renderer.domElement.addEventListener('pointermove', ev => {
   const rc = renderer.domElement.getBoundingClientRect();
   mouse.set(((ev.clientX - rc.left) / rc.width) * 2 - 1, -((ev.clientY - rc.top) / rc.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
-  // 후보는 항상 위에 그려지므로 후보 적중을 먼저 사용
+  // 후보 적중을 먼저 사용
   const hit = [groups.cand, groups.bld, groups.roads].filter(g => g.visible)
     .map(g => ray.intersectObject(g, true).find(h => h.object.userData.info)).find(Boolean);
   if (!hit) { tip.style.display = 'none'; return; }
@@ -183,7 +191,7 @@ function projectVertices() {
     return { ...v, sx: Math.round((q.x + 1) / 2 * W), sy: Math.round((1 - q.y) / 2 * H), inView: Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && q.z < 1 };
   });
 }
-window.preview = { setCam, camText, projectVertices };
+window.preview = { setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
 setCam([201000, 557150, 220], [201050, 557250, 115]);
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
