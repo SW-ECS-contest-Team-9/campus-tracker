@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="640" viewBox="0 0 1800 640">
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#233B63" stroke-width="2"/></marker><marker id="hot" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#FF0000" stroke-width="2"/></marker></defs>
+<g font-family="Malgun Gothic,Arial,sans-serif" font-size="24" font-weight="700" fill="none" stroke-linecap="round">
+<path d="M230 200H1740" stroke="#233B63" stroke-width="8"/>
+<path d="M270 210C270 340 290 420 350 420H1740" stroke="#3E567A" stroke-width="8"/>
+<text x="40" y="205" fill="#233B63">main</text>
+<text x="40" y="425" fill="#3E567A">develop</text>
+<path d="M400 190C400 110 430 95 480 95H700C750 95 780 120 780 190" stroke="#FF0000" stroke-width="7"/>
+<text x="495" y="55" fill="#FF0000">hotfix/*</text>
+
+<path d="M800 215C800 265 830 290 900 290H1650C1700 290 1710 330 1710 405" stroke="#FF0000" stroke-width="4" stroke-dasharray="10 9" marker-end="url(#hot)"/>
+
+<path d="M1520 405C1520 350 1520 270 1520 215" stroke="#233B63" stroke-width="5" marker-end="url(#arrow)"/>
+
+<path d="M380 433C380 505 400 535 435 535H470C510 535 530 505 530 433" stroke="#304A73" stroke-width="7"/>
+<path d="M600 433C600 505 620 535 655 535H690C730 535 750 505 750 433" stroke="#7185A3" stroke-width="7"/>
+<path d="M820 433C820 505 840 535 875 535H910C950 535 970 505 970 433" stroke="#4C658B" stroke-width="7"/>
+<path d="M1040 433C1040 505 1060 535 1095 535H1130C1170 535 1190 505 1190 433" stroke="#5D7393" stroke-width="7"/>
+<path d="M1260 433C1260 505 1280 535 1315 535H1350C1390 535 1410 505 1410 433" stroke="#8293AC" stroke-width="7"/>
+<g text-anchor="middle"><text x="455" y="590" fill="#304A73">feature/*</text><text x="675" y="590" fill="#7185A3">docs/*</text><text x="895" y="590" fill="#4C658B">refactoring/*</text><text x="1115" y="590" fill="#5D7393">fix/*</text><text x="1335" y="590" fill="#8293AC">chore/*</text></g>
+<g fill="#fff" stroke-width="5"><g stroke="#233B63"><circle cx="270" cy="200" r="13"/><circle cx="400" cy="200" r="13"/><circle cx="780" cy="200" r="13"/><circle cx="1520" cy="200" r="13"/></g><g stroke="#3E567A"><circle cx="380" cy="420" r="13"/><circle cx="530" cy="420" r="13"/><circle cx="600" cy="420" r="13"/><circle cx="750" cy="420" r="13"/><circle cx="820" cy="420" r="13"/><circle cx="970" cy="420" r="13"/><circle cx="1040" cy="420" r="13"/><circle cx="1190" cy="420" r="13"/><circle cx="1260" cy="420" r="13"/><circle cx="1410" cy="420" r="13"/><circle cx="1520" cy="420" r="13"/><circle cx="1710" cy="420" r="13"/></g><circle cx="590" cy="95" r="11" stroke="#FF0000"/><circle cx="455" cy="535" r="11" stroke="#304A73"/><circle cx="675" cy="535" r="11" stroke="#7185A3"/><circle cx="895" cy="535" r="11" stroke="#4C658B"/><circle cx="1115" cy="535" r="11" stroke="#5D7393"/><circle cx="1335" cy="535" r="11" stroke="#8293AC"/></g>
+
+
+
+</g></svg>
