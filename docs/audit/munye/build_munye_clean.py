@@ -42,17 +42,18 @@ def rnd(g):
 
 fc = {'type': 'FeatureCollection', 'name': 'munye-highrise-v2', 'crs': v1['crs'],
       'provenance': {**v1['provenance'], 'sample_class_sha256': hashlib.sha256(cls_raw).hexdigest(), 'generator': 'docs/audit/munye/build_munye_clean.py',
-                     'limit': '격자 지붕 표본(2 m)은 지붕 위 점이며 벽 위치 근거가 아니다. 벽 방향은 원외곽선 직선을 따랐고 위치는 면적 일치 조건으로만 정함 — 실측 정확도 주장 없음'},
+                     'limit': 'MY-T-CLEAN은 외곽선 정리(톱니 완화) 추정값이다. 격자 지붕 표본(2 m)은 지붕 위 점이며 벽 위치 근거가 아니다. 벽 방향은 원외곽선 직선, 위치는 셀 면적과 같게 하는 조건으로만 정함(면적 일치는 정확도 검증 아님) — 실측 정확도 주장 없음, 사진 외벽 대응 미실시'},
       'features': [
           {'type': 'Feature', 'properties': {'id': 'MY-T-CLEAN', 'type': 'high_rise', 'buildingId': '문예관', 'kind': 'extrude', 'fromM': 153.238, 'toM': 189.4, 'estimated': True,
                                              'assumption': f'벽 = 원외곽선 직선을 안쪽 {d:.2f} m 평행 이동(셀 면적 {T.area:.1f} m²와 같게). 셀 윤곽과 하우스도르프 {haus:.2f} m, 대칭차 {sym:.1f} m²',
                                              'source': 'MY-T(S-MAP 고층 지붕 표본 셀) 면적 + building-outlines 문예관 외곽선 방향; 상단 189.4 = S-MAP 지붕 z 중앙값'},
            'geometry': rnd(clean)},
-          {'type': 'Feature', 'properties': {'id': 'MY-L-EST', 'type': 'low_wing', 'kind': 'extrude', 'fromM': base_low, 'toM': 148.8, 'estimated': True,
-                                             'assumption': f'평면 = 148.8 저층 표본 2 m 셀 {len(low_cells)}개 합집합 − 원외곽선(실제 벽 아님), 바닥 = 셀 위치 DEM 최소 {base_low}',
-                                             'source': 'munye-sample-class-5186.geojson 저층 날개 표본(S-MAP 148.8), DEM 스냅샷'},
-           'geometry': rnd(L)},
+          {'type': 'Feature', 'properties': {'id': 'MY-L-ROOF', 'type': 'low_wing', 'kind': 'surface', 'estimated': True,
+                                             'assumption': f'저층부 지붕 면만(148.8). 평면 = 148.8 저층 표본 2 m 셀 {len(low_cells)}개 합집합 − 원외곽선(실제 벽 아님). 하부 벽·기둥·바닥은 미생성: 사진25(문예관 하행)에 경로 쪽 1층 차양·상가 벽이 보이나 이 셀들과의 평면 대응 근거 없음, 사진30·영상 01:20도 위치 대응 불가 → 하부 공간을 채우지 않음',
+                                             'source': 'munye-sample-class-5186.geojson 저층 날개 표본(S-MAP 148.8)'},
+           'geometry': {'type': 'Polygon', 'coordinates': [[[round(x, 3), round(y, 3), 148.8] for x, y in L.exterior.coords]]}},
       ]}
 (ROOT / 'frontend/public/corrections/munye-highrise-v2.geojson').write_text(json.dumps(fc, ensure_ascii=False), encoding='utf-8')
 print(f'd={d:.3f} cells={T.area:.1f} clean={clean.area:.1f} 변화={clean.area - T.area:+.1f} 하우스도르프={haus:.2f} 대칭차={sym:.1f} 꼭짓점 {len(T.exterior.coords) - 1}→{len(clean.exterior.coords) - 1}')
-print(f'MY-L 면적={L.area:.1f} base={base_low} 셀={len(low_cells)}')
+print(f'MY-L 지붕 면적={L.area:.1f} 셀={len(low_cells)} (DEM 최소 {base_low}는 바닥 근거가 아니어서 쓰지 않음)')
+print(f'비교(면적 일치는 정확도 아님): 원외곽선 {O.area:.1f} / 셀 {T.area:.1f} / 직선 {clean.area:.1f} m²; 하우스도르프 원-셀 {O.hausdorff_distance(T):.2f}, 원-직선 {O.hausdorff_distance(clean):.2f}, 셀-직선 {haus:.2f} m; 대칭차 원-셀 {O.symmetric_difference(T).area:.1f}, 셀-직선 {sym:.1f} m²')

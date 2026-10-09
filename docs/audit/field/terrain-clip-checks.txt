@@ -1,0 +1,12 @@
+SKIRT-SF-FIELD: 점 517, |면−DEM| 중앙 7.03 최대 8.11 m
+SKIRT-SF-CORRIDOR: 점 238, |면−DEM| 중앙 4.63 최대 9.03 m
+SKIRT-SF-ENJU2-UPPER: 점 233, |면−DEM| 중앙 10.23 최대 21.10 m
+SKIRT-SF-ENJU2-LOWER-0: 점 71, |면−DEM| 중앙 2.08 최대 6.74 m
+SKIRT-SF-ENJU2-LOWER-1: 점 19, |면−DEM| 중앙 0.65 최대 14.46 m
+관통 셀(DEM 셀 중심 > 면 + 0.3 m): 구역 / 전체 셀 / 관통 / 잘림 구역 안 / 남음
+  SF-FIELD: 1992 / 428 / 428 / 0
+  SF-CORRIDOR: 290 / 94 / 94 / 0
+  SF-ENJU2-UPPER: 734 / 150 / 150 / 0
+  SF-ENJU2-LOWER-0: 34 / 30 / 30 / 0
+  SF-ENJU2-LOWER-1: 2 / 0 / 0 / 0
+청운관: 원외곽선 1334.8 m², 돌출부 76.0 m², 본체 1230.4 m² (3조각)

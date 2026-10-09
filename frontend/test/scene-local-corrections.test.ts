@@ -68,14 +68,15 @@ test('문예관 v1: MY-T 하나만, 원천 좌표 원값, 원본 roofM 위로만
   assert.deepEqual(fc.features[0].geometry, orig.geometry);
 });
 
-test('문예관 v2: 직선 벽 MY-T-CLEAN(8꼭짓점)과 저층 MY-L-EST 분리, 둘 다 추정 표시, 고층 상단 189.4·저층 상단 148.8', () => {
+test('문예관 v2: 직선 벽 MY-T-CLEAN(8꼭짓점)과 저층 지붕 면 MY-L-ROOF(148.8, 하부 채움 없음), 둘 다 추정 표시', () => {
   const fc = read('munye-highrise-v2.geojson');
   const byId = new Map(fc.features.map((f: any) => [f.properties.id, f]));
   const t: any = byId.get('MY-T-CLEAN');
-  const l: any = byId.get('MY-L-EST');
+  const l: any = byId.get('MY-L-ROOF');
   assert.equal(t.geometry.coordinates[0].length - 1, 8);
   assert.equal(t.properties.toM, 189.4);
-  assert.equal(l.properties.toM, 148.8);
+  assert.equal(l.properties.kind, 'surface');
+  assert.ok(l.geometry.coordinates[0].every((c: number[]) => c[2] === 148.8));
   for (const f of [t, l]) assert.ok(f.properties.estimated === true && f.properties.assumption && f.properties.source);
   assert.ok(/정확도 주장 없음/.test(fc.provenance.limit));
 });
@@ -116,4 +117,25 @@ test('v4: 평지 경계는 참고선만(직선화 면 미사용), 계단 끝점 
   const zs = new Set(est.flatMap((f: any) => [f.properties.fromM, f.properties.toM, f.properties.z_bottom, f.properties.z_top]));
   for (const f of ep) assert.ok(zs.has(f.geometry.coordinates[0][2]), `${f.properties.id} z가 추정 계단 z와 다름`);
   assert.ok(ep.some((f: any) => f.properties.type === 'endpoint_unverified'));
+});
+
+test('지형 잘라냄: 구역 = 검증된 표면 5개 경계 그대로, 경계 세로 면은 표면 z 원값·DEM z 쌍', () => {
+  const fc = read('terrain-clip-v1.geojson');
+  const surf = new Map(read('field-surfaces-v3.geojson').features.map((f: any) => [f.properties.id, f]));
+  const clips = fc.features.filter((f: any) => f.properties.kind === 'clip');
+  assert.deepEqual(clips.map((f: any) => f.properties.id), ['CLIP-SF-FIELD', 'CLIP-SF-CORRIDOR', 'CLIP-SF-ENJU2-UPPER', 'CLIP-SF-ENJU2-LOWER-0', 'CLIP-SF-ENJU2-LOWER-1']);
+  for (const c of clips) {
+    const s: any = surf.get(c.properties.id.replace('CLIP-', ''));
+    assert.deepEqual(c.geometry.coordinates[0], s.geometry.coordinates[0].map((p: number[]) => p.slice(0, 2)));
+  }
+  const r = parseCorrections('terrain-clip-v1.geojson', fc, 'corrected');
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.features.filter((f: any) => f.kind === 'skirt').length, 5);
+});
+
+test('청운관 분리: 본체 override 하나(buildingId 청운관), 돌출부 평면은 빠짐', () => {
+  const fc = read('cheongun-split-v1.geojson');
+  const r = parseCorrections('cheongun-split-v1.geojson', fc, 'estimated');
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.features.map((f: any) => [f.kind, f.buildingId]), [['override', '청운관']]);
 });
