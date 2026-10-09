@@ -15,6 +15,7 @@ through the editor MCP read tools and the public scene/terrain API; the DEM ther
 | `terrain_candidate_impact.py` | `claude-terrain-impact.json` | CT-M04: per-building terrain change and recomputed base/roof, edge runs, steep-cell clusters |
 | `scene_heights_repro.py` | `claude-scene-heights-repro.json` | CT-M07: exact server base/roof reproduction (GPKG + PostGIS interior point), edge classes with CX-01..03, wall-strip options |
 | `roof_edge_variant.py` | `claude-roof-edge-variant.json`, `claude-field-terrain-variantB.f32` | CT-M09: edge runs vs footprints, roof-side transition blocked (variant B), same-scope A/B comparison, roof-as-ground check |
+| `node_merge_candidate.py` | `claude-m12/M13-노드병합후보.json` | CT-M13: 북악관 stair ends on coincident corridor nodes — merge candidate checks (self loop, duplicate edge, cross-level Z, validator case) |
 | `check_candidates.py` | exit code | Snapshot = archive, no junction gaps, Z-only change, stair direction kept, cross-walk agreement |
 
 Run in this order (later scripts read earlier outputs):
