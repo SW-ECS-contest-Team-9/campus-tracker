@@ -3,8 +3,10 @@
 Only the four stairs from CT-M12 are examined. For each stair end, nodes within the editor's coincident tolerance
 (XY 0.02 m, Z 0.05 m; get_editor_context) are listed with their incident roads. A merge candidate replaces the stair's
 end node id by the corridor node id; road geometry and heights are untouched. Coordinate agreement and real-connection
-evidence are judged separately. Checks: Z change, self loop, duplicate edge, cross-level link, editor levelId rule
-("roads connect only when levelId matches exactly").
+evidence are judged separately. Checks: self loop, duplicate edge, cross-level Z. The editor's levelId rule does not
+block this case: network-validate.ts reports a stairs/elevator/ramp end and a road of another level on separate coincident
+nodes as LEVEL_NODES_NOT_JOINED and suggests merge_nodes (connectors join levels). All candidates are then applied together
+on a copy of the graph and compared before/after (geometry, Z, references, components).
 
   python node_merge_candidate.py <audit-dir> <out.json>
 """
@@ -40,7 +42,7 @@ for short in STAIRS:
             row['candidates'].append({
                 'nodeId': n['id'], 'nodeLevelId': n.get('levelId'), 'dxyM': round(math.hypot(n['coordinate'][0] - c[0], n['coordinate'][1] - c[1]), 3),
                 'dzM': round(n['coordinate'][2] - c[2], 3), 'incidentRoads': [{'id': x['id'], 'name': x['name'], 'structure': x['structure'], 'levelId': x['levelId']} for x in inc],
-                'checks': {'zChange': 0.0, 'incidentEndZSpreadM': round(max(ends_z) - min(ends_z), 3) if ends_z else None,
+                'checks': {'incidentEndZSpreadM': round(max(ends_z) - min(ends_z), 3) if ends_z else None,
                            'selfLoop': new_from == new_to, 'duplicateEdge': dup, 'crossLevel': any(abs(z - c[2]) > TOL_Z for z in ends_z),
                            'sameLevelId': all(x['levelId'] == r['levelId'] for x in inc), 'corridorLevelIds': levels,
                            'validatorCase': 'LEVEL_NODES_NOT_JOINED (connector end vs other level) -> merge_nodes suggested' if r['structure'] in ('stairs', 'elevator', 'ramp') and not all(x['levelId'] == r['levelId'] for x in inc) else 'DUPLICATE_NODES or none'}})
@@ -58,6 +60,45 @@ for p in pairs:
 report = {'snapshot': (live / 'snapshot2-time.txt').read_text().strip(), 'roads': len(roads), 'deletedExcluded': deleted, 'tolerance': {'xyM': TOL_XY, 'zM': TOL_Z},
           'stairEnds': out, 'danglingEndsWithCoincidentNode': len(pairs),
           'operationallyApplicable': False, 'note': 'geometry and Z unchanged; only node ids would change; not applied'}
+# ---- combined application on a COPY of the graph (not operations): all candidates at once, real before/after comparison
+import copy
+merges = {p['nodeId']: c['nodeId'] for p in pairs for c in p['candidates'] if c['judgement']['decision'].startswith('병합 후보')}
+after = copy.deepcopy(roads)
+for r in after.values():
+    r['fromNodeId'] = merges.get(r['fromNodeId'], r['fromNodeId']); r['toNodeId'] = merges.get(r['toNodeId'], r['toNodeId'])
+nodes_after = {k: v for k, v in nodes.items() if k not in merges}
+pairs_after = {}
+for r in after.values(): pairs_after.setdefault(frozenset((r['fromNodeId'], r['toNodeId'])), []).append(r['id'])
+
+
+def components(rs, ns):
+    parent = {n: n for n in ns}
+    def find(x):
+        while parent[x] != x: parent[x] = parent[parent[x]]; x = parent[x]
+        return x
+    for r in rs.values(): parent[find(r['fromNodeId'])] = find(r['toNodeId'])
+    return len({find(n) for n in ns})
+
+
+used_before = {n for r in roads.values() for n in (r['fromNodeId'], r['toNodeId'])}
+used_after = {n for r in after.values() for n in (r['fromNodeId'], r['toNodeId'])}
+end_mismatch = [r['id'] for r in after.values() for nid, c in ((r['fromNodeId'], r['coordinates'][0]), (r['toNodeId'], r['coordinates'][-1]))
+                if nid in nodes_after and (math.hypot(nodes_after[nid]['coordinate'][0] - c[0], nodes_after[nid]['coordinate'][1] - c[1]) > TOL_XY
+                                           or abs(nodes_after[nid]['coordinate'][2] - c[2]) > TOL_Z)]
+combined = {
+    'merges': merges, 'selfLoops': [r['id'] for r in after.values() if r['fromNodeId'] == r['toNodeId']],
+    'duplicateEdges': [v for v in pairs_after.values() if len(v) > 1],
+    'danglingNodeRefs': sorted(n for n in used_after if n not in nodes_after),
+    'removedNodesStillReferenced': sorted(n for n in merges if n in used_after),
+    'incidentEndCoordinateMismatch': end_mismatch,
+    'deletedRoadsAbsent': {d: not any(k.startswith(d) for k in roads) for d in deleted},
+    'geometryIdentical': all(after[k]['coordinates'] == roads[k]['coordinates'] for k in roads),
+    'zIdentical': all([c[2] for c in after[k]['coordinates']] == [c[2] for c in roads[k]['coordinates']] for k in roads),
+    'roadsChanged': sorted(k for k in roads if (after[k]['fromNodeId'], after[k]['toNodeId']) != (roads[k]['fromNodeId'], roads[k]['toNodeId'])),
+    'componentsBefore': components(roads, used_before), 'componentsAfter': components(after, used_after),
+}
+combined['pass'] = not (combined['selfLoops'] or combined['duplicateEdges'] or combined['danglingNodeRefs'] or combined['removedNodesStillReferenced']
+                        or combined['incidentEndCoordinateMismatch']) and all(combined['deletedRoadsAbsent'].values()) and combined['geometryIdentical'] and combined['zIdentical']
+report['combinedGraphCheck'] = combined
 pathlib.Path(sys.argv[2]).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
-for p in out:
-    print(p['stair'][:8], p['end'], 'deg', p['nodeDegree'], p['stairLevelId'], [(c['nodeId'][:8], c['checks']['corridorLevelIds'], c['checks']['sameLevelId'], c['checks']['duplicateEdge'] != [], c['checks']['crossLevel'], c.get('judgement', {}).get('decision')) for c in p['candidates']])
+print('combined', {k: v for k, v in combined.items() if k != 'merges'})
