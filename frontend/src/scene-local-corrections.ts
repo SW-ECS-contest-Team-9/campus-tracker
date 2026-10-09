@@ -8,7 +8,7 @@ import { tmInverse } from './tm';
 
 type CesiumNS = typeof import('cesium');
 
-export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'stairV6';
+export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'stairV6' | 'pathGraph';
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
@@ -21,6 +21,8 @@ export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'corridor-stair-cut-v1.geojson', group: 'stairCandidate' },
   // 경쟁 후보 'v6 계단 후보': v6 끝점에 맞춘 새 추정 계단 + 그 자리 사잇길 대체(Corrected 위에서만, 켜면 DRAFT 비교보다 우선, 기존 DRAFT 계단 숨김)
   { file: 'stairs-v6-est.geojson', group: 'stairV6' },
+  // '길 사슬 후보': 다른 작업자의 path-graph-candidate.json을 integrate_path_graph.py로 변환한 파일(없으면 pending). 상태별 색: 그림만/그래프 연결/미검증·보류
+  { file: 'path-graph-candidate.geojson', group: 'pathGraph' },
 ];
 
 export type CorrectionFeature = {
@@ -82,8 +84,8 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   const loaded: string[] = [];
   const pending: string[] = [];
   const errors: string[] = [];
-  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [] };
-  const hidesByGroup: Record<CorrectionGroup, string[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [] };
+  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [], pathGraph: [] };
+  const hidesByGroup: Record<CorrectionGroup, string[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [], pathGraph: [] };
   for (const { file, group } of CORRECTION_FILES) {
     const fc = await loadFile(base, file);
     if (!fc) { pending.push(file); continue; }
@@ -95,7 +97,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   }
   const prims = {
     corrected: draw(C, viewer, byGroup.corrected, false), estimated: draw(C, viewer, byGroup.estimated, true),
-    stairCandidate: draw(C, viewer, byGroup.stairCandidate, false), stairV6: draw(C, viewer, byGroup.stairV6, true),
+    stairCandidate: draw(C, viewer, byGroup.stairCandidate, false), stairV6: draw(C, viewer, byGroup.stairV6, true), pathGraph: draw(C, viewer, byGroup.pathGraph, true),
   };
   // 지형 잘라냄: 보정 면 구역 안 렌더 지형만 숨김(DEM 자료 불변). 끄면 clippingPolygons를 비활성화해 원본 그대로.
   const clips = byGroup.corrected.filter((f) => f.kind === 'clip');
@@ -105,11 +107,11 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   }) : null;
   if (clipping) viewer.scene.globe.clippingPolygons = clipping;
   const replacedBy = (g: CorrectionGroup) => byGroup[g].map((f) => f.replaces).filter(Boolean) as string[];
-  const state: Record<CorrectionGroup, boolean> = { corrected: false, estimated: false, stairCandidate: false, stairV6: false };
+  const state: Record<CorrectionGroup, boolean> = { corrected: false, estimated: false, stairCandidate: false, stairV6: false, pathGraph: false };
   const apply = () => {
     const v6 = state.corrected && state.stairV6; // 계단 후보들은 Corrected 위에서만 의미
     const draft = state.corrected && state.stairCandidate && !v6;
-    const vis: Record<CorrectionGroup, boolean> = { corrected: state.corrected, estimated: state.estimated, stairCandidate: draft, stairV6: v6 };
+    const vis: Record<CorrectionGroup, boolean> = { corrected: state.corrected, estimated: state.estimated, stairCandidate: draft, stairV6: v6, pathGraph: state.pathGraph };
     for (const g of Object.keys(prims) as CorrectionGroup[]) for (const p of prims[g]) p.show = vis[g];
     const hidden = new Set<string>([...(draft ? replacedBy('stairCandidate') : []), ...(v6 ? replacedBy('stairV6') : []), ...(state.estimated ? replacedBy('estimated') : [])]);
     const prefixes = v6 ? hidesByGroup.stairV6 : [];
@@ -141,7 +143,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }>();
 const OUTLINES = new Map<string, any[]>(); // 면 테두리선(대체 시 함께 숨김)
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc', path_drawn_only: '#9ca3af', path_connected: '#22c55e', path_unverified: '#f97316' };
 const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {

@@ -173,3 +173,11 @@ test('v6 계단 후보: 새 계단·참·사잇길 대체 면 모두 추정·미
   const ch = read('cheongun-split-v1.geojson').features.filter((f: any) => f.properties.replaces);
   assert.deepEqual(ch.map((f: any) => f.properties.replaces), ['SF-CHEONGUN-CANOPY']);
 });
+
+test('렌더 삼각형 검사: 사잇길 절단 면 내부·경계 z가 원 면 렌더 z와 같음(render-z-checks.txt)', () => {
+  const chk = fs.readFileSync(new URL('../../docs/audit/field/render-z-checks.txt', import.meta.url), 'utf8');
+  const worst = [...chk.matchAll(/절단 면 z − 원 면 렌더 z 최대 ([\d.]+) m/g)].map((m) => Number(m[1]));
+  assert.equal(worst.length, 2);
+  for (const w of worst) assert.ok(w <= 0.002, `${w}`);
+  assert.match(chk, /출구 문턱 면 없음/);
+});
