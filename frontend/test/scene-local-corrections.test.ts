@@ -196,8 +196,8 @@ test('길 사슬 후보: 상태별 type만(연결/그림만/미검증), 원천 S
 });
 
 test('사잇길 TIN v5: v3 SF-CORRIDOR 대체, 빈칸은 선(미검증)만, 렌더 표본 재현 0, 빈칸·구역 밖·겹침 0', () => {
-  const fc = read('corridor-surface-v5.geojson');
-  const r = parseCorrections('corridor-surface-v5.geojson', fc, 'corrected');
+  const fc = read('corridor-surface-v5.1.geojson');
+  const r = parseCorrections('corridor-surface-v5.1.geojson', fc, 'corrected');
   assert.deepEqual(r.errors, []);
   assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR');
   assert.ok(r.features.filter((f: any) => f.type === 'gap_unverified').every((f: any) => f.kind === 'line'));

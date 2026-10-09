@@ -1,0 +1,2 @@
+corridor-stair-cut-v1.geojson: (a) 저장된 절단 경계점 → 원 면 XY 거리 최대 0.000e+00 m
+stairs-v6-est.geojson: (a) 저장된 절단 경계점 → 원 면 XY 거리 최대 0.000e+00 m
