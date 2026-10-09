@@ -35,3 +35,10 @@ python check_candidates.py "$A"
 
 Requires Python 3.11+, numpy, shapely 2. Candidates are proposals only: applying them is an editor change set that
 must be re-checked against the road revisions at that time.
+
+### 추가 검증 (CT-M13·CT-M15)
+
+- `node_merge_candidate.py <audit-dir> <output.json>`: 스냅샷 복사 그래프에 5개 병합을 동시에 적용해 참조·자기 루프·중복·좌표·고도 불변을 검사한다. 실제 계단 위치와 연결은 미확정이므로 운영 적용 근거로 사용하지 않는다.
+- `bukak_b1_constraint.py <audit-dir> <output.json>`: 사용자 확인인 “북악관 B1은 실제 뒤편 산책로보다 낮다”를 보존하고 주변 DEM 표본을 출력한다. 산책로 위치와 절대 층고가 미확인이라 두 층 가설 모두 미판정이다. 주변 DEM을 산책로 고도로 대체하거나 층 라벨 변경 근거로 쓰지 않는다.
+
+두 스크립트는 운영 DB·모델을 수정하지 않는다. 입력 자료는 위 Obsidian 감사 폴더에 있으며 저장소에 복사하지 않는다.
