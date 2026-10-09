@@ -131,25 +131,7 @@ feat('ST-A3-OUTLINE', 'stair_outline', {'type': 'LineString', 'coordinates': [[x
      {'kind': 'line', 'z': FIELD_Z, 'assumption': '양 끝 높이 근거 없음(인접 면은 지붕 SF-CHEONGUN-CANOPY뿐) → 계단 형상 미생성, 평면 외곽선만 운동장 z에 표시',
       'source': f'{SRC_TAG} ST-A3(주석 A3) 평면'})
 
-# 청운관 전면 열린 다층 돌출부(사진23, 영상 SKU 02:03 / DAKNAT 04:00): 벽 없이 기둥 + 중간 슬래브. 지붕(163.8)은 v3 SF-CHEONGUN-CANOPY 그대로.
-CH = shape(F['SF-CHEONGUN-CANOPY']['geometry'])
-CH_TOP = F['SF-CHEONGUN-CANOPY']['properties']['z']
-N_LV = 4  # 가정 층수
-for k in range(1, N_LV):
-    z = round(FIELD_Z + (CH_TOP - FIELD_Z) * k / N_LV, 2)
-    feat(f'EST-CHEONGUN-SLAB-{k}', 'open_slab', {'type': 'Polygon', 'coordinates': [ring(CH)]},
-         {'kind': 'extrude', 'fromM': round(z - 0.3, 2), 'toM': z,
-          'assumption': f'열린 다층 구조 {N_LV}층 균등 분할 가정(층수·층고 미측정): 운동장 {FIELD_Z}~지붕 {CH_TOP} 사이 {k}/{N_LV}, 슬래브 두께 0.3 m, 평면 = 지붕 평면과 같음, 벽 없음',
-          'source': f'{SRC_TAG} SF-CHEONGUN-CANOPY 평면·z(S-MAP), SF-FIELD z; 구조 종류 = 사진16·23, 영상 SKU 02:03·DAKNAT 04:00'})
-for k, (x, y) in enumerate(list(CH.minimum_rotated_rectangle.exterior.coords)[:4], 1):
-    c = CH.centroid
-    x, y = x + (c.x - x) * 0.08, y + (c.y - y) * 0.08  # 모서리에서 조금 안쪽
-    if box(x - 0.3, y - 0.3, x + 0.3, y + 0.3).intersects(unary_union([shape(F[q]['geometry']) for q in ('ST-CHEONGUN-DOWN', 'ST-A3')])):
-        continue  # 계단 위에 기둥을 세우지 않음
-    feat(f'EST-CHEONGUN-COL-{k}', 'column', {'type': 'Polygon', 'coordinates': [[[round(x - 0.3, 3), round(y - 0.3, 3)], [round(x + 0.3, 3), round(y - 0.3, 3)], [round(x + 0.3, 3), round(y + 0.3, 3)], [round(x - 0.3, 3), round(y + 0.3, 3)], [round(x - 0.3, 3), round(y - 0.3, 3)]]]},
-         {'kind': 'extrude', 'fromM': FIELD_Z, 'toM': CH_TOP,
-          'assumption': '기둥 0.6 m 정사각형, 지붕 평면 최소 회전 사각형 모서리 근처 4개 — 실제 기둥 수·위치 미측정(사진의 기둥 모양만 근거)',
-          'source': f'{SRC_TAG} SF-CHEONGUN-CANOPY 평면·z, SF-FIELD z; 사진23'})
+# 청운관 열린 다층 돌출부(슬래브·기둥)는 terrain_clip_v1.py의 cheongun-split-v1.geojson에서 연속 절단 범위로 생성
 
 fc = {'type': 'FeatureCollection', 'name': 'field-structures-est-v1', 'crs': v3['crs'],
       'provenance': {'source': 'Obsidian 데이터/보완자료/3d-map-audit-20261009/claude-user-20261010/운동장구조/field-surfaces-v3.geojson', 'sha256': hashlib.sha256(raw).hexdigest(),

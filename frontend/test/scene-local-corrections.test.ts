@@ -134,18 +134,21 @@ test('지형 잘라냄: 구역 = 검증된 표면 5개 경계 그대로, 경계 
   for (const f of fc.features.filter((f: any) => f.properties.kind === 'skirt')) assert.ok(f.properties.type === 'render_connection_face' && f.properties.verifiedWall === false && /렌더 연결면/.test(f.properties.assumption));
 });
 
-test('청운관 분리: 본체 override 하나(buildingId 청운관), 돌출부 평면은 빠짐', () => {
+test('청운관 분리: 본체 override(직선 절단) + 슬래브·기둥만, 벽 없음', () => {
   const fc = read('cheongun-split-v1.geojson');
   const r = parseCorrections('cheongun-split-v1.geojson', fc, 'estimated');
   assert.deepEqual(r.errors, []);
-  assert.deepEqual(r.features.map((f: any) => [f.kind, f.buildingId]), [['override', '청운관']]);
+  assert.deepEqual(r.features.filter((f: any) => f.kind === 'override').map((f: any) => f.buildingId), ['청운관']);
+  assert.ok(fc.features.every((f: any) => ['building_override', 'open_slab', 'column'].includes(f.properties.type)));
 });
 
-test('v5: 계단 끝점 상태(확인/미검증) 표지와 제안 계단 선, 기존 추정 계단은 그대로', { skip: !present.includes('stair-endpoints-v5.geojson') }, () => {
-  const fc = read('stair-endpoints-v5.geojson');
-  const r = parseCorrections('stair-endpoints-v5.geojson', fc, 'estimated');
+test('v6: 계단 끝점 상태(표면 후보 대응/미검증) 표지와 제안 계단 선, 기존 추정 계단은 그대로', { skip: !present.includes('stair-endpoints-v6.geojson') }, () => {
+  const fc = read('stair-endpoints-v6.geojson');
+  const r = parseCorrections('stair-endpoints-v6.geojson', fc, 'estimated');
   assert.deepEqual(r.errors, []);
   const t = fc.features.map((f: any) => f.properties.type);
-  assert.ok(t.includes('endpoint_unverified') && t.includes('endpoint_confirmed') && t.includes('stair_proposal'));
-  assert.ok(!present.includes('stair-endpoints-v4.geojson'));
+  assert.ok(t.includes('endpoint_unverified') && t.includes('endpoint_surface_match') && t.includes('stair_proposal'));
+  assert.ok(!t.includes('endpoint_confirmed'));
+  for (const f of fc.features.filter((f: any) => f.properties.type === 'endpoint_surface_match')) assert.ok(/실제 계단 끝점 확인 아님/.test(f.properties.legend));
+  assert.ok(!present.includes('stair-endpoints-v4.geojson') && !present.includes('stair-endpoints-v5.geojson'));
 });

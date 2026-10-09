@@ -189,6 +189,9 @@ export class CampusSceneLayer {
   /** Local display-only footprint replacement for one building (null restores the original geometry). */
   setFootprintOverride(buildingId: string, coordinates: number[][][][] | null) {
     if (coordinates) this.overrides.set(buildingId, coordinates); else this.overrides.delete(buildingId);
+    this.edges.removeAll(); // roof/corner edges follow the replaced footprint (no floating original rim)
+    this.labels.removeAll();
+    this.drawEdgesAndLabels();
     this.rebuild();
   }
 
@@ -291,7 +294,7 @@ export class CampusSceneLayer {
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(COLORS.edge) });
     for (const b of this.scene.buildings) {
       let best: number[][] = [];
-      for (const poly of b.geometry.coordinates) {
+      for (const poly of this.overrides.get(b.buildingId) ?? b.geometry.coordinates) {
         const r = poly[0];
         if (r.length > best.length) best = r;
         // roof outline, slightly above the roof so it is not z-fighting

@@ -11,7 +11,7 @@
 import hashlib, json, sys
 from pathlib import Path
 import numpy as np
-from shapely.geometry import Point, Polygon, mapping, shape
+from shapely.geometry import LineString, Point, Polygon, mapping, shape
 from shapely.prepared import prep
 
 ROOT = Path(sys.argv[1])
@@ -114,16 +114,50 @@ for zid in ZONES:
 o = [b for b in json.loads((ROOT / 'docs/audit/m16/preview/data/building-outlines-5186.json').read_text(encoding='utf-8')) if b['name'] == '청운관'][0]
 O = shape({'type': 'MultiPolygon', 'coordinates': o['coordinates']})
 CAN = shape(S['SF-CHEONGUN-CANOPY']['geometry'])
-body = O.difference(Polygon([(x, y) for x, y, *_ in CAN.exterior.coords]).buffer(0.5, join_style=2))  # 지붕 셀 평면이 외곽선에서 0.08 m 떨어져 있어 0.5 m 넓혀 전면까지 열음(가정)
-parts = [q for q in getattr(body, 'geoms', [body]) if q.area >= 2.0]  # 2 m² 미만 조각(버퍼 잔여)은 버림
+CAN2 = Polygon([(x, y) for x, y, *_ in CAN.exterior.coords])
+# 연속 절단면(추정): 돌출 지붕에 가장 가까운 원외곽선 변의 방향(u)과 법선(n)에 맞춘 직사각형.
+# 폭 = 지붕 셀을 u축에 투영한 범위, 깊이 = 외곽선 밖 1 m ~ 지붕 셀의 가장 안쪽까지. 셀 톱니를 그대로 쓰지 않음.
+ext = list(O.geoms[0].exterior.coords)
+edges = [(ext[k], ext[k + 1]) for k in range(len(ext) - 1)]
+(a, b) = min(edges, key=lambda e: LineString([e[0], e[1]]).distance(CAN2))
+L = float(np.hypot(b[0] - a[0], b[1] - a[1]))
+u = ((b[0] - a[0]) / L, (b[1] - a[1]) / L)
+n = (-u[1], u[0])
+if O.contains(Point(a[0] + (b[0] - a[0]) / 2 + n[0] * 1.0, a[1] + (b[1] - a[1]) / 2 + n[1] * 1.0)) is False:
+    n = (-n[0], -n[1])  # 안쪽을 향하게
+cs = [((x - a[0]) * u[0] + (y - a[1]) * u[1], (x - a[0]) * n[0] + (y - a[1]) * n[1]) for x, y in CAN2.exterior.coords]
+u0, u1 = min(c[0] for c in cs), max(c[0] for c in cs)
+v1 = max(c[1] for c in cs)
+P = lambda s_, t_: (a[0] + u[0] * s_ + n[0] * t_, a[1] + u[1] * s_ + n[1] * t_)
+CUT = Polygon([P(u0, -1.0), P(u1, -1.0), P(u1, v1), P(u0, v1)])
+OPEN = O.intersection(CUT)  # 열린 돌출부 범위(원외곽선 안)
+body = O.difference(CUT)
+parts = list(getattr(body, 'geoms', [body]))
+CH_TOP = S['SF-CHEONGUN-CANOPY']['geometry']['coordinates'][0][0][2]
+FIELD_Z = S['SF-FIELD']['geometry']['coordinates'][0][0][2]
+SRC_C = 'building-outlines-5186 청운관 외곽선 변 방향, SF-CHEONGUN-CANOPY 셀 범위·z(S-MAP), SF-FIELD z; 구조 종류 = 사진16·23, 영상 SKU 02:03·DAKNAT 04:00'
+openring = [[round(x, 3), round(y, 3)] for x, y in OPEN.exterior.coords]
+feats2 = [{'type': 'Feature', 'properties': {'id': 'CHEONGUN-BODY', 'type': 'building_override', 'kind': 'override', 'buildingId': '청운관', 'estimated': True,
+                                             'assumption': f'청운관 본체 = 원외곽선 − 연속 절단 직사각형(전면 변 방향, 폭 {u1 - u0:.1f} m, 깊이 {v1:.1f} m, 추정). 절단 범위 안 원본 세로 벽 제거, 본체 높이는 원본 baseM/roofM 유지',
+                                             'source': SRC_C},
+           'geometry': {'type': 'MultiPolygon', 'coordinates': [[[[round(x, 3), round(y, 3)] for x, y in r.coords] for r in [p_.exterior, *p_.interiors]] for p_ in parts]}}]
+N_LV = 4
+for k in range(1, N_LV + 1):
+    z = round(FIELD_Z + (CH_TOP - FIELD_Z) * k / N_LV, 2)
+    feats2.append({'type': 'Feature', 'properties': {'id': f'EST-CHEONGUN-SLAB-{k}', 'type': 'open_slab', 'kind': 'extrude', 'fromM': round(z - 0.3, 2), 'toM': z, 'estimated': True,
+                   'assumption': f'수평 슬래브(두께 0.3 m): {N_LV}층 균등 분할 가정, {k}/{N_LV}' + (' = 지붕 높이 163.8' if k == N_LV else '') + '. 평면 = 연속 절단 범위(직선 면), 벽 없음', 'source': SRC_C},
+                   'geometry': {'type': 'Polygon', 'coordinates': [openring]}})
+for k, s_ in enumerate((u0 + 0.4, (u0 + u1) / 2, u1 - 0.4), 1):
+    x, y = P(s_, 0.4)
+    feats2.append({'type': 'Feature', 'properties': {'id': f'EST-CHEONGUN-COL-{k}', 'type': 'column', 'kind': 'extrude', 'fromM': FIELD_Z, 'toM': CH_TOP, 'estimated': True,
+                   'assumption': '기둥 0.5 m 정사각형, 전면 변을 따라 양끝·가운데 3개(수·위치 미측정, 사진의 열린 기둥 구조만 근거)', 'source': SRC_C},
+                   'geometry': {'type': 'Polygon', 'coordinates': [[[round(x + dx, 3), round(y + dy, 3)] for dx, dy in ((-.25, -.25), (.25, -.25), (.25, .25), (-.25, .25), (-.25, -.25))]]}})
 fc2 = {'type': 'FeatureCollection', 'name': 'cheongun-split-v1', 'crs': v3['crs'],
        'provenance': {'source': 'building-outlines-5186.json 청운관 + field-surfaces-v3 SF-CHEONGUN-CANOPY', 'sha256': hashlib.sha256((ROOT / 'docs/audit/m16/preview/data/building-outlines-5186.json').read_bytes()).hexdigest(), 'generator': 'docs/audit/field/terrain_clip_v1.py',
                       'status': '표시용 국소 대체(추정). 원본 scene 자료·운영 DB 불변'},
-       'features': [{'type': 'Feature', 'properties': {'id': 'CHEONGUN-BODY', 'type': 'building_override', 'kind': 'override', 'buildingId': '청운관', 'estimated': True,
-                                                       'assumption': f'청운관 본체 = 원외곽선 − 돌출 지붕 평면({CAN.area:.1f} m²)을 0.5 m 넓힌 범위(전면 외곽선까지 열기 위한 가정). 본체 높이는 원본 baseM/roofM 유지. 돌출부는 열린 다층(슬래브·기둥 추정)과 빈 공간',
-                                                       'source': 'building-outlines-5186 청운관 외곽선, SF-CHEONGUN-CANOPY 평면(S-MAP), 사진23·영상 SKU 02:03'},
-                     'geometry': {'type': 'MultiPolygon', 'coordinates': [[[[round(x, 3), round(y, 3)] for x, y in r.coords] for r in [p.exterior, *p.interiors]] for p in parts]}}]}
+       'features': feats2}
 (OUT / 'cheongun-split-v1.geojson').write_text(json.dumps(fc2, ensure_ascii=False), encoding='utf-8')
-lines.append(f'청운관: 원외곽선 {O.area:.1f} m², 돌출부 {O.intersection(CAN).area:.1f} m², 본체 {body.area:.1f} m² ({len(parts)}조각)')
+lines.append(f'청운관: 원외곽선 {O.area:.1f} m², 절단(열린 돌출부) {OPEN.area:.1f} m² (폭 {u1 - u0:.1f} × 깊이 {v1:.1f} m), 본체 {body.area:.1f} m² ({len(parts)}조각, 조각 면적 {[round(q.area, 1) for q in parts]})')
+lines.append(f'  지붕 셀 {CAN2.area:.1f} m² 대비: 절단 범위 − 셀 {OPEN.difference(CAN2).area:.1f} m², 셀 − 절단 범위 {CAN2.difference(OPEN).area:.1f} m², 하우스도르프 {OPEN.hausdorff_distance(CAN2):.2f} m')
 (ROOT / 'docs/audit/field/terrain-clip-checks.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 print('\n'.join(lines))
