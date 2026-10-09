@@ -13,6 +13,7 @@ through the editor MCP read tools and the public scene/terrain API; the DEM ther
 | `c02_candidate.py` | `claude-c02-candidate-v1.json` | C02 field re-level candidate (2 hops) and every boundary road it would affect |
 | `c02_integrated.py` | `claude-c02-integrated-candidate.json`, `claude-field-terrain-candidate.f32`, `.png` | CT-M02: field polygon from walls, flat field terrain + 4 m open-edge band, merged road candidate, boundary decisions, all checks |
 | `terrain_candidate_impact.py` | `claude-terrain-impact.json` | CT-M04: per-building terrain change and recomputed base/roof, edge runs, steep-cell clusters |
+| `scene_heights_repro.py` | `claude-scene-heights-repro.json` | CT-M07: exact server base/roof reproduction (GPKG + PostGIS interior point), edge classes with CX-01..03, wall-strip options |
 | `check_candidates.py` | exit code | Snapshot = archive, no junction gaps, Z-only change, stair direction kept, cross-walk agreement |
 
 Run in this order (later scripts read earlier outputs):
@@ -26,6 +27,7 @@ python c02_surface_fit.py "$A" "$A/claude-c02-surface-fit.json"
 python c02_candidate.py "$A" "$A/claude-c02-candidate-v1.json"
 python c02_integrated.py "$A" "$A/claude-c02-integrated-candidate.json" "$A/claude-field-terrain-candidate.f32" "$A/claude-c02-integrated-candidate.png"
 python terrain_candidate_impact.py "$A" "$A/claude-terrain-impact.json"
+python scene_heights_repro.py "$A" "<repo>/backend/data/scene/source/campus.gpkg" "$A/claude-scene-heights-repro.json"
 python check_candidates.py "$A"
 ```
 
