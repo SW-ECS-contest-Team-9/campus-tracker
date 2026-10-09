@@ -1,153 +1,177 @@
 # CT-M17 검토 후속: Y-A 지붕 표본의 약 2m 톱니가 태양광 패널(부착물)인지 건물 지붕인지 기존 자료만으로 판정.
-# 입력(읽기): vault claude-m17/tower-sample-class.json, claude-m16/S06/smap-ortho-yudam-main-road-c201060_557270-r600.jpg 판독값(아래 상수)
-# 새 외부 조회 없음. 출력: vault claude-m17/panel-analysis.json, panel-class.png, panel-checks.txt
-import json, os, sys, math
+# 입력(읽기): vault claude-m17/tower-sample-class.json, claude-m17/ortho-camera-recovery.json(뷰어 역투영 기록)
+# 새 외부 조회 없음. 출력: vault claude-m17/panel-analysis.json, panel-before-after.json, panel-class.png, panel-checks.txt,
+#       yudam-building-roof-candidate-5186.geojson (+ preview data 사본)
+#
+# 3f53bb9 정정: 이전 crop2map은 화면 중심을 (400,250)으로, 축척을 0.1585*600/(600-(h-120)) = 0.1745 m/px로 썼다.
+# 뷰어 재현 결과(ortho-camera-recovery.json): 눈 높이 720(=중심 z120 + range 600), 중심 투영점 화면 (406.25,243.75),
+# 축척 z120 0.1599, z175 0.1452 m/px. 높은 면일수록 m/px가 작아지므로 이전 식은 방향이 반대였다.
+# 이제 판독점 좌표는 식으로 계산하지 않고 뷰어의 getCoordinate3dFromPixel 역투영값을 그대로 쓴다.
+import json, os, sys, math, shutil
 import numpy as np
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon, Point, LineString
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 V = sys.argv[1]
 S = json.load(open(os.path.join(V, "tower-sample-class.json"), encoding="utf-8"))
+CAM = json.load(open(os.path.join(V, "ortho-camera-recovery.json"), encoding="utf-8"))
 roof = [s for s in S if s["class"] == "지붕"]
 X = np.array([s["x"] for s in roof], float); Y = np.array([s["y"] for s in roof], float); Z = np.array([s["z"] for s in roof], float)
+CLS_ALL = {(int(s["x"]), int(s["y"])): s["class"] for s in S}   # 타워 모델 셀 분류 (지붕/측벽·아래 표면/판독불가)
+HOLE = Polygon([(201060, 557264), (201066, 557264), (201066, 557268), (201060, 557268)])  # 표면 후보 구멍(§8)
 
-# 1) 정사 화면 판독 (smap-ortho-yudam-main-road-c201060_557270-r600.jpg, 800x450, 북쪽 위, 회전 0)
-#    화면 중심(400,250) = (201060, 557270, z120). 지면 z120 기준 0.1585 m/px (CT-M16 픽 2점에서 산출).
-#    지붕 높이 h에서는 원근으로 0.1585*600/(600-(h-120)) m/px. 지붕 h=175 사용 → 0.144 m/px. 오차 ±2 m 가정.
-#    판독점은 2.5배 확대 crop(원점 120,130) 좌표로 읽고 화면 px = 120+cx/2.5, 130+cy/2.5.
-def crop2map(cx, cy, h=175.0):
+# ---- 판독점: 이전(잘못된 식) / 이후(뷰어 역투영)
+def crop2map_old(cx, cy, h=175.0):
     sx, sy = 120 + cx / 2.5, 130 + cy / 2.5
     s = 0.1585 * 600 / (600 - (h - 120))
     return 201060 + (sx - 400) * s, 557270 + (250 - sy) * s
-PANEL_CORNERS_CROP = [(285, 55), (865, 415), (630, 770), (70, 395)]       # 패널 배열 바깥 모서리(판독)
-GAP_LINE_CROP = [((590, 250), (380, 580)), ((690, 300), (470, 640))]     # 패널 열 사이 어두운 간극선 2개
-GAP_STARTS_CROP = [(300, 60), (400, 120), (490, 185), (590, 250), (690, 300), (780, 355)]  # 간극선 북동 끝(판독)
-panel_poly = Polygon([crop2map(*c) for c in PANEL_CORNERS_CROP])
-gl = [(crop2map(*a), crop2map(*b)) for a, b in GAP_LINE_CROP]
-dirs = [math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 180 for a, b in gl]
-strip_dir = float(np.mean(dirs))                         # 패널 열(간극선) 방향, 동쪽 기준 반시계 각
-perp = math.radians(strip_dir + 90)
-gs = [crop2map(*c) for c in GAP_STARTS_CROP]
-proj = [p[0] * math.cos(perp) + p[1] * math.sin(perp) for p in gs]
-ortho_period = float(np.mean(np.abs(np.diff(sorted(proj)))))
+U = {tuple(p["crop"]): tuple(p["xyz"][:2]) for p in CAM["unprojected_read_points"]}
+CORNERS = [(285, 55), (865, 415), (630, 770), (70, 395)]
+GAPS = [((590, 250), (380, 580)), ((690, 300), (470, 640))]
+STARTS = [(300, 60), (400, 120), (490, 185), (590, 250), (690, 300), (780, 355)]
+def geom(f):
+    poly = Polygon([f(*c) for c in CORNERS]); gl = [(f(*a), f(*b)) for a, b in GAPS]
+    sd = float(np.mean([math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 180 for a, b in gl]))
+    pr = math.radians(sd + 90); gs = [f(*c) for c in STARTS]
+    per = float(np.mean(np.abs(np.diff(sorted(p[0] * math.cos(pr) + p[1] * math.sin(pr) for p in gs)))))
+    return poly, gl, sd, per
+OLD = geom(crop2map_old)
+NEW = geom(lambda cx, cy: U[(cx, cy)])
+corner_shift = [round(math.dist(crop2map_old(*c), U[c]), 2) for c in CORNERS]
 
-# 2) 격자 톱니의 방향·주기: 평면 제거 후 잔차를 톱니 기저(2고조파)로 맞춰 R2 최대인 방향·주기 탐색 (패널 영역 셀만)
-inP = np.array([panel_poly.contains(Point(x, y)) for x, y in zip(X, Y)])
+# ---- 톱니 방향·주기 (패널 다각형 안 셀)
 def plane_resid(m):
     A = np.c_[X[m], Y[m], np.ones(m.sum())]; c, *_ = np.linalg.lstsq(A, Z[m], rcond=None); return Z[m] - A @ c
-r = plane_resid(inP)
-best = (-1, None, None)
-for th in np.arange(0, 180, 1.0):
-    u = X[inP] * math.cos(math.radians(th)) + Y[inP] * math.sin(math.radians(th))
-    for P in np.arange(4.0, 12.01, 0.1):
-        ph = 2 * math.pi * u / P
-        B = np.c_[np.sin(ph), np.cos(ph), np.sin(2 * ph), np.cos(2 * ph), np.ones_like(ph)]
-        c, *_ = np.linalg.lstsq(B, r, rcond=None); res = r - B @ c
-        R2 = 1 - res.var() / r.var()
-        if R2 > best[0]: best = (R2, th, P)
-R2, th_best, P_best = best
-# 같은 방법을 패널 영역 밖 지붕 셀에 적용(대조)
-outP = (~inP) & np.array([panel_poly.exterior.distance(Point(x, y)) > 2.0 for x, y in zip(X, Y)])
-R2_out = None
-if outP.sum() >= 12:
-    ro = plane_resid(outP); u = X[outP] * math.cos(math.radians(th_best)) + Y[outP] * math.sin(math.radians(th_best)); ph = 2 * math.pi * u / P_best
-    B = np.c_[np.sin(ph), np.cos(ph), np.sin(2 * ph), np.cos(2 * ph), np.ones_like(ph)]; c, *_ = np.linalg.lstsq(B, ro, rcond=None)
-    R2_out = float(1 - (ro - B @ c).var() / ro.var())
-perp_deg = (strip_dir + 90) % 180
-ang_diff = abs(((th_best - perp_deg) + 90) % 180 - 90)
+def sawtooth(poly):
+    inP = np.array([poly.contains(Point(x, y)) for x, y in zip(X, Y)]); r = plane_resid(inP); best = (-1, None, None)
+    for th in np.arange(0, 180, 1.0):
+        u = X[inP] * math.cos(math.radians(th)) + Y[inP] * math.sin(math.radians(th))
+        for P in np.arange(4.0, 12.01, 0.1):
+            ph = 2 * math.pi * u / P; B = np.c_[np.sin(ph), np.cos(ph), np.sin(2 * ph), np.cos(2 * ph), np.ones_like(ph)]
+            c, *_ = np.linalg.lstsq(B, r, rcond=None); R2 = 1 - (r - B @ c).var() / r.var()
+            if R2 > best[0]: best = (float(R2), float(th), float(P))
+    return best
 
-# 3) 분류 (지붕 표본만). 근거: 평면 제거 잔차가 두 층(+1.1~+1.9 / -1.2~-0.7 m)으로 갈리고,
-#    높은 층은 정사 화면 패널 열과 같은 방향(57°)·주기의 띠로만 나타남.
-#   평면은 낮은 층 표본으로 다시 맞춤(2회 반복). HIGH = 잔차 > +0.2 m.
-#   부착물(패널 상면): HIGH 이고 패널 배열 다각형 안(경계 포함)
-#   건물 지붕: HIGH 아님(낮은 층) — 패널 사이 간극과 패널 밖 가장자리에서 같은 높이층
-#   미판정: HIGH 인데 패널 다각형 밖(패널 근거 없음)
-low = np.ones(len(Z), bool)
-for _ in range(3):
-    A = np.c_[X, Y, np.ones(len(X))]; pc, *_ = np.linalg.lstsq(A[low], Z[low], rcond=None)
-    res = Z - A @ pc; low = res <= 0.2
-HIGH = ~low
-cls = np.array(["부착물(패널)" if h and panel_poly.buffer(2.0).contains(Point(x, y)) else ("미판정" if h else "건물 지붕") for x, y, h in zip(X, Y, HIGH)])
-def summ(a):
-    a = np.sort(a); return None if len(a) == 0 else {"n": int(len(a)), "area_m2": 4.0 * len(a), "min": float(a[0]), "p10": float(np.percentile(a, 10)), "median": float(np.median(a)), "p90": float(np.percentile(a, 90)), "max": float(a[-1])}
-summary = {c: summ(Z[cls == c]) for c in ("부착물(패널)", "건물 지붕", "미판정")}
-step_hi_lo = float(np.median(res[HIGH]) - np.median(res[low]))
-lowres_in = res[low & np.array([panel_poly.contains(Point(x, y)) for x, y in zip(X, Y)])]
-lowres_out = res[low & ~np.array([panel_poly.buffer(2.0).contains(Point(x, y)) for x, y in zip(X, Y)])]
+# ---- 분류. 가정: 잔차 임계 HI(기본 +0.2 m), 패널 다각형 여유 BUF(기본 2 m)
+def classify(poly, HI=0.2, BUF=2.0):
+    low = np.ones(len(Z), bool)
+    for _ in range(3):
+        A = np.c_[X, Y, np.ones(len(X))]; pc, *_ = np.linalg.lstsq(A[low], Z[low], rcond=None); res = Z - A @ pc; low = res <= HI
+    pb = poly.buffer(BUF)
+    cls = np.array(["부착물(패널)" if (not l) and pb.contains(Point(x, y)) else ("미판정" if not l else "건물 지붕") for x, y, l in zip(X, Y, low)])
+    return cls, res
 
-# 4) 건물 지붕 후보: 낮은 층(건물 지붕) 표본은 원값 z 그대로. 패널 상면 표본 위치는 톱니 방향(th_best)으로
-#    양쪽 가장 가까운 건물 지붕 표본(각각 한 주기 P_best 이내, 측방 오차 1.5 m 이내) 사이 선형 보간만 허용.
-#    한쪽이라도 없으면 그 위치는 제외(외삽 없음). 미판정 표본은 제외.
-ux, uy = math.cos(math.radians(th_best)), math.sin(math.radians(th_best))
-roofk = np.where(cls == "건물 지붕")[0]
-cand = []
-for k in range(len(Z)):
-    if cls[k] == "건물 지붕": cand.append((X[k], Y[k], float(Z[k]), "표본(건물 지붕)")); continue
-    if cls[k] != "부착물(패널)": continue
-    dx, dy = X[roofk] - X[k], Y[roofk] - Y[k]; along = dx * ux + dy * uy; side = np.abs(-dx * uy + dy * ux)
-    okm = side <= 1.5
-    fwd = np.where(okm & (along > 0) & (along <= P_best))[0]; bwd = np.where(okm & (along < 0) & (along >= -P_best))[0]
-    if len(fwd) == 0 or len(bwd) == 0: continue
-    f = fwd[np.argmin(along[fwd])]; b = bwd[np.argmax(along[bwd])]
-    t = -along[b] / (along[f] - along[b]); zf, zb = Z[roofk[f]], Z[roofk[b]]
-    cand.append((X[k], Y[k], float(zb + t * (zf - zb)), "보간(패널 아래, 양쪽 간극 표본 사이)"))
-out = {"ortho": {"image": "claude-m16/S06/smap-ortho-yudam-main-road-c201060_557270-r600.jpg", "strip_dir_deg_from_east": round(strip_dir, 1),
-                 "period_m": round(ortho_period, 2), "panel_polygon_5186": [[round(a, 1), round(b, 1)] for a, b in panel_poly.exterior.coords],
-                 "panel_polygon_area_m2": round(panel_poly.area, 1), "err_xy_m_assumed": 2.0},
-       "grid_sawtooth": {"best_dir_deg_from_east": float(th_best), "best_period_m": round(float(P_best), 2), "R2_panel_area": round(float(R2), 3),
-                          "R2_outside_panel_same_basis": None if R2_out is None else round(R2_out, 3),
-                          "ortho_perp_dir_deg": round(perp_deg, 1), "angle_diff_deg": round(float(ang_diff), 1)},
-       "class_summary": summary,
-       "two_level": {"high_minus_low_median_m": round(step_hi_lo, 2), "low_resid_inside_panel": summ(lowres_in), "low_resid_outside_panel": summ(lowres_out)},
-       "samples": [{"x": float(x), "y": float(y), "z": float(z), "class": c} for x, y, z, c in zip(X, Y, Z, cls)]}
-lines = []
-# 후보 메시 (2m 이웃, 세 변 |dz|<=3m, 빈 위치 연결 안 함)
-P2 = {(int(round(x)), int(round(y))): (z, src) for x, y, z, src in cand}
-tris = []
-for (x, y) in P2:
-    a_, b_, c_, d_ = (x, y), (x + 2, y), (x + 2, y + 2), (x, y + 2)
-    for t in ((a_, b_, c_), (a_, c_, d_)):
-        if all(q in P2 for q in t) and max(P2[q][0] for q in t) - min(P2[q][0] for q in t) <= 3.0: tris.append(t)
-n_s = sum(1 for v in P2.values() if v[1].startswith("표본")); n_i = len(P2) - n_s
-excluded_panel = int((cls == "부착물(패널)").sum()) - n_i
+# ---- 건물 지붕 후보: 건물 지붕 표본 원값 + 패널 위치는 톱니 방향 양쪽 간극 표본 사이 선형 보간
+def build(cls, th, P):
+    ux, uy = math.cos(math.radians(th)), math.sin(math.radians(th))
+    rk = np.where(cls == "건물 지붕")[0]; out = {}
+    for k in range(len(Z)):
+        key = (int(X[k]), int(Y[k]))
+        if cls[k] == "건물 지붕": out[key] = {"z": float(Z[k]), "src": "표본(건물 지붕)"}; continue
+        if cls[k] != "부착물(패널)": continue
+        dx, dy = X[rk] - X[k], Y[rk] - Y[k]; al = dx * ux + dy * uy; sd = np.abs(-dx * uy + dy * ux); okm = sd <= 1.5
+        fw = np.where(okm & (al > 0) & (al <= P))[0]; bw = np.where(okm & (al < 0) & (al >= -P))[0]
+        if len(fw) == 0 or len(bw) == 0: continue
+        f = rk[fw[np.argmin(al[fw])]]; b = rk[bw[np.argmax(al[bw])]]
+        af, ab = al[fw].min(), al[bw].max(); t = float(-ab / (af - ab))
+        out[key] = {"z": float(Z[b] + t * (Z[f] - Z[b])), "src": "보간(패널 아래, 양쪽 간극 표본 사이)",
+                    "from": {"x": float(X[b]), "y": float(Y[b]), "z": float(Z[b])}, "to": {"x": float(X[f]), "y": float(Y[f]), "z": float(Z[f])}, "ratio_from_to": round(t, 4)}
+    return out
+def tris_of(P2):
+    T = []
+    for (x, y) in P2:
+        a, b, c, d = (x, y), (x + 2, y), (x + 2, y + 2), (x, y + 2)
+        for t in ((a, b, c), (a, c, d)):
+            if all(q in P2 for q in t) and max(P2[q]["z"] for q in t) - min(P2[q]["z"] for q in t) <= 3.0: T.append(t)
+    return T
+
+# ---- 보간 선분이 금지 셀(미판정·측벽·판독불가·미취득·구멍)을 지나지 않는지
+def crossing_violations(P2, cls):
+    clsmap = {(int(x), int(y)): c for x, y, c in zip(X, Y, cls)}
+    bad = []
+    for key, v in P2.items():
+        if "from" not in v: continue
+        seg = LineString([(v["from"]["x"], v["from"]["y"]), (v["to"]["x"], v["to"]["y"])])
+        for s in np.linspace(0, seg.length, max(2, int(seg.length / 0.25) + 1)):
+            p = seg.interpolate(s); c = (int(round(p.x / 2) * 2), int(round(p.y / 2) * 2))
+            tag = CLS_ALL.get(c)
+            if tag is None: why = "미취득/모델 밖"
+            elif tag != "지붕": why = tag
+            elif clsmap.get(c) == "미판정": why = "미판정"
+            elif HOLE.contains(Point(*c)): why = "구멍"
+            else: continue
+            bad.append({"vertex": key, "cell": c, "why": why}); break
+    return bad
+
+# ---- 실행: 이전 다각형 / 이후(검증) 다각형
+R_old = sawtooth(OLD[0]); R_new = sawtooth(NEW[0])
+cls_old, _ = classify(OLD[0]); cls_new, res = classify(NEW[0])
+P_old = build(cls_old, R_old[1], R_old[2]); P_new = build(cls_new, R_new[1], R_new[2])
+T_new = tris_of(P_new)
+viol = crossing_violations(P_new, cls_new)
+def cnt(c): return {k: int((c == k).sum()) for k in ("부착물(패널)", "건물 지붕", "미판정")}
+changed = [{"x": float(x), "y": float(y), "before": a, "after": b} for x, y, a, b in zip(X, Y, cls_old, cls_new) if a != b]
+common = set(P_old) & set(P_new)
+dz = np.array([P_new[k]["z"] - P_old[k]["z"] for k in common])
+# 가정 민감도
+sens = {f"HI={hi},BUF={bf}": cnt(classify(NEW[0], hi, bf)[0]) for hi in (0.0, 0.2, 0.5) for bf in (0.0, 2.0, 4.0)}
+ba = {"corner_shift_old_to_viewer_m": corner_shift,
+      "old": {"strip_dir": round(OLD[2], 1), "period_m": round(OLD[3], 2), "poly_area_m2": round(OLD[0].area, 1), "sawtooth": R_old, "counts": cnt(cls_old), "candidate_vertices": len(P_old)},
+      "new": {"strip_dir": round(NEW[2], 1), "period_m": round(NEW[3], 2), "poly_area_m2": round(NEW[0].area, 1), "sawtooth": R_new, "counts": cnt(cls_new), "candidate_vertices": len(P_new)},
+      "changed_samples": changed,
+      "surface_diff_common_vertices": {"n": int(len(dz)), "max_abs_m": round(float(np.abs(dz).max()), 3) if len(dz) else None, "n_changed_over_0.01m": int((np.abs(dz) > 0.01).sum())},
+      "only_in_old": len(set(P_old) - set(P_new)), "only_in_new": len(set(P_new) - set(P_old)),
+      "sensitivity_counts_new_poly": sens}
+json.dump(ba, open(os.path.join(V, "panel-before-after.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
+poly, gl, strip_dir, ortho_period = NEW; R2, th_best, P_best = R_new
+perp_deg = (strip_dir + 90) % 180; ang_diff = abs(((th_best - perp_deg) + 90) % 180 - 90)
+n_s = sum(1 for v in P_new.values() if "from" not in v); n_i = len(P_new) - n_s
 fc = {"type": "FeatureCollection", "name": "yudam-building-roof-candidate", "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::5186"}},
-      "properties": {"status": "미리보기 후보 전용, 운영·원본 반영 금지", "accuracyVerified": False, "created": "2026-10-09",
-                     "rule": "건물 지붕 분류 표본 z 원값 + 패널 상면 위치는 톱니 방향 양쪽 간극 표본(한 주기 이내) 사이 선형 보간만. 외삽·평활·중앙값 대체 없음",
-                     "vertices_sample": n_s, "vertices_interpolated": n_i, "panel_positions_excluded_no_bracket": excluded_panel,
-                     "excluded_classes": {"미판정": int((cls == "미판정").sum())}},
-      "features": [{"type": "Feature", "properties": {"id": "Y-A-building-roof", "accuracyVerified": False, "triangles": len(tris),
-                     "vertex_sources": {f"{x},{y}": P2[(x, y)][1] for (x, y) in sorted(P2)}},
-                    "geometry": {"type": "MultiPolygon", "coordinates": [[[[q[0], q[1], P2[q][0]] for q in (*t, t[0])]] for t in tris]}}]}
+      "properties": {"status": "미리보기 후보 전용, 운영·원본 반영 금지", "accuracyVerified": False, "created": "2026-10-09", "revised": "3f53bb9 정정(뷰어 역투영 다각형)",
+                     "rule": "건물 지붕 분류 표본 z 원값 + 패널 상면 위치는 톱니 방향 양쪽 간극 표본(한 주기 이내, 측방 1.5m) 사이 선형 보간만. 외삽·평활·중앙값 대체 없음",
+                     "assumptions": {"residual_high_m": 0.2, "panel_polygon_buffer_m": 2.0, "note": "가정값. 민감도는 panel-before-after.json"},
+                     "vertices_sample": n_s, "vertices_interpolated": n_i},
+      "features": [{"type": "Feature", "properties": {"id": "Y-A-building-roof", "accuracyVerified": False, "triangles": len(T_new),
+                     "vertices": [{"x": k[0], "y": k[1], **v} for k, v in sorted(P_new.items())]},
+                    "geometry": {"type": "MultiPolygon", "coordinates": [[[[q[0], q[1], P_new[q]["z"]] for q in (*t, t[0])]] for t in T_new]}}]}
 json.dump(fc, open(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), "w", encoding="utf-8"), ensure_ascii=False)
-import shutil
-shutil.copy(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "m16", "preview", "data", "yudam-building-roof-candidate-5186.geojson"))
-# 검사: 표본 정점 z 보존
-smap = {(int(round(x)), int(round(y))): float(z) for x, y, z in zip(X, Y, Z)}
-bad = sum(1 for (q, (z, src)) in P2.items() if src.startswith("표본") and smap[q] != z)
-lines.append(("PASS " if bad == 0 else "FAIL ") + "건물 지붕 후보의 표본 정점 z가 원값과 같음 | 불일치 %d / %d" % (bad, n_s))
-lines.append(("PASS " if all(max(P2[q][0] for q in t) - min(P2[q][0] for q in t) <= 3.0 for t in tris) else "FAIL ") + "후보 삼각형 |dz|<=3m")
-lines.append("INFO 건물 지붕 후보 | 표본 정점 %d, 보간 정점 %d, 보간 못 해 제외한 패널 위치 %d, 삼각형 %d" % (n_s, n_i, excluded_panel, len(tris)))
-json.dump(out, open(os.path.join(V, "panel-analysis.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
-lines.append(("PASS " if len(cls) == len(roof) else "FAIL ") + "지붕 표본 전부 분류됨 | " + str(len(roof)))
-lines.append("INFO 정사 판독 | 패널 열 방향 %.1f°, 주기 %.2f m, 패널 다각형 %.0f m²" % (strip_dir, ortho_period, panel_poly.area))
-lines.append("INFO 격자 톱니 | 방향 %.0f°, 주기 %.2f m, R2 %.3f (패널 밖 같은 기저 R2 %s), 정사 수직방향과 각도 차 %.1f°" % (th_best, P_best, R2, "없음" if R2_out is None else "%.3f" % R2_out, ang_diff))
-lines.append("INFO 분류 | " + json.dumps({k: (v and {"n": v["n"], "area_m2": v["area_m2"], "median": v["median"]}) for k, v in summary.items()}, ensure_ascii=False))
-lines.append("INFO 두 층 | 높은층-낮은층 잔차 중앙값 차 %.2f m; 낮은층 잔차 패널 안 중앙 %.2f / 밖 중앙 %.2f" % (step_hi_lo, np.median(lowres_in), np.median(lowres_out)))
-open(os.path.join(V, "panel-checks.txt"), "w", encoding="utf-8").write("\n".join(lines) + "\n"); print("\n".join(lines))
+shutil.copy(os.path.join(V, "yudam-building-roof-candidate-5186.geojson"), os.path.join(HERE, "..", "m16", "preview", "data", "yudam-building-roof-candidate-5186.geojson"))
+json.dump({"ortho": {"source": "ortho-camera-recovery.json 역투영", "strip_dir_deg_from_east": round(strip_dir, 1), "period_m": round(ortho_period, 2),
+                     "panel_polygon_5186": [[round(a, 2), round(b, 2)] for a, b in poly.exterior.coords], "panel_polygon_area_m2": round(poly.area, 1)},
+           "grid_sawtooth": {"best_dir_deg_from_east": th_best, "best_period_m": round(P_best, 2), "R2_panel_area": round(R2, 3), "angle_diff_deg": round(ang_diff, 1)},
+           "samples": [{"x": float(x), "y": float(y), "z": float(z), "resid": round(float(r), 3), "class": c} for x, y, z, r, c in zip(X, Y, Z, res, cls_new)]},
+          open(os.path.join(V, "panel-analysis.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+
+smap = {(int(x), int(y)): float(z) for x, y, z in zip(X, Y, Z)}
+L = []
+def chk(n, c, t=""): L.append(("PASS " if c else "FAIL ") + n + (" | " + t if t else ""))
+def info(n, t): L.append("INFO " + n + " | " + t)
+chk("지붕 표본 전부 분류됨", len(cls_new) == len(roof), str(len(roof)))
+chk("판독점 12개 모두 뷰어 역투영 좌표 있음(유담관 모델 위)", all(tuple(c) in U for c in CORNERS + STARTS) and all(p["model"] == 172425217 for p in CAM["unprojected_read_points"]))
+chk("건물 지붕 후보 표본 정점 z 원값 일치", all(P_new[k]["z"] == smap[k] for k, v in P_new.items() if "from" not in v), f"표본 {n_s}")
+chk("보간 정점마다 양쪽 원천 표본 x,y,z와 비율 기록", all({"from", "to", "ratio_from_to"} <= set(v) for v in P_new.values() if v["src"].startswith("보간")), f"보간 {n_i}")
+chk("보간 원천 표본이 실제 건물 지붕 표본과 일치", all(smap.get((int(v[s]["x"]), int(v[s]["y"]))) == v[s]["z"] for v in P_new.values() if "from" in v for s in ("from", "to")))
+chk("보간 선분이 미판정·측벽·판독불가·미취득·구멍 셀을 지나지 않음", len(viol) == 0, f"위반 {len(viol)}" + ("" if not viol else " 예: " + json.dumps(viol[:3], ensure_ascii=False)))
+chk("후보 삼각형 |dz|<=3m", all(max(P_new[q]["z"] for q in t) - min(P_new[q]["z"] for q in t) <= 3.0 for t in T_new))
+info("카메라", "눈 z720(중심 z120+range600), 축척 z120 0.1599 / z175 0.1452 m/px, 중심 투영점 화면(406.25,243.75)")
+info("판독 모서리 이동(이전 식→역투영) m", str(corner_shift))
+info("정사(역투영)", "패널 열 방향 %.1f°, 주기 %.2f m, 다각형 %.0f m²" % (strip_dir, ortho_period, poly.area))
+info("격자 톱니(새 다각형)", "방향 %.0f°, 주기 %.2f m, R2 %.3f, 정사 수직방향과 차 %.1f°" % (th_best, P_best, R2, ang_diff))
+info("분류 이전→이후", json.dumps({"이전": cnt(cls_old), "이후": cnt(cls_new), "바뀐 표본": len(changed)}, ensure_ascii=False))
+info("표면 차(공통 정점)", json.dumps(ba["surface_diff_common_vertices"], ensure_ascii=False) + f", 이전에만 {ba['only_in_old']}, 이후에만 {ba['only_in_new']}")
+info("건물 지붕 후보", "표본 정점 %d, 보간 정점 %d, 삼각형 %d" % (n_s, n_i, len(T_new)))
+open(os.path.join(V, "panel-checks.txt"), "w", encoding="utf-8").write("\n".join(L) + "\n"); print("\n".join(L))
 try:
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
     plt.rcParams["font.family"] = "Malgun Gothic"; plt.rcParams["axes.unicode_minus"] = False
     fig, ax = plt.subplots(1, 2, figsize=(14, 6.5))
     col = {"부착물(패널)": "#3060c0", "건물 지붕": "#c03030", "미판정": "#e0a020"}
-    for c, cc in col.items(): ax[0].scatter(X[cls == c], Y[cls == c], s=16, marker="s", c=cc, label=f"{c} ({(cls == c).sum()})")
-    ax[0].plot(*panel_poly.exterior.xy, "k--", lw=1, label="정사 화면 판독 패널 배열")
-    for a, b in gl: ax[0].plot([a[0], b[0]], [a[1], b[1]], "k-", lw=1)
-    ax[0].set_aspect("equal"); ax[0].legend(fontsize=8); ax[0].set_title("지붕 표본 분류 (EPSG:5186)")
-    u = X * math.cos(math.radians(th_best)) + Y * math.sin(math.radians(th_best))
-    rr = Z - np.c_[X, Y, np.ones(len(X))] @ np.linalg.lstsq(np.c_[X, Y, np.ones(len(X))], Z, rcond=None)[0]
-    for c, cc in col.items(): ax[1].scatter(u[cls == c] % P_best, rr[cls == c], s=8, c=cc, label=c)
-    ax[1].set_xlabel(f"톱니 방향 {th_best:.0f}° 위치 mod 주기 {P_best:.2f} m"); ax[1].set_ylabel("평면 제거 잔차 (m)"); ax[1].legend(fontsize=8)
-    ax[1].set_title("주기로 접은 잔차: 높은 층(패널 상면)은 위상 약 1.4~6.4 m, 간극 위상에는 없음")
+    for a, (cls_, pol, ttl) in zip(ax, ((cls_old, OLD[0], "이전(잘못된 축척 식)"), (cls_new, NEW[0], "이후(뷰어 역투영 다각형)"))):
+        for c, cc in col.items(): a.scatter(X[cls_ == c], Y[cls_ == c], s=16, marker="s", c=cc, label=f"{c} ({(cls_ == c).sum()})")
+        a.plot(*pol.exterior.xy, "k--", lw=1, label="패널 배열 판독 다각형")
+        a.set_aspect("equal"); a.legend(fontsize=8); a.set_title(f"지붕 표본 분류 — {ttl}")
     fig.tight_layout(); fig.savefig(os.path.join(V, "panel-class.png"), dpi=100)
 except Exception as e:
     print("plot skipped", e)
-sys.exit(1 if any(l.startswith("FAIL") for l in lines) else 0)
+sys.exit(1 if any(l.startswith("FAIL") for l in L) else 0)
