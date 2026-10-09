@@ -8,7 +8,7 @@
 import hashlib, json, statistics, sys
 from pathlib import Path
 import numpy as np
-from shapely.geometry import LineString, Point, Polygon, shape
+from shapely.geometry import LineString, Point, Polygon, box, shape
 from shapely.ops import unary_union
 
 SRC, ROOT = Path(sys.argv[1]), Path(sys.argv[2])
@@ -131,6 +131,26 @@ feat('ST-A3-OUTLINE', 'stair_outline', {'type': 'LineString', 'coordinates': [[x
      {'kind': 'line', 'z': FIELD_Z, 'assumption': '양 끝 높이 근거 없음(인접 면은 지붕 SF-CHEONGUN-CANOPY뿐) → 계단 형상 미생성, 평면 외곽선만 운동장 z에 표시',
       'source': f'{SRC_TAG} ST-A3(주석 A3) 평면'})
 
+# 청운관 전면 열린 다층 돌출부(사진23, 영상 SKU 02:03 / DAKNAT 04:00): 벽 없이 기둥 + 중간 슬래브. 지붕(163.8)은 v3 SF-CHEONGUN-CANOPY 그대로.
+CH = shape(F['SF-CHEONGUN-CANOPY']['geometry'])
+CH_TOP = F['SF-CHEONGUN-CANOPY']['properties']['z']
+N_LV = 4  # 가정 층수
+for k in range(1, N_LV):
+    z = round(FIELD_Z + (CH_TOP - FIELD_Z) * k / N_LV, 2)
+    feat(f'EST-CHEONGUN-SLAB-{k}', 'open_slab', {'type': 'Polygon', 'coordinates': [ring(CH)]},
+         {'kind': 'extrude', 'fromM': round(z - 0.3, 2), 'toM': z,
+          'assumption': f'열린 다층 구조 {N_LV}층 균등 분할 가정(층수·층고 미측정): 운동장 {FIELD_Z}~지붕 {CH_TOP} 사이 {k}/{N_LV}, 슬래브 두께 0.3 m, 평면 = 지붕 평면과 같음, 벽 없음',
+          'source': f'{SRC_TAG} SF-CHEONGUN-CANOPY 평면·z(S-MAP), SF-FIELD z; 구조 종류 = 사진16·23, 영상 SKU 02:03·DAKNAT 04:00'})
+for k, (x, y) in enumerate(list(CH.minimum_rotated_rectangle.exterior.coords)[:4], 1):
+    c = CH.centroid
+    x, y = x + (c.x - x) * 0.08, y + (c.y - y) * 0.08  # 모서리에서 조금 안쪽
+    if box(x - 0.3, y - 0.3, x + 0.3, y + 0.3).intersects(unary_union([shape(F[q]['geometry']) for q in ('ST-CHEONGUN-DOWN', 'ST-A3')])):
+        continue  # 계단 위에 기둥을 세우지 않음
+    feat(f'EST-CHEONGUN-COL-{k}', 'column', {'type': 'Polygon', 'coordinates': [[[round(x - 0.3, 3), round(y - 0.3, 3)], [round(x + 0.3, 3), round(y - 0.3, 3)], [round(x + 0.3, 3), round(y + 0.3, 3)], [round(x - 0.3, 3), round(y + 0.3, 3)], [round(x - 0.3, 3), round(y - 0.3, 3)]]]},
+         {'kind': 'extrude', 'fromM': FIELD_Z, 'toM': CH_TOP,
+          'assumption': '기둥 0.6 m 정사각형, 지붕 평면 최소 회전 사각형 모서리 근처 4개 — 실제 기둥 수·위치 미측정(사진의 기둥 모양만 근거)',
+          'source': f'{SRC_TAG} SF-CHEONGUN-CANOPY 평면·z, SF-FIELD z; 사진23'})
+
 fc = {'type': 'FeatureCollection', 'name': 'field-structures-est-v1', 'crs': v3['crs'],
       'provenance': {'source': 'Obsidian 데이터/보완자료/3d-map-audit-20261009/claude-user-20261010/운동장구조/field-surfaces-v3.geojson', 'sha256': hashlib.sha256(raw).hexdigest(),
                      'roads': 'docs/audit/m16/preview/data/roads-live-2.json(운영 스냅샷, DRAFT z)', 'generator': 'docs/audit/field/build_structures_est.py',
@@ -180,10 +200,10 @@ for i in range(len(objs)):
         I = a[1].intersection(b[1])
         if I.area < 0.05:
             continue
-        over.append((a[0], b[0], round(I.area, 2)))
-        # 겹침 영역 0.5 m 격자 표본에서 z 구간이 tol 넘게 겹치면 3D 교차
+        # 겹침 영역 0.5 m 격자 표본: 3D 교차 + 수직 간격(위 객체 하단 − 아래 객체 상단) 최소값
         x0, y0, x1, y1 = I.bounds
         bad = 0
+        gap = None
         for x in np.arange(x0 + 0.25, x1, 0.5):
             for y in np.arange(y0 + 0.25, y1, 0.5):
                 if not I.contains(Point(x, y)):
@@ -199,11 +219,28 @@ for i in range(len(objs)):
                 else:
                     hit = min(ahi, bhi) - max(alo, blo) > TOL
                 bad += hit
+                upper_is_a = alo >= bhi - TOL or (alo + ahi) / 2 > (blo + bhi) / 2
+                g = (alo - bhi) if upper_is_a else (blo - ahi)
+                up = a[0] if upper_is_a else b[0]
+                if gap is None or g < gap[0]:
+                    gap = (g, up)
+        if gap is None:
+            continue
+        over.append((a[0], b[0], round(I.area, 2), round(gap[0], 2), gap[1]))
         if bad:
             inter.append((a[0], b[0], bad))
+ROOFS = ('SF-DAEIL-CANOPY', 'SF-CHEONGUN-CANOPY', 'EST-CHEONGUN-SLAB')
+CLEAR = 2.0
+stack = [o for o in over if (o[4].startswith(ROOFS) and o[3] >= CLEAR) or (o[4].startswith(('EST-CHEONGUN-COL', 'EST-WALL', 'EST-PLANTER')) and abs(o[3]) <= TOL)]
+improper = [o for o in over if o not in stack]
 lines.append(f'평면 겹침 쌍(면적≥0.05 m², 같은 계단 단끼리 제외): {len(over)}')
-for o in over:
-    lines.append(f'  {o[0]} × {o[1]}: {o[2]} m²')
+lines.append(f'(a) 의도된 수직 중첩(위가 지붕·슬래브이고 최소 간격 ≥ {CLEAR} m, 또는 기둥·옹벽·화단 하단이 아래 면에 놓임 |간격| ≤ {TOL} m): {len(stack)}')
+for o in stack:
+    lines.append(f'  {o[0]} × {o[1]}: {o[2]} m², 최소 간격 {o[3]} m (위 {o[4]})')
+lines.append(f'(b) 부적절(보행면끼리 상하 중첩·관통 또는 지붕 아래 간격 < {CLEAR} m): {len(improper)}')
+for o in improper:
+    note = '계단이 사잇길 경사면 아래에 묻힘(공통 XY에서 사잇길 z > 계단 상단)' if 'SF-CORRIDOR' in (o[0], o[1]) and o[4] == 'SF-CORRIDOR' else ''
+    lines.append(f'  {o[0]} × {o[1]}: {o[2]} m², 최소 간격 {o[3]} m (위 {o[4]}) {note}')
 lines.append(f'3D 교차(겹침 영역 0.5 m 표본에서 z 구간 겹침 > {TOL} m): {len(inter)}')
 for o in inter:
     lines.append(f'  {o[0]} × {o[1]}: 표본 {o[2]}')

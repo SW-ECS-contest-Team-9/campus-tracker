@@ -34,7 +34,7 @@ test('EPSG:5186 1 m = 1 m: 변환 왕복 오차 < 1 mm, 동서·남북 1 m 간�
 });
 
 test('모든 보정 피처는 source가 있고 거부 없이 읽힌다', () => {
-  assert.ok(present.includes('munye-highrise-v1.geojson'));
+  assert.ok(present.includes('munye-highrise-v2.geojson'));
   for (const f of present) {
     const fc = read(f);
     assert.ok(fc.provenance?.source && /^[0-9a-f]{64}$/.test(fc.provenance.sha256), `${f} provenance`);
@@ -54,7 +54,7 @@ test('source 없는 면, z 없는 surface는 거부', () => {
   assert.equal(r.errors.length, 2);
 });
 
-test('문예관: MY-T 하나만, 원천 좌표 원값, 원본 roofM 위로만 압출(아래·MY-R·기반·층수 불변)', () => {
+test('문예관 v1: MY-T 하나만, 원천 좌표 원값, 원본 roofM 위로만 압출', () => {
   const fc = read('munye-highrise-v1.geojson');
   assert.deepEqual(fc.features.map((f: any) => f.properties.id), ['MY-T']);
   const p = fc.features[0].properties;
@@ -66,6 +66,18 @@ test('문예관: MY-T 하나만, 원천 좌표 원값, 원본 roofM 위로만 �
   assert.equal(createHash('sha256').update(raw).digest('hex'), fc.provenance.sha256);
   const orig = JSON.parse(raw.toString('utf8')).features.find((f: any) => f.properties.id === 'MY-T');
   assert.deepEqual(fc.features[0].geometry, orig.geometry);
+});
+
+test('문예관 v2: 직선 벽 MY-T-CLEAN(8꼭짓점)과 저층 MY-L-EST 분리, 둘 다 추정 표시, 고층 상단 189.4·저층 상단 148.8', () => {
+  const fc = read('munye-highrise-v2.geojson');
+  const byId = new Map(fc.features.map((f: any) => [f.properties.id, f]));
+  const t: any = byId.get('MY-T-CLEAN');
+  const l: any = byId.get('MY-L-EST');
+  assert.equal(t.geometry.coordinates[0].length - 1, 8);
+  assert.equal(t.properties.toM, 189.4);
+  assert.equal(l.properties.toM, 148.8);
+  for (const f of [t, l]) assert.ok(f.properties.estimated === true && f.properties.assumption && f.properties.source);
+  assert.ok(/정확도 주장 없음/.test(fc.provenance.limit));
 });
 
 test('운동장 표면: 서로 다른 표면이 정점을 공유하지 않음(보간 연결면 없음), 대일관 돌출 지붕 아래 통로 높이 ≥ 2 m', { skip: !present.includes('field-surfaces-v3.geojson') }, () => {

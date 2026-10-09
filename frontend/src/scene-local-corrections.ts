@@ -8,9 +8,12 @@ type CesiumNS = typeof import('cesium');
 
 export type CorrectionGroup = 'corrected' | 'estimated';
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
-  { file: 'munye-highrise-v1.geojson', group: 'corrected' },
+  { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
+  // 다른 작업자 산출 예정(아직 없으면 pending): 평지 경계·계단 끝점 v4
+  { file: 'field-boundary-v4.geojson', group: 'estimated' },
+  { file: 'stair-endpoints-v4.geojson', group: 'estimated' },
 ];
 
 export type CorrectionFeature = {
@@ -89,14 +92,15 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, base = '/cor
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1' };
+const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa' };
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
   const extrudes: any[] = [];
   const surfaces: any[] = [];
   const outlines = new C.PolylineCollection({ show: false });
   features.forEach((f, i) => {
-    const css = estimated ? EST_COLORS[f.type ?? ''] ?? '#fb923c' : f.kind === 'extrude' ? '#60a5fa' : PALETTE[i % PALETTE.length];
+    const css = estimated ? EST_COLORS[f.type ?? ''] ?? '#fb923c' : f.kind === 'extrude' ? TYPE_COLORS[f.type ?? ''] ?? '#60a5fa' : PALETTE[i % PALETTE.length];
     const color = C.Color.fromCssColorString(css).withAlpha(estimated ? 1 : f.kind === 'extrude' ? 0.55 : 0.8);
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(css).darken(0.35, new C.Color()) });
     for (const poly of f.polygons) {
