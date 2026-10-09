@@ -1,0 +1,87 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import { register } from 'node:module';
+import test from 'node:test';
+import * as C from 'cesium';
+
+// src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
+register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
+const { parseCorrections, CORRECTION_FILES } = await import('../src/scene-local-corrections.ts');
+const { tmForward, tmInverse } = await import('../src/tm.ts');
+
+const DIR = new URL('../public/corrections/', import.meta.url);
+const present = CORRECTION_FILES.filter((f: string) => fs.existsSync(new URL(f, DIR)));
+const read = (f: string) => JSON.parse(fs.readFileSync(new URL(f, DIR), 'utf8'));
+
+test('EPSG:5186 1 m = 1 m: 변환 왕복 오차 < 1 mm, 동서·남북 1 m 간격의 측지 거리 1 m ± 1 mm', () => {
+  for (const f of present) {
+    for (const feat of read(f).features) {
+      const polys = feat.geometry.type === 'Polygon' ? [feat.geometry.coordinates] : feat.geometry.coordinates;
+      for (const [x, y] of polys.flat(2)) {
+        const { latitude, longitude } = tmInverse(x, y);
+        const back = tmForward(latitude, longitude);
+        assert.ok(Math.hypot(back.x - x, back.y - y) < 1e-3, `${f} ${x},${y}`);
+        for (const [dx, dy] of [[1, 0], [0, 1]]) {
+          const q = tmInverse(x + dx, y + dy);
+          const g = new C.EllipsoidGeodesic(C.Cartographic.fromDegrees(longitude, latitude), C.Cartographic.fromDegrees(q.longitude, q.latitude));
+          assert.ok(Math.abs(g.surfaceDistance - 1) < 1e-3, `${g.surfaceDistance}`);
+        }
+      }
+    }
+  }
+});
+
+test('모든 보정 피처는 source가 있고 거부 없이 읽힌다', () => {
+  assert.ok(present.includes('munye-highrise-v1.geojson'));
+  for (const f of present) {
+    const fc = read(f);
+    assert.ok(fc.provenance?.source && /^[0-9a-f]{64}$/.test(fc.provenance.sha256), `${f} provenance`);
+    const r = parseCorrections(f, fc);
+    assert.deepEqual(r.errors, []);
+    assert.equal(r.features.length, fc.features.length);
+  }
+});
+
+test('source 없는 면, z 없는 surface는 거부', () => {
+  const sq = [[[0, 0], [1, 0], [1, 1], [0, 0]]].map((r) => r.map(([a, b]) => [201000 + a, 557000 + b]));
+  const r = parseCorrections('t', { features: [
+    { properties: { id: 'a', kind: 'extrude', fromM: 1, toM: 2 }, geometry: { type: 'Polygon', coordinates: sq } },
+    { properties: { id: 'b', kind: 'surface', source: 's' }, geometry: { type: 'Polygon', coordinates: sq } },
+  ] });
+  assert.equal(r.features.length, 0);
+  assert.equal(r.errors.length, 2);
+});
+
+test('문예관: MY-T 하나만, 원천 좌표 원값, 원본 roofM 위로만 압출(아래·MY-R·기반·층수 불변)', () => {
+  const fc = read('munye-highrise-v1.geojson');
+  assert.deepEqual(fc.features.map((f: any) => f.properties.id), ['MY-T']);
+  const p = fc.features[0].properties;
+  assert.equal(p.fromM, 153.238); // 원본 scene roofM
+  assert.equal(p.toM, 189.4);
+  const src = 'C:/campus-tracker-backend/데이터/보완자료/3d-map-audit-20261009/claude-user-20261010/문예관고층부/munye-massing-candidate-5186.geojson';
+  if (!fs.existsSync(src)) return; // 원천 폴더가 없는 환경에서는 SHA 대조 생략
+  const raw = fs.readFileSync(src);
+  assert.equal(createHash('sha256').update(raw).digest('hex'), fc.provenance.sha256);
+  const orig = JSON.parse(raw.toString('utf8')).features.find((f: any) => f.properties.id === 'MY-T');
+  assert.deepEqual(fc.features[0].geometry, orig.geometry);
+});
+
+test('운동장 표면: 서로 다른 표면이 정점을 공유하지 않음(보간 연결면 없음), 대일관 돌출 지붕 아래 통로 높이 ≥ 2 m', { skip: !present.includes('field-surfaces-v3.geojson') }, () => {
+  const fc = read('field-surfaces-v3.geojson');
+  const owner = new Map<string, string>();
+  const pts = (f: any) => (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates).flat(2) as number[][];
+  for (const f of fc.features) {
+    for (const [x, y, z] of pts(f)) {
+      const k = `${x},${y},${z}`;
+      const o = owner.get(k);
+      assert.ok(!o || o === f.properties.id, `${k}: ${o} / ${f.properties.id}`);
+      owner.set(k, f.properties.id);
+    }
+  }
+  const byId = new Map(fc.features.map((f: any) => [f.properties.id, f]));
+  const canopy = Math.min(...pts(byId.get('SF-DAEIL-CANOPY')).map((p) => p[2]));
+  const pave = Math.max(...pts(byId.get('SF-DAEIL-ENTRY-PAVE')).map((p) => p[2]));
+  assert.ok(canopy - pave >= 2, `${canopy} - ${pave}`);
+  assert.equal(byId.get('SF-DAEIL-CANOPY').properties.walkable, false);
+});
