@@ -29,6 +29,9 @@
     <label><input type="checkbox" id="tBld" checked> 원본 건물(baseM~roofM)</label><br>
     <label><input type="checkbox" id="tRoads" checked> 현재 도로(roads-live-2)</label><br>
     <label><input type="checkbox" id="tCand" checked> 후보 4개</label><br>
+    <b>유담관(CT-M17)</b>
+    <label><input type="radio" name="yd" id="ydOrig" checked> 원본</label>
+    <label><input type="radio" name="yd" id="ydCand"> 분리 후보</label><br>
     <label><input type="radio" name="occ" id="occOn" checked> 가림 적용</label>
     <label><input type="radio" name="occ" id="occOff"> 후보 항상 보기</label>
   </p>
@@ -96,9 +99,39 @@ for (const o of outlines) {
     g.rotateX(-Math.PI / 2); g.translate(0, h.baseM, 0);
     const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xd8cfc0, transparent: true, opacity: 0.55 }));
     m.userData.info = `원본 건물 ${o.name}\nbaseM ${h.baseM} / roofM ${h.roofM}`;
+    if (o.name === '유담관') m.userData.yudamOrig = true;
     groups.bld.add(m);
   }
 }
+
+// CT-M17 유담관 분리 후보 (미리보기 전용). 상단: A=S-MAP 지붕 z 중앙값, B=데크 z 중앙값, C=원본 roofM 유지.
+// 하단은 미확정이라 셋 다 원본 baseM으로 둔다(대장 높이를 부분에 적용하지 않음).
+const ydGroup = new THREE.Group(); ydGroup.visible = false; groups.bld.add(ydGroup);
+{
+  const yc = await (await get('data/yudam-split-candidates-5186.geojson')).json();
+  const base = hByName['유담관'] ? hByName['유담관'].baseM : yc.properties.original_attrs.base_m;
+  const roofOrig = hByName['유담관'] ? hByName['유담관'].roofM : yc.properties.original_attrs.roof_m;
+  const COL = { 'Y-A': 0xc04040, 'Y-B': 0x4080c0, 'Y-C': 0xbbbbbb };
+  for (const f of yc.features) {
+    const p = f.properties;
+    const top = p.id === 'Y-C' ? roofOrig : p.topZ_median;
+    const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const poly of polys) {
+      const shape = new THREE.Shape(poly[0].map(([e, n]) => new THREE.Vector2(e - OX, n - OY)));
+      for (const hole of poly.slice(1)) shape.holes.push(new THREE.Path(hole.map(([e, n]) => new THREE.Vector2(e - OX, n - OY))));
+      const g = new THREE.ExtrudeGeometry(shape, { depth: top - base, bevelEnabled: false });
+      g.rotateX(-Math.PI / 2); g.translate(0, base, 0);
+      const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: COL[p.id], transparent: true, opacity: p.id === 'Y-C' ? 0.35 : 0.7 }));
+      m.userData.info = `${p.id} ${p.part}
+상단 ${top}${p.id === 'Y-C' ? ' (원본 roofM 유지)' : ' (S-MAP 표면 z 중앙값)'} / 하단 ${base} (원본 baseM, 미확정)
+accuracyVerified=false`;
+      ydGroup.add(m);
+    }
+  }
+}
+function setYudam(cand) { groups.bld.children.forEach(o => { if (o.userData.yudamOrig) o.visible = !cand; }); ydGroup.visible = cand; }
+document.getElementById('ydOrig').onchange = () => setYudam(false);
+document.getElementById('ydCand').onchange = () => setYudam(true);
 
 // 현재 도로
 const roads = await (await get('data/roads-live-2.json')).json();
@@ -191,7 +224,7 @@ function projectVertices() {
     return { ...v, sx: Math.round((q.x + 1) / 2 * W), sy: Math.round((1 - q.y) / 2 * H), inView: Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && q.z < 1 };
   });
 }
-window.preview = { setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
+window.preview = { setYudam: c => { document.getElementById(c ? 'ydCand' : 'ydOrig').checked = true; setYudam(c); }, setOcclusion: on => { document.getElementById(on ? 'occOn' : 'occOff').checked = true; setOcclusion(on); }, setCam, camText, projectVertices };
 setCam([201000, 557150, 220], [201050, 557250, 115]);
 
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); document.getElementById('cam').textContent = camText(); });
