@@ -162,3 +162,14 @@ test('계단 후보: 사잇길 절단 면은 원 면 대체용, 추정 계단 �
   assert.match(chk, /불일치 0/);
   assert.match(chk, /겹침: 0\.000 m²/);
 });
+
+test('v6 계단 후보: 새 계단·참·사잇길 대체 면 모두 추정·미검증, DRAFT 계단 숨김 접두어, 청운관 지붕 슬래브가 원 지붕 셀 면 대체', () => {
+  const fc = read('stairs-v6-est.geojson');
+  const r = parseCorrections('stairs-v6-est.geojson', fc, 'stairV6');
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(fc.provenance.hides, ['ST-DAEIL-EXIT-SIDE', 'ST-A14']);
+  assert.ok(fc.features.filter((f: any) => ['stair_step', 'landing'].includes(f.properties.type)).every((f: any) => f.properties.status === '미검증'));
+  assert.equal(r.features.find((f: any) => f.kind === 'surface')?.replaces, 'SF-CORRIDOR');
+  const ch = read('cheongun-split-v1.geojson').features.filter((f: any) => f.properties.replaces);
+  assert.deepEqual(ch.map((f: any) => f.properties.replaces), ['SF-CHEONGUN-CANOPY']);
+});

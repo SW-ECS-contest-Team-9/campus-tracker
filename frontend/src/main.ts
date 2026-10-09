@@ -975,6 +975,7 @@ async function boot() {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
           $<HTMLInputElement>('scene-estimated').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'estimated'));
           $<HTMLInputElement>('scene-stair-candidate').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'stairCandidate'));
+          $<HTMLInputElement>('scene-stair-v6').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'stairV6'));
           if (import.meta.env.DEV) (window as any).__localCorrections = c;
         });
         return r.viewer;

@@ -8,19 +8,19 @@ import { tmInverse } from './tm';
 
 type CesiumNS = typeof import('cesium');
 
-export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate';
+export type CorrectionGroup = 'corrected' | 'estimated' | 'stairCandidate' | 'stairV6';
 export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'munye-highrise-v2.geojson', group: 'corrected' }, // v1(셀 윤곽)은 비교용으로 파일만 보존
   { file: 'field-surfaces-v3.geojson', group: 'corrected' },
-  { file: 'terrain-clip-v1.geojson', group: 'corrected' }, // 표면 구역 안 지형 잘라냄 + 경계 세로 면
+  { file: 'terrain-clip-v1.geojson', group: 'corrected' }, // 표면 구역 안 지형 잘라냄 + 경계 렌더 연결면
   { file: 'field-structures-est-v1.geojson', group: 'estimated' },
-  // 다른 작업자 산출 예정(아직 없으면 pending): 평지 경계·계단 끝점 v4
-  { file: 'field-boundary-v4.geojson', group: 'estimated' },
-  // stair-endpoints-v4.geojson은 v5로 대체(파일만 보존)
-  { file: 'cheongun-split-v1.geojson', group: 'estimated' },
-  // 비교 후보 '계단 후보': 추정 계단 자리만 사잇길 면을 잘라낸 대체 면(켜면 SF-CORRIDOR 원 면 대신 표시, Corrected가 켜져 있을 때만)
-  { file: 'corridor-stair-cut-v1.geojson', group: 'stairCandidate' }, // 청운관 본체/돌출부 분리(원본 건물 평면 대체)
+  { file: 'field-boundary-v4.geojson', group: 'estimated' }, // 사진15 재대응 경계(참고선)
+  { file: 'cheongun-split-v1.geojson', group: 'estimated' }, // 청운관 본체/돌출부 분리(원본 건물 평면 대체), 지붕 슬래브가 원 지붕 셀 면 대체
   { file: 'stair-endpoints-v6.geojson', group: 'estimated' }, // 계단 끝점 상태 v6 + 제안 계단 선(v4·v5는 파일만 보존)
+  // 비교 'DRAFT 계단 노출 비교': 기존 DRAFT 기반 추정 계단 자리만 사잇길 면 절단(Corrected 위에서만)
+  { file: 'corridor-stair-cut-v1.geojson', group: 'stairCandidate' },
+  // 경쟁 후보 'v6 계단 후보': v6 끝점에 맞춘 새 추정 계단 + 그 자리 사잇길 대체(Corrected 위에서만, 켜면 DRAFT 비교보다 우선, 기존 DRAFT 계단 숨김)
+  { file: 'stairs-v6-est.geojson', group: 'stairV6' },
 ];
 
 export type CorrectionFeature = {
@@ -82,16 +82,21 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   const loaded: string[] = [];
   const pending: string[] = [];
   const errors: string[] = [];
-  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [] };
+  const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [] };
+  const hidesByGroup: Record<CorrectionGroup, string[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [] };
   for (const { file, group } of CORRECTION_FILES) {
     const fc = await loadFile(base, file);
     if (!fc) { pending.push(file); continue; }
     const r = parseCorrections(file, fc, group);
     loaded.push(file);
     byGroup[group].push(...r.features);
+    hidesByGroup[group].push(...(fc.provenance?.hides ?? [])); // 이 그룹이 켜지면 숨길 기존 객체 id 접두어
     errors.push(...r.errors);
   }
-  const prims = { corrected: draw(C, viewer, byGroup.corrected, false), estimated: draw(C, viewer, byGroup.estimated, true), stairCandidate: draw(C, viewer, byGroup.stairCandidate, false) };
+  const prims = {
+    corrected: draw(C, viewer, byGroup.corrected, false), estimated: draw(C, viewer, byGroup.estimated, true),
+    stairCandidate: draw(C, viewer, byGroup.stairCandidate, false), stairV6: draw(C, viewer, byGroup.stairV6, true),
+  };
   // 지형 잘라냄: 보정 면 구역 안 렌더 지형만 숨김(DEM 자료 불변). 끄면 clippingPolygons를 비활성화해 원본 그대로.
   const clips = byGroup.corrected.filter((f) => f.kind === 'clip');
   const clipping = clips.length ? new C.ClippingPolygonCollection({
@@ -99,24 +104,32 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
     polygons: clips.map((f) => new C.ClippingPolygon({ positions: C.Cartesian3.fromDegreesArray(f.polygons[0][0].slice(0, -1).flatMap(([lon, lat]) => [lon, lat])) })),
   }) : null;
   if (clipping) viewer.scene.globe.clippingPolygons = clipping;
-  const overrides = { corrected: byGroup.corrected, estimated: byGroup.estimated, stairCandidate: [] as CorrectionFeature[] };
-  const replaced = new Set(byGroup.stairCandidate.map((f) => f.replaces).filter(Boolean) as string[]);
-  const state = { corrected: false, estimated: false, stairCandidate: false };
+  const replacedBy = (g: CorrectionGroup) => byGroup[g].map((f) => f.replaces).filter(Boolean) as string[];
+  const state: Record<CorrectionGroup, boolean> = { corrected: false, estimated: false, stairCandidate: false, stairV6: false };
+  const apply = () => {
+    const v6 = state.corrected && state.stairV6; // 계단 후보들은 Corrected 위에서만 의미
+    const draft = state.corrected && state.stairCandidate && !v6;
+    const vis: Record<CorrectionGroup, boolean> = { corrected: state.corrected, estimated: state.estimated, stairCandidate: draft, stairV6: v6 };
+    for (const g of Object.keys(prims) as CorrectionGroup[]) for (const p of prims[g]) p.show = vis[g];
+    const hidden = new Set<string>([...(draft ? replacedBy('stairCandidate') : []), ...(v6 ? replacedBy('stairV6') : []), ...(state.estimated ? replacedBy('estimated') : [])]);
+    const prefixes = v6 ? hidesByGroup.stairV6 : [];
+    for (const [id, pid] of INSTANCE_IDS) {
+      const hide = hidden.has(id) || prefixes.some((x) => id.startsWith(x));
+      for (const l of OUTLINES.get(id) ?? []) l.show = !hide;
+      for (const p of [...prims.corrected, ...prims.estimated]) {
+        const a = p.getGeometryInstanceAttributes ? p.getGeometryInstanceAttributes(pid) : undefined;
+        if (a?.show) a.show = C.ShowGeometryInstanceAttribute.toValue(!hide, a.show);
+      }
+    }
+    if (clipping) clipping.enabled = state.corrected;
+  };
   if (errors.length) console.warn('local corrections rejected', errors);
   return {
-    loaded, pending, errors, ids: [...byGroup.corrected, ...byGroup.estimated, ...byGroup.stairCandidate].map((f) => f.id),
+    loaded, pending, errors, ids: Object.values(byGroup).flat().map((f) => f.id),
     setVisible(show: boolean, group: CorrectionGroup = 'corrected') {
       state[group] = show;
-      for (const g of ['corrected', 'estimated'] as const) for (const p of prims[g]) p.show = state[g];
-      const cand = state.corrected && state.stairCandidate; // 후보는 Corrected 위에서만 의미
-      for (const p of prims.stairCandidate) p.show = cand;
-      for (const p of prims.corrected) for (const id of replaced) {
-        const pid = INSTANCE_IDS.get(id);
-        const a = pid && p.getGeometryInstanceAttributes ? p.getGeometryInstanceAttributes(pid) : null;
-        if (a?.show) a.show = C.ShowGeometryInstanceAttribute.toValue(!cand, a.show);
-      }
-      if (group === 'corrected' && clipping) clipping.enabled = show;
-      for (const f of overrides[group]) if (f.kind === 'override') sceneLayer?.setFootprintOverride(f.buildingId!, show ? f.polygons : null);
+      apply();
+      if (group === 'estimated') for (const f of byGroup.estimated) if (f.kind === 'override') sceneLayer?.setFootprintOverride(f.buildingId!, show ? f.polygons : null);
       viewer.scene.requestRender?.();
     },
   };
@@ -126,8 +139,9 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
 // MY-T(압출)는 반투명: 원본 건물의 불명확 가장자리(MY-R)와 아래 저층이 덩어리 안에 묻히지 않고 보이게.
 // 추정 구조는 종류별 색(옹벽·화단·계단·참·외곽선).
 const INSTANCE_IDS = new Map<string, { kind: string; id: string; source: string }>();
+const OUTLINES = new Map<string, any[]>(); // 면 테두리선(대체 시 함께 숨김)
 const PALETTE = ['#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#f97316'];
-const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15' };
+const EST_COLORS: Record<string, string> = { retaining_wall: '#78716c', planter: '#4d7c0f', stair_step: '#fb923c', landing: '#fdba74', outline: '#ffffff', stair_outline: '#fb923c', open_slab: '#38bdf8', column: '#0369a1', endpoint_unverified: '#dc2626', endpoint_confirmed: '#16a34a', endpoint_surface_match: '#16a34a', stair_proposal: '#facc15', corridor_cut: '#a5b4fc' };
 const TYPE_COLORS: Record<string, string> = { high_rise: '#60a5fa', low_wing: '#a78bfa', corridor_cut: '#a5b4fc' }; // 계단 후보 사잇길 면은 원 면(남색)과 구분되는 연한 남색
 
 function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated: boolean): any[] {
@@ -165,7 +179,8 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
       const pickId = INSTANCE_IDS.get(f.id) ?? { kind: 'correction', id: f.id, source: f.source };
       INSTANCE_IDS.set(f.id, pickId); // 같은 객체로 개별 표시/숨김(getGeometryInstanceAttributes는 참조 비교)
       (f.kind === 'extrude' ? extrudes : surfaces).push(new C.GeometryInstance({ geometry, id: pickId, attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color), show: new C.ShowGeometryInstanceAttribute(true) } }));
-      outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(outer.flatMap(([lon, lat, z]) => [lon, lat, z + 0.05])), width: estimated ? 1 : 2, material: edge });
+      const line = outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(outer.flatMap(([lon, lat, z]) => [lon, lat, z + 0.05])), width: estimated ? 1 : 2, material: edge });
+      OUTLINES.set(f.id, [...(OUTLINES.get(f.id) ?? []), line]);
     }
   });
   const add = (instances: any[], translucent: boolean, offset: boolean) => instances.length
