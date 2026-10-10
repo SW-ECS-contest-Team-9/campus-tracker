@@ -2,13 +2,15 @@
 // the merged road / area surfaces (road-surface-layer.ts) and the cross-section tool (section-layer.ts).
 // A page gives the data (setData): the preview reads the public endpoints (loadPublicLayerData), the editor passes
 // its own in-memory snapshot (scene-layer-data.ts), so unsaved edits show too.
-// A further layer (e.g. stairs and walls from a structures file) joins through addLayer(): it is then cut by the
-// cross-section on both pages.
+// The structures and the neutral campus ground (structures-layer.ts) are part of it too: the road surfaces are built
+// around the structures (sync), and the cross-section cuts all of them.
+// A further layer joins through addLayer(): it is then cut by the cross-section on both pages.
 import { api, type TerrainGrid } from './api';
 import { sampler, type CampusSceneLayer } from './campus-map';
 import { RoadSurfaceLayer, type RoadSurfacePart } from './road-surface-layer';
 import { layerDataKey, type LayerData } from './scene-layer-data';
 import { SectionTool, type Cuttable } from './section-layer';
+import { StructuresLayer, type StructurePart } from './structures-layer';
 import type { Viewer } from './vworld';
 
 export type SceneLayersOptions = {
@@ -16,6 +18,12 @@ export type SceneLayersOptions = {
   scene: CampusSceneLayer | null;
   /** Which surface parts show at first (default: all but the underground ways). */
   visible?: Partial<Record<RoadSurfacePart, boolean>>;
+  /** Whether the structures and the neutral campus ground show at first (default: both). */
+  structures?: Partial<Record<StructurePart, boolean>>;
+  /** Shows or hides the ivory campus area of the ground texture (initCampusMap gives it): hidden while the campus ground is drawn instead of the terrain. */
+  campusTint?: (show: boolean) => void;
+  /** Called after the structures or the ground changed (a page redraws what depends on them). */
+  onStructures?: () => void;
   /** false: clicks go through the surfaces. */
   pickable?: boolean;
   /** Which entities the cross-section cuts (section-layer.ts `objects`); default: all. */
@@ -24,6 +32,7 @@ export type SceneLayersOptions = {
 
 export class SceneLayers {
   readonly surfaces: RoadSurfaceLayer;
+  readonly structures: StructuresLayer;
   readonly section: SectionTool;
   /** Called with the status text of the cross-section whenever it changes (bindLayerControls sets it). */
   onSectionStatus: (text: string) => void = () => undefined;
@@ -31,18 +40,21 @@ export class SceneLayers {
   private key = '';
   private readonly extra: (() => Cuttable | null)[] = [];
 
-  constructor(viewer: Viewer, options: SceneLayersOptions) {
+  constructor(viewer: Viewer, private readonly options: SceneLayersOptions) {
     const g = options.grid;
     const buildings = () => options.scene?.scene.buildings ?? [];
+    // before the road surfaces: the underground ways show through whatever was added to the scene before them
+    this.structures = new StructuresLayer(viewer, { terrain: sampler(g), buildings, campus: () => options.scene?.scene.campus ?? [], visible: options.structures, pickable: options.pickable, campusTint: options.campusTint });
     this.surfaces = new RoadSurfaceLayer(viewer, { ground: sampler(g), buildings, visible: options.visible, pickable: options.pickable });
+    this.structures.setUnderground(this.surfaces.isVisible('underground'));
     this.section = new SectionTool(viewer, {
-      height: sampler(g),
+      height: (x, y) => this.structures.groundAt(x, y), // the ground as drawn: the neutral surface inside the campus
       box: { minX: g.originX, minY: g.originY, maxX: g.originX + g.width * g.resolution, maxY: g.originY + g.height * g.resolution },
       buildings,
       roads: () => this.data.roads,
       surfaces: () => this.surfaces.surfaces(),
       areas: () => this.data.areas,
-      layers: () => [options.scene, this.surfaces, ...this.extra.map((get) => get())],
+      layers: () => [options.scene, this.structures, this.surfaces, ...this.extra.map((get) => get())],
       objects: options.sectionObjects,
     }, (text) => this.onSectionStatus(text));
   }
@@ -59,12 +71,37 @@ export class SceneLayers {
     this.key = key;
     this.data = data;
     this.surfaces.setData(data.roads, data.areas);
-    this.section.refresh();
+    this.sync();
   }
 
   setVisible(part: RoadSurfacePart, visible: boolean) {
     this.surfaces.setVisible(visible, part);
+    if (part === 'underground') this.structures.setUnderground(visible);
+    else this.sync(); // the neutral ground fills what a hidden surface leaves
     this.section.refresh(); // the cut face marks the surfaces that are shown
+  }
+
+  setStructuresVisible(part: StructurePart, visible: boolean) {
+    this.structures.setVisible(part, visible);
+    this.sync();
+  }
+
+  /** Reads the structure files, then draws (a page calls this once; without it the layer stays empty). */
+  async loadStructures() {
+    await this.structures.load();
+    this.sync();
+  }
+
+  /**
+   * Structures and road surfaces depend on each other in this order: the road surfaces are built around the
+   * structures (structures.ts PRECEDENCE), then the structures layer colours the platform tops with the roads on them
+   * and stretches the neutral ground between everything that is drawn.
+   */
+  private sync() {
+    this.surfaces.setContext(this.structures.context());
+    this.structures.setSurfaces(this.surfaces.drawn());
+    this.section.refresh();
+    this.options.onStructures?.();
   }
 }
 
@@ -77,6 +114,8 @@ export async function loadPublicLayerData(): Promise<LayerData> {
 export type LayerControls = {
   /** Checkboxes per surface part (a page may leave one out and drive that part itself). */
   parts: Partial<Record<RoadSurfacePart, HTMLInputElement>>;
+  /** Checkboxes of the structures and of the neutral campus ground. */
+  structures?: Partial<Record<StructurePart, HTMLInputElement>>;
   section: HTMLInputElement;
   /** Shown while a cut is set: holds the two buttons. */
   sectionTools: HTMLElement;
@@ -90,6 +129,10 @@ export function bindLayerControls(layers: SceneLayers, controls: LayerControls) 
   for (const [part, input] of Object.entries(controls.parts) as [RoadSurfacePart, HTMLInputElement][]) {
     input.checked = layers.surfaces.isVisible(part);
     input.addEventListener('change', () => layers.setVisible(part, input.checked));
+  }
+  for (const [part, input] of Object.entries(controls.structures ?? {}) as [StructurePart, HTMLInputElement][]) {
+    input.checked = layers.structures.isVisible(part);
+    input.addEventListener('change', () => layers.setStructuresVisible(part, input.checked));
   }
   layers.onSectionStatus = (text) => {
     controls.sectionStatus.textContent = text;

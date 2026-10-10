@@ -38,7 +38,7 @@ import {
 } from './trajectory';
 
 // ---------------- state ----------------
-type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | { kind: 'building'; id: string } | { kind: 'mobility'; pick: MobilityPick } | null;
+type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | { kind: 'building'; id: string } | { kind: 'mobility'; pick: MobilityPick } | { kind: 'structure'; id: string } | null;
 
 const state = {
   mode: 'live' as 'live' | 'history' | 'lab',
@@ -502,6 +502,7 @@ function renderDetail() {
   if (sel.kind === 'session') return renderSessionDetail(el, sel.id);
   if (sel.kind === 'building') return renderBuildingDetail(el, sel.id);
   if (sel.kind === 'mobility') return renderMobilityDetail(el, sel.pick);
+  if (sel.kind === 'structure') return renderStructureDetail(el, sel.id);
   return renderPointDetail(el, sel.pick);
 }
 
@@ -619,6 +620,17 @@ function renderBuildingDetail(el: HTMLElement, buildingId: string) {
     ${row('Note', `<span class="muted">${esc(b.note ?? '')}</span>`)}
   </table>
   <div class="small muted">Rough block model (docs/CAMPUS_3D_PREVIEW_PLAN.md): flat roof; base and roof on the same terrain DEM fusion uses.</div>`;
+}
+
+/** A structure of the structures files (structures-layer.ts): name, kind, heights, evidence grade. */
+function renderStructureDetail(el: HTMLElement, id: string) {
+  const d = sceneLayers?.structures.describe(id);
+  if (!d) return;
+  el.innerHTML = `<table>
+    ${row('구조물', `<b>${esc(d.title)}</b>`)}
+    ${d.rows.map(([k, v]) => row(esc(k), esc(v))).join('')}
+  </table>
+  <div class="small muted">구조물 파일(frontend/public/structures)의 값 그대로. 추정 표시가 있는 것은 치수·자리가 확정이 아니다.</div>`;
 }
 
 /** A hand-drawn corridor / open area / portal (edited in QGIS, schema mobility). */
@@ -925,6 +937,14 @@ function enablePicking(v: Viewer) {
       scheduleRender();
       return;
     }
+    // a structure (stair step, wall, platform ...) when it is the nearest of structures and buildings under the click
+    const first = hits.map((h) => h.id as { kind?: string; id?: string } | undefined).find((x) => x?.kind === 'structure' || x?.kind === 'building');
+    if (first?.kind === 'structure' && state.mode !== 'lab') {
+      state.selected = { kind: 'structure', id: first.id! };
+      campusScene?.select(null);
+      scheduleRender();
+      return;
+    }
     // campus 3D building (after the dots, so a dot in front of a wall still wins)
     const building = hits.map((h) => h.id as BuildingPick | undefined).find((x) => x?.kind === 'building');
     if (building && state.mode !== 'lab') {
@@ -979,15 +999,18 @@ async function boot() {
         setupSceneControls();
         // 길 면(편집기 도로, 읽기 전용): '차도'·'보행로' 기본 표시, '지하 길'은 체크 시
         // 단면도: 체크 뒤 지도에서 두 점을 찍으면 그 선으로 자름. 끄면 원래대로 (편집기와 같은 scene-layers.ts)
-        const layers = new SceneLayers(r.viewer, { grid: r.grid, scene: r.scene });
+        const layers = new SceneLayers(r.viewer, { grid: r.grid, scene: r.scene, campusTint: r.setCampusTint, onStructures: () => mobilityLayer?.refresh() });
         sceneLayers = layers;
+        // 구조물(기단·계단·벽 등)과 캠퍼스 안 미확정 바닥: 둘 다 기본 켬 (structures-layer.ts)
+        void layers.loadStructures().catch((err) => console.error('structures unavailable', err));
         layers.addLayer(() => mobilityLayer);
         bindLayerControls(layers, {
           parts: { ground: $<HTMLInputElement>('scene-roads'), pedestrian: $<HTMLInputElement>('scene-roads-pedestrian'), underground: $<HTMLInputElement>('scene-roads-underground') },
+          structures: { structures: $<HTMLInputElement>('scene-structures'), ground: $<HTMLInputElement>('scene-campus-ground') },
           section: $<HTMLInputElement>('scene-section'), sectionTools: $('scene-section-tools'), sectionLook: $('scene-section-look'), sectionFlip: $('scene-section-flip'), sectionStatus: $('scene-section-status'),
         });
         void reloadSceneLayers().catch((err) => console.error('road surfaces unavailable', err));
-        if (import.meta.env.DEV) (window as any).__section = layers.section;
+        if (import.meta.env.DEV) { (window as any).__section = layers.section; (window as any).__layers = layers; }
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
@@ -1016,6 +1039,7 @@ async function boot() {
       enablePicking(v);
       mobilityLayer = new MobilityLayer(v);
       mobilityLayer.surfacesElsewhere = sceneLayers !== null; // 포장면·운동장은 길 면과 합쳐 그림(운동장은 Paths 토글을 따름)
+      mobilityLayer.coveredByStructure = (a) => sceneLayers?.structures.coversArea(a.geometry.coordinates) ?? false; // 기단이 그 바닥이면 반투명 영역은 안 그림
       void mobilityLayer.reload().catch((err) => console.error('mobility spaces unavailable', err));
       $<HTMLInputElement>('scene-mobility').addEventListener('change', (e) => {
         mobilityLayer?.setVisible((e.target as HTMLInputElement).checked);

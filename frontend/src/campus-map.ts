@@ -361,7 +361,11 @@ export class CampusSceneLayer {
  * Creates the Cesium viewer with the campus terrain and 3D scene. Resolves like initVWorld (the viewer) plus the
  * building layer; without an imported scene the ground still works and `scene` is null.
  */
-export async function initCampusMap(containerId: string): Promise<{ viewer: Viewer; scene: CampusSceneLayer | null; grid: TerrainGrid; warning: string | null }> {
+export async function initCampusMap(containerId: string): Promise<{
+  viewer: Viewer; scene: CampusSceneLayer | null; grid: TerrainGrid; warning: string | null;
+  /** false: the ground texture has no ivory campus area (the terrain inside the campus is not drawn then, structures-layer.ts, and the ivory would only be a jagged fringe just outside its edge). */
+  setCampusTint: (show: boolean) => void;
+}> {
   (window as any).CESIUM_BASE_URL = '/cesium/';
   const C: CesiumNS = await import('cesium');
   (window as any).Cesium = C; // trajectory.ts / lab.ts use the global namespace (as with VWorld)
@@ -402,11 +406,20 @@ export async function initCampusMap(containerId: string): Promise<{ viewer: View
   scene.light = new C.DirectionalLight({ direction: C.Cartesian3.normalize(dir, dir), intensity: 2.2 });
 
   const campus = sceneData instanceof Error ? [] : sceneData.campus;
-  viewer.imageryLayers.addImageryProvider(
-    await C.SingleTileImageryProvider.fromUrl(groundTexture(grid, campus), {
+  const texture = async (regions: CampusScene['campus']) => viewer.imageryLayers.addImageryProvider(
+    await C.SingleTileImageryProvider.fromUrl(groundTexture(grid, regions), {
       rectangle: C.Rectangle.fromDegrees(grid.bounds.west, grid.bounds.south, grid.bounds.east, grid.bounds.north),
     }),
   );
+  const tinted = await texture(campus);
+  let plain: any = null; // the same hillshade without the campus colour: made when first asked for
+  let tint = true;
+  const setCampusTint = (show: boolean) => {
+    tint = show;
+    tinted.show = show;
+    if (plain) plain.show = !show;
+    else if (!show && campus.length) void texture([]).then((layer) => { plain = layer; layer.show = !tint; });
+  };
   for (const m of campus) {
     for (const poly of m.coordinates) {
       viewer.entities.add({ polyline: { positions: C.Cartesian3.fromDegreesArray(poly[0].flat()), width: 2, clampToGround: true, material: C.Color.fromCssColorString('#b3ae94') } });
@@ -422,8 +435,8 @@ export async function initCampusMap(containerId: string): Promise<{ viewer: View
   });
   if (sceneData instanceof Error) {
     viewer.camera.setView({ destination: C.Rectangle.fromDegrees(grid.bounds.west, grid.bounds.south, grid.bounds.east, grid.bounds.north) });
-    return { viewer, scene: null, grid, warning: `Campus 3D buildings unavailable: ${sceneData.message} (npm run scene:import)` };
+    return { viewer, scene: null, grid, setCampusTint, warning: `Campus 3D buildings unavailable: ${sceneData.message} (npm run scene:import)` };
   }
   layer!.home(0);
-  return { viewer, scene: layer, grid, warning: null };
+  return { viewer, scene: layer, grid, setCampusTint, warning: null };
 }

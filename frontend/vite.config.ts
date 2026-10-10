@@ -24,6 +24,29 @@ function cesiumStatic(): Plugin {
   };
 }
 
+// The structure files (frontend/public/structures/*.geojson, one per zone, written by the data tasks) are listed for the
+// browser at /structures/index.json: made from the folder, in dev on every request and on build into dist. A new zone
+// file is drawn without touching code (structures-layer.ts reads the list).
+const STRUCTURES_DIR = path.resolve(import.meta.dirname, 'public/structures');
+const structureFiles = () => (fs.existsSync(STRUCTURES_DIR) ? fs.readdirSync(STRUCTURES_DIR).filter((f) => f.endsWith('.geojson')).sort() : []);
+function structuresIndex(): Plugin {
+  return {
+    name: 'structures-index',
+    configureServer(server) {
+      server.middlewares.use('/structures/index.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end(JSON.stringify(structureFiles()));
+      });
+    },
+    writeBundle(options) {
+      const out = path.join(options.dir ?? 'dist', 'structures');
+      fs.mkdirSync(out, { recursive: true });
+      fs.writeFileSync(path.join(out, 'index.json'), JSON.stringify(structureFiles()));
+    },
+  };
+}
+
 // The preview talks to the backend through this dev server (same origin): /api, /health and
 // /socket.io are proxied to the backend. So there is no hard-coded backend URL in the browser code,
 // the backend port comes only from PORT in the root .env, and no CORS is needed.
@@ -55,6 +78,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       cesiumStatic(),
+      structuresIndex(),
       {
         name: 'vworld-loader',
         transformIndexHtml: () =>

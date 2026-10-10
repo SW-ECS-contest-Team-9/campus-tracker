@@ -71,6 +71,11 @@ export const PAVED = {
   shortRoadM: 12,
   /** Around a level area the height changes over to the road heights within this distance. */
   areaBlendM: 3,
+  /**
+   * A surface runs into the top of a platform (structures.ts) without a step, changing over within areaBlendM of its
+   * edge, when the two heights are within this of each other there. A larger difference is left: that is a wall face.
+   */
+  platformFlushM: 0.5,
   /** A point takes its height from the roads within their half width plus this (weighted by nearness). */
   roadReachM: 2.5,
   /** No triangle of a sloping surface is longer than about this (the surface is cut into cells of this size). */
@@ -353,7 +358,32 @@ export function roadProfile(centre: P3[], ground: (x: number, y: number) => numb
  * height. Elsewhere: the height lines of the roads within reach, weighted by nearness; within PAVED.areaBlendM of a
  * level area the two are mixed, so a road runs into a level area without a step. Nothing in reach: the ground.
  */
-export function surfaceHeight(lines: { line: P3[]; halfWidthM: number }[], levels: { ring: Ring; z: number }[], ground: (x: number, y: number) => number) {
+export function surfaceHeight(
+  lines: { line: P3[]; halfWidthM: number }[], levels: { ring: Ring; z: number }[], ground: (x: number, y: number) => number,
+  platforms: { ring: Ring; top: (x: number, y: number) => number }[] = [],
+) {
+  const boxes = platforms.map(({ ring }) => ({ minX: Math.min(...ring.map((p) => p[0])), minY: Math.min(...ring.map((p) => p[1])), maxX: Math.max(...ring.map((p) => p[0])), maxY: Math.max(...ring.map((p) => p[1])) }));
+  /** Towards the top of a platform near its edge, when the step would be small (PAVED.platformFlushM). */
+  const flush = (x: number, y: number, z: number): number => {
+    let best: { d: number; top: number } | null = null;
+    platforms.forEach(({ ring, top }, k) => {
+      const b = boxes[k];
+      if (x < b.minX - PAVED.areaBlendM || y < b.minY - PAVED.areaBlendM || x > b.maxX + PAVED.areaBlendM || y > b.maxY + PAVED.areaBlendM) return;
+      ring.forEach((p, i) => {
+        const q = ring[(i + 1) % ring.length];
+        const { d, t } = toSegment(x, y, p, q);
+        if (d < PAVED.areaBlendM && (!best || d < best.d)) best = { d, top: top(p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t) };
+      });
+    });
+    const near = best as { d: number; top: number } | null;
+    if (!near || Math.abs(z - near.top) > PAVED.platformFlushM) return z;
+    const t = near.d / PAVED.areaBlendM;
+    return near.top + (z - near.top) * t * t * (3 - 2 * t);
+  };
+  const plain = surfaceHeightPlain(lines, levels, ground);
+  return platforms.length ? (x: number, y: number) => flush(x, y, plain(x, y)) : plain;
+}
+function surfaceHeightPlain(lines: { line: P3[]; halfWidthM: number }[], levels: { ring: Ring; z: number }[], ground: (x: number, y: number) => number) {
   const reachOf = (halfWidthM: number) => halfWidthM + PAVED.closeRadiusM + PAVED.roadReachM;
   const grid = new SegmentGrid<number>(8, 0);
   lines.forEach(({ line, halfWidthM }, road) => { for (let i = 0; i + 1 < line.length; i++) grid.add(line[i], line[i + 1], road, reachOf(halfWidthM)); });
@@ -433,7 +463,7 @@ function triangulate(shape: Shape, cellM: number, vertex: (x: number, y: number)
 }
 
 /** Vertical faces from every outline edge down (or up) to the ground, reaching PAVED.skirtDepthM into it. x, y, z per vertex. */
-function skirt(shape: Shape, height: (x: number, y: number) => number, ground: (x: number, y: number) => number): Mesh {
+function skirt(shape: Shape, height: (x: number, y: number) => number, ground: (x: number, y: number) => number, skip: (x: number, y: number) => boolean = () => false): Mesh {
   const mesh: Mesh = { positions: [], indices: [] };
   for (const path of shape) {
     const ring = toRing(path).map(([x, y]) => {
@@ -442,6 +472,7 @@ function skirt(shape: Shape, height: (x: number, y: number) => number, ground: (
     });
     ring.forEach((a, i) => {
       const b = ring[(i + 1) % ring.length];
+      if (skip((a.x + b.x) / 2, (a.y + b.y) / 2)) return;
       const at = mesh.positions.length / 3;
       mesh.positions.push(a.x, a.y, a.top, b.x, b.y, b.top, b.x, b.y, b.bottom, a.x, a.y, a.bottom);
       mesh.indices.push(at, at + 1, at + 2, at, at + 2, at + 3);
@@ -476,7 +507,14 @@ export type PavedSurfaces = {
     skirt: Mesh;
     /** The outline as rings without holes: the ground inside is hidden. */
     outline: Ring[];
+    /** The plan shape exactly as drawn: polygons, each its outer ring and then its holes. */
+    drawn: Ring[][];
   }[];
+  /**
+   * The parts of each material that lie on a platform (input `exclude`): not drawn here. The platform is the geometry
+   * there, and these polygons (outer ring, then holes) only colour its top (structures.ts PRECEDENCE).
+   */
+  covered: { material: Material; polygons: Ring[][] }[];
   /** Pedestrian ways drawn as part of the black paved surface. */
   joinedRoadIds: string[];
   /** Per surface road: drawn at its stored height, or on the smoothed ground. */
@@ -491,10 +529,21 @@ export type PavedSurfaces = {
  * clipped against the buildings, split by material, triangulated at the surface height with a rim and a skirt.
  * Underground roads are not part of it (road-surface.ts draws them at their stored height).
  */
-export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: SurfaceArea[]; buildings: Ring[][]; ground: (x: number, y: number) => number }): PavedSurfaces {
+export function buildPavedSurfaces(input: {
+  roads: SurfaceRoad[]; areas: SurfaceArea[]; buildings: Ring[][]; ground: (x: number, y: number) => number;
+  /**
+   * Structures the surfaces give way to (the rules are structures.ts PRECEDENCE): nothing is drawn inside a platform
+   * or under a stair step or landing (`treads`), and the ribbon of a `stairs` road also ends `stairRibbonReachM`
+   * before a tread. Polygons in metres: outer ring, then holes. Only the materials of `platformTints` come back in
+   * `covered` (they colour the platform top).
+   */
+  exclude?: { platforms: { polygon: Ring[]; top: (x: number, y: number) => number }[]; treads: Ring[][]; stairRibbonReachM: number; platformTints: string[] };
+  /** Where this is true the ground beside a surface is drawn flush with it (campus-ground.ts): the skirt there only hangs below the surface. */
+  flush?: (x: number, y: number) => boolean;
+}): PavedSurfaces {
   const roads = input.roads.filter((r) => surfaceKind(r) !== null && !isUnderground(r));
   const first = roads[0]?.geometry.coordinates[0] ?? input.areas[0]?.rings[0][0];
-  if (!first) return { surfaces: [], joinedRoadIds: [], heightSource: {}, rawOutline: [], outline: [] };
+  if (!first) return { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
   const joinedRoadIds = pavedRoadIds(roads, input.areas.filter((a) => a.fill === 'asphalt').map((a) => a.rings));
   origin = [Math.floor(first[0]), Math.floor(first[1])];
 
@@ -545,8 +594,28 @@ export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: Surface
     parts.set(to, union(parts.get(to)!, piece));
   }
 
+  // structures win where they are (structures.ts PRECEDENCE)
+  const covered: PavedSurfaces['covered'] = [];
+  const platforms = union(...(input.exclude?.platforms ?? []).map((p) => polygonShape(p.polygon)));
+  const treads = union(...(input.exclude?.treads ?? []).map(polygonShape));
+  const gone = union(platforms, treads);
+  if (gone.length) {
+    const nearTreads = union(gone, grow(treads, input.exclude!.stairRibbonReachM));
+    for (const m of MATERIALS) {
+      const mine = parts.get(m)!;
+      if (!mine.length) continue;
+      const on = both(mine, platforms);
+      if (on.length && input.exclude!.platformTints.includes(m)) covered.push({ material: m, polygons: polygons(on).map(({ outer, holes }) => [toRing(outer), ...holes.map(toRing)]) });
+      // what is left, without the pieces too thin to be a surface (the cut itself stays sharp: these are built edges)
+      const left = polygons(minus(mine, m === 'stairs' ? nearTreads : gone)).map(({ outer, holes }) => [outer, ...holes]).filter((piece) => opening(piece, PAVED.sliverM).length > 0);
+      parts.set(m, left.flat());
+    }
+  }
+  const atStructure = gone.length ? ringGrid(gone.map(toRing), 0.5) : null;
+  const flush = input.flush;
+
   const levels = input.areas.filter((a) => a.elevationM != null).map((a) => ({ ring: a.rings[0], z: a.elevationM! }));
-  const height = surfaceHeight(lines, levels, input.ground);
+  const height = surfaceHeight(lines, levels, input.ground, (input.exclude?.platforms ?? []).flatMap((p) => p.polygon.map((ring) => ({ ring, top: p.top }))));
   const fieldZ = input.areas.find((a) => a.fill === 'field' && a.elevationM != null)?.elevationM;
   const inner = grow(whole, -PAVED.rimWidthM);
   const toEdge = ringGrid(whole.map(toRing), PAVED.rimWidthM);
@@ -563,9 +632,15 @@ export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: Surface
       const t = 1 - Math.min(1, toEdge(x, y) / PAVED.rimWidthM);
       return [z(x, y), t * t * (3 - 2 * t)];
     }, mesh);
-    surfaces.push({ material: m, mesh, skirt: skirt(shape, z, input.ground), outline: withoutHoles(ClipperLib.Clipper.CleanPolygons(parts.get(m)!, 0.02 * MM)) });
+    // no skirt along a structure (its own side face is there), and only a short one where the ground is drawn flush
+    const beside = flush ? (x: number, y: number) => (flush(x, y) ? z(x, y) : input.ground(x, y)) : input.ground;
+    surfaces.push({
+      material: m, mesh, skirt: skirt(shape, z, beside, atStructure ? (x, y) => atStructure(x, y) < 0.02 : undefined),
+      outline: withoutHoles(ClipperLib.Clipper.CleanPolygons(parts.get(m)!, 0.02 * MM)),
+      drawn: polygons(shape).map(({ outer, holes }) => [toRing(outer), ...holes.map(toRing)]),
+    });
   }
-  return { surfaces, joinedRoadIds, heightSource, rawOutline: everything.map(toRing), outline: whole.map(toRing) };
+  return { surfaces, joinedRoadIds, heightSource, covered, rawOutline: everything.map(toRing), outline: whole.map(toRing) };
 }
 
 /** Test and measuring helpers: the same operations on plain rings in metres. */

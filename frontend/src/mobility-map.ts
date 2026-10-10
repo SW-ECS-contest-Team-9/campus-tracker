@@ -40,6 +40,8 @@ export class MobilityLayer {
    * height): they are then left out here. False (the VWorld map): drawn here as before.
    */
   surfacesElsewhere = false;
+  /** An open area for which this is true is not drawn: a platform solid is that ground (structures.ts PRECEDENCE 4). */
+  coveredByStructure: ((area: MobilityOpenArea) => boolean) | null = null;
   data: MobilitySpaces = { corridors: [], openAreas: [], portals: [] };
 
   constructor(private readonly viewer: Viewer) {
@@ -52,6 +54,11 @@ export class MobilityLayer {
     this.data = await api.mobility();
     this.draw();
     return this.data;
+  }
+
+  /** Draw again from the data already read (what the structures cover changed). */
+  refresh() {
+    this.draw();
   }
 
   setVisible(visible: boolean) {
@@ -103,6 +110,7 @@ export class MobilityLayer {
         }
         continue;
       }
+      if (this.coveredByStructure?.(a)) continue;
       this.add({
         polygon: {
           hierarchy,

@@ -45,6 +45,15 @@ export function areaSurfacePart(area: { kind: string; name: string | null; eleva
   return fill.id === 'field' ? 'area' : 'ground';
 }
 
+/** What the structures layer tells the surfaces (scene-layers.ts passes it on): `key` changes when anything in it does. */
+export type SurfaceContext = {
+  key: string;
+  /** The structures the surfaces give way to (structures.ts PRECEDENCE). */
+  exclude?: { platforms: { polygon: number[][][]; top: (x: number, y: number) => number }[]; treads: number[][][][]; stairRibbonReachM: number; platformTints: string[] };
+  /** Where the ground beside a surface is drawn flush with it (the neutral campus ground). */
+  flush?: (x: number, y: number) => boolean;
+};
+
 export class RoadSurfaceLayer {
   private readonly prims: any;
   private parts: { part: RoadSurfacePart; prim: any }[] = [];
@@ -54,11 +63,12 @@ export class RoadSurfaceLayer {
   /** The data changed since the surfaces were built (they are built only while a part is shown). */
   private stale = false;
   /** Built once per data change, not per frame and not per toggle. */
-  private paved: PavedSurfaces = { surfaces: [], joinedRoadIds: [], heightSource: {}, rawOutline: [], outline: [] };
+  private paved: PavedSurfaces = { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
   private underground: ReturnType<typeof buildRoadSurfaces>['underground'] = [];
   roads: CarriagewayRoad[] = [];
   /** How long the last build of the merged surfaces took. */
   buildMs = 0;
+  private context: SurfaceContext = { key: '' };
 
   constructor(private readonly viewer: Viewer, private readonly src: RoadSurfaceSources) {
     this.prims = viewer.scene.primitives.add(new (window as any).Cesium.PrimitiveCollection());
@@ -77,7 +87,7 @@ export class RoadSurfaceLayer {
     if (!this.stale) return;
     if (!Object.values(this.visible).some(Boolean)) {
       // nothing shown: drop what was drawn from the old data, build when a part is turned on
-      this.paved = { surfaces: [], joinedRoadIds: [], heightSource: {}, rawOutline: [], outline: [] };
+      this.paved = { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
       this.underground = [];
       this.draw();
       return;
@@ -88,6 +98,7 @@ export class RoadSurfaceLayer {
     this.paved = buildPavedSurfaces({
       roads: this.roads, areas: surfaceAreas(this.areas), ground: this.src.ground,
       buildings: this.src.buildings().flatMap((b) => b.geometry.coordinates.map((poly) => poly.map(metres))),
+      exclude: this.context.exclude, flush: this.context.flush,
     });
     this.underground = buildRoadSurfaces(this.roads).underground;
     this.buildMs = performance.now() - started;
@@ -95,6 +106,26 @@ export class RoadSurfaceLayer {
   }
 
   isVisible(part: RoadSurfacePart) { return this.visible[part]; }
+
+  /** The structures changed (or were turned on or off): the surfaces are built again around them. */
+  setContext(context: SurfaceContext) {
+    if (context.key === this.context.key) return;
+    this.context = context;
+    this.stale = true;
+    this.build();
+  }
+
+  /**
+   * The visible ground surfaces as drawn, for the structures layer: plan shape and triangles (x, y, height, edge per
+   * vertex) of what lies outside the platforms, and per material the polygons that lie on a platform (they colour its top).
+   */
+  drawn() {
+    const shown = (m: Material) => this.visible[PART[m]];
+    return {
+      surfaces: this.paved.surfaces.filter((s) => shown(s.material)).map((s) => ({ polygons: s.drawn, mesh: s.mesh, stride: 4 })),
+      covered: this.paved.covered.filter((c) => shown(c.material)).map((c) => ({ color: this.color(c.material), polygons: c.polygons })),
+    };
+  }
 
   setVisible(visible: boolean, part: RoadSurfacePart = 'ground') {
     this.visible[part] = visible;
