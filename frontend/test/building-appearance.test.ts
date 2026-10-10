@@ -69,3 +69,42 @@ test('평지붕: 지붕 색 뚜껑 한 장, 테두리 띠는 벽 꼭대기 1.2 m
   assert.equal(tris(rim), 2 + 4 * 2);
   assert.equal(Math.min(...zs(rim)), 118.8);
 });
+
+// ---- Z07 ----
+test('벽면: 그 방향을 보는 벽만 다른 재질의 판을 받는다(나머지 벽은 그대로)', async () => {
+  const { azimuth, faceOf } = await import('../src/building-appearance.ts');
+  assert.equal(Math.round(azimuth([0, 1])), 0);
+  assert.equal(Math.round(azimuth([1, 0])), 90);
+  const a = { wall: 'stone', faces: [{ azimuth: 0, spread: 30, wall: 'ivy' }] };
+  assert.equal(faceOf(a, [0.3, 0.95])?.wall, 'ivy');
+  assert.equal(faceOf(a, [1, 0]), undefined);
+  const mesh = decorate([block], { roofM: 120, groundM: 100 }, a);
+  // 북쪽을 보는 긴 벽(y = Y0 + 12) 하나에만 판 하나(삼각형 둘), 담쟁이 색, 벽 밖 3 cm
+  assert.equal(tris(mesh), 2);
+  for (let i = 0; i < mesh.positions.length; i += 3) assert.ok(Math.abs(mesh.positions[i + 1] - (Y0 + 12.03)) < 1e-6);
+  assert.deepEqual(mesh.colors.slice(0, 3), [0x4d, 0x6b, 0x3a]);
+});
+
+test('긴 아치: 칸마다 층을 꿰뚫는 유리 한 장과 둥근 머리, 층 바닥마다 벽 띠', () => {
+  const a = { wall: 'white', windows: { style: 'bays' as const, floorsM: [100, 104, 108, 112] } };
+  const mesh = decorate([[[[X0, Y0], [X0 + 10, Y0], [X0 + 10, Y0 + 0.5], [X0, Y0 + 0.5], [X0, Y0]]]], { roofM: 117, groundM: 100 }, a);
+  // 10 m 벽 둘에 칸 둘씩(짧은 벽 0.5 m 는 건너뜀): 칸 하나 = 유리 2 + 머리 8 + 층 띠 3 x 2 삼각형
+  assert.equal(tris(mesh), 4 * (2 + 8 + 6));
+  assert.ok(Math.max(...zs(mesh)) <= 117 - 0.5 + 1e-6 && Math.min(...zs(mesh)) >= 100.6 - 1e-6);
+});
+
+test('지붕까지: 층 표가 끝난 위로 마지막 층 간격의 줄이 벽 꼭대기 2 m 아래까지 이어진다', () => {
+  const a = { wall: 'glass', windows: { style: 'curtain' as const, floorsM: [100, 104, 108], toRoof: true } };
+  assert.deepEqual(storeys(a, 100, 125).map((l) => l[0]), [100, 104, 108, 112, 116, 120]);
+  assert.deepEqual(storeys({ ...a, windows: { ...a.windows, toRoof: false } }, 100, 125).map((l) => l[0]), [100, 104, 108]);
+});
+
+test('기둥 열: 그 방향의 가장 긴 벽 가운데에 기둥과 보, 그 뒤에는 창이 없다', () => {
+  const rows = { wall: 'stone', windows: { style: 'rows' as const, floorsM: [100, 104, 108] } };
+  const plain = decorate([block], { roofM: 113, groundM: 100 }, rows);
+  const withColumns = decorate([block], { roofM: 113, groundM: 100 }, { ...rows, faces: [{ azimuth: 180, spread: 30, columns: 4 }] });
+  // 남쪽 긴 벽: 들임 판 1 + 기둥 4 + 보 1 (기둥·보는 면 넷씩) = 2 + 5 x 8 삼각형이 더해지고, 가려진 창 칸(층마다)이 빠진다
+  const span = 3 * 4.4 + 0.9, hiddenPerLevel = Array.from({ length: 12 }, (_, c) => (40 - 12 * 3.2) / 2 + (3.2 - 1.5) / 2 + c * 3.2).filter((s) => s + 1.5 > (40 - span) / 2 - 0.5 && s < (40 + span) / 2 + 0.5).length;
+  assert.equal(tris(withColumns), tris(plain) + 2 + 5 * 8 - hiddenPerLevel * 3 * 2);
+  assert.ok(hiddenPerLevel >= 4);
+});

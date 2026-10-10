@@ -6,3 +6,4 @@ _src = _src.replace('WG = np.array([200984.0, 557399.5])', 'WG = np.array([wx(55
 exec(_src.replace('Z04-', 'Z05-').replace('Z04 ', 'Z05 '))
 if (HERE5 / 'boxes_z05.py').exists(): exec((HERE5 / 'boxes_z05.py').read_text(encoding='utf-8'))
 if (HERE5 / 'boxes_z06.py').exists(): exec((HERE5 / 'boxes_z06.py').read_text(encoding='utf-8'))
+if (HERE5 / 'boxes_z07.py').exists(): exec((HERE5 / 'boxes_z07.py').read_text(encoding='utf-8'))

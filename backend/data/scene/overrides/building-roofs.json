@@ -591,11 +591,26 @@
         ],
         "color": "#7f8f97"
       },
+      "faces": [
+        {
+          "azimuth": 26,
+          "grade": "확정",
+          "spread": 30,
+          "wall": "ivy"
+        },
+        {
+          "azimuth": 205,
+          "grade": "확정(기둥 넷과 보), 추정(자리·치수)",
+          "spread": 30,
+          "columns": 4
+        }
+      ],
       "roof": {
         "type": "hipped",
         "material": "tile",
         "color": "#6b7280",
-        "riseM": 3.0
+        "riseM": 3.0,
+        "eaveBandM": 1.2
       },
       "grades": {
         "wall": "원천(학교 사진)",
@@ -604,15 +619,27 @@
       },
       "features": [
         {
-          "what": "정면의 큰 기둥 열",
-          "evidence": "학교 공식 사진 판독, DAKNAT 02:29(사진 파일은 볼트에 없음)",
-          "grade": "원천(학교 사진)",
+          "what": "남쪽 면 가운데의 큰 기둥 열(흰 기둥 넷과 보)",
+          "evidence": "사용자-유담관분수-북악관앞-20261010/유담관-분수광장-넓게.jpg",
+          "grade": "확정(사용자 사진)",
+          "drawn": true
+        },
+        {
+          "what": "내리막길 쪽 벽의 담쟁이",
+          "evidence": "사용자-SMAP높이-20261010/사진-21-사잇길-상행.png",
+          "grade": "확정",
+          "drawn": true
+        },
+        {
+          "what": "처마 밑 공포(흰 받침 줄)와 두 겹 처마",
+          "evidence": "사용자-SMAP높이-20261010/사진-21-사잇길-상행.png, 사용자-유담관분수-북악관앞-20261010/유담관-분수광장-넓게.jpg. 밝은 띠 하나로만 그림",
+          "grade": "확정",
           "drawn": false
         },
         {
-          "what": "내리막길 쪽 벽의 담쟁이와 처마 밑 공포",
-          "evidence": "사용자-SMAP높이-20261010/사진-21-사잇길-상행.png",
-          "grade": "확정",
+          "what": "회차 공간 쪽(서쪽 끝) 면과 동쪽 끝 면의 모습",
+          "evidence": "사용자-SMAP높이-20261010/사진-30-문예관-원형고층부-사잇길.png(동쪽 끝 아래에 흰 기둥이 보이나 어느 면인지 못 가림). 서쪽 끝 면을 찍은 사진은 볼트에 없다",
+          "grade": "추정",
           "drawn": false
         }
       ]
@@ -660,7 +687,7 @@
       "id": "수인관",
       "wall": "white",
       "windows": {
-        "style": "arches",
+        "style": "bays",
         "floorsM": [
           108.0,
           112.02,
@@ -713,7 +740,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -771,7 +799,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -808,7 +837,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -845,7 +875,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -882,7 +913,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -919,7 +951,8 @@
           151.8,
           155.6
         ],
-        "color": "#86b9da"
+        "color": "#86b9da",
+        "toRoof": true
       },
       "roof": {
         "type": "flat",
@@ -935,7 +968,7 @@
       "id": "은주관",
       "wall": "stone",
       "windows": {
-        "style": "arches",
+        "style": "bays",
         "floorsM": [
           131.3,
           137.2,
@@ -1076,7 +1109,7 @@
       "id": "은주관#접합부",
       "wall": "stone",
       "windows": {
-        "style": "arches",
+        "style": "bays",
         "floorsM": [
           131.3,
           137.2,
@@ -1101,7 +1134,7 @@
       "id": "은주관#접합부-남서날개",
       "wall": "stone",
       "windows": {
-        "style": "arches",
+        "style": "bays",
         "floorsM": [
           131.3,
           137.2,
@@ -1243,6 +1276,35 @@
         "wall": "원천(학교 사진)",
         "roof": "S-MAP"
       }
+    },
+    {
+      "id": "추가-상승관",
+      "wall": "brick",
+      "windows": {
+        "style": "rows",
+        "floorsM": [
+          153.1,
+          156.43,
+          159.77
+        ]
+      },
+      "roof": {
+        "type": "flat",
+        "material": "metal"
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "추정",
+        "roof": "확정(짙은 지붕), 재질은 추정"
+      },
+      "features": [
+        {
+          "what": "우편취급국 글자",
+          "evidence": "사용자 확정 2026-10-11(글자가 있는 낮은 건물). 어느 벽에 있는지 모름",
+          "grade": "확정",
+          "drawn": false
+        }
+      ]
     },
     {
       "id": "추가-외국인생활관",

@@ -295,3 +295,12 @@ test('화단 기단은 윗면만 초록이고 옆면은 벽 색, 상자의 재�
   assert.equal(solidColors(solid('box', 'deck', 'timber')).body, STRUCTURES.types.deck);
   assert.equal(solidColors(solid('box', 'canopy', 'opening')).top, STRUCTURES.boxMaterials.opening);
 });
+
+test('Z07: 상자는 제 색(color, topColor)을 가질 수 있다. 기단은 아니다', async () => {
+  const { STRUCTURES, solidColors } = await import('../src/structures.ts');
+  const solid = (role: string, type: string, props: Record<string, unknown>, material?: string) => ({ role, type, material, props }) as any;
+  assert.deepEqual(solidColors(solid('box', 'wall', { color: '#5f9a86', topColor: '#7f9a6b' })), { body: '#5f9a86', top: '#7f9a6b' });
+  assert.deepEqual(solidColors(solid('box', 'wall', { color: '#5f9a86' }, 'brick')), { body: '#5f9a86', top: '#5f9a86' });
+  assert.equal(solidColors(solid('box', 'wall', { color: 'green' }, 'brick')).body, STRUCTURES.boxMaterials.brick);
+  assert.equal(solidColors(solid('platform', 'platform', { color: '#5f9a86' }, 'paving')).body, STRUCTURES.materials.paving);
+});

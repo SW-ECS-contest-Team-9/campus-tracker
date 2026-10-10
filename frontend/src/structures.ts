@@ -410,5 +410,9 @@ export function solidColors(solid: Solid): { body: string; top: string } {
     : STRUCTURES.boxMaterials[solid.material ?? ''] ?? STRUCTURES.types[solid.type] ?? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown;
   if (solid.role === 'platform' && solid.material === 'planting') return { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop };
   if (solid.role === 'platform' && solid.material === 'asphalt') return { body: STRUCTURES.asphaltSide, top: STRUCTURES.materials.asphalt };
-  return { body, top: solid.type === 'planter' ? STRUCTURES.planterTop : body };
+  // Z07: a box may carry its own colour (`color`, and `topColor` for its top face) instead of a material of the table
+  const own = (v: unknown) => (typeof v === 'string' && /^#[0-9a-f]{6}$/.test(v) ? v : null);
+  const color = solid.role === 'box' ? own(solid.props?.color) : null;
+  const top = (solid.role === 'box' ? own(solid.props?.topColor) : null) ?? (solid.type === 'planter' ? STRUCTURES.planterTop : color ?? body);
+  return { body: color ?? body, top };
 }

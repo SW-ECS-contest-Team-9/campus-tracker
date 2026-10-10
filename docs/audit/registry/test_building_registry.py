@@ -203,6 +203,16 @@ class Registry(unittest.TestCase):
         self.assertTrue(br.appearance.from_note(head(look.replace('5층: {값: 110.5', '4층: {값: 110.5')))[1])      # there is no 4th floor
         self.assertTrue(br.appearance.from_note(head(look.replace('등급: 확정}', '등급: 모름}')))[1])                # an unknown is not written down
         self.assertTrue(br.appearance.from_note(head(look.replace('값: 붉은 벽돌', '값: 나무')))[1])
+        # Z07: one wall face in another material, tall columns, the long arch bay, lines up to the roof, the eave band
+        z07 = look.replace('창: {모양: 낱창,', '창: {모양: 긴 아치, 지붕까지: true,').replace('오름: 3.0,', '오름: 3.0, 처마띠: 1.2,').replace(
+            '    특징:', '    벽면:\n      - {방향: 26, 폭: 30, 값: 담쟁이, 출처: 사진, 등급: 확정}\n      - {방향: 남, 기둥: 4, 창: 없음, 출처: 사진, 등급: 추정}\n    특징:')
+        got, bad = br.appearance.from_note(head(z07))
+        self.assertEqual(bad, [])
+        self.assertEqual(got[0]['windows'], {'style': 'bays', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'toRoof': True})
+        self.assertEqual(got[0]['roof']['eaveBandM'], 1.2)
+        self.assertEqual(got[0]['faces'], [{'azimuth': 26, 'grade': '확정', 'spread': 30, 'wall': 'ivy'}, {'azimuth': 180, 'grade': '추정', 'style': 'none', 'columns': 4}])
+        self.assertTrue(br.appearance.from_note(head(z07.replace('방향: 남,', '방향: 위,')))[1])
+        self.assertTrue(br.appearance.from_note(head(z07.replace('값: 담쟁이, 출처: 사진, 등급: 확정', '값: 담쟁이')))[1])   # a face needs its evidence and grade too
 
     def test_check_and_write_commands(self):
         d = folder(가관=ROOF, 나관=PARTS)

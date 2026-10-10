@@ -316,16 +316,23 @@ export interface SceneBuilding {
   /** How the block looks (walls, window rows, roof), from the building notes; absent or null = a plain block. */
   appearance?: BuildingAppearance | null;
 }
+export type WindowStyle = 'rows' | 'bands' | 'curtain' | 'arches' | 'bays';
 /** Display only (building-appearance.ts draws it). Every item carries the note's evidence grade in `grades`. */
 export interface BuildingAppearance {
   /** Wall material word: brick, glass, stone, concrete, ivy, panel, metal, white. */
   wall: string;
   wallColor?: string;
   /** Window rows: one per storey at the note's floor heights (MSL), or `count` equal storeys when the note has no floor table. */
-  windows?: { style: 'rows' | 'bands' | 'curtain' | 'arches'; floorsM?: number[]; count?: number; color?: string; accent?: string };
+  windows?: { style: WindowStyle; floorsM?: number[]; count?: number; color?: string; accent?: string; /** the lines go on above the last floor of the table up to the roof (Z07) */ toRoof?: boolean };
+  /**
+   * Wall faces that differ from the rest (Z07), chosen by the compass direction the wall faces (degrees, north 0, east 90;
+   * `spread`: how far off a wall may face, default 45): another wall material or colour, another window style ('none': no
+   * windows), `columns`: that many tall columns with a beam in front of the longest wall of the face.
+   */
+  faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; grade?: string }[];
   /** A band of another colour on the walls above a height (upper storeys clad differently). */
   upper?: { fromM: number; color: string };
-  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; dormers?: boolean; rim?: string };
+  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string };
   grades?: Record<string, string>;
   features?: { what: string; evidence: string; grade: string; drawn: boolean }[];
 }

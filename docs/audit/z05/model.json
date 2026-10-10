@@ -5,7 +5,7 @@
   "roadPieces": 37,
   "handOther": 5,
   "planes": 49,
-  "boxes": 230,
+  "boxes": 263,
   "terrainSurfaces": 91,
   "edgeSamples": 1855,
   "z04": {
@@ -475,7 +475,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 13
+   "boxes": 46
   },
   "back-paths": {
    "title": "문예관–대일관 사잇길, 북악관 옆길, 뒤편 산책로",

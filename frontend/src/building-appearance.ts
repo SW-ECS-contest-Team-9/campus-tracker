@@ -38,7 +38,20 @@ const STYLES = {
   bands: { pitch: 6, width: 5.5, sill: 1.0, head: 2.3, gap: 0.6 },
   curtain: { pitch: 1.8, width: 1.66, sill: 0.14, head: 99, gap: 0.14 },
   arches: { pitch: 4.2, width: 3.0, sill: 1.0, head: 2.6, gap: 0.5 },
+  // one tall arched bay through all the storeys (Z07): glass from the lowest sill to a round head under the eave, a band at every floor
+  bays: { pitch: 4.6, width: 3.2, sill: 0.6, head: 99, gap: 0.5 },
 } as const;
+/** A row of tall columns in front of a wall face (Z07): column width and spacing, how far they stand out, the beam on top. */
+const COLONNADE = { pitch: 4.4, width: 0.9, depth: 0.6, beam: 1.3, recess: '#3b3f42', color: '#e6e3da' };
+
+/** Compass direction (degrees, north 0, east 90) an outward wall normal faces. */
+export const azimuth = (n: XY) => ((Math.atan2(n[0], n[1]) * 180) / Math.PI + 360) % 360;
+const turn = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+/** The face rule of the record a wall with this outward normal falls under (the nearest direction within its spread), or undefined. */
+export function faceOf(a: BuildingAppearance, n: XY) {
+  const az = azimuth(n);
+  return (a.faces ?? []).filter((f) => turn(az, f.azimuth) <= (f.spread ?? 45)).sort((f, g) => turn(az, f.azimuth) - turn(az, g.azimuth))[0];
+}
 
 const area2 = (r: XY[]) => r.reduce((s, p, i) => s + p[0] * r[(i + 1) % r.length][1] - r[(i + 1) % r.length][0] * p[1], 0);
 function contains(x: number, y: number, ring: XY[]) {
@@ -76,6 +89,15 @@ class Builder {
     const at = (s: number, z: number) => [p[0] + u[0] * s + n[0] * off, p[1] + u[1] * s + n[1] * off, z];
     this.quad(at(s0, z0), at(s1, z0), at(s1, z1), at(s0, z1), color);
   }
+  /** A pier standing out of a wall: its front, its two sides and its top. */
+  pier(p: XY, u: XY, n: XY, s0: number, s1: number, z0: number, z1: number, depth: number, color: RGB) {
+    if (s1 - s0 < 0.05 || z1 - z0 < 0.05) return;
+    const at = (s: number, d: number, z: number) => [p[0] + u[0] * s + n[0] * d, p[1] + u[1] * s + n[1] * d, z];
+    this.quad(at(s0, depth, z0), at(s1, depth, z0), at(s1, depth, z1), at(s0, depth, z1), color);
+    this.quad(at(s0, 0, z0), at(s0, depth, z0), at(s0, depth, z1), at(s0, 0, z1), color);
+    this.quad(at(s1, depth, z0), at(s1, 0, z0), at(s1, 0, z1), at(s1, depth, z1), color);
+    this.quad(at(s0, 0, z1), at(s0, depth, z1), at(s1, depth, z1), at(s1, 0, z1), color);
+  }
   /** Flat polygon (outer ring + holes) at one height. */
   cap(rings: XY[][], z: number, color: RGB) {
     const flat = rings.flatMap((r) => r.flatMap((p) => [p[0], p[1]]));
@@ -97,6 +119,8 @@ export function storeys(a: BuildingAppearance, groundM: number, topM: number): [
   if (!w) return [];
   if (w.floorsM?.length) {
     const f = [...w.floorsM].sort((p, q) => p - q).filter((z) => z > groundM - 1.5 && z < topM - 2);
+    // toRoof: the lines of the last storey height go on up to the top of the walls (lines of the cladding, not counted floors)
+    if (w.toRoof && f.length >= 2) for (const h = Math.max(f[f.length - 1] - f[f.length - 2], 2.6); f[f.length - 1] + h < topM - 2; ) f.push(f[f.length - 1] + h);
     return f.map((z, i) => [z, i + 1 < f.length ? f[i + 1] : Math.min(topM, z + (i > 0 ? Math.max(f[i] - f[i - 1], 2.6) : 4))]);
   }
   if (!w.count || !(topM - groundM > w.count * 2)) return [];
@@ -113,11 +137,25 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
   const out = new Builder();
   const top = wallTopM(b.roofM, a);
   const levels = storeys(a, b.groundM, top);
-  const style = a.windows ? STYLES[a.windows.style] : null;
+  const baseStyle = a.windows ? STYLES[a.windows.style] : null;
   const glass = hex(a.windows?.color ?? (a.windows?.style === 'rows' ? WINDOW.frame : WINDOW.glass)); // punched windows read as their light frames
+  const wall = hex(wallColor(a));
   const accent = a.windows?.accent ? hex(a.windows.accent) : null;
   const infill = hex(WINDOW.infill);
   const neighbour = opts.neighbourTop ?? (() => -Infinity);
+  // a colonnade stands on the longest wall of its face only
+  const longest = new Map<object, number>();
+  for (const poly of polygons) for (const ring of poly.map((r) => tidy(r, 0.02)).filter((r) => r.length >= 3)) {
+    const inside = (x: number, y: number) => contains(x, y, poly[0]) && !poly.slice(1).some((h) => contains(x, y, h));
+    ring.forEach((p, i) => {
+      const q = ring[(i + 1) % ring.length], len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+      if (len < 0.9) return;
+      let n = [(q[1] - p[1]) / len, -(q[0] - p[0]) / len];
+      if (inside((p[0] + q[0]) / 2 + n[0] * 0.05, (p[1] + q[1]) / 2 + n[1] * 0.05)) n = [-n[0], -n[1]];
+      const f = faceOf(a, n);
+      if (f?.columns && len > (longest.get(f) ?? 0)) longest.set(f, len);
+    });
+  }
   for (const poly of polygons) {
     const rings = poly.map((r) => tidy(r, 0.02)).filter((r) => r.length >= 3);
     if (!rings.length) continue;
@@ -133,21 +171,58 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         if (inside(mid[0] + n[0] * 0.05, mid[1] + n[1] * 0.05)) n = [-n[0], -n[1]];
         if (opts.cut?.(mid[0], mid[1])) continue;
         const hidden = neighbour(mid[0] + n[0] * 0.4, mid[1] + n[1] * 0.4); // a neighbour stands against this wall up to here
+        const face = faceOf(a, n);
+        // this face in another material: one panel over the whole wall, under the windows
+        if (face && (face.wall || face.wallColor) && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), top, 0.03, hex(face.wallColor ?? WALL_COLORS[face.wall ?? ''] ?? WALL_COLORS.panel));
         if (a.upper && top > a.upper.fromM && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(a.upper.fromM, hidden), top, 0.04, hex(a.upper.color));
         if (a.roof?.rim && hidden < top - 1) out.panel(p, u, n, 0, len, top - 1.2, top, 0.1, hex(a.roof.rim));
+        if (a.roof?.eaveBandM && hidden < top - 1) out.panel(p, u, n, 0, len, top - a.roof.eaveBandM, top, 0.12, hex(WINDOW.cornice));
+        // tall columns with a beam on top, centred on the longest wall of the face; no windows behind them
+        let clear: [number, number] | null = null;
+        if (face?.columns && longest.get(face) === len && levels.length && hidden < levels[0][0]) {
+          const k = Math.max(2, Math.min(face.columns, Math.floor((len - 1) / COLONNADE.pitch) + 1));
+          const span = (k - 1) * COLONNADE.pitch + COLONNADE.width, s0 = (len - span) / 2;
+          const z0 = levels[0][0], z1 = top - (a.roof?.eaveBandM ?? 0) - 0.2, col = hex(COLONNADE.color);
+          out.panel(p, u, n, s0, s0 + span, z0, z1 - COLONNADE.beam, 0.06, hex(COLONNADE.recess));
+          for (let c = 0; c < k; c++) out.pier(p, u, n, s0 + c * COLONNADE.pitch, s0 + c * COLONNADE.pitch + COLONNADE.width, z0, z1 - COLONNADE.beam, COLONNADE.depth, col);
+          out.pier(p, u, n, s0 - 0.4, s0 + span + 0.4, z1 - COLONNADE.beam, z1, COLONNADE.depth + 0.2, col);
+          clear = [s0 - 0.5, s0 + span + 0.5];
+        }
+        const style = face?.style === 'none' ? null : face?.style ? STYLES[face.style] : baseStyle;
+        const kind = face?.style ?? a.windows?.style;
         if (!style) continue;
         let count = Math.floor((len - 0.6) / style.pitch), width: number = style.width, pitch: number = style.pitch;
         if (count < 1) { count = 1; width = Math.min(width, len - 0.3); pitch = len - 0.6; }
         const start = (len - count * pitch) / 2 + (pitch - width) / 2;
+        const behind = (s: number) => clear !== null && s + width > clear[0] && s < clear[1];
+        if (kind === 'bays') { // one bay through the storeys that show above a neighbour: glass, a round head, a wall band at each floor
+          const seen = levels.filter(([z0]) => z0 >= hidden - 0.5);
+          if (!seen.length) continue;
+          const r = width / 2, sill = seen[0][0] + style.sill, crown = Math.min(seen[seen.length - 1][1] - style.gap, top - (a.roof?.eaveBandM ?? 0) - 0.5);
+          const ry = Math.min(r, Math.max(0, crown - sill - 1)), head = crown - ry;
+          for (let c = 0; c < count; c++) {
+            const s = start + c * pitch;
+            if (behind(s) || head - sill < 0.5) continue;
+            out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
+            if (ry > 0.3) {
+              const at = (t: number) => { const s1 = s + r - r * Math.cos(t); return [p[0] + u[0] * s1 + n[0] * 0.08, p[1] + u[1] * s1 + n[1] * 0.08, head + ry * Math.sin(t)]; };
+              const centre = [p[0] + u[0] * (s + r) + n[0] * 0.08, p[1] + u[1] * (s + r) + n[1] * 0.08, head];
+              for (let j = 0; j < 8; j++) out.tri(centre, at((j * Math.PI) / 8), at(((j + 1) * Math.PI) / 8), glass);
+            }
+            seen.slice(1).forEach(([z0], j) => { if (z0 + 0.3 < head) out.panel(p, u, n, s, s + width, z0 - 0.35, z0 + 0.3, 0.1, accent && j % 2 ? accent : wall); });
+          }
+          continue;
+        }
         levels.forEach(([z0, z1], k) => {
           if (z0 < hidden - 0.5) return;
           const sill = z0 + style.sill, head = Math.min(z0 + style.head, z1 - style.gap);
           for (let c = 0; c < count; c++) {
             const s = start + c * pitch;
+            if (behind(s)) continue;
             out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
             // the panel under the window: the accent colour and grey in a checker (the real pattern is irregular)
-            if (accent && a.windows!.style === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);
-            if (a.windows!.style === 'arches' && k === levels.length - 1) { // the bay ends in a round head (drawn flatter when the wall above is short)
+            if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);
+            if (kind === 'arches' && k === levels.length - 1) { // the bay ends in a round head (drawn flatter when the wall above is short)
               const r = width / 2, ry = Math.min(r, top - head - 0.4);
               if (ry > 0.3) {
                 const at = (t: number) => { const s1 = s + r - r * Math.cos(t); return [p[0] + u[0] * s1 + n[0] * 0.08, p[1] + u[1] * s1 + n[1] * 0.08, head + ry * Math.sin(t)]; };

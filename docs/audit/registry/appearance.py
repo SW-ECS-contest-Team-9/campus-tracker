@@ -4,11 +4,17 @@ building_registry.py 가 부른다(write·check 에 함께 들어간다). 노트
   겉모습:
     - 대상: [장면 건물 id, ...]     # GET /api/v1/scene 의 buildingId (부분은 "동#부분id", 추가 건물은 "추가-...")
       벽: {값: 붉은 벽돌|유리|밝은 돌|흰 돌|콘크리트|담쟁이|판|금속판, 색: "#rrggbb"(없으면 재질 기본색), 출처, 등급}
-      창: {모양: 낱창|띠창|유리벽|아치, 층_표: 층_바닥_높이 안의 이름(은주1관 등. 없으면 동의 표), 색, 덧색(아치 칸의 창 아래 판 색), 출처, 등급}
+      창: {모양: 낱창|띠창|유리벽|아치|긴 아치, 층_표: 층_바닥_높이 안의 이름(은주1관 등. 없으면 동의 표), 색, 덧색(아치 칸의 창 아래 판 색), 출처, 등급}
           층 표가 없는 동: 층수(정수)와 아래_높이(맨 아래 창 줄의 바닥, m)를 적는다. 지붕까지 고르게 나눈다.
       윗벽: {부터_층: "6층" 또는 부터_높이: m, 색, 출처, 등급}
       지붕: {모양: 평지붕|모임지붕, 재질: 기와|콘크리트|유리|옥상 정원|금속판|코트, 색, 오름: m, 들임: m(경사면이 벽에서 안으로 들어가는 거리. 없으면 오름의 1.4배), 지붕창: true, 테두리: "#rrggbb", 출처, 등급}
       특징: [{무엇, 출처, 등급, 그림: 예|아니오}]
+Z07 에서 더한 것:
+      창.모양 "긴 아치": 여러 층을 꿰뚫는 아치 칸 하나(유리 + 층마다 벽 띠 + 둥근 머리).
+      창.지붕까지: true     # 층 표가 끝난 위로도 마지막 층 간격의 줄을 벽 꼭대기까지 잇는다(외장의 줄이지 층이 아니다. 층 번호를 만들지 않는다)
+      벽면: [{방향: 북|북동|동|남동|남|남서|서|북서 또는 방위각(도, 북 0·동 90), 폭: 도(기본 45), 값: 벽 재질, 색, 창: 창 모양 또는 "없음", 기둥: 개수(그 방향의 가장 긴 벽 가운데에 큰 기둥 열과 보), 출처, 등급}]
+            # 그 방향을 보는 벽면만 다른 재질·창 모양으로 그린다(한 면의 담쟁이, 정면의 기둥 열)
+      지붕.처마띠: m     # 처마 밑 벽의 밝은 띠 높이
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정).
 """
@@ -16,7 +22,8 @@ import re
 
 GRADES = ('확정', '원천', 'S-MAP', '추정')
 WALLS = {'붉은 벽돌': 'brick', '유리': 'glass', '밝은 돌': 'stone', '흰 돌': 'white', '콘크리트': 'concrete', '담쟁이': 'ivy', '판': 'panel', '금속판': 'metal'}
-STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches'}
+STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches', '긴 아치': 'bays'}
+DIRECTIONS = {'북': 0, '북동': 45, '동': 90, '남동': 135, '남': 180, '남서': 225, '서': 270, '북서': 315}
 ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped'}
 ROOF_MATERIALS = {'기와': 'tile', '콘크리트': 'concrete', '유리': 'glass', '옥상 정원': 'green', '금속판': 'metal', '코트': 'court'}
 KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof'}
@@ -80,6 +87,30 @@ def from_note(head):
             if floors and win.get('모양') in STYLES:
                 rec['windows'] = {'style': STYLES[win['모양']], 'floorsM': floors}
                 color(win, '색', rec['windows'], 'color'); color(win, '덧색', rec['windows'], 'accent')
+                if win.get('지붕까지') is True: rec['windows']['toRoof'] = True
+        faces = []
+        for k, f in enumerate(e.get('벽면') or []):
+            fa = f'{at}.벽면[{k}]'
+            if not isinstance(f, dict) or _grade(f) is None or not f.get('출처'): bad.append(f'{fa}: 출처와 등급이 있어야 한다'); continue
+            d = f.get('방향'); az = DIRECTIONS.get(d) if isinstance(d, str) else d
+            if not isinstance(az, (int, float)) or isinstance(az, bool) or not 0 <= az < 360: bad.append(f"{fa}.방향 {d!r}: {', '.join(DIRECTIONS)} 또는 방위각 0~360"); continue
+            face = {'azimuth': az, 'grade': str(f['등급'])}
+            if f.get('폭') is not None:
+                if not isinstance(f['폭'], (int, float)) or not 5 <= f['폭'] <= 90: bad.append(f'{fa}.폭 은 5~90 도'); continue
+                face['spread'] = f['폭']
+            if f.get('값') is not None:
+                if f['값'] not in WALLS: bad.append(f"{fa}.값 {f['값']!r}: {', '.join(WALLS)} 중 하나"); continue
+                face['wall'] = WALLS[f['값']]
+            color(f, '색', face, 'wallColor')
+            if f.get('창') is not None:
+                if f['창'] != '없음' and f['창'] not in STYLES: bad.append(f"{fa}.창 {f['창']!r}: {', '.join(STYLES)} 또는 없음"); continue
+                face['style'] = 'none' if f['창'] == '없음' else STYLES[f['창']]
+            if f.get('기둥') is not None:
+                if not isinstance(f['기둥'], int) or not 2 <= f['기둥'] <= 12: bad.append(f'{fa}.기둥 은 2~12 개'); continue
+                face['columns'] = f['기둥']
+            if len(face) == 2: bad.append(f'{fa}: 값·색·창·기둥 중 하나는 있어야 한다'); continue
+            faces.append(face)
+        if faces: rec['faces'] = faces
         up = item('윗벽')
         if up:
             z = up.get('부터_높이')
@@ -101,6 +132,9 @@ def from_note(head):
                 if r.get('들임') is not None:
                     if not isinstance(r['들임'], (int, float)) or not 0 < r['들임'] <= 10: bad.append(f'{at}.지붕.들임 은 0~10 m')
                     else: roof['runM'] = r['들임']
+                if r.get('처마띠') is not None:
+                    if not isinstance(r['처마띠'], (int, float)) or not 0 < r['처마띠'] <= 4: bad.append(f'{at}.지붕.처마띠 는 0~4 m')
+                    else: roof['eaveBandM'] = r['처마띠']
                 if r.get('지붕창') is True: roof['dormers'] = True
                 rec['roof'] = roof
         feats = []
