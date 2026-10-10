@@ -18,7 +18,7 @@ def bil(g, x, y):
 def cell(g, x, y): return g[((np.asarray(y) - Y0) // R).astype(int), ((np.asarray(x) - X0) // R).astype(int)]
 mesh = Mesh(); res = {}
 surf = json.loads((HERE.parents[2] / 'backend/data/terrain/recipes/g02-surface.geojson').read_text(encoding='utf-8'))
-boxes = json.loads((HERE / 'structures-g02.geojson').read_text(encoding='utf-8'))['features']
+boxes = json.loads((HERE.parents[2] / 'frontend/public/structures/g02-way.geojson').read_text(encoding='utf-8'))['features']
 pins = [p for p in json.loads((HERE.parent / 'v02' / 'user-readings.json').read_text(encoding='utf-8'))['points'] if p.get('x')]
 from matplotlib.path import Path
 cy, cx = np.mgrid[0:H, 0:W]; ccx = X0 + (cx + 0.5) * R; ccy = Y0 + (cy + 0.5) * R; cs, ct = xy_to_st(ccx, ccy)
@@ -106,7 +106,7 @@ for k, s0 in enumerate(stations):
     for f in boxes:  # 이 단면이 지나는 구조물 상자
         r = np.array(f['geometry']['coordinates'][0]); bs, bt = xy_to_st(r[:, 0], r[:, 1])
         if bs.min() <= s0 <= bs.max():
-            A.add_patch(plt.Rectangle((bt.min(), f['properties']['fromM']), bt.max() - bt.min(), f['properties']['toM'] - f['properties']['fromM'], fc={'planter': '#7a5', 'stair_step': '#fa3', 'barrier': '#e22'}.get(f['properties']['type'], '#888'), ec='k', lw=.5, alpha=.8))
+            A.add_patch(plt.Rectangle((bt.min(), f['properties']['fromM']), bt.max() - bt.min(), f['properties']['toM'] - f['properties']['fromM'], fc={'planter': '#7a5', 'stair_step': '#fa3', 'barrier': '#e22', 'wall': '#bbb'}.get(f['properties']['type'], '#888'), ec='k', lw=.5, alpha=.8))
     for u in pins:
         us, ut = xy_to_st(u['x'], u['y'])
         if abs(us - s0) <= 4 and -8 <= ut <= 18: A.plot(ut, u['value_m'], 'k*', ms=11); A.annotate(u['id'], (ut, u['value_m']), fontsize=7)
