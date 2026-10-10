@@ -18,7 +18,11 @@ def bil(g, x, y):
 def cell(g, x, y): return g[((np.asarray(y) - Y0) // R).astype(int), ((np.asarray(x) - X0) // R).astype(int)]
 mesh = Mesh(); res = {}
 surf = json.loads((HERE.parents[2] / 'backend/data/terrain/recipes/g02-surface.geojson').read_text(encoding='utf-8'))
+surf = json.loads((HERE.parents[2] / 'backend/data/terrain/recipes/g02-surface.geojson').read_text(encoding='utf-8'))
 boxes = json.loads((HERE.parents[2] / 'frontend/public/structures/g02-way.geojson').read_text(encoding='utf-8'))['features']
+platforms = [f for f in boxes if f['properties']['kind'] == 'platform' and f['properties']['id'] != 'G02-PLATFORM-PLAZA']; boxes = [f for f in boxes if f['properties']['kind'] == 'extrude']
+# 기단 정의와 조리법 surface 입력이 같은 것인지(외곽·높이)
+assert [(f['properties']['surfaceName'], f['geometry'], f['properties'].get('topM'), f['properties'].get('topProfile')) for f in platforms] == [(f['properties']['name'], f['geometry'], f['properties'].get('heightM'), f['properties'].get('profile')) for f in surf['features']], '기단과 surface 입력이 다르다'
 pins = [p for p in json.loads((HERE.parent / 'v02' / 'user-readings.json').read_text(encoding='utf-8'))['points'] if p.get('x')]
 from matplotlib.path import Path
 cy, cx = np.mgrid[0:H, 0:W]; ccx = X0 + (cx + 0.5) * R; ccy = Y0 + (cy + 0.5) * R; cs, ct = xy_to_st(ccx, ccy)

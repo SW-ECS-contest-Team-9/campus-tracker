@@ -125,6 +125,30 @@ for nm, (sa, sb) in {'W': (-13.9, -13.3), 'E': (-4.3, -3.7)}.items():
 box('G02-BUKAK-PLANTER-E', 'planter', ring(rect(-3.7, 0.0, 9.0, 17.0)), 130.6, 132.5, '정문 동쪽 화단(화강석 벽 + 소나무): 윗면 132.5 m = 동쪽 마당 높이(S-MAP 132.2~132.9)', PB, basePlane='plaza 130.6')
 box('G02-BARRIER-POST', 'barrier', ring(rect(4.3, 4.8, RAMP_N - 0.5, RAMP_N)), way_z(4.3), way_z(4.5) + 1.1, '차단기 기둥(노란 상자), 자리 s 4.5 ±2 m', '거리뷰 09, SKU 0:52')
 box('G02-BARRIER-ARM', 'barrier', ring(rect(4.45, 4.6, S_PAVE + 0.6, RAMP_N - 0.5)), way_z(4.5) + 0.9, way_z(4.5) + 1.0, '차단기 막대: 경사로 폭을 가로막음', '거리뷰 09, SKU 0:52')
+# ---------- 2b. 기단(땅 덩어리): 기본 평면을 구조물로. 지형 조리법의 surface 입력(g02-surface.geojson)은 이 정의에서 나온 것과 같다 ----------
+BOTTOM = {'WAY': 125.0, 'LANE': 128.0, 'PODIUM': 132.5, 'FORK': 139.0, 'TOP': 139.0}
+BOTTOM_WHY = {'WAY': '지하 차도 바닥(128.5 m)보다 아래의 안전 깊이. 지하 차도 자리는 G02-VOID-UNDERGROUND-ROAD 가 비운다', 'LANE': '옛 지형 최저보다 아래의 안전 깊이', 'PODIUM': '서쪽 낮은 마당 높이(132.5 m)', 'FORK': '옆 길 경사면(141 m)보다 아래', 'TOP': '옆 길 경사면(142.6 m)보다 아래'}
+platforms = []
+for p, f in zip(planes, feats):
+    pr = {'id': 'G02-PLATFORM-' + p['name'], 'type': 'platform', 'kind': 'platform', 'estimated': True, 'grade': p['grade'] + '(윗면 높이), 추정(외곽 ±1~1.5 m, 바닥)', 'surfaceName': p['name'],
+          'bottomM': BOTTOM[p['name']], 'bottomNote': BOTTOM_WHY[p['name']], 'material': 'paving', 'assumption': '외곽은 S-MAP 0.5 m 메시에서 높이가 바뀌는 선과 건물 외곽. 건물 평면과 겹치는 곳은 건물이 우선', 'source': SRC_MESH + ', ' + p['reason']}
+    if p.get('profile'): pr['topProfile'] = PROFILE
+    else: pr['topM'] = p['heightM']
+    platforms.append({'type': 'Feature', 'properties': pr, 'geometry': f['geometry']})
+plaza = [x for x in json.loads((REC / 'f05-plateaus.geojson').read_text(encoding='utf-8'))['features'] if x['properties']['name'] == 'plaza'][0]
+platforms.append({'type': 'Feature', 'properties': {'id': 'G02-PLATFORM-PLAZA', 'type': 'platform', 'kind': 'platform', 'estimated': True, 'grade': '확정(한 포장면, 사용자 그림 11), S-MAP·사용자 핀(130.6 m)', 'surfaceName': 'plaza (f05-plateaus.geojson)',
+    'topM': plaza['properties']['heightM'], 'bottomM': 126.0, 'bottomNote': '지하 차도·통로(128.5 m)보다 아래의 안전 깊이', 'material': 'paving', 'assumption': '외곽은 T06·F05 조리법의 포장면 다각형 그대로(다시 그리지 않음)', 'source': 'backend/data/terrain/recipes/f05-plateaus.geojson (T06)'}, 'geometry': plaza['geometry']})
+# 지하 차도: 길 경사면 기단 아래의 빈 곳. 바닥은 시험용 DB 길 951c157d 의 높이, 천장은 위 기단 윗면 − 0.6 m(슬래브 두께 가정)
+ug = np.array([(201053.9, 557349.2, 128.5), (201056.2, 557348.2, 128.6), (201081.2, 557336.5, 132.2), (201100.3, 557327.6, 136.4)])
+voids = []
+for k in range(len(ug) - 1):
+    for q in range(4):
+        pa = ug[k] + (ug[k + 1] - ug[k]) * q / 4; pb = ug[k] + (ug[k + 1] - ug[k]) * (q + 1) / 4; v = (pb - pa)[:2]; v = v / np.hypot(*v); w = np.array([-v[1], v[0]]) * 3.6
+        zc = float(way_z(xy_to_st((pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2)[0])) - 0.6
+        voids.append({'type': 'Feature', 'properties': {'id': f'G02-VOID-UNDERGROUND-ROAD-{k}{q}', 'type': 'void', 'kind': 'void', 'estimated': True, 'grade': '확정(위 길보다 한 층 아래 지하 차도가 나란히 있음), 추정(선·폭·높이)',
+            'fromM': r2(min(pa[2], pb[2])), 'toM': r2(zc), 'inside': 'G02-PLATFORM-WAY', 'assumption': '바닥 = 시험용 DB 길 951c157d 높이(추정), 폭 7.2 m(그림에서 4.1 m 로도 읽힘), 천장 = 길 경사면 − 0.6 m(슬래브 두께 가정). 남는 높이 %.1f m' % (zc - max(pa[2], pb[2])),
+            'source': '사용자 확정(지하 차도), 그림 14, 시험용 DB 길 951c157d'}, 'geometry': {'type': 'Polygon', 'coordinates': [ring_xy([pa[:2] + w, pb[:2] + w, pb[:2] - w, pa[:2] - w])]}})
+boxes = platforms + voids + boxes
 STRUCT = REPO / 'frontend' / 'public' / 'structures' / 'g02-way.geojson'; STRUCT.parent.mkdir(exist_ok=True)
 dump(STRUCT, {'type': 'FeatureCollection', 'name': 'g02-way', 'crs': CRS,
   'provenance': {'builder': 'docs/audit/g02/build_inputs.py', 'basePlanes': 'backend/data/terrain/recipes/g02-surface.geojson', 'schema': 'docs/audit/g02/STRUCTURES.md', 'note': '모든 상자는 기본 평면 위에 얹힌다. 치수는 사진 눈대중이라 전부 estimated.'},
@@ -157,4 +181,4 @@ dump(HERE / 'model.json', {'crs': 'EPSG:5186', 'axis': {'origin': [float(O[0]), 
   'way_profile': [{'s': s_, 'z': z_} for s_, z_ in WAY_PROFILE], 'base_planes': [{'name': p['name'], 'heightM': p.get('heightM', 'profile'), 'grade': p['grade'], 'st': p['st']} for p in planes],
   'strips': strips, 'stepped_strip': {'riserM': RISER, 'treads': len(treads), 'riseM': r2(way_z(STRIP_END) - way_z(5)), 'grade': '추정(사진에서 세지 않음)'},
   'walls': walls, 'underground': {'road': '951c157d 지하 차도', 'note': '경사면 아래의 따로 떨어진 상자(빈 곳). 지형에 새기지 않는다. 덮개 두께는 preview.py'}})
-print('planes', len(feats), 'boxes', len(boxes), 'treads', n)
+print('platforms', len(platforms), 'voids', len(voids), 'features', len(boxes), 'treads', n)

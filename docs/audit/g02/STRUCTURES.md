@@ -5,7 +5,23 @@
 ## 파일
 - 자리: `frontend/public/structures/<구역>.geojson` (구역마다 한 파일. 이 구역은 `g02-way.geojson`, 만드는 스크립트 `docs/audit/g02/build_inputs.py`). 손으로 고치지 않고 스크립트로 다시 만든다.
 - GeoJSON FeatureCollection, 좌표 EPSG:5186(미터), `crs` 를 적는다. `provenance` 에 만든 스크립트와 기본 평면 파일.
-- 기본 평면은 지형 조리법의 surface 단계 입력(`backend/data/terrain/recipes/g02-surface.geojson`)에 있다. 구조물 파일에는 넣지 않는다.
+- 파일 하나에 기단(`platform`), 빈 곳(`void`), 얹는 상자(`extrude`)가 함께 들어 있다.
+
+## 기단(땅 덩어리) — `kind: "platform"`
+사용자 2026-10-11: "지형이 까다로운 거면 어차피 지하 구조부터 지상까지 전부 기둥·철골·콘크리트·암석인 거, 구조물을 추가해서 다뤄." 캠퍼스 안의 땅은 그 자체를 구조물로 적는다. 기단이 먼저이고, 계단·화단·현관·데크는 기단 위에 얹는다.
+
+| 속성 | 뜻 |
+|---|---|
+| `id`, `type: "platform"`, `kind: "platform"` | 기단 하나. 도형은 평면 외곽 `Polygon` |
+| `topM` | 윗면이 평평할 때의 높이(m) |
+| `topProfile` | 윗면이 한 방향으로 기울 때: `{origin:[x,y], direction:[dx,dy], points:[[거리, 높이], …]}`. 높이 = 그 점을 `direction` 축에 내린 거리에서의 값(사이는 직선, 폭 방향으로 평평, 양 끝 밖은 끝 값). `topM` 과 둘 중 하나만 |
+| `bottomM`, `bottomNote` | 옆면을 내릴 바닥 높이와 그 까닭(아래 기단의 윗면, 지하층 천장, 옛 지형보다 아래의 안전 깊이) |
+| `material` | `paving` / `concrete` / `rock` / `timber` |
+| `surfaceName` | 지형 조리법 surface 입력에서 같은 평면의 `name` (지형 칸은 여기서 나온다) |
+| `grade`, `estimated`, `assumption`, `source` | 상자와 같다 |
+
+- **지형 칸은 기단에서 만든다.** `docs/audit/g02/build_inputs.py` 가 같은 정의로 구조물 파일의 기단과 조리법 입력 `g02-surface.geojson` 을 함께 쓴다. 조리법의 `surface` 단계는 칸 가운데가 기단 외곽 안이면 그 칸을 기단 윗면 높이로 둔다(번짐 없음, 건물 칸은 그대로, 겹치면 뒤의 기단). `preview.py` 가 둘이 같은지 확인한다. 지형을 따로 손보지 않는다.
+- **빈 곳** `kind: "void"`(`type: "void"`): 기단 안에 비워 둘 공간(지하 차도 등). 평면 외곽 + `fromM`(바닥) ~ `toM`(천장) + `inside`(어느 기단 안인지). 지형 칸에는 영향이 없다(위 기단의 윗면이 그대로 지표다).
 
 ## 피처 하나 = 상자 하나
 도형은 평면 외곽 `Polygon`(z 없음). 높이는 속성으로 준다. 프런트의 보정 레이어(`scene-local-corrections.ts`)가 이미 읽는 모양(kind=extrude)을 그대로 쓴다.
@@ -13,7 +29,7 @@
 | 속성 | 뜻 |
 |---|---|
 | `id` | 파일 안에서 하나뿐인 이름. 구역 머리말로 시작(`G02-…`, `Z02-…`) |
-| `kind` | 항상 `extrude` (외곽을 `fromM` 에서 `toM` 까지 세운 상자) |
+| `kind` | `extrude` (외곽을 `fromM` 에서 `toM` 까지 세운 상자). 기단·빈 곳은 위 절 |
 | `type` | 요소 종류: `stair_step`(계단 한 단 또는 디딤판), `landing`(참·바닥), `planter`(화단 상자), `wall`(옹벽·난간·기둥처럼 얇고 높은 상자), `deck`(뜬 판), `canopy`(차양·지붕 덩어리), `barrier`(차단기) |
 | `fromM`, `toM` | 상자 아래·위 높이(m). `fromM` 은 그 자리 기본 평면 높이 이하로 내려도 되지만(틈 막기) 윗면 `toM` 이 형상을 정한다. `toM > fromM` |
 | `basePlane` | 얹힌 기본 평면의 이름(조리법 surface 피처의 `name`, 또는 `plaza 130.6` 같은 평탄면, 다른 상자의 `id`). 뜬 판은 `없음(…)` |
@@ -27,6 +43,7 @@
 경사진 윗면(길을 따라 오르는 옹벽 등)은 2 m 마디로 잘라 마디마다 평평한 윗면을 준다. 계단은 단마다 상자 하나다(윗면 = 그 단의 디딤 높이, 아래는 계단 발치 높이까지).
 
 ## 프런트가 할 일 (아직 안 됨)
+0. `kind=platform`: 윗면(평평하거나 `topProfile` 대로 기운 면)을 재질 색으로 그리고, 외곽을 따라 `bottomM` 까지 세로 옆면을 그린다. 기단 외곽 안의 지형은 숨긴다(지금 길 면 안의 지형을 숨기는 것과 같은 방식). 이렇게 하면 평면 사이가 2 m 폭 비탈이 아니라 벽면이 되고, 치마가 뜨거나 골이 생길 수 없다. `kind=void` 는 단면도에서만 빈 곳으로 보이면 된다. 길 찾기는 그대로 길·영역을 쓴다.
 1. `frontend/public/structures/*.geojson` 을 읽어 `kind=extrude` 상자를 그린다. 지금 있는 보정 레이어 코드(`scene-local-corrections.ts` 의 extrude 그리기)를 그대로 쓸 수 있다: 파일 목록에 이 경로를 넣고, 기본으로 켜고, `type` 별 색(돌계단·화강석 화단·흰 옹벽·나무 데크)을 정한다.
 2. 합친 길 면(`road-surface-layer.ts`)이 계단 상자 위를 덮지 않게, `stair_step`·`landing` 평면 안에서는 길 면을 상자 윗면 높이로 올리거나 그리지 않는다.
 3. 단면도(`section-layer.ts`)에 `addLayer()` 로 넣어 같이 잘리게 한다.
