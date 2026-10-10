@@ -1,0 +1,1646 @@
+{
+ "created": "2026-10-10",
+ "grid": {
+  "originX": 200668,
+  "originY": 556798,
+  "resolution": 2,
+  "width": 450,
+  "height": 464
+ },
+ "reproduction": {
+  "cells": 208800,
+  "maxAbsM": 0,
+  "rmsM": 0,
+  "note": "applyPasses(등고선만의 면, 원 표고점) 대 보관된 서버 격자"
+ },
+ "datum": {
+  "sameXYasOriginalSpot": [
+   {
+    "x": 201212.0129,
+    "y": 557220.795,
+    "spot": 148.91,
+    "smap": 148.94,
+    "diff": 0.03
+   }
+  ],
+  "apiWithin1mOfContour": [
+   {
+    "area": "S06",
+    "d": -1.24,
+    "name": "S06-R3 주오르막"
+   },
+   {
+    "area": "기타",
+    "d": -0.25,
+    "name": "W3 서측 띠 경사 하단"
+   },
+   {
+    "area": "기타",
+    "d": -1.4,
+    "name": "뒤편 산책로 굴곡(사진2)"
+   },
+   {
+    "area": "S06",
+    "d": -1.34,
+    "name": "st3 off-1"
+   },
+   {
+    "area": "S06",
+    "d": -1.22,
+    "name": "st3 off1"
+   },
+   {
+    "area": "S06",
+    "d": -1.2,
+    "name": "st3 off-3"
+   },
+   {
+    "area": "S06",
+    "d": -1.25,
+    "name": "st3 off-2"
+   }
+  ],
+  "apiOtherAreaList": [
+   {
+    "name": "plateau_boundary_max",
+    "smap": 125.83,
+    "smapMinusLive": -0.82
+   },
+   {
+    "name": "S06-P1 분수광장 중앙부",
+    "smap": 114.09,
+    "smapMinusLive": 6.07
+   },
+   {
+    "name": "S06-P2 분수",
+    "smap": 113.65,
+    "smapMinusLive": 7.45
+   },
+   {
+    "name": "S06-L1 낮은길",
+    "smap": 93.09,
+    "smapMinusLive": 1.35
+   },
+   {
+    "name": "S06-L2 낮은길",
+    "smap": 95.18,
+    "smapMinusLive": 0.67
+   },
+   {
+    "name": "S06-W1 벽 상단",
+    "smap": 113.45,
+    "smapMinusLive": 8.3
+   },
+   {
+    "name": "S06-W2 벽 하단",
+    "smap": 94.03,
+    "smapMinusLive": -1.74
+   },
+   {
+    "name": "S07-K1 P1 포털 가장자리",
+    "smap": 127.67,
+    "smapMinusLive": -3.54
+   },
+   {
+    "name": "S07-K2 포털 위 화단",
+    "smap": 131.45,
+    "smapMinusLive": 0.24
+   },
+   {
+    "name": "S07-K3 포털 앞 도로",
+    "smap": 127.52,
+    "smapMinusLive": -3.75
+   },
+   {
+    "name": "S07-K4 회차공간",
+    "smap": 129.58,
+    "smapMinusLive": -0.74
+   },
+   {
+    "name": "S07-G2 식재섬 사이 상단",
+    "smap": 127.2,
+    "smapMinusLive": -4.56
+   },
+   {
+    "name": "S07-F1 본관 전면 보도",
+    "smap": 128.14,
+    "smapMinusLive": -4.13
+   },
+   {
+    "name": "S07-E1 951c157d 끝점",
+    "smap": 132.42,
+    "smapMinusLive": -0.79
+   },
+   {
+    "name": "D2 서측 129.1 평탄면 남",
+    "smap": 115.82,
+    "smapMinusLive": -6.39
+   },
+   {
+    "name": "D3 서측 평탄면 북(회차공간 남)",
+    "smap": 121.15,
+    "smapMinusLive": -0.79
+   },
+   {
+    "name": "W1 서측 띠 135 마루",
+    "smap": 117.59,
+    "smapMinusLive": -4.17
+   },
+   {
+    "name": "W2 서측 띠 북",
+    "smap": 123.05,
+    "smapMinusLive": -0.83
+   },
+   {
+    "name": "W3 서측 띠 경사 하단",
+    "smap": 104.75,
+    "smapMinusLive": -0.78
+   },
+   {
+    "name": "S1 남단 꼭지점 부근(광장)",
+    "smap": 114.18,
+    "smapMinusLive": -5.7
+   },
+   {
+    "name": "S2 남서 외곽선 안 경사",
+    "smap": 110.69,
+    "smapMinusLive": -12.37
+   },
+   {
+    "name": "O2 외곽선 밖 지상(회차공간)",
+    "smap": 129.07,
+    "smapMinusLive": -1.37
+   },
+   {
+    "name": "정문 원 중심",
+    "smap": 131.44,
+    "smapMinusLive": -1.88
+   },
+   {
+    "name": "정문 돌출부 앞 지면",
+    "smap": 131.87,
+    "smapMinusLive": -1.15
+   },
+   {
+    "name": "옆길 남단(사진2)",
+    "smap": 131.5,
+    "smapMinusLive": 1.79
+   },
+   {
+    "name": "옆길 중간",
+    "smap": 132.19,
+    "smapMinusLive": 1.91
+   },
+   {
+    "name": "옆길 북단=뒤편 시작(사진2)",
+    "smap": 132.51,
+    "smapMinusLive": 0.86
+   },
+   {
+    "name": "a03d33c3 시작 노드 7895ac0d",
+    "smap": 132.54,
+    "smapMinusLive": 2.06
+   },
+   {
+    "name": "뒤편 산책로 굴곡(사진2)",
+    "smap": 133.6,
+    "smapMinusLive": 0.88
+   },
+   {
+    "name": "뒤편 산책로 북악관 동끝 뒤",
+    "smap": 137.39,
+    "smapMinusLive": 6.12
+   },
+   {
+    "name": "뒤편 산책로 문예관 뒤",
+    "smap": 139.87,
+    "smapMinusLive": 4.48
+   }
+  ],
+  "apiOtherAreaVsLiveDem": {
+   "n": 31,
+   "median": -0.79,
+   "p90Abs": 6.39,
+   "maxAbs": 12.37
+  }
+ },
+ "samples": {
+  "used": 2539,
+  "perArea": {
+   "운동장": {
+    "api": 14,
+    "mesh": 2033
+   },
+   "사잇길": {
+    "api": 2,
+    "mesh": 213
+   },
+   "S06": {
+    "api": 38,
+    "mesh": 208
+   },
+   "기타": {
+    "api": 31,
+    "mesh": 0
+   }
+  }
+ },
+ "baseline": {
+  "all": {
+   "운동장": {
+    "n": 2047,
+    "median": 7.22,
+    "p90Abs": 8.52,
+    "maxAbs": 10.52
+   },
+   "사잇길": {
+    "n": 215,
+    "median": 3.37,
+    "p90Abs": 6.53,
+    "maxAbs": 8.97
+   },
+   "S06": {
+    "n": 246,
+    "median": -2.78,
+    "p90Abs": 4.98,
+    "maxAbs": 6.53
+   },
+   "기타": {
+    "n": 31,
+    "median": -0.79,
+    "p90Abs": 6.39,
+    "maxAbs": 12.37
+   }
+  },
+  "apiOnly": {
+   "운동장": {
+    "n": 14,
+    "median": 3.91,
+    "p90Abs": 7.83,
+    "maxAbs": 8.96
+   },
+   "사잇길": {
+    "n": 2,
+    "median": 1.02,
+    "p90Abs": 1.02,
+    "maxAbs": 4.83
+   },
+   "S06": {
+    "n": 38,
+    "median": -1.97,
+    "p90Abs": 4.67,
+    "maxAbs": 6.15
+   },
+   "기타": {
+    "n": 31,
+    "median": -0.79,
+    "p90Abs": 6.39,
+    "maxAbs": 12.37
+   }
+  }
+ },
+ "baselineOrigSpotLoo": {
+  "n": 39,
+  "median": -0.3,
+  "p90Abs": 4.88,
+  "maxAbs": 8.38
+ },
+ "variants": {
+  "V1": {
+   "desc": "표본을 표고점에 합침, 기본 단계 [[120,300],[25,60]]",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.53,
+     "p90Abs": 3.75,
+     "maxAbs": 5.62
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.81,
+     "p90Abs": 2.7,
+     "maxAbs": 5.38
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.37,
+     "p90Abs": 2.29,
+     "maxAbs": 3.39
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.16,
+     "p90Abs": 7.11,
+     "maxAbs": 9.16
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.27,
+    "p90Abs": 2.06,
+    "maxAbs": 5.45
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.53,
+     "p90Abs": 3.75,
+     "maxAbs": 5.59
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.82,
+     "p90Abs": 2.71,
+     "maxAbs": 5.41
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.38,
+     "p90Abs": 2.3,
+     "maxAbs": 3.34
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.2,
+     "p90Abs": 7.26,
+     "maxAbs": 9.59
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.52,
+     "p90Abs": 3.8,
+     "maxAbs": 5.67
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.75,
+     "p90Abs": 2.79,
+     "maxAbs": 5.52
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.39,
+     "p90Abs": 2.62,
+     "maxAbs": 3.69
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.28,
+     "p90Abs": 7.02,
+     "maxAbs": 9.75
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 9.25,
+    "areaOver05M2": 380112,
+    "areaOver01M2": 466808
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 7.82,
+    "areaOver05M2": 40836,
+    "maxAt": {
+     "x": 201195,
+     "y": 557331,
+     "deltaM": 7.82,
+     "distToSampleM": 29.53
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -1.45,
+    "p90Abs": 6.38,
+    "maxAbs": 8.08,
+    "maxChangeVsBaseline": 7
+   },
+   "gateSpotResiduals": {
+    "n": 2578,
+    "median": 5.95,
+    "p90Abs": 6.38,
+    "pass": false
+   },
+   "slope": {
+    "inside": {
+     "max": 5.38,
+     "p99": 1.7,
+     "over1": 244
+    },
+    "edge2to30m": {
+     "max": 9.7,
+     "p99": 4.3,
+     "over1": 1758
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 24,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 153.45,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": -0.87,
+     "p90Abs": 3.31,
+     "maxAbs": 4.52
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -1.44,
+     "p90Abs": 0.71,
+     "maxAbs": 1.44
+    },
+    "S06": {
+     "n": 38,
+     "median": 0.51,
+     "p90Abs": 2.67,
+     "maxAbs": 2.93
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.14,
+     "p90Abs": 7.84,
+     "maxAbs": 10.17
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 1.61,
+     "p90Abs": 4.73,
+     "maxAbs": 6.23
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 0.33,
+     "p90Abs": 2.29,
+     "maxAbs": 4.34
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.78,
+     "p90Abs": 2.42,
+     "maxAbs": 4
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V2a": {
+   "desc": "V1 + 좁은 단계 [6,15],[3,8] 추가",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.66,
+     "maxAbs": 1.94
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.02,
+     "p90Abs": 0.77,
+     "maxAbs": 1.66
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 1.03,
+     "maxAbs": 2.17
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.02,
+     "p90Abs": 0.98,
+     "maxAbs": 2.58
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.01,
+    "p90Abs": 0.12,
+    "maxAbs": 0.32
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.72,
+     "maxAbs": 1.94
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.02,
+     "p90Abs": 0.9,
+     "maxAbs": 1.96
+    },
+    "S06": {
+     "n": 246,
+     "median": 0,
+     "p90Abs": 1.13,
+     "maxAbs": 2.53
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.21,
+     "p90Abs": 7.73,
+     "maxAbs": 8.73
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.9,
+     "maxAbs": 2.7
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.13,
+     "p90Abs": 1.4,
+     "maxAbs": 2.66
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 1.67,
+     "maxAbs": 3.2
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.26,
+     "p90Abs": 7.68,
+     "maxAbs": 8.77
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 9.25,
+    "areaOver05M2": 377536,
+    "areaOver01M2": 471944
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 11.88,
+    "areaOver05M2": 40928,
+    "maxAt": {
+     "x": 201015,
+     "y": 557245,
+     "deltaM": -11.88,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -1.38,
+    "p90Abs": 6.38,
+    "maxAbs": 8.08,
+    "maxChangeVsBaseline": 7
+   },
+   "gateSpotResiduals": {
+    "n": 2578,
+    "median": 5.95,
+    "p90Abs": 6.38,
+    "pass": false
+   },
+   "slope": {
+    "inside": {
+     "max": 5.37,
+     "p99": 1.56,
+     "over1": 125
+    },
+    "edge2to30m": {
+     "max": 9.31,
+     "p99": 4.12,
+     "over1": 1773
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 26,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 149.1,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": 0,
+     "p90Abs": 1.28,
+     "maxAbs": 1.44
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -0.19,
+     "p90Abs": 0.15,
+     "maxAbs": 0.19
+    },
+    "S06": {
+     "n": 38,
+     "median": 0.02,
+     "p90Abs": 1.51,
+     "maxAbs": 1.75
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.59,
+     "p90Abs": 7.84,
+     "maxAbs": 10.17
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 1.24,
+     "p90Abs": 4.41,
+     "maxAbs": 6.23
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 0.17,
+     "p90Abs": 2.03,
+     "maxAbs": 4.14
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.21,
+     "p90Abs": 1.38,
+     "maxAbs": 2.23
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V2b": {
+   "desc": "원 표고점만으로 기본 단계(=현행 DEM) 뒤, 표본만으로 좁은 단계 [6,15],[3,8]",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.67,
+     "maxAbs": 1.93
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.02,
+     "p90Abs": 0.76,
+     "maxAbs": 1.7
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 1.02,
+     "maxAbs": 2.16
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.03,
+     "p90Abs": 0.87,
+     "maxAbs": 2.62
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.05,
+    "p90Abs": 0.89,
+    "maxAbs": 1.42
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.74,
+     "maxAbs": 1.91
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.03,
+     "p90Abs": 0.89,
+     "maxAbs": 1.92
+    },
+    "S06": {
+     "n": 246,
+     "median": 0,
+     "p90Abs": 1.12,
+     "maxAbs": 2.67
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.09,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.91,
+     "maxAbs": 2.72
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.11,
+     "p90Abs": 1.45,
+     "maxAbs": 2.66
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 1.63,
+     "maxAbs": 3.15
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.53,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 0,
+    "areaOver05M2": 0,
+    "areaOver01M2": 0
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 11.59,
+    "areaOver05M2": 16784,
+    "maxAt": {
+     "x": 201015,
+     "y": 557245,
+     "deltaM": -11.59,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -0.18,
+    "p90Abs": 4.88,
+    "maxAbs": 8.38,
+    "maxChangeVsBaseline": 2.84
+   },
+   "gateSpotResiduals": {
+    "n": 39,
+    "median": -1.85,
+    "p90Abs": 4.79,
+    "pass": true
+   },
+   "slope": {
+    "inside": {
+     "max": 5.52,
+     "p99": 1.58,
+     "over1": 127
+    },
+    "edge2to30m": {
+     "max": 9.11,
+     "p99": 4.08,
+     "over1": 1980
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 1,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 149.1,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": -0.06,
+     "p90Abs": 1.3,
+     "maxAbs": 1.45
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -0.17,
+     "p90Abs": 0.15,
+     "maxAbs": 0.17
+    },
+    "S06": {
+     "n": 38,
+     "median": 0,
+     "p90Abs": 1.5,
+     "maxAbs": 1.75
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 4.77,
+     "p90Abs": 8.05,
+     "maxAbs": 10.52
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 1.44,
+     "p90Abs": 3.99,
+     "maxAbs": 7.15
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.24,
+     "p90Abs": 1.36,
+     "maxAbs": 2.23
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V2c": {
+   "desc": "V2b 와 같으나 좁은 단계를 [3,8] 하나만",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.16,
+     "p90Abs": 0.8,
+     "maxAbs": 2.01
+    },
+    "사잇길": {
+     "n": 215,
+     "median": 0.06,
+     "p90Abs": 0.91,
+     "maxAbs": 1.96
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.08,
+     "p90Abs": 1.06,
+     "maxAbs": 2.24
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.19,
+     "p90Abs": 1.84,
+     "maxAbs": 3.35
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.05,
+    "p90Abs": 0.89,
+    "maxAbs": 1.42
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.21,
+     "p90Abs": 0.87,
+     "maxAbs": 2.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": 0.1,
+     "p90Abs": 1.07,
+     "maxAbs": 2.14
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.12,
+     "p90Abs": 1.16,
+     "maxAbs": 2.28
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.39,
+     "p90Abs": 1.37,
+     "maxAbs": 3.77
+    },
+    "사잇길": {
+     "n": 215,
+     "median": 0.18,
+     "p90Abs": 1.77,
+     "maxAbs": 5.51
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.31,
+     "p90Abs": 1.69,
+     "maxAbs": 3.29
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.79,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 0,
+    "areaOver05M2": 0,
+    "areaOver01M2": 0
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 9.26,
+    "areaOver05M2": 5984,
+    "maxAt": {
+     "x": 201015,
+     "y": 557245,
+     "deltaM": -9.26,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -0.3,
+    "p90Abs": 4.88,
+    "maxAbs": 8.38,
+    "maxChangeVsBaseline": 2.66
+   },
+   "gateSpotResiduals": {
+    "n": 39,
+    "median": -1.85,
+    "p90Abs": 4.79,
+    "pass": true
+   },
+   "slope": {
+    "inside": {
+     "max": 5.5,
+     "p99": 1.59,
+     "over1": 130
+    },
+    "edge2to30m": {
+     "max": 9.04,
+     "p99": 4.06,
+     "over1": 1980
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 0,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 149.22,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": 0.02,
+     "p90Abs": 1.2,
+     "maxAbs": 1.57
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -0.13,
+     "p90Abs": 0.04,
+     "maxAbs": 0.13
+    },
+    "S06": {
+     "n": 38,
+     "median": -0.08,
+     "p90Abs": 1.44,
+     "maxAbs": 1.89
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.79,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 7.14,
+     "p90Abs": 8.41,
+     "maxAbs": 10.52
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 2.55,
+     "p90Abs": 6.17,
+     "maxAbs": 8.97
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.97,
+     "p90Abs": 2.31,
+     "maxAbs": 2.97
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V2d": {
+   "desc": "V2b 에 격자 한 칸 폭 단계 [2,6] 을 두 번 더",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.01,
+     "p90Abs": 0.19,
+     "maxAbs": 0.52
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.02,
+    "p90Abs": 0.89,
+    "maxAbs": 1.42
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.39,
+     "maxAbs": 1.57
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.5,
+     "maxAbs": 1.75
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 0.75,
+     "maxAbs": 2.92
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.09,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.3,
+     "maxAbs": 2.47
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.07,
+     "p90Abs": 1.25,
+     "maxAbs": 3.28
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.53,
+     "p90Abs": 7.45,
+     "maxAbs": 12.37
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 0,
+    "areaOver05M2": 0,
+    "areaOver01M2": 0
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 12.17,
+    "areaOver05M2": 16772,
+    "maxAt": {
+     "x": 201015,
+     "y": 557245,
+     "deltaM": -12.17,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -0.14,
+    "p90Abs": 4.88,
+    "maxAbs": 8.38,
+    "maxChangeVsBaseline": 3.1
+   },
+   "gateSpotResiduals": {
+    "n": 39,
+    "median": -1.85,
+    "p90Abs": 4.79,
+    "pass": true
+   },
+   "slope": {
+    "inside": {
+     "max": 5.53,
+     "p99": 1.44,
+     "over1": 65
+    },
+    "edge2to30m": {
+     "max": 9.09,
+     "p99": 4.07,
+     "over1": 1980
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 1,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 148.84,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": 0.02,
+     "p90Abs": 0.76,
+     "maxAbs": 0.81
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -0.08,
+     "p90Abs": 0.05,
+     "maxAbs": 0.08
+    },
+    "S06": {
+     "n": 38,
+     "median": 0.09,
+     "p90Abs": 0.56,
+     "maxAbs": 1.14
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 4.77,
+     "p90Abs": 8.05,
+     "maxAbs": 10.52
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 1.43,
+     "p90Abs": 3.99,
+     "maxAbs": 7.15
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.14,
+     "p90Abs": 1.29,
+     "maxAbs": 2.1
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V2e": {
+   "desc": "V2d 와 같으나 기타 구역 표본(흩어진 api 31개)은 넣지 않음",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.02,
+    "p90Abs": 0.89,
+    "maxAbs": 1.42
+   },
+   "holdoutRandom5": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.39,
+     "maxAbs": 1.57
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.5,
+     "maxAbs": 1.75
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 0.75,
+     "maxAbs": 2.92
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.3,
+     "maxAbs": 2.47
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.08,
+     "p90Abs": 1.25,
+     "maxAbs": 3.28
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "changeBeyond30m": {
+    "maxAbsM": 0,
+    "areaOver05M2": 0,
+    "areaOver01M2": 0
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 10.53,
+    "areaOver05M2": 8672,
+    "maxAt": {
+     "x": 201187,
+     "y": 557305,
+     "deltaM": 10.53,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -0.14,
+    "p90Abs": 4.88,
+    "maxAbs": 8.38,
+    "maxChangeVsBaseline": 3.1
+   },
+   "gateSpotResiduals": {
+    "n": 39,
+    "median": -1.85,
+    "p90Abs": 4.79,
+    "pass": true
+   },
+   "slope": {
+    "inside": {
+     "max": 2.48,
+     "p99": 1.06,
+     "over1": 33
+    },
+    "edge2to30m": {
+     "max": 4.9,
+     "p99": 2.54,
+     "over1": 939
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 2.49,
+     "p99": 1.72,
+     "over1": 221
+    },
+    "edge2to30m": {
+     "max": 4.9,
+     "p99": 2.58,
+     "over1": 740
+    }
+   },
+   "inputSamples": 2508,
+   "areasM2": {
+    "within2m": 11148,
+    "band2to30m": 23032,
+    "beyond30m": 801020
+   },
+   "seconds": 1,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 148.84,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ],
+   "trainMeshTestApi": {
+    "운동장": {
+     "n": 14,
+     "median": 0.02,
+     "p90Abs": 0.76,
+     "maxAbs": 0.81
+    },
+    "사잇길": {
+     "n": 2,
+     "median": -0.08,
+     "p90Abs": 0.05,
+     "maxAbs": 0.08
+    },
+    "S06": {
+     "n": 38,
+     "median": 0.09,
+     "p90Abs": 0.56,
+     "maxAbs": 1.14
+    },
+    "기타": {
+     "n": 31,
+     "median": -0.78,
+     "p90Abs": 6.39,
+     "maxAbs": 12.37
+    }
+   },
+   "trainApiTestMesh": {
+    "운동장": {
+     "n": 2033,
+     "median": 4.77,
+     "p90Abs": 8.05,
+     "maxAbs": 10.52
+    },
+    "사잇길": {
+     "n": 213,
+     "median": 1.43,
+     "p90Abs": 3.99,
+     "maxAbs": 7.15
+    },
+    "S06": {
+     "n": 208,
+     "median": -0.15,
+     "p90Abs": 1.27,
+     "maxAbs": 2.1
+    },
+    "기타": {
+     "n": 0
+    }
+   }
+  },
+  "V3": {
+   "desc": "V2b 에서 운동장 평지 칸 표본을 빼고 SF-FIELD 다각형을 148.92 m 로 평탄화",
+   "fit": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0,
+     "maxAbs": 0.83
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.03,
+     "p90Abs": 0.76,
+     "maxAbs": 1.7
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.02,
+     "p90Abs": 1.02,
+     "maxAbs": 2.16
+    },
+    "기타": {
+     "n": 31,
+     "median": 0.03,
+     "p90Abs": 0.87,
+     "maxAbs": 2.62
+    }
+   },
+   "origSpotsFit": {
+    "n": 39,
+    "median": -0.02,
+    "p90Abs": 0.89,
+    "maxAbs": 1.42
+   },
+   "holdoutRandom5": "해당 없음(평탄화 다각형이 같은 칸에서 나옴)",
+   "holdoutBlock10m": "해당 없음",
+   "changeBeyond30m": {
+    "maxAbsM": 0,
+    "areaOver05M2": 0,
+    "areaOver01M2": 0
+   },
+   "changeBand2to30m": {
+    "maxAbsM": 11.59,
+    "areaOver05M2": 13444,
+    "maxAt": {
+     "x": 201015,
+     "y": 557245,
+     "deltaM": -11.59,
+     "distToSampleM": 2.83
+    }
+   },
+   "origSpotLoo": {
+    "n": 39,
+    "median": -0.26,
+    "p90Abs": 4.88,
+    "maxAbs": 8.38,
+    "maxChangeVsBaseline": 2.77
+   },
+   "gateSpotResiduals": {
+    "n": 39,
+    "median": -1.85,
+    "p90Abs": 4.79,
+    "pass": true
+   },
+   "slope": {
+    "inside": {
+     "max": 5.52,
+     "p99": 1.98,
+     "over1": 129
+    },
+    "edge2to30m": {
+     "max": 9.11,
+     "p99": 4.08,
+     "over1": 1975
+    }
+   },
+   "slopeBefore": {
+    "inside": {
+     "max": 5.46,
+     "p99": 1.76,
+     "over1": 250
+    },
+    "edge2to30m": {
+     "max": 9.74,
+     "p99": 4.35,
+     "over1": 1716
+    }
+   },
+   "inputSamples": 2539,
+   "areasM2": {
+    "within2m": 11760,
+    "band2to30m": 44776,
+    "beyond30m": 778664
+   },
+   "seconds": 0,
+   "origSpotsNearSamples": [
+    {
+     "x": 201212.01,
+     "y": 557220.8,
+     "spotZ": 148.91,
+     "newDem": 148.92,
+     "liveDem": 149.46,
+     "distM": 0
+    }
+   ]
+  }
+ }
+}
