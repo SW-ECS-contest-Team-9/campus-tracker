@@ -1,5 +1,5 @@
 {
-  "about": "Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): \"buildings\" = roof elevation of one building, \"hidden\" = a GeoPackage building that is not drawn, \"parts\" = one footprint drawn as several flat-roofed blocks. Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
+  "about": "Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): \"buildings\" = roof elevation of one building, \"hidden\" = a GeoPackage building that is not drawn, \"parts\" = one footprint drawn as several flat-roofed blocks, \"added\" = a building that is not in the GeoPackage or the campus map (scene only). Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
   "generated": "Generated from the building notes by docs/audit/registry/building_registry.py (write); do not edit by hand.",
   "buildings": [
     {
@@ -25,7 +25,7 @@
   "hidden": [
     {
       "name": "공연실습소",
-      "reason": "The polygon carrying the register record 53636 (공연실습소) lies on 혜인관 and is not the 공연실습소 building; the real building is elsewhere (user, 2026-10-10). Its location is not in the campus map yet, so nothing is drawn for it.",
+      "reason": "The polygon carrying the register record 53636 (공연실습소) lies on 혜인관 and is not the 공연실습소 building; the real building is elsewhere (user, 2026-10-10) and is drawn from the added entry 추가-공연실습소.",
       "evidence": {
         "source": "user statement 2026-10-10; register AL_D010 record 53636; S-MAP 3D viewer building model, 2 m grid",
         "collectedOn": "2026-10-10",
@@ -33,7 +33,7 @@
         "independentSurvey": false,
         "register": "record 53636 states footprint 570.29 m2, its polygon is 1511.9 m2 and 96 % of it lies on the 혜인관 polygon 42232",
         "mesh": "364 of 380 grid cells under the polygon are the single S-MAP 혜인관 model (roof median 178.1 m); the 14 cells outside the 혜인관 polygon are open ground (149.1 m). No second volume",
-        "notCovered": "the real 공연실습소 (user-marked cluster south-west of 유담관, outside the campus map footprints); campus_buildings still has this polygon as building id 혜인관",
+        "notCovered": "campus_buildings still has this polygon as building id 혜인관 (the real 혜인관 is 건물5); the real 공연실습소 is the added entry 추가-공연실습소",
         "reproduce": "docs/audit/e05/analyze.py -> docs/audit/e05/results.json (B_공연실습소)"
       }
     }
@@ -344,6 +344,57 @@
           ]
         }
       ]
+    }
+  ],
+  "added": [
+    {
+      "id": "추가-공연실습소",
+      "name": "공연실습소",
+      "roofM": 107.0,
+      "heightSource": "SMAP_MESH",
+      "floors": 5,
+      "registerId": "53636",
+      "polygon": [
+        [
+          [201025.5, 557199.5], [201011.5, 557210.5], [201016.5, 557216.5], [201022.5, 557211.5], [201027.5, 557215.5], [201049.5, 557201.5], [201049.5, 557198.5], [201044.5, 557190.5], [201034.5, 557183.5], [201021.5, 557192.5], [201025.5, 557199.5]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model 171376641, 1 m grid; user photos showing the building's sign; register AL_D010 record 53636",
+        "collectedOn": "2026-10-10",
+        "level": "name and appearance user-confirmed (photo of the sign); outline and roof are S-MAP source data (one provider), not field verified; that the photographed building is this S-MAP model was matched by Claude (five agreeing clues, none against)",
+        "independentSurvey": false,
+        "outline": "union of the 627 one-metre cells of the model, simplified to 1.5 m (633.5 m2, +-1 m). The building is not in campus.gpkg or the campus map; the register polygon 53636 lies on 혜인관 and stays hidden",
+        "roof": "one flat block at the median of the cells, 107.0 m (p10-p90 105.5-108.7). In the model: south-west half 107.0, street half 107.9-108.0, a tower by the street 113.1, the north-west wing 105.5 (68 cells) inside a rim at 108.7-108.8",
+        "wing": "the north-west wing is included: it is the same S-MAP model, joined without a gap, and its rim stands at the height of the main block's rim (108.7-108.8 m). Against it: a different roof colour seen from above, and the register footprint 570.29 m2 is nearer the 559 cells without the wing",
+        "floors": "5 ground floors: register 53636 (3 basement floors); five storeys are visible in the user photo",
+        "terrain": "server DEM seoul5000-2015-ba7fcb19 against S-MAP ground 2-6 m outside the outline, by direction: -2.0 to +2.1 m (22-93 cells each). Base on the server DEM 84.3 m; the lowest S-MAP side is 86.0 m",
+        "notCovered": "the tower and the roof steps, the rooftop concrete frame, entrances, street address; campus_buildings and building_metadata do not have this building (the terrain model's building lookup does not know it); vertical datum of S-MAP",
+        "reproduce": "docs/audit/b05/sites.py -> docs/audit/b05/sites.json"
+      }
+    },
+    {
+      "id": "추가-외국인생활관",
+      "name": "외국인 생활관",
+      "roofM": 107.0,
+      "heightSource": "SMAP_MESH",
+      "polygon": [
+        [
+          [200992.5, 557217.5], [200981.5, 557223.5], [200987.5, 557232.5], [201001.5, 557231.5], [201010.5, 557225.5], [201007.5, 557218.5], [200992.5, 557217.5]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model 172359682, 1 m grid; user photo showing the building's sign",
+        "collectedOn": "2026-10-10",
+        "level": "name and appearance user-confirmed (photo of the sign); outline and roof are S-MAP source data (one provider), not field verified; that the photographed building is this S-MAP model was matched by Claude (four agreeing clues, none against)",
+        "independentSurvey": false,
+        "outline": "union of the 309 one-metre cells of the model, simplified to 1.5 m (311.0 m2, +-1 m). The building is not in campus.gpkg or the campus map; the register polygon 30791 (no attributes) covers 82 % of the cells",
+        "roof": "one flat block at the flat top of the model, 107.0 m (119 cells); all cells: median 106.6, p10-p90 105.5-107.0. The edge band slopes down to 105.5 m and a pit in the middle is 103.9 m (15 cells); the dormers of the photo are not in the model",
+        "floors": "not stated: the count read from the photo (four brick storeys and a roof storey) is an estimate",
+        "terrain": "server DEM seoul5000-2015-ba7fcb19 against S-MAP ground 2-6 m outside the outline, by direction: -1.3 to +1.6 m, except the south side where the server DEM is 5.0 m higher (86.8 against 81.8 m, 15 cells). Base on the server DEM 84.9 m; the south wall is drawn about 5 m shorter than S-MAP has it",
+        "notCovered": "the sloping roof edge, floors, entrances, street address, whether this is the university's 생활관 3동; campus_buildings and building_metadata do not have this building (the terrain model's building lookup does not know it); vertical datum of S-MAP",
+        "reproduce": "docs/audit/b05/sites.py -> docs/audit/b05/sites.json"
+      }
     }
   ]
 }

@@ -12,12 +12,14 @@
   부분[]: 모델_반영: "예" | "아니오 (이유)", 모델_부분: {id, 표지, 지면과_같은_지붕}, 외곽: {좌표: [고리, ...], 등급}, 지붕_높이: {값, 등급}
   덮지_않는_곳(글): 부분들이 원천 외곽을 다 덮지 않을 때 나머지가 무엇인지(-> uncovered). 없으면 빈틈없이 덮어야 한다.
   지면과_같은_지붕(글): 그 부분의 지붕이 외곽선의 가장 높은 땅보다 낮아도 되는 이유(-> terrace). 없으면 지붕이 땅보다 높아야 한다.
+  모델_추가: {건물_id, 높이_출처, 층수: {값, 등급}, 대장_id, 근거}: 원천 파일과 캠퍼스 지도에 없는 건물을 새로 넣는다(-> added). 이름표는 노트의 이름.
+    외곽과 지붕은 모델_반영 예인 부분 하나의 외곽.좌표·지붕_높이. 이때 모델_보정은 숨김(같은 이름의 잘못 놓인 원천 도형) 또는 없음이어야 한다.
 """
 import argparse, json, pathlib, re, sys
 import yaml
 
 ABOUT = ('Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): "buildings" = roof elevation of one building, '
-         '"hidden" = a GeoPackage building that is not drawn, "parts" = one footprint drawn as several flat-roofed blocks. Remove an entry, or import '
+         '"hidden" = a GeoPackage building that is not drawn, "parts" = one footprint drawn as several flat-roofed blocks, "added" = a building that is not in the GeoPackage or the campus map (scene only). Remove an entry, or import '
          'with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.')
 GENERATED = 'Generated from the building notes by docs/audit/registry/building_registry.py (write); do not edit by hand.'
 ALLOWED = ('확정', '원천', 'S-MAP')
@@ -48,8 +50,45 @@ def in_model(part):
     return v.startswith('예')
 
 
+def bad_evidence(ev):
+    return not isinstance(ev, dict) or not all(isinstance(ev.get(k), str) and ev.get(k) for k in ('source', 'collectedOn', 'level')) or not isinstance(ev.get('independentSurvey'), bool)
+
+
+def floors_of(m, problems):
+    """{'floors': n} from 층수: {값, 등급}, or {} when the note states none."""
+    f = m.get('층수')
+    if f is None: return {}
+    if grade(f) not in ALLOWED: problems.append(f"층수의 등급 {f.get('등급') if isinstance(f, dict) else None!r} 은 모델에 넣을 수 없다")
+    if not isinstance(f, dict) or not isinstance(f.get('값'), int): problems.append('모델_보정.층수.값 은 정수'); return {}
+    return {'floors': f['값']}
+
+
+def part_grades(p, problems):
+    if grade(p.get('지붕_높이')) not in ALLOWED: problems.append(f"부분 '{p.get('이름')}': 지붕_높이 등급 {grade(p.get('지붕_높이'))!r} 은 모델에 넣을 수 없다")
+    if not isinstance((p.get('지붕_높이') or {}).get('값'), (int, float)): problems.append(f"부분 '{p.get('이름')}': 지붕_높이.값 이 숫자가 아니다")
+    if grade(p.get('외곽')) not in ALLOWED: problems.append(f"부분 '{p.get('이름')}': 외곽 등급 {grade(p.get('외곽'))!r} 은 모델에 넣을 수 없다")
+
+
+def added_from_note(head, used):
+    """(entry, problems) of 모델_추가: a building that has no source polygon, drawn from the one part that is in the model."""
+    a = head.get('모델_추가'); problems = []
+    if not isinstance(a, dict): return None, ['모델_추가 는 {건물_id, 높이_출처, 근거, ...}']
+    if (head.get('모델_보정') or {}).get('종류') not in ('숨김', '없음'): problems.append('모델_추가 가 있으면 모델_보정.종류 는 숨김 또는 없음(원천 도형이 없는 건물)')
+    if not a.get('건물_id'): problems.append('모델_추가.건물_id 가 없다')
+    if not head.get('이름'): problems.append('이름 이 없다')
+    if bad_evidence(a.get('근거')): problems.append('모델_추가.근거 에 source, collectedOn, level, independentSurvey 가 있어야 한다')
+    if len(used) != 1: return None, problems + [f'모델_추가 는 모델_반영 예인 부분이 하나여야 한다({len(used)}개)']
+    floors = floors_of(a, problems)
+    part_grades(used[0], problems)
+    rings = (used[0].get('외곽') or {}).get('좌표')
+    if not isinstance(rings, list) or not rings: problems.append(f"부분 '{used[0].get('이름')}': 외곽.좌표 가 있어야 한다(원천 도형이 없다)")
+    if problems: return None, problems
+    return {'id': str(a['건물_id']), 'name': head['이름'], 'roofM': used[0]['지붕_높이']['값'], 'heightSource': a.get('높이_출처'), **floors,
+            **({'registerId': str(a['대장_id'])} if a.get('대장_id') is not None else {}), 'polygon': rings, 'evidence': a['근거']}, problems
+
+
 def entry_from_note(head):
-    """(section, entry, problems) for one note; section is 'buildings' | 'hidden' | 'parts' | None."""
+    """(section, entry, problems, added entry) for one note; section is 'buildings' | 'hidden' | 'parts' | None."""
     name = head.get('이름'); problems = []
     parts = head.get('부분') or []
     used = []
@@ -58,6 +97,15 @@ def entry_from_note(head):
             if in_model(p): used.append(p)
         except ValueError as e:
             problems.append(str(e))
+    added = None
+    if head.get('모델_추가') is not None:   # its part belongs to the added building, not to a source polygon
+        added, bad = added_from_note(head, used)
+        problems += bad; used = []
+    section, entry, problems = source_entry(head, used, problems)
+    return section, entry, problems, added
+
+
+def source_entry(head, used, problems):
     m = head.get('모델_보정')
     if not isinstance(m, dict) or m.get('종류') not in ('지붕', '부분', '숨김', '없음'):
         return None, None, problems + ['모델_보정.종류 가 없다(지붕·부분·숨김·없음)']
@@ -68,23 +116,15 @@ def entry_from_note(head):
     src = m.get('원천_이름')
     ev = m.get('근거')
     if not src: problems.append('모델_보정.원천_이름 이 없다')
-    if not isinstance(ev, dict) or not all(isinstance(ev.get(k), str) and ev.get(k) for k in ('source', 'collectedOn', 'level')) or not isinstance(ev.get('independentSurvey'), bool):
+    if bad_evidence(ev):
         problems.append('모델_보정.근거 에 source, collectedOn, level, independentSurvey 가 있어야 한다')
     if kind == '숨김':
         if used: problems.append('숨김인데 모델_반영 예인 부분이 있다')
         if grade(m) not in ALLOWED: problems.append(f"숨김의 등급 {m.get('등급')!r} 은 모델에 넣을 수 없다")
         if not m.get('사유'): problems.append('숨김에는 사유를 적는다')
         return 'hidden', {'name': src, 'reason': m.get('사유'), 'evidence': ev}, problems
-    floors = {}
-    if m.get('층수') is not None:
-        f = m['층수']
-        if grade(f) not in ALLOWED: problems.append(f"층수의 등급 {f.get('등급') if isinstance(f, dict) else None!r} 은 모델에 넣을 수 없다")
-        if not isinstance(f, dict) or not isinstance(f.get('값'), int): problems.append('모델_보정.층수.값 은 정수')
-        else: floors = {'floors': f['값']}
-    for p in used:
-        if grade(p.get('지붕_높이')) not in ALLOWED: problems.append(f"부분 '{p.get('이름')}': 지붕_높이 등급 {grade(p.get('지붕_높이'))!r} 은 모델에 넣을 수 없다")
-        if not isinstance((p.get('지붕_높이') or {}).get('값'), (int, float)): problems.append(f"부분 '{p.get('이름')}': 지붕_높이.값 이 숫자가 아니다")
-        if grade(p.get('외곽')) not in ALLOWED: problems.append(f"부분 '{p.get('이름')}': 외곽 등급 {grade(p.get('외곽'))!r} 은 모델에 넣을 수 없다")
+    floors = floors_of(m, problems)
+    for p in used: part_grades(p, problems)
     if problems: return None, None, problems
     if kind == '지붕':
         if len(used) != 1: return None, None, [f'지붕 보정은 모델_반영 예인 부분이 하나여야 한다({len(used)}개)']
@@ -103,18 +143,20 @@ def entry_from_note(head):
 
 def build(notes_dir):
     """(document, {note name: [problems]}) from every *.md in the folder."""
-    doc = {'about': ABOUT, 'generated': GENERATED, 'buildings': [], 'hidden': [], 'parts': []}
+    doc = {'about': ABOUT, 'generated': GENERATED, 'buildings': [], 'hidden': [], 'parts': [], 'added': []}
     problems = {}
     for path in sorted(pathlib.Path(notes_dir).glob('*.md')):
         try:
             head = read_head(path.read_text(encoding='utf-8'))
-            section, entry, bad = entry_from_note(head)
+            section, entry, bad, added = entry_from_note(head)
         except Exception as e:  # a note that cannot be read is a failure, not a skipped building
             problems[path.stem] = [f'읽지 못함: {e}']
             continue
         if bad: problems[path.stem] = bad
-        elif section: doc[section].append(entry)
-    for k in ('buildings', 'hidden', 'parts'): doc[k].sort(key=lambda e: e['name'])
+        else:
+            if section: doc[section].append(entry)
+            if added: doc['added'].append(added)
+    for k in ('buildings', 'hidden', 'parts', 'added'): doc[k].sort(key=lambda e: e['name'])
     return doc, problems
 
 
@@ -129,15 +171,16 @@ def diff(expected, actual):
     """Per-building differences between the document the notes give and the stored file."""
     out = {}
     add = lambda name, msg: out.setdefault(name, []).append(msg)
-    for sec, label in (('buildings', '지붕 보정'), ('hidden', '숨김'), ('parts', '부분 나누기')):
+    for sec, label in (('buildings', '지붕 보정'), ('hidden', '숨김'), ('parts', '부분 나누기'), ('added', '건물 추가')):
         e = {x['name']: x for x in expected.get(sec, [])}; a = {x.get('name'): x for x in actual.get(sec, []) or []}
         for n in e.keys() - a.keys(): add(n, f'{label}: 노트에는 있고 파일에는 없다')
         for n in a.keys() - e.keys(): add(n, f'{label}: 파일에는 있고 노트에는 없다(노트 등급이 낮거나 모델_반영 아니오)')
         for n in e.keys() & a.keys():
             x, y = e[n], a[n]
-            for k in sorted((x.keys() | y.keys()) - {'parts', 'evidence'}):
+            for k in sorted((x.keys() | y.keys()) - {'parts', 'evidence', 'polygon'}):
                 if x.get(k) != y.get(k): add(n, f'{label} {k}: 노트 {x.get(k)!r} / 파일 {y.get(k)!r}')
             if x.get('evidence') != y.get('evidence'): add(n, f'{label}: 근거 블록이 다르다')
+            if x.get('polygon') != y.get('polygon'): add(n, f'{label}: 외곽 좌표가 다르다')
             if sec == 'parts':
                 px = {p['id']: p for p in x['parts']}; py = {p.get('id'): p for p in y.get('parts', [])}
                 if [p['id'] for p in x['parts']] != [p.get('id') for p in y.get('parts', [])]: add(n, f"부분 순서·목록: 노트 {list(px)} / 파일 {list(py)}")
@@ -166,7 +209,7 @@ def main(argv=None):
         if problems:
             print('노트에 문제가 있어 쓰지 않았다.'); return 1
         path.write_text(dumps(doc), encoding='utf-8', newline='\n')
-        print(f"썼다: {path} (지붕 {len(doc['buildings'])}, 숨김 {len(doc['hidden'])}, 부분 나누기 {len(doc['parts'])})")
+        print(f"썼다: {path} (지붕 {len(doc['buildings'])}, 숨김 {len(doc['hidden'])}, 부분 나누기 {len(doc['parts'])}, 건물 추가 {len(doc['added'])})")
         return 0
     text = path.read_text(encoding='utf-8')
     d = diff(doc, json.loads(text))
@@ -175,7 +218,7 @@ def main(argv=None):
     same_text = text == dumps(doc)
     if not d and not same_text and not problems: print('[불일치] 값은 같지만 파일 글자가 생성 결과와 다르다(손으로 고친 흔적). write 로 다시 만든다.')
     names = lambda sec: ', '.join(f"{e['name']}" + (f"({len(e['parts'])})" if sec == 'parts' else '') for e in doc[sec]) or '없음'
-    print(f"노트 기준: 지붕 {names('buildings')} / 숨김 {names('hidden')} / 부분 나누기 {names('parts')}")
+    print(f"노트 기준: 지붕 {names('buildings')} / 숨김 {names('hidden')} / 부분 나누기 {names('parts')} / 건물 추가 {names('added')}")
     ok = not problems and not d and same_text
     print('일치' if ok else '불일치: 노트가 맞다. 노트를 고친 뒤 write, 다시 check.')
     return 0 if ok else 1

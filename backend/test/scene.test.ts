@@ -106,7 +106,7 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.equal(parseSceneOverrides({ buildings: [], parts: [{ ...split, floors: 7 }] }).parts[0].floors, 7);
   assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, floors: 0 }] }), /floors/);
   assert.match(partsAreaProblem(ok.parts[0], 230)!, /cover 200.0 m2/);
-  assert.deepEqual(parseSceneOverrides({ buildings: [] }), { roofs: [], hidden: [], parts: [] });
+  assert.deepEqual(parseSceneOverrides({ buildings: [] }), { roofs: [], hidden: [], parts: [], added: [] });
   assert.throws(() => parseSceneOverrides({ buildings: [], hidden: [{ name: 'H', evidence }] }), /reason/);
   assert.throws(() => parseSceneOverrides({ buildings: [], hidden: [{ name: 'A', reason: 'r', evidence }], parts: [split] }), /twice/);
   assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0]] }] }), /two parts/);
@@ -136,4 +136,42 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['유담관']);
   const yudam = all.parts.find((o) => o.name === '유담관')!;
   assert.ok(yudam.uncovered && yudam.parts[0].terrace === undefined && yudam.parts.filter((p) => p.terrace !== undefined).length === 1);
+});
+
+test('scene overrides: added buildings (not in the GeoPackage) carry their own outline, id and roof; bad entries are refused', () => {
+  const dir = path.resolve(import.meta.dirname, '../data/scene');
+  const all = parseSceneOverrides(JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8')));
+  const names = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features.map((f) => f.properties.name);
+  // the stored file: two buildings; a GeoPackage name is reused only where that GeoPackage building is hidden
+  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
+  assert.ok(all.added.every((a) => !names.includes(a.id) && a.evidence.independentSurvey === false && (!names.includes(a.name) || all.hidden.some((h) => h.name === a.name))));
+  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 311]);
+  // same rules as any block: base 1 m below the lowest ground of the outline, height = stated roof - median ground
+  const ground = [85.31, 86, 88.049, 90, 94.033];
+  const h = blockHeights(ground, 0);
+  assert.equal(h.baseM, 84.31);
+  assert.deepEqual(overrideHeights(ground, h, 107), { heightM: 18.951, roofM: 107 });
+  assert.throws(() => overrideHeights(ground, h, 94), /not above the ground/);
+
+  const evidence = { source: 's', collectedOn: '2026-10-10', level: 'l', independentSurvey: false };
+  const sq: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]];
+  const add = { id: 'new-A', name: 'A', roofM: 20, heightSource: 'SMAP_MESH', polygon: [sq], evidence };
+  const hidden = { name: 'A', reason: 'r', evidence };
+  const roof = { name: 'A', roofM: 10, heightSource: 'SMAP_MESH', evidence };
+  assert.deepEqual(parseSceneOverrides({ buildings: [], hidden: [hidden], added: [add] }).added, [add]); // the name of a hidden building may be reused
+  assert.deepEqual(parseSceneOverrides({ buildings: [], added: [{ ...add, floors: 5, registerId: '1' }] }).added[0], { ...add, floors: 5, registerId: '1' });
+  assert.throws(() => parseSceneOverrides({ buildings: [roof], added: [add] }), /twice/); // not the name of a building that is still drawn
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [add, { ...add, id: 'new-B' }] }), /twice/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [add, { ...add, name: 'B' }] }), /id must be unique/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, id: 'a#b' }] }), /id must be unique/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, name: ' ' }] }), /name is required/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, roofM: '20' }] }), /roofM/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, heightSource: 'REGISTER' }] }), /heightSource/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, floors: 4.5 }] }), /floors/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, registerId: 53636 }] }), /registerId/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, polygon: [sq.slice(0, 4)] }] }), /closed/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: [{ ...add, evidence: { source: 's' } }] }), /evidence/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], added: {} }), /"added" must be an array/);
+  // without overrides the version id is the old one; anything applied (an added building too) gives another id
+  assert.notEqual(sceneVersionId('g', 't', 'm', 'RECOMPUTED', 'x'), sceneVersionId('g', 't', 'm', 'RECOMPUTED'));
 });

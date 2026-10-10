@@ -58,6 +58,17 @@ NONE = '''---
     지붕_높이: {값: 100, 등급: 추정}
 ---
 '''
+ADDED = f'''---
+이름: 마관
+모델_보정: {{종류: 없음}}
+모델_추가: {{건물_id: "추가-마관", 높이_출처: SMAP_MESH, 층수: {{값: 5, 등급: 원천}}, 대장_id: 53636, 근거: {EV}}}
+부분:
+  - 이름: 본체
+    모델_반영: 예
+    외곽: {{좌표: {SQ(0)}, 등급: S-MAP}}
+    지붕_높이: {{값: 107.0, 등급: S-MAP}}
+---
+'''
 
 
 def folder(**notes):
@@ -106,6 +117,33 @@ class Registry(unittest.TestCase):
         self.assertTrue(any('외곽 좌표' in m for m in d['나관']))
         self.assertTrue(any('파일에는 없다' in m for m in d['다관']))
         self.assertTrue(any('노트에는 없다' in m for m in d['마관']))
+
+    def test_added_building_beside_a_hidden_source_polygon(self):
+        hidden_and_added = ADDED.replace('이름: 마관', '이름: 다관').replace('모델_보정: {종류: 없음}', f'모델_보정: {{종류: 숨김, 원천_이름: 다관, 등급: 확정, 사유: "r", 근거: {EV}}}')
+        doc, problems = br.build(folder(마관=ADDED, 다관=hidden_and_added, 라관=NONE))
+        self.assertEqual(problems, {})
+        self.assertEqual(doc['added'][1], {'id': '추가-마관', 'name': '마관', 'roofM': 107.0, 'heightSource': 'SMAP_MESH', 'floors': 5, 'registerId': '53636',
+                                           'polygon': [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]], 'evidence': json.loads(EV)})
+        self.assertEqual([e['name'] for e in doc['hidden']], ['다관'])     # the misplaced source polygon stays hidden, the same note adds the real building
+        self.assertEqual(doc['added'][0]['name'], '다관')
+        self.assertEqual(doc['buildings'] + doc['parts'], [])
+        text = br.dumps(doc)
+        self.assertEqual(br.diff(doc, json.loads(text)), {})
+        stored = json.loads(text); stored['added'][1]['polygon'][0][1] = [11, 0]; stored['added'][1]['roofM'] = 108; del stored['added'][0]
+        d = br.diff(doc, stored)
+        self.assertTrue(any('외곽 좌표' in m for m in d['마관']) and any('roofM' in m for m in d['마관']))
+        self.assertTrue(any('건물 추가: 노트에는 있고 파일에는 없다' in m for m in d['다관']))
+        bad = {
+            'est_floors': ADDED.replace('층수: {값: 5, 등급: 원천}', '층수: {값: 5, 등급: 추정}'),      # a floor count read from a photo does not go in
+            'est_roof': ADDED.replace('지붕_높이: {값: 107.0, 등급: S-MAP}', '지붕_높이: {값: 107.0, 등급: 추정}'),
+            'no_outline': ADDED.replace(f'좌표: {SQ(0)}, ', ''),
+            'no_id': ADDED.replace('건물_id: "추가-마관", ', ''),
+            'not_in_model': ADDED.replace('모델_반영: 예', '모델_반영: "아니오 (사용자 결정 대기)"'),
+            'on_a_source_polygon': ADDED.replace('모델_보정: {종류: 없음}', f'모델_보정: {{종류: 지붕, 원천_이름: 마관, 높이_출처: SMAP_MESH, 근거: {EV}}}'),
+        }
+        doc, problems = br.build(folder(**bad))
+        self.assertEqual(set(problems), set(bad))
+        self.assertEqual(doc['added'], [])
 
     def test_low_grades_and_missing_fields_are_refused(self):
         bad = {

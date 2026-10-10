@@ -1,0 +1,179 @@
+{
+  "terrain": "seoul5000-2015-ba7fcb19",
+  "buildings": {
+    "공연실습소": {
+      "id": "추가-공연실습소",
+      "areaM2": 633.5,
+      "outlineSamples": 63,
+      "sourceFootprints": {
+        "overlapM2": 0.0,
+        "nearest": [
+          14.5,
+          "유담관"
+        ]
+      },
+      "import": {
+        "base": 84.31,
+        "roof": 107.0,
+        "height": 18.951,
+        "terrainMin": 85.31,
+        "terrainMedian": 88.049,
+        "terrainMax": 94.033,
+        "roofAboveGround": true
+      },
+      "serverUnderFootprint": {
+        "min": 85.3,
+        "median": 88.4,
+        "max": 94.0
+      },
+      "smapGroundRing": {
+        "min": 83.9,
+        "median": 91.2,
+        "max": 95.6,
+        "cells": 473
+      },
+      "sides": {
+        "동": {
+          "server": 94.4,
+          "smap": 95.0,
+          "smapCells": 71,
+          "serverMinusSmap": -0.6
+        },
+        "북동": {
+          "server": 96.2,
+          "smap": 94.0,
+          "smapCells": 50,
+          "serverMinusSmap": 2.1
+        },
+        "북": {
+          "server": 92.1,
+          "smap": 93.0,
+          "smapCells": 58,
+          "serverMinusSmap": -0.8
+        },
+        "북서": {
+          "server": 88.8,
+          "smap": 90.8,
+          "smapCells": 93,
+          "serverMinusSmap": -2.0
+        },
+        "서": {
+          "server": 85.8,
+          "smap": 87.4,
+          "smapCells": 22,
+          "serverMinusSmap": -1.6
+        },
+        "남서": {
+          "server": 84.9,
+          "smap": 86.0,
+          "smapCells": 50,
+          "serverMinusSmap": -1.1
+        },
+        "남": {
+          "server": 85.2,
+          "smap": 86.0,
+          "smapCells": 65,
+          "serverMinusSmap": -0.8
+        },
+        "남동": {
+          "server": 89.9,
+          "smap": 89.6,
+          "smapCells": 64,
+          "serverMinusSmap": 0.3
+        }
+      },
+      "drawnWall": {
+        "lowSide": 22.7,
+        "smapLowSide": 21.0,
+        "smapHighSide": 12.0
+      }
+    },
+    "외국인 생활관": {
+      "id": "추가-외국인생활관",
+      "areaM2": 311.0,
+      "outlineSamples": 40,
+      "sourceFootprints": {
+        "overlapM2": 0.0,
+        "nearest": [
+          15.5,
+          "유담관"
+        ]
+      },
+      "import": {
+        "base": 84.919,
+        "roof": 107.0,
+        "height": 18.847,
+        "terrainMin": 85.919,
+        "terrainMedian": 88.153,
+        "terrainMax": 91.159,
+        "roofAboveGround": true
+      },
+      "serverUnderFootprint": {
+        "min": 85.7,
+        "median": 88.3,
+        "max": 91.2
+      },
+      "smapGroundRing": {
+        "min": 81.1,
+        "median": 90.2,
+        "max": 92.6,
+        "cells": 364
+      },
+      "sides": {
+        "동": {
+          "server": 90.6,
+          "smap": 91.9,
+          "smapCells": 59,
+          "serverMinusSmap": -1.3
+        },
+        "북동": {
+          "server": 92.2,
+          "smap": 92.3,
+          "smapCells": 45,
+          "serverMinusSmap": -0.1
+        },
+        "북": {
+          "server": 91.8,
+          "smap": 92.6,
+          "smapCells": 37,
+          "serverMinusSmap": -0.8
+        },
+        "북서": {
+          "server": 90.3,
+          "smap": 91.6,
+          "smapCells": 50,
+          "serverMinusSmap": -1.3
+        },
+        "서": {
+          "server": 87.5,
+          "smap": 88.1,
+          "smapCells": 61,
+          "serverMinusSmap": -0.6
+        },
+        "남서": {
+          "server": 86.7,
+          "smap": 85.1,
+          "smapCells": 45,
+          "serverMinusSmap": 1.6
+        },
+        "남": {
+          "server": 86.8,
+          "smap": 81.8,
+          "smapCells": 15,
+          "serverMinusSmap": 5.0
+        },
+        "남동": {
+          "server": 86.5,
+          "smap": 85.8,
+          "smapCells": 52,
+          "serverMinusSmap": 0.6
+        }
+      },
+      "drawnWall": {
+        "lowSide": 22.1,
+        "smapLowSide": 25.2,
+        "smapHighSide": 14.4
+      }
+    }
+  }
+}

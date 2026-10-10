@@ -34,12 +34,15 @@ async function main() {
 
   const ctx = await terrain.context(await terrain.activeVersion());
   if (!ctx) throw new Error('No active terrain version');
-  const { rows: buildings } = await pool.query<{ name: string; base_m: number; roof_m: number; terrain_min_m: number; terrain_max_m: number }>(
-    `SELECT b.name, b.base_m, b.roof_m, b.terrain_min_m, b.terrain_max_m FROM scene_buildings b JOIN scene_versions v ON v.id = b.scene_version_id AND v.active`,
+  const { rows: scene } = await pool.query<{ building_id: string; name: string; base_m: number; roof_m: number; terrain_min_m: number; terrain_max_m: number }>(
+    `SELECT b.building_id, b.name, b.base_m, b.roof_m, b.terrain_min_m, b.terrain_max_m FROM scene_buildings b JOIN scene_versions v ON v.id = b.scene_version_id AND v.active`,
   );
-  if (!buildings.length) throw new Error('No active campus scene (npm run scene:import)');
+  if (!scene.length) throw new Error('No active campus scene (npm run scene:import)');
   // Buildings the scene overrides hide or split into parts have no row of their own name in the scene: their GeoPackage rows are left as they are.
-  const { rows: [sv] } = await pool.query<{ metadata: { hiddenBuildings?: { name: string }[]; buildingParts?: { name: string }[] } | null }>('SELECT metadata FROM scene_versions WHERE active');
+  const { rows: [sv] } = await pool.query<{ metadata: { hiddenBuildings?: { name: string }[]; buildingParts?: { name: string }[]; addedBuildings?: { id: string }[] } | null }>('SELECT metadata FROM scene_versions WHERE active');
+  // Buildings the overrides add are not in the GeoPackage; one may carry the name of a hidden GeoPackage row, which must not take its heights.
+  const added = new Set((sv?.metadata?.addedBuildings ?? []).map((o) => o.id));
+  const buildings = scene.filter((b) => !added.has(b.building_id));
   const overridden = new Set([...(sv?.metadata?.hiddenBuildings ?? []), ...(sv?.metadata?.buildingParts ?? [])].map((o) => o.name));
 
   // 1. server DEM -> GeoTIFF (rows north to south; the stored grid's row 0 is the south edge)
