@@ -1,23 +1,25 @@
 /** Preview by default; --save stores an INACTIVE candidate. Never changes buildings or roads.
- * Usage: npx tsx scripts/terrain-local-samples.ts BASE_VERSION samples.json [--areas=field,corridor,s06] [--save]
- * Input: data/terrain/samples/smap_samples_5186.json (EPSG:5186 ground samples with provenance and reason).
+ * Usage: npx tsx scripts/terrain-local-samples.ts BASE_VERSION samples.json[,more.json] [--areas=field,corridor,s06,gate_road,...] [--save]
+ * Input: data/terrain/samples/smap_samples_5186.json (areas field, corridor, s06) and, joined with a comma,
+ * data/terrain/samples/smap_samples_roads_5186.json (areas gate_road, turnaround, fountain_plaza). EPSG:5186 ground samples with provenance and reason.
+ * The id hashes the whole input: ids made from the first file alone stay the same; a two-file input gives new ids.
  * Activate a saved candidate with scripts/terrain-versions.ts.
  */
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pool } from '../src/config/database.js';
 import { terrain } from '../src/geo/terrain.js';
-import { applyLocalSamples, changeStats, parseLocalSamples, LOCAL_SAMPLE_DEFAULTS } from '../src/geo/terrain-local-samples.js';
+import { applyLocalSamples, changeStats, mergeLocalSampleInputs, parseLocalSamples, LOCAL_SAMPLE_DEFAULTS } from '../src/geo/terrain-local-samples.js';
 
 async function main() {
   const [baseVersion, file, ...flags] = process.argv.slice(2);
   const save = flags.includes('--save');
   const areasFlag = flags.find((f) => f.startsWith('--areas='));
   if (!baseVersion || !file || flags.some((f) => f !== '--save' && f !== areasFlag)) {
-    throw new Error('Usage: terrain-local-samples.ts BASE_VERSION samples.json [--areas=field,corridor,s06] [--save]');
+    throw new Error('Usage: terrain-local-samples.ts BASE_VERSION samples.json[,more.json] [--areas=field,corridor,s06,...] [--save]');
   }
   const areas = areasFlag?.slice('--areas='.length).split(',').filter(Boolean);
-  const input = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^﻿/, ''));
+  const input = mergeLocalSampleInputs(file.split(',').map((f) => JSON.parse(fs.readFileSync(f, 'utf8').replace(/^﻿/, ''))));
   const { reason, samples, groups } = parseLocalSamples(input, areas);
   const db = await pool.connect();
   try {

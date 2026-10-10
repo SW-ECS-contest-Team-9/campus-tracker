@@ -1,0 +1,612 @@
+{
+ "created": "2026-10-10",
+ "sessionsRead": 29,
+ "note": "실외 = 건물 소속 없음, 위치 불확실도 15 m 이하. 구역 = 새 표본 칸에서 4 m 안. 검사 대상 = 한 구역 안 연속 8점·15 m 이상",
+ "outdoorPointsByArea": {
+  "gate_road": 4,
+  "turnaround": 400
+ },
+ "runsTested": 13,
+ "rows": [
+  {
+   "session": "c186b516",
+   "collector": "C01",
+   "date": "2026-10-01",
+   "area": "turnaround",
+   "points": 1,
+   "seconds": 907,
+   "lengthM": 0
+  },
+  {
+   "session": "c186b516",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 87
+  },
+  {
+   "session": "a1dbb118",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 1,
+   "seconds": 21,
+   "lengthM": 0
+  },
+  {
+   "session": "a1dbb118",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 3,
+   "seconds": 14,
+   "lengthM": 3
+  },
+  {
+   "session": "a1dbb118",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 35
+  },
+  {
+   "session": "89013bdb",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 3,
+   "seconds": 62,
+   "lengthM": 2
+  },
+  {
+   "session": "89013bdb",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 9,
+   "seconds": 64,
+   "lengthM": 11
+  },
+  {
+   "session": "89013bdb",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 1,
+   "seconds": 3,
+   "lengthM": 0
+  },
+  {
+   "session": "89013bdb",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 11
+  },
+  {
+   "session": "52f472a2",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 5,
+   "seconds": 200,
+   "lengthM": 5
+  },
+  {
+   "session": "52f472a2",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 292
+  },
+  {
+   "session": "e54010c2",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 17,
+   "seconds": 427,
+   "lengthM": 28,
+   "zRangeM": 0.73,
+   "oldRangeM": 1.89,
+   "correctedRangeM": 2.1,
+   "correctedMinusOldM": [
+    -1.16,
+    0.56
+   ],
+   "old": {
+    "rms": 0.49,
+    "shifted10m": [
+     0.41,
+     1.79
+    ]
+   },
+   "corrected": {
+    "rms": 0.84,
+    "shifted10m": [
+     0.33,
+     0.84
+    ]
+   }
+  },
+  {
+   "session": "e54010c2",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 1
+  },
+  {
+   "session": "813468d0",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 11,
+   "seconds": 10,
+   "lengthM": 15,
+   "zRangeM": 0.03,
+   "oldRangeM": 0.51,
+   "correctedRangeM": 0.94,
+   "correctedMinusOldM": [
+    -0.54,
+    0.91
+   ],
+   "old": {
+    "rms": 0.15,
+    "shifted10m": [
+     0.08,
+     0.59
+    ]
+   },
+   "corrected": {
+    "rms": 0.29,
+    "shifted10m": [
+     0.07,
+     0.33
+    ]
+   }
+  },
+  {
+   "session": "813468d0",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 24,
+   "seconds": 27,
+   "lengthM": 38,
+   "zRangeM": 2.13,
+   "oldRangeM": 3.08,
+   "correctedRangeM": 0.79,
+   "correctedMinusOldM": [
+    -1.55,
+    1.68
+   ],
+   "old": {
+    "rms": 1.45,
+    "shifted10m": [
+     1.12,
+     1.71
+    ]
+   },
+   "corrected": {
+    "rms": 0.49,
+    "shifted10m": [
+     0.3,
+     1.37
+    ]
+   }
+  },
+  {
+   "session": "813468d0",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 2
+  },
+  {
+   "session": "fbaa781d",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 2,
+   "seconds": 2,
+   "lengthM": 1
+  },
+  {
+   "session": "fbaa781d",
+   "collector": "C01",
+   "date": "2026-10-02",
+   "area": "turnaround",
+   "points": 39,
+   "seconds": 49,
+   "lengthM": 63,
+   "zRangeM": 2.65,
+   "oldRangeM": 4.53,
+   "correctedRangeM": 1.8,
+   "correctedMinusOldM": [
+    -2.12,
+    2.03
+   ],
+   "old": {
+    "rms": 1.44,
+    "shifted10m": [
+     1.16,
+     2.82
+    ]
+   },
+   "corrected": {
+    "rms": 0.74,
+    "shifted10m": [
+     0.53,
+     1.37
+    ]
+   }
+  },
+  {
+   "session": "7c640688",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 4,
+   "seconds": 6,
+   "lengthM": 4
+  },
+  {
+   "session": "7c640688",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 4
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 8,
+   "seconds": 12,
+   "lengthM": 14
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 24,
+   "seconds": 38,
+   "lengthM": 42,
+   "zRangeM": 7.02,
+   "oldRangeM": 1.74,
+   "correctedRangeM": 2.41,
+   "correctedMinusOldM": [
+    -2.67,
+    0.37
+   ],
+   "old": {
+    "rms": 1.74,
+    "shifted10m": [
+     1.38,
+     1.92
+    ]
+   },
+   "corrected": {
+    "rms": 1.76,
+    "shifted10m": [
+     1.45,
+     1.9
+    ]
+   }
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "area": "turnaround",
+   "notOutdoorPoints": 1
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 6,
+   "seconds": 9,
+   "lengthM": 9
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 6,
+   "seconds": 8,
+   "lengthM": 9
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 50,
+   "seconds": 80,
+   "lengthM": 97,
+   "zRangeM": 0.17,
+   "oldRangeM": 5.63,
+   "correctedRangeM": 2.7,
+   "correctedMinusOldM": [
+    -0.79,
+    5.29
+   ],
+   "old": {
+    "rms": 1.98,
+    "shifted10m": [
+     0.58,
+     6.79
+    ]
+   },
+   "corrected": {
+    "rms": 0.71,
+    "shifted10m": [
+     0.38,
+     6.16
+    ]
+   }
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 10,
+   "seconds": 15,
+   "lengthM": 18,
+   "zRangeM": 0.08,
+   "oldRangeM": 1.55,
+   "correctedRangeM": 1.36,
+   "correctedMinusOldM": [
+    -1.51,
+    1.23
+   ],
+   "old": {
+    "rms": 0.52,
+    "shifted10m": [
+     0.19,
+     0.52
+    ]
+   },
+   "corrected": {
+    "rms": 0.48,
+    "shifted10m": [
+     0.2,
+     0.72
+    ]
+   }
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 15,
+   "seconds": 16,
+   "lengthM": 24,
+   "zRangeM": 2.18,
+   "oldRangeM": 0.93,
+   "correctedRangeM": 0.8,
+   "correctedMinusOldM": [
+    -1.93,
+    -0.76
+   ],
+   "old": {
+    "rms": 0.95,
+    "shifted10m": [
+     0.38,
+     1.5
+    ]
+   },
+   "corrected": {
+    "rms": 0.64,
+    "shifted10m": [
+     0.39,
+     1.12
+    ]
+   }
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 7
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 16,
+   "seconds": 27,
+   "lengthM": 25,
+   "zRangeM": 1.67,
+   "oldRangeM": 1.57,
+   "correctedRangeM": 1.2,
+   "correctedMinusOldM": [
+    -3.07,
+    -1.26
+   ],
+   "old": {
+    "rms": 0.71,
+    "shifted10m": [
+     0.42,
+     0.71
+    ]
+   },
+   "corrected": {
+    "rms": 0.33,
+    "shifted10m": [
+     0.31,
+     0.64
+    ]
+   }
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 5,
+   "seconds": 4,
+   "lengthM": 5
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 12,
+   "seconds": 16,
+   "lengthM": 19,
+   "zRangeM": 1.31,
+   "oldRangeM": 0.6,
+   "correctedRangeM": 0.59,
+   "correctedMinusOldM": [
+    -1.89,
+    -0.81
+   ],
+   "old": {
+    "rms": 0.7,
+    "shifted10m": [
+     0.49,
+     0.83
+    ]
+   },
+   "corrected": {
+    "rms": 0.42,
+    "shifted10m": [
+     0.37,
+     0.88
+    ]
+   }
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 3,
+   "seconds": 4,
+   "lengthM": 3
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 3,
+   "seconds": 4,
+   "lengthM": 3
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07",
+   "area": "turnaround",
+   "points": 22,
+   "seconds": 27,
+   "lengthM": 31,
+   "zRangeM": 3.94,
+   "oldRangeM": 1.34,
+   "correctedRangeM": 1.14,
+   "correctedMinusOldM": [
+    -2.08,
+    -0.49
+   ],
+   "old": {
+    "rms": 1.11,
+    "shifted10m": [
+     0.73,
+     1.62
+    ]
+   },
+   "corrected": {
+    "rms": 0.85,
+    "shifted10m": [
+     0.73,
+     1.16
+    ]
+   }
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "area": "turnaround",
+   "notOutdoorPoints": 4
+  },
+  {
+   "session": "f4325e32",
+   "collector": "C01",
+   "date": "2026-10-08",
+   "area": "turnaround",
+   "points": 52,
+   "seconds": 51,
+   "lengthM": 83,
+   "zRangeM": 4.16,
+   "oldRangeM": 4.23,
+   "correctedRangeM": 4.61,
+   "correctedMinusOldM": [
+    -3.67,
+    0.1
+   ],
+   "old": {
+    "rms": 0.63,
+    "shifted10m": [
+     0.63,
+     3.72
+    ]
+   },
+   "corrected": {
+    "rms": 0.95,
+    "shifted10m": [
+     0.95,
+     4.91
+    ]
+   }
+  },
+  {
+   "session": "f4325e32",
+   "collector": "C01",
+   "date": "2026-10-08",
+   "area": "gate_road",
+   "points": 4,
+   "seconds": 4,
+   "lengthM": 5
+  },
+  {
+   "session": "9023ed38",
+   "collector": "C01",
+   "date": "2026-10-08",
+   "area": "turnaround",
+   "points": 48,
+   "seconds": 49,
+   "lengthM": 69,
+   "zRangeM": 3.37,
+   "oldRangeM": 4.79,
+   "correctedRangeM": 2.81,
+   "correctedMinusOldM": [
+    0.09,
+    3.16
+   ],
+   "old": {
+    "rms": 0.67,
+    "shifted10m": [
+     0.67,
+     4.65
+    ]
+   },
+   "corrected": {
+    "rms": 0.47,
+    "shifted10m": [
+     0.25,
+     5.53
+    ]
+   }
+  },
+  {
+   "session": "9023ed38",
+   "collector": "C01",
+   "area": "turnaround",
+   "notOutdoorPoints": 1
+  }
+ ]
+}

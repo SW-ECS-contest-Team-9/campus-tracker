@@ -113,6 +113,18 @@ export function parseLocalSamples(input: any, areas?: string[]): { reason: strin
   return { reason: input.reason.trim(), samples, groups };
 }
 
+/** Join several samples files into one input for parseLocalSamples. A single file is returned as is, so candidate ids
+ * made from that file alone (the id hashes the whole input) do not change when another file is added next to it.
+ */
+export function mergeLocalSampleInputs(inputs: any[]): any {
+  if (!inputs.length) throw new Error('No samples file');
+  if (inputs.length === 1) return inputs[0];
+  if (inputs.some((f) => f?.crs !== 'EPSG:5186' || typeof f.reason !== 'string' || !Array.isArray(f.groups))) {
+    throw new Error('Expected samples files with crs=EPSG:5186, reason and groups');
+  }
+  return { crs: 'EPSG:5186', reason: inputs.map((f) => f.reason.trim()).join(' + '), groups: inputs.flatMap((f) => f.groups) };
+}
+
 /** Preview numbers for a corrected grid: changed cells, area (m2) by |delta| bin, cells steeper than 45 degrees. */
 export function changeStats(grid: Grid, before: Float32Array, after: Float32Array) {
   const g = grid;

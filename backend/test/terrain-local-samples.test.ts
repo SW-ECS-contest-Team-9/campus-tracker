@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bilinear, buildDem, type ContourRun } from '../src/geo/dem.js';
-import { applyLocalSamples, changeStats, parseLocalSamples, type LocalSampleOptions } from '../src/geo/terrain-local-samples.js';
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { applyLocalSamples, changeStats, mergeLocalSampleInputs, parseLocalSamples, LOCAL_SAMPLE_DEFAULTS, type LocalSampleOptions } from '../src/geo/terrain-local-samples.js';
 import { gridDifferences } from '../src/geo/terrain-versions.js';
 
 const grid = { originX: 0, originY: 0, resolution: 2, width: 40, height: 40 };
@@ -102,4 +104,37 @@ test('terrain versions are switchable only on the same grid, datum and geoid', (
   assert.deepEqual(gridDifferences(a, { ...a }), []);
   assert.deepEqual(gridDifferences(a, { ...a, width: 451, originX: 200670 }), ['originX', 'width']);
   assert.deepEqual(gridDifferences(a, { ...a, verticalDatum: 'OTHER' }), ['verticalDatum']);
+});
+
+test('several samples files join into one input and a single file stays untouched', () => {
+  const group = (area: string, points: number[][]) => ({ area, source: 's', collected: '2026-10-10', originalFile: 'f', points });
+  const a = { crs: 'EPSG:5186', reason: 'first', note: 'kept only when alone', groups: [group('field', [[1, 2, 3]])] };
+  const b = { crs: 'EPSG:5186', reason: ' second ', groups: [group('gate_road', [[4, 5, 6], [7, 8, 9]])] };
+  assert.equal(mergeLocalSampleInputs([a]), a);
+  const merged = mergeLocalSampleInputs([a, b]);
+  assert.deepEqual(merged, { crs: 'EPSG:5186', reason: 'first + second', groups: [...a.groups, ...b.groups] });
+  assert.equal(parseLocalSamples(merged, ['field', 'gate_road']).samples.length, 3);
+  assert.throws(() => parseLocalSamples(a, ['gate_road']));
+  assert.throws(() => mergeLocalSampleInputs([]));
+  assert.throws(() => mergeLocalSampleInputs([a, { ...b, crs: 'EPSG:4326' }]));
+});
+
+test('committed samples: the first file is unchanged (announced candidate ids hash it) and the road areas are dense enough', () => {
+  const read = (name: string) => JSON.parse(fs.readFileSync(new URL(`../data/terrain/samples/${name}`, import.meta.url), 'utf8'));
+  const first = read('smap_samples_5186.json'), roads = read('smap_samples_roads_5186.json');
+  // local-samples-7e415b29668b2f62 (field) and -09eca6c203f338b0 (field,s06) were announced with this input hash
+  assert.equal(createHash('sha256').update(JSON.stringify(first)).digest('hex'), '233b848a4ef0d75efc300e743f32361e0067d642f0fbbefea1bdabdfd3fddc2c');
+  assert.deepEqual([...new Set(first.groups.map((g: any) => g.area))].sort(), ['corridor', 'field', 's06']);
+  assert.deepEqual([...new Set(roads.groups.map((g: any) => g.area))].sort(), ['gate_road', 'turnaround']);
+  const { samples, groups } = parseLocalSamples(mergeLocalSampleInputs([first, roads]), ['field', 's06', 'gate_road', 'turnaround']);
+  assert.equal(samples.length, 3326);
+  assert.equal(groups.filter((g) => g.area === 'gate_road' || g.area === 'turnaround').reduce((n, g) => n + g.count, 0), 1033);
+  // with S06 next to it no road sample is dropped by the lone-sample guard
+  const near = LOCAL_SAMPLE_DEFAULTS.neighbourRadiusM ** 2;
+  const road = parseLocalSamples(roads).samples;
+  for (const s of road) {
+    let n = 0;
+    for (const o of samples) if (o !== s && (o.x - s.x) ** 2 + (o.y - s.y) ** 2 <= near && !(o.x === s.x && o.y === s.y && o.z === s.z) && ++n >= LOCAL_SAMPLE_DEFAULTS.minNeighbours) break;
+    assert.ok(n >= LOCAL_SAMPLE_DEFAULTS.minNeighbours, `sample ${s.x},${s.y} has ${n} neighbours`);
+  }
 });
