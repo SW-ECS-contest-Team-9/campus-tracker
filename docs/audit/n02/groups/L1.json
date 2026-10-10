@@ -1,0 +1,270 @@
+{
+ "id": "L1",
+ "title": "북악관 층 표기 (B10-2): 높이가 든 이름을 층 이름으로, 1번째 묶음 (전체 31)",
+ "ops": [
+  {
+   "ref": "b11c08e0 북악관_Z143.47_추정 -> 북악관_3F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+    "expectedRevision": 4,
+    "attrs": {
+     "levelId": "북악관_3F_추정"
+    }
+   }
+  },
+  {
+   "ref": "bd2df230 북악관_Z143.47_추정 -> 북악관_3F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+    "expectedRevision": 6,
+    "attrs": {
+     "levelId": "북악관_3F_추정"
+    }
+   }
+  },
+  {
+   "ref": "123bdf83 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "2c9fe889 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+    "expectedRevision": 4,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "5ceb6a04 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "981f886c 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "981f886c-9429-4f48-aa71-701a741d0241",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "b5895273 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "b5895273-5301-4145-9073-50f94199db29",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "b9b7cc0e 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "ec66a05b 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+    "expectedRevision": 5,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "fb9063c7 북악관_Z146.18_추정 -> 북악관_5F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_5F_추정"
+    }
+   }
+  },
+  {
+   "ref": "081bd92e 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "0bb9d397 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "391630e3 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+    "expectedRevision": 5,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "5b75b809 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "b36ea64e 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "cca24e70 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+    "expectedRevision": 4,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "d21b1693 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "d21b1693-a659-41c4-aedc-d98191848484",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "da914768 북악관_Z148.92_추정 -> 북악관_6F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_6F_추정"
+    }
+   }
+  },
+  {
+   "ref": "1c04557f 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "3623188a 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "6d2cc67e 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "a169f6f9 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "bb3ea136 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "bb3ea136-968e-41be-a002-198998286f87",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "d71001fc 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "d71001fc-4918-48b3-ad45-8eba5f6c6b91",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  }
+ ]
+}

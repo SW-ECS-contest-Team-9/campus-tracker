@@ -1,0 +1,615 @@
+{
+ "id": "V1",
+ "title": "북악관 실내 길 높이 옮기기: 길 안쪽 꼭짓점 (B10-1), 1번째 묶음 (전체 15)",
+ "ops": [
+  {
+   "ref": "00ad9781 안쪽 꼭짓점 4개",
+   "op": "update_road",
+   "args": {
+    "id": "00ad9781-fdd7-4f3f-ac4f-5397eb0c7d8d",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201016.69,
+        557401.03
+       ],
+       "z": 138.0
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201019.42,
+        557406.82
+       ],
+       "z": 136.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 3,
+      "point": {
+       "xy": [
+        201020.69,
+        557406.23
+       ],
+       "z": 136.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 4,
+      "point": {
+       "xy": [
+        201017.96,
+        557400.44
+       ],
+       "z": 134.24
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "1fc3a2f5 안쪽 꼭짓점 4개",
+   "op": "update_road",
+   "args": {
+    "id": "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+    "expectedRevision": 5,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201046.46,
+        557381.26
+       ],
+       "z": 130.5
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201037.41,
+        557385.88
+       ],
+       "z": 130.5
+      }
+     },
+     {
+      "op": "move",
+      "index": 3,
+      "point": {
+       "xy": [
+        201028.43,
+        557390.27
+       ],
+       "z": 130.5
+      }
+     },
+     {
+      "op": "move",
+      "index": 4,
+      "point": {
+       "xy": [
+        201022.64,
+        557393.44
+       ],
+       "z": 130.5
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "384246b2 안쪽 꼭짓점 1개",
+   "op": "update_road",
+   "args": {
+    "id": "384246b2-f7bb-4afb-aeb7-707a6265847e",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201048.72,
+        557370.91
+       ],
+       "z": 134.1
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "391630e3 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+    "expectedRevision": 4,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201051.76,
+        557388.83
+       ],
+       "z": 147.27
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201058.8,
+        557385.51
+       ],
+       "z": 148.23
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "69dd7d08 안쪽 꼭짓점 5개",
+   "op": "update_road",
+   "args": {
+    "id": "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+    "expectedRevision": 5,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201046.46,
+        557381.26
+       ],
+       "z": 138.0
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201037.41,
+        557385.88
+       ],
+       "z": 138.0
+      }
+     },
+     {
+      "op": "move",
+      "index": 3,
+      "point": {
+       "xy": [
+        201028.43,
+        557390.27
+       ],
+       "z": 138.0
+      }
+     },
+     {
+      "op": "move",
+      "index": 4,
+      "point": {
+       "xy": [
+        201022.64,
+        557393.44
+       ],
+       "z": 138.0
+      }
+     },
+     {
+      "op": "move",
+      "index": 5,
+      "point": {
+       "xy": [
+        201014.37,
+        557396.23
+       ],
+       "z": 138.0
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "71335ce0 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "71335ce0-2a26-47ff-8871-e0c6c38e1809",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201058.8,
+        557385.51
+       ],
+       "z": 138.67
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201051.76,
+        557388.83
+       ],
+       "z": 140.14
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "83109850 안쪽 꼭짓점 1개",
+   "op": "update_road",
+   "args": {
+    "id": "83109850-3fb2-407f-aabb-2310040310a4",
+    "expectedRevision": 4,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201015.35,
+        557396.54
+       ],
+       "z": 140.93
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "a350a80e 안쪽 꼭짓점 5개",
+   "op": "update_road",
+   "args": {
+    "id": "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+    "expectedRevision": 5,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201048.12,
+        557381.1
+       ],
+       "z": 134.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201046.46,
+        557381.26
+       ],
+       "z": 134.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 3,
+      "point": {
+       "xy": [
+        201037.41,
+        557385.88
+       ],
+       "z": 134.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 4,
+      "point": {
+       "xy": [
+        201028.43,
+        557390.27
+       ],
+       "z": 134.1
+      }
+     },
+     {
+      "op": "move",
+      "index": 5,
+      "point": {
+       "xy": [
+        201022.64,
+        557393.44
+       ],
+       "z": 134.05
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "a648c084 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "a648c084-deeb-42c0-821f-1acebf23746d",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201011.3,
+        557391.22
+       ],
+       "z": 134.01
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201008.38,
+        557387.02
+       ],
+       "z": 133.87
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "bb1a4cfc 안쪽 꼭짓점 4개",
+   "op": "update_road",
+   "args": {
+    "id": "bb1a4cfc-ca3f-43f0-8b18-37c071fdbdb3",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201016.69,
+        557401.03
+       ],
+       "z": 140.93
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201019.42,
+        557406.82
+       ],
+       "z": 139.47
+      }
+     },
+     {
+      "op": "move",
+      "index": 3,
+      "point": {
+       "xy": [
+        201020.69,
+        557406.23
+       ],
+       "z": 139.47
+      }
+     },
+     {
+      "op": "move",
+      "index": 4,
+      "point": {
+       "xy": [
+        201017.96,
+        557400.44
+       ],
+       "z": 138.0
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "bd2df230 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+    "expectedRevision": 5,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201051.76,
+        557388.83
+       ],
+       "z": 141.8
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201058.8,
+        557385.51
+       ],
+       "z": 142.7
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "bfabfade 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "bfabfade-cdf0-4b0c-9f3a-06b4c3103d73",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201060.72,
+        557389.58
+       ],
+       "z": 134.81
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201053.68,
+        557392.9
+       ],
+       "z": 137.03
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "de66c1f1 안쪽 꼭짓점 1개",
+   "op": "update_road",
+   "args": {
+    "id": "de66c1f1-54f1-47f7-8388-f60a96d671f6",
+    "expectedRevision": 3,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201057.73,
+        557383.25
+       ],
+       "z": 134.1
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "ec66a05b 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+    "expectedRevision": 4,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201058.8,
+        557385.51
+       ],
+       "z": 144.5
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201051.76,
+        557388.83
+       ],
+       "z": 145.4
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "f1d0ee7b 안쪽 꼭짓점 2개",
+   "op": "update_road",
+   "args": {
+    "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+    "expectedRevision": 4,
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201058.8,
+        557385.51
+       ],
+       "z": 150.3
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201051.76,
+        557388.83
+       ],
+       "z": 151.4
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  }
+ ]
+}

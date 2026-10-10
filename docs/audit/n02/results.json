@@ -1,0 +1,5228 @@
+{
+ "title": "N02 포장면·북악관 B1·N01 뒷정리 (시험용 DB)",
+ "database": "campus-tracker-test-db 127.0.0.1:5544 (운영 아님)",
+ "terrain": {
+  "active": "local-samples-f5f1dbc499a3263c",
+  "was": "local-samples-7e415b29668b2f62",
+  "scene": "campus3d-83d5f401 (전 campus3d-1b0d4590)",
+  "relevelRoads": "옮길 길 0 (자체 높이 길 19, 실내 19)"
+ },
+ "georef": {
+  "image": "11-네이버위성-회차공간·오르막길-포장면-사용자표시.webp",
+  "scaleMPerPx": 0.131,
+  "rotationDeg": -0.31,
+  "gcp": [
+   {
+    "name": "북악관 남서 모서리(낮은 단 모서리)",
+    "px": [
+     165,
+     212
+    ],
+    "en": [
+     201004.76,
+     557387.19
+    ],
+    "source": "원천 외곽",
+    "residualM": 0.53
+   },
+   {
+    "name": "본관 북서 모서리",
+    "px": [
+     468,
+     522
+    ],
+    "en": [
+     201044.69,
+     557344.2
+    ],
+    "source": "원천 외곽(지붕 가장자리라 처마만큼 어긋날 수 있음)",
+    "residualM": 2.62
+   },
+   {
+    "name": "정문 계단 동쪽 화단의 남서 모서리",
+    "px": [
+     480,
+     462
+    ],
+    "en": [
+     201046.5,
+     557357.0
+    ],
+    "source": "S-MAP 1 m 메시의 131.5 m 턱",
+    "residualM": 2.37
+   },
+   {
+    "name": "유담관 9층 쪽 데크(둥근 화단) 북쪽 끝",
+    "px": [
+     215,
+     745
+    ],
+    "en": [
+     201011.0,
+     557318.5
+    ],
+    "source": "S-MAP 2 m 메시의 131 m 단",
+    "residualM": 0.75
+   }
+  ],
+  "rmsM": 1.83,
+  "maxResidualM": 2.62,
+  "markers": {
+   "버스 표지 북": [
+    201006.24,
+    557363.65
+   ],
+   "버스 표지 남": [
+    201018.0,
+    557335.17
+   ],
+   "GS25 표지": [
+    201046.27,
+    557379.41
+   ],
+   "횡단보도 띠 서쪽 끝": [
+    201005.76,
+    557348.33
+   ],
+   "횡단보도 띠 동쪽 끝": [
+    201026.88,
+    557354.24
+   ]
+  }
+ },
+ "area": {
+  "id": 2,
+  "name": "회차 공간·북악관 현관 앞 포장면 (평탄부)",
+  "kind": "plaza",
+  "elevationM": 131,
+  "areaM2": 1324.3,
+  "revision": "1275"
+ },
+ "counts": {
+  "before": {
+   "roads": 149,
+   "nodes": 136,
+   "places": 6,
+   "totalLengthM": 2537.5
+  },
+  "after": {
+   "roads": 158,
+   "nodes": 148,
+   "places": 10,
+   "totalLengthM": 2604.9
+  }
+ },
+ "roads": {
+  "new": [
+   {
+    "id": "3a5e6480",
+    "name": "본관 입구(2) 문 앞 ~ 본관 모서리 앞 계단 위 (포장면 가장자리, 문 자리는 학교 표지)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 3.49,
+    "widthM": null
+   },
+   {
+    "id": "558c81e6",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 26.29,
+    "widthM": null
+   },
+   {
+    "id": "7e1b63d6",
+    "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 11.71,
+    "widthM": null
+   },
+   {
+    "id": "b6ea9f96",
+    "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 25.6,
+    "widthM": null
+   },
+   {
+    "id": "dc64985c",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 6.93,
+    "widthM": null
+   },
+   {
+    "id": "07615440",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 36.22,
+    "widthM": 14
+   },
+   {
+    "id": "67e234b5",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 9.07,
+    "widthM": 14
+   },
+   {
+    "id": "38fd4580",
+    "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 3,
+    "widthM": null
+   },
+   {
+    "id": "b1758181",
+    "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 43.13,
+    "widthM": null
+   },
+   {
+    "id": "7ca95923",
+    "name": "북악관 입구(4) GS25 문 앞 (옆길 ~ 문)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 2,
+    "widthM": null
+   },
+   {
+    "id": "8efa102d",
+    "name": "GS25 문 안 계단 (문 ~ B1 복도, 6~9칸 내려감. 평면·계단 길이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 1.12,
+    "widthM": null
+   },
+   {
+    "id": "8f8c716f",
+    "name": "북악관 정문 계단 (바깥 12칸 + 안쪽 5칸 = 17칸, 131.4 → 1층 134.1 m. 칸 수 확정, 높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 12.7,
+    "widthM": null
+   },
+   {
+    "id": "cb8bd678",
+    "name": "북악관 B1 복도 서쪽 끝 ~ GS25 문 안 계단 아래 (평지 130.5 m, 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.88,
+    "widthM": null
+   },
+   {
+    "id": "db3fe999",
+    "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 뒤편 산책로와는 아직 안 이음, 높이 S-MAP)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 16.93,
+    "widthM": 6
+   },
+   {
+    "id": "ddb8a8f8",
+    "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 포장 폭 약 6 m, 높이 S-MAP)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 10.69,
+    "widthM": 6
+   },
+   {
+    "id": "a1a9b9dd",
+    "name": "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 4.46,
+    "widthM": null
+   }
+  ],
+  "goneOrReplaced": [
+   {
+    "id": "b30c65f1",
+    "name": "본관 서쪽 회차 공간 (P1 분기 ~ 북악관 앞 버스 공간 남쪽 끝) (S-MAP 판독)",
+    "lengthM": 45.29
+   },
+   {
+    "id": "d5d8cd64",
+    "name": "본관 서쪽 회차 공간 (P1 분기 ~ 북악관 앞 버스 공간 남쪽 끝) (S-MAP 판독)",
+    "lengthM": 5.67
+   },
+   {
+    "id": "dfd2dc4a",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "lengthM": 33.21
+   },
+   {
+    "id": "6b695a7c",
+    "name": "본관 모서리 앞 ~ 횡단보도 ~ 북악관 쪽 통로 (사용자 그림, 위치 추정)",
+    "lengthM": 15.09
+   },
+   {
+    "id": "8ca109ec",
+    "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+    "lengthM": 46.13
+   },
+   {
+    "id": "c738cda0",
+    "name": "횡단보도 ~ 문예관 옆 오르막 보행로 아래 끝 (위치 추정)",
+    "lengthM": 11.69
+   },
+   {
+    "id": "dc9e833a",
+    "name": "본관 모서리 앞 ~ 횡단보도 ~ 북악관 쪽 통로 (사용자 그림, 위치 추정)",
+    "lengthM": 8.77
+   }
+  ]
+ },
+ "validation": {
+  "before": {
+   "total": 195,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 1,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 49,
+    "ISOLATED_COMPONENT": 5,
+    "UNCONNECTED_CROSSING": 139
+   },
+   "bySeverity": {
+    "warning": 54,
+    "info": 141
+   }
+  },
+  "after": {
+   "total": 194,
+   "byCode": {
+    "OFF_TERRAIN": 46,
+    "ISOLATED_COMPONENT": 7,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 50,
+    "info": 144
+   }
+  }
+ },
+ "components": {
+  "before": {
+   "roadsOnly": [
+    [
+     120,
+     1889.6,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     25,
+     613.3,
+     "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)"
+    ],
+    [
+     1,
+     14.1,
+     "상승관 오른쪽 계단 (사용자 그림, 위치·높이 추정)"
+    ],
+    [
+     1,
+     9,
+     "한림관 6층 ~ 운동장 높이 계단 (6칸쯤, 위치 추정)"
+    ],
+    [
+     1,
+     7.1,
+     "상승관 왼쪽 계단 (사용자 그림, 위치·높이 추정)"
+    ],
+    [
+     1,
+     4.4,
+     "대일관 현관 앞 계단 (13단쯤, 위치·높이 추정)"
+    ]
+   ],
+   "withAreas": [
+    [
+     124,
+     1924.2,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     25,
+     613.3,
+     "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)"
+    ]
+   ],
+   "withAreasWalkNotProhibited": [
+    [
+     121,
+     1804.8,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     25,
+     613.3,
+     "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)"
+    ]
+   ],
+   "areaAccessNodes": {
+    "운동장": 6
+   }
+  },
+  "after": {
+   "roadsOnly": [
+    [
+     82,
+     994.7,
+     "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)"
+    ],
+    [
+     43,
+     926.2,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     28,
+     645.0,
+     "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)"
+    ],
+    [
+     1,
+     14.1,
+     "상승관 오른쪽 계단 (사용자 그림, 위치·높이 추정)"
+    ],
+    [
+     1,
+     9,
+     "한림관 6층 ~ 운동장 높이 계단 (6칸쯤, 위치 추정)"
+    ],
+    [
+     1,
+     7.1,
+     "상승관 왼쪽 계단 (사용자 그림, 위치·높이 추정)"
+    ],
+    [
+     1,
+     4.5,
+     "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)"
+    ],
+    [
+     1,
+     4.4,
+     "대일관 현관 앞 계단 (13단쯤, 위치·높이 추정)"
+    ]
+   ],
+   "withAreas": [
+    [
+     157,
+     2600.5,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     1,
+     4.5,
+     "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)"
+    ]
+   ],
+   "withAreasWalkNotProhibited": [
+    [
+     155,
+     2497.1,
+     "대일관 측면 접근로 (기존 C02)"
+    ],
+    [
+     1,
+     4.5,
+     "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)"
+    ]
+   ],
+   "areaAccessNodes": {
+    "운동장": 6,
+    "회차 공간·북악관 현관 앞 포장면 (평탄부)": 9
+   }
+  }
+ },
+ "componentsNote": "roadsOnly = 길만(편집기 검사와 같은 셈). withAreas = 공간 영역 위 같은 높이(±0.5 m) 노드를 한데 묶음(도달 검사와 같은 셈)",
+ "routes": [
+  {
+   "id": "gate>turn",
+   "label": "정문(공도 분기) → 회차 공간(차도가 포장면에 닿는 곳)",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 279.1
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 290.66,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 290.66,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 273.44
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 284.98,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 284.98,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "gate>main2",
+   "label": "정문 → 본관 모서리 앞(본관 쪽 계단 위)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 262.1
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 308.1,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>uphillTop",
+   "label": "정문 → 회차 공간 → 오르막 보행로 위 끝",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 229.17
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 379.27,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>munye3",
+   "label": "정문 → 문예관 3층 입구 통로",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 243.82
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 407.14,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>daeilW",
+   "label": "정문 → 대일관 서쪽 끝(전면 하단)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 218.81
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 430.48,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>daeil1",
+   "label": "정문 → 대일관 입구(1) 1층 로비(현관 계단 위)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 213.62
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 444.79,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>hyeinB1",
+   "label": "정문 → 혜인관 B1 문 안(운동장 건넘)",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 160.25
+    },
+    "walkAssumeUnknown": {
+     "reachable": false,
+     "closestReachedM": 113.87
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 160.25
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 559.03,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "gate>yudam6",
+   "label": "정문 → 유담관 입구(1) 6층 로비(분수 광장)",
+   "before": {
+    "walk": "노드 없음",
+    "walkAssumeUnknown": "노드 없음",
+    "vehicle": "노드 없음"
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 157.6
+    },
+    "walkAssumeUnknown": {
+     "reachable": false,
+     "closestReachedM": 17.66
+    },
+    "vehicle": {
+     "reachable": false,
+     "closestReachedM": 38.72
+    }
+   }
+  },
+  {
+   "id": "turn>bukak1F",
+   "label": "회차 공간 → 정문 계단 → 북악관 1층 로비 복도",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 53.38,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 53.38,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "turn>bukakB1",
+   "label": "회차 공간 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 67.51,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 67.51,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "main2>bukakB1",
+   "label": "본관 모서리 앞 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 44.38,
+     "viaArea": false
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 44.38,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "bukakB1>gs25out",
+   "label": "북악관 B1 복도(편의점 앞) → GS25 문 안 계단 → 문 밖(131.7 m)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 43.15,
+     "viaArea": false
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 43.15,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "bukakB1>bukak1F",
+   "label": "북악관 B1 복도 → 1층 로비 복도(건물 안)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 15.63,
+     "viaArea": false
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 15.63,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "turn>gs25out",
+   "label": "회차 공간 → 북악관 서쪽 옆길 → GS25 문 밖",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 54.86,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 54.86,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "turn>busN",
+   "label": "회차 공간 → 북쪽 버스 정류장 표지",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 22.45,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 22.45,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "turn>busS",
+   "label": "회차 공간 → 남쪽 버스 정류장 표지 앞(차도 위)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 9.06
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 9.07,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 9.07,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "turn>main2door",
+   "label": "회차 공간 → 본관 입구(2) 문 앞",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 24.51,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 24.51,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "turn>daeil1",
+   "label": "회차 공간 → 대일관 입구(1) 1층 로비",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 145.41
+    },
+    "walkAssumeUnknown": {
+     "reachable": false,
+     "closestReachedM": 87.1
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 159.81,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 159.81,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "main2>daeil1",
+   "label": "본관 모서리 앞 → 대일관 입구(1) 1층 로비",
+   "before": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 146.79,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 146.79,
+     "viaArea": true
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 141.54,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 141.54,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "main2>munye3",
+   "label": "본관 모서리 앞 → 문예관 3층 입구 통로",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 10.63
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 109.15,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 10.63
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 103.9,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "munye3>daeilW",
+   "label": "문예관 3층 입구 통로 → 대일관 서쪽 끝(전면 하단)",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 44.77
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 49.49,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 44.77
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 49.49,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "daeilW>daeil1",
+   "label": "대일관 서쪽 끝(전면 하단) → 대일관 입구(1) 1층 로비",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 11.25
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 34.31,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "daeil1>hyeinB1",
+   "label": "대일관 입구(1) 1층 로비 → 혜인관 B1 문 안",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 132.05,
+     "viaArea": true
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 132.05,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "hanlim6>hyeinB1",
+   "label": "한림관 6층 계단 아래 → 혜인관 B1 문 안(운동장)",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 139.45,
+     "viaArea": true
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 139.45,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "hanlim6>daeil1",
+   "label": "한림관 6층 계단 아래 → 대일관 입구(1) 1층 로비",
+   "before": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 22.07,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 22.07,
+     "viaArea": true
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 22.07,
+     "viaArea": true
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 22.07,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "sangseung>hyeinB1",
+   "label": "상승관 왼쪽 계단 위 → 혜인관 B1 문 안",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 100.65,
+     "viaArea": true
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 100.65,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "bukakB1>hyeinB1",
+   "label": "북악관 B1 복도(편의점 앞) → 혜인관 B1 문 안",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 19.52
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 300.16,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "yudam9>turn",
+   "label": "유담관 9층 입구 통로 → 회차 공간",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 35.77
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 36.51,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 30.6
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 30.83,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "yudam9>main2",
+   "label": "유담관 9층 입구 통로 → 본관 모서리 앞",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 36.1
+    },
+    "walkAssumeUnknown": {
+     "reachable": false,
+     "closestReachedM": 23.12
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 36.1
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 53.95,
+     "viaArea": true
+    }
+   }
+  },
+  {
+   "id": "turn>p1",
+   "label": "회차 공간 → 표지판 P1 입구",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 42.99
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 63.7,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 63.7,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 37.15
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 58.02,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 58.02,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "gate>u1end",
+   "label": "정문 → 은주관 서쪽 윗길 끝",
+   "before": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 116.07
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 273.71,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 273.71,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 116.07
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 273.71,
+     "viaArea": false
+    },
+    "vehicle": {
+     "reachable": true,
+     "lengthM": 273.71,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "strip>main2",
+   "label": "지하 차도 보행 구간 동쪽 끝(그림 끝) → 본관 모서리 앞",
+   "before": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 51.84,
+     "viaArea": false
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 51.84,
+     "viaArea": false
+    }
+   },
+   "after": {
+    "walk": {
+     "reachable": true,
+     "lengthM": 51.84,
+     "viaArea": false
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 51.84,
+     "viaArea": false
+    }
+   }
+  },
+  {
+   "id": "turn>backpath",
+   "label": "회차 공간 → 뒤편 산책로 서쪽 끝(7895ac0d)",
+   "before": "N01 때 재지 않은 쌍",
+   "after": {
+    "walk": {
+     "reachable": false,
+     "closestReachedM": 6.87
+    },
+    "walkAssumeUnknown": {
+     "reachable": true,
+     "lengthM": 421.53,
+     "viaArea": true
+    }
+   }
+  }
+ ],
+ "roadMinusTerrain": {
+  "terrainVersion": "local-samples-f5f1dbc499a3263c",
+  "rows": [
+   {
+    "id": "9713befb",
+    "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 94.49,
+    "minM": -12.3,
+    "medianM": -5.3,
+    "maxM": 1.39,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "a1a9b9dd",
+    "name": "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 4.46,
+    "minM": -7.94,
+    "medianM": -7.84,
+    "maxM": -7.84,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "b1758181",
+    "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 43.13,
+    "minM": -4.98,
+    "medianM": -3.28,
+    "maxM": -2.24,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "951c157d",
+    "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 51.19,
+    "minM": -4.25,
+    "medianM": -3.6,
+    "maxM": -2.96,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "88ba01e6",
+    "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 8.7,
+    "minM": -3.3,
+    "medianM": 0.04,
+    "maxM": 0.04,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "8fde6a04",
+    "name": "북악관 B1 가는 지하 횡단보도·통로 (본관 쪽 보행 구간 ~ 지하 차도 건넘 ~ 통로 ~ 계단 아래. 사용자 그림 14, 위치 ±2 m·높이 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 18.25,
+    "minM": -3.01,
+    "medianM": -2.77,
+    "maxM": -2.27,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "38fd4580",
+    "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 3,
+    "minM": -3.01,
+    "medianM": -2.6,
+    "maxM": -2.6,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "e996a8f7",
+    "name": "본관 모서리 앞 계단 (지상 ~ 지하 차도 보행 구간, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 5.71,
+    "minM": -2.6,
+    "medianM": -0.1,
+    "maxM": -0.1,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "729bd2ad",
+    "name": "정문 진입로 (공도 분기 ~ 하단 주차장 차로 분기) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 27.55,
+    "minM": -2.31,
+    "medianM": 0.33,
+    "maxM": 0.54,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "f99540e3",
+    "name": "북악관 B1 진입 계단 (4~6칸 올라감, 129.7 → 130.5 m. 높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 1.86,
+    "minM": -2.27,
+    "medianM": -1.12,
+    "maxM": -1.12,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "a789c985",
+    "name": "지하주차장 통로 (추정)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 52.19,
+    "minM": -2.01,
+    "medianM": -1.98,
+    "maxM": -1.33,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "c52095ad",
+    "name": "문예관 옆 오르막 보행로 (보행. 공사 차량만 제한 통행, 입구 차단기. 높이 S-MAP)",
+    "class": "pedestrian",
+    "structure": "ramp",
+    "lengthM": 67.33,
+    "minM": -1.92,
+    "medianM": 0.54,
+    "maxM": 1.78,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "1b2219e1",
+    "name": "하단 주차장 차로 (정문 안쪽 서편, 표지판 \"P2\") (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 34.34,
+    "minM": -1.57,
+    "medianM": -0.12,
+    "maxM": 0.19,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "e934fcd3",
+    "name": "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 151.67,
+    "minM": -1.57,
+    "medianM": 0.0,
+    "maxM": 0.64,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "b17424ba",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 4.59,
+    "minM": -1.33,
+    "medianM": 0.0,
+    "maxM": 1.21,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "05378724",
+    "name": "북악관 B1 진입 통로 (계단 위, 평지 130.5 m. 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.65,
+    "minM": -1.16,
+    "medianM": -1.12,
+    "maxM": -1.12,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "95632bb8",
+    "name": "북악관 B1 진입 통로 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 10.92,
+    "minM": -1.16,
+    "medianM": -0.58,
+    "maxM": -0.58,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "1fc3a2f5",
+    "name": "북악관 B1 좌측 공간 통합 주동선 (고도 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 37.15,
+    "minM": -0.69,
+    "medianM": 0.07,
+    "maxM": 0.63,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "45682ee7",
+    "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 19.99,
+    "minM": -0.69,
+    "medianM": 0.04,
+    "maxM": 0.04,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "8e71c240",
+    "name": "혜인관 방향 지상 경사로 연장 (추정)",
+    "class": "pedestrian",
+    "structure": "ramp",
+    "lengthM": 36.24,
+    "minM": -0.69,
+    "medianM": -0.29,
+    "maxM": 1.03,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "23283481",
+    "name": "북악관 B1 엘리베이터 앞 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 7.17,
+    "minM": -0.63,
+    "medianM": -0.58,
+    "maxM": -0.58,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "3e22ef54",
+    "name": "북악관 엘리베이터 B1-1F (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": -0.63,
+    "medianM": 2.97,
+    "maxM": 2.97,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "cc1b136f",
+    "name": "북악관 B1 1·2호기 공용 홀 (배치·고도 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": -0.63,
+    "medianM": -0.59,
+    "maxM": -0.59,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "d0ee3d82",
+    "name": "북악관 2호기 B1–1F (배치·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": -0.59,
+    "medianM": 3.01,
+    "maxM": 3.01,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "499d8625",
+    "name": "북악관 B1 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 36.99,
+    "minM": -0.58,
+    "medianM": -0.5,
+    "maxM": -0.5,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "3a5e6480",
+    "name": "본관 입구(2) 문 앞 ~ 본관 모서리 앞 계단 위 (포장면 가장자리, 문 자리는 학교 표지)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 3.49,
+    "minM": -0.31,
+    "medianM": -0.1,
+    "maxM": -0.1,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "07615440",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 36.22,
+    "minM": -0.17,
+    "medianM": 0.0,
+    "maxM": 0.05,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "499ab1ab",
+    "name": "주 경사로 상부 = S06 (굽이 ~ 본관 남서 모서리 P1 분기) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 60.47,
+    "minM": -0.15,
+    "medianM": 0.0,
+    "maxM": 1.02,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "6e30f94e",
+    "name": "상승관 왼쪽 계단 (사용자 그림, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 7.11,
+    "minM": -0.05,
+    "medianM": 1.47,
+    "maxM": 1.47,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "5dcbde43",
+    "name": "한림관 6층 ~ 운동장 높이 계단 (6칸쯤, 위치 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 9,
+    "minM": -0.03,
+    "medianM": 0.28,
+    "maxM": 0.28,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "b7c0792f",
+    "name": "대일관 현관 앞 계단 (13단쯤, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 4.39,
+    "minM": -0.03,
+    "medianM": 2.25,
+    "maxM": 2.25,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "67e234b5",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 9.07,
+    "minM": -0.03,
+    "medianM": 0.0,
+    "maxM": 0.22,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "79fbc430",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 129.39,
+    "minM": -0.01,
+    "medianM": 0.0,
+    "maxM": 0.04,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "8f8c716f",
+    "name": "북악관 정문 계단 (바깥 12칸 + 안쪽 5칸 = 17칸, 131.4 → 1층 134.1 m. 칸 수 확정, 높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 12.7,
+    "minM": -0.01,
+    "medianM": 1.76,
+    "maxM": 2.3,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "4ee99835",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 52.57,
+    "minM": 0.0,
+    "medianM": 1.21,
+    "maxM": 1.33,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "bf2acf00",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 19.52,
+    "minM": 0.0,
+    "medianM": 0.01,
+    "maxM": 1.33,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "b6ea9f96",
+    "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 25.6,
+    "minM": 0.0,
+    "medianM": 0.1,
+    "maxM": 0.48,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "7e1b63d6",
+    "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 11.71,
+    "minM": 0.01,
+    "medianM": 0.48,
+    "maxM": 0.48,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "192703b3",
+    "name": "P1 주차장 차로 (본관 남서 모서리, 표지판 \"P1\") (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 12.74,
+    "minM": 0.02,
+    "medianM": 0.05,
+    "maxM": 0.08,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "fc50ca50",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 30.83,
+    "minM": 0.22,
+    "medianM": 0.59,
+    "maxM": 1.09,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "dc64985c",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 6.93,
+    "minM": 0.22,
+    "medianM": 0.48,
+    "maxM": 0.56,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "568ba2aa",
+    "name": "상승관 오른쪽 계단 (사용자 그림, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 14.12,
+    "minM": 0.29,
+    "medianM": 7.84,
+    "maxM": 7.84,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "8efa102d",
+    "name": "GS25 문 안 계단 (문 ~ B1 복도, 6~9칸 내려감. 평면·계단 길이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 1.12,
+    "minM": 0.43,
+    "medianM": 1.43,
+    "maxM": 1.43,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "cb8bd678",
+    "name": "북악관 B1 복도 서쪽 끝 ~ GS25 문 안 계단 아래 (평지 130.5 m, 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.88,
+    "minM": 0.43,
+    "medianM": 0.63,
+    "maxM": 0.63,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "558c81e6",
+    "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 26.29,
+    "minM": 0.48,
+    "medianM": 3.16,
+    "maxM": 3.16,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "ddb8a8f8",
+    "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 포장 폭 약 6 m, 높이 S-MAP)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 10.69,
+    "minM": 0.59,
+    "medianM": 0.92,
+    "maxM": 0.97,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "7ca95923",
+    "name": "북악관 입구(4) GS25 문 앞 (옆길 ~ 문)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 2,
+    "minM": 0.97,
+    "medianM": 1.43,
+    "maxM": 1.43,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "db3fe999",
+    "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 뒤편 산책로와는 아직 안 이음, 높이 S-MAP)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 16.93,
+    "minM": 0.97,
+    "medianM": 1.91,
+    "maxM": 2.02,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "040d4571",
+    "name": "갈림 지점 ~ 문예관 옆 오르막 위 끝 내려가는 길 (사용자 그림, 위치·높이 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 14.8,
+    "minM": 1.03,
+    "medianM": 3.26,
+    "maxM": 3.96,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "9112314a",
+    "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 6.76,
+    "minM": 1.63,
+    "medianM": 3.64,
+    "maxM": 3.64,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "618385b9",
+    "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 21.66,
+    "minM": 1.8,
+    "medianM": 2.11,
+    "maxM": 4.14,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "384246b2",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 13.71,
+    "minM": 2.3,
+    "medianM": 2.31,
+    "maxM": 3.04,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "a350a80e",
+    "name": "북악관 1F 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 40.29,
+    "minM": 2.91,
+    "medianM": 3.03,
+    "maxM": 4.14,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "2677d707",
+    "name": "북악관 1F 엘리베이터 앞 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 6.45,
+    "minM": 2.97,
+    "medianM": 3.03,
+    "maxM": 3.03,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "344d1f3f",
+    "name": "북악관 1F 1·2호기 공용 홀 (배치·고도 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 2.97,
+    "medianM": 3.01,
+    "maxM": 3.01,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "4800e550",
+    "name": "북악관 엘리베이터 1F-2F (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 2.97,
+    "medianM": 6.87,
+    "maxM": 6.87,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bfabfade",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 13.69,
+    "minM": 2.98,
+    "medianM": 5.73,
+    "maxM": 6.81,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "de66c1f1",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 6.48,
+    "minM": 2.98,
+    "medianM": 3.05,
+    "maxM": 3.06,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "c14a8753",
+    "name": "북악관 2호기 1F–2F (배치·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 3.01,
+    "medianM": 6.91,
+    "maxM": 6.91,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "aa988488",
+    "name": "북악관 1F 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.02,
+    "minM": 3.03,
+    "medianM": 3.04,
+    "maxM": 3.04,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "51001632",
+    "name": "북악관 1F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 30.41,
+    "minM": 3.04,
+    "medianM": 3.07,
+    "maxM": 3.07,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "c683f1f8",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 3.79,
+    "minM": 3.04,
+    "medianM": 3.05,
+    "maxM": 3.05,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "a648c084",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 12.38,
+    "minM": 3.33,
+    "medianM": 4.06,
+    "maxM": 4.14,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "992af5b0",
+    "name": "문예관 하행계단 아래 평탄부 (추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 4.4,
+    "minM": 3.64,
+    "medianM": 3.96,
+    "maxM": 3.96,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "3cb404de",
+    "name": "문예관 하행계단 아래 평탄부 (추정)",
+    "class": "pedestrian",
+    "structure": "ordinary",
+    "lengthM": 3.63,
+    "minM": 3.96,
+    "medianM": 4.04,
+    "maxM": 4.04,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "a7a51d3c",
+    "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 11.13,
+    "minM": 4.04,
+    "medianM": 4.14,
+    "maxM": 4.14,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "5e2f8114",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.4,
+    "minM": 4.14,
+    "medianM": 4.23,
+    "maxM": 4.23,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "00ad9781",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 16.64,
+    "minM": 4.17,
+    "medianM": 5.98,
+    "maxM": 7.99,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "69dd7d08",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 41.55,
+    "minM": 6.81,
+    "medianM": 7.57,
+    "maxM": 8.13,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "9be4bca2",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 9.64,
+    "minM": 6.81,
+    "medianM": 6.92,
+    "maxM": 6.92,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "0ed024f9",
+    "name": "북악관 2F 엘리베이터 앞 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 7.17,
+    "minM": 6.87,
+    "medianM": 6.92,
+    "maxM": 6.92,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "427ac753",
+    "name": "북악관 2F 1·2호기 공용 홀 (배치·고도 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 6.87,
+    "medianM": 6.91,
+    "maxM": 6.91,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "53bd7d38",
+    "name": "북악관 1호기 2F–143.47m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 6.87,
+    "medianM": 9.77,
+    "maxM": 9.77,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "6e61a9c3",
+    "name": "북악관 2호기 140.6–143.47m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 6.91,
+    "medianM": 9.81,
+    "maxM": 9.81,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "0d4b3980",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 7.78,
+    "minM": 6.92,
+    "medianM": 6.97,
+    "maxM": 6.97,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "2b3d1698",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 5.04,
+    "minM": 6.97,
+    "medianM": 6.97,
+    "maxM": 6.97,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "71335ce0",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 15.29,
+    "minM": 6.97,
+    "medianM": 8.98,
+    "maxM": 9.79,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "fbfd71bc",
+    "name": "북악관 2F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 29.2,
+    "minM": 6.97,
+    "medianM": 7,
+    "maxM": 7,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bb1a4cfc",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 16.64,
+    "minM": 7.93,
+    "medianM": 9.35,
+    "maxM": 10.92,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "0dc5293d",
+    "name": "북악관 143.47m 1·2호기 공용 홀 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 9.77,
+    "medianM": 9.81,
+    "maxM": 9.81,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "b11c08e0",
+    "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 9.77,
+    "medianM": 12.47,
+    "maxM": 12.47,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bc582299",
+    "name": "C01·C02 북악관 승강기 앞 연결 143.47m (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 3.64,
+    "minM": 9.77,
+    "medianM": 9.79,
+    "maxM": 9.79,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "2ecf4f90",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.54,
+    "minM": 9.79,
+    "medianM": 9.82,
+    "maxM": 9.82,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bd2df230",
+    "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 15.29,
+    "minM": 9.79,
+    "medianM": 11.62,
+    "maxM": 12.57,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bfc76c5f",
+    "name": "북악관 2호기 143.47–146.18m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 9.81,
+    "medianM": 12.51,
+    "maxM": 12.51,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "83109850",
+    "name": null,
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 39.86,
+    "minM": 9.82,
+    "medianM": 10.92,
+    "maxM": 11.04,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "d25e1c6d",
+    "name": "C01·C02 공통 북악관 동측 복도 143.47m (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 9.82,
+    "medianM": 9.87,
+    "maxM": 9.87,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "2c9fe889",
+    "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 12.47,
+    "medianM": 15.17,
+    "maxM": 15.17,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "5ceb6a04",
+    "name": "북악관 146.18m 1·2호기 공용 홀 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 12.47,
+    "medianM": 12.51,
+    "maxM": 12.51,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "b5895273",
+    "name": "북악관 146.18m 엘리베이터 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.93,
+    "minM": 12.47,
+    "medianM": 12.57,
+    "maxM": 12.57,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "123bdf83",
+    "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 12.51,
+    "medianM": 15.21,
+    "maxM": 15.21,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "981f886c",
+    "name": "북악관 146.18m 동측 복도 (C01·C02 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 12.52,
+    "medianM": 12.57,
+    "maxM": 12.57,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "b9b7cc0e",
+    "name": "북악관 146.18m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 12.52,
+    "medianM": 13.7,
+    "maxM": 13.7,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "fb9063c7",
+    "name": "북악관 146.18m 계단 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 9.27,
+    "minM": 12.52,
+    "medianM": 12.57,
+    "maxM": 12.57,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "ec66a05b",
+    "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 15.29,
+    "minM": 12.57,
+    "medianM": 14.24,
+    "maxM": 15.19,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "0bb9d397",
+    "name": "북악관 148.92m 1·2호기 공용 홀 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 15.17,
+    "medianM": 15.21,
+    "maxM": 15.21,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "5b75b809",
+    "name": "북악관 148.92m 엘리베이터 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 3.64,
+    "minM": 15.17,
+    "medianM": 15.19,
+    "maxM": 15.19,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "cca24e70",
+    "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 15.17,
+    "medianM": 18.07,
+    "maxM": 18.07,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "391630e3",
+    "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 15.29,
+    "minM": 15.19,
+    "medianM": 17.15,
+    "maxM": 18.17,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "da914768",
+    "name": "북악관 148.92m 계단 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.54,
+    "minM": 15.19,
+    "medianM": 15.22,
+    "maxM": 15.22,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "081bd92e",
+    "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 15.21,
+    "medianM": 18.11,
+    "maxM": 18.11,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "b36ea64e",
+    "name": "북악관 148.92m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 15.22,
+    "medianM": 16.4,
+    "maxM": 16.4,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "d21b1693",
+    "name": "북악관 148.92m 동측 복도 (C01·C02 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 15.22,
+    "medianM": 15.27,
+    "maxM": 15.27,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "3623188a",
+    "name": "북악관 151.79m 엘리베이터 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.93,
+    "minM": 18.07,
+    "medianM": 18.17,
+    "maxM": 18.17,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "d71001fc",
+    "name": "북악관 151.79m 1·2호기 공용 홀 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 18.07,
+    "medianM": 18.11,
+    "maxM": 18.11,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "ec2088ac",
+    "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 18.07,
+    "medianM": 21.37,
+    "maxM": 21.37,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "1c04557f",
+    "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+    "class": "pedestrian",
+    "structure": "elevator",
+    "lengthM": 0,
+    "minM": 18.11,
+    "medianM": 21.41,
+    "maxM": 21.41,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "6d2cc67e",
+    "name": "북악관 151.79m 계단 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 9.27,
+    "minM": 18.12,
+    "medianM": 18.17,
+    "maxM": 18.17,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "a169f6f9",
+    "name": "북악관 151.79m 동측 복도 (C01·C02 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 18.12,
+    "medianM": 18.17,
+    "maxM": 18.17,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "bb3ea136",
+    "name": "북악관 151.79m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 18.12,
+    "medianM": 19.3,
+    "maxM": 19.3,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "f1d0ee7b",
+    "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+    "class": "pedestrian",
+    "structure": "stairs",
+    "lengthM": 15.29,
+    "minM": 18.17,
+    "medianM": 20.24,
+    "maxM": 21.39,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "769252fb",
+    "name": "북악관 154.51m 1·2호기 공용 홀 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 2.5,
+    "minM": 21.37,
+    "medianM": 21.41,
+    "maxM": 21.41,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "e518e939",
+    "name": "북악관 154.51m 엘리베이터 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 3.64,
+    "minM": 21.37,
+    "medianM": 21.39,
+    "maxM": 21.39,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "8aa3e856",
+    "name": "북악관 154.51m 계단 앞 복도 (추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 4.54,
+    "minM": 21.39,
+    "medianM": 21.42,
+    "maxM": 21.42,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "9556d4b6",
+    "name": "북악관 154.51m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 21.42,
+    "medianM": 22.6,
+    "maxM": 22.6,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "b6003357",
+    "name": "북악관 154.51m 동측 복도 (C01·C02 추정)",
+    "class": "pedestrian",
+    "structure": "indoor_corridor",
+    "lengthM": 35.28,
+    "minM": 21.42,
+    "medianM": 21.47,
+    "maxM": 21.47,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   }
+  ]
+ },
+ "steepSegmentsLeft": [
+  {
+   "road": "45682ee7",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "structure": "ordinary",
+   "from": [
+    201139.1,
+    557309.5,
+    141.73
+   ],
+   "to": [
+    201157.33,
+    557301.3,
+    148.96
+   ],
+   "dzM": 7.23,
+   "runM": 19.99,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "89ce1806",
+   "name": "혜인관 B1 통로 (추정)",
+   "structure": "indoor_corridor",
+   "from": [
+    201221.75,
+    557230.35,
+    150.83
+   ],
+   "to": [
+    201224.38,
+    557230.25,
+    150.26
+   ],
+   "dzM": -0.57,
+   "runM": 2.63,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "9112314a",
+   "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+   "structure": "ordinary",
+   "from": [
+    201115.99,
+    557337.2,
+    144.3
+   ],
+   "to": [
+    201109.5,
+    557339.1,
+    142.44
+   ],
+   "dzM": -1.86,
+   "runM": 6.76,
+   "alreadyBeforeN02": false
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201018.47,
+    557413.32,
+    128.13
+   ],
+   "to": [
+    201027.46,
+    557408.82,
+    130.66
+   ],
+   "dzM": 2.53,
+   "runM": 10.05,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201110.12,
+    557367.43,
+    131.14
+   ],
+   "to": [
+    201111.91,
+    557366.53,
+    133.63
+   ],
+   "dzM": 2.49,
+   "runM": 2.0,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201111.91,
+    557366.53,
+    133.63
+   ],
+   "to": [
+    201113.71,
+    557365.63,
+    135.46
+   ],
+   "dzM": 1.83,
+   "runM": 2.01,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201122.69,
+    557361.13,
+    136.16
+   ],
+   "to": [
+    201124.49,
+    557360.23,
+    137.8
+   ],
+   "dzM": 1.64,
+   "runM": 2.01,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201128.09,
+    557358.43,
+    137.83
+   ],
+   "to": [
+    201129.88,
+    557357.53,
+    138.61
+   ],
+   "dzM": 0.78,
+   "runM": 2.0,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201131.68,
+    557356.63,
+    138.31
+   ],
+   "to": [
+    201133.48,
+    557355.73,
+    138.9
+   ],
+   "dzM": 0.59,
+   "runM": 2.01,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201133.48,
+    557355.73,
+    138.9
+   ],
+   "to": [
+    201135.27,
+    557354.83,
+    140.21
+   ],
+   "dzM": 1.31,
+   "runM": 2.0,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "structure": "ordinary",
+   "from": [
+    201157.3,
+    557351.11,
+    141.85
+   ],
+   "to": [
+    201161.39,
+    557350.68,
+    143.44
+   ],
+   "dzM": 1.59,
+   "runM": 4.11,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "b17424ba",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "from": [
+    201214.63,
+    557269.03,
+    150.66
+   ],
+   "to": [
+    201214.46,
+    557269.12,
+    149.5
+   ],
+   "dzM": -1.16,
+   "runM": 0.19,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "b17424ba",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "from": [
+    201214.46,
+    557269.12,
+    149.5
+   ],
+   "to": [
+    201210.9,
+    557271.01,
+    147.5
+   ],
+   "dzM": -2.0,
+   "runM": 4.03,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "b17424ba",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "from": [
+    201210.9,
+    557271.01,
+    147.5
+   ],
+   "to": [
+    201210.58,
+    557271.18,
+    146.33
+   ],
+   "dzM": -1.17,
+   "runM": 0.36,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "9713befb",
+   "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+   "structure": "ramp",
+   "from": [
+    201085.17,
+    557271,
+    122.21
+   ],
+   "to": [
+    201088.3,
+    557275.64,
+    123.41
+   ],
+   "dzM": 1.2,
+   "runM": 5.6,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "79fbc430",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "from": [
+    201193.46,
+    557219.66,
+    148.5
+   ],
+   "to": [
+    201195.04,
+    557218.4,
+    149.69
+   ],
+   "dzM": 1.19,
+   "runM": 2.02,
+   "alreadyBeforeN02": true
+  },
+  {
+   "road": "79fbc430",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "from": [
+    201212.61,
+    557212.2,
+    148.2
+   ],
+   "to": [
+    201213.72,
+    557213.9,
+    149.26
+   ],
+   "dzM": 1.06,
+   "runM": 2.03,
+   "alreadyBeforeN02": true
+  }
+ ],
+ "groups": [
+  {
+   "group": "P",
+   "title": "포장면 둘레: 지상 횡단 길 거둠, 오르막 보행로·갈림 계단 높이, 본관 입구(2), 버스 표지·횡단보도, 회차 공간 차도 끝",
+   "batchId": "6f5bfb43-53fa-4ac7-a92c-0325972c9aa5",
+   "at": "2026-10-10T15:13:38.645Z",
+   "changeSets": [
+    {
+     "ref": "N01 지상 횡단 길(본관 모서리 앞~횡단보도) 거둠",
+     "op": "retire_feature",
+     "changeSetId": "1b6c3eb2-83d2-450a-95b1-f7f6df0212ff",
+     "roads": []
+    },
+    {
+     "ref": "N01 지상 횡단 길(횡단보도~통로~계단 아래) 거둠",
+     "op": "retire_feature",
+     "changeSetId": "f9ec114b-9219-4415-9af0-e022afe51ad5",
+     "roads": []
+    },
+    {
+     "ref": "N01 지상 횡단보도~오르막 아래 끝 거둠",
+     "op": "retire_feature",
+     "changeSetId": "d8af0e6f-ed3c-4a9f-9188-f87e1860b18c",
+     "roads": []
+    },
+    {
+     "ref": "회차 공간 차도 끝 5.7 m 거둠(보행 기록 옆 겹침)",
+     "op": "retire_feature",
+     "changeSetId": "dc18ef1e-d1b2-4bf5-b728-d73750692d0f",
+     "roads": []
+    },
+    {
+     "ref": "오르막 위 끝 141.73 -> S-MAP 141.0",
+     "op": "move_node",
+     "changeSetId": "2ad53fc2-2a2e-4551-8d86-65f64be1a94d",
+     "roads": [
+      {
+       "id": "c52095ad-8e31-48ee-98b3-e3f925318fed",
+       "name": null,
+       "lengthM": 54.5
+      },
+      {
+       "id": "040d4571-9207-49f3-a5cd-06fe1d0cb46c",
+       "name": "갈림 지점 ~ 문예관 옆 오르막 위 끝 내려가는 길 (사용자 그림, 위치·높이 추정)",
+       "lengthM": 14.8
+      },
+      {
+       "id": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+       "name": "혜인관 방향 지상 경사로 연장 (추정)",
+       "lengthM": 36.24
+      }
+     ]
+    },
+    {
+     "ref": "오르막 보행로 c52095ad: S-MAP 높이, 포장면까지 늘임, 폭 9 m",
+     "op": "update_road",
+     "changeSetId": "5aa475cf-547a-4736-b879-628731ef750c",
+     "roads": [
+      {
+       "id": "c52095ad-8e31-48ee-98b3-e3f925318fed",
+       "name": "문예관 옆 오르막 보행로 (보행. 공사 차량만 제한 통행, 입구 차단기. 높이 S-MAP)",
+       "lengthM": 67.33
+      }
+     ]
+    },
+    {
+     "ref": "갈림 지점 142.44 -> S-MAP 144.3",
+     "op": "move_node",
+     "changeSetId": "6c56bb5e-d0b2-4c8a-bb47-2b17f90696cf",
+     "roads": [
+      {
+       "id": "040d4571-9207-49f3-a5cd-06fe1d0cb46c",
+       "name": "갈림 지점 ~ 문예관 옆 오르막 위 끝 내려가는 길 (사용자 그림, 위치·높이 추정)",
+       "lengthM": 14.8
+      },
+      {
+       "id": "3cb404de-438e-45a4-87fe-e1064d2436e7",
+       "name": "문예관 하행계단 아래 평탄부 (추정)",
+       "lengthM": 3.63
+      },
+      {
+       "id": "992af5b0-0016-4499-adc0-c02c61122204",
+       "name": "문예관 하행계단 아래 평탄부 (추정)",
+       "lengthM": 4.4
+      }
+     ]
+    },
+    {
+     "ref": "갈림 동쪽 평탄부 끝 -> S-MAP 144.1",
+     "op": "move_node",
+     "changeSetId": "937453e6-5fc5-40f9-bfbe-03e2e867746e",
+     "roads": [
+      {
+       "id": "3cb404de-438e-45a4-87fe-e1064d2436e7",
+       "name": "문예관 하행계단 아래 평탄부 (추정)",
+       "lengthM": 3.63
+      },
+      {
+       "id": "a7a51d3c-af49-4127-83ef-d4157247f27b",
+       "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+       "lengthM": 11.13
+      }
+     ]
+    },
+    {
+     "ref": "갈림 북쪽 평탄부 끝 -> S-MAP 144.2~144.3",
+     "op": "move_node",
+     "changeSetId": "ec0f180f-c51a-40a8-bc24-a44642dce2ec",
+     "roads": [
+      {
+       "id": "992af5b0-0016-4499-adc0-c02c61122204",
+       "name": "문예관 하행계단 아래 평탄부 (추정)",
+       "lengthM": 4.4
+      },
+      {
+       "id": "9112314a-18aa-4821-821b-22528d8dcf91",
+       "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+       "lengthM": 6.76
+      }
+     ]
+    },
+    {
+     "ref": "문예관 입구 방향 계단 위 143.80 -> S-MAP 145.6",
+     "op": "move_node",
+     "changeSetId": "d620fb88-3ab0-4d64-aafd-913582fd8ac0",
+     "roads": [
+      {
+       "id": "618385b9-0078-485b-856e-772d6e4a0b1e",
+       "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+       "lengthM": 21.66
+      },
+      {
+       "id": "a7a51d3c-af49-4127-83ef-d4157247f27b",
+       "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+       "lengthM": 11.13
+      }
+     ]
+    },
+    {
+     "ref": "갈림 계단 040d4571 안쪽 꼭짓점 S-MAP",
+     "op": "update_road",
+     "changeSetId": "46cc860d-234a-4afd-84bf-7af7ba58f494",
+     "roads": [
+      {
+       "id": "040d4571-9207-49f3-a5cd-06fe1d0cb46c",
+       "name": "갈림 지점 ~ 문예관 옆 오르막 위 끝 내려가는 길 (사용자 그림, 위치·높이 추정)",
+       "lengthM": 14.8
+      }
+     ]
+    },
+    {
+     "ref": "본관 입구(2) 문 앞",
+     "op": "create_road",
+     "changeSetId": "e0d4ecaf-cbda-48c9-90e5-f40b834b58d8",
+     "roads": [
+      {
+       "id": "3a5e6480-4b6d-4389-ab22-58b6f39dafbe",
+       "name": "본관 입구(2) 문 앞 ~ 본관 모서리 앞 계단 위 (포장면 가장자리, 문 자리는 학교 표지)",
+       "lengthM": 3.49
+      }
+     ]
+    },
+    {
+     "ref": "북쪽 버스 표지~횡단보도",
+     "op": "create_road",
+     "changeSetId": "6b1ad060-48fe-4e2a-a036-f8203cfa0d0c",
+     "roads": [
+      {
+       "id": "558c81e6-08c8-4af5-b928-e4865f18e287",
+       "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+       "lengthM": 26.29
+      },
+      {
+       "id": "dc64985c-3fea-41c0-a047-196bc29dc59d",
+       "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+       "lengthM": 6.93
+      },
+      {
+       "id": "b6ea9f96-c0dc-4857-af97-7d90cc589f44",
+       "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+       "lengthM": 25.61
+      },
+      {
+       "id": "7e1b63d6-f954-43e4-bd49-ff20879a49fa",
+       "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+       "lengthM": 11.71
+      }
+     ],
+     "warnings": [
+      "The line crosses itself or other roads, so it was saved as several road pieces"
+     ]
+    },
+    {
+     "ref": "회차 공간 차도 b30c65f1 폭",
+     "op": "update_road",
+     "changeSetId": "0aac2ca5-1ccd-40eb-94b0-5fa6d6915f24",
+     "roads": [
+      {
+       "id": "b30c65f1-c784-46ee-a91e-3eb07bbbda9b",
+       "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+       "lengthM": 45.28
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "P2",
+   "title": "남쪽 버스 정류장 표지 앞에서 회차 공간 차도를 나눔(표지에서 2.3 m)",
+   "batchId": null,
+   "at": "2026-10-10T15:13:52.052Z",
+   "changeSets": [
+    {
+     "ref": "남쪽 버스 표지 앞 노드",
+     "op": "split_road",
+     "changeSetId": "ae9d3701-9b6f-438d-94ae-1e8f4aec5246",
+     "roads": [
+      {
+       "id": "07615440-e6c0-4f7b-9a01-982ea7a4af68",
+       "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+       "lengthM": 36.22
+      },
+      {
+       "id": "67e234b5-f38c-4400-b046-975d0125ebc6",
+       "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+       "lengthM": 9.07
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "Z1",
+   "title": "북악관 실내 길 높이 옮기기: 노드 (B10-1), 1번째 묶음 (전체 57)",
+   "batchId": "3f53337c-2e03-4b5b-ac44-0ad000a8014e",
+   "at": "2026-10-10T15:14:34.018Z",
+   "changeSets": [
+    {
+     "ref": "18b2d87e 131.1 -> 129.7",
+     "op": "move_node",
+     "changeSetId": "c0f46d46-e8f9-4ab5-a0d3-a7584ade45e8",
+     "roads": [
+      {
+       "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
+       "name": "지하주차장-북악관 B1 연결 (추정)",
+       "lengthM": 16.06
+      },
+      {
+       "id": "f99540e3-b6fe-47c7-994d-469bf008c8f6",
+       "name": "북악관 B1 진입 계단 (추정)",
+       "lengthM": 1.86
+      }
+     ]
+    },
+    {
+     "ref": "3c4d5560 132.08 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "74001e77-9bd8-4335-a552-c7fdfa36edf7",
+     "roads": [
+      {
+       "id": "05378724-6530-4c5e-8918-c8c2bad2f4f5",
+       "name": "북악관 B1 진입 계단 (추정)",
+       "lengthM": 4.65
+      },
+      {
+       "id": "f99540e3-b6fe-47c7-994d-469bf008c8f6",
+       "name": "북악관 B1 진입 계단 (추정)",
+       "lengthM": 1.86
+      }
+     ]
+    },
+    {
+     "ref": "7a32499f 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "7a37a138-350e-4233-8ced-066240fd6e99",
+     "roads": [
+      {
+       "id": "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+       "name": "북악관 B1 좌측 공간 통합 주동선 (고도 추정)",
+       "lengthM": 37.15
+      },
+      {
+       "id": "23283481-90c5-4985-a86e-0fa00cd9b902",
+       "name": "북악관 B1 엘리베이터 앞 (추정)",
+       "lengthM": 7.17
+      },
+      {
+       "id": "95632bb8-5143-4de5-8633-e894697a3841",
+       "name": "북악관 B1 진입 통로 (추정)",
+       "lengthM": 10.92
+      },
+      {
+       "id": "499d8625-25f7-4045-96bf-508f66d89a3d",
+       "name": "북악관 B1 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 36.99
+      }
+     ]
+    },
+    {
+     "ref": "f645a7b9 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "2a37fad3-c6d8-44f5-8bbe-62558a1b587c",
+     "roads": [
+      {
+       "id": "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+       "name": "북악관 B1 좌측 공간 통합 주동선 (고도 추정)",
+       "lengthM": 37.15
+      }
+     ]
+    },
+    {
+     "ref": "7698e723 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "5ade0dc8-0216-4218-921b-d5bac686895d",
+     "roads": [
+      {
+       "id": "23283481-90c5-4985-a86e-0fa00cd9b902",
+       "name": "북악관 B1 엘리베이터 앞 (추정)",
+       "lengthM": 7.17
+      },
+      {
+       "id": "3e22ef54-36d0-44b7-9212-d451abe3f400",
+       "name": "북악관 엘리베이터 B1-1F (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "cc1b136f-ea3f-4975-bb88-8ac6ac9e6925",
+       "name": "북악관 B1 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "7c22ff7d 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "c2321df9-3743-4cd6-91e7-37c973a73cd6",
+     "roads": [
+      {
+       "id": "05378724-6530-4c5e-8918-c8c2bad2f4f5",
+       "name": "북악관 B1 진입 계단 (추정)",
+       "lengthM": 4.65
+      },
+      {
+       "id": "95632bb8-5143-4de5-8633-e894697a3841",
+       "name": "북악관 B1 진입 통로 (추정)",
+       "lengthM": 10.92
+      }
+     ]
+    },
+    {
+     "ref": "84c00557 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "876c50df-62c7-4290-a261-0efbc5906536",
+     "roads": [
+      {
+       "id": "cc1b136f-ea3f-4975-bb88-8ac6ac9e6925",
+       "name": "북악관 B1 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "d0ee3d82-b9cd-4b69-82a9-f246d9eface7",
+       "name": "북악관 2호기 B1–1F (배치·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "49120230 132.8 -> 130.5",
+     "op": "move_node",
+     "changeSetId": "df8bc9cd-fb02-4893-ac0c-0f01a047bacd",
+     "roads": [
+      {
+       "id": "499d8625-25f7-4045-96bf-508f66d89a3d",
+       "name": "북악관 B1 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 36.99
+      }
+     ]
+    },
+    {
+     "ref": "e6480084 136.2 -> 133.64",
+     "op": "move_node",
+     "changeSetId": "60f4a406-3d3e-4efa-bef1-ec22592e9e89",
+     "roads": [
+      {
+       "id": "a648c084-deeb-42c0-821f-1acebf23746d",
+       "name": null,
+       "lengthM": 12.38
+      }
+     ]
+    },
+    {
+     "ref": "596405f1 136.29 -> 133.72",
+     "op": "move_node",
+     "changeSetId": "f24d4eda-116f-4728-ad9c-904bdc44f20c",
+     "roads": [
+      {
+       "id": "384246b2-f7bb-4afb-aeb7-707a6265847e",
+       "name": null,
+       "lengthM": 13.71
+      }
+     ]
+    },
+    {
+     "ref": "c8fce788 136.6 -> 134.01",
+     "op": "move_node",
+     "changeSetId": "186a4453-fb6c-4b1c-825e-d8ba1987e1ab",
+     "roads": [
+      {
+       "id": "5e2f8114-5be6-4674-90d0-73e6d2119828",
+       "name": null,
+       "lengthM": 4.4
+      },
+      {
+       "id": "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+       "name": "북악관 1F 복도 (추정)",
+       "lengthM": 40.29
+      },
+      {
+       "id": "a648c084-deeb-42c0-821f-1acebf23746d",
+       "name": null,
+       "lengthM": 12.38
+      }
+     ]
+    },
+    {
+     "ref": "5207d3df 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "e817802a-10e9-429c-a534-a8c6694201e2",
+     "roads": [
+      {
+       "id": "bfabfade-cdf0-4b0c-9f3a-06b4c3103d73",
+       "name": null,
+       "lengthM": 13.69
+      },
+      {
+       "id": "de66c1f1-54f1-47f7-8388-f60a96d671f6",
+       "name": null,
+       "lengthM": 6.48
+      }
+     ]
+    },
+    {
+     "ref": "5b6e2c78 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "6f94cb05-44ed-4892-9a64-3b6b390e1966",
+     "roads": [
+      {
+       "id": "2677d707-2eec-4cf4-839a-acc83d3faa1b",
+       "name": "북악관 1F 엘리베이터 앞 (추정)",
+       "lengthM": 6.45
+      },
+      {
+       "id": "344d1f3f-6175-4932-9f27-59aa120fdace",
+       "name": "북악관 1F 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "3e22ef54-36d0-44b7-9212-d451abe3f400",
+       "name": "북악관 엘리베이터 B1-1F (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "4800e550-71c4-46f3-8aea-fc5002df6d80",
+       "name": "북악관 엘리베이터 1F-2F (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "fa92a412 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "441ebe80-fd26-4d6e-b900-1a52f5a3b5ee",
+     "roads": [
+      {
+       "id": "c683f1f8-be42-4daf-ad25-513b5586402e",
+       "name": null,
+       "lengthM": 3.79
+      },
+      {
+       "id": "de66c1f1-54f1-47f7-8388-f60a96d671f6",
+       "name": null,
+       "lengthM": 6.48
+      }
+     ]
+    },
+    {
+     "ref": "1b3868d8 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "66b3c862-679f-4836-a7d7-cd9daf330d38",
+     "roads": [
+      {
+       "id": "2677d707-2eec-4cf4-839a-acc83d3faa1b",
+       "name": "북악관 1F 엘리베이터 앞 (추정)",
+       "lengthM": 6.45
+      },
+      {
+       "id": "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+       "name": "북악관 1F 복도 (추정)",
+       "lengthM": 40.29
+      },
+      {
+       "id": "aa988488-d892-4632-bae4-55dc0a42de91",
+       "name": "북악관 1F 복도 (추정)",
+       "lengthM": 2.02
+      }
+     ]
+    },
+    {
+     "ref": "a09e1033 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "4ea44e5f-3513-4991-bb42-24372b53ac53",
+     "roads": [
+      {
+       "id": "384246b2-f7bb-4afb-aeb7-707a6265847e",
+       "name": null,
+       "lengthM": 13.71
+      },
+      {
+       "id": "51001632-02d7-4852-8f8e-2f4feb06cfda",
+       "name": "북악관 1F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 30.41
+      },
+      {
+       "id": "aa988488-d892-4632-bae4-55dc0a42de91",
+       "name": "북악관 1F 복도 (추정)",
+       "lengthM": 2.02
+      },
+      {
+       "id": "c683f1f8-be42-4daf-ad25-513b5586402e",
+       "name": null,
+       "lengthM": 3.79
+      }
+     ]
+    },
+    {
+     "ref": "c3ef5cd4 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "03181863-4f9e-495a-b2a1-050270fca137",
+     "roads": [
+      {
+       "id": "344d1f3f-6175-4932-9f27-59aa120fdace",
+       "name": "북악관 1F 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "c14a8753-ae0a-4650-ac2b-57b0c9373a69",
+       "name": "북악관 2호기 1F–2F (배치·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "d0ee3d82-b9cd-4b69-82a9-f246d9eface7",
+       "name": "북악관 2호기 B1–1F (배치·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "58765a5e 136.7 -> 134.1",
+     "op": "move_node",
+     "changeSetId": "1c53b906-0928-4efe-b922-ad2150d7d990",
+     "roads": [
+      {
+       "id": "51001632-02d7-4852-8f8e-2f4feb06cfda",
+       "name": "북악관 1F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 30.41
+      }
+     ]
+    },
+    {
+     "ref": "f4a2f4e6 136.84 -> 134.24",
+     "op": "move_node",
+     "changeSetId": "0d506f53-0eca-428c-b1b3-c3b0d3bc6694",
+     "roads": [
+      {
+       "id": "00ad9781-fdd7-4f3f-ac4f-5397eb0c7d8d",
+       "name": null,
+       "lengthM": 16.64
+      },
+      {
+       "id": "5e2f8114-5be6-4674-90d0-73e6d2119828",
+       "name": null,
+       "lengthM": 4.4
+      }
+     ]
+    },
+    {
+     "ref": "f54bc91a 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "1df4492b-2c1c-4cfe-be90-81544d0405ff",
+     "roads": [
+      {
+       "id": "0d4b3980-e030-4de9-bd32-b0408882c9d4",
+       "name": null,
+       "lengthM": 7.78
+      },
+      {
+       "id": "0ed024f9-e1dd-4b3d-b82e-1668bac21c74",
+       "name": "북악관 2F 엘리베이터 앞 (추정)",
+       "lengthM": 7.17
+      },
+      {
+       "id": "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+       "name": null,
+       "lengthM": 41.55
+      },
+      {
+       "id": "9be4bca2-ebf2-4b2b-8283-d766200a2254",
+       "name": null,
+       "lengthM": 9.64
+      }
+     ]
+    },
+    {
+     "ref": "0092f501 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "ab430ea3-c8aa-4c5b-ae76-5303f9758b0f",
+     "roads": [
+      {
+       "id": "00ad9781-fdd7-4f3f-ac4f-5397eb0c7d8d",
+       "name": null,
+       "lengthM": 16.64
+      },
+      {
+       "id": "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+       "name": null,
+       "lengthM": 41.55
+      },
+      {
+       "id": "bb1a4cfc-ca3f-43f0-8b18-37c071fdbdb3",
+       "name": null,
+       "lengthM": 16.64
+      }
+     ]
+    },
+    {
+     "ref": "69181a72 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "b019238d-13fb-49de-ad59-fe8a3e535170",
+     "roads": [
+      {
+       "id": "2b3d1698-726e-4122-840d-24928872a8ad",
+       "name": null,
+       "lengthM": 5.04
+      },
+      {
+       "id": "71335ce0-2a26-47ff-8871-e0c6c38e1809",
+       "name": null,
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "2d7e2141 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "de123bba-1c89-42e7-9d61-3f33303214a1",
+     "roads": [
+      {
+       "id": "9be4bca2-ebf2-4b2b-8283-d766200a2254",
+       "name": null,
+       "lengthM": 9.64
+      },
+      {
+       "id": "bfabfade-cdf0-4b0c-9f3a-06b4c3103d73",
+       "name": null,
+       "lengthM": 13.69
+      }
+     ]
+    },
+    {
+     "ref": "5aa5dddf 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "85bcdf83-9730-4e92-9301-38a9e12f1220",
+     "roads": [
+      {
+       "id": "0ed024f9-e1dd-4b3d-b82e-1668bac21c74",
+       "name": "북악관 2F 엘리베이터 앞 (추정)",
+       "lengthM": 7.17
+      },
+      {
+       "id": "427ac753-4c1e-4c0a-a404-8217058f3ca2",
+       "name": "북악관 2F 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "4800e550-71c4-46f3-8aea-fc5002df6d80",
+       "name": "북악관 엘리베이터 1F-2F (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "53bd7d38-a552-48bb-8310-cb6803e9ba34",
+       "name": "북악관 1호기 2F–143.47m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "Z2",
+   "title": "북악관 실내 길 높이 옮기기: 노드 (B10-1), 2번째 묶음 (전체 57)",
+   "batchId": "a5716737-c1d7-4b78-b94f-6e920d8512bb",
+   "at": "2026-10-10T15:15:15.936Z",
+   "changeSets": [
+    {
+     "ref": "9798b171 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "221931cc-a844-4843-87dd-3d574d173cbe",
+     "roads": [
+      {
+       "id": "6e61a9c3-4403-49d7-adb0-3c35d530795b",
+       "name": "북악관 2호기 140.6–143.47m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "c14a8753-ae0a-4650-ac2b-57b0c9373a69",
+       "name": "북악관 2호기 1F–2F (배치·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "427ac753-4c1e-4c0a-a404-8217058f3ca2",
+       "name": "북악관 2F 1·2호기 공용 홀 (배치·고도 추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "cd46ee99 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "79501917-b84f-48af-816c-c89e8e2bae52",
+     "roads": [
+      {
+       "id": "fbfd71bc-f33c-41ad-94a7-aed53ee23e99",
+       "name": "북악관 2F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 29.2
+      },
+      {
+       "id": "0d4b3980-e030-4de9-bd32-b0408882c9d4",
+       "name": null,
+       "lengthM": 7.78
+      },
+      {
+       "id": "2b3d1698-726e-4122-840d-24928872a8ad",
+       "name": null,
+       "lengthM": 5.04
+      }
+     ]
+    },
+    {
+     "ref": "86b5d51c 140.6 -> 138.0",
+     "op": "move_node",
+     "changeSetId": "053e6c66-fde7-421e-9d1f-e7a0d503e6da",
+     "roads": [
+      {
+       "id": "fbfd71bc-f33c-41ad-94a7-aed53ee23e99",
+       "name": "북악관 2F 동측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 29.2
+      }
+     ]
+    },
+    {
+     "ref": "df658c8d 143.47 -> 140.9",
+     "op": "move_node",
+     "changeSetId": "e70dc3d6-957a-444a-afe0-a1bc97bda9d7",
+     "roads": [
+      {
+       "id": "2ecf4f90-57a9-49c8-9e04-a46c7da7b659",
+       "name": null,
+       "lengthM": 4.54
+      },
+      {
+       "id": "83109850-3fb2-407f-aabb-2310040310a4",
+       "name": null,
+       "lengthM": 39.86
+      },
+      {
+       "id": "d25e1c6d-839d-478f-9cf0-ac66fabbd573",
+       "name": "C01·C02 공통 북악관 동측 복도 143.47m (추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "3d601a75 143.47 -> 140.9",
+     "op": "move_node",
+     "changeSetId": "745ca754-1418-42f8-a9e0-45c24e1e2226",
+     "roads": [
+      {
+       "id": "2ecf4f90-57a9-49c8-9e04-a46c7da7b659",
+       "name": null,
+       "lengthM": 4.54
+      },
+      {
+       "id": "bc582299-13e2-458d-a8a2-58acfc8c5df6",
+       "name": "C01·C02 북악관 승강기 앞 연결 143.47m (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+       "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+       "lengthM": 15.29
+      },
+      {
+       "id": "71335ce0-2a26-47ff-8871-e0c6c38e1809",
+       "name": null,
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "8ad36f57 143.47 -> 140.9",
+     "op": "move_node",
+     "changeSetId": "3d0aebea-df2c-4b89-b84a-05c4692d00f0",
+     "roads": [
+      {
+       "id": "bc582299-13e2-458d-a8a2-58acfc8c5df6",
+       "name": "C01·C02 북악관 승강기 앞 연결 143.47m (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "0dc5293d-646f-413d-af95-324716677939",
+       "name": "북악관 143.47m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "53bd7d38-a552-48bb-8310-cb6803e9ba34",
+       "name": "북악관 1호기 2F–143.47m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+       "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "34ad3d69 143.47 -> 140.9",
+     "op": "move_node",
+     "changeSetId": "66e58f73-9383-4b86-bbf2-2125fd4348f4",
+     "roads": [
+      {
+       "id": "d25e1c6d-839d-478f-9cf0-ac66fabbd573",
+       "name": "C01·C02 공통 북악관 동측 복도 143.47m (추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "0cb15ed1 143.47 -> 140.9",
+     "op": "move_node",
+     "changeSetId": "4e2b607a-cf4d-40af-998a-a6852b688645",
+     "roads": [
+      {
+       "id": "0dc5293d-646f-413d-af95-324716677939",
+       "name": "북악관 143.47m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "6e61a9c3-4403-49d7-adb0-3c35d530795b",
+       "name": "북악관 2호기 140.6–143.47m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "bfc76c5f-d0e8-4ac9-87a1-6055d8710787",
+       "name": "북악관 2호기 143.47–146.18m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "d3dd8247 143.5 -> 140.93",
+     "op": "move_node",
+     "changeSetId": "8f9b8401-a2a7-4f80-8245-d573e748c918",
+     "roads": [
+      {
+       "id": "83109850-3fb2-407f-aabb-2310040310a4",
+       "name": null,
+       "lengthM": 39.86
+      },
+      {
+       "id": "bb1a4cfc-ca3f-43f0-8b18-37c071fdbdb3",
+       "name": null,
+       "lengthM": 16.64
+      }
+     ]
+    },
+    {
+     "ref": "b9854aa3 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "17c9c19a-d807-4177-b6c8-05c0a9654ae0",
+     "roads": [
+      {
+       "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+       "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+       "name": "북악관 146.18m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+       "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "b5895273-5301-4145-9073-50f94199db29",
+       "name": "북악관 146.18m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      }
+     ]
+    },
+    {
+     "ref": "083a9fbd 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "ae45f58c-2ddf-4e00-85a7-47a2e1d2e042",
+     "roads": [
+      {
+       "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+       "name": "북악관 146.18m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      },
+      {
+       "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+       "name": "북악관 146.18m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      },
+      {
+       "id": "981f886c-9429-4f48-aa71-701a741d0241",
+       "name": "북악관 146.18m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "ab79bb5d 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "9decd7eb-e72d-4b36-bc61-ff7ed62918b9",
+     "roads": [
+      {
+       "id": "981f886c-9429-4f48-aa71-701a741d0241",
+       "name": "북악관 146.18m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "961562f7 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "ed027565-2c95-40e3-8262-c7208b940897",
+     "roads": [
+      {
+       "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+       "name": "북악관 146.18m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      },
+      {
+       "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+       "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+       "lengthM": 15.29
+      },
+      {
+       "id": "b5895273-5301-4145-9073-50f94199db29",
+       "name": "북악관 146.18m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      },
+      {
+       "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+       "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "b9d8e78f 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "46d87df5-f472-4a8a-b18c-eb746c26c5f3",
+     "roads": [
+      {
+       "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+       "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+       "name": "북악관 146.18m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "bfc76c5f-d0e8-4ac9-87a1-6055d8710787",
+       "name": "북악관 2호기 143.47–146.18m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "ef425170 146.18 -> 143.6",
+     "op": "move_node",
+     "changeSetId": "9bb35a9a-0fce-4e03-b8c3-c51af96ccf29",
+     "roads": [
+      {
+       "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+       "name": "북악관 146.18m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "8d47f845 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "0c8cceac-6eea-4f33-8574-ea999a104a6d",
+     "roads": [
+      {
+       "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+       "name": "북악관 148.92m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+       "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+       "name": "북악관 148.92m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+       "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "e57f45e3 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "d07684fa-ff17-47a1-99aa-3374d39f6b94",
+     "roads": [
+      {
+       "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+       "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+       "lengthM": 15.29
+      },
+      {
+       "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+       "name": "북악관 148.92m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+       "name": "북악관 148.92m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      },
+      {
+       "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+       "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "16137e42 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "9b29516a-12d3-4ec1-bf29-5e0029bd2a8d",
+     "roads": [
+      {
+       "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+       "name": "북악관 148.92m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      },
+      {
+       "id": "d21b1693-a659-41c4-aedc-d98191848484",
+       "name": "북악관 148.92m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      },
+      {
+       "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+       "name": "북악관 148.92m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      }
+     ]
+    },
+    {
+     "ref": "a8c3227c 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "fbad160d-9324-4004-a329-f754a7bb9506",
+     "roads": [
+      {
+       "id": "d21b1693-a659-41c4-aedc-d98191848484",
+       "name": "북악관 148.92m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "2f378d78 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "f5dfa74e-5508-409a-8a95-2af7fd46c23c",
+     "roads": [
+      {
+       "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+       "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+       "name": "북악관 148.92m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+       "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "511e0acf 148.92 -> 146.3",
+     "op": "move_node",
+     "changeSetId": "57e73baf-b3ae-4e32-8376-98d822c4f319",
+     "roads": [
+      {
+       "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+       "name": "북악관 148.92m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "457cc960 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "7912a619-1c2c-48e5-8832-80e5fe670f82",
+     "roads": [
+      {
+       "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+       "name": "북악관 151.79m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      },
+      {
+       "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+       "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+       "lengthM": 15.29
+      },
+      {
+       "id": "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+       "name": "북악관 151.79m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      },
+      {
+       "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+       "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "577d75ff 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "871e9f36-eae3-4185-974c-e4cde936b691",
+     "roads": [
+      {
+       "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+       "name": "북악관 151.79m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      },
+      {
+       "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+       "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "d71001fc-4918-48b3-ad45-8eba5f6c6b91",
+       "name": "북악관 151.79m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "ec2088ac-3376-427f-8f19-b68842675430",
+       "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "82c5e128 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "0896fb0c-c3e5-4483-9f95-f0e17d71439b",
+     "roads": [
+      {
+       "id": "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+       "name": "북악관 151.79m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      },
+      {
+       "id": "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+       "name": "북악관 151.79m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      },
+      {
+       "id": "bb3ea136-968e-41be-a002-198998286f87",
+       "name": "북악관 151.79m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "Z3",
+   "title": "북악관 실내 길 높이 옮기기: 노드 (B10-1), 3번째 묶음 (전체 57)",
+   "batchId": "05b3e7e9-61d7-4ee4-9200-13bb73c333c4",
+   "at": "2026-10-10T15:15:58.364Z",
+   "changeSets": [
+    {
+     "ref": "19fad869 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "302ab31d-641a-4d35-99c9-3725067f73e6",
+     "roads": [
+      {
+       "id": "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+       "name": "북악관 151.79m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "9f48b4d8 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "a5ae04db-4ee2-497a-9eaf-be1a82f20299",
+     "roads": [
+      {
+       "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+       "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+       "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "d71001fc-4918-48b3-ad45-8eba5f6c6b91",
+       "name": "북악관 151.79m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "a58bd182 151.79 -> 149.2",
+     "op": "move_node",
+     "changeSetId": "1c9ee673-8976-4b3b-8119-ce82177ff579",
+     "roads": [
+      {
+       "id": "bb3ea136-968e-41be-a002-198998286f87",
+       "name": "북악관 151.79m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "e90ce3a9 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "6de8d245-900b-4fc2-800c-354361824075",
+     "roads": [
+      {
+       "id": "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+       "name": "북악관 154.51m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      },
+      {
+       "id": "b6003357-d22d-494c-b66c-600be0fdf83c",
+       "name": "북악관 154.51m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      },
+      {
+       "id": "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+       "name": "북악관 154.51m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "2c228325 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "fda5aa1f-fa8d-4248-be45-0e694e3d2dfa",
+     "roads": [
+      {
+       "id": "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+       "name": "북악관 154.51m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      },
+      {
+       "id": "e518e939-8007-410f-a9ea-40066525647a",
+       "name": "북악관 154.51m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+       "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "4b9f3d20 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "9dab0f24-4005-4a9a-9993-e3b5e3a5aa71",
+     "roads": [
+      {
+       "id": "b6003357-d22d-494c-b66c-600be0fdf83c",
+       "name": "북악관 154.51m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "62c49cff 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "c2d4a7b3-59a2-4f3b-8b44-b556e1ea5d06",
+     "roads": [
+      {
+       "id": "e518e939-8007-410f-a9ea-40066525647a",
+       "name": "북악관 154.51m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      },
+      {
+       "id": "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+       "name": "북악관 154.51m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      },
+      {
+       "id": "ec2088ac-3376-427f-8f19-b68842675430",
+       "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "51e1f4f1 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "ab1a355a-1014-4d6e-9df6-08a548e617e0",
+     "roads": [
+      {
+       "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+       "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+       "lengthM": 0
+      },
+      {
+       "id": "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+       "name": "북악관 154.51m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "779151af 154.51 -> 152.5",
+     "op": "move_node",
+     "changeSetId": "86aeadc5-eea3-4a4a-8ada-e4f6d5abf44c",
+     "roads": [
+      {
+       "id": "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+       "name": "북악관 154.51m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "V1",
+   "title": "북악관 실내 길 높이 옮기기: 길 안쪽 꼭짓점 (B10-1), 1번째 묶음 (전체 15)",
+   "batchId": "d0be4313-7237-4b59-a6d0-d72055b5da39",
+   "at": "2026-10-10T15:17:35.958Z",
+   "changeSets": [
+    {
+     "ref": "00ad9781 안쪽 꼭짓점 4개",
+     "op": "update_road",
+     "changeSetId": "24cc82cf-fe3c-40cb-9401-ec922c507abc",
+     "roads": [
+      {
+       "id": "00ad9781-fdd7-4f3f-ac4f-5397eb0c7d8d",
+       "name": null,
+       "lengthM": 16.64
+      }
+     ]
+    },
+    {
+     "ref": "1fc3a2f5 안쪽 꼭짓점 4개",
+     "op": "update_road",
+     "changeSetId": "e7926d9f-9af6-4bb3-a61d-7ebb0c9d4946",
+     "roads": [
+      {
+       "id": "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+       "name": "북악관 B1 좌측 공간 통합 주동선 (고도 추정)",
+       "lengthM": 37.15
+      }
+     ]
+    },
+    {
+     "ref": "384246b2 안쪽 꼭짓점 1개",
+     "op": "update_road",
+     "changeSetId": "88f4140d-ff1d-4416-b61b-7efdf7b60d52",
+     "roads": [
+      {
+       "id": "384246b2-f7bb-4afb-aeb7-707a6265847e",
+       "name": null,
+       "lengthM": 13.71
+      }
+     ]
+    },
+    {
+     "ref": "391630e3 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "3d5d2fe8-e716-4d9a-ac84-4d7aedd892a1",
+     "roads": [
+      {
+       "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+       "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "69dd7d08 안쪽 꼭짓점 5개",
+     "op": "update_road",
+     "changeSetId": "6dfb0be8-95d5-4716-b99b-8fe5348e5d02",
+     "roads": [
+      {
+       "id": "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+       "name": null,
+       "lengthM": 41.55
+      }
+     ]
+    },
+    {
+     "ref": "71335ce0 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "00b0527d-4123-4e46-b829-b21f5e777b4f",
+     "roads": [
+      {
+       "id": "71335ce0-2a26-47ff-8871-e0c6c38e1809",
+       "name": null,
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "83109850 안쪽 꼭짓점 1개",
+     "op": "update_road",
+     "changeSetId": "f3fb24fc-5950-44f0-86fb-421f3fb0d463",
+     "roads": [
+      {
+       "id": "83109850-3fb2-407f-aabb-2310040310a4",
+       "name": null,
+       "lengthM": 39.86
+      }
+     ]
+    },
+    {
+     "ref": "a350a80e 안쪽 꼭짓점 5개",
+     "op": "update_road",
+     "changeSetId": "478f99d9-66c7-41d5-a6c0-37565c44d771",
+     "roads": [
+      {
+       "id": "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+       "name": "북악관 1F 복도 (추정)",
+       "lengthM": 40.29
+      }
+     ]
+    },
+    {
+     "ref": "a648c084 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "c20f67d4-47db-417b-bcc8-805cc205f1f7",
+     "roads": [
+      {
+       "id": "a648c084-deeb-42c0-821f-1acebf23746d",
+       "name": null,
+       "lengthM": 12.38
+      }
+     ]
+    },
+    {
+     "ref": "bb1a4cfc 안쪽 꼭짓점 4개",
+     "op": "update_road",
+     "changeSetId": "45091842-ee0f-46d7-b144-47b09f4d6660",
+     "roads": [
+      {
+       "id": "bb1a4cfc-ca3f-43f0-8b18-37c071fdbdb3",
+       "name": null,
+       "lengthM": 16.64
+      }
+     ]
+    },
+    {
+     "ref": "bd2df230 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "5c52db7b-269d-4bad-8d51-b2c2d4b7e0d0",
+     "roads": [
+      {
+       "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+       "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "bfabfade 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "a6c4e974-2129-4017-8784-28d893361e51",
+     "roads": [
+      {
+       "id": "bfabfade-cdf0-4b0c-9f3a-06b4c3103d73",
+       "name": null,
+       "lengthM": 13.69
+      }
+     ]
+    },
+    {
+     "ref": "de66c1f1 안쪽 꼭짓점 1개",
+     "op": "update_road",
+     "changeSetId": "3214afe8-4a70-4f21-9b8b-7da518a2f09b",
+     "roads": [
+      {
+       "id": "de66c1f1-54f1-47f7-8388-f60a96d671f6",
+       "name": null,
+       "lengthM": 6.48
+      }
+     ]
+    },
+    {
+     "ref": "ec66a05b 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "111c9a2e-81fc-441b-926a-55abadf76828",
+     "roads": [
+      {
+       "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+       "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "f1d0ee7b 안쪽 꼭짓점 2개",
+     "op": "update_road",
+     "changeSetId": "01634185-3adf-47ab-84e7-9448b6ae46e3",
+     "roads": [
+      {
+       "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+       "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "U1",
+   "title": "지하 높이(보행 기록의 가장 낮은 곳 128.4~128.7 m): 본관 쪽 계단 아래·지하 차도 아래 끝 126.82 -> 128.5, B1 진입 계단 이름·구조",
+   "batchId": "f85387b4-045f-40e7-ad5a-83a103ffb695",
+   "at": "2026-10-10T15:17:37.467Z",
+   "changeSets": [
+    {
+     "ref": "본관 쪽 계단 아래(보행 구간 서쪽 끝) 126.82 -> 128.5 (추정 127.8~128.7)",
+     "op": "move_node",
+     "changeSetId": "c8916a76-2d09-4433-a42d-1ce91da24a7f",
+     "roads": [
+      {
+       "id": "8ca109ec-5560-46fa-bd32-2a642762d2c1",
+       "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+       "lengthM": 46.13
+      },
+      {
+       "id": "e996a8f7-a40c-44fb-bb2a-59288fbe7bd0",
+       "name": "본관 모서리 앞 계단 (지상 ~ 지하 차도 보행 구간, 위치·높이 추정)",
+       "lengthM": 5.71
+      }
+     ]
+    },
+    {
+     "ref": "지하 차도 951c157d 아래 끝 126.82 -> 128.5 (추정)",
+     "op": "move_node",
+     "changeSetId": "0b514cbe-ca43-42a4-9fde-96a872ab37ec",
+     "roads": [
+      {
+       "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
+       "name": "지하주차장-북악관 B1 연결 (추정)",
+       "lengthM": 16.06
+      },
+      {
+       "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
+       "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+       "lengthM": 51.19
+      }
+     ]
+    },
+    {
+     "ref": "f99540e3 이름",
+     "op": "update_road",
+     "changeSetId": "b8bcee88-d433-44cb-b556-4e35bdae072c",
+     "roads": [
+      {
+       "id": "f99540e3-b6fe-47c7-994d-469bf008c8f6",
+       "name": "북악관 B1 진입 계단 (4~6칸 올라감, 129.7 → 130.5 m. 높이 추정)",
+       "lengthM": 1.86
+      }
+     ]
+    },
+    {
+     "ref": "05378724 계단 -> 평지 통로",
+     "op": "update_road",
+     "changeSetId": "11aba5f9-4df8-40a4-8598-55f433e97c5f",
+     "roads": [
+      {
+       "id": "05378724-6530-4c5e-8918-c8c2bad2f4f5",
+       "name": "북악관 B1 진입 통로 (계단 위, 평지 130.5 m. 추정)",
+       "lengthM": 4.65
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "U2",
+   "title": "지하 횡단보도·통로: 8fde6a04 를 보행 길로 바꾸고 그림 14 의 자리로(보행 구간 ~ 횡단보도 ~ 통로 ~ B1 계단 아래)",
+   "batchId": "0c3105f0-ebe2-4220-98a4-cafc9e8397f4",
+   "at": "2026-10-10T15:17:49.872Z",
+   "changeSets": [
+    {
+     "ref": "보행 구간 서쪽 꼭짓점 128.5",
+     "op": "update_road",
+     "changeSetId": "aeacb7fa-7852-44d5-9bdf-bb7550a8a66d",
+     "roads": [
+      {
+       "id": "8ca109ec-5560-46fa-bd32-2a642762d2c1",
+       "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+       "lengthM": 46.13
+      }
+     ]
+    },
+    {
+     "ref": "지하 차도 아래쪽 꼭짓점 128.6",
+     "op": "update_road",
+     "changeSetId": "5cfe06f3-b76f-49d5-bbc9-8b6ede374740",
+     "roads": [
+      {
+       "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
+       "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+       "lengthM": 51.19
+      }
+     ]
+    },
+    {
+     "ref": "8fde6a04 -> 지하 횡단보도·통로(보행)",
+     "op": "update_road",
+     "changeSetId": "bac1e323-0082-4abe-8597-522d5fdfd1c4",
+     "roads": [
+      {
+       "id": "38fd4580-7708-4baa-8256-329fa109f78e",
+       "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+       "lengthM": 3
+      },
+      {
+       "id": "b1758181-c991-4365-98f7-bb3209f5bae1",
+       "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+       "lengthM": 43.13
+      },
+      {
+       "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
+       "name": "북악관 B1 가는 지하 횡단보도·통로 (본관 쪽 보행 구간 ~ 지하 차도 건넘 ~ 통로 ~ 계단 아래. 사용자 그림 14, 위치 ±2 m·높이 추정)",
+       "lengthM": 18.25
+      }
+     ],
+     "warnings": [
+      "ENDPOINT_DETACHED: the start moved away from a node that 1 other road(s) use; they are no longer connected to this road. Use move_node to move a junction with all its roads"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "G",
+   "title": "북악관 서쪽 옆길, GS25 문과 문 안 계단(B10-3·4), 정문 계단, 장소(B10-5·6, B08-7)",
+   "batchId": "9efad265-edd3-4f8d-b24f-726959d1da17",
+   "at": "2026-10-10T15:17:51.441Z",
+   "changeSets": [
+    {
+     "ref": "옆길 남쪽",
+     "op": "create_road",
+     "changeSetId": "94efaf64-4423-42b3-ada9-791ee20c07e7",
+     "roads": [
+      {
+       "id": "ddb8a8f8-f977-4ea3-812b-3d934820da65",
+       "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 포장 폭 약 6 m, 높이 S-MAP)",
+       "lengthM": 10.69
+      }
+     ]
+    },
+    {
+     "ref": "옆길 북쪽",
+     "op": "create_road",
+     "changeSetId": "23cb6807-02d1-42f5-9b19-ee9bf52c9601",
+     "roads": [
+      {
+       "id": "db3fe999-f295-4b84-bad8-b8f8ae24e8a8",
+       "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 뒤편 산책로와는 아직 안 이음, 높이 S-MAP)",
+       "lengthM": 16.93
+      }
+     ]
+    },
+    {
+     "ref": "GS25 문 앞",
+     "op": "create_road",
+     "changeSetId": "eed59799-8ec3-4e08-940c-ce8b65dcd48f",
+     "roads": [
+      {
+       "id": "7ca95923-159d-4a76-a142-bba763c3cb4d",
+       "name": "북악관 입구(4) GS25 문 앞 (옆길 ~ 문)",
+       "lengthM": 2
+      }
+     ]
+    },
+    {
+     "ref": "B10-4",
+     "op": "create_road",
+     "changeSetId": "c59f2cc1-4a50-4031-a94d-65b5ffdb2647",
+     "roads": [
+      {
+       "id": "8efa102d-c5de-492b-8b70-19d8132e1de5",
+       "name": "GS25 문 안 계단 (문 ~ B1 복도, 6~9칸 내려감. 평면·계단 길이 추정)",
+       "lengthM": 1.12
+      }
+     ]
+    },
+    {
+     "ref": "B10-3",
+     "op": "create_road",
+     "changeSetId": "0e4a9153-6267-4f69-bbce-b9387373fa76",
+     "roads": [
+      {
+       "id": "cb8bd678-eb46-4732-af53-85cecca8de0c",
+       "name": "북악관 B1 복도 서쪽 끝 ~ GS25 문 안 계단 아래 (평지 130.5 m, 추정)",
+       "lengthM": 4.88
+      }
+     ]
+    },
+    {
+     "ref": "정문 계단",
+     "op": "create_road",
+     "changeSetId": "04567df2-37ad-4733-b82b-370e6fc1e181",
+     "roads": [
+      {
+       "id": "8f8c716f-eda3-415f-83bf-f6ebccb498ef",
+       "name": "북악관 정문 계단 (바깥 12칸 + 안쪽 5칸 = 17칸, 131.4 → 1층 134.1 m. 칸 수 확정, 높이 추정)",
+       "lengthM": 12.7
+      }
+     ]
+    },
+    {
+     "ref": "B10-5",
+     "op": "create_place",
+     "changeSetId": "ffd0aa09-333a-46c3-a36e-9d4a3e68fa21",
+     "roads": [],
+     "placeId": "0806a5f0-71d3-4305-90e3-6791df12256f"
+    },
+    {
+     "ref": "B10-6",
+     "op": "create_place",
+     "changeSetId": "72a50621-5cba-4b09-a827-40ac2e53afd5",
+     "roads": [],
+     "placeId": "0306994d-fbd2-4618-a9be-ad40a1484464"
+    },
+    {
+     "ref": "B08-7",
+     "op": "create_place",
+     "changeSetId": "bbeb03a5-6f3a-4125-a675-ab5c996a91a5",
+     "roads": [],
+     "placeId": "e7dde86d-13e4-4c02-8116-92b428f10e2b"
+    }
+   ]
+  },
+  {
+   "group": "L1",
+   "title": "북악관 층 표기 (B10-2): 높이가 든 이름을 층 이름으로, 1번째 묶음 (전체 31)",
+   "batchId": "85a7759c-9065-414b-917f-e5333ab21c3c",
+   "at": "2026-10-10T15:18:19.038Z",
+   "changeSets": [
+    {
+     "ref": "b11c08e0 북악관_Z143.47_추정 -> 북악관_3F_추정",
+     "op": "update_road",
+     "changeSetId": "8daa7d01-c8cb-4d42-956e-e8df115af77f",
+     "roads": [
+      {
+       "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+       "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "bd2df230 북악관_Z143.47_추정 -> 북악관_3F_추정",
+     "op": "update_road",
+     "changeSetId": "a7b64e27-fd4f-48fd-8edc-295e755935a5",
+     "roads": [
+      {
+       "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+       "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "123bdf83 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "d2fa8a4a-3259-45c2-a550-e391cd352a9b",
+     "roads": [
+      {
+       "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+       "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "2c9fe889 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "6c5afd29-6fed-4e68-a05d-042fc29f3462",
+     "roads": [
+      {
+       "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+       "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "5ceb6a04 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "5df3c530-2a32-4fe4-80f0-ccd309f45e5a",
+     "roads": [
+      {
+       "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+       "name": "북악관 146.18m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "981f886c 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "63d9a90b-a3cf-4550-941d-3ecc454865c8",
+     "roads": [
+      {
+       "id": "981f886c-9429-4f48-aa71-701a741d0241",
+       "name": "북악관 146.18m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "b5895273 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "943048b4-aa52-4c58-bc41-ae8f1f2c6f77",
+     "roads": [
+      {
+       "id": "b5895273-5301-4145-9073-50f94199db29",
+       "name": "북악관 146.18m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      }
+     ]
+    },
+    {
+     "ref": "b9b7cc0e 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "5981cf99-e6a2-4ac7-bc4c-5d35b0258fa9",
+     "roads": [
+      {
+       "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+       "name": "북악관 146.18m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "ec66a05b 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "345ed3f0-9a76-449d-bac5-fe7f522fae24",
+     "roads": [
+      {
+       "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+       "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "fb9063c7 북악관_Z146.18_추정 -> 북악관_5F_추정",
+     "op": "update_road",
+     "changeSetId": "3fb008a6-d4fb-497c-816a-c949567f4d3a",
+     "roads": [
+      {
+       "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+       "name": "북악관 146.18m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      }
+     ]
+    },
+    {
+     "ref": "081bd92e 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "4105cd9a-867e-4ef0-a980-63dc3053ec75",
+     "roads": [
+      {
+       "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+       "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "0bb9d397 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "47bd0875-464d-41b8-a4ca-1d8801452b07",
+     "roads": [
+      {
+       "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+       "name": "북악관 148.92m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "391630e3 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "d2202efa-2b3b-433c-b8c0-2c783ff2ffee",
+     "roads": [
+      {
+       "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+       "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "5b75b809 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "4f55e241-e161-4ee8-a0fa-381dd263fdab",
+     "roads": [
+      {
+       "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+       "name": "북악관 148.92m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      }
+     ]
+    },
+    {
+     "ref": "b36ea64e 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "78c9dcd8-0bfa-4ab8-9942-f2ee6a3079eb",
+     "roads": [
+      {
+       "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+       "name": "북악관 148.92m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "cca24e70 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "032813f9-eb49-4602-9984-5c2c5ab73906",
+     "roads": [
+      {
+       "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+       "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "d21b1693 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "e6400852-8df8-4231-86c8-f14e9cb69ffd",
+     "roads": [
+      {
+       "id": "d21b1693-a659-41c4-aedc-d98191848484",
+       "name": "북악관 148.92m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "da914768 북악관_Z148.92_추정 -> 북악관_6F_추정",
+     "op": "update_road",
+     "changeSetId": "26ef3c41-1082-4231-8806-561c28e5600a",
+     "roads": [
+      {
+       "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+       "name": "북악관 148.92m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      }
+     ]
+    },
+    {
+     "ref": "1c04557f 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "5064c3fd-df75-4def-8bf5-b9d010e1d2bf",
+     "roads": [
+      {
+       "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+       "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "3623188a 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "ce015090-2677-4dae-b904-1e59ca264b0c",
+     "roads": [
+      {
+       "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+       "name": "북악관 151.79m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 4.93
+      }
+     ]
+    },
+    {
+     "ref": "6d2cc67e 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "6bd6ebf8-bd8d-4c3c-8494-064c93aa4b35",
+     "roads": [
+      {
+       "id": "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+       "name": "북악관 151.79m 계단 앞 복도 (추정)",
+       "lengthM": 9.27
+      }
+     ]
+    },
+    {
+     "ref": "a169f6f9 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "74566e75-cde0-44b2-9dff-ad0cb5fc11e8",
+     "roads": [
+      {
+       "id": "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+       "name": "북악관 151.79m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "bb3ea136 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "f543d20b-68dc-4945-8e02-3c7a158b08ff",
+     "roads": [
+      {
+       "id": "bb3ea136-968e-41be-a002-198998286f87",
+       "name": "북악관 151.79m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "d71001fc 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "5c930a92-d80d-41f3-a886-e54df1521587",
+     "roads": [
+      {
+       "id": "d71001fc-4918-48b3-ad45-8eba5f6c6b91",
+       "name": "북악관 151.79m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "L2",
+   "title": "북악관 층 표기 (B10-2): 높이가 든 이름을 층 이름으로, 2번째(남은 것) 묶음 (전체 7)",
+   "batchId": "912ebb98-095a-412d-a125-0596a87c2979",
+   "at": "2026-10-10T15:19:04.482Z",
+   "changeSets": [
+    {
+     "ref": "ec2088ac 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "b5796bbf-18ec-463a-8b57-0e196d479b2e",
+     "roads": [
+      {
+       "id": "ec2088ac-3376-427f-8f19-b68842675430",
+       "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+       "lengthM": 0
+      }
+     ]
+    },
+    {
+     "ref": "f1d0ee7b 북악관_Z151.79_추정 -> 북악관_7F_추정",
+     "op": "update_road",
+     "changeSetId": "eb7b2fa6-ed4c-40c0-89e8-e472baf1031f",
+     "roads": [
+      {
+       "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+       "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+       "lengthM": 15.29
+      }
+     ]
+    },
+    {
+     "ref": "769252fb 북악관_Z154.51_추정 -> 북악관_8F_추정",
+     "op": "update_road",
+     "changeSetId": "c78178a9-21c5-4752-925c-f3d6399e3bb5",
+     "roads": [
+      {
+       "id": "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+       "name": "북악관 154.51m 1·2호기 공용 홀 (추정)",
+       "lengthM": 2.5
+      }
+     ]
+    },
+    {
+     "ref": "8aa3e856 북악관_Z154.51_추정 -> 북악관_8F_추정",
+     "op": "update_road",
+     "changeSetId": "633ec0cb-d90e-4c7e-9e10-117e1fde4d62",
+     "roads": [
+      {
+       "id": "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+       "name": "북악관 154.51m 계단 앞 복도 (추정)",
+       "lengthM": 4.54
+      }
+     ]
+    },
+    {
+     "ref": "9556d4b6 북악관_Z154.51_추정 -> 북악관_8F_추정",
+     "op": "update_road",
+     "changeSetId": "901119c6-7139-48e0-a221-1593a411ed9f",
+     "roads": [
+      {
+       "id": "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+       "name": "북악관 154.51m 서측 대칭 보완 복도 (사용자 배치 지시·추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "b6003357 북악관_Z154.51_추정 -> 북악관_8F_추정",
+     "op": "update_road",
+     "changeSetId": "012644a0-4eda-44e9-88e8-c6de54c7cf1d",
+     "roads": [
+      {
+       "id": "b6003357-d22d-494c-b66c-600be0fdf83c",
+       "name": "북악관 154.51m 동측 복도 (C01·C02 추정)",
+       "lengthM": 35.28
+      }
+     ]
+    },
+    {
+     "ref": "e518e939 북악관_Z154.51_추정 -> 북악관_8F_추정",
+     "op": "update_road",
+     "changeSetId": "ac23bdcc-0bf2-4ccf-a999-1956a9ea3ece",
+     "roads": [
+      {
+       "id": "e518e939-8007-410f-a9ea-40066525647a",
+       "name": "북악관 154.51m 엘리베이터 앞 복도 (추정)",
+       "lengthM": 3.64
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "group": "Y",
+   "title": "유담관 입구(1) 6층 로비 문 앞(분수 광장 114.1 m) 노드. 차도와는 잇지 않음(보행 길 근거 없음)",
+   "batchId": "fdb5cfdf-1765-4ea1-996a-8462327d84c3",
+   "at": "2026-10-10T15:19:05.977Z",
+   "changeSets": [
+    {
+     "ref": "유담관 6층 문 앞",
+     "op": "create_road",
+     "changeSetId": "c7c30558-7ed8-47bd-bd3c-0eab0db40486",
+     "roads": [
+      {
+       "id": "a1a9b9dd-aae8-4846-895c-e6a0022c7150",
+       "name": "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)",
+       "lengthM": 4.46
+      }
+     ]
+    },
+    {
+     "ref": "유담관 입구(1)",
+     "op": "create_place",
+     "changeSetId": "d8cef33d-d7ea-4995-af6f-ce6fefbb27d3",
+     "roads": [],
+     "placeId": "ac172e8e-cf5a-427e-8951-a44458530a48"
+    }
+   ]
+  }
+ ],
+ "revert": {
+  "roads": "변경 묶음을 아래 순서(나중 것부터)로 하나씩 revert_changeset. backend 폴더에서: npx tsx ../docs/audit/n02/n02.ts call revert_changeset {\"changeSetId\":\"<id>\"}",
+  "order": [
+   "d8cef33d-d7ea-4995-af6f-ce6fefbb27d3",
+   "c7c30558-7ed8-47bd-bd3c-0eab0db40486",
+   "ac23bdcc-0bf2-4ccf-a999-1956a9ea3ece",
+   "012644a0-4eda-44e9-88e8-c6de54c7cf1d",
+   "901119c6-7139-48e0-a221-1593a411ed9f",
+   "633ec0cb-d90e-4c7e-9e10-117e1fde4d62",
+   "c78178a9-21c5-4752-925c-f3d6399e3bb5",
+   "eb7b2fa6-ed4c-40c0-89e8-e472baf1031f",
+   "b5796bbf-18ec-463a-8b57-0e196d479b2e",
+   "5c930a92-d80d-41f3-a886-e54df1521587",
+   "f543d20b-68dc-4945-8e02-3c7a158b08ff",
+   "74566e75-cde0-44b2-9dff-ad0cb5fc11e8",
+   "6bd6ebf8-bd8d-4c3c-8494-064c93aa4b35",
+   "ce015090-2677-4dae-b904-1e59ca264b0c",
+   "5064c3fd-df75-4def-8bf5-b9d010e1d2bf",
+   "26ef3c41-1082-4231-8806-561c28e5600a",
+   "e6400852-8df8-4231-86c8-f14e9cb69ffd",
+   "032813f9-eb49-4602-9984-5c2c5ab73906",
+   "78c9dcd8-0bfa-4ab8-9942-f2ee6a3079eb",
+   "4f55e241-e161-4ee8-a0fa-381dd263fdab",
+   "d2202efa-2b3b-433c-b8c0-2c783ff2ffee",
+   "47bd0875-464d-41b8-a4ca-1d8801452b07",
+   "4105cd9a-867e-4ef0-a980-63dc3053ec75",
+   "3fb008a6-d4fb-497c-816a-c949567f4d3a",
+   "345ed3f0-9a76-449d-bac5-fe7f522fae24",
+   "5981cf99-e6a2-4ac7-bc4c-5d35b0258fa9",
+   "943048b4-aa52-4c58-bc41-ae8f1f2c6f77",
+   "63d9a90b-a3cf-4550-941d-3ecc454865c8",
+   "5df3c530-2a32-4fe4-80f0-ccd309f45e5a",
+   "6c5afd29-6fed-4e68-a05d-042fc29f3462",
+   "d2fa8a4a-3259-45c2-a550-e391cd352a9b",
+   "a7b64e27-fd4f-48fd-8edc-295e755935a5",
+   "8daa7d01-c8cb-4d42-956e-e8df115af77f",
+   "bbeb03a5-6f3a-4125-a675-ab5c996a91a5",
+   "72a50621-5cba-4b09-a827-40ac2e53afd5",
+   "ffd0aa09-333a-46c3-a36e-9d4a3e68fa21",
+   "04567df2-37ad-4733-b82b-370e6fc1e181",
+   "0e4a9153-6267-4f69-bbce-b9387373fa76",
+   "c59f2cc1-4a50-4031-a94d-65b5ffdb2647",
+   "eed59799-8ec3-4e08-940c-ce8b65dcd48f",
+   "23cb6807-02d1-42f5-9b19-ee9bf52c9601",
+   "94efaf64-4423-42b3-ada9-791ee20c07e7",
+   "bac1e323-0082-4abe-8597-522d5fdfd1c4",
+   "5cfe06f3-b76f-49d5-bbc9-8b6ede374740",
+   "aeacb7fa-7852-44d5-9bdf-bb7550a8a66d",
+   "11aba5f9-4df8-40a4-8598-55f433e97c5f",
+   "b8bcee88-d433-44cb-b556-4e35bdae072c",
+   "0b514cbe-ca43-42a4-9fde-96a872ab37ec",
+   "c8916a76-2d09-4433-a42d-1ce91da24a7f",
+   "01634185-3adf-47ab-84e7-9448b6ae46e3",
+   "111c9a2e-81fc-441b-926a-55abadf76828",
+   "3214afe8-4a70-4f21-9b8b-7da518a2f09b",
+   "a6c4e974-2129-4017-8784-28d893361e51",
+   "5c52db7b-269d-4bad-8d51-b2c2d4b7e0d0",
+   "45091842-ee0f-46d7-b144-47b09f4d6660",
+   "c20f67d4-47db-417b-bcc8-805cc205f1f7",
+   "478f99d9-66c7-41d5-a6c0-37565c44d771",
+   "f3fb24fc-5950-44f0-86fb-421f3fb0d463",
+   "00b0527d-4123-4e46-b829-b21f5e777b4f",
+   "6dfb0be8-95d5-4716-b99b-8fe5348e5d02",
+   "3d5d2fe8-e716-4d9a-ac84-4d7aedd892a1",
+   "88f4140d-ff1d-4416-b61b-7efdf7b60d52",
+   "e7926d9f-9af6-4bb3-a61d-7ebb0c9d4946",
+   "24cc82cf-fe3c-40cb-9401-ec922c507abc",
+   "86aeadc5-eea3-4a4a-8ada-e4f6d5abf44c",
+   "ab1a355a-1014-4d6e-9df6-08a548e617e0",
+   "c2d4a7b3-59a2-4f3b-8b44-b556e1ea5d06",
+   "9dab0f24-4005-4a9a-9993-e3b5e3a5aa71",
+   "fda5aa1f-fa8d-4248-be45-0e694e3d2dfa",
+   "6de8d245-900b-4fc2-800c-354361824075",
+   "1c9ee673-8976-4b3b-8119-ce82177ff579",
+   "a5ae04db-4ee2-497a-9eaf-be1a82f20299",
+   "302ab31d-641a-4d35-99c9-3725067f73e6",
+   "0896fb0c-c3e5-4483-9f95-f0e17d71439b",
+   "871e9f36-eae3-4185-974c-e4cde936b691",
+   "7912a619-1c2c-48e5-8832-80e5fe670f82",
+   "57e73baf-b3ae-4e32-8376-98d822c4f319",
+   "f5dfa74e-5508-409a-8a95-2af7fd46c23c",
+   "fbad160d-9324-4004-a329-f754a7bb9506",
+   "9b29516a-12d3-4ec1-bf29-5e0029bd2a8d",
+   "d07684fa-ff17-47a1-99aa-3374d39f6b94",
+   "0c8cceac-6eea-4f33-8574-ea999a104a6d",
+   "9bb35a9a-0fce-4e03-b8c3-c51af96ccf29",
+   "46d87df5-f472-4a8a-b18c-eb746c26c5f3",
+   "ed027565-2c95-40e3-8262-c7208b940897",
+   "9decd7eb-e72d-4b36-bc61-ff7ed62918b9",
+   "ae45f58c-2ddf-4e00-85a7-47a2e1d2e042",
+   "17c9c19a-d807-4177-b6c8-05c0a9654ae0",
+   "8f9b8401-a2a7-4f80-8245-d573e748c918",
+   "4e2b607a-cf4d-40af-998a-a6852b688645",
+   "66e58f73-9383-4b86-bbf2-2125fd4348f4",
+   "3d0aebea-df2c-4b89-b84a-05c4692d00f0",
+   "745ca754-1418-42f8-a9e0-45c24e1e2226",
+   "e70dc3d6-957a-444a-afe0-a1bc97bda9d7",
+   "053e6c66-fde7-421e-9d1f-e7a0d503e6da",
+   "79501917-b84f-48af-816c-c89e8e2bae52",
+   "221931cc-a844-4843-87dd-3d574d173cbe",
+   "85bcdf83-9730-4e92-9301-38a9e12f1220",
+   "de123bba-1c89-42e7-9d61-3f33303214a1",
+   "b019238d-13fb-49de-ad59-fe8a3e535170",
+   "ab430ea3-c8aa-4c5b-ae76-5303f9758b0f",
+   "1df4492b-2c1c-4cfe-be90-81544d0405ff",
+   "0d506f53-0eca-428c-b1b3-c3b0d3bc6694",
+   "1c53b906-0928-4efe-b922-ad2150d7d990",
+   "03181863-4f9e-495a-b2a1-050270fca137",
+   "4ea44e5f-3513-4991-bb42-24372b53ac53",
+   "66b3c862-679f-4836-a7d7-cd9daf330d38",
+   "441ebe80-fd26-4d6e-b900-1a52f5a3b5ee",
+   "6f94cb05-44ed-4892-9a64-3b6b390e1966",
+   "e817802a-10e9-429c-a534-a8c6694201e2",
+   "186a4453-fb6c-4b1c-825e-d8ba1987e1ab",
+   "f24d4eda-116f-4728-ad9c-904bdc44f20c",
+   "60f4a406-3d3e-4efa-bef1-ec22592e9e89",
+   "df8bc9cd-fb02-4893-ac0c-0f01a047bacd",
+   "876c50df-62c7-4290-a261-0efbc5906536",
+   "c2321df9-3743-4cd6-91e7-37c973a73cd6",
+   "5ade0dc8-0216-4218-921b-d5bac686895d",
+   "2a37fad3-c6d8-44f5-8bbe-62558a1b587c",
+   "7a37a138-350e-4233-8ced-066240fd6e99",
+   "74001e77-9bd8-4335-a552-c7fdfa36edf7",
+   "c0f46d46-e8f9-4ab5-a0d3-a7584ade45e8",
+   "ae9d3701-9b6f-438d-94ae-1e8f4aec5246",
+   "0aac2ca5-1ccd-40eb-94b0-5fa6d6915f24",
+   "6b1ad060-48fe-4e2a-a036-f8203cfa0d0c",
+   "e0d4ecaf-cbda-48c9-90e5-f40b834b58d8",
+   "46cc860d-234a-4afd-84bf-7af7ba58f494",
+   "d620fb88-3ab0-4d64-aafd-913582fd8ac0",
+   "ec0f180f-c51a-40a8-bc24-a44642dce2ec",
+   "937453e6-5fc5-40f9-bfbe-03e2e867746e",
+   "6c56bb5e-d0b2-4c8a-bb47-2b17f90696cf",
+   "5aa475cf-547a-4736-b879-628731ef750c",
+   "2ad53fc2-2a2e-4551-8d86-65f64be1a94d",
+   "dc18ef1e-d1b2-4bf5-b728-d73750692d0f",
+   "d8af0e6f-ed3c-4a9f-9188-f87e1860b18c",
+   "f9ec114b-9219-4415-9af0-e022afe51ad5",
+   "1b6c3eb2-83d2-450a-95b1-f7f6df0212ff"
+  ],
+  "area": "공간 영역은 변경 묶음에 안 들어간다: npx tsx ../docs/audit/n02/n02.ts rest DELETE areas/2?expectedRevision=<지금 revision>",
+  "terrain": "npm run terrain:activate -- local-samples-7e415b29668b2f62 뒤 scene:import 다시 (도로 이동 없음)",
+  "wholeDatabase": "00-backup-mobility-before.sql (pg_dump --schema=mobility, N02 적용 전)"
+ }
+}

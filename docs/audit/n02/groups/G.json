@@ -1,0 +1,245 @@
+{
+ "id": "G",
+ "title": "북악관 서쪽 옆길, GS25 문과 문 안 계단(B10-3·4), 정문 계단, 장소(B10-5·6, B08-7)",
+ "ops": [
+  {
+   "ref": "옆길 남쪽",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 포장 폭 약 6 m, 높이 S-MAP)",
+    "widthM": 6,
+    "path": [
+     {
+      "xy": [
+       201004.5,
+       557384.5
+      ],
+      "z": 131.3
+     },
+     {
+      "xy": [
+       201005.0,
+       557388.0
+      ],
+      "z": 131.4
+     },
+     {
+      "xy": [
+       201006.5,
+       557395.0
+      ],
+      "z": 131.7
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "옆길 북쪽",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 뒤편 산책로와는 아직 안 이음, 높이 S-MAP)",
+    "widthM": 6,
+    "path": [
+     {
+      "xy": [
+       201006.5,
+       557395.0
+      ],
+      "z": 131.7
+     },
+     {
+      "xy": [
+       201009.0,
+       557403.0
+      ],
+      "z": 132.2
+     },
+     {
+      "xy": [
+       201012.0,
+       557411.0
+      ],
+      "z": 132.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "GS25 문 앞",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "북악관 입구(4) GS25 문 앞 (옆길 ~ 문)",
+    "path": [
+     {
+      "xy": [
+       201006.5,
+       557395.0
+      ],
+      "z": 131.7
+     },
+     {
+      "xy": [
+       201008.5,
+       557395.0
+      ],
+      "z": 131.7
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "B10-4",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "GS25 문 안 계단 (문 ~ B1 복도, 6~9칸 내려감. 평면·계단 길이 추정)",
+    "structure": "stairs",
+    "buildingId": "북악관",
+    "path": [
+     {
+      "xy": [
+       201008.5,
+       557395.0
+      ],
+      "z": 131.7
+     },
+     {
+      "xy": [
+       201009.6,
+       557395.2
+      ],
+      "z": 130.5
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "B10-3",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "북악관 B1 복도 서쪽 끝 ~ GS25 문 안 계단 아래 (평지 130.5 m, 추정)",
+    "structure": "indoor_corridor",
+    "buildingId": "북악관",
+    "path": [
+     {
+      "xy": [
+       201009.6,
+       557395.2
+      ],
+      "z": 130.5
+     },
+     {
+      "at": {
+       "nodeId": "f645a7b9-b468-45af-9098-6a99c283e524"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "정문 계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "북악관 정문 계단 (바깥 12칸 + 안쪽 5칸 = 17칸, 131.4 → 1층 134.1 m. 칸 수 확정, 높이 추정)",
+    "structure": "stairs",
+    "buildingId": "북악관",
+    "path": [
+     {
+      "xy": [
+       201039.5,
+       557360.5
+      ],
+      "z": 131.4
+     },
+     {
+      "xy": [
+       201041.5,
+       557365.0
+      ],
+      "z": 133.3
+     },
+     {
+      "xy": [
+       201043.7,
+       557368.7
+      ],
+      "z": 133.3
+     },
+     {
+      "at": {
+       "nodeId": "596405f1-d19b-4c69-8801-fafd209e409a"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   }
+  },
+  {
+   "ref": "B10-5",
+   "op": "create_place",
+   "args": {
+    "name": "편의점 (북악관 B1)",
+    "category": "facility",
+    "buildingId": "북악관",
+    "description": "B10-5. 계단을 올라 바로 좌회전하면 있다(사용자 확정). 위치 추정 ±10 m(네이버 GS25 표지는 여기서 2.5 m). 높이 B1 130.5 m 추정",
+    "position": {
+     "xy": [
+      201048.1,
+      557381.1
+     ],
+     "z": 130.5
+    }
+   }
+  },
+  {
+   "ref": "B10-6",
+   "op": "create_place",
+   "args": {
+    "name": "라운지 (북악관 B1)",
+    "category": "facility",
+    "buildingId": "북악관",
+    "description": "B10-6. 계단을 올라 바로 좌회전하면 있다(사용자 확정). 위치 추정 ±10 m. 높이 B1 130.5 m 추정",
+    "position": {
+     "xy": [
+      201046.5,
+      557381.3
+     ],
+     "z": 130.5
+    }
+   }
+  },
+  {
+   "ref": "B08-7",
+   "op": "create_place",
+   "args": {
+    "name": "북악관 입구(4) = GS25 출입구",
+    "category": "building_entrance",
+    "buildingId": "북악관",
+    "description": "B08-7. B1층 입구(사용자 확정). 문 앞 지면 131.7 m(S-MAP), 문 안에서 6~9칸 내려가 B1 130.5 m. 위치는 학교 표지를 서쪽 끝 벽 앞으로 옮긴 자리(±2 m)",
+    "position": {
+     "xy": [
+      201008.5,
+      557395.0
+     ],
+     "z": 131.7
+    }
+   }
+  }
+ ]
+}

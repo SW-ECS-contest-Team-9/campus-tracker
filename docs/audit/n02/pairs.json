@@ -1,0 +1,536 @@
+{
+ "note": "N02 도달 검사 쌍. point 는 가장 가까운 노드(평면, snapRadiusM 안)로 붙는다. 정문은 차도의 남쪽 끝 노드(공도 분기)로 잰다. 회차 공간은 차도가 평탄부에 닿는 노드 a12b5e30. N01 과 같은 id 는 같은 쌍이다(회차 공간 끝점만 5.7 m 남쪽으로 바뀜: 차도 끝 조각을 거뒀다).",
+ "pairs": [
+  {
+   "id": "gate>turn",
+   "label": "정문(공도 분기) → 회차 공간(차도가 포장면에 닿는 곳)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "vehicle": true,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>main2",
+   "label": "정문 → 본관 모서리 앞(본관 쪽 계단 위)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>uphillTop",
+   "label": "정문 → 회차 공간 → 오르막 보행로 위 끝",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201106.22,
+     557324.73
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>munye3",
+   "label": "정문 → 문예관 3층 입구 통로",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>daeilW",
+   "label": "정문 → 대일관 서쪽 끝(전면 하단)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "nodeId": "d85f61a5-7015-4845-bc4b-a4d38d3808ba"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>daeil1",
+   "label": "정문 → 대일관 입구(1) 1층 로비(현관 계단 위)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>hyeinB1",
+   "label": "정문 → 혜인관 B1 문 안(운동장 건넘)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>yudam6",
+   "label": "정문 → 유담관 입구(1) 6층 로비(분수 광장)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201057.2,
+     557234.5
+    ]
+   },
+   "vehicle": true,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "turn>bukak1F",
+   "label": "회차 공간 → 정문 계단 → 북악관 1층 로비 복도",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "turn>bukakB1",
+   "label": "회차 공간 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "nodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d"
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "main2>bukakB1",
+   "label": "본관 모서리 앞 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "from": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "to": {
+    "nodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d"
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "bukakB1>gs25out",
+   "label": "북악관 B1 복도(편의점 앞) → GS25 문 안 계단 → 문 밖(131.7 m)",
+   "from": {
+    "nodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d"
+   },
+   "to": {
+    "point": [
+     201008.5,
+     557395.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "bukakB1>bukak1F",
+   "label": "북악관 B1 복도 → 1층 로비 복도(건물 안)",
+   "from": {
+    "nodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d"
+   },
+   "to": {
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142"
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "turn>gs25out",
+   "label": "회차 공간 → 북악관 서쪽 옆길 → GS25 문 밖",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201008.5,
+     557395.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "turn>busN",
+   "label": "회차 공간 → 북쪽 버스 정류장 표지",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201006.2,
+     557363.7
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "turn>busS",
+   "label": "회차 공간 → 남쪽 버스 정류장 표지 앞(차도 위)",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201018.0,
+     557335.2
+    ]
+   },
+   "vehicle": true,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "turn>main2door",
+   "label": "회차 공간 → 본관 입구(2) 문 앞",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201041.6,
+     557338.6
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "turn>daeil1",
+   "label": "회차 공간 → 대일관 입구(1) 1층 로비",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "main2>daeil1",
+   "label": "본관 모서리 앞 → 대일관 입구(1) 1층 로비",
+   "from": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "to": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "main2>munye3",
+   "label": "본관 모서리 앞 → 문예관 3층 입구 통로",
+   "from": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "to": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "munye3>daeilW",
+   "label": "문예관 3층 입구 통로 → 대일관 서쪽 끝(전면 하단)",
+   "from": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "to": {
+    "nodeId": "d85f61a5-7015-4845-bc4b-a4d38d3808ba"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "daeilW>daeil1",
+   "label": "대일관 서쪽 끝(전면 하단) → 대일관 입구(1) 1층 로비",
+   "from": {
+    "nodeId": "d85f61a5-7015-4845-bc4b-a4d38d3808ba"
+   },
+   "to": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "daeil1>hyeinB1",
+   "label": "대일관 입구(1) 1층 로비 → 혜인관 B1 문 안",
+   "from": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "hanlim6>hyeinB1",
+   "label": "한림관 6층 계단 아래 → 혜인관 B1 문 안(운동장)",
+   "from": {
+    "point": [
+     201140,
+     557304
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "hanlim6>daeil1",
+   "label": "한림관 6층 계단 아래 → 대일관 입구(1) 1층 로비",
+   "from": {
+    "point": [
+     201140,
+     557304
+    ]
+   },
+   "to": {
+    "point": [
+     201155.2,
+     557310.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "sangseung>hyeinB1",
+   "label": "상승관 왼쪽 계단 위 → 혜인관 B1 문 안",
+   "from": {
+    "point": [
+     201205.4,
+     557294.5
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "bukakB1>hyeinB1",
+   "label": "북악관 B1 복도(편의점 앞) → 혜인관 B1 문 안",
+   "from": {
+    "nodeId": "7a32499f-d508-445d-8a75-9663b3fc1a8d"
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "yudam9>turn",
+   "label": "유담관 9층 입구 통로 → 회차 공간",
+   "from": {
+    "nodeId": "6aef72a9-302d-4cc5-9783-3cc503cb24cd"
+   },
+   "to": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "yudam9>main2",
+   "label": "유담관 9층 입구 통로 → 본관 모서리 앞",
+   "from": {
+    "nodeId": "6aef72a9-302d-4cc5-9783-3cc503cb24cd"
+   },
+   "to": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "turn>p1",
+   "label": "회차 공간 → 표지판 P1 입구",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "point": [
+     201021.95,
+     557307.07
+    ]
+   },
+   "vehicle": true,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "gate>u1end",
+   "label": "정문 → 은주관 서쪽 윗길 끝",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201112.12,
+     557211.18
+    ]
+   },
+   "vehicle": true,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "strip>main2",
+   "label": "지하 차도 보행 구간 동쪽 끝(그림 끝) → 본관 모서리 앞",
+   "from": {
+    "point": [
+     201083.5,
+     557329.7
+    ]
+   },
+   "to": {
+    "point": [
+     201040.8,
+     557342.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "turn>backpath",
+   "label": "회차 공간 → 뒤편 산책로 서쪽 끝(7895ac0d)",
+   "from": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "to": {
+    "nodeId": "7895ac0d-084b-467f-a57d-75a35e02c435"
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  }
+ ]
+}

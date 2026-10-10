@@ -1,0 +1,18 @@
+{
+ "id": "P2",
+ "title": "남쪽 버스 정류장 표지 앞에서 회차 공간 차도를 나눔(표지에서 2.3 m)",
+ "ops": [
+  {
+   "ref": "남쪽 버스 표지 앞 노드",
+   "op": "split_road",
+   "args": {
+    "roadId": "b30c65f1-c784-46ee-a91e-3eb07bbbda9b",
+    "expectedRevision": 2,
+    "nearest": [
+     201018.0,
+     557335.2
+    ]
+   }
+  }
+ ]
+}

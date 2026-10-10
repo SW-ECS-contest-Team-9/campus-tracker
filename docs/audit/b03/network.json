@@ -1652,8 +1652,10 @@
    "rollback": "revert_changeset(이 작업의 변경 묶음): RETIRED 가 DRAFT 로 돌아온다",
    "alsoIn": "docs/audit/e09/editor-ops.json",
    "statusBeforeB10": null,
-   "status": "보류(B10)",
-   "b10Reason": "이 선의 평면·오름(126.8 → 131.1)은 12:18 걷기의 \"내려갔다가 올라 B1 로\" 구간과 겹친다. 횡단보도가 차도 높이면 이 선이 사용자가 말한 횡단보도·통로이고, 없앨 것이 아니라 보행 길로 고쳐야 한다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤"
+   "status": "거둠(N02): 없애지 않고 보행 길로 고침",
+   "b10Reason": "이 선의 평면·오름(126.8 → 131.1)은 12:18 걷기의 \"내려갔다가 올라 B1 로\" 구간과 겹친다. 횡단보도가 차도 높이면 이 선이 사용자가 말한 횡단보도·통로이고, 없앨 것이 아니라 보행 길로 고쳐야 한다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤",
+   "statusBeforeN02": "보류(B10)",
+   "n02Note": "8fde6a04 = 사용자가 말한 지하 횡단보도·통로(확정: 횡단보도는 지하). 보행·차량 금지로 바꾸고 그림 14 의 자리로 옮김, 높이 128.5 → 129.7 m(추정)"
   },
   {
    "building": "본관·북악관 사이",
@@ -1702,8 +1704,10 @@
    },
    "rollback": "revert_changeset: 새 길이 RETIRED",
    "statusBeforeB10": null,
-   "status": "보류(B10)",
-   "b10Reason": "지상 면 높이(131.5~132.8)로 그린 선을 운영 노드 18b2d87e 에 붙이면, 그 노드의 실제 높이(B1 − 4~6칸 = 129.5~129.9)와 1.6~3.3 m 단이 생긴다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤"
+   "status": "거둠(N02): 지상 횡단 길은 없다",
+   "b10Reason": "지상 면 높이(131.5~132.8)로 그린 선을 운영 노드 18b2d87e 에 붙이면, 그 노드의 실제 높이(B1 − 4~6칸 = 129.5~129.9)와 1.6~3.3 m 단이 생긴다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤",
+   "statusBeforeN02": "보류(B10)",
+   "n02Note": "N01 이 넣은 지상 선 6b695a7c·dc9e833a 를 시험용 DB 에서 거둠"
   },
   {
    "building": "본관·북악관 사이",
@@ -1737,8 +1741,10 @@
    },
    "rollback": "revert_changeset",
    "statusBeforeB10": null,
-   "status": "보류(B10)",
-   "b10Reason": "시작점이 B08-2 의 횡단보도 점이다. B08-2 와 함께"
+   "status": "거둠(N02): 포장면이 잇는다",
+   "b10Reason": "시작점이 B08-2 의 횡단보도 점이다. B08-2 와 함께",
+   "statusBeforeN02": "보류(B10)",
+   "n02Note": "N01 이 넣은 c738cda0 을 거둠. 오르막 보행로를 포장면 가장자리까지 늘임"
   },
   {
    "building": "본관·북악관 사이",
@@ -1763,7 +1769,10 @@
    "gradeClass": "확정(있다는 사실) + 추정(위치·값)",
    "evidence": "위 끝 = 그림의 계단 뭉치 가운데(지상, S-MAP), 아래 끝 = 띠의 시작점(높이 = 951c157d 아래 끝 값, 추정). 평면 길이가 내림에 비해 짧다: 실제 계단은 더 길거나 꺾인다(모름). 본관 입구(2)(\"지하주차장과 본관 2층으로 연결\", 지면 130.5~130.7 = 본관 2층 기준)와 같은 곳으로 보인다(추정): 지상 = 본관 2층 높이, 계단 아래 = 지하 차도 높이",
    "expectedPreState": {},
-   "rollback": "revert_changeset"
+   "rollback": "revert_changeset",
+   "statusBeforeN02": null,
+   "status": "시험용 DB 적용(N01), 높이 고침(N02)",
+   "n02Note": "계단 아래 126.82 → 128.5 m(보행 기록의 가장 낮은 곳 128.4~128.7, 추정)"
   },
   {
    "building": "본관·북악관 사이",
@@ -1850,7 +1859,10 @@
    "expectedPreState": {
     "note": "951c157d 와는 잇지 않는다(차도와 보행 구간은 나란한 별개 선)"
    },
-   "rollback": "revert_changeset"
+   "rollback": "revert_changeset",
+   "statusBeforeN02": null,
+   "status": "시험용 DB 적용(N01), 높이 고침(N02)",
+   "n02Note": "서쪽 꼭짓점 4개 128.5 m. 횡단보도가 붙는 자리에서 둘로 나뉨"
   },
   {
    "building": "북악관",
@@ -1872,7 +1884,9 @@
    "gradeClass": "확정 + 원천 + S-MAP",
    "evidence": "B06 의 문 자리. 길은 B08-8·9",
    "expectedPreState": {},
-   "rollback": "revert_changeset"
+   "rollback": "revert_changeset",
+   "statusBeforeN02": null,
+   "status": "시험용 DB 적용(N02)"
   },
   {
    "building": "북악관",
@@ -1923,7 +1937,10 @@
      128.13
     ]
    },
-   "rollback": "revert_changeset"
+   "rollback": "revert_changeset",
+   "statusBeforeN02": null,
+   "status": "시험용 DB 적용(N02): 뒤편 산책로 끝 7895ac0d 에는 안 붙임",
+   "n02Note": "7895ac0d 저장 128.13 m 가 S-MAP 132.5 m 보다 4.4 m 낮다. 옆길은 (201012, 557411, 132.9) 에서 끝남"
   },
   {
    "building": "북악관",
@@ -1948,7 +1965,9 @@
    "gradeClass": "S-MAP + 추정(평면)",
    "evidence": "사슬 2c: 옆길에서 문 앞까지 3.5 m. B06 의 \"서쪽 벽을 따라 문 앞까지\" 선을 이것으로 바꾼다(옆길이 문 앞을 지난다)",
    "expectedPreState": {},
-   "rollback": "revert_changeset"
+   "rollback": "revert_changeset",
+   "statusBeforeN02": null,
+   "status": "시험용 DB 적용(N02)"
   },
   {
    "building": "북악관",
@@ -3285,8 +3304,10 @@
     }
    ],
    "evidence": "운영 길의 여덟 단(132.8~154.51)은 B1·1·2·3·5·6·7·8층이고 이름은 맞다. 높이는 보정 안 된 휴대폰 기압 높이라 2.0~2.7 m 높다(휴대 높이 약 1 m + 치우침)",
-   "status": "제안(추정). 길 71개를 한 묶음으로",
-   "rollback": "revert_changeset"
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(추정). 길 71개를 한 묶음으로",
+   "n02Note": "노드 57개 옮김 + 길 15개의 안쪽 꼭짓점. B1 계단 f99540e3 만 129.7 → 130.5 m(4~6칸), 05378724 는 평지 통로로"
   },
   {
    "b10Id": "B10-2",
@@ -3329,8 +3350,10 @@
    "toLabel": "3층 / 5층 / 6층 / 7층 / 8층 (132.8 = B1, 136.7 = 1층, 140.6 = 2층은 이름 그대로)",
    "grade": "추정(사다리에서 높은 층 자리가 사용자 확정 B1·1층·7층과 맞는 유일한 이름 붙이기) + 확정(4층 없음)",
    "evidence": "B03 의 \"한 층씩 밀려 있다\"(B1→1층 …, 143.47→5층 …)를 거두고 이것으로 바꾼다",
-   "status": "제안(추정)",
-   "rollback": "revert_changeset"
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(추정)",
+   "n02Note": "층 표기 31개 길: 북악관_Z143.47/146.18/148.92/151.79/154.51_추정 → 북악관_3F/5F/6F/7F/8F_추정. 노드의 층 표기는 일부만 따라 바뀜(도구 동작)"
   },
   {
    "b10Id": "B10-3",
@@ -3360,8 +3383,9 @@
      132.8
     ]
    },
-   "status": "제안(추정)",
-   "rollback": "revert_changeset"
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(추정)"
   },
   {
    "b10Id": "B10-4",
@@ -3384,8 +3408,10 @@
    ],
    "grade": "확정(문으로 들어가면 계단을 내려간다, 6~9칸) / S-MAP(문 앞 지면) / 추정(평면, 계단 길이)",
    "evidence": "오름 1.2 m = 한 칸 0.15~0.17 로 7~8칸. 아래 끝 높이는 B10-1 을 적용한 뒤의 값",
-   "status": "제안(추정): B10-1 과 함께",
-   "rollback": "revert_changeset"
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(추정): B10-1 과 함께",
+   "n02Note": "계단 평면 길이 1.1 m 는 그대로(추정)"
   },
   {
    "b10Id": "B10-5",
@@ -3404,8 +3430,9 @@
    ],
    "grade": "확정(계단을 올라 바로 좌회전하면 있다) / 위치 추정(±10 m) / 높이 추정",
    "evidence": "B08-11 을 바꿈(높이가 정해짐)",
-   "status": "제안(위치 추정)",
-   "rollback": "revert_changeset"
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(위치 추정)"
   },
   {
    "b10Id": "B10-6",
@@ -3424,8 +3451,113 @@
    ],
    "grade": "확정(계단을 올라 바로 좌회전하면 있다) / 위치 추정(±10 m) / 높이 추정",
    "evidence": "B08-12 를 바꿈",
-   "status": "제안(위치 추정)",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset",
+   "statusBeforeN02": "제안(위치 추정)",
+   "n02Note": "편의점과 1.6 m 떨어진 복도 꼭짓점에 둠"
+  },
+  {
+   "n02Id": "N02-1",
+   "op": "create_area",
+   "building": "회차 공간",
+   "name": "회차 공간·북악관 현관 앞 포장면 (평탄부)",
+   "kind": "plaza",
+   "elevationM": 131,
+   "areaM2": 1324.3,
+   "coordinatesFile": "docs/audit/n02/area-plaza.json",
+   "grade": "확정(전부 포장면, 사용자 그림 11) + S-MAP(평탄 범위 130.5~131.5 m) + 추정(경계 ±1~2 m)",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "편집기 공간 영역 삭제(변경 묶음 되돌리기에 안 들어감)"
+  },
+  {
+   "n02Id": "N02-2",
+   "op": "update_road",
+   "building": "문예관 옆",
+   "name": "오르막 보행로 c52095ad: 높이 S-MAP(131.4 → 141.0 m), 포장면 가장자리까지 늘임(67.3 m), 폭 9 m, 보행 유지",
+   "grade": "확정(보행로, 포장면과 이어짐) + S-MAP(높이, 폭 8~10 m)",
+   "status": "시험용 DB 적용(N02)",
    "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-3",
+   "op": "shift_z",
+   "building": "문예관·대일관 사이",
+   "name": "갈림 지점 일대 노드 4개를 S-MAP 으로: 3df2b596 144.3, 85a0ed07 144.1, b5e0b6b5 144.3, 59f9ab35 145.6, 오르막 위 끝 4f294196 141.0. 갈림 계단 040d4571 은 144.3 → 141.0 m",
+   "grade": "S-MAP(표고 조회 2026-10-11)",
+   "status": "시험용 DB 적용(N02)",
+   "leftSteps": "9112314a(문예관 입구 쪽 144.3 → 142.44), 618385b9(145.6 → 143.80, 실제는 149.3 으로 오름)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-4",
+   "op": "create_road",
+   "building": "북악관",
+   "name": "정문 계단 131.4 → 133.3(바깥 12칸) → 1층 로비 길 끝 596405f1(133.72) → 134.1 m",
+   "grade": "확정(17칸) + S-MAP(계단 아래) + 추정(평면)",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-5",
+   "op": "create_road",
+   "building": "회차 공간",
+   "name": "본관 입구(2) 문 앞 ~ 본관 모서리 앞 계단 위 / 북쪽 버스 표지 ~ 서쪽 가장자리 ~ 횡단보도(흰 띠) / 남쪽 버스 표지 앞에서 차도 나눔",
+   "grade": "원천(문 자리) + 사용자 그림 11(표지·흰 띠, ±3 m) + S-MAP(높이)",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-6",
+   "op": "retire_feature",
+   "building": "회차 공간",
+   "name": "회차 공간 차도 끝 5.7 m(d5d8cd64) 거둠, 남은 차도(b30c65f1)에 폭 14 m",
+   "grade": "검사 경고 2건(옆에서 끊김, 겹쳐 달림) 정리. 포장면이 버스 공간을 대신한다",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-7",
+   "op": "create_road",
+   "building": "유담관",
+   "name": "유담관 입구(1) 6층 로비 문 앞 4.5 m(114.1 m)와 장소",
+   "grade": "확정(분수 광장 = 6층) + 원천(문 자리) + S-MAP(광장 114.1)",
+   "status": "시험용 DB 적용(N02): 차도와는 안 이음",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-8",
+   "op": "shift_z",
+   "building": "지하 차도",
+   "name": "951c157d 아래 끝 126.82 → 128.5 m, 그 앞 꼭짓점 128.6 m",
+   "grade": "추정(횡단보도가 차도를 건넌다는 확정 + 보행 기록의 가장 낮은 곳 128.4~128.7). E09 의 \"높이는 건드리지 않는다\"와 다르게 한 것",
+   "status": "시험용 DB 적용(N02)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-9",
+   "op": "shift_z",
+   "building": "대일관",
+   "name": "대일관 앞 실외 길을 S-MAP 으로(미적용): d85f61a5 149.3, e0591f2c 150.6, 552b685d 150.6, f0cca79e 151.1, 0e650ceb 151.0, 016416b6 152.4 (저장 143.80~145.80). 8e71c240 은 141.0 → 144.0 → 147.2",
+   "grade": "S-MAP(표고 조회 2026-10-11). 대일관 1층 실내 길(+6.0 m)과 함께 옮겨야 문에서 단이 안 생긴다",
+   "status": "제안(미적용)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-10",
+   "op": "move_node",
+   "building": "북악관 뒤",
+   "name": "뒤편 산책로 서쪽 끝 7895ac0d 128.13 → 132.5 m 와 a03d33c3 서쪽 구간, 그 뒤 옆길 끝과 잇기(6.9 m)",
+   "grade": "S-MAP(132.5). a03d33c3 의 다음 꼭짓점도 2.5~4 m 낮아 함께 고쳐야 한다",
+   "status": "제안(미적용)",
+   "rollback": "revert_changeset"
+  },
+  {
+   "n02Id": "N02-11",
+   "op": "schema",
+   "building": "-",
+   "name": "공간 영역 종류에 \"포장 광장(차·사람 함께)\"을 따로 두기. 지금은 plaza 를 썼다(지도 화면은 parking 만 검게 칠한다)",
+   "grade": "제안",
+   "status": "제안(미적용, 마이그레이션 필요)"
   }
  ],
  "proposalCounts": {
@@ -3438,20 +3570,28 @@
   "create_node / 바뀜: B08-7 (같은 문, 장소로)": 1,
   "create_road / 바뀜: B08-9 (옆길에서 문 앞까지)": 1,
   "create_road / 그대로: B08-8 로 다시 적음": 1,
-  "create_road / 제안": 5,
+  "create_road / 제안": 1,
   "create_road / 바뀜: B08-2 (북악관 쪽 끝을 운영 노드 18b2d87e 에 붙임)": 1,
   "no_change / B10: f99540e3 는 그대로(오르는 방향이 맞다: 사용자 확정 + 보행 기록 1.7~2.2 m 오름). 방향 고치기 거둠. 8fde6a04 는 보류": 1,
   "record_only / B08: 벽 쪽 지하 공간 = B1 복도(계단 아래에서 좌회전, GS25 출입구까지 직진. 확정). 그린 선은 복도 가운데 선으로 쓰지 않는다": 1,
-  "retire_feature / 보류(B10)": 1,
-  "create_road / 보류(B10)": 2,
-  "create_place / 제안": 1,
+  "retire_feature / 거둠(N02): 없애지 않고 보행 길로 고침": 1,
+  "create_road / 거둠(N02): 지상 횡단 길은 없다": 1,
+  "create_road / 거둠(N02): 포장면이 잇는다": 1,
+  "create_road / 시험용 DB 적용(N01), 높이 고침(N02)": 2,
+  "create_place / 시험용 DB 적용(N02)": 3,
+  "create_road / 시험용 DB 적용(N02): 뒤편 산책로 끝 7895ac0d 에는 안 붙임": 1,
+  "create_road / 시험용 DB 적용(N02)": 5,
   "create_road / 바뀜(B10): B10-3·B10-4": 1,
   "create_place / 바뀜(B10): B10-5·B10-6": 2,
-  "shift_z / 제안(추정). 길 71개를 한 묶음으로": 1,
-  "relabel_level / 제안(추정)": 1,
-  "create_road / 제안(추정)": 1,
-  "create_road / 제안(추정): B10-1 과 함께": 1,
-  "create_place / 제안(위치 추정)": 2
+  "shift_z / 시험용 DB 적용(N02)": 3,
+  "relabel_level / 시험용 DB 적용(N02)": 1,
+  "create_area / 시험용 DB 적용(N02)": 1,
+  "update_road / 시험용 DB 적용(N02)": 1,
+  "retire_feature / 시험용 DB 적용(N02)": 1,
+  "create_road / 시험용 DB 적용(N02): 차도와는 안 이음": 1,
+  "shift_z / 제안(미적용)": 1,
+  "move_node / 제안(미적용)": 1,
+  "schema / 제안(미적용, 마이그레이션 필요)": 1
  },
  "b10": {
   "date": "2026-10-10",
@@ -3697,5 +3837,83 @@
   },
   "unresolvedU4": "풀림: GS25 문 안쪽 바닥 = B1 130.5, 문 앞 131.7, 계단 B10-4",
   "source": "docs/audit/b10/results.json"
+ },
+ "n02": {
+  "date": "2026-10-11",
+  "appliedTo": "시험용 DB(campus-tracker-test-db)만. 운영 적용 없음",
+  "touched": [
+   [
+    "B08-1",
+    "거둠(N02): 없애지 않고 보행 길로 고침"
+   ],
+   [
+    "B08-2",
+    "거둠(N02): 지상 횡단 길은 없다"
+   ],
+   [
+    "B08-3",
+    "거둠(N02): 포장면이 잇는다"
+   ],
+   [
+    "B08-4",
+    "시험용 DB 적용(N01), 높이 고침(N02)"
+   ],
+   [
+    "B08-5",
+    "시험용 DB 적용(N01), 높이 고침(N02)"
+   ],
+   [
+    "B08-7",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B08-8",
+    "시험용 DB 적용(N02): 뒤편 산책로 끝 7895ac0d 에는 안 붙임"
+   ],
+   [
+    "B08-9",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-1",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-2",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-3",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-4",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-5",
+    "시험용 DB 적용(N02)"
+   ],
+   [
+    "B10-6",
+    "시험용 DB 적용(N02)"
+   ]
+  ],
+  "new": [
+   "N02-1",
+   "N02-2",
+   "N02-3",
+   "N02-4",
+   "N02-5",
+   "N02-6",
+   "N02-7",
+   "N02-8",
+   "N02-9",
+   "N02-10",
+   "N02-11"
+  ],
+  "settled": "횡단보도는 지하(사용자 확정): B10 의 해석 D. 8fde6a04 는 그 횡단보도·통로, f99540e3 은 4~6칸 계단(129.7 → 130.5 m)",
+  "results": "docs/audit/n02/results.json",
+  "rerun": "b10.py --write-proposals 뒤에 n02.py --write-proposals"
  }
 }

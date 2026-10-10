@@ -422,7 +422,9 @@
     ],
     "zMode": "explicit",
     "densify": false
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "N01 적용. N02: 북쪽 끝 5.7 m 조각 거둠, 폭 14 m, 남쪽 버스 표지 앞에서 둘로 나눔"
   },
   {
    "id": "E09-P-LOW",
@@ -800,7 +802,9 @@
      "vehicleAccess": "restricted",
      "pedestrianAccess": "allowed"
     }
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "N01 적용. N02: 높이 S-MAP, 포장면까지 늘임, 폭 9 m(보행 유지)"
   },
   {
    "id": "E09-FIX-8e71c240",
@@ -815,7 +819,9 @@
      "vehicleAccess": "restricted",
      "pedestrianAccess": "allowed"
     }
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "N01 적용. N02: 서쪽 끝만 141.0 m(오르막 위 끝과 같은 노드). 나머지 141.73 은 그대로(S-MAP 144.0 → 147.2)"
   },
   {
    "id": "E09-B08-1",
@@ -835,8 +841,9 @@
     "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
     "expectedRevision": 2
    },
-   "status": "보류(B10)",
-   "b10Reason": "이 선의 평면·오름(126.8 → 131.1)은 12:18 걷기의 \"내려갔다가 올라 B1 로\" 구간과 겹친다. 횡단보도가 차도 높이면 이 선이 사용자가 말한 횡단보도·통로이고, 없앨 것이 아니라 보행 길로 고쳐야 한다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤"
+   "status": "거둠(N02): 8fde6a04 를 없애지 않고 지하 횡단보도·통로(보행)로 고침",
+   "b10Reason": "이 선의 평면·오름(126.8 → 131.1)은 12:18 걷기의 \"내려갔다가 올라 B1 로\" 구간과 겹친다. 횡단보도가 차도 높이면 이 선이 사용자가 말한 횡단보도·통로이고, 없앨 것이 아니라 보행 길로 고쳐야 한다. 횡단보도가 회차 공간 지상 면인지 그 아래 차도 높이인지 받은 뒤",
+   "statusBeforeN02": "보류(B10)"
   },
   {
    "id": "E09-B08-6",
@@ -858,7 +865,9 @@
      "widthM": 7.2
     }
    },
-   "supersedes": "E09-FIX-951c157d (보행 허용으로 고치기: 거둠)"
+   "supersedes": "E09-FIX-951c157d (보행 허용으로 고치기: 거둠)",
+   "statusBeforeN02": null,
+   "status": "N01 적용. N02: 아래 끝 126.82 → 128.5 m(추정)"
   },
   {
    "id": "E09-JOIN-N1",
@@ -872,7 +881,9 @@
      ],
      "z": 107.1
     }
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "쓸 수 없음(N01: 이미 이어짐으로 거부)"
   },
   {
    "id": "E09-JOIN-N2",
@@ -886,7 +897,9 @@
      ],
      "z": 121.06
     }
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "쓸 수 없음(N01)"
   },
   {
    "id": "E09-JOIN-N3",
@@ -900,7 +913,136 @@
      ],
      "z": 127.79
     }
-   }
+   },
+   "statusBeforeN02": null,
+   "status": "쓸 수 없음(N01)"
   }
- ]
+ ],
+ "n02": {
+  "date": "2026-10-11",
+  "appliedTo": "시험용 DB만",
+  "note": "차량 7구간은 N01 이 넣었다. N02 는 회차 공간 평탄부를 공간 영역(plaza)으로 두고 차도 V4 는 그 남쪽 가장자리에서 끝낸다. 951c157d 아래 끝 높이를 128.5 m 로 올렸다(추정)",
+  "roadMinusTerrainAfter": [
+   {
+    "id": "9713befb",
+    "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 94.49,
+    "minM": -12.3,
+    "medianM": -5.3,
+    "maxM": 1.39,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "951c157d",
+    "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 51.19,
+    "minM": -4.25,
+    "medianM": -3.6,
+    "maxM": -2.96,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "729bd2ad",
+    "name": "정문 진입로 (공도 분기 ~ 하단 주차장 차로 분기) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 27.55,
+    "minM": -2.31,
+    "medianM": 0.33,
+    "maxM": 0.54,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "a789c985",
+    "name": "지하주차장 통로 (추정)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 52.19,
+    "minM": -2.01,
+    "medianM": -1.98,
+    "maxM": -1.33,
+    "undergroundOrIndoor": true,
+    "over0_5": false
+   },
+   {
+    "id": "1b2219e1",
+    "name": "하단 주차장 차로 (정문 안쪽 서편, 표지판 \"P2\") (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 34.34,
+    "minM": -1.57,
+    "medianM": -0.12,
+    "maxM": 0.19,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "e934fcd3",
+    "name": "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 151.67,
+    "minM": -1.57,
+    "medianM": 0.0,
+    "maxM": 0.64,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "07615440",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 36.22,
+    "minM": -0.17,
+    "medianM": 0.0,
+    "maxM": 0.05,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "499ab1ab",
+    "name": "주 경사로 상부 = S06 (굽이 ~ 본관 남서 모서리 P1 분기) (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 60.47,
+    "minM": -0.15,
+    "medianM": 0.0,
+    "maxM": 1.02,
+    "undergroundOrIndoor": false,
+    "over0_5": true
+   },
+   {
+    "id": "67e234b5",
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "class": "vehicle",
+    "structure": "ordinary",
+    "lengthM": 9.07,
+    "minM": -0.03,
+    "medianM": 0.0,
+    "maxM": 0.22,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   },
+   {
+    "id": "192703b3",
+    "name": "P1 주차장 차로 (본관 남서 모서리, 표지판 \"P1\") (S-MAP 판독)",
+    "class": "vehicle",
+    "structure": "ramp",
+    "lengthM": 12.74,
+    "minM": 0.02,
+    "medianM": 0.05,
+    "maxM": 0.08,
+    "undergroundOrIndoor": false,
+    "over0_5": false
+   }
+  ]
+ }
 }

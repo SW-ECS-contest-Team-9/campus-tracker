@@ -1,0 +1,83 @@
+{
+ "id": "L2",
+ "title": "북악관 층 표기 (B10-2): 높이가 든 이름을 층 이름으로, 2번째(남은 것) 묶음 (전체 7)",
+ "ops": [
+  {
+   "ref": "ec2088ac 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "ec2088ac-3376-427f-8f19-b68842675430",
+    "expectedRevision": 4,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "f1d0ee7b 북악관_Z151.79_추정 -> 북악관_7F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "f1d0ee7b-4e05-4ef6-98e3-856780af9b64",
+    "expectedRevision": 5,
+    "attrs": {
+     "levelId": "북악관_7F_추정"
+    }
+   }
+  },
+  {
+   "ref": "769252fb 북악관_Z154.51_추정 -> 북악관_8F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_8F_추정"
+    }
+   }
+  },
+  {
+   "ref": "8aa3e856 북악관_Z154.51_추정 -> 북악관_8F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_8F_추정"
+    }
+   }
+  },
+  {
+   "ref": "9556d4b6 북악관_Z154.51_추정 -> 북악관_8F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_8F_추정"
+    }
+   }
+  },
+  {
+   "ref": "b6003357 북악관_Z154.51_추정 -> 북악관_8F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "b6003357-d22d-494c-b66c-600be0fdf83c",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_8F_추정"
+    }
+   }
+  },
+  {
+   "ref": "e518e939 북악관_Z154.51_추정 -> 북악관_8F_추정",
+   "op": "update_road",
+   "args": {
+    "id": "e518e939-8007-410f-a9ea-40066525647a",
+    "expectedRevision": 3,
+    "attrs": {
+     "levelId": "북악관_8F_추정"
+    }
+   }
+  }
+ ]
+}
