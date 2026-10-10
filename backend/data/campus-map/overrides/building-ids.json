@@ -1,0 +1,19 @@
+{
+  "about": "Corrections to the building ids that scripts/spatial-import.ts derives from building.shp (see src/modules/spatial/building-ids.ts). The footprints are unchanged. An existing database is renamed with scripts/building-ids-rename.ts.",
+  "ids": [
+    {
+      "feature": "building-1",
+      "from": "혜인관",
+      "id": "혜인관-중복도형",
+      "name": "혜인관",
+      "reason": "This 1,512 m2 polygon carries the name 혜인관 in the file, but it is a duplicate lying on the 혜인관 site (the scene source calls it 공연실습소 and the scene hides it); the user confirmed on 2026-10-10 that 공연실습소 is a separate building elsewhere. It must not hold the id of the real building."
+    },
+    {
+      "feature": "building-5",
+      "from": "건물5",
+      "id": "혜인관",
+      "name": "혜인관",
+      "reason": "The unnamed 1,933 m2 polygon is the real 혜인관 (register 42232; building metadata, the scene source and the university map all call it 혜인관). Roads and places inside it were stored under the placeholder id 건물5."
+    }
+  ]
+}

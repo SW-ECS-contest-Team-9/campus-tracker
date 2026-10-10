@@ -14,6 +14,8 @@
   지면과_같은_지붕(글): 그 부분의 지붕이 외곽선의 가장 높은 땅보다 낮아도 되는 이유(-> terrace). 없으면 지붕이 땅보다 높아야 한다. 종류가 지붕인 동의 한 덩어리에도 쓸 수 있다.
   모델_추가: {건물_id, 높이_출처, 층수: {값, 등급}, 대장_id, 근거}: 원천 파일과 캠퍼스 지도에 없는 건물을 새로 넣는다(-> added). 이름표는 노트의 이름.
     외곽과 지붕은 모델_반영 예인 부분 하나의 외곽.좌표·지붕_높이. 이때 모델_보정은 숨김(같은 이름의 잘못 놓인 원천 도형) 또는 없음이어야 한다.
+  모델_부분.덧붙임: {건물_id, 표지, 근거}: 원천 외곽 밖으로 나온 덩어리(저층부 등)를 그 동의 원천 도형과 따로 한 건물로 넣는다(-> added).
+    외곽.좌표·지붕_높이는 그 부분의 것, 높이_출처는 모델_보정의 것. 표지는 지도 이름표라 동 이름과 달라야 한다. 그 부분은 원천 도형의 보정(지붕·부분)에서 빠진다.
 """
 import argparse, json, pathlib, re, sys
 import yaml
@@ -87,20 +89,35 @@ def added_from_note(head, used):
             **({'registerId': str(a['대장_id'])} if a.get('대장_id') is not None else {}), 'polygon': rings, 'evidence': a['근거']}, problems
 
 
+def annex_from_part(head, p, problems):
+    """added entry of a part that states 모델_부분.덧붙임: a block outside the source footprint, drawn as its own building."""
+    a = (p.get('모델_부분') or {}).get('덧붙임'); n = len(problems)
+    if not isinstance(a, dict) or not a.get('건물_id'): problems.append(f"부분 '{p.get('이름')}': 덧붙임 은 {{건물_id, 표지, 근거}}"); return None
+    if not a.get('표지') or a.get('표지') == head.get('이름'): problems.append(f"부분 '{p.get('이름')}': 덧붙임.표지 는 동 이름과 다른 이름표여야 한다")
+    if bad_evidence(a.get('근거')): problems.append(f"부분 '{p.get('이름')}': 덧붙임.근거 에 source, collectedOn, level, independentSurvey 가 있어야 한다")
+    part_grades(p, problems)
+    rings = (p.get('외곽') or {}).get('좌표')
+    if not isinstance(rings, list) or not rings: problems.append(f"부분 '{p.get('이름')}': 외곽.좌표 가 있어야 한다(원천 외곽 밖의 덩어리)")
+    if len(problems) > n: return None
+    return {'id': str(a['건물_id']), 'name': a['표지'], 'roofM': p['지붕_높이']['값'], 'heightSource': (head.get('모델_보정') or {}).get('높이_출처'), 'polygon': rings, 'evidence': a['근거']}
+
+
 def entry_from_note(head):
-    """(section, entry, problems, added entry) for one note; section is 'buildings' | 'hidden' | 'parts' | None."""
+    """(section, entry, problems, added entries) for one note; section is 'buildings' | 'hidden' | 'parts' | None."""
     name = head.get('이름'); problems = []
     parts = head.get('부분') or []
-    used = []
+    used = []; annex = []
     for p in parts:
         try:
-            if in_model(p): used.append(p)
+            if in_model(p): (annex if (p.get('모델_부분') or {}).get('덧붙임') is not None else used).append(p)
         except ValueError as e:
             problems.append(str(e))
-    added = None
+    added = []
     if head.get('모델_추가') is not None:   # its part belongs to the added building, not to a source polygon
-        added, bad = added_from_note(head, used)
+        one, bad = added_from_note(head, used)
         problems += bad; used = []
+        if one: added.append(one)
+    added += [e for e in (annex_from_part(head, p, problems) for p in annex) if e]
     section, entry, problems = source_entry(head, used, problems)
     return section, entry, problems, added
 
@@ -156,7 +173,7 @@ def build(notes_dir):
         if bad: problems[path.stem] = bad
         else:
             if section: doc[section].append(entry)
-            if added: doc['added'].append(added)
+            doc['added'] += added
     for k in ('buildings', 'hidden', 'parts', 'added'): doc[k].sort(key=lambda e: e['name'])
     return doc, problems
 

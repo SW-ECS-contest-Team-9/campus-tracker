@@ -148,6 +148,25 @@ class Registry(unittest.TestCase):
         self.assertEqual(set(problems), set(bad))
         self.assertEqual(doc['added'], [])
 
+    def test_annex_outside_the_source_footprint_is_added_beside_the_roof_override(self):
+        annex = f"""  - 이름: 저층부
+    모델_반영: 예
+    모델_부분: {{덧붙임: {{건물_id: "추가-가관저층부", 표지: "가관 저층부", 근거: {EV}}}}}
+    외곽: {{좌표: {SQ(20)}, 등급: S-MAP}}
+    지붕_높이: {{값: 148.8, 등급: S-MAP}}
+---"""
+        note = ROOF.replace('---\n# 가관', annex + '\n# 가관', 1)
+        doc, problems = br.build(folder(가관=note))
+        self.assertEqual(problems, {})
+        self.assertEqual(doc['buildings'][0]['roofM'], 189.4)        # the source polygon keeps its one roof override
+        self.assertEqual(doc['added'], [{'id': '추가-가관저층부', 'name': '가관 저층부', 'roofM': 148.8, 'heightSource': 'SMAP_MESH',
+                                         'polygon': [[[20, 0], [30, 0], [30, 10], [20, 10], [20, 0]]], 'evidence': json.loads(EV)}])
+        bad = {'same_label': note.replace('표지: "가관 저층부"', '표지: "가관"'), 'est_roof': note.replace('지붕_높이: {값: 148.8, 등급: S-MAP}\n---', '지붕_높이: {값: 148.8, 등급: 추정}\n---'),
+               'no_evidence': note.replace(f', 근거: {EV}}}}}', '}}')}
+        doc, problems = br.build(folder(**bad))
+        self.assertEqual(set(problems), set(bad))
+        self.assertEqual(doc['added'], [])
+
     def test_low_grades_and_missing_fields_are_refused(self):
         bad = {
             'est': ROOF.replace('지붕_높이: {값: 189.4, 등급: S-MAP}', '지붕_높이: {값: 189.4, 등급: 추정}'),

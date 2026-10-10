@@ -138,8 +138,8 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.deepEqual(overrideHeights(slope, sh, 129.3, true), { heightM: 7.3, roofM: 129.3 }); // 129.3 - median 122
   assert.throws(() => overrideHeights(slope, sh, 121.9, true), /terrace roof 121.9 is not above the median ground 122/);
   assert.equal(sh.baseM, 107); // the base is still 1 m below the lowest ground
-  // the stored file: 유담관 uses the relaxed gates, 대일관 leaves the 상승관 strip undrawn; its tower keeps the building id and the ordinary gate
-  assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['대일관', '유담관']);
+  // the stored file: 유담관 uses the relaxed gates, 대일관 leaves the 상승관 strip undrawn, 청운관 its open porch (structure file); the 유담관 tower keeps the building id and the ordinary gate
+  assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['대일관', '유담관', '청운관']);
   const yudam = all.parts.find((o) => o.name === '유담관')!;
   assert.ok(yudam.uncovered && yudam.parts[0].terrace === undefined && yudam.parts.filter((p) => p.terrace !== undefined).length === 1);
 });
@@ -148,10 +148,10 @@ test('scene overrides: added buildings (not in the GeoPackage) carry their own o
   const dir = path.resolve(import.meta.dirname, '../data/scene');
   const all = parseSceneOverrides(JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8')));
   const names = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features.map((f) => f.properties.name);
-  // the stored file: three buildings; a GeoPackage name is reused only where that GeoPackage building is hidden
-  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-상승관', '상승관', 163.1, undefined, undefined], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
+  // the stored file: three buildings and the low podium strip of 문예관 (outside its footprint); a GeoPackage name is reused only where that GeoPackage building is hidden
+  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-문예관저층부', '문예관 저층부', 148.8, undefined, undefined], ['추가-상승관', '상승관', 163.1, undefined, undefined], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
   assert.ok(all.added.every((a) => !names.includes(a.id) && a.evidence.independentSurvey === false && (!names.includes(a.name) || all.hidden.some((h) => h.name === a.name))));
-  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 293, 311]);
+  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 61, 293, 311]);
   // same rules as any block: base 1 m below the lowest ground of the outline, height = stated roof - median ground
   const ground = [85.31, 86, 88.049, 90, 94.033];
   const h = blockHeights(ground, 0);

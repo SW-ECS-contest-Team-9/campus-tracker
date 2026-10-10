@@ -3,11 +3,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { pool, withTransaction } from '../src/config/database.js';
+import { parseBuildingIdFixes, resolveBuildingIds } from '../src/modules/spatial/building-ids.js';
 
 type Ring = [number, number][];
 type Polygon = Ring[];
 type Feature = { id: string; name: string | null; rings: Polygon };
 const sourceDir = path.resolve(import.meta.dirname, '../data/campus-map/source');
+const idFixesFile = path.resolve(import.meta.dirname, '../data/campus-map/overrides/building-ids.json'); // optional: ids the file gives the wrong footprint
 
 function parseShp(buffer: Buffer): Polygon[] {
   if (buffer.readInt32BE(0) !== 9994) throw new Error('Invalid shapefile header');
@@ -112,7 +114,10 @@ async function main() {
   const sourceHash = hash.digest('hex');
   const mapVersion = sourceHash.slice(0, 16);
   for (const feature of [...campus, ...buildings]) polygonWkt(feature.rings);
-  const summary = { mapVersion, sourceSha256: sourceHash, campusFeatures: campus.length, buildingFeatures: buildings.length, buildingNames: buildings.map((f) => f.name ?? '(이름 미등록)') };
+  const idFixes = await fs.readFile(idFixesFile, 'utf8').then((text) => parseBuildingIdFixes(JSON.parse(text)), (err) => { if (err.code === 'ENOENT') return []; throw err; });
+  const named = resolveBuildingIds(buildings, idFixes);
+  const summary = { mapVersion, sourceSha256: sourceHash, campusFeatures: campus.length, buildingFeatures: buildings.length, buildingNames: buildings.map((f) => f.name ?? '(이름 미등록)'),
+    buildingIds: named.map((f) => f.buildingId), buildingIdFixes: idFixes.map((f) => `${f.from} -> ${f.id}`) };
   if (process.argv.includes('--dry-run')) {
     console.log(JSON.stringify(summary, null, 2));
     return;
@@ -142,12 +147,8 @@ async function main() {
         [mapVersion, feature.id, polygonWkt(feature.rings)],
       );
     }
-    const ids = new Set<string>();
-    for (const feature of buildings) {
-      const normalized = feature.name?.replace(/\s+/g, '') ?? `건물${feature.id.split('-')[1]}`;
-      const buildingId = normalized.normalize('NFC');
-      if (ids.has(buildingId)) throw new Error(`Duplicate building name/ID: ${buildingId}`);
-      ids.add(buildingId);
+    for (const feature of named) {
+      const buildingId = feature.buildingId;
       const geom = polygonWkt(feature.rings);
       const { rows } = await db.query<{ valid: boolean; reason: string }>(
         `SELECT ST_IsValid(g) AS valid, ST_IsValidReason(g) AS reason FROM
@@ -157,7 +158,7 @@ async function main() {
       await db.query(
         `INSERT INTO campus_buildings (map_version_id, building_id, building_name, geom)
          VALUES ($1, $2, $3, ST_Multi(ST_SetSRID(ST_GeomFromText($4), 5186)))`,
-        [mapVersion, buildingId, feature.name, geom],
+        [mapVersion, buildingId, feature.buildingName, geom],
       );
     }
     const checks = await db.query<{ outsideCampus: number; overlaps: number }>(
