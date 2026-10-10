@@ -19,10 +19,10 @@
    ]
   },
   "Z03-BANK-S": {
-   "cells": 18,
+   "cells": 17,
    "old_minus_plane_m": [
     -10.33,
-    -7.73,
+    -7.43,
     -4.27
    ]
   },
@@ -51,35 +51,35 @@
    ]
   },
   "Z03-PLAZA": {
-   "cells": 253,
+   "cells": 255,
    "old_minus_plane_m": [
     -13.18,
-    -3.44,
+    -4.47,
     10.13
    ]
   }
  },
  "changed": {
   "cells": 614,
-  "in_platforms": 610,
-  "outside_platforms": 4,
+  "in_platforms": 611,
+  "outside_platforms": 3,
   "building_cells": 0,
   "min": -10.13,
   "max": 14.53
  },
  "plane_fit_max_abs_m": 0.0,
- "old_cells_off_plane_by_0.3m": 351,
+ "old_cells_off_plane_by_0.3m": 352,
  "new_cells_off_plane_by_0.3m": 0,
  "vs_smap_Z03-PLAZA": {
-  "points": 3423,
+  "points": 3465,
   "old": {
-   "median": -2.4,
-   "p90_abs": 8.32,
+   "median": -2.55,
+   "p90_abs": 8.46,
    "max_abs": 13.02
   },
   "new": {
    "median": 0.09,
-   "p90_abs": 0.42,
+   "p90_abs": 0.43,
    "max_abs": 10.0
   }
  },
