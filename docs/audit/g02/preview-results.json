@@ -1,0 +1,242 @@
+{
+ "changed": {
+  "cells": 561,
+  "in_zone": 556,
+  "outside_zone": 5,
+  "min": -2.7456207275390625,
+  "max": 5.644287109375,
+  "building_cells_changed": 0
+ },
+ "below_way_plane": {
+  "cells": 47,
+  "all_in_LANE": true,
+  "old_cells_below_plane_by_0.3": 224,
+  "old_max_below_m": 5.1959749475116155
+ },
+ "plane_fit_max_abs_m": 7.617912245905245e-06,
+ "ramp_vs_smap_old": {
+  "n": 1526,
+  "median": -0.05,
+  "p90_abs": 2.03,
+  "max_abs": 4.29
+ },
+ "ramp_vs_smap_new": {
+  "n": 1526,
+  "median": 0.04,
+  "p90_abs": 0.34,
+  "max_abs": 2.2
+ },
+ "platforms": {
+  "LANE": {
+   "smap_median": 132.64,
+   "smap_p5_p95": [
+    132.3,
+    132.92
+   ],
+   "old_median": 132.78,
+   "new_median": 132.5
+  },
+  "PODIUM": {
+   "smap_median": 138.68,
+   "smap_p5_p95": [
+    137.61,
+    139.05
+   ],
+   "old_median": 136.43,
+   "new_median": 138.8
+  },
+  "FORK": {
+   "smap_median": 143.94,
+   "smap_p5_p95": [
+    142.73,
+    144.81
+   ],
+   "old_median": 140.35,
+   "new_median": 144.2
+  },
+  "TOP": {
+   "smap_median": 145.56,
+   "smap_p5_p95": [
+    145.29,
+    146.01
+   ],
+   "old_median": 141.48,
+   "new_median": 145.5
+  }
+ },
+ "user_pins": [
+  {
+   "id": "U078",
+   "s": 107.6,
+   "t": 2.4,
+   "user": 148.5,
+   "old": 148.88,
+   "new": 147.87,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U079",
+   "s": 99.4,
+   "t": 2.6,
+   "user": 147.0,
+   "old": 142.82,
+   "new": 146.64,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U081",
+   "s": 92.9,
+   "t": 2.8,
+   "user": 145.6,
+   "old": 142.82,
+   "new": 145.56,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U084",
+   "s": 97.3,
+   "t": 11.8,
+   "user": 146.8,
+   "old": 141.79,
+   "new": 146.34,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U085",
+   "s": 93.0,
+   "t": 11.3,
+   "user": 145.6,
+   "old": 141.65,
+   "new": 145.57,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U086",
+   "s": 67.3,
+   "t": 3.4,
+   "user": 141.0,
+   "old": 140.94,
+   "new": 140.95,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U088",
+   "s": 81.3,
+   "t": 12.7,
+   "user": 145.4,
+   "old": 141.67,
+   "new": 145.5,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U089",
+   "s": 67.9,
+   "t": 12.4,
+   "user": 143.7,
+   "old": 140.8,
+   "new": 144.2,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U091",
+   "s": 42.4,
+   "t": 4.8,
+   "user": 136.8,
+   "old": 137.16,
+   "new": 137.23,
+   "xy_err_m": 1.5
+  },
+  {
+   "id": "U094",
+   "s": 44.5,
+   "t": 12.9,
+   "user": 138.8,
+   "old": 136.57,
+   "new": 138.8,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U095",
+   "s": 22.9,
+   "t": 3.0,
+   "user": 133.7,
+   "old": 134.18,
+   "new": 134.04,
+   "xy_err_m": 1.5
+  },
+  {
+   "id": "U096",
+   "s": 39.7,
+   "t": 14.1,
+   "user": 138.8,
+   "old": 135.45,
+   "new": 138.8,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U100",
+   "s": 29.1,
+   "t": 16.6,
+   "user": 132.3,
+   "old": 133.57,
+   "new": 132.5,
+   "xy_err_m": 3.0
+  },
+  {
+   "id": "U102",
+   "s": 23.9,
+   "t": 16.4,
+   "user": 132.5,
+   "old": 132.48,
+   "new": 132.5,
+   "xy_err_m": 3.0
+  }
+ ],
+ "underground_cover_m": {
+  "min": 3.48,
+  "max": 4.42,
+  "note": "지하 차도 바닥(시험용 DB 길 951c157d 높이, 추정)에서 새 지표까지"
+ },
+ "building_outline_terrain": {
+  "한림관": {
+   "old_min": 136.63,
+   "new_min": 136.63,
+   "old_max": 143.81,
+   "new_max": 143.81,
+   "max_drop": 0.0,
+   "max_rise": 0.18
+  },
+  "북악관": {
+   "old_min": 129.94,
+   "new_min": 129.94,
+   "old_max": 134.93,
+   "new_max": 137.64,
+   "max_drop": 0.73,
+   "max_rise": 2.85
+  },
+  "대일관": {
+   "old_min": 139.86,
+   "new_min": 139.86,
+   "old_max": 151.81,
+   "new_max": 151.81,
+   "max_drop": 0.0,
+   "max_rise": 4.18
+  },
+  "본관": {
+   "old_min": 127.12,
+   "new_min": 127.12,
+   "old_max": 140.45,
+   "new_max": 140.58,
+   "max_drop": 0.96,
+   "max_rise": 0.58
+  },
+  "문예관": {
+   "old_min": 131.01,
+   "new_min": 131.01,
+   "old_max": 140.83,
+   "new_max": 142.22,
+   "max_drop": 1.68,
+   "max_rise": 2.77
+  }
+ }
+}

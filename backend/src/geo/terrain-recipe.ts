@@ -1,5 +1,6 @@
 // A terrain recipe stacks the existing terrain edits on ONE base version, in order, into one derived candidate:
-//   local-samples (pull towards ground samples) -> plateau (flatten polygons) -> corridor (burn road profiles in).
+//   local-samples (pull towards ground samples) -> plateau (flatten polygons) -> corridor (burn road profiles in)
+//   -> surface (base planes of built ground: platforms and ramps with hard edges).
 // Each step works on the result of the previous one. The candidate id depends only on the base id, the recipe and
 // the content of its input files (and the building footprints when they are protected), so the same recipe on the
 // same base gives the same id on every machine. Pure: files and the database are read by scripts/terrain-recipe.ts.
@@ -8,6 +9,7 @@ import type { Grid } from './dem.js';
 import { burnCorridors, polygonsMask, CORRIDOR_DEFAULTS, type CorridorLine } from './terrain-corridor.js';
 import { applyLocalSamples, changeStats, mergeLocalSampleInputs, parseLocalSamples, LOCAL_SAMPLE_DEFAULTS } from './terrain-local-samples.js';
 import { applyPlateau } from './terrain-plateau.js';
+import { applySurface, parseSurface } from './terrain-surface.js';
 
 export const RECIPE_ALGORITHM = 'terrain-recipe-v1';
 /** Plateau edge used by recipes: 3 m flat margin (> the 2.83 m diagonal of the 2 m grid), then a 4 m fade. */
@@ -23,7 +25,9 @@ interface MaskRefs {
 export type RecipeStep =
   | { type: 'local-samples'; files: string[]; areas?: string[] }
   | ({ type: 'plateau'; file: string; marginM?: number; blendM?: number } & MaskRefs)
-  | ({ type: 'corridor'; file: string; lines?: string[]; shoulderM?: number; blendM?: number } & MaskRefs);
+  | ({ type: 'corridor'; file: string; lines?: string[]; shoulderM?: number; blendM?: number } & MaskRefs)
+  /** Base planes (terrain-surface.ts). Hard edges; building cells are kept when protectBuildings is set. */
+  | { type: 'surface'; file: string };
 export interface Recipe {
   crs: 'EPSG:5186';
   reason: string;
@@ -45,6 +49,7 @@ export function parseRecipe(input: any): Recipe {
     const ok = s?.type === 'local-samples' ? Array.isArray(s.files) && s.files.length > 0 && s.files.every(isFile) && (s.areas === undefined || (Array.isArray(s.areas) && s.areas.every(isFile)))
       : s?.type === 'plateau' ? isFile(s.file) && isNum(s.marginM) && isNum(s.blendM) && masksOk
       : s?.type === 'corridor' ? isFile(s.file) && isNum(s.shoulderM) && isNum(s.blendM) && masksOk && (s.lines === undefined || (Array.isArray(s.lines) && s.lines.length > 0 && s.lines.every(isFile)))
+      : s?.type === 'surface' ? isFile(s.file) && s.keep === undefined && s.noBlend === undefined
       : false;
     if (!ok) throw new Error(`Invalid recipe step ${k + 1}`);
   });
@@ -53,7 +58,7 @@ export function parseRecipe(input: any): Recipe {
 
 /** Every file a recipe reads, in order of first use. */
 export function recipeFiles(recipe: Recipe): string[] {
-  const files = recipe.steps.flatMap((s) => [...(s.type === 'local-samples' ? s.files : [s.file, s.keep, s.noBlend])]);
+  const files = recipe.steps.flatMap((s) => [...(s.type === 'local-samples' ? s.files : s.type === 'surface' ? [s.file] : [s.file, s.keep, s.noBlend])]);
   return [...new Set(files.filter((f): f is string => !!f))];
 }
 
@@ -117,6 +122,10 @@ export function applyRecipe(
       const polygons = parsePolygons(need(step.file), true);
       for (const p of polygons) heights = applyPlateau(grid, heights, p.rings, p.heightM, { ...edge, ...m });
       detail = { ...edge, polygons: polygons.map((p) => ({ name: p.name, heightM: p.heightM })) };
+    } else if (step.type === 'surface') {
+      const patches = parseSurface(need(step.file));
+      heights = applySurface(grid, heights, patches, buildingMask ?? undefined);
+      detail = { patches: patches.map((p) => ({ name: p.name, heightM: p.heightM ?? null, profile: p.profile?.points ?? null })) };
     } else {
       const opts = { shoulderM: step.shoulderM ?? CORRIDOR_DEFAULTS.shoulderM, blendM: step.blendM ?? CORRIDOR_DEFAULTS.blendM };
       const lines = parseCorridors(need(step.file), step.lines);

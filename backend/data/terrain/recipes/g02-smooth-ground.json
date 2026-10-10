@@ -1,0 +1,45 @@
+{
+ "crs": "EPSG:5186",
+ "protectBuildings": true,
+ "reason": "G02: F05 조리법에서 오르막 보행로 띠 새김(UPHILL, 아래 67 m·폭 9 m)을 빼고, 내리막길 전체(110 m)를 기본 평면으로 넣음: 경사면 하나(평면 조각 4개)와 평탄면 넷(북악관 동쪽 마당 132.5, 문예관 기단 138.8, 갈림 지점 144.2, 대일관 서쪽 끝 앞 145.5 m). 평면끼리는 번짐 없이 벽면으로 만난다. 계단·화단·옹벽은 지형이 아니라 구조물 파일(docs/audit/g02/structures-g02.geojson)이 싣는다.",
+ "steps": [
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_5186.json",
+    "../samples/smap_samples_roads_5186.json",
+    "../samples/smap_samples_roadprofile_5186.json"
+   ],
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ]
+  },
+  {
+   "type": "plateau",
+   "file": "f05-plateaus.geojson",
+   "noBlend": "f05-no-blend.geojson"
+  },
+  {
+   "type": "corridor",
+   "file": "t06-road-corridors.json",
+   "lines": [
+    "V1",
+    "V2",
+    "V3",
+    "V4a",
+    "V4b",
+    "P-LOW",
+    "P-UP"
+   ],
+   "keep": "f05-plateaus.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "g02-surface.geojson"
+  }
+ ]
+}
