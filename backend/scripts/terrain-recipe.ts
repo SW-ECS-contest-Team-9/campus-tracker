@@ -2,17 +2,16 @@
  * Preview by default; --save stores an INACTIVE candidate. Never changes buildings or roads.
  * Usage: npx tsx scripts/terrain-recipe.ts BASE_VERSION recipe.json [--save]
  * File paths in the recipe are relative to the recipe file. See src/geo/terrain-recipe.ts for the format and
- * data/terrain/recipes/ for recipes. The id depends on the base id, the recipe and its input contents (and, with
- * protectBuildings, the footprints of the active campus map). Activate a saved candidate with scripts/terrain-versions.ts.
+ * data/terrain/recipes/ for recipes. The id depends on the base id, the recipe, the default settings and its input contents
+ * (and, with protectBuildings, the footprints of the active campus map). Activate a saved candidate with scripts/terrain-versions.ts.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { pool } from '../src/config/database.js';
 import { terrain } from '../src/geo/terrain.js';
-import { CORRIDOR_DEFAULTS } from '../src/geo/terrain-corridor.js';
-import { changeStats, LOCAL_SAMPLE_DEFAULTS } from '../src/geo/terrain-local-samples.js';
-import { applyRecipe, parseRecipe, recipeFiles, recipeId, recipeInputHashes, PLATEAU_EDGE_DEFAULTS, RECIPE_ALGORITHM } from '../src/geo/terrain-recipe.js';
+import { changeStats } from '../src/geo/terrain-local-samples.js';
+import { applyRecipe, parseRecipe, recipeFiles, recipeId, recipeInputHashes, RECIPE_ALGORITHM, RECIPE_DEFAULTS } from '../src/geo/terrain-recipe.js';
 
 const readJson = (f: string) => JSON.parse(fs.readFileSync(f, 'utf8').replace(/^﻿/, ''));
 
@@ -42,7 +41,7 @@ async function main() {
     const id = recipeId(baseVersion, recipe, inputs, buildings);
     const sha = createHash('sha256').update(id).update(Buffer.from(heights.buffer)).digest('hex');
     const metadata = { baseVersion, correction: { reason: recipe.reason.trim(), recipe, inputSha256: recipeInputHashes(recipe, inputs, buildings) },
-      algorithm: RECIPE_ALGORITHM, options: { localSamples: LOCAL_SAMPLE_DEFAULTS, corridor: CORRIDOR_DEFAULTS, plateauEdge: PLATEAU_EDGE_DEFAULTS },
+      algorithm: RECIPE_ALGORITHM, options: RECIPE_DEFAULTS,
       steps, ...stats, status: 'DRAFT',
       uncertainty: 'Sigma inherited from base; heights are S-MAP values and user-confirmed floor levels, not an independent survey; not field validated.',
       qa: { requiresBoundaryAndConnectionReview: true } };

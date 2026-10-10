@@ -3,13 +3,15 @@ import { rasterizePolygon, type Grid } from './dem.js';
 /** A road centreline with its height profile: [x, y, z] in EPSG:5186 / metres, dense enough that z is linear between points. */
 export interface CorridorLine { name: string; halfWidthM: number; points: [number, number, number][] }
 export interface CorridorOptions {
-  /** Flat strip added on each side of the carriageway. One cell diagonal or more keeps bilinear samples on the carriageway on burned cells only. */
+  /** Flat strip added on each side of the carriageway (kerb, gutter, pavement at road level). */
   shoulderM: number;
   /** Outside the flat strip the burned height fades into the existing terrain over this distance (smoothstep). 0 = hard edge. */
   blendM: number;
 }
-/** The one place for the corridor settings. 3 m shoulder > the 2.83 m diagonal of the 2 m campus grid. */
-export const CORRIDOR_DEFAULTS: CorridorOptions = { shoulderM: 3, blendM: 4 };
+/** The one place for the corridor settings. Shoulder = one cell of the 2 m campus grid: carriageway + 2 x 2 m matches the flat band
+ * measured on the S-MAP mesh along the main road (V02: 10.5-13 m for a 7 m carriageway). A wider shoulder cut up to 15 m into the
+ * retaining walls beside the road and did not bring the ground any closer to the road profile (T06). */
+export const CORRIDOR_DEFAULTS: CorridorOptions = { shoulderM: 2, blendM: 4 };
 
 /** Cells a step must leave alone. keep = never changed (building footprints, earlier plateaus);
  * noBlend = no fade there (a known wall or bank: the step stays at the edge of the flat part instead of being smeared). */

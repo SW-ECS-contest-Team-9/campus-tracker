@@ -6,7 +6,7 @@
 import { createHash } from 'node:crypto';
 import type { Grid } from './dem.js';
 import { burnCorridors, polygonsMask, CORRIDOR_DEFAULTS, type CorridorLine } from './terrain-corridor.js';
-import { applyLocalSamples, changeStats, mergeLocalSampleInputs, parseLocalSamples } from './terrain-local-samples.js';
+import { applyLocalSamples, changeStats, mergeLocalSampleInputs, parseLocalSamples, LOCAL_SAMPLE_DEFAULTS } from './terrain-local-samples.js';
 import { applyPlateau } from './terrain-plateau.js';
 
 export const RECIPE_ALGORITHM = 'terrain-recipe-v1';
@@ -140,7 +140,10 @@ export function recipeInputHashes(recipe: Recipe, inputs: Record<string, unknown
   };
 }
 
-/** Deterministic candidate id: base version + recipe + input contents (+ protected footprints). */
+/** Settings a step uses when the recipe does not state them. Part of the id: changing a default gives new ids. */
+export const RECIPE_DEFAULTS = { localSamples: LOCAL_SAMPLE_DEFAULTS, plateauEdge: PLATEAU_EDGE_DEFAULTS, corridor: CORRIDOR_DEFAULTS };
+
+/** Deterministic candidate id: base version + recipe + default settings + input contents (+ protected footprints). */
 export function recipeId(baseVersion: string, recipe: Recipe, inputs: Record<string, unknown>, buildings: Polygons = []): string {
-  return `recipe-${sha({ algorithm: RECIPE_ALGORITHM, baseVersion, recipe, inputs: recipeInputHashes(recipe, inputs, buildings) }).slice(0, 16)}`;
+  return `recipe-${sha({ algorithm: RECIPE_ALGORITHM, baseVersion, recipe, defaults: RECIPE_DEFAULTS, inputs: recipeInputHashes(recipe, inputs, buildings) }).slice(0, 16)}`;
 }
