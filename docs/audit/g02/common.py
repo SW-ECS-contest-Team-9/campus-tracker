@@ -48,5 +48,5 @@ class Mesh:
         return out
 
 # 길의 기본 경사면(가운데 경사로의 S-MAP 높이에 맞춘 평면 조각 3개, 폭 방향으로 평평). s -> z
-WAY_PROFILE = [(-6.8, 130.6), (20.0, 133.75), (55.0, 138.95), (112.9, 148.9)]
+WAY_PROFILE = [(0.0, 130.6), (20.0, 133.75), (55.0, 138.95), (100.0, 146.68), (110.0, 148.9)]
 def way_z(s): return np.interp(s, [p[0] for p in WAY_PROFILE], [p[1] for p in WAY_PROFILE])

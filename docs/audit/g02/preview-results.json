@@ -1,17 +1,17 @@
 {
  "changed": {
-  "cells": 561,
-  "in_zone": 556,
+  "cells": 559,
+  "in_zone": 554,
   "outside_zone": 5,
   "min": -2.7456207275390625,
   "max": 5.644287109375,
   "building_cells_changed": 0
  },
  "below_way_plane": {
-  "cells": 47,
+  "cells": 42,
   "all_in_LANE": true,
-  "old_cells_below_plane_by_0.3": 224,
-  "old_max_below_m": 5.1959749475116155
+  "old_cells_below_plane_by_0.3": 191,
+  "old_max_below_m": 5.262946761229642
  },
  "plane_fit_max_abs_m": 7.617912245905245e-06,
  "ramp_vs_smap_old": {
@@ -23,7 +23,7 @@
  "ramp_vs_smap_new": {
   "n": 1526,
   "median": 0.04,
-  "p90_abs": 0.34,
+  "p90_abs": 0.6,
   "max_abs": 2.2
  },
  "platforms": {
@@ -71,7 +71,7 @@
    "t": 2.4,
    "user": 148.5,
    "old": 148.88,
-   "new": 147.87,
+   "new": 148.21,
    "xy_err_m": 3.0
   },
   {
