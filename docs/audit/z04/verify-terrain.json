@@ -1,0 +1,187 @@
+{
+ "new": "terrain-recipe-a334b116df79c91e.f32",
+ "old": "terrain-recipe-795e6fbc2c056089.f32",
+ "changed": {
+  "cells": 5492,
+  "in_z04_platforms": 5419,
+  "outside": 73,
+  "building_cells": 0,
+  "min": -28.6,
+  "max": 30.83
+ },
+ "plane_fit_max_abs_m": 2.6,
+ "platform_cells": 5435,
+ "old_cells_off_plane_by_0.3m": 4366,
+ "new_cells_off_plane_by_0.3m": 3,
+ "vs_smap_1m_by_zone": {
+  "BACK": {
+   "mesh_points": 5096,
+   "old": {
+    "median": -4.06,
+    "p90_abs": 7.9
+   },
+   "new": {
+    "median": 0.01,
+    "p90_abs": 1.17
+   }
+  },
+  "CHEONGUN": {
+   "mesh_points": 702,
+   "old": {
+    "median": 1.5,
+    "p90_abs": 1.84
+   },
+   "new": {
+    "median": 0.01,
+    "p90_abs": 0.31
+   }
+  },
+  "EUNJU": {
+   "mesh_points": 1624,
+   "old": {
+    "median": 1.11,
+    "p90_abs": 10.01
+   },
+   "new": {
+    "median": 0.05,
+    "p90_abs": 3.65
+   }
+  },
+  "GATE": {
+   "mesh_points": 3245,
+   "old": {
+    "median": -0.03,
+    "p90_abs": 6.72
+   },
+   "new": {
+    "median": 0.04,
+    "p90_abs": 3.27
+   }
+  },
+  "HYEIN": {
+   "mesh_points": 936,
+   "old": {
+    "median": -0.7,
+    "p90_abs": 5.37
+   },
+   "new": {
+    "median": -0.01,
+    "p90_abs": 0.66
+   }
+  },
+  "TURN": {
+   "mesh_points": 2861,
+   "old": {
+    "median": -0.11,
+    "p90_abs": 1.24
+   },
+   "new": {
+    "median": 0.04,
+    "p90_abs": 0.4
+   }
+  },
+  "UPPER": {
+   "mesh_points": 2781,
+   "old": {
+    "median": 4.85,
+    "p90_abs": 11.55
+   },
+   "new": {
+    "median": 0.08,
+    "p90_abs": 1.98
+   }
+  },
+  "WEST": {
+   "mesh_points": 1288,
+   "old": {
+    "median": 0.88,
+    "p90_abs": 7.04
+   },
+   "new": {
+    "median": -0.01,
+    "p90_abs": 7.24
+   }
+  },
+  "YUDAM9": {
+   "mesh_points": 2478,
+   "old": {
+    "median": -0.03,
+    "p90_abs": 5.06
+   },
+   "new": {
+    "median": 0.01,
+    "p90_abs": 3.8
+   }
+  }
+ },
+ "vs_smap_1m_all": {
+  "points": 21011,
+  "old_p50_abs": 1.94,
+  "old_p90_abs": 8.07,
+  "new_p50_abs": 0.19,
+  "new_p90_abs": 1.84
+ },
+ "g02_foot_0_10m": {
+  "old": {
+   "min": -1.1,
+   "median": -0.58,
+   "max": -0.24
+  },
+  "new": {
+   "min": -0.6,
+   "median": -0.17,
+   "max": 0.06
+  }
+ },
+ "user_pins": {
+  "n": 56,
+  "old_max_abs": 11.77,
+  "new_max_abs": 19.89,
+  "old_p90_abs": 9.86,
+  "new_p90_abs": 1.72,
+  "new_over_1m": [
+   {
+    "id": "U013",
+    "user_m": 105.9,
+    "old": 105.79,
+    "new": 111.0
+   },
+   {
+    "id": "U016",
+    "user_m": 106.4,
+    "old": 99.62,
+    "new": 111.0
+   },
+   {
+    "id": "U037",
+    "user_m": 114.1,
+    "old": 104.12,
+    "new": 94.21
+   },
+   {
+    "id": "U043",
+    "user_m": 130.2,
+    "old": 141.97,
+    "new": 128.5
+   },
+   {
+    "id": "U054",
+    "user_m": 127.7,
+    "old": 129.09,
+    "new": 129.8
+   },
+   {
+    "id": "U063",
+    "user_m": 125.1,
+    "old": 136.75,
+    "new": 126.84
+   },
+   {
+    "id": "U082",
+    "user_m": 142.9,
+    "old": 142.15,
+    "new": 135.3
+   }
+  ]
+ }
+}

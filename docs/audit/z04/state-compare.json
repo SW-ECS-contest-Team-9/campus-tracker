@@ -1,0 +1,61 @@
+{
+ "z03": {
+  "pairs": 4,
+  "reachableFlips": [],
+  "lengthChanges": []
+ },
+ "n02": {
+  "pairs": 33,
+  "reachableFlips": [],
+  "lengthChanges": []
+ },
+ "z02": {
+  "pairs": 6,
+  "reachableFlips": [],
+  "lengthChanges": []
+ },
+ "validation": {
+  "before": {
+   "total": 190,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 2,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 41,
+    "ISOLATED_COMPONENT": 5,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 45,
+    "info": 145
+   }
+  },
+  "after": {
+   "total": 181,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 2,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 32,
+    "ISOLATED_COMPONENT": 5,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 36,
+    "info": 145
+   }
+  }
+ },
+ "counts": {
+  "before": {
+   "roads": 167,
+   "nodes": 156,
+   "places": 10,
+   "totalLengthM": 2539.8
+  },
+  "after": {
+   "roads": 167,
+   "nodes": 156,
+   "places": 10,
+   "totalLengthM": 2539.8
+  }
+ }
+}

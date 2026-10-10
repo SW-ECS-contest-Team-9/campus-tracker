@@ -86,3 +86,22 @@ for z in ZONES:
     T = [s for s in summary[z] if not isinstance(s['top'], list)]; print(z, 'platforms', len(feats[z]), 'boxes', len(BOX[z]), 'area', round(sum(s['area'] for s in summary[z])), 'flat heights', sorted({s['top'] for s in T})[:40])
 print('plaza', PLAZA_PROF, 'slope %', round(pl_slope, 2), 'res', round(pl_res, 2), 'way foot', prof_z(PLAZA_PROF, 201044.0, 557350.0), 'bukak stair foot', prof_z(PLAZA_PROF, 201041.7, 557360.5))
 print('coverage m2', round(inside.area), round(inside.intersection(cov).area), 'surfaces', len(surf))
+# ---------- 길 높이 맞춤(시험용 DB 편집 묶음 A: 노드 옮기기). 자기 높이를 가진 바깥 길 가운데 새 기단 위에 놓인 것 ----------
+RELEVEL = {'3a5e6480': '본관 입구(2) 문 앞(포장면)', '558c81e6': '회차 공간 야외 접근(옛 기압 높이)', 'dc64985c': '회차 공간 야외 접근', 'fc50ca50': '회차 공간 ~ 유담관 9층 쪽 야외 접근', '7ca95923': 'GS25 문 앞', 'db3fe999': '북악관 서쪽 옆길(북)', 'ddb8a8f8': '북악관 서쪽 옆길(남)',
+           'd8ae25f8': '대일관 측면 하부 평탄 접근부', '1d10b963': '대일관 측면 계단(실재 모름)', '64c08202': '대일관 측면 계단참', 'a714275b': '대일관 측면 짧은 계단', '9c73ebe5': '대일관 측면 상부 연결부', '1f32cde9': '대일관 1층 높이 접근 통로', 'a03d33c3': '뒤편 산책로'}
+EXTRA_NODES = {'8f8c716f': 0, 'e996a8f7': 0}   # 북악관 정문 계단 발치, 본관 모서리 앞 계단 위 끝(둘 다 포장면 위의 첫 꼭짓점)
+RB = roads_before(); byshort = {r['id'][:8]: r for r in RB}
+indoor_nodes = {n for r in RB if r.get('buildingId') and r['id'][:8] not in EXTRA_NODES for n in (r['fromNodeId'], r['toNodeId'])}
+moves = {}
+def want(node, xyz, why):
+    if node in indoor_nodes or node in moves: return
+    z = ground(xyz[0], xyz[1])
+    if z is None or abs(z - xyz[2]) < 0.05: return
+    moves[node] = {'ref': f'Z04 노드 높이 {xyz[2]:.2f} -> {z:.2f} m ({why})', 'op': 'move_node', 'args': {'nodeId': node, 'to': {'xy': [xyz[0], xyz[1]], 'z': r2(z)}}}
+for k, why in RELEVEL.items():
+    r = byshort[k]; c = r['coordinates']; want(r['fromNodeId'], c[0], why); want(r['toNodeId'], c[-1], why)
+for k, end in EXTRA_NODES.items():
+    r = byshort[k]; c = r['coordinates']; want(r['fromNodeId'] if end == 0 else r['toNodeId'], c[0] if end == 0 else c[-1], r['name'][:20])
+(Z04 / 'group-A.json').write_text(json.dumps({'id': 'Z04-A', 'comment': 'Z04 새 기단 위에 놓인 바깥 길의 끝 노드를 기단 윗면 높이로(실내 길과 닿는 노드는 그대로)', 'ops': list(moves.values())}, ensure_ascii=False, indent=1), encoding='utf-8')
+(HERE / 'relevel.json').write_text(json.dumps({'drape': RELEVEL, 'nodeMoves': len(moves)}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
+print('node moves', len(moves))
