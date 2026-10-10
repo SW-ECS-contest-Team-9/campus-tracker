@@ -65,6 +65,11 @@ test('roof overrides: stored file carries provenance and names buildings of the 
   assert.equal('floors' in parseRoofOverrides({ buildings: [entry] })[0], false); // no stated floor count: nothing is made up
   assert.equal(parseRoofOverrides({ buildings: [{ ...entry, floors: 15 }] })[0].floors, 15);
   assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, floors: 3.5 }] }), /floors/);
+  // "terrace" on a whole building: a roof deck level with the upper ground of a slope is checked against the median ground only
+  assert.equal('terrace' in parseRoofOverrides({ buildings: [entry] })[0], false);
+  assert.equal(parseRoofOverrides({ buildings: [{ ...entry, terrace: 'deck' }] })[0].terrace, 'deck');
+  assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, terrace: ' ' }] }), /terrace/);
+  assert.deepEqual(overrides.filter((o) => o.terrace !== undefined).map((o) => [o.name, o.roofM]), [['수인관', 132.1]]); // the stored file: only the roof deck of 수인관
 });
 
 test('scene version id: unchanged without roof overrides (the live id), different with them', () => {

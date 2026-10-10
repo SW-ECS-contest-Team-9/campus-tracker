@@ -13,6 +13,8 @@ export interface RoofOverride {
   roofM: number;         // roof elevation, orthometric (Incheon MSL)
   heightSource: string;  // stored in scene_buildings.height_source (VARCHAR(16)); not REGISTER / ESTIMATE
   floors?: number;       // stated floor count (scene_buildings.ground_floors); without it an assumed GeoPackage count is not carried over
+  /** Why the roof may lie below the highest ground on the outline (a roof deck level with the upper ground of a slope). Without it the roof must clear all of the ground. */
+  terrace?: string;
   evidence: Evidence;
 }
 export interface HiddenBuilding { name: string; reason: string; evidence: Evidence }
@@ -57,8 +59,9 @@ export function parseRoofOverrides(doc: unknown): RoofOverride[] {
     if (!Number.isFinite(o.roofM)) throw new Error(`${at} ${o.name}: roofM must be a number`);
     if (badSource(o.heightSource)) throw new Error(`${at} ${o.name}: heightSource must be its own label (A-Z_, at most 16 characters)`);
     if (badFloors(o.floors)) throw new Error(`${at} ${o.name}: floors must be a positive whole number`);
+    if (badReason(o.terrace)) throw new Error(`${at} ${o.name}: terrace must say why the roof may lie below the higher ground`);
     if (badEvidence(o.evidence)) throw new Error(`${at} ${o.name}: evidence needs source, collectedOn, level and independentSurvey`);
-    return { name: o.name, roofM: o.roofM, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), evidence: o.evidence };
+    return { name: o.name, roofM: o.roofM, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), ...(o.terrace === undefined ? {} : { terrace: o.terrace }), evidence: o.evidence };
   });
 }
 

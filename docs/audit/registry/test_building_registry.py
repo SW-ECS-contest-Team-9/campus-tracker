@@ -95,6 +95,9 @@ class Registry(unittest.TestCase):
         p = doc['parts'][0]
         self.assertEqual(p['uncovered'], '맨땅')
         self.assertEqual([q.get('terrace') for q in p['parts']], [None, '윗길과 같은 높이의 데크'])
+        roof, problems = br.build(folder(가관=ROOF.replace('외곽: {값: "원천 외곽 그대로", 등급: 원천}', '모델_부분: {지면과_같은_지붕: "윗땅과 같은 높이의 옥상"}\n    외곽: {값: "원천 외곽 그대로", 등급: 원천}')))
+        self.assertEqual((problems, roof['buildings'][0].get('terrace')), ({}, '윗땅과 같은 높이의 옥상'))   # a whole-building roof may say it too
+        self.assertNotIn('terrace', br.build(folder(가관=ROOF))[0]['buildings'][0])
         plain, _ = br.build(folder(나관=PARTS))
         self.assertNotIn('uncovered', plain['parts'][0])
         self.assertTrue(all('terrace' not in q for q in plain['parts'][0]['parts']))

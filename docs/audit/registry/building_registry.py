@@ -11,7 +11,7 @@
   모델_보정: {종류: 지붕|부분|숨김|없음, 원천_이름, 높이_출처, 층수: {값, 등급}, 사유, 등급, 덮지_않는_곳, 근거: {source, collectedOn, level, independentSurvey, ...}}
   부분[]: 모델_반영: "예" | "아니오 (이유)", 모델_부분: {id, 표지, 지면과_같은_지붕}, 외곽: {좌표: [고리, ...], 등급}, 지붕_높이: {값, 등급}
   덮지_않는_곳(글): 부분들이 원천 외곽을 다 덮지 않을 때 나머지가 무엇인지(-> uncovered). 없으면 빈틈없이 덮어야 한다.
-  지면과_같은_지붕(글): 그 부분의 지붕이 외곽선의 가장 높은 땅보다 낮아도 되는 이유(-> terrace). 없으면 지붕이 땅보다 높아야 한다.
+  지면과_같은_지붕(글): 그 부분의 지붕이 외곽선의 가장 높은 땅보다 낮아도 되는 이유(-> terrace). 없으면 지붕이 땅보다 높아야 한다. 종류가 지붕인 동의 한 덩어리에도 쓸 수 있다.
   모델_추가: {건물_id, 높이_출처, 층수: {값, 등급}, 대장_id, 근거}: 원천 파일과 캠퍼스 지도에 없는 건물을 새로 넣는다(-> added). 이름표는 노트의 이름.
     외곽과 지붕은 모델_반영 예인 부분 하나의 외곽.좌표·지붕_높이. 이때 모델_보정은 숨김(같은 이름의 잘못 놓인 원천 도형) 또는 없음이어야 한다.
 """
@@ -128,7 +128,8 @@ def source_entry(head, used, problems):
     if problems: return None, None, problems
     if kind == '지붕':
         if len(used) != 1: return None, None, [f'지붕 보정은 모델_반영 예인 부분이 하나여야 한다({len(used)}개)']
-        return 'buildings', {'name': src, 'roofM': used[0]['지붕_높이']['값'], 'heightSource': m.get('높이_출처'), **floors, 'evidence': ev}, problems
+        terrace = (used[0].get('모델_부분') or {}).get('지면과_같은_지붕')
+        return 'buildings', {'name': src, 'roofM': used[0]['지붕_높이']['값'], 'heightSource': m.get('높이_출처'), **floors, **({'terrace': terrace} if terrace else {}), 'evidence': ev}, problems
     out = []
     for p in used:
         mp = p.get('모델_부분') or {}

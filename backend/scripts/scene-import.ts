@@ -11,6 +11,7 @@
  * - Roof overrides (data/scene/overrides/building-roofs.json): a listed building takes the given roof elevation and
  *   height source instead of the GeoPackage height; the base is unchanged. They give the scene another version id.
  *   An override may state the floor count ("floors"); without it only a register count is kept (an assumed one is dropped).
+ *   One that states "terrace" may have its roof below the highest ground on the outline (above the median), like a terrace part.
  *   The same file can leave a GeoPackage building out of the scene ("hidden") or draw one footprint as several blocks
  *   with their own roofs ("parts": polygons that tile the footprint; the first part keeps the building id, the others
  *   get <id>#<part id>). A split that states "uncovered" may leave part of the footprint undrawn (parts inside it, no
@@ -101,16 +102,16 @@ async function main() {
     const o = overrides.find((x) => x.name === p.name);
     if (o) {
       try {
-        ({ heightM, roofM } = overrideHeights(samples as number[], h, o.roofM));
+        ({ heightM, roofM } = overrideHeights(samples as number[], h, o.roofM, o.terrace !== undefined));
       } catch (err) {
         problems.push(`${p.name}: ${(err as Error).message}`);
       }
     }
     if (!(baseM < h.terrainMinM)) problems.push(`${p.name}: base ${baseM} not below the ground ${h.terrainMinM}`);
-    if (!(roofM > h.terrainMaxM)) problems.push(`${p.name}: roof ${roofM} not above the ground ${h.terrainMaxM}`);
+    if (!(roofM > h.terrainMaxM) && o?.terrace === undefined) problems.push(`${p.name}: roof ${roofM} not above the ground ${h.terrainMaxM}`); // a terrace roof is checked against the median ground above
     if (p.name && best.display && p.name !== best.display) problems.push(`${p.name}: building metadata calls ${best.building_id} "${best.display}"`);
     const note = [p.note, h.roofRaised && mode === 'RECOMPUTED' && !o ? 'roof raised to DEM max + 3 m on the server DEM' : null,
-      o ? `roof ${o.roofM} m from ${o.evidence.source} (${o.evidence.collectedOn}, ${o.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); GeoPackage height ${p.height_m} m ${p.height_source}` : null].filter(Boolean).join('; ') || null;
+      o ? `${o.terrace === undefined ? '' : 'terrace, roof below the highest ground on its outline; '}roof ${o.roofM} m from ${o.evidence.source} (${o.evidence.collectedOn}, ${o.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); GeoPackage height ${p.height_m} m ${p.height_source}` : null].filter(Boolean).join('; ') || null;
     if (all.hidden.some((x) => x.name === p.name)) { // checked like any building of the model, but not drawn
       rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), source: 'hidden (override)' });
       continue;
