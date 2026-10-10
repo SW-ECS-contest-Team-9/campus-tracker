@@ -1,0 +1,1207 @@
+{
+ "smapCells": 1316,
+ "shiftM": 10.0,
+ "sessions": [
+  {
+   "session": "813468d0",
+   "collector": "C01",
+   "date": "2026-10-02T07:09",
+   "n": 38,
+   "metres": 58,
+   "minutes": 2.0,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 3.19,
+     "max": 5.2,
+     "median": -0.65,
+     "rmsShiftMin": 2.54,
+     "rmsShiftMax": 3.55,
+     "rmsEnvelope": 2.28
+    },
+    "smap": {
+     "rms": 3.25,
+     "max": 6.24,
+     "median": -0.09,
+     "rmsShiftMin": 3.1,
+     "rmsShiftMax": 4.03,
+     "rmsEnvelope": 3.12
+    },
+    "n": 38,
+    "metres": 58
+   },
+   "agree": {
+    "old": {
+     "rms": 3.46,
+     "max": 5.2,
+     "median": 0.0,
+     "rmsShiftMin": 2.46,
+     "rmsShiftMax": 4.04,
+     "rmsEnvelope": 2.6
+    },
+    "smap": {
+     "rms": 3.76,
+     "max": 6.24,
+     "median": 0.0,
+     "rmsShiftMin": 3.61,
+     "rmsShiftMax": 4.62,
+     "rmsEnvelope": 3.63
+    },
+    "n": 28,
+    "metres": 43
+   },
+   "differ": null,
+   "differByPlace": {},
+   "perStretch": {
+    "n": 25,
+    "rmsOld": 1.42,
+    "rmsSmap": 0.63
+   }
+  },
+  {
+   "session": "fbaa781d",
+   "collector": "C01",
+   "date": "2026-10-02T08:17",
+   "n": 57,
+   "metres": 104,
+   "minutes": 4.2,
+   "altimeterRebases": 0,
+   "offsetFrom": "전체 중앙값(지형별)",
+   "all": {
+    "old": {
+     "rms": 3.36,
+     "max": 6.45,
+     "median": 0.0,
+     "rmsShiftMin": 3.0,
+     "rmsShiftMax": 3.68,
+     "rmsEnvelope": 2.53
+    },
+    "smap": {
+     "rms": 2.45,
+     "max": 5.27,
+     "median": 0.0,
+     "rmsShiftMin": 2.45,
+     "rmsShiftMax": 3.48,
+     "rmsEnvelope": 2.22
+    },
+    "n": 57,
+    "metres": 104
+   },
+   "agree": {
+    "old": {
+     "rms": 0.89,
+     "max": 1.93,
+     "median": -0.73,
+     "rmsShiftMin": 0.89,
+     "rmsShiftMax": 2.96,
+     "rmsEnvelope": 0.24
+    },
+    "smap": {
+     "rms": 0.43,
+     "max": 0.99,
+     "median": -0.08,
+     "rmsShiftMin": 0.42,
+     "rmsShiftMax": 1.67,
+     "rmsEnvelope": 0.33
+    },
+    "n": 18,
+    "metres": 27
+   },
+   "differ": {
+    "old": {
+     "rms": 4.97,
+     "max": 6.45,
+     "median": 5.74,
+     "rmsShiftMin": 3.36,
+     "rmsShiftMax": 5.33,
+     "rmsEnvelope": 3.92
+    },
+    "smap": {
+     "rms": 3.49,
+     "max": 4.67,
+     "median": 4.16,
+     "rmsShiftMin": 3.49,
+     "rmsShiftMax": 5.44,
+     "rmsEnvelope": 3.23
+    },
+    "n": 11,
+    "metres": 19
+   },
+   "differByPlace": {
+    "기타": {
+     "old": {
+      "rms": 4.97,
+      "max": 6.45,
+      "median": 5.74,
+      "rmsShiftMin": 3.36,
+      "rmsShiftMax": 5.33,
+      "rmsEnvelope": 3.92
+     },
+     "smap": {
+      "rms": 3.49,
+      "max": 4.67,
+      "median": 4.16,
+      "rmsShiftMin": 3.49,
+      "rmsShiftMax": 5.44,
+      "rmsEnvelope": 3.23
+     },
+     "n": 11,
+     "metres": 19,
+     "smapMinusOldMedian": 2.17,
+     "centre": [
+      201037,
+      557403
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 55,
+    "rmsOld": 1.25,
+    "rmsSmap": 0.46
+   }
+  },
+  {
+   "session": "2acb8440",
+   "collector": "C01",
+   "date": "2026-10-06T00:02",
+   "n": 82,
+   "metres": 183,
+   "minutes": 2.5,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 7.55,
+     "max": 12.81,
+     "median": 7.53,
+     "rmsShiftMin": 3.93,
+     "rmsShiftMax": 7.79,
+     "rmsEnvelope": 6.76
+    },
+    "smap": {
+     "rms": 7.56,
+     "max": 13.99,
+     "median": 0.16,
+     "rmsShiftMin": 7.4,
+     "rmsShiftMax": 7.58,
+     "rmsEnvelope": 7.24
+    },
+    "n": 82,
+    "metres": 183
+   },
+   "agree": {
+    "old": {
+     "rms": 6.46,
+     "max": 12.63,
+     "median": 0.0,
+     "rmsShiftMin": 3.16,
+     "rmsShiftMax": 6.65,
+     "rmsEnvelope": 5.54
+    },
+    "smap": {
+     "rms": 6.61,
+     "max": 12.98,
+     "median": 0.0,
+     "rmsShiftMin": 6.32,
+     "rmsShiftMax": 6.77,
+     "rmsEnvelope": 6.33
+    },
+    "n": 22,
+    "metres": 48
+   },
+   "differ": {
+    "old": {
+     "rms": 8.27,
+     "max": 11.98,
+     "median": 8.06,
+     "rmsShiftMin": 4.34,
+     "rmsShiftMax": 8.5,
+     "rmsEnvelope": 7.55
+    },
+    "smap": {
+     "rms": 8.12,
+     "max": 13.99,
+     "median": 0.04,
+     "rmsShiftMin": 7.9,
+     "rmsShiftMax": 8.13,
+     "rmsEnvelope": 7.78
+    },
+    "n": 48,
+    "metres": 111
+   },
+   "differByPlace": {
+    "운동장": {
+     "old": {
+      "rms": 7.0,
+      "max": 9.03,
+      "median": 7.53,
+      "rmsShiftMin": 3.18,
+      "rmsShiftMax": 7.0,
+      "rmsEnvelope": 6.15
+     },
+     "smap": {
+      "rms": 1.78,
+      "max": 5.76,
+      "median": 0.03,
+      "rmsShiftMin": 0.45,
+      "rmsShiftMax": 1.78,
+      "rmsEnvelope": 0.31
+     },
+     "n": 30,
+     "metres": 70,
+     "smapMinusOldMedian": 7.12
+    },
+    "기타": {
+     "old": {
+      "rms": 10.04,
+      "max": 11.98,
+      "median": 10.35,
+      "rmsShiftMin": 5.66,
+      "rmsShiftMax": 10.75,
+      "rmsEnvelope": 9.44
+     },
+     "smap": {
+      "rms": 13.06,
+      "max": 13.99,
+      "median": 13.57,
+      "rmsShiftMin": 12.89,
+      "rmsShiftMax": 13.08,
+      "rmsEnvelope": 12.7
+     },
+     "n": 18,
+     "metres": 41,
+     "smapMinusOldMedian": -3.98,
+     "centre": [
+      201270,
+      557192
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 82,
+    "rmsOld": 3.7,
+    "rmsSmap": 3.55
+   }
+  },
+  {
+   "session": "bdd9a756",
+   "collector": "C01",
+   "date": "2026-10-06T02:35",
+   "n": 48,
+   "metres": 73,
+   "minutes": 1.7,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 1.71,
+     "max": 4.54,
+     "median": 0.34,
+     "rmsShiftMin": 1.71,
+     "rmsShiftMax": 3.2,
+     "rmsEnvelope": 1.14
+    },
+    "smap": {
+     "rms": 2.01,
+     "max": 3.26,
+     "median": -0.88,
+     "rmsShiftMin": 1.82,
+     "rmsShiftMax": 3.73,
+     "rmsEnvelope": 0.62
+    },
+    "n": 48,
+    "metres": 73
+   },
+   "agree": {
+    "old": {
+     "rms": 1.93,
+     "max": 4.15,
+     "median": 0.0,
+     "rmsShiftMin": 1.93,
+     "rmsShiftMax": 3.09,
+     "rmsEnvelope": 1.55
+    },
+    "smap": {
+     "rms": 1.98,
+     "max": 3.26,
+     "median": 0.0,
+     "rmsShiftMin": 1.85,
+     "rmsShiftMax": 4.3,
+     "rmsEnvelope": 0.79
+    },
+    "n": 25,
+    "metres": 45
+   },
+   "differ": {
+    "old": {
+     "rms": 1.34,
+     "max": 2.45,
+     "median": 1.02,
+     "rmsShiftMin": 1.14,
+     "rmsShiftMax": 3.2,
+     "rmsEnvelope": 0.0
+    },
+    "smap": {
+     "rms": 2.16,
+     "max": 3.17,
+     "median": -1.63,
+     "rmsShiftMin": 1.1,
+     "rmsShiftMax": 2.95,
+     "rmsEnvelope": 0.0
+    },
+    "n": 10,
+    "metres": 13
+   },
+   "differByPlace": {
+    "기타": {
+     "old": {
+      "rms": 1.34,
+      "max": 2.45,
+      "median": 1.02,
+      "rmsShiftMin": 1.14,
+      "rmsShiftMax": 3.2,
+      "rmsEnvelope": 0.0
+     },
+     "smap": {
+      "rms": 2.16,
+      "max": 3.17,
+      "median": -1.63,
+      "rmsShiftMin": 1.1,
+      "rmsShiftMax": 2.95,
+      "rmsEnvelope": 0.0
+     },
+     "n": 10,
+     "metres": 13,
+     "smapMinusOldMedian": 2.5,
+     "centre": [
+      201081,
+      557328
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 48,
+    "rmsOld": 1.65,
+    "rmsSmap": 1.95
+   }
+  },
+  {
+   "session": "bdcd4aae",
+   "collector": "C01",
+   "date": "2026-10-07T01:17",
+   "n": 140,
+   "metres": 237,
+   "minutes": 6.0,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 6.7,
+     "max": 20.51,
+     "median": 0.15,
+     "rmsShiftMin": 6.57,
+     "rmsShiftMax": 6.89,
+     "rmsEnvelope": 6.29
+    },
+    "smap": {
+     "rms": 5.64,
+     "max": 20.03,
+     "median": -2.61,
+     "rmsShiftMin": 4.68,
+     "rmsShiftMax": 6.57,
+     "rmsEnvelope": 4.5
+    },
+    "n": 140,
+    "metres": 237
+   },
+   "agree": {
+    "old": {
+     "rms": 7.61,
+     "max": 20.51,
+     "median": 0.0,
+     "rmsShiftMin": 7.38,
+     "rmsShiftMax": 7.66,
+     "rmsEnvelope": 7.16
+    },
+    "smap": {
+     "rms": 7.75,
+     "max": 20.03,
+     "median": 0.0,
+     "rmsShiftMin": 7.3,
+     "rmsShiftMax": 8.44,
+     "rmsEnvelope": 7.23
+    },
+    "n": 37,
+    "metres": 50
+   },
+   "differ": {
+    "old": {
+     "rms": 6.87,
+     "max": 8.52,
+     "median": 7.96,
+     "rmsShiftMin": 6.72,
+     "rmsShiftMax": 7.17,
+     "rmsEnvelope": 6.6
+    },
+    "smap": {
+     "rms": 4.44,
+     "max": 9.2,
+     "median": -3.35,
+     "rmsShiftMin": 3.04,
+     "rmsShiftMax": 5.5,
+     "rmsEnvelope": 2.68
+    },
+    "n": 78,
+    "metres": 131
+   },
+   "differByPlace": {
+    "사잇길": {
+     "old": {
+      "rms": 4.13,
+      "max": 7.12,
+      "median": 0.19,
+      "rmsShiftMin": 4.13,
+      "rmsShiftMax": 4.92,
+      "rmsEnvelope": 3.38
+     },
+     "smap": {
+      "rms": 6.12,
+      "max": 9.2,
+      "median": -4.55,
+      "rmsShiftMin": 4.11,
+      "rmsShiftMax": 7.88,
+      "rmsEnvelope": 4.12
+     },
+     "n": 31,
+     "metres": 41,
+     "smapMinusOldMedian": 4.25
+    },
+    "기타": {
+     "old": {
+      "rms": 8.19,
+      "max": 8.52,
+      "median": 8.23,
+      "rmsShiftMin": 7.98,
+      "rmsShiftMax": 8.49,
+      "rmsEnvelope": 8.04
+     },
+     "smap": {
+      "rms": 2.83,
+      "max": 3.9,
+      "median": -2.65,
+      "rmsShiftMin": 1.2,
+      "rmsShiftMax": 3.17,
+      "rmsEnvelope": 0.83
+     },
+     "n": 47,
+     "metres": 90,
+     "smapMinusOldMedian": 10.14,
+     "centre": [
+      201184,
+      557302
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 135,
+    "rmsOld": 5.77,
+    "rmsSmap": 3.27
+   }
+  },
+  {
+   "session": "b67f36bf",
+   "collector": "C01",
+   "date": "2026-10-07T01:31",
+   "n": 178,
+   "metres": 228,
+   "minutes": 5.2,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 5.67,
+     "max": 11.05,
+     "median": -0.4,
+     "rmsShiftMin": 5.33,
+     "rmsShiftMax": 5.75,
+     "rmsEnvelope": 4.68
+    },
+    "smap": {
+     "rms": 5.55,
+     "max": 11.89,
+     "median": -0.41,
+     "rmsShiftMin": 3.43,
+     "rmsShiftMax": 6.42,
+     "rmsEnvelope": 3.19
+    },
+    "n": 178,
+    "metres": 228
+   },
+   "agree": {
+    "old": {
+     "rms": 5.67,
+     "max": 11.05,
+     "median": 0.0,
+     "rmsShiftMin": 4.49,
+     "rmsShiftMax": 5.78,
+     "rmsEnvelope": 4.33
+    },
+    "smap": {
+     "rms": 5.9,
+     "max": 11.89,
+     "median": 0.0,
+     "rmsShiftMin": 4.09,
+     "rmsShiftMax": 6.56,
+     "rmsEnvelope": 3.98
+    },
+    "n": 51,
+    "metres": 67
+   },
+   "differ": {
+    "old": {
+     "rms": 6.06,
+     "max": 8.05,
+     "median": 4.55,
+     "rmsShiftMin": 5.87,
+     "rmsShiftMax": 6.23,
+     "rmsEnvelope": 5.2
+    },
+    "smap": {
+     "rms": 5.31,
+     "max": 10.84,
+     "median": -0.59,
+     "rmsShiftMin": 3.39,
+     "rmsShiftMax": 6.23,
+     "rmsEnvelope": 3.03
+    },
+    "n": 90,
+    "metres": 114
+   },
+   "differByPlace": {
+    "운동장": {
+     "old": {
+      "rms": 6.7,
+      "max": 8.05,
+      "median": 7.26,
+      "rmsShiftMin": 5.95,
+      "rmsShiftMax": 6.7,
+      "rmsEnvelope": 5.77
+     },
+     "smap": {
+      "rms": 0.89,
+      "max": 3.31,
+      "median": -0.44,
+      "rmsShiftMin": 0.72,
+      "rmsShiftMax": 1.42,
+      "rmsEnvelope": 0.68
+     },
+     "n": 55,
+     "metres": 71,
+     "smapMinusOldMedian": 7.22
+    },
+    "사잇길": {
+     "old": {
+      "rms": 4.62,
+      "max": 6.85,
+      "median": -4.79,
+      "rmsShiftMin": 4.62,
+      "rmsShiftMax": 6.06,
+      "rmsEnvelope": 4.04
+     },
+     "smap": {
+      "rms": 8.25,
+      "max": 9.8,
+      "median": -8.77,
+      "rmsShiftMin": 5.15,
+      "rmsShiftMax": 9.74,
+      "rmsEnvelope": 4.47
+     },
+     "n": 31,
+     "metres": 40,
+     "smapMinusOldMedian": 3.41
+    }
+   },
+   "perStretch": {
+    "n": 177,
+    "rmsOld": 5.72,
+    "rmsSmap": 5.33
+   }
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "date": "2026-10-07T08:46",
+   "n": 438,
+   "metres": 741,
+   "minutes": 16.6,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 7.42,
+     "max": 18.68,
+     "median": 5.8,
+     "rmsShiftMin": 7.42,
+     "rmsShiftMax": 8.48,
+     "rmsEnvelope": 6.66
+    },
+    "smap": {
+     "rms": 4.16,
+     "max": 16.27,
+     "median": 0.15,
+     "rmsShiftMin": 4.16,
+     "rmsShiftMax": 4.98,
+     "rmsEnvelope": 3.86
+    },
+    "n": 438,
+    "metres": 741
+   },
+   "agree": {
+    "old": {
+     "rms": 4.31,
+     "max": 13.98,
+     "median": 0.0,
+     "rmsShiftMin": 4.26,
+     "rmsShiftMax": 7.13,
+     "rmsEnvelope": 3.81
+    },
+    "smap": {
+     "rms": 4.19,
+     "max": 13.53,
+     "median": -0.0,
+     "rmsShiftMin": 3.96,
+     "rmsShiftMax": 4.89,
+     "rmsEnvelope": 3.41
+    },
+    "n": 48,
+    "metres": 82
+   },
+   "differ": {
+    "old": {
+     "rms": 7.6,
+     "max": 16.04,
+     "median": 7.33,
+     "rmsShiftMin": 7.37,
+     "rmsShiftMax": 8.04,
+     "rmsEnvelope": 6.6
+    },
+    "smap": {
+     "rms": 2.45,
+     "max": 13.34,
+     "median": 0.12,
+     "rmsShiftMin": 2.45,
+     "rmsShiftMax": 3.06,
+     "rmsEnvelope": 2.29
+    },
+    "n": 268,
+    "metres": 452
+   },
+   "differByPlace": {
+    "운동장": {
+     "old": {
+      "rms": 7.54,
+      "max": 10.06,
+      "median": 7.81,
+      "rmsShiftMin": 7.06,
+      "rmsShiftMax": 7.85,
+      "rmsEnvelope": 6.46
+     },
+     "smap": {
+      "rms": 0.68,
+      "max": 1.69,
+      "median": -0.0,
+      "rmsShiftMin": 0.68,
+      "rmsShiftMax": 1.31,
+      "rmsEnvelope": 0.57
+     },
+     "n": 121,
+     "metres": 197,
+     "smapMinusOldMedian": 7.19
+    },
+    "사잇길": {
+     "old": {
+      "rms": 5.27,
+      "max": 7.93,
+      "median": 4.94,
+      "rmsShiftMin": 4.39,
+      "rmsShiftMax": 5.52,
+      "rmsEnvelope": 3.92
+     },
+     "smap": {
+      "rms": 0.84,
+      "max": 1.83,
+      "median": 0.43,
+      "rmsShiftMin": 0.84,
+      "rmsShiftMax": 2.43,
+      "rmsEnvelope": 0.21
+     },
+     "n": 26,
+     "metres": 54,
+     "smapMinusOldMedian": 4.21
+    },
+    "기타": {
+     "old": {
+      "rms": 8.06,
+      "max": 16.04,
+      "median": 6.84,
+      "rmsShiftMin": 7.85,
+      "rmsShiftMax": 8.78,
+      "rmsEnvelope": 7.17
+     },
+     "smap": {
+      "rms": 3.55,
+      "max": 13.34,
+      "median": 0.21,
+      "rmsShiftMin": 3.55,
+      "rmsShiftMax": 4.43,
+      "rmsEnvelope": 3.36
+     },
+     "n": 121,
+     "metres": 202,
+     "smapMinusOldMedian": 5.01,
+     "centre": [
+      201156,
+      557350
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 423,
+    "rmsOld": 4.14,
+    "rmsSmap": 2.71
+   }
+  },
+  {
+   "session": "f1236a25",
+   "collector": "C01",
+   "date": "2026-10-07T12:18",
+   "n": 185,
+   "metres": 358,
+   "minutes": 14.1,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 5.76,
+     "max": 17.32,
+     "median": 0.82,
+     "rmsShiftMin": 4.87,
+     "rmsShiftMax": 7.12,
+     "rmsEnvelope": 4.25
+    },
+    "smap": {
+     "rms": 4.74,
+     "max": 16.18,
+     "median": 0.39,
+     "rmsShiftMin": 3.78,
+     "rmsShiftMax": 6.13,
+     "rmsEnvelope": 3.44
+    },
+    "n": 185,
+    "metres": 358
+   },
+   "agree": {
+    "old": {
+     "rms": 4.93,
+     "max": 15.99,
+     "median": 0.0,
+     "rmsShiftMin": 4.82,
+     "rmsShiftMax": 5.87,
+     "rmsEnvelope": 4.38
+    },
+    "smap": {
+     "rms": 4.78,
+     "max": 16.18,
+     "median": 0.0,
+     "rmsShiftMin": 4.17,
+     "rmsShiftMax": 5.17,
+     "rmsEnvelope": 3.8
+    },
+    "n": 76,
+    "metres": 141
+   },
+   "differ": {
+    "old": {
+     "rms": 8.08,
+     "max": 17.32,
+     "median": 4.51,
+     "rmsShiftMin": 5.94,
+     "rmsShiftMax": 10.48,
+     "rmsEnvelope": 5.35
+    },
+    "smap": {
+     "rms": 5.98,
+     "max": 14.21,
+     "median": 0.98,
+     "rmsShiftMin": 4.31,
+     "rmsShiftMax": 8.65,
+     "rmsEnvelope": 4.06
+    },
+    "n": 61,
+    "metres": 138
+   },
+   "differByPlace": {
+    "사잇길": {
+     "old": {
+      "rms": 1.14,
+      "max": 1.88,
+      "median": -0.18,
+      "rmsShiftMin": 0.85,
+      "rmsShiftMax": 2.09,
+      "rmsEnvelope": 0.02
+     },
+     "smap": {
+      "rms": 3.53,
+      "max": 4.03,
+      "median": -3.5,
+      "rmsShiftMin": 1.69,
+      "rmsShiftMax": 5.23,
+      "rmsEnvelope": 0.81
+     },
+     "n": 8,
+     "metres": 31,
+     "smapMinusOldMedian": 3.39
+    },
+    "기타": {
+     "old": {
+      "rms": 8.66,
+      "max": 17.32,
+      "median": 5.15,
+      "rmsShiftMin": 6.32,
+      "rmsShiftMax": 11.24,
+      "rmsEnvelope": 5.74
+     },
+     "smap": {
+      "rms": 6.27,
+      "max": 14.21,
+      "median": 1.58,
+      "rmsShiftMin": 4.48,
+      "rmsShiftMax": 9.06,
+      "rmsEnvelope": 4.35
+     },
+     "n": 53,
+     "metres": 107,
+     "smapMinusOldMedian": 3.08,
+     "centre": [
+      201089,
+      557360
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 171,
+    "rmsOld": 4.85,
+    "rmsSmap": 4.07
+   }
+  },
+  {
+   "session": "f15f0e50",
+   "collector": "C02",
+   "date": "2026-10-07T12:18",
+   "n": 147,
+   "metres": 230,
+   "minutes": 14.1,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 6.86,
+     "max": 21.54,
+     "median": 0.32,
+     "rmsShiftMin": 6.32,
+     "rmsShiftMax": 7.9,
+     "rmsEnvelope": 6.15
+    },
+    "smap": {
+     "rms": 5.58,
+     "max": 19.45,
+     "median": 0.48,
+     "rmsShiftMin": 5.37,
+     "rmsShiftMax": 7.49,
+     "rmsEnvelope": 5.26
+    },
+    "n": 147,
+    "metres": 230
+   },
+   "agree": {
+    "old": {
+     "rms": 1.86,
+     "max": 5.25,
+     "median": 0.0,
+     "rmsShiftMin": 1.6,
+     "rmsShiftMax": 2.22,
+     "rmsEnvelope": 1.24
+    },
+    "smap": {
+     "rms": 1.74,
+     "max": 4.4,
+     "median": 0.0,
+     "rmsShiftMin": 1.56,
+     "rmsShiftMax": 2.46,
+     "rmsEnvelope": 0.92
+    },
+    "n": 26,
+    "metres": 43
+   },
+   "differ": {
+    "old": {
+     "rms": 10.69,
+     "max": 21.54,
+     "median": 7.99,
+     "rmsShiftMin": 9.71,
+     "rmsShiftMax": 12.47,
+     "rmsEnvelope": 9.71
+    },
+    "smap": {
+     "rms": 8.76,
+     "max": 19.45,
+     "median": 5.36,
+     "rmsShiftMin": 8.38,
+     "rmsShiftMax": 11.71,
+     "rmsEnvelope": 8.44
+    },
+    "n": 55,
+    "metres": 75
+   },
+   "differByPlace": {
+    "사잇길": {
+     "old": {
+      "rms": 3.4,
+      "max": 3.86,
+      "median": 3.38,
+      "rmsShiftMin": 1.41,
+      "rmsShiftMax": 3.4,
+      "rmsEnvelope": 1.26
+     },
+     "smap": {
+      "rms": 0.37,
+      "max": 0.72,
+      "median": -0.2,
+      "rmsShiftMin": 0.31,
+      "rmsShiftMax": 2.58,
+      "rmsEnvelope": 0.0
+     },
+     "n": 7,
+     "metres": 11,
+     "smapMinusOldMedian": 3.82
+    },
+    "기타": {
+     "old": {
+      "rms": 11.37,
+      "max": 21.54,
+      "median": 8.81,
+      "rmsShiftMin": 10.38,
+      "rmsShiftMax": 13.29,
+      "rmsEnvelope": 10.38
+     },
+     "smap": {
+      "rms": 9.38,
+      "max": 19.45,
+      "median": 6.39,
+      "rmsShiftMin": 8.97,
+      "rmsShiftMax": 12.52,
+      "rmsEnvelope": 9.04
+     },
+     "n": 48,
+     "metres": 64,
+     "smapMinusOldMedian": 2.3,
+     "centre": [
+      201053,
+      557396
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 105,
+    "rmsOld": 1.65,
+    "rmsSmap": 1.44
+   }
+  },
+  {
+   "session": "f4325e32",
+   "collector": "C01",
+   "date": "2026-10-08T04:31",
+   "n": 85,
+   "metres": 180,
+   "minutes": 5.0,
+   "altimeterRebases": 0,
+   "offsetFrom": "맞는 곳",
+   "all": {
+    "old": {
+     "rms": 12.51,
+     "max": 29.43,
+     "median": -0.81,
+     "rmsShiftMin": 11.6,
+     "rmsShiftMax": 13.35,
+     "rmsEnvelope": 11.02
+    },
+    "smap": {
+     "rms": 13.0,
+     "max": 31.43,
+     "median": 0.27,
+     "rmsShiftMin": 11.87,
+     "rmsShiftMax": 13.7,
+     "rmsEnvelope": 12.34
+    },
+    "n": 85,
+    "metres": 180
+   },
+   "agree": {
+    "old": {
+     "rms": 12.06,
+     "max": 27.75,
+     "median": 0.0,
+     "rmsShiftMin": 10.48,
+     "rmsShiftMax": 12.74,
+     "rmsEnvelope": 9.73
+    },
+    "smap": {
+     "rms": 12.3,
+     "max": 28.1,
+     "median": 0.0,
+     "rmsShiftMin": 11.14,
+     "rmsShiftMax": 13.04,
+     "rmsEnvelope": 11.56
+    },
+    "n": 48,
+    "metres": 99
+   },
+   "differ": {
+    "old": {
+     "rms": 13.13,
+     "max": 29.43,
+     "median": -1.4,
+     "rmsShiftMin": 12.9,
+     "rmsShiftMax": 14.74,
+     "rmsEnvelope": 12.76
+    },
+    "smap": {
+     "rms": 14.24,
+     "max": 31.43,
+     "median": 1.51,
+     "rmsShiftMin": 13.11,
+     "rmsShiftMax": 14.98,
+     "rmsEnvelope": 13.73
+    },
+    "n": 19,
+    "metres": 50
+   },
+   "differByPlace": {
+    "기타": {
+     "old": {
+      "rms": 1.98,
+      "max": 3.31,
+      "median": -1.6,
+      "rmsShiftMin": 0.78,
+      "rmsShiftMax": 6.31,
+      "rmsEnvelope": 0.15
+     },
+     "smap": {
+      "rms": 1.23,
+      "max": 2.1,
+      "median": 0.67,
+      "rmsShiftMin": 0.74,
+      "rmsShiftMax": 2.78,
+      "rmsEnvelope": 0.12
+     },
+     "n": 15,
+     "metres": 24,
+     "smapMinusOldMedian": -3.13,
+     "centre": [
+      201025,
+      557302
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 85,
+    "rmsOld": 12.87,
+    "rmsSmap": 12.87
+   }
+  },
+  {
+   "session": "9023ed38",
+   "collector": "C01",
+   "date": "2026-10-08T04:47",
+   "n": 58,
+   "metres": 84,
+   "minutes": 1.0,
+   "altimeterRebases": 0,
+   "offsetFrom": "전체 중앙값(지형별)",
+   "all": {
+    "old": {
+     "rms": 1.62,
+     "max": 7.6,
+     "median": 0.0,
+     "rmsShiftMin": 0.8,
+     "rmsShiftMax": 4.64,
+     "rmsEnvelope": 0.0
+    },
+    "smap": {
+     "rms": 0.43,
+     "max": 1.33,
+     "median": -0.0,
+     "rmsShiftMin": 0.39,
+     "rmsShiftMax": 4.87,
+     "rmsEnvelope": 0.17
+    },
+    "n": 58,
+    "metres": 84
+   },
+   "agree": null,
+   "differ": {
+    "old": {
+     "rms": 1.66,
+     "max": 7.6,
+     "median": 0.06,
+     "rmsShiftMin": 0.63,
+     "rmsShiftMax": 4.66,
+     "rmsEnvelope": 0.0
+    },
+    "smap": {
+     "rms": 0.34,
+     "max": 1.16,
+     "median": -0.03,
+     "rmsShiftMin": 0.3,
+     "rmsShiftMax": 3.21,
+     "rmsEnvelope": 0.0
+    },
+    "n": 49,
+    "metres": 70
+   },
+   "differByPlace": {
+    "기타": {
+     "old": {
+      "rms": 1.66,
+      "max": 7.6,
+      "median": 0.06,
+      "rmsShiftMin": 0.63,
+      "rmsShiftMax": 4.66,
+      "rmsEnvelope": 0.0
+     },
+     "smap": {
+      "rms": 0.34,
+      "max": 1.16,
+      "median": -0.03,
+      "rmsShiftMin": 0.3,
+      "rmsShiftMax": 3.21,
+      "rmsEnvelope": 0.0
+     },
+     "n": 49,
+     "metres": 70,
+     "smapMinusOldMedian": 2.91,
+     "centre": [
+      201011,
+      557336
+     ]
+    }
+   },
+   "perStretch": {
+    "n": 58,
+    "rmsOld": 1.62,
+    "rmsSmap": 0.43
+   }
+  }
+ ]
+}

@@ -1,0 +1,200 @@
+{
+ "spot": [
+  201212.01,
+  557220.8,
+  148.91
+ ],
+ "nearRadius": 15.0,
+ "edgeMargin": 5.0,
+ "passes": [
+  {
+   "session": "2acb8440",
+   "collector": "C01",
+   "date": "2026-10-06T00:02",
+   "passNo": 0,
+   "n": 44,
+   "seconds": 43,
+   "metres": 91,
+   "huMedian": 4.0,
+   "zDistinct": 35,
+   "zRange": [
+    4.56,
+    7.23
+   ],
+   "oldRange": [
+    140.88,
+    149.65
+   ],
+   "newRange": [
+    148.82,
+    149.29
+   ],
+   "rmsVsOld": 3.18,
+   "rmsVsNew": 0.87,
+   "slopeOnOld": 0.05,
+   "spotTest": {
+    "nLow": 31,
+    "nNear": 8,
+    "gapSeconds": 10,
+    "measured": -0.03,
+    "unc": 0.62,
+    "nearSpread": 0.06,
+    "nearZminmax": [
+     6.8,
+     6.92
+    ],
+    "predOld": -7.67,
+    "predNew": 0.02,
+    "fieldLevelFromSpot": 148.88
+   }
+  },
+  {
+   "session": "bdcd4aae",
+   "collector": "C01",
+   "date": "2026-10-07T01:17",
+   "passNo": 0,
+   "n": 27,
+   "seconds": 26,
+   "metres": 35,
+   "huMedian": 3.2,
+   "zDistinct": 18,
+   "zRange": [
+    10.88,
+    11.0
+   ],
+   "oldRange": [
+    149.58,
+    150.41
+   ],
+   "newRange": [
+    148.92,
+    148.92
+   ],
+   "rmsVsOld": 0.31,
+   "rmsVsNew": 0.04
+  },
+  {
+   "session": "b67f36bf",
+   "collector": "C01",
+   "date": "2026-10-07T01:31",
+   "passNo": 0,
+   "n": 90,
+   "seconds": 90,
+   "metres": 112,
+   "huMedian": 2.9,
+   "zDistinct": 49,
+   "zRange": [
+    -24.53,
+    -23.93
+   ],
+   "oldRange": [
+    141.4,
+    150.52
+   ],
+   "newRange": [
+    148.58,
+    149.26
+   ],
+   "rmsVsOld": 3.94,
+   "rmsVsNew": 0.43,
+   "slopeOnOld": 0.03,
+   "spotTest": {
+    "nLow": 44,
+    "nNear": 23,
+    "gapSeconds": 48,
+    "measured": -4.19,
+    "unc": 2.05,
+    "nearSpread": 2.03,
+    "nearZminmax": [
+     -23.98,
+     -16.7
+    ],
+    "predOld": -7.82,
+    "predNew": -0.0,
+    "fieldLevelFromSpot": 144.72
+   }
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "date": "2026-10-07T08:46",
+   "passNo": 0,
+   "n": 107,
+   "seconds": 106,
+   "metres": 115,
+   "huMedian": 1.5,
+   "zDistinct": 99,
+   "zRange": [
+    1.64,
+    3.87
+   ],
+   "oldRange": [
+    140.1,
+    145.15
+   ],
+   "newRange": [
+    148.72,
+    149.03
+   ],
+   "rmsVsOld": 1.83,
+   "rmsVsNew": 0.74,
+   "slopeOnOld": -0.15,
+   "spotTest": {
+    "nLow": 91,
+    "nNear": 44,
+    "gapSeconds": 5,
+    "measured": 0.16,
+    "unc": 0.73,
+    "nearSpread": 0.42,
+    "nearZminmax": [
+     1.81,
+     4.01
+    ],
+    "predOld": -3.63,
+    "predNew": 0.02,
+    "fieldLevelFromSpot": 149.07
+   }
+  },
+  {
+   "session": "9dc5afa4",
+   "collector": "C02",
+   "date": "2026-10-07T08:46",
+   "passNo": 1,
+   "n": 69,
+   "seconds": 73,
+   "metres": 76,
+   "huMedian": 1.5,
+   "zDistinct": 65,
+   "zRange": [
+    1.86,
+    4.14
+   ],
+   "oldRange": [
+    141.1,
+    150.54
+   ],
+   "newRange": [
+    148.49,
+    149.66
+   ],
+   "rmsVsOld": 4.18,
+   "rmsVsNew": 0.83,
+   "slopeOnOld": -0.03,
+   "spotTest": {
+    "nLow": 41,
+    "nNear": 44,
+    "gapSeconds": 63,
+    "measured": -0.2,
+    "unc": 0.94,
+    "nearSpread": 0.42,
+    "nearZminmax": [
+     1.81,
+     4.01
+    ],
+    "predOld": -3.81,
+    "predNew": 0.01,
+    "fieldLevelFromSpot": 148.71
+   }
+  }
+ ]
+}
