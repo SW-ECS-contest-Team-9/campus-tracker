@@ -372,10 +372,12 @@ export class SectionTool {
     for (const r of roads) {
       const css = r.kind ? ROAD_SURFACE.colors[r.kind] : SECTION.indoorColor;
       line([front(r.d - r.half, r.z), front(r.d + r.half, r.z)], css, 6);
-      const key = `${Math.round(r.d / 5)}:${r.z.toFixed(1)}`;
-      if (labelled.has(key)) continue;
-      labelled.add(key);
-      label(r.d + r.half, r.z, `${r.z.toFixed(1)} m${r.kind && r.road.name ? ` ${r.road.name.split(' (')[0]}` : ''}`);
+      // one label per height within 5 m, and (Z08) one per road within 15 m: a way that runs along the cut meets it at every bend
+      const keys = [`${Math.round(r.d / 5)}:${r.z.toFixed(1)}`, `${r.road.id}:${Math.round(r.d / 15)}`];
+      if (keys.some((key) => labelled.has(key))) continue;
+      for (const key of keys) labelled.add(key);
+      const name = r.kind && r.road.name ? r.road.name.split(' (')[0] : '';
+      label(r.d + r.half, r.z, `${r.z.toFixed(1)} m${name ? ` ${name.length > 16 ? `${name.slice(0, 15)}…` : name}` : ''}`);
     }
     this.drawn.push(this.viewer.scene.primitives.add(lines), this.viewer.scene.primitives.add(labels));
   }

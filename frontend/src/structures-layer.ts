@@ -359,12 +359,14 @@ export class StructuresLayer {
       if (indices.length) parts.push({ mesh: { positions, indices }, stride: 3, rgb: () => rgb });
     };
     const labels = new C.LabelCollection();
-    const text = (d: number, z: number, value: string, below = false) => {
+    // where: above the point and centred, below it and centred (inside the mass), or above it ending at the point (beside a road's own label, which starts there)
+    const text = (d: number, z: number, value: string, where: 'above' | 'below' | 'before' = 'above') => {
       const [x, y] = planePoint(plane, d, -0.05);
       labels.add({
         position: this.position(x, y, z), text: value, font: '12px system-ui, "Apple SD Gothic Neo", sans-serif',
         fillColor: C.Color.fromCssColorString('#3b352d'), outlineColor: C.Color.WHITE, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
-        horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: below ? C.VerticalOrigin.TOP : C.VerticalOrigin.BOTTOM, pixelOffset: new C.Cartesian2(0, below ? 2 : -2), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        horizontalOrigin: where === 'before' ? C.HorizontalOrigin.RIGHT : C.HorizontalOrigin.CENTER, verticalOrigin: where === 'below' ? C.VerticalOrigin.TOP : C.VerticalOrigin.BOTTOM,
+        pixelOffset: new C.Cartesian2(where === 'before' ? -4 : 0, where === 'below' ? 3 : -3), disableDepthTestDistance: Number.POSITIVE_INFINITY,
       });
     };
     const named = new Map<string, number[]>();
@@ -383,7 +385,9 @@ export class StructuresLayer {
       named.set(name, [...seen, mid]);
       const [x, y] = planePoint(plane, mid);
       const top = topHeight(solid)(x, y);
-      if (solid.role === 'platform') text(mid, top, `${name} ${top.toFixed(1)} m`, true);
+      if (solid.role === 'platform') text(mid, top, `${name} ${top.toFixed(1)} m`, 'below');
+      else if (solid.type === 'landing') text(mid, top, `${name} ${top.toFixed(1)} m`, 'below');
+      else if (solid.type === 'deck') text(from, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`, 'before');
       else text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`);
     }
     let last = -Infinity;
