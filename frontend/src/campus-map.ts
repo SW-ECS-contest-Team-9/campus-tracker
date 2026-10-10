@@ -5,9 +5,10 @@
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import './elevation-colors.css';
 import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './api';
+import { decorate, wallColor, wallTopM } from './building-appearance';
 import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
-import { clipLonLatPolygons, type SectionPlane } from './section';
-import { tmForward } from './tm';
+import { clipLonLatPolygons, planeSide, type SectionPlane } from './section';
+import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
 
 type CesiumNS = typeof import('cesium');
@@ -166,6 +167,7 @@ function terrainProvider(C: CesiumNS, g: TerrainGrid) {
 /** The campus buildings: one batched primitive (extruded footprints), roof/corner edges and name labels. */
 export class CampusSceneLayer {
   private primitive: any = null;
+  private decor: any = null; // windows, roofs (building-appearance.ts): drawn right after the blocks
   private edges: any;
   private labels: any;
   private opacity = 1;
@@ -176,7 +178,11 @@ export class CampusSceneLayer {
   private readonly overrides = new Map<string, number[][][][]>(); // 표시용 평면 대체(scene-local-corrections, 끄면 원본)
   private section: SectionPlane | null = null;
 
+  private readonly enu: any; // east / north / up at the campus -> globe frame (for the normals of the windows and roofs)
+
   constructor(private readonly C: CesiumNS, private readonly viewer: any, readonly scene: CampusScene) {
+    const first = scene.buildings[0]?.geometry.coordinates[0][0][0] ?? [127.013, 37.615];
+    this.enu = C.Transforms.eastNorthUpToFixedFrame(C.Cartesian3.fromDegrees(first[0], first[1], 0));
     this.edges = viewer.scene.primitives.add(new C.PolylineCollection());
     this.labels = viewer.scene.primitives.add(new C.LabelCollection());
     for (const b of scene.buildings) this.picks.set(b.buildingId, { kind: 'building', buildingId: b.buildingId });
@@ -262,18 +268,65 @@ export class CampusSceneLayer {
     this.viewer.camera.flyToBoundingSphere(sphere, { duration: 1, offset: new C.HeadingPitchRange(C.Math.toRadians(-20), C.Math.toRadians(-35), Math.max(sphere.radius * 3, 80)) });
   }
 
+  /** Top of the walls: lower than the stored roof under a pitched roof. */
+  private wallTop(b: SceneBuilding) {
+    return wallTopM(b.roofM, b.appearance);
+  }
+
+  /** Windows and roofs of the buildings that have an appearance record, as one mesh per building (picked like its block). */
+  private decorInstances(): any[] {
+    const C = this.C;
+    const xy = (polygons: number[][][][]) => polygons.map((poly) => poly.map((r) => r.map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; })));
+    const all = this.scene.buildings.map((b) => ({ b, top: this.wallTop(b), polys: xy(b.geometry.coordinates) }));
+    const cut = this.section ? (x: number, y: number) => Math.abs(planeSide(this.section!, [x, y])) < 0.05 : undefined;
+    const instances: any[] = [];
+    const scratch = new C.Cartesian3();
+    for (const b of this.scene.buildings) {
+      if (!b.appearance) continue;
+      const neighbourTop = (x: number, y: number) => all.reduce((m, o) => (o.b !== b && o.top > m && o.polys.some((poly) => ringContains(x, y, poly[0] as [number, number][])) ? o.top : m), -Infinity);
+      const mesh = decorate(xy(this.footprint(b)), { roofM: b.roofM, groundM: b.terrainMinM ?? b.baseM + 1 }, b.appearance, { neighbourTop, cut });
+      const n = mesh.positions.length / 3;
+      if (!n) continue;
+      const positions = new Float64Array(n * 3), normals = new Float32Array(n * 3), colors = new Uint8Array(n * 4);
+      const mix = b.buildingId === this.selected ? 0.45 : 0; // a selected building keeps its windows, tinted like its block
+      for (let i = 0; i < n; i++) {
+        const g = tmInverse(mesh.positions[3 * i], mesh.positions[3 * i + 1]);
+        const p = C.Cartesian3.fromDegrees(g.longitude, g.latitude, mesh.positions[3 * i + 2], undefined, scratch);
+        positions.set([p.x, p.y, p.z], 3 * i);
+        // the mesh normal is east / north / up; this.enu turns it into the globe's frame
+        const v = C.Matrix4.multiplyByPointAsVector(this.enu, new C.Cartesian3(mesh.normals[3 * i], mesh.normals[3 * i + 1], mesh.normals[3 * i + 2]), scratch);
+        normals.set([v.x, v.y, v.z], 3 * i);
+        colors.set([mesh.colors[3 * i] * (1 - mix) + 147 * mix, mesh.colors[3 * i + 1] * (1 - mix) + 197 * mix, mesh.colors[3 * i + 2] * (1 - mix) + 253 * mix, 255 * this.opacity], 4 * i);
+      }
+      instances.push(new C.GeometryInstance({
+        geometry: new C.Geometry({
+          attributes: {
+            position: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.DOUBLE, componentsPerAttribute: 3, values: positions }),
+            normal: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.FLOAT, componentsPerAttribute: 3, values: normals }),
+            color: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.UNSIGNED_BYTE, componentsPerAttribute: 4, normalize: true, values: colors }),
+          } as any,
+          primitiveType: C.PrimitiveType.TRIANGLES,
+          boundingSphere: C.BoundingSphere.fromVertices(positions as any),
+        }),
+        id: this.picks.get(b.buildingId),
+      }));
+    }
+    return instances;
+  }
+
   private rebuild() {
     const C = this.C;
     const instances: any[] = [];
     for (const b of this.scene.buildings) {
-      const css = b.buildingId === this.selected ? COLORS.selected : this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall;
+      const own = !this.elevation && b.appearance ? wallColor(b.appearance) : null;
+      const css = b.buildingId === this.selected ? COLORS.selected : own ?? (this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall);
       const color = C.Color.fromCssColorString(css).withAlpha(this.opacity);
       for (const poly of this.footprint(b)) {
         const ring = (r: number[][]) => C.Cartesian3.fromDegreesArray(r.slice(0, -1).flat());
         const polygon = new C.PolygonGeometry({
           polygonHierarchy: new C.PolygonHierarchy(ring(poly[0]), poly.slice(1).map((h) => new C.PolygonHierarchy(ring(h)))),
           height: b.baseM,
-          extrudedHeight: b.roofM,
+          extrudedHeight: this.elevation ? b.roofM : this.wallTop(b),
           vertexFormat: this.elevation ? C.MaterialAppearance.MaterialSupport.TEXTURED.vertexFormat : C.PerInstanceColorAppearance.VERTEX_FORMAT,
         });
         const geometry = this.elevation ? C.PolygonGeometry.createGeometry(polygon)! : polygon;
@@ -303,7 +356,15 @@ export class CampusSceneLayer {
       for (let i = 0; i < primitives.length; i++) if (primitives.get(i) === this.primitive) index = i;
       primitives.remove(this.primitive);
     }
+    if (this.decor) primitives.remove(this.decor);
     this.primitive = primitives.add(next, index);
+    // the windows and roofs follow their blocks in the draw order (not with the altitude colours: those show heights only)
+    const decor = this.elevation ? [] : this.decorInstances();
+    this.decor = decor.length ? primitives.add(new C.Primitive({
+      geometryInstances: decor,
+      appearance: new C.PerInstanceColorAppearance({ translucent: this.opacity < 1, closed: false }),
+      asynchronous: false,
+    }), index === undefined ? undefined : index + 1) : null;
     // Selection remains visible without replacing the altitude colour of the selected surface.
     for (let i = 0; i < this.edges.length; i++) {
       const edge = this.edges.get(i);
@@ -322,7 +383,7 @@ export class CampusSceneLayer {
         const r = poly[0];
         if (r.length > best.length) best = r;
         // roof outline, slightly above the roof so it is not z-fighting
-        this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat]) => [lon, lat, b.roofM + 0.05])), width: 1.5, material: edge, id: this.picks.get(b.buildingId) });
+        this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat]) => [lon, lat, this.wallTop(b) + 0.05])), width: 1.5, material: edge, id: this.picks.get(b.buildingId) });
         // vertical edges only at real corners (not along curved walls)
         const open = r.slice(0, -1);
         for (let i = 0; i < open.length; i++) {
@@ -334,7 +395,7 @@ export class CampusSceneLayer {
           let turn = Math.abs(a2 - a1);
           if (turn > Math.PI) turn = 2 * Math.PI - turn;
           if (turn < (35 * Math.PI) / 180) continue;
-          this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights([c[0], c[1], b.baseM, c[0], c[1], b.roofM + 0.05]), width: 1, material: edge, id: this.picks.get(b.buildingId) });
+          this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights([c[0], c[1], b.baseM, c[0], c[1], this.wallTop(b) + 0.05]), width: 1, material: edge, id: this.picks.get(b.buildingId) });
         }
       }
       if (!b.name || !best.length) continue;

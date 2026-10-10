@@ -16,9 +16,12 @@
     외곽과 지붕은 모델_반영 예인 부분 하나의 외곽.좌표·지붕_높이. 이때 모델_보정은 숨김(같은 이름의 잘못 놓인 원천 도형) 또는 없음이어야 한다.
   모델_부분.덧붙임: {건물_id, 표지, 근거}: 원천 외곽 밖으로 나온 덩어리(저층부 등)를 그 동의 원천 도형과 따로 한 건물로 넣는다(-> added).
     외곽.좌표·지붕_높이는 그 부분의 것, 높이_출처는 모델_보정의 것. 표지는 지도 이름표라 동 이름과 달라야 한다. 그 부분은 원천 도형의 보정(지붕·부분)에서 빠진다.
+  겉모습[]: 벽·창·지붕·특징(-> appearance, 화면 표시 전용. 양식과 등급 규칙은 appearance.py).
 """
 import argparse, json, pathlib, re, sys
 import yaml
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import appearance
 
 ABOUT = ('Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): "buildings" = roof elevation of one building, '
          '"hidden" = a GeoPackage building that is not drawn, "parts" = one footprint drawn as several flat-roofed blocks, "added" = a building that is not in the GeoPackage or the campus map (scene only). Remove an entry, or import '
@@ -161,12 +164,14 @@ def source_entry(head, used, problems):
 
 def build(notes_dir):
     """(document, {note name: [problems]}) from every *.md in the folder."""
-    doc = {'about': ABOUT, 'generated': GENERATED, 'buildings': [], 'hidden': [], 'parts': [], 'added': []}
+    doc = {'about': ABOUT, 'generated': GENERATED, 'buildings': [], 'hidden': [], 'parts': [], 'added': [], 'appearance': []}
     problems = {}
     for path in sorted(pathlib.Path(notes_dir).glob('*.md')):
         try:
             head = read_head(path.read_text(encoding='utf-8'))
             section, entry, bad, added = entry_from_note(head)
+            looks, bad_looks = appearance.from_note(head)
+            bad = bad + bad_looks
         except Exception as e:  # a note that cannot be read is a failure, not a skipped building
             problems[path.stem] = [f'읽지 못함: {e}']
             continue
@@ -174,7 +179,11 @@ def build(notes_dir):
         else:
             if section: doc[section].append(entry)
             doc['added'] += added
+            doc['appearance'] += looks
     for k in ('buildings', 'hidden', 'parts', 'added'): doc[k].sort(key=lambda e: e['name'])
+    doc['appearance'].sort(key=lambda e: e['id'])
+    ids = [e['id'] for e in doc['appearance']]
+    for i in sorted({i for i in ids if ids.count(i) > 1}): problems.setdefault('(겉모습)', []).append(f'장면 건물 id {i} 가 두 번 나온다')
     return doc, problems
 
 
@@ -206,6 +215,9 @@ def diff(expected, actual):
                     for k in ('name', 'roofM', 'terrace'):
                         if px[i].get(k) != py[i].get(k): add(n, f'부분 {i} {k}: 노트 {px[i].get(k)!r} / 파일 {py[i].get(k)!r}')
                     if px[i].get('polygon') != py[i].get('polygon'): add(n, f'부분 {i}: 외곽 좌표가 다르다')
+    e = {x['id']: x for x in expected.get('appearance', [])}; a = {x.get('id'): x for x in actual.get('appearance', []) or []}
+    for n in sorted(e.keys() | a.keys()):
+        if e.get(n) != a.get(n): add(n, '겉모습: 노트와 파일이 다르다' if n in e and n in a else '겉모습: 노트에는 있고 파일에는 없다' if n in e else '겉모습: 파일에는 있고 노트에는 없다')
     for k in ('about', 'generated'):
         if expected.get(k) != actual.get(k): add('(파일 머리)', f'{k} 가 다르다')
     return out
@@ -227,7 +239,7 @@ def main(argv=None):
         if problems:
             print('노트에 문제가 있어 쓰지 않았다.'); return 1
         path.write_text(dumps(doc), encoding='utf-8', newline='\n')
-        print(f"썼다: {path} (지붕 {len(doc['buildings'])}, 숨김 {len(doc['hidden'])}, 부분 나누기 {len(doc['parts'])}, 건물 추가 {len(doc['added'])})")
+        print(f"썼다: {path} (지붕 {len(doc['buildings'])}, 숨김 {len(doc['hidden'])}, 부분 나누기 {len(doc['parts'])}, 건물 추가 {len(doc['added'])}, 겉모습 {len(doc['appearance'])})")
         return 0
     text = path.read_text(encoding='utf-8')
     d = diff(doc, json.loads(text))
@@ -236,7 +248,7 @@ def main(argv=None):
     same_text = text == dumps(doc)
     if not d and not same_text and not problems: print('[불일치] 값은 같지만 파일 글자가 생성 결과와 다르다(손으로 고친 흔적). write 로 다시 만든다.')
     names = lambda sec: ', '.join(f"{e['name']}" + (f"({len(e['parts'])})" if sec == 'parts' else '') for e in doc[sec]) or '없음'
-    print(f"노트 기준: 지붕 {names('buildings')} / 숨김 {names('hidden')} / 부분 나누기 {names('parts')} / 건물 추가 {names('added')}")
+    print(f"노트 기준: 지붕 {names('buildings')} / 숨김 {names('hidden')} / 부분 나누기 {names('parts')} / 건물 추가 {names('added')} / 겉모습 {len(doc['appearance'])}개")
     ok = not problems and not d and same_text
     print('일치' if ok else '불일치: 노트가 맞다. 노트를 고친 뒤 write, 다시 check.')
     return 0 if ok else 1

@@ -5,7 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { decodeGpkgGeometry, readGpkgLayer } from '../src/geo/gpkg.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
-import { gpkgSyncRows, overrideHeights, parseRoofOverrides, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, ringArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
+import { gpkgSyncRows, overrideHeights, parseAppearance, parseRoofOverrides, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, ringArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 /** GeoPackage blob: "GP", version 0, flags (little endian, no envelope), srs 5186, then WKB polygon. */
 function gpkgPolygon(ring: [number, number][]): Uint8Array {
@@ -192,4 +192,13 @@ test('qgis:sync rows: added buildings and every row of a hidden or split buildin
   assert.deepEqual(rows.map((b) => b.building_id), ['본관', '대일관#동쪽부속부', '은주관', '수인관']); // nameless parts and 은주1관 match no GeoPackage name later
   assert.deepEqual([...kept].sort(), ['공연실습소', '대일관', '은주관']);
   assert.deepEqual(gpkgSyncRows(scene, null).rows, scene); // a scene imported without overrides syncs every row
+});
+
+test('appearance records are optional, keyed by scene building id and listed once', () => {
+  assert.deepEqual(parseAppearance({ buildings: [] }), []);
+  const one = { id: 'A#p', wall: 'brick', windows: { style: 'rows', floorsM: [10, 13.5] }, roof: { type: 'hipped' } };
+  assert.deepEqual(parseAppearance({ appearance: [one] }), [one]);
+  assert.throws(() => parseAppearance({ appearance: [one, one] }), /listed once/);
+  assert.throws(() => parseAppearance({ appearance: [{ id: 'A' }] }), /wall/);
+  assert.throws(() => parseAppearance({ appearance: [{ ...one, windows: { floorsM: ['x'] } }] }), /floorsM/);
 });

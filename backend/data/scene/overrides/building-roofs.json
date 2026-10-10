@@ -480,5 +480,910 @@
         "reproduce": "docs/audit/b05/sites.py -> docs/audit/b05/sites.json"
       }
     }
+  ],
+  "appearance": [
+    {
+      "id": "대일관",
+      "wall": "brick",
+      "windows": {
+        "style": "rows",
+        "floorsM": [
+          145.0,
+          148.4,
+          151.8,
+          155.2,
+          158.6,
+          161.9,
+          165.3,
+          168.7
+        ],
+        "color": "#e9ece8"
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 4.0,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "확정(사용자 영상 캡처)",
+        "windows": "추정(줄 수는 사진, 높이는 층 표)",
+        "roof": "확정(경사·지붕창), 오름은 추정"
+      },
+      "features": [
+        {
+          "what": "정면이 굽어 보임",
+          "evidence": "사용자-SMAP높이-20261010/사진-18-대일관-정면.png 에서만 굽어 보이고 사용자-SMAP높이-20261010/사진-28-운동장-고각전경.png(위에서)과 원천 외곽은 곧다. 광각 렌즈 탓으로 봄",
+          "grade": "추정",
+          "drawn": false
+        },
+        {
+          "what": "현관(벽돌 기둥, 아치 둘, 기와 차양)",
+          "evidence": "사용자-SMAP높이-20261010/사진-18-대일관-정면.png. 구조물 파일 z02-daeil-front 가 그린다",
+          "grade": "확정",
+          "drawn": true
+        }
+      ]
+    },
+    {
+      "id": "문예관",
+      "wall": "glass",
+      "wallColor": "#6f9f9c",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          131.1,
+          135.0,
+          138.9,
+          144.8,
+          148.8,
+          152.5,
+          156.2,
+          159.9,
+          163.6,
+          167.3,
+          170.9,
+          174.6,
+          178.3,
+          182.0,
+          185.7
+        ],
+        "color": "#a9cfc9"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "concrete",
+        "rim": "#dfe3e0"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "측면의 주황 학교 로고와 둥근 유리 돌출",
+          "evidence": "사용자-SMAP높이-20261010/사진-30-문예관-원형고층부-사잇길.png",
+          "grade": "확정",
+          "drawn": false
+        },
+        {
+          "what": "옥상 통신 철탑",
+          "evidence": "학교 공식 사진 판독",
+          "grade": "원천(학교 사진)",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "본관",
+      "wall": "white",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          127.1,
+          130.7,
+          134.2,
+          137.8,
+          141.8,
+          145.8,
+          149.8
+        ],
+        "color": "#8fa3ad"
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "color": "#6b7280",
+        "riseM": 3.0
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "확정(경사), 오름은 추정"
+      }
+    },
+    {
+      "id": "북악관",
+      "wall": "stone",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          130.5,
+          134.1,
+          138.0,
+          140.9,
+          143.6,
+          146.3,
+          149.2,
+          152.5,
+          155.3
+        ],
+        "accent": "#e8a33a"
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 3.4,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "확정(사용자 영상 캡처)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "확정(경사·지붕창), 오름은 추정"
+      },
+      "features": [
+        {
+          "what": "정문 현관(돌 기둥, 아치 둘, 기와)",
+          "evidence": "사용자-SMAP높이-20261010/사진-19-북악관-정면.png. 구조물 파일 z05-turnaround 가 그린다",
+          "grade": "확정",
+          "drawn": true
+        }
+      ]
+    },
+    {
+      "id": "수인관",
+      "wall": "white",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          108.0,
+          112.02,
+          116.03,
+          120.05,
+          124.07,
+          128.08
+        ]
+      },
+      "roof": {
+        "type": "flat",
+        "material": "court"
+      },
+      "grades": {
+        "wall": "확정(사용자 거리뷰)",
+        "windows": "추정",
+        "roof": "확정"
+      }
+    },
+    {
+      "id": "유담관",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "유담관#기단데크",
+      "wall": "glass",
+      "wallColor": "#5b8fb0",
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "둥근 돌 기단부(창 줄 셋, 옥상 정원)",
+          "evidence": "사용자-유담관분수-북악관앞-20261010/유담관-분수광장-넓게.jpg. 구조물 파일 z03-fountain 의 상자가 그린다",
+          "grade": "확정",
+          "drawn": true
+        }
+      ]
+    },
+    {
+      "id": "유담관#탑2",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "유담관#탑3",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "유담관#탑4",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "유담관#탑5",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "유담관#탑6",
+      "wall": "glass",
+      "wallColor": "#4d86b5",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ],
+        "color": "#86b9da"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "은주관",
+      "wall": "stone",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          131.3,
+          137.2,
+          143.0,
+          148.9,
+          152.9
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 2.6,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "원천(학교 사진)",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "S-MAP(오름), 확정(지붕창)"
+      }
+    },
+    {
+      "id": "은주관#2관",
+      "wall": "stone",
+      "wallColor": "#b9b5aa",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          132.2,
+          137.8,
+          143.3,
+          148.9,
+          154.3
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 3.0,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "확정(경사·지붕창), 단면은 모름"
+      }
+    },
+    {
+      "id": "은주관#2관-낮은단",
+      "wall": "concrete",
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "추정",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "은주관#동쪽끝-남쪽날개",
+      "wall": "stone",
+      "wallColor": "#b9b5aa",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          132.2,
+          137.8,
+          143.3,
+          148.9,
+          154.3
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 3.0,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "확정(경사·지붕창), 단면은 모름"
+      }
+    },
+    {
+      "id": "은주관#동쪽끝-낮은부분",
+      "wall": "stone",
+      "wallColor": "#b9b5aa",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          132.2,
+          137.8,
+          143.3,
+          148.9,
+          154.3
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 3.0,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "확정(경사·지붕창), 단면은 모름"
+      }
+    },
+    {
+      "id": "은주관#동쪽끝-높은부분",
+      "wall": "stone",
+      "wallColor": "#b9b5aa",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          132.2,
+          137.8,
+          143.3,
+          148.9,
+          154.3
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 3.0,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "확정(경사·지붕창), 단면은 모름"
+      }
+    },
+    {
+      "id": "은주관#접합부",
+      "wall": "stone",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          131.3,
+          137.2,
+          143.0,
+          148.9,
+          152.9
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 2.6,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "원천(학교 사진)",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "S-MAP(오름), 확정(지붕창)"
+      }
+    },
+    {
+      "id": "은주관#접합부-남서날개",
+      "wall": "stone",
+      "windows": {
+        "style": "arches",
+        "floorsM": [
+          131.3,
+          137.2,
+          143.0,
+          148.9,
+          152.9
+        ]
+      },
+      "roof": {
+        "type": "hipped",
+        "material": "tile",
+        "riseM": 2.6,
+        "dormers": true
+      },
+      "grades": {
+        "wall": "원천(학교 사진)",
+        "windows": "원천(아치 칸), 높이는 추정",
+        "roof": "S-MAP(오름), 확정(지붕창)"
+      }
+    },
+    {
+      "id": "은주관#탑",
+      "wall": "concrete",
+      "wallColor": "#8d8b84",
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "확정",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "원통 위 통신 안테나",
+          "evidence": "사용자-공연실습소-은주관-20261010/은주관-운동장에서.png",
+          "grade": "확정",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "청운관",
+      "wall": "brick",
+      "windows": {
+        "style": "bands",
+        "floorsM": [
+          148.9,
+          153.1,
+          156.6,
+          160.0,
+          163.5,
+          167.0,
+          170.4,
+          173.9,
+          177.4,
+          180.9,
+          184.3
+        ],
+        "color": "#dcd8c8"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "확정(사용자 영상 캡처)",
+        "windows": "추정(줄 수가 사진과 다르다)",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "운동장 쪽 유리 승강기 탑",
+          "evidence": "사용자-SMAP높이-20261010/사진-23-청운관-열린돌출부.png",
+          "grade": "확정",
+          "drawn": false
+        },
+        {
+          "what": "열린 기둥부(밝은 콘크리트)",
+          "evidence": "사용자-SMAP높이-20261010/사진-23-청운관-열린돌출부.png. 구조물 파일 z05-cheongun 이 그린다",
+          "grade": "확정",
+          "drawn": true
+        }
+      ]
+    },
+    {
+      "id": "청운관#북동저층부",
+      "wall": "brick",
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "추정",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "추가-공연실습소",
+      "wall": "concrete",
+      "windows": {
+        "style": "bands",
+        "floorsM": [
+          92.9,
+          95.72,
+          98.54,
+          101.36,
+          104.18
+        ],
+        "color": "#3d4348"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "concrete"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "확정(5개 층), 높이는 추정",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "옥상 콘크리트 틀과 길가 탑",
+          "evidence": "사용자-서문-공연실습소-생활관-20261010/공연실습소.webp",
+          "grade": "확정",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "추가-문예관저층부",
+      "wall": "glass",
+      "wallColor": "#5f9a86",
+      "roof": {
+        "type": "flat",
+        "material": "green"
+      },
+      "grades": {
+        "wall": "원천(학교 사진)",
+        "roof": "S-MAP"
+      }
+    },
+    {
+      "id": "추가-외국인생활관",
+      "wall": "brick",
+      "windows": {
+        "style": "rows",
+        "floorsM": [
+          92.6,
+          95.48,
+          98.36,
+          101.24,
+          104.12
+        ],
+        "color": "#3d4348"
+      },
+      "upper": {
+        "fromM": 104.1,
+        "color": "#5b6068"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "metal"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정",
+        "upper": "확정(재질), 높이는 추정",
+        "roof": "S-MAP"
+      },
+      "features": [
+        {
+          "what": "금속판 지붕층의 세모 지붕창",
+          "evidence": "사용자-서문-공연실습소-생활관-20261010/외국인생활관.jpg",
+          "grade": "확정",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "한림관",
+      "wall": "glass",
+      "wallColor": "#2f6f73",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          127.2,
+          132.5,
+          137.8,
+          142.9,
+          147.9,
+          152.4,
+          156.8,
+          161.3,
+          165.8,
+          170.2,
+          174.7,
+          179.2,
+          183.6,
+          188.1,
+          192.7
+        ],
+        "color": "#5aa3a6"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "concrete",
+        "rim": "#3b82c4"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "확정(사용자 영상 캡처)"
+      },
+      "features": [
+        {
+          "what": "꼭대기 첨탑",
+          "evidence": "학교 공식 사진 판독",
+          "grade": "원천(학교 사진)",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "한림관#고리",
+      "wall": "glass",
+      "wallColor": "#2f6f73",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          127.2,
+          132.5,
+          137.8,
+          142.9,
+          147.9,
+          152.4,
+          156.8,
+          161.3,
+          165.8,
+          170.2,
+          174.7,
+          179.2,
+          183.6,
+          188.1,
+          192.7
+        ],
+        "color": "#5aa3a6"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "concrete",
+        "rim": "#3b82c4"
+      },
+      "grades": {
+        "wall": "확정(사용자 사진)",
+        "windows": "추정(높이는 층 표)",
+        "roof": "확정(사용자 영상 캡처)"
+      },
+      "features": [
+        {
+          "what": "꼭대기 첨탑",
+          "evidence": "학교 공식 사진 판독",
+          "grade": "원천(학교 사진)",
+          "drawn": false
+        }
+      ]
+    },
+    {
+      "id": "혜인관",
+      "wall": "ivy",
+      "windows": {
+        "style": "rows",
+        "floorsM": [
+          149.3,
+          153.4,
+          157.5,
+          161.6,
+          165.8,
+          169.9,
+          174.0
+        ],
+        "color": "#e9ece8"
+      },
+      "upper": {
+        "fromM": 169.9,
+        "color": "#e0962b"
+      },
+      "roof": {
+        "type": "flat",
+        "color": "#a85a3c"
+      },
+      "grades": {
+        "wall": "확정(운동장 쪽 면). 다른 면은 모름(같은 색으로 칠함)",
+        "windows": "추정(높이는 층 표)",
+        "upper": "추정",
+        "roof": "확정(색), 단은 미실시"
+      },
+      "features": [
+        {
+          "what": "윗부분의 아치 지붕창 띠",
+          "evidence": "사용자-SMAP높이-20261010/사진-22-운동장-전경.png",
+          "grade": "확정",
+          "drawn": false
+        }
+      ]
+    }
   ]
 }

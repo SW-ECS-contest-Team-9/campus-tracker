@@ -21,12 +21,14 @@ function cached(req: Request, res: Response, etag: string): boolean {
 
 // GET /api/v1/scene
 sceneRoutes.get('/scene', async (req, res) => {
-  const { rows } = await pool.query<{ id: string; terrainVersionId: string; mapVersionId: string; heightMode: string; importedAt: Date }>(
-    `SELECT id, terrain_version_id "terrainVersionId", map_version_id "mapVersionId", height_mode "heightMode", imported_at "importedAt"
+  const { rows } = await pool.query<{ id: string; terrainVersionId: string; mapVersionId: string; heightMode: string; importedAt: Date; appearance?: { id: string }[] | null }>(
+    `SELECT id, terrain_version_id "terrainVersionId", map_version_id "mapVersionId", height_mode "heightMode", imported_at "importedAt", metadata->'appearance' appearance
        FROM scene_versions WHERE active`,
   );
   if (!rows.length) throw AppError.notFound('SCENE_UNAVAILABLE', 'No active campus scene (npm run scene:import)');
-  const v = rows[0];
+  const { appearance, ...v } = rows[0];
+  // how each building looks (walls, window rows, roof): from the building notes through the overrides file, display only
+  const looks = new Map((appearance ?? []).map(({ id, ...rest }) => [id, rest]));
   if (cached(req, res, v.id)) return;
   const [buildings, campus, ctx] = await Promise.all([
     pool.query(
@@ -45,7 +47,7 @@ sceneRoutes.get('/scene', async (req, res) => {
     ...v,
     frame: CAMPUS_FRAME,
     geoidSeparationM: ctx?.geoidSeparation ?? CAMPUS_FRAME.geoidN,
-    buildings: buildings.rows,
+    buildings: buildings.rows.map((b) => ({ ...b, appearance: looks.get(b.buildingId) ?? null })),
     campus: campus.rows.map((r) => r.geometry),
   });
 });

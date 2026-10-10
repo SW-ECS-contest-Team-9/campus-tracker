@@ -313,6 +313,21 @@ export interface SceneBuilding {
   note: string | null;
   geometry: { type: 'MultiPolygon'; coordinates: number[][][][] };
   calibration: BuildingCalibration | null;
+  /** How the block looks (walls, window rows, roof), from the building notes; absent or null = a plain block. */
+  appearance?: BuildingAppearance | null;
+}
+/** Display only (building-appearance.ts draws it). Every item carries the note's evidence grade in `grades`. */
+export interface BuildingAppearance {
+  /** Wall material word: brick, glass, stone, concrete, ivy, panel, metal, white. */
+  wall: string;
+  wallColor?: string;
+  /** Window rows: one per storey at the note's floor heights (MSL), or `count` equal storeys when the note has no floor table. */
+  windows?: { style: 'rows' | 'bands' | 'curtain' | 'arches'; floorsM?: number[]; count?: number; color?: string; accent?: string };
+  /** A band of another colour on the walls above a height (upper storeys clad differently). */
+  upper?: { fromM: number; color: string };
+  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; dormers?: boolean; rim?: string };
+  grades?: Record<string, string>;
+  features?: { what: string; evidence: string; grade: string; drawn: boolean }[];
 }
 export interface CampusScene {
   id: string;

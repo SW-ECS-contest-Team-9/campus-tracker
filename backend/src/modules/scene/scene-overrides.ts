@@ -142,6 +142,28 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
   return { roofs, hidden, parts, added };
 }
 
+/**
+ * How a scene building looks ("appearance" of the overrides file, F07): display only, keyed by scene building id.
+ * The record is passed through to GET /api/v1/scene as it is (the frontend's BuildingAppearance); here only its shape is checked.
+ */
+export interface AppearanceRecord { id: string; wall: string; [k: string]: unknown }
+
+export function parseAppearance(doc: unknown): AppearanceRecord[] {
+  const list = (doc as { appearance?: unknown })?.appearance;
+  if (list === undefined) return [];
+  if (!Array.isArray(list)) throw new Error('Scene overrides: "appearance" must be an array');
+  const seen = new Set<string>();
+  return list.map((o: AppearanceRecord, i) => {
+    const at = `Appearance[${i}]`;
+    if (typeof o?.id !== 'string' || !o.id || seen.has(o.id)) throw new Error(`${at}: id must be a scene building id, listed once`);
+    seen.add(o.id);
+    if (typeof o.wall !== 'string' || !o.wall) throw new Error(`${at} ${o.id}: wall is required`);
+    const floors = (o.windows as { floorsM?: unknown } | undefined)?.floorsM;
+    if (floors !== undefined && !(Array.isArray(floors) && floors.every(Number.isFinite))) throw new Error(`${at} ${o.id}: windows.floorsM must be numbers`);
+    return o;
+  });
+}
+
 /** scene_buildings.building_id of a part: the first part keeps the building's id, so references to it stay valid. */
 export function partBuildingId(buildingId: string, parts: BuildingPart[], index: number): string {
   return index === 0 ? buildingId : `${buildingId}#${parts[index].id}`;

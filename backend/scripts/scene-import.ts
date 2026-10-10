@@ -30,7 +30,7 @@ import { pool, withTransaction } from '../src/config/database.js';
 import { readGpkgLayer, type Ring } from '../src/geo/gpkg.js';
 import { terrain } from '../src/geo/terrain.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
-import { overrideHeights, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
+import { overrideHeights, parseAppearance, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 const { values: args } = parseArgs({ options: { dir: { type: 'string' }, 'keep-absolute': { type: 'boolean', default: false }, 'no-overrides': { type: 'boolean', default: false }, 'dry-run': { type: 'boolean', default: false } } });
 const DEST = path.resolve(import.meta.dirname, '../data/scene/source');
@@ -55,6 +55,7 @@ async function main() {
   const mode = args['keep-absolute'] ? 'ABSOLUTE' : 'RECOMPUTED';
   const all = args['no-overrides'] || !fs.existsSync(OVERRIDES) ? { roofs: [], hidden: [], parts: [], added: [] } : parseSceneOverrides(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
   const overrides = all.roofs;
+  const appearance = args['no-overrides'] || !fs.existsSync(OVERRIDES) ? [] : parseAppearance(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
   const applied = overrides.length + all.hidden.length + all.parts.length + all.added.length;
 
   const problems: string[] = [];
@@ -202,6 +203,7 @@ async function main() {
     rows.push({ name: `${a.name} (added)`, building: a.id, iou: '', height: heightM, source: a.heightSource, base: h.baseM, roof: a.roofM, 'gpkg roof': '', 'Δroof': '', raised: '' });
   }
   console.table(rows);
+  for (const a of appearance) if (!out.some((b) => b.buildingId === a.id)) problems.push(`appearance ${a.id}: no such building in the scene`);
   if (problems.length) {
     console.log(`\n${problems.length} problem(s):\n  ${problems.join('\n  ')}`);
     throw new Error('Gates failed: nothing imported');
@@ -230,7 +232,7 @@ async function main() {
       `INSERT INTO scene_versions (id, source_sha256, terrain_version_id, map_version_id, height_mode, active, metadata) VALUES ($1, $2, $3, $4, $5, true, $6)`,
       [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows, ...(overrides.length ? { roofOverrides: overrides } : {}),
         ...(all.hidden.length ? { hiddenBuildings: all.hidden } : {}), ...(all.parts.length ? { buildingParts: all.parts } : {}),
-        ...(all.added.length ? { addedBuildings: all.added } : {}) })],
+        ...(all.added.length ? { addedBuildings: all.added } : {}), ...(appearance.length ? { appearance } : {}) })],
     );
     for (const b of out) {
       await client.query(
