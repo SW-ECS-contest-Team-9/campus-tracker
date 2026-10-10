@@ -258,7 +258,7 @@
     "kind": "platform",
     "estimated": true,
     "grade": "확정(있음, 운동장보다 2 m 이상 높음, 양 끝: 사용자 그림 02), S-MAP·사용자 핀(높이 151.0~151.8 범위), 추정(151.3 으로 고른 것, 폭)",
-    "surfaceName": "Z02-PASSAGE",
+    "surfaceName": "없음(폭 1.9~2.5 m 로 지형 격자 2 m 한 칸보다 좁아 지형에 싣지 않음. 아래 기단 Z02-PLATFORM-APRON 의 칸이 그대로 남고 형상은 이 기단이 싣는다)",
     "topM": 151.25,
     "bottomM": 148.9,
     "bottomNote": "바닥 기단 Z02-PLATFORM-APRON 윗면",

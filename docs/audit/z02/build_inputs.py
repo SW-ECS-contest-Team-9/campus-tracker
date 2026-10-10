@@ -56,11 +56,12 @@ def geom(poly):
     return {'type': 'Polygon', 'coordinates': [c]}
 
 feats, surf = [], []
+NARROW = '없음(폭 1.9~2.5 m 로 지형 격자 2 m 한 칸보다 좁아 지형에 싣지 않음. 아래 기단 Z02-PLATFORM-APRON 의 칸이 그대로 남고 형상은 이 기단이 싣는다)'
 def platform(name, poly, top, bottom, bottom_note, material, grade, assumption, source, reason, terrain=True):
     g = geom(poly)
-    feats.append({'type': 'Feature', 'properties': {'id': 'Z02-PLATFORM-' + name, 'type': 'platform', 'kind': 'platform', 'estimated': True, 'grade': grade, 'surfaceName': 'Z02-' + name if terrain else 'field (f05-plateaus.geojson)',
+    feats.append({'type': 'Feature', 'properties': {'id': 'Z02-PLATFORM-' + name, 'type': 'platform', 'kind': 'platform', 'estimated': True, 'grade': grade, 'surfaceName': 'Z02-' + name if terrain is True else NARROW if terrain == 'narrow' else 'field (f05-plateaus.geojson)',
         'topM': top, 'bottomM': bottom, 'bottomNote': bottom_note, 'material': material, 'assumption': assumption, 'source': source}, 'geometry': g})
-    if terrain: surf.append({'type': 'Feature', 'properties': {'name': 'Z02-' + name, 'srid': 5186, 'heightM': top, 'reason': reason, 'grade': grade, 'source': source}, 'geometry': g})
+    if terrain is True: surf.append({'type': 'Feature', 'properties': {'name': 'Z02-' + name, 'srid': 5186, 'heightM': top, 'reason': reason, 'grade': grade, 'source': source}, 'geometry': g})
 def box(id, typ, uv, fromM, toM, base, grade, assumption, source, **extra):
     feats.append({'type': 'Feature', 'properties': {'id': 'Z02-' + id, 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': grade, 'basePlane': base, 'fromM': r2(fromM), 'toM': r2(toM), 'assumption': assumption, 'source': source, **extra},
                   'geometry': {'type': 'Polygon', 'coordinates': [ring(uv)]}})
@@ -81,7 +82,7 @@ platform('ENTRANCE', ent, Z_ENT, Z_FIELD, '바닥 기단 Z02-PLATFORM-APRON 윗�
 pas = P([(ENT_U[1], -0.2), (40.0, -0.2), (40.1, 1.47), (54.0, 1.47), (54.0, PASS_V_E), (40.1, PASS_V_E), (40.1, PASS_V), (ENT_U[1], PASS_V)])
 platform('PASSAGE', pas, Z_PASS - 0.05, Z_FIELD, '바닥 기단 Z02-PLATFORM-APRON 윗면', 'concrete', '확정(있음, 운동장보다 2 m 이상 높음, 양 끝: 사용자 그림 02), S-MAP·사용자 핀(높이 151.0~151.8 범위), 추정(151.3 으로 고른 것, 폭)',
          '높은 가장자리 길의 몸통(옹벽 + 채움). 길이 방향으로 평평하다(S-MAP 벽 앞 값이 u 10~40 에서 ±0.15 m). 높이는 현관 단에서 2칸 위로 고름(사용자: 그대로 또는 1~2칸). 폭 2.5 m(동쪽 돌출 구간 1.9 m)',
-         f'사용자 그림 02, {P14}, 사진 6(핀 151.3 / 151.6), {MESH}', 'Z02 높은 가장자리 길(나무 데크 아래 몸통) 151.25 m. 폭이 격자 한 칸이라 지형에서는 톱니로 남고 형상은 구조물 파일이 싣는다.')
+         f'사용자 그림 02, {P14}, 사진 6(핀 151.3 / 151.6), {MESH}', '', terrain='narrow')
 plaza = P([(54.0, -4.6), (58.3, -4.6), (59.6, -2.2), (R_U0, -2.2), (R_U0, E_TOP), (54.0, E_TOP)])
 platform('PLAZA', plaza, Z_PLAZA, Z_FIELD, '바닥 기단 Z02-PLATFORM-APRON 윗면', 'paving', 'S-MAP(높이 150.9~151.0), 추정(외곽 ±1.5 m)',
          '동쪽 끝 계단을 올라선 작은 광장. 외곽은 대일관 동쪽 끝 벽과 계단 사이', f'{MESH}, 사용자 그림 07, {P23}', 'Z02 대일관·청운관 사이 작은 광장 151.0 m.')
@@ -167,7 +168,7 @@ dump(STRUCT, {'type': 'FeatureCollection', 'name': 'z02-daeil-front', 'crs': CRS
 dump(REC / 'z02-surface.geojson', {'type': 'FeatureCollection', 'name': 'z02-surface', 'crs': CRS, 'features': surf})
 g02 = json.loads((REC / 'g02-smooth-ground.json').read_text(encoding='utf-8'))
 dump(REC / 'z02-smooth-ground.json', {'crs': 'EPSG:5186', 'protectBuildings': True,
-    'reason': 'Z02: G02 조리법에 대일관 정면·운동장 북쪽 가장자리의 기단을 더함: 운동장 슬래브를 정면 벽까지 이은 바닥(148.9), 현관 단 151.0, 높은 가장자리 길 151.25, 작은 광장 151.0, 안쪽 마당 153.1 m. 지형 칸은 구조물 파일(frontend/public/structures/z02-daeil-front.geojson)의 기단 윗면에서 나온다. 계단·화단·현관·데크는 구조물 파일이 싣는다.',
+    'reason': 'Z02: G02 조리법에 대일관 정면·운동장 북쪽 가장자리의 기단을 더함: 운동장 슬래브를 정면 벽까지 이은 바닥(148.9), 현관 단 151.0, 작은 광장 151.0, 안쪽 마당 153.1 m(높은 가장자리 길 151.25 m 는 격자 한 칸보다 좁아 지형에 싣지 않음). 지형 칸은 구조물 파일(frontend/public/structures/z02-daeil-front.geojson)의 기단 윗면에서 나온다. 계단·화단·현관·데크는 구조물 파일이 싣는다.',
     'steps': g02['steps'] + [{'type': 'surface', 'file': 'z02-surface.geojson'}]})
 xy = lambda u, v: [r2(c) for c in uv_to_xy(u, v)]
 dump(HERE / 'model.json', {'crs': 'EPSG:5186', 'axis': {'origin': W0.tolist(), 'u': U.tolist(), 'v': V.tolist(), 'note': 'u = 대일관 정면 벽을 따라 동쪽, v = 벽에서 운동장 쪽'},
