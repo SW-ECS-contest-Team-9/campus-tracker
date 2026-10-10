@@ -2,6 +2,7 @@
 // Corridors are drawn with their real width, open areas as filled polygons, portals as labelled points.
 // Features without elevation_m lie on the terrain; with it, at that absolute (MSL) height (indoor / elevated).
 import { api, type MobilityCorridor, type MobilityOpenArea, type MobilityPortal, type MobilitySpaces } from './api';
+import { ROAD_SURFACE } from './road-surface';
 import type { Viewer } from './vworld';
 
 export type MobilityPick = { kind: 'mobility'; table: 'corridors' | 'openAreas' | 'portals'; id: number };
@@ -11,6 +12,8 @@ const CORRIDOR_COLORS: Record<string, string> = {
   crosswalk: '#f8fafc', road_shoulder: '#94a3b8', other: '#64748b',
 };
 const AREA_COLORS: Record<string, string> = { plaza: '#22c55e', courtyard: '#84cc16', lobby: '#a855f7', parking: '#94a3b8', other: '#64748b' };
+/** Open areas of this kind are paved road surface: drawn like the carriageways (road-surface.ts), so a road running into them reads as one surface. */
+const ASPHALT_AREA_KIND = 'parking';
 const PORTAL_COLORS: Record<string, string> = {
   building_entrance: '#ef4444', plaza_entrance: '#22c55e', stair_start: '#f97316', stair_end: '#fb923c', elevator: '#a855f7', junction: '#0ea5e9', other: '#64748b',
 };
@@ -52,9 +55,16 @@ export class MobilityLayer {
     for (const a of this.data.openAreas) {
       const ring = a.geometry.coordinates[0].flat();
       const pick: MobilityPick = { kind: 'mobility', table: 'openAreas', id: a.id };
+      const hierarchy = new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring), a.geometry.coordinates.slice(1).map((h) => new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(h.flat()))));
+      if (a.kind === ASPHALT_AREA_KIND) {
+        // outdoors it lies on the map's ground like the carriageways (stored heights and terrain differ by metres); inside a building it stays at its floor height
+        const indoor = a.elevationM != null && (a.buildingId || a.floor);
+        this.add({ polygon: { hierarchy, material: color(ROAD_SURFACE.color, 1), ...(indoor ? { height: a.elevationM, perPositionHeight: false } : { classificationType: C.ClassificationType.TERRAIN }) } }, pick);
+        continue;
+      }
       this.add({
         polygon: {
-          hierarchy: new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring), a.geometry.coordinates.slice(1).map((h) => new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(h.flat())))),
+          hierarchy,
           material: color(AREA_COLORS[a.kind] ?? AREA_COLORS.other, 0.3),
           ...(a.elevationM != null ? { height: a.elevationM, perPositionHeight: false } : { classificationType: C.ClassificationType.TERRAIN }),
         },
