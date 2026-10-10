@@ -24,6 +24,7 @@ export const CORRECTION_FILES: { file: string; group: CorrectionGroup }[] = [
   { file: 'stairs-v6-est.geojson', group: 'stairV6' },
   // '길 사슬 후보': path-graph-candidate-v2.json을 integrate_path_graph.py로 변환. 그래프 상태(+0.3 m)와 표면 접속 상태(+1.0 m)를 따로 표시
   { file: 'path-graph-candidate.geojson', group: 'pathGraph' },
+  { file: 'access-comparison-v1.geojson', group: 'pathGraph' }, // S06 차도·S07 문턱과 기존 DEM/DRAFT 길 비교(접속 미검증)
 ];
 
 export type CorrectionFeature = {

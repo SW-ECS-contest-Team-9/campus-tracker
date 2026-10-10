@@ -1,0 +1,223 @@
+{
+  "type": "FeatureCollection",
+  "provenance": {
+    "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\candidates-5186.geojson",
+    "sha256": "a0fb3c803b91866258608ce521ef0d1e4c7a823fd10fce049ce8bfe534507e90",
+    "inputs": {
+      "roads-live-2.json": "7ca603183098952e76637e2d590972514c76082674aaff05b6b7c41971cf48f6",
+      "terrain-grid.f32": "051d632f65c5fa6abc19a26d71f6f85fa2311c2b94c9059e78d357f419546ad8",
+      "terrain-grid-meta.json": "0a708cbd6f10cfe1591ba4caff41118f0fd4656948db69938ada8a769e322732"
+    },
+    "operationalChanges": false
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S06-C1",
+        "kind": "line",
+        "type": "path_unverified",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\candidates-5186.geojson",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "평면 위치는 정사 화면 차선·횡단보도로 판독. z는 S-MAP DEM(메시와 같은 계열로 추정, 독립 측량 아님). 보도·계단 보행로는 위치 띠만 확인되어 미작성.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201091.11,
+            557241.71,
+            117.7
+          ],
+          [
+            201075.75,
+            557270.59,
+            121.8
+          ],
+          [
+            201062.18,
+            557281.71,
+            123.76
+          ],
+          [
+            201052.66,
+            557287.23,
+            125.25
+          ],
+          [
+            201043.19,
+            557293.51,
+            126.76
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S07-C1",
+        "kind": "line",
+        "type": "path_unverified",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\candidates-5186.geojson",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "포털 위 화단 S-MAP dem_z 131.45(S07-K2). 메시는 하강 바닥을 표현 못함. 지하 표면은 별도 객체, 높이 미상. 951c157d 끝점(201053.9,557349.2)과 약50m 떨어져 연결 근거 없음.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201021.09,
+            557305.03,
+            127.39
+          ],
+          [
+            201022.81,
+            557309.11,
+            128.5
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S06-DEM",
+        "kind": "line",
+        "type": "surface_operational_only",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\terrain-grid.f32",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "동일 XY의 2015 DEM 표본 비교선. 표본 사이 직선은 지형 단면이나 보행로 확정이 아니다.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201091.11,
+            557241.71,
+            120.94031586742531
+          ],
+          [
+            201075.75,
+            557270.59,
+            124.92021230216778
+          ],
+          [
+            201062.18,
+            557281.71,
+            124.48742300339572
+          ],
+          [
+            201052.66,
+            557287.23,
+            127.15373419718992
+          ],
+          [
+            201043.19,
+            557293.51,
+            131.55086272315955
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S07-1d983e3a",
+        "kind": "line",
+        "type": "path_drawn_only",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\roads-live-2.json",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "입구 인근 기존 DRAFT indoor_corridor 비교. 같은 표면·입구 접속 근거 없음.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201018.15,
+            557313.89,
+            130.97
+          ],
+          [
+            201019.59,
+            557301.53,
+            130.97
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S07-699d0cbc",
+        "kind": "line",
+        "type": "path_drawn_only",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\roads-live-2.json",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "입구 인근 기존 DRAFT stairs 비교. 같은 표면·입구 접속 근거 없음.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201019.59,
+            557301.53,
+            130.97
+          ],
+          [
+            201025.2,
+            557291.29,
+            129.38
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ACCESS-S07-ccdf841c",
+        "kind": "line",
+        "type": "path_drawn_only",
+        "source": "C:\\campus-tracker\\docs\\audit\\m16\\preview\\data\\roads-live-2.json",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "입구 인근 기존 DRAFT ordinary 비교. 같은 표면·입구 접속 근거 없음.",
+        "status": "비교용·물리 접속 미검증"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            201006.82,
+            557375.82,
+            134.4
+          ],
+          [
+            201017.71,
+            557345.18,
+            131.25
+          ],
+          [
+            201019.84,
+            557330.32,
+            130.37
+          ],
+          [
+            201018.15,
+            557313.89,
+            130.97
+          ]
+        ]
+      }
+    }
+  ]
+}
