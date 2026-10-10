@@ -282,3 +282,13 @@ test('실제 구조물 파일(G02)이 있으면: 전부 읽히고 덩어리가 �
   for (const s of solids) if (s.stair) stairs.set(s.stair, [...(stairs.get(s.stair) ?? []), s.topM]);
   for (const [name, tops] of stairs) assert.ok(tops.every((z, i) => i === 0 || z > tops[i - 1]), name);
 });
+
+test('화단 기단은 윗면만 초록이고 옆면은 벽 색, 상자의 재질 색은 종류 색보다 먼저다', async () => {
+  const { STRUCTURES, solidColors } = await import('../src/structures.ts');
+  const solid = (role: string, type: string, material?: string) => ({ role, type, material }) as any;
+  assert.deepEqual(solidColors(solid('platform', 'platform', 'planting')), { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop });
+  assert.deepEqual(solidColors(solid('platform', 'platform', 'paving')), { body: STRUCTURES.materials.paving, top: STRUCTURES.materials.paving });
+  assert.equal(solidColors(solid('box', 'deck', 'concrete')).body, STRUCTURES.boxMaterials.concrete);
+  assert.equal(solidColors(solid('box', 'deck', 'timber')).body, STRUCTURES.types.deck);
+  assert.equal(solidColors(solid('box', 'canopy', 'opening')).top, STRUCTURES.boxMaterials.opening);
+});

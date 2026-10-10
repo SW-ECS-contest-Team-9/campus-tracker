@@ -277,12 +277,13 @@
     {
       "name": "청운관",
       "heightSource": "SMAP_MESH",
+      "uncovered": "The field-side porch (100 m2, roof 163.8 m) is an open column structure, not a closed block (user photos 16 and 23; user, 2026-10-11): it is drawn as columns, slabs, a roof and two stairs by the structure file frontend/public/structures/z05-cheongun.geojson.",
       "evidence": {
         "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
         "collectedOn": "2026-10-10",
         "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
         "independentSurvey": false,
-        "footprint": "unchanged; parts tile it (1334.8 of 1334.8 m2). Cut by two lines parallel to the north-east edge, 14.6 m and 32.5 m from it",
+        "footprint": "unchanged; cut by two lines parallel to the north-east edge, 14.6 m and 32.5 m from it. The two closed parts cover 1234.8 of 1334.8 m2; the field-side porch (100 m2) is open and is not drawn as a block",
         "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 본체: 187.8 (p10-p90 186.8-190.0, 170 cells, 86 % within 1.5 m); 북동저층부: 162.9 (p10-p90 161.0-164.0, 140 cells, 57 % within 1.5 m); 운동장쪽돌출부: 163.8 (p10-p90 163.8-163.8, 19 cells, 100 % within 1.5 m)",
         "roofForm": "본체: flat roof with roof structures up to 191.9 m at its north-west end. 북동저층부: two levels (161.0 and 163-164 m) drawn as one. 운동장쪽돌출부: the roof over the open multi-storey porch on the field side (user photos); drawn as a closed block because the model has no open structures",
         "replaces": "one block, roof 165.135 m (assumed 6 floors x 3.5 m = 21 m on the server DEM median 144.135 m)",
@@ -308,16 +309,6 @@
           "polygon": [
             [
               [201261.22, 557286.79], [201251.2, 557276.31], [201251.12, 557276.23], [201225.03, 557303.23], [201225.62, 557302.73], [201235.3, 557313.61], [201261.22, 557286.79]
-            ]
-          ]
-        },
-        {
-          "id": "운동장쪽돌출부",
-          "name": null,
-          "roofM": 163.8,
-          "polygon": [
-            [
-              [201221.15, 557275.04], [201211.87, 557280.87], [201212.23, 557290.03], [201212.59, 557290.34], [201228.91, 557273.46], [201221.15, 557275.04]
             ]
           ]
         }

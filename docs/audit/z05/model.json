@@ -1,12 +1,12 @@
 {
  "crs": "EPSG:5186",
  "counts": {
-  "platforms": 80,
+  "platforms": 87,
   "roadPieces": 37,
   "handOther": 5,
-  "planes": 38,
-  "boxes": 52,
-  "terrainSurfaces": 79,
+  "planes": 45,
+  "boxes": 170,
+  "terrainSurfaces": 87,
   "edgeSamples": 1821,
   "z04": {
    "platforms": 205,
@@ -20,12 +20,12 @@
  },
  "coverage": {
   "campusOutsideBuildingsM2": 34388,
-  "coveredByPlatformsM2": 32605
+  "coveredByPlatformsM2": 34200
  },
  "vsSmap1m": {
-  "points": 26345,
+  "points": 28362,
   "p50abs": 0.44,
-  "p90abs": 5.93
+  "p90abs": 5.94
  },
  "zones": {
   "turnaround": {
@@ -38,7 +38,7 @@
       130.14,
       131.45
      ],
-     "area": 1324.3,
+     "area": 1333.6,
      "grade": "확정(회차 공간·북악관 현관 앞·본관 앞·오르막길이 끊김 없는 한 포장면: 사용자 그림 11), S-MAP(높이)",
      "material": "paving",
      "terrain": true,
@@ -82,6 +82,19 @@
      "material": "paving",
      "terrain": true,
      "kind": "hand"
+    },
+    {
+     "id": "Z05-PLATFORM-TURN-BUKAK-FRONT",
+     "what": "북악관 남서 벽 앞(포장면과 건물 사이). 메시 135칸에 맞춘 평면 하나",
+     "top": [
+      131.75,
+      133.1
+     ],
+     "area": 328.2,
+     "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
     },
     {
      "id": "Z05-PLATFORM-TURN-WEST-EDGE",
@@ -334,7 +347,7 @@
      "id": "Z05-PLATFORM-UPPER-HANLIM-1F",
      "what": "한림관 1층 로비 문 앞 단(계단 위)",
      "top": 127.2,
-     "area": 55.8,
+     "area": 85.0,
      "grade": "확정(한림관 1층은 앞 길에서 계단 몇 개 위), S-MAP(126.9~127.5)",
      "material": "paving",
      "terrain": true,
@@ -364,7 +377,7 @@
      "id": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
      "what": "위쪽 갈래 굽이 안쪽의 섬(화단으로 봄)",
      "top": 125.4,
-     "area": 171.9,
+     "area": 202.3,
      "grade": "S-MAP(높이), 추정(외곽·재질)",
      "material": "planting",
      "terrain": true,
@@ -377,7 +390,7 @@
       119.1,
       121.09
      ],
-     "area": 295.7,
+     "area": 294.8,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -479,9 +492,9 @@
      "what": "대일관 뒤(서쪽)",
      "top": [
       139.5,
-      147.76
+      147.79
      ],
-     "area": 800.5,
+     "area": 819.1,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -494,7 +507,7 @@
       147.25,
       149.4
      ],
-     "area": 1233.6,
+     "area": 1292.3,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -527,7 +540,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 4
+   "boxes": 22
   },
   "cheongun": {
    "title": "청운관 앞",
@@ -543,7 +556,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 0
+   "boxes": 61
   },
   "hyein": {
    "title": "혜인관 둘레",
@@ -552,14 +565,14 @@
      "id": "Z05-PLATFORM-HYEIN-HYEIN-GROUND",
      "what": "혜인관 둘레",
      "top": 149.0,
-     "area": 1769.9,
+     "area": 1669.5,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
     }
    ],
-   "boxes": 2
+   "boxes": 32
   },
   "eunju": {
    "title": "은주관 둘레(풋살장·수인관)",
@@ -610,7 +623,7 @@
       127.3,
       131.0
      ],
-     "area": 425.6,
+     "area": 434.9,
      "grade": "S-MAP·사용자 핀(위쪽 갈래 높이), 추정(벽 면 자리 ±2 m, 띠가 화단인지 보도인지)",
      "material": "planting",
      "terrain": true,
@@ -623,7 +636,7 @@
       126.5,
       129.61
      ],
-     "area": 177.5,
+     "area": 236.8,
      "grade": "S-MAP(높이), 추정(무엇인지 모름: 비탈·계단 구분 근거 없음)",
      "material": "planting",
      "terrain": true,
@@ -636,7 +649,7 @@
       126.5,
       127.82
      ],
-     "area": 151.7,
+     "area": 202.8,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -646,8 +659,18 @@
      "id": "Z05-PLATFORM-EUNJU-EUNJU1-WEST",
      "what": "은주1관 서쪽(위쪽 갈래와 건물 사이 보도·화단 띠, 입구(1) 131.3 m)",
      "top": 131.8,
-     "area": 314.0,
+     "area": 314.1,
      "grade": "S-MAP(높이), 원천(입구(1) 표지), 추정(외곽)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-EUNJU-EUNJU2-ENTRANCE",
+     "what": "은주2관 1층 로비 입구 앞(수인관 옥상 높이와 이어짐)",
+     "top": 132.2,
+     "area": 524.6,
+     "grade": "원천(입구(1) 표지: 1층 로비), S-MAP(132.0~132.9)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -666,7 +689,7 @@
      "id": "Z05-PLATFORM-EUNJU-FIELD-WEST-EDGE",
      "what": "운동장 서쪽 가장자리(은주1관 벽까지)",
      "top": 148.9,
-     "area": 167.4,
+     "area": 180.6,
      "grade": "확정(운동장 148.9), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -676,9 +699,19 @@
      "id": "Z05-PLATFORM-EUNJU-FIELD-WEST-EDGE-b",
      "what": "운동장 서쪽 가장자리(은주1관 벽까지)",
      "top": 148.9,
-     "area": 53.9,
+     "area": 76.1,
      "grade": "확정(운동장 148.9), 추정(외곽)",
      "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-EUNJU-SUIN-SOUTH-EDGE",
+     "what": "수인관 남동 가장자리(건물 덩어리와 캠퍼스 외곽 사이의 좁은 띠)",
+     "top": 132.1,
+     "area": 323.6,
+     "grade": "추정(S-MAP 128~132 m, 무엇인지 모름)",
+     "material": "concrete",
      "terrain": true,
      "kind": "spec"
     }
@@ -803,13 +836,36 @@
      "kind": "hand"
     },
     {
-     "id": "Z05-PLATFORM-YUDAM9-YUDAM-NORTH",
-     "what": "유담관 9층 쪽 앞마당 둘레(제2주차장 위). 메시 63칸에 맞춘 평면 하나",
+     "id": "Z05-PLATFORM-YUDAM9-PLAZA-NORTH-EDGE",
+     "what": "분수 광장 북쪽 가장자리(광장 판과 유담관 벽 사이)",
+     "top": 114.1,
+     "area": 393.9,
+     "grade": "S-MAP(114.1), 추정(외곽)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-YUDAM9-V3-SOUTH-EDGE",
+     "what": "본관 앞 차도의 남쪽 가장자리(차도와 유담관 벽 사이). 메시 19칸에 맞춘 평면 하나",
      "top": [
-      127.54,
+      121.58,
+      127.92
+     ],
+     "area": 289.7,
+     "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-YUDAM9-YUDAM-NORTH",
+     "what": "유담관 9층 쪽 앞마당 둘레(제2주차장 위). 메시 57칸에 맞춘 평면 하나",
+     "top": [
+      127.86,
       131.6
      ],
-     "area": 255.0,
+     "area": 240.3,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -817,15 +873,15 @@
     },
     {
      "id": "Z05-PLATFORM-YUDAM9-YUDAM-NORTH-b",
-     "what": "유담관 9층 쪽 앞마당 둘레(제2주차장 위). 메시 63칸에 맞춘 평면 하나",
+     "what": "유담관 9층 쪽 앞마당 둘레(제2주차장 위). 메시 57칸에 맞춘 평면 하나",
      "top": [
-      127.54,
+      127.86,
       131.6
      ],
-     "area": 22.7,
+     "area": 59.6,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
-     "terrain": false,
+     "terrain": true,
      "kind": "spec"
     },
     {
@@ -835,7 +891,7 @@
       128.57,
       130.52
      ],
-     "area": 191.5,
+     "area": 197.9,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -845,7 +901,7 @@
      "id": "Z05-PLATFORM-YUDAM9-TERRACE-SW",
      "what": "유담관 9층 높이의 남서쪽 테라스(건물 덩어리 밖으로 나온 띠)",
      "top": 129.2,
-     "area": 116.6,
+     "area": 116.5,
      "grade": "S-MAP(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -855,14 +911,14 @@
      "id": "Z05-PLATFORM-YUDAM9-TERRACE-SW-b",
      "what": "유담관 9층 높이의 남서쪽 테라스(건물 덩어리 밖으로 나온 띠)",
      "top": 129.2,
-     "area": 103.9,
+     "area": 96.8,
      "grade": "S-MAP(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
     }
    ],
-   "boxes": 0
+   "boxes": 4
   },
   "west": {
    "title": "서문과 서쪽 옹벽",
@@ -874,8 +930,8 @@
       94.0,
       119.0
      ],
-     "area": 1826.0,
-     "grade": "S-MAP(종단), 추정(폭 11 m, 북쪽 끝)",
+     "area": 2869.8,
+     "grade": "S-MAP(종단), 추정(폭 11~23 m: 캠퍼스 외곽까지, 북쪽 끝)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -914,7 +970,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 4
+   "boxes": 5
   },
   "gate": {
    "title": "정문과 남서쪽 공도",
@@ -1015,9 +1071,9 @@
      "what": "정문 안 포장(정문 진입로·주차장 차로·주 진입로 사이와 수인관 벽까지)",
      "top": [
       106.69,
-      108.87
+      108.86
      ],
-     "area": 673.8,
+     "area": 673.7,
      "grade": "S-MAP·사용자 핀(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -1028,9 +1084,9 @@
      "what": "정문 안 포장(정문 진입로·주차장 차로·주 진입로 사이와 수인관 벽까지)",
      "top": [
       106.69,
-      108.87
+      108.86
      ],
-     "area": 585.7,
+     "area": 585.4,
      "grade": "S-MAP·사용자 핀(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -1043,8 +1099,34 @@
       95.0,
       106.9
      ],
-     "area": 2867.1,
+     "area": 2835.0,
      "grade": "S-MAP(종단), 추정(폭·축)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-GATE-ROAD-EAST-EDGE",
+     "what": "주 진입로의 동쪽 가장자리(차도와 가운데 옹벽·수인관 벽 사이)",
+     "top": [
+      108.14,
+      119.09
+     ],
+     "area": 334.6,
+     "grade": "S-MAP·사용자 핀(차도 종단, V02), 추정(외곽)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-GATE-ROAD-EAST-EDGE-b",
+     "what": "주 진입로의 동쪽 가장자리(차도와 가운데 옹벽·수인관 벽 사이)",
+     "top": [
+      108.14,
+      119.09
+     ],
+     "area": 22.8,
+     "grade": "S-MAP·사용자 핀(차도 종단, V02), 추정(외곽)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -1054,23 +1136,23 @@
      "what": "정문 앞 서경로(캠퍼스 밖 공도)",
      "top": [
       105.5,
-      112.54
+      111.0
      ],
-     "area": 986.5,
+     "area": 958.4,
      "grade": "S-MAP(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
     }
    ],
-   "boxes": 5
+   "boxes": 9
   }
  },
  "residuals": {
   "Z05-PLATFORM-TURN-PLAZA": [
    -0.01,
    0.26,
-   1326
+   1330
   ],
   "Z05-PLATFORM-TURN-V4-01": [
    0.09,
@@ -1268,9 +1350,9 @@
    153
   ],
   "Z05-PLATFORM-UPPER-HANLIM-1F": [
-   0.52,
-   0.97,
-   45
+   0.59,
+   1.02,
+   70
   ],
   "Z05-PLATFORM-YUDAM9-FORECOURT-9F": [
    0.3,
@@ -1278,9 +1360,9 @@
    54
   ],
   "Z05-PLATFORM-WEST-STREET": [
-   -1.14,
-   14.48,
-   1519
+   -0.38,
+   13.29,
+   1765
   ],
   "Z05-PLATFORM-WEST-WALLTOP-PLANTER": [
    -1.79,
@@ -1323,14 +1405,14 @@
    159
   ],
   "Z05-PLATFORM-BACK-BEHIND-DAEIL-W": [
-   -0.05,
-   4.1,
-   766
+   -0.07,
+   4.11,
+   783
   ],
   "Z05-PLATFORM-BACK-BEHIND-DAEIL-E": [
-   -0.05,
-   1.42,
-   1068
+   -0.06,
+   1.66,
+   1086
   ],
   "Z05-PLATFORM-BACK-BANK-W": [
    -2.18,
@@ -1353,9 +1435,9 @@
    34
   ],
   "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND": [
-   0.21,
-   1.56,
-   167
+   0.4,
+   1.95,
+   197
   ],
   "Z05-PLATFORM-UPPER-JUNCTION": [
    -0.11,
@@ -1373,24 +1455,29 @@
    77
   ],
   "Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP": [
-   5.65,
-   10.84,
-   413
+   5.48,
+   10.82,
+   428
   ],
   "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH": [
-   0.07,
-   4.51,
-   170
+   -0.03,
+   3.49,
+   230
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-NW": [
-   -0.49,
-   3.07,
-   137
+   -1.24,
+   5.52,
+   180
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-WEST": [
    0.49,
    2.43,
    287
+  ],
+  "Z05-PLATFORM-EUNJU-EUNJU2-ENTRANCE": [
+   -0.51,
+   3.05,
+   346
   ],
   "Z05-PLATFORM-EUNJU-EUNJU2-AREAWAY": [
    -1.87,
@@ -1400,27 +1487,42 @@
   "Z05-PLATFORM-EUNJU-FIELD-WEST-EDGE": [
    -0.6,
    0.9,
-   140
+   138
   ],
   "Z05-PLATFORM-EUNJU-FIELD-WEST-EDGE-b": [
    -0.55,
-   0.94,
-   44
+   0.97,
+   66
+  ],
+  "Z05-PLATFORM-TURN-BUKAK-FRONT": [
+   0.05,
+   0.52,
+   251
+  ],
+  "Z05-PLATFORM-YUDAM9-PLAZA-NORTH-EDGE": [
+   -2.29,
+   13.47,
+   297
+  ],
+  "Z05-PLATFORM-YUDAM9-V3-SOUTH-EDGE": [
+   0.0,
+   0.17,
+   99
   ],
   "Z05-PLATFORM-YUDAM9-YUDAM-NORTH": [
-   0.11,
-   0.86,
-   192
+   0.14,
+   0.92,
+   180
   ],
   "Z05-PLATFORM-YUDAM9-YUDAM-NORTH-b": [
-   -0.49,
-   0.63,
-   16
+   -0.89,
+   1.28,
+   52
   ],
   "Z05-PLATFORM-YUDAM9-MAIN-WEST": [
-   -0.0,
-   0.24,
-   153
+   0.0,
+   0.19,
+   167
   ],
   "Z05-PLATFORM-TURN-WEST-EDGE": [
    -0.02,
@@ -1434,8 +1536,8 @@
   ],
   "Z05-PLATFORM-YUDAM9-TERRACE-SW-b": [
    0.06,
-   0.23,
-   98
+   0.13,
+   92
   ],
   "Z05-PLATFORM-GATE-APRON": [
    -2.62,
@@ -1444,18 +1546,33 @@
   ],
   "Z05-PLATFORM-GATE-APRON-b": [
    -0.23,
-   3.35,
-   577
+   3.38,
+   578
   ],
   "Z05-PLATFORM-GATE-STREET-SW": [
-   -0.02,
-   16.05,
-   2835
+   -0.01,
+   14.69,
+   2800
+  ],
+  "Z05-PLATFORM-GATE-ROAD-EAST-EDGE": [
+   -4.2,
+   19.25,
+   331
+  ],
+  "Z05-PLATFORM-GATE-ROAD-EAST-EDGE-b": [
+   -1.84,
+   3.3,
+   18
+  ],
+  "Z05-PLATFORM-EUNJU-SUIN-SOUTH-EDGE": [
+   0.03,
+   9.52,
+   314
   ],
   "Z05-PLATFORM-GATE-SEOGYEONG-RO": [
-   -0.37,
-   4.59,
-   687
+   -0.27,
+   3.22,
+   658
   ],
   "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND": [
    0.05,
@@ -1463,9 +1580,9 @@
    587
   ],
   "Z05-PLATFORM-HYEIN-HYEIN-GROUND": [
-   -0.11,
-   8.11,
-   1096
+   -0.14,
+   1.0,
+   1010
   ]
  }
 }

@@ -22,6 +22,8 @@ export const STRUCTURES = {
   types: { stair_step: '#d2cdc0', landing: '#c4bfb2', planter: '#a9a59b', wall: '#dfdcd3', deck: '#a47551', canopy: '#7b7068', barrier: '#d8b23f' } as Record<string, string>,
   /** A `planting` platform (a planted bank or a planter band on a wall): its top is the planted green, its sides are this wall colour. */
   plantingSide: '#a9a59b',
+  /** A box whose `material` is one of these is drawn in this colour instead of the colour of its `type` (a concrete slab is not a timber deck; `opening` = a dark panel marking a portal in a wall). */
+  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136' } as Record<string, string>,
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
   /** A material or type this table does not know. */
@@ -403,7 +405,7 @@ export function surfaceExclusions(solids: Solid[]): { platforms: { polygon: Poly
 export function solidColors(solid: Solid): { body: string; top: string } {
   if (solid.role === 'void') return { body: STRUCTURES.void, top: STRUCTURES.void };
   const body = solid.role === 'platform' ? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown
-    : STRUCTURES.types[solid.type] ?? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown;
+    : STRUCTURES.boxMaterials[solid.material ?? ''] ?? STRUCTURES.types[solid.type] ?? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown;
   if (solid.role === 'platform' && solid.material === 'planting') return { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop };
   return { body, top: solid.type === 'planter' ? STRUCTURES.planterTop : body };
 }
