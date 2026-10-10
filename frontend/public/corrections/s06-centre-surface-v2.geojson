@@ -1,0 +1,1196 @@
+{
+  "type": "FeatureCollection",
+  "provenance": {
+    "source": "C:\\campus-tracker-backend\\데이터\\보완자료\\3d-map-audit-20261009\\claude-m16\\s06-extended-samples.json",
+    "sha256": "4467403ddb1db046caaa394452e05967b32877be631f09dd2fd87bc8ac31870e",
+    "inputs": {
+      "C:\\campus-tracker-backend\\데이터\\보완자료\\3d-map-audit-20261009\\claude-m16\\s06-cross-sections-raw-20261010.json": "b93b81c5848c14fea5102e2233844f9e908f9ff23c88b8ccf5a4f3f3db6537e0",
+      "C:\\campus-tracker-backend\\데이터\\보완자료\\3d-map-audit-20261009\\claude-m16\\s06-end-cross-sections-raw-20261010.json": "9af517da363710b7dcd6eda65b5df09de197d29dde83bcc2095006d209bdc7f5",
+      "C:\\campus-tracker-backend\\데이터\\보완자료\\3d-map-audit-20261009\\claude-m16\\s06-lower-interior-raw-20261010.json": "42d4f9d1dd8ca1b8af08c15b398e5bacf7ceae549e67265a3531fe147982a00d"
+    },
+    "operationalChanges": false,
+    "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님.",
+    "status": "연장 검토 후보, 실측 정확도·실물 접속 미검증"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201091.9928939628,
+              557242.1795724123,
+              117.70098876953125
+            ],
+            [
+              201088.1528939628,
+              557249.3995724123,
+              118.75675964355469
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201091.9928939628,
+              557242.1795724123,
+              117.70098876953125
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201091.9928939628,
+              557242.1795724123,
+              117.70098876953125
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201091.11,
+              557241.71,
+              117.69651794433594
+            ],
+            [
+              201091.9928939628,
+              557242.1795724123,
+              117.70098876953125
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201091.11,
+              557241.71,
+              117.69651794433594
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201086.38710603717,
+              557248.4604275876,
+              118.6264877319336
+            ],
+            [
+              201091.11,
+              557241.71,
+              117.69651794433594
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201091.11,
+              557241.71,
+              117.69651794433594
+            ],
+            [
+              201086.38710603717,
+              557248.4604275876,
+              118.6264877319336
+            ],
+            [
+              201090.22710603717,
+              557241.2404275876,
+              117.5360336303711
+            ],
+            [
+              201091.11,
+              557241.71,
+              117.69651794433594
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.25--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201088.1528939628,
+              557249.3995724123,
+              118.75675964355469
+            ],
+            [
+              201084.3128939628,
+              557256.6195724122,
+              119.93172454833984
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201088.1528939628,
+              557249.3995724123,
+              118.75675964355469
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.25--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201088.1528939628,
+              557249.3995724123,
+              118.75675964355469
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201088.1528939628,
+              557249.3995724123,
+              118.75675964355469
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.25-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201082.54710603718,
+              557255.6804275876,
+              119.91574096679688
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.25-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ],
+            [
+              201082.54710603718,
+              557255.6804275876,
+              119.91574096679688
+            ],
+            [
+              201086.38710603717,
+              557248.4604275876,
+              118.6264877319336
+            ],
+            [
+              201087.27,
+              557248.9299999999,
+              118.7666015625
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.5--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201084.3128939628,
+              557256.6195724122,
+              119.93172454833984
+            ],
+            [
+              201080.4728939628,
+              557263.8395724123,
+              120.97537231445312
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201084.3128939628,
+              557256.6195724122,
+              119.93172454833984
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.5--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201084.3128939628,
+              557256.6195724122,
+              119.93172454833984
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201084.3128939628,
+              557256.6195724122,
+              119.93172454833984
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.5-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201078.70710603718,
+              557262.9004275877,
+              120.96832275390625
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.5-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ],
+            [
+              201078.70710603718,
+              557262.9004275877,
+              120.96832275390625
+            ],
+            [
+              201082.54710603718,
+              557255.6804275876,
+              119.91574096679688
+            ],
+            [
+              201083.43,
+              557256.1499999999,
+              119.85372924804688
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.75--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201080.4728939628,
+              557263.8395724123,
+              120.97537231445312
+            ],
+            [
+              201076.56028376322,
+              557271.1760377317,
+              121.73958587646484
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201080.4728939628,
+              557263.8395724123,
+              120.97537231445312
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.75--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201080.4728939628,
+              557263.8395724123,
+              120.97537231445312
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201080.4728939628,
+              557263.8395724123,
+              120.97537231445312
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.75-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201074.93971623678,
+              557270.0039622682,
+              121.715576171875
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-1.75-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ],
+            [
+              201074.93971623678,
+              557270.0039622682,
+              121.715576171875
+            ],
+            [
+              201078.70710603718,
+              557262.9004275877,
+              120.96832275390625
+            ],
+            [
+              201079.59,
+              557263.37,
+              120.9082260131836
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-2--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201076.56028376322,
+              557271.1760377317,
+              121.73958587646484
+            ],
+            [
+              201062.7646563972,
+              557282.5212810223,
+              123.65583038330078
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201076.56028376322,
+              557271.1760377317,
+              121.73958587646484
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-2--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201076.56028376322,
+              557271.1760377317,
+              121.73958587646484
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201076.56028376322,
+              557271.1760377317,
+              121.73958587646484
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-2-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201061.5953436028,
+              557280.8987189776,
+              123.78407287597656
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-2-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ],
+            [
+              201061.5953436028,
+              557280.8987189776,
+              123.78407287597656
+            ],
+            [
+              201074.93971623678,
+              557270.0039622682,
+              121.715576171875
+            ],
+            [
+              201075.75,
+              557270.59,
+              121.79660034179688
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-3--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201062.7646563972,
+              557282.5212810223,
+              123.65583038330078
+            ],
+            [
+              201053.1877858851,
+              557288.079377454,
+              125.20921325683594
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201062.7646563972,
+              557282.5212810223,
+              123.65583038330078
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-3--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201062.7646563972,
+              557282.5212810223,
+              123.65583038330078
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201062.7646563972,
+              557282.5212810223,
+              123.65583038330078
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-3-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201052.1322141149,
+              557286.380622546,
+              125.17839813232422
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-3-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ],
+            [
+              201052.1322141149,
+              557286.380622546,
+              125.17839813232422
+            ],
+            [
+              201061.5953436028,
+              557280.8987189776,
+              123.78407287597656
+            ],
+            [
+              201062.18,
+              557281.71,
+              123.7568359375
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-4--1-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201053.1877858851,
+              557288.079377454,
+              125.20921325683594
+            ],
+            [
+              201043.74266767298,
+              557294.3434017298,
+              126.82320404052734
+            ],
+            [
+              201043.19,
+              557293.51,
+              126.75926971435547
+            ],
+            [
+              201053.1877858851,
+              557288.079377454,
+              125.20921325683594
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-4--1-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201053.1877858851,
+              557288.079377454,
+              125.20921325683594
+            ],
+            [
+              201043.19,
+              557293.51,
+              126.75926971435547
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201053.1877858851,
+              557288.079377454,
+              125.20921325683594
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-4-0-A",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201043.19,
+              557293.51,
+              126.75926971435547
+            ],
+            [
+              201042.63733232702,
+              557292.6765982702,
+              126.89231872558594
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-4-0-B",
+        "kind": "surface",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ],
+            [
+              201042.63733232702,
+              557292.6765982702,
+              126.89231872558594
+            ],
+            [
+              201052.1322141149,
+              557286.380622546,
+              125.17839813232422
+            ],
+            [
+              201052.66,
+              557287.23,
+              125.2509994506836
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "S06-CENTRE-CLIP",
+        "kind": "clip",
+        "type": "corridor_tin",
+        "source": "https://smap.seoul.go.kr/measure/getMeasureElevation3d.do",
+        "estimated": true,
+        "accuracyVerified": false,
+        "assumption": "±1m 표본 사이 선형 보간. 실제 차도 폭/보도/계단/끝단 접속 미검증. 실측 정확도 확인 아님."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              201091.9928939628,
+              557242.1795724123
+            ],
+            [
+              201088.1528939628,
+              557249.3995724123
+            ],
+            [
+              201084.3128939628,
+              557256.6195724122
+            ],
+            [
+              201080.4728939628,
+              557263.8395724123
+            ],
+            [
+              201076.56028376322,
+              557271.1760377317
+            ],
+            [
+              201062.7646563972,
+              557282.5212810223
+            ],
+            [
+              201053.1877858851,
+              557288.079377454
+            ],
+            [
+              201043.74266767298,
+              557294.3434017298
+            ],
+            [
+              201042.63733232702,
+              557292.6765982702
+            ],
+            [
+              201052.1322141149,
+              557286.380622546
+            ],
+            [
+              201061.5953436028,
+              557280.8987189776
+            ],
+            [
+              201074.93971623678,
+              557270.0039622682
+            ],
+            [
+              201078.70710603718,
+              557262.9004275877
+            ],
+            [
+              201082.54710603718,
+              557255.6804275876
+            ],
+            [
+              201086.38710603717,
+              557248.4604275876
+            ],
+            [
+              201090.22710603717,
+              557241.2404275876
+            ],
+            [
+              201091.9928939628,
+              557242.1795724123
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

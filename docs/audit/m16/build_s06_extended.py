@@ -29,10 +29,10 @@ ring = [points[s,-1][:2] for s in stations]+[points[s,1][:2] for s in reversed(s
 feature('S06-CENTRE-CLIP','clip',ring)
 inputs = {str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 (folder/'s06-extended-samples.json').write_text(json.dumps({'inputs':inputs,'points':samples},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-output = folder/'s06-centre-surface-v2-candidate.geojson'
+output = Path(sys.argv[2]) if len(sys.argv) > 2 else folder/'s06-centre-surface-v2-candidate.geojson'
 combined = folder/'s06-extended-samples.json'
 output.write_text(json.dumps({'type':'FeatureCollection','provenance':{
     'source':str(combined),'sha256':hashlib.sha256(combined.read_bytes()).hexdigest(),
-    'inputs':inputs,'operationalChanges':False,'assumption':note,'status':'앱 미등록 연장 검토 후보'},
+    'inputs':inputs,'operationalChanges':False,'assumption':note,'status':'연장 검토 후보, 실측 정확도·실물 접속 미검증'},
     'features':features},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 print(output, 'triangles',len(features)-1)

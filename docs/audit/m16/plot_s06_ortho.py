@@ -41,6 +41,10 @@ ax.set_xlabel('Original screenshot pixel x');ax.set_ylabel('Original screenshot 
 fig.tight_layout()
 stem = 's06-extended-projection-estimate' if extended else 's06-ortho-projection-estimate'
 fig.savefig(audit/'claude-m16'/f'{stem}.png',dpi=160)
+if extended:
+    ax.set_xlim(480,625); ax.set_ylim(440,250)
+    ax.set_title('S06 lower bend: projected samples, ground registration unverified')
+    fig.savefig(audit/'claude-m16/s06-lower-bend-projection-detail.png',dpi=160)
 result={'method':'Height-aware perspective fit to 12 recovered roof references. Ground projection extrapolation, not independent ground validation.',
         'referenceResidualRmsPx':float(np.sqrt(np.mean(residual**2))),
         'referenceResidualMaxPx':float(max(residual)), 'fit':fit.tolist(),
