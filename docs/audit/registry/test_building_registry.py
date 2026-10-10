@@ -183,6 +183,27 @@ class Registry(unittest.TestCase):
         self.assertEqual(set(problems), set(bad))
         self.assertEqual(doc['buildings'] + doc['hidden'] + doc['parts'], [])
 
+    def test_appearance_goes_to_the_file_with_window_rows_at_the_floor_table(self):
+        look = """층_바닥_높이:
+  층: {1층: {값: 100.0, 등급: 추정}, 2층: {값: 103.5, 등급: 추정}, 3층: {값: 107.0, 등급: 추정}, 5층: {값: 110.5, 등급: 추정}}
+겉모습:
+  - 대상: ["가관"]
+    벽: {값: 붉은 벽돌, 출처: 사진, 등급: "원천(학교 사진)"}
+    창: {모양: 낱창, 출처: 사진, 등급: 추정}
+    지붕: {모양: 모임지붕, 재질: 기와, 오름: 3.0, 지붕창: true, 출처: 사진, 등급: 확정}
+    특징: [{무엇: 굽은 정면, 출처: 사진, 등급: 추정, 그림: 아니오}]
+---"""
+        head = lambda text: br.read_head(ROOF.replace('---', '', 1).replace('---', text, 1).join(['---', '']))
+        got, bad = br.appearance.from_note(head(look))
+        self.assertEqual(bad, [])
+        self.assertEqual(got, [{'id': '가관', 'wall': 'brick', 'windows': {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5]},
+                                'roof': {'type': 'hipped', 'material': 'tile', 'riseM': 3.0, 'dormers': True},
+                                'grades': {'wall': '원천(학교 사진)', 'windows': '추정', 'roof': '확정'},
+                                'features': [{'what': '굽은 정면', 'evidence': '사진', 'grade': '추정', 'drawn': False}]}])
+        self.assertTrue(br.appearance.from_note(head(look.replace('5층: {값: 110.5', '4층: {값: 110.5')))[1])      # there is no 4th floor
+        self.assertTrue(br.appearance.from_note(head(look.replace('등급: 확정}', '등급: 모름}')))[1])                # an unknown is not written down
+        self.assertTrue(br.appearance.from_note(head(look.replace('값: 붉은 벽돌', '값: 나무')))[1])
+
     def test_check_and_write_commands(self):
         d = folder(가관=ROOF, 나관=PARTS)
         out = pathlib.Path(d, 'o.json')

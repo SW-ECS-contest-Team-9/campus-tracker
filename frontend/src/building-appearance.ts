@@ -20,10 +20,10 @@ const hex = (css: string): RGB => [1, 3, 5].map((i) => parseInt(css.slice(i, i +
 
 /** Wall and roof colours per material word of the notes; `color` in the record replaces them. */
 export const WALL_COLORS: Record<string, string> = {
-  brick: '#9c4a3c', glass: '#4f8fa8', stone: '#d9d2c2', concrete: '#a9a8a2', ivy: '#4d6b3a', panel: '#c9c3b4', metal: '#5b6068', white: '#ece9e1',
+  brick: '#8a4a3c', glass: '#4f8fa8', stone: '#d9d2c2', concrete: '#a9a8a2', ivy: '#4d6b3a', panel: '#c9c3b4', metal: '#5b6068', white: '#dcd8cd',
 };
 export const ROOF_COLORS: Record<string, string> = { tile: '#4a4d52', concrete: '#b5b3ac', glass: '#3f7890', green: '#5f8a5a', metal: '#4d5258', court: '#4f9a63' };
-const WINDOW = { glass: '#9fc4d6', frame: '#e8ebe6', dormer: '#d5d9dc', cornice: '#d8d4c8' };
+const WINDOW = { glass: '#6f8794', frame: '#d3d8d5', dormer: '#aeb4b8', cornice: '#d8d4c8', infill: '#8e8f8c' };
 
 export const wallColor = (a: BuildingAppearance) => a.wallColor ?? WALL_COLORS[a.wall] ?? WALL_COLORS.panel;
 const roofColor = (a: BuildingAppearance) => a.roof?.color ?? ROOF_COLORS[a.roof?.material ?? ''] ?? ROOF_COLORS.concrete;
@@ -114,8 +114,9 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
   const top = wallTopM(b.roofM, a);
   const levels = storeys(a, b.groundM, top);
   const style = a.windows ? STYLES[a.windows.style] : null;
-  const glass = hex(a.windows?.color ?? WINDOW.glass);
+  const glass = hex(a.windows?.color ?? (a.windows?.style === 'rows' ? WINDOW.frame : WINDOW.glass)); // punched windows read as their light frames
   const accent = a.windows?.accent ? hex(a.windows.accent) : null;
+  const infill = hex(WINDOW.infill);
   const neighbour = opts.neighbourTop ?? (() => -Infinity);
   for (const poly of polygons) {
     const rings = poly.map((r) => tidy(r, 0.02)).filter((r) => r.length >= 3);
@@ -144,7 +145,8 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
           for (let c = 0; c < count; c++) {
             const s = start + c * pitch;
             out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
-            if (accent && a.windows!.style === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, accent);
+            // the panel under the window: the accent colour and grey in a checker (the real pattern is irregular)
+            if (accent && a.windows!.style === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);
             if (a.windows!.style === 'arches' && k === levels.length - 1) { // the bay ends in a round head (drawn flatter when the wall above is short)
               const r = width / 2, ry = Math.min(r, top - head - 0.4);
               if (ry > 0.3) {
@@ -188,7 +190,7 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
     if (Math.abs(det) < 0.2) { const k = (d1 + d2) / 2; return [p[0] + ((e1.n[0] + e2.n[0]) / 2) * k, p[1] + ((e1.n[1] + e2.n[1]) / 2) * k]; }
     return [p[0] + (d1 * e2.n[1] - d2 * e1.n[1]) / det, p[1] + (e1.n[0] * d2 - e2.n[0] * d1) / det];
   });
-  const eaveM = a.roof.eaveM ?? 0.6;
+  const eaveM = a.roof.eaveM ?? 0.9;
   const eave = offset((e) => (e.open ? eaveM : 0));
   // the run of the slope: as asked, but never more than what leaves a top (about half the width of a long block)
   let run = Math.min(a.roof.runM ?? h * 1.4, (0.9 * Math.abs(area2(outer))) / perimeter);
@@ -199,7 +201,10 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
   const z = (p: XY, zz: number) => [p[0], p[1], zz];
   edges.forEach((e, i) => {
     const j = (i + 1) % N;
-    if (e.open) out.quad(z(outer[i], top), z(outer[j], top), z(eave[j], top), z(eave[i], top), cornice); // soffit of the eave
+    if (e.open) { // the eave: its underside and a light band along its edge
+      out.quad(z(outer[i], top - 0.45), z(outer[j], top - 0.45), z(eave[j], top - 0.45), z(eave[i], top - 0.45), cornice);
+      out.quad(z(eave[i], top - 0.45), z(eave[j], top - 0.45), z(eave[j], top), z(eave[i], top), cornice);
+    }
     out.quad(z(eave[i], top), z(eave[j], top), z(ridge[j], top + h), z(ridge[i], top + h), e.open ? color : wall);
     if (!e.open || !a.roof!.dormers || e.len < 6) return;
     const count = Math.floor(e.len / 5);
@@ -209,8 +214,8 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
         const hi = [ridge[i][0] + (ridge[j][0] - ridge[i][0]) * s, ridge[i][1] + (ridge[j][1] - ridge[i][1]) * s];
         return [lo[0] + (hi[0] - lo[0]) * t + e.n[0] * 0.1, lo[1] + (hi[1] - lo[1]) * t + e.n[1] * 0.1, top + h * t + 0.12];
       };
-      const s0 = (c + 0.5) / count - 0.7 / e.len, s1 = (c + 0.5) / count + 0.7 / e.len;
-      out.quad(lerp(s0, 0.3), lerp(s1, 0.3), lerp(s1, 0.7), lerp(s0, 0.7), dormer);
+      const s0 = (c + 0.5) / count - 0.55 / e.len, s1 = (c + 0.5) / count + 0.55 / e.len;
+      out.quad(lerp(s0, 0.3), lerp(s1, 0.3), lerp(s1, 0.6), lerp(s0, 0.6), dormer);
     }
   });
   out.cap([ridge], top + h, color);

@@ -496,13 +496,13 @@
           161.9,
           165.3,
           168.7
-        ],
-        "color": "#e9ece8"
+        ]
       },
       "roof": {
         "type": "hipped",
         "material": "tile",
         "riseM": 4.0,
+        "runM": 1.6,
         "dormers": true
       },
       "grades": {
@@ -625,6 +625,7 @@
         "type": "hipped",
         "material": "tile",
         "riseM": 3.4,
+        "runM": 2.0,
         "dormers": true
       },
       "grades": {
@@ -1359,8 +1360,7 @@
           165.8,
           169.9,
           174.0
-        ],
-        "color": "#e9ece8"
+        ]
       },
       "upper": {
         "fromM": 169.9,

@@ -50,7 +50,7 @@ test('모임지붕: 벽은 오름의 절반만큼 낮아지고, 처마는 벽 �
   assert.equal(wallTopM(120, { wall: 'brick', roof: { type: 'flat' as const } }), 120);
   const mesh = decorate([block], { roofM: 120, groundM: 100 }, a);
   const z = zs(mesh);
-  assert.equal(Math.min(...z), 118);
+  assert.equal(Math.min(...z), 117.55); // 처마 띠의 아랫면
   assert.equal(Math.max(...z), 122);
   const xs = mesh.positions.filter((_, i) => i % 3 === 0);
   assert.ok(Math.abs(Math.min(...xs) - (X0 - 0.6)) < 1e-6 && Math.abs(Math.max(...xs) - (X0 + 40.6)) < 1e-6);
