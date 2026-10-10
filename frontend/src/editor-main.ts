@@ -156,8 +156,8 @@ root.innerHTML = `
           <label class="inline-check" title="실외 보행로·계단·횡단 길을 회색 면으로 (프리뷰의 '보행로'와 같음)"><input id="layer-pedestrian" type="checkbox"> 보행로 면</label>
           <label class="inline-check" title="지하에 있는 길을 저장된 높이에 면으로. 땅·건물에 가린 부분도 비쳐 보임"><input id="layer-underground" type="checkbox"> 지하 길</label>
           <label class="inline-check" title="운동장처럼 면으로 채우는 공간 영역. 포장면 영역은 '차도 면'에 들어 있음"><input id="layer-area" type="checkbox"> 영역</label>
-          <label class="inline-check" title="구조물 파일(기단·계단·참·화단·벽·데크)을 덩어리로 (프리뷰의 '구조물'과 같음). 기단 안의 길 면은 기단 윗면에 색으로만 칠해짐"><input id="layer-structures" type="checkbox"> 구조물</label>
-          <label class="inline-check" title="캠퍼스 안의 옛 등고선 지형을 숨기고, 기단·길 면이 없는 곳은 중립 바닥(미확정)으로 (프리뷰의 '캠퍼스 바닥 정리'와 같음). 커서 높이는 전처럼 서버 지형 값"><input id="layer-campus-ground" type="checkbox"> 캠퍼스 바닥 정리</label>
+          <label class="inline-check" title="구조물 파일(기단·계단·참·화단·벽·데크)을 덩어리로 (프리뷰의 '구조물'과 같음). 기단 안의 길 면은 기단 윗면에 색으로만 칠해짐"><input id="layer-structures" type="checkbox" checked> 구조물</label>
+          <label class="inline-check" title="캠퍼스 안의 옛 등고선 지형을 숨기고, 기단·길 면이 없는 곳은 중립 바닥(미확정)으로 (프리뷰의 '캠퍼스 바닥 정리'와 같음). 커서 높이는 전처럼 서버 지형 값"><input id="layer-campus-ground" type="checkbox" checked> 캠퍼스 바닥 정리</label>
           <label class="inline-check" title="켜고 지도에서 두 점을 찍으면 그 선을 따라 세로로 잘라 카메라 쪽 절반을 숨김. 끄면 원래대로"><input id="layer-section" type="checkbox"> 단면도</label>
           <div id="layer-section-tools" hidden><div class="feature-actions"><button id="layer-section-look" type="button" title="자른 면을 정면에서 멀리 보기(원근 없는 보기)">단면 보기</button><button id="layer-section-flip" type="button" title="숨기는 쪽을 반대로">반대쪽</button></div></div>
           <div id="layer-section-status" class="editor-hint"></div>
@@ -1898,7 +1898,7 @@ async function startEditor() {
   xrayPaths = new XrayPaths(C, viewer);
   // Surfaces start off: the editor is for the lines, and a surface hides the ground inside its outline.
   sceneLayers = new SceneLayers(viewer, { grid: result.grid, scene: result.scene, pickable: false, campusTint: result.setCampusTint,
-    visible: { ground: false, pedestrian: false, area: false, underground: false }, structures: { structures: false, ground: false },
+    visible: { ground: false, pedestrian: false, area: false, underground: false }, structures: { structures: true, ground: true },
     sectionObjects: (entity) => drawnEntities.has(entity) });
   void sceneLayers.loadStructures().catch((err) => console.error('structures unavailable', err));
   bindLayerControls(sceneLayers, {
