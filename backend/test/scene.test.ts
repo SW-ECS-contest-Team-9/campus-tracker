@@ -115,4 +115,25 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0], { ...split.parts[1], polygon: [sq(10).slice(0, 4)] }] }] }), /closed/);
   assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, evidence: { source: 's' } }] }), /evidence/);
   assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, heightSource: 'ESTIMATE' }] }), /heightSource/);
+
+  // "uncovered": the parts may cover less than the footprint, never more; "terrace": a roof below the highest ground of its outline
+  assert.match(partsAreaProblem(ok.parts[0], 230)!, /cover 200.0 m2/); // without "uncovered" a gap is still refused
+  const partial = parseSceneOverrides({ buildings: [], parts: [{ ...split, uncovered: 'open ground', parts: [split.parts[0], { ...split.parts[1], terrace: 'deck level with the upper ground' }] }] }).parts[0];
+  assert.equal(partial.uncovered, 'open ground');
+  assert.deepEqual(partial.parts.map((p) => p.terrace), [undefined, 'deck level with the upper ground']);
+  assert.equal(partsAreaProblem(partial, 230), null);
+  assert.equal(partsAreaProblem(partial, 200), null);
+  assert.match(partsAreaProblem(partial, 190)!, /more than the footprint/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, uncovered: ' ' }] }), /uncovered/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0], { ...split.parts[1], terrace: true }] }] }), /terrace/);
+  const slope = [108, 120, 122, 124, 131.7];
+  const sh = blockHeights(slope, 0);
+  assert.throws(() => overrideHeights(slope, sh, 129.3), /not above the ground 131.7/); // an ordinary part is refused as before
+  assert.deepEqual(overrideHeights(slope, sh, 129.3, true), { heightM: 7.3, roofM: 129.3 }); // 129.3 - median 122
+  assert.throws(() => overrideHeights(slope, sh, 121.9, true), /terrace roof 121.9 is not above the median ground 122/);
+  assert.equal(sh.baseM, 107); // the base is still 1 m below the lowest ground
+  // the stored file: only 유담관 uses the relaxed gates; its tower keeps the building id and the ordinary gate
+  assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['유담관']);
+  const yudam = all.parts.find((o) => o.name === '유담관')!;
+  assert.ok(yudam.uncovered && yudam.parts[0].terrace === undefined && yudam.parts.filter((p) => p.terrace !== undefined).length === 1);
 });

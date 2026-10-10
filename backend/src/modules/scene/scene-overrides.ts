@@ -17,14 +17,22 @@ export interface RoofOverride {
 export interface HiddenBuilding { name: string; reason: string; evidence: Evidence }
 export type PartRing = [number, number][];
 /** One block of a split footprint: an EPSG:5186 polygon (outer ring, then holes) with a flat roof. `name` is the map label (null = no label). */
-export interface BuildingPart { id: string; name: string | null; roofM: number; polygon: PartRing[] }
-/** `floors` (stated floor count of the building) is stored on the parts that carry a label. */
-export interface BuildingParts { name: string; heightSource: string; floors?: number; evidence: Evidence; parts: BuildingPart[] }
+export interface BuildingPart {
+  id: string; name: string | null; roofM: number; polygon: PartRing[];
+  /** Why this part's roof may lie below the highest ground on its outline (a deck level with the upper ground of a slope). Without it the roof must clear all of the ground. */
+  terrace?: string;
+}
+/**
+ * `floors` (stated floor count of the building) is stored on the parts that carry a label.
+ * `uncovered` says what the rest of the footprint is when the parts do not tile it (that area is not drawn); without it they must tile it.
+ */
+export interface BuildingParts { name: string; heightSource: string; floors?: number; uncovered?: string; evidence: Evidence; parts: BuildingPart[] }
 export interface SceneOverrides { roofs: RoofOverride[]; hidden: HiddenBuilding[]; parts: BuildingParts[] }
 
 const badEvidence = (e: Evidence | undefined) =>
   !e || [e.source, e.collectedOn, e.level].some((v) => typeof v !== 'string' || !v) || typeof e.independentSurvey !== 'boolean';
 const badFloors = (v: unknown) => v !== undefined && !(Number.isInteger(v) && (v as number) > 0 && (v as number) < 200);
+const badReason = (v: unknown) => v !== undefined && (typeof v !== 'string' || !v.trim());
 const badSource = (v: unknown) => typeof v !== 'string' || !/^[A-Z_]{1,16}$/.test(v) || v === 'REGISTER' || v === 'ESTIMATE';
 
 export function parseRoofOverrides(doc: unknown): RoofOverride[] {
@@ -81,6 +89,7 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
     if (badSource(o.heightSource)) throw new Error(`${at} ${o.name}: heightSource must be its own label (A-Z_, at most 16 characters)`);
     if (badEvidence(o.evidence)) throw new Error(`${at} ${o.name}: evidence needs source, collectedOn, level and independentSurvey`);
     if (badFloors(o.floors)) throw new Error(`${at} ${o.name}: floors must be a positive whole number`);
+    if (badReason(o.uncovered)) throw new Error(`${at} ${o.name}: uncovered must say what the rest of the footprint is`);
     if (!Array.isArray(o.parts) || o.parts.length < 2) throw new Error(`${at} ${o.name}: at least two parts`);
     const ids = new Set<string>();
     const list = o.parts.map((p, k) => {
@@ -92,9 +101,10 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
       const closed = (r: PartRing) => Array.isArray(r) && r.length >= 4 && r.every((c) => Array.isArray(c) && c.length === 2 && c.every(Number.isFinite)) && r[0][0] === r.at(-1)![0] && r[0][1] === r.at(-1)![1];
       if (!Array.isArray(p.polygon) || !p.polygon.length || !p.polygon.every(closed)) throw new Error(`${pat}: polygon must be closed rings of [x, y] (EPSG:5186), outer ring first`);
       if (!(polygonArea(p.polygon) > 1)) throw new Error(`${pat}: polygon area must be over 1 m2`);
-      return { id: p.id, name: p.name ?? null, roofM: p.roofM, polygon: p.polygon };
+      if (badReason(p.terrace)) throw new Error(`${pat}: terrace must say why the roof may lie below the higher ground`);
+      return { id: p.id, name: p.name ?? null, roofM: p.roofM, polygon: p.polygon, ...(p.terrace === undefined ? {} : { terrace: p.terrace }) };
     });
-    return { name: o.name, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), evidence: o.evidence, parts: list };
+    return { name: o.name, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), ...(o.uncovered === undefined ? {} : { uncovered: o.uncovered }), evidence: o.evidence, parts: list };
   });
   return { roofs, hidden, parts };
 }
@@ -104,17 +114,25 @@ export function partBuildingId(buildingId: string, parts: BuildingPart[], index:
   return index === 0 ? buildingId : `${buildingId}#${parts[index].id}`;
 }
 
-/** Parts must tile the footprint: their areas add up to its area (that each lies inside it is checked in PostGIS by the import). */
+/**
+ * Parts must tile the footprint: their areas add up to its area (that each lies inside it is checked in PostGIS by the import).
+ * With `uncovered` they may cover less, never more (that they do not overlap is then checked in PostGIS as well).
+ */
 export function partsAreaProblem(o: BuildingParts, footprintAreaM2: number, toleranceM2 = 1): string | null {
   const sum = o.parts.reduce((s, p) => s + polygonArea(p.polygon), 0);
+  if (o.uncovered !== undefined) return sum > footprintAreaM2 + toleranceM2 ? `parts of ${o.name} cover ${sum.toFixed(1)} m2, more than the footprint ${footprintAreaM2.toFixed(1)} m2` : null;
   return Math.abs(sum - footprintAreaM2) > toleranceM2 ? `parts of ${o.name} cover ${sum.toFixed(1)} m2, the footprint is ${footprintAreaM2.toFixed(1)} m2` : null;
 }
 
-/** The overridden roof on the building's own ground: height_m is kept consistent with roof = median(samples) + height. */
-export function overrideHeights(samples: number[], h: BlockHeights, roofM: number): { heightM: number; roofM: number } {
-  if (!(roofM > h.terrainMaxM)) throw new Error(`roof override ${roofM} is not above the ground ${h.terrainMaxM}`);
+/**
+ * The overridden roof on the building's own ground: height_m is kept consistent with roof = median(samples) + height.
+ * The roof must be above all of the ground; a terrace (a part that says so) only above the median ground, so that it still
+ * stands out of the slope on its lower side and its height stays positive.
+ */
+export function overrideHeights(samples: number[], h: BlockHeights, roofM: number, terrace = false): { heightM: number; roofM: number } {
   const s = [...samples].sort((a, b) => a - b);
   const med = s.length % 2 ? s[s.length >> 1] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+  if (terrace ? !(roofM > med) : !(roofM > h.terrainMaxM)) throw new Error(terrace ? `terrace roof ${roofM} is not above the median ground ${med}` : `roof override ${roofM} is not above the ground ${h.terrainMaxM}`);
   return { heightM: Math.round((roofM - med) * 1000) / 1000, roofM };
 }
 

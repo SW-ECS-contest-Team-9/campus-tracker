@@ -8,8 +8,10 @@
 노트 폴더(Obsidian 볼트)는 서버에 없다. 서버는 커밋된 보정 파일만 읽는다. 보정 파일은 손으로 고치지 않는다.
 
 노트 머리에서 읽는 항목(건물 규칙서 "동 노트 양식"):
-  모델_보정: {종류: 지붕|부분|숨김|없음, 원천_이름, 높이_출처, 층수: {값, 등급}, 사유, 등급, 근거: {source, collectedOn, level, independentSurvey, ...}}
-  부분[]: 모델_반영: "예" | "아니오 (이유)", 모델_부분: {id, 표지}, 외곽: {좌표: [고리, ...], 등급}, 지붕_높이: {값, 등급}
+  모델_보정: {종류: 지붕|부분|숨김|없음, 원천_이름, 높이_출처, 층수: {값, 등급}, 사유, 등급, 덮지_않는_곳, 근거: {source, collectedOn, level, independentSurvey, ...}}
+  부분[]: 모델_반영: "예" | "아니오 (이유)", 모델_부분: {id, 표지, 지면과_같은_지붕}, 외곽: {좌표: [고리, ...], 등급}, 지붕_높이: {값, 등급}
+  덮지_않는_곳(글): 부분들이 원천 외곽을 다 덮지 않을 때 나머지가 무엇인지(-> uncovered). 없으면 빈틈없이 덮어야 한다.
+  지면과_같은_지붕(글): 그 부분의 지붕이 외곽선의 가장 높은 땅보다 낮아도 되는 이유(-> terrace). 없으면 지붕이 땅보다 높아야 한다.
 """
 import argparse, json, pathlib, re, sys
 import yaml
@@ -94,9 +96,9 @@ def entry_from_note(head):
         if not mp.get('id') or not isinstance(rings, list) or not rings:
             problems.append(f"부분 '{p.get('이름')}': 모델_부분.id 와 외곽.좌표 가 있어야 한다")
             continue
-        out.append({'id': str(mp['id']), 'name': mp.get('표지'), 'roofM': p['지붕_높이']['값'], 'polygon': rings})
+        out.append({'id': str(mp['id']), 'name': mp.get('표지'), 'roofM': p['지붕_높이']['값'], 'polygon': rings, **({'terrace': mp['지면과_같은_지붕']} if mp.get('지면과_같은_지붕') else {})})
     if len(out) < 2: problems.append('부분 보정은 모델_반영 예인 부분이 둘 이상이어야 한다')
-    return 'parts', {'name': src, 'heightSource': m.get('높이_출처'), **floors, 'evidence': ev, 'parts': out}, problems
+    return 'parts', {'name': src, 'heightSource': m.get('높이_출처'), **floors, **({'uncovered': m['덮지_않는_곳']} if m.get('덮지_않는_곳') else {}), 'evidence': ev, 'parts': out}, problems
 
 
 def build(notes_dir):
@@ -140,7 +142,7 @@ def diff(expected, actual):
                 px = {p['id']: p for p in x['parts']}; py = {p.get('id'): p for p in y.get('parts', [])}
                 if [p['id'] for p in x['parts']] != [p.get('id') for p in y.get('parts', [])]: add(n, f"부분 순서·목록: 노트 {list(px)} / 파일 {list(py)}")
                 for i in px.keys() & py.keys():
-                    for k in ('name', 'roofM'):
+                    for k in ('name', 'roofM', 'terrace'):
                         if px[i].get(k) != py[i].get(k): add(n, f'부분 {i} {k}: 노트 {px[i].get(k)!r} / 파일 {py[i].get(k)!r}')
                     if px[i].get('polygon') != py[i].get('polygon'): add(n, f'부분 {i}: 외곽 좌표가 다르다')
     for k in ('about', 'generated'):

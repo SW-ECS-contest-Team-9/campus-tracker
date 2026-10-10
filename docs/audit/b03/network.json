@@ -1,0 +1,1112 @@
+{
+ "method": "B03 2단계 — 운영 실내 길(스냅숏)의 층 표기·높이를 1단계 층 바닥 높이와 견준다. 분석만 한다(DB·MCP 쓰기 없음).\n\n  python docs/audit/b03/network.py <audit-dir> <anchors.json> <out.json>\n\n입력: <audit-dir>/claude-live/roads-live-2.json (운영 도로 스냅숏 2026-10-09), anchors.py 의 결과.\n- 동별로 실내 길(복도·계단·승강기)의 평평한 높이를 모아 \"저장된 층\"으로 묶고, 사다리에서 가장 가까운 층과 차이를 적는다.\n- 길 이름에 적힌 층(B1, 1F, 2F, 1층 ...)과 levelId 를 함께 적는다.\n- 제안(PROPOSALS)은 사람이 정한 규칙표다: 층 이름 바꾸기(relabel_level), 이어진 실내 묶음의 높이 옮기기(shift_z). 근거 등급을 붙인다. 적용하지 않는다.\n",
+ "snapshot": "roads-live-2.json (128 roads)",
+ "applied": false,
+ "perBuilding": {
+  "대일관": {
+   "serverBuildingId": "대일관",
+   "indoorRoads": 1,
+   "storedLevels": [
+    {
+     "storedM": [
+      145.8,
+      145.8
+     ],
+     "roads": 1,
+     "roadIds": [
+      "9a3cce3f"
+     ],
+     "namedFloor": {
+      "1층": 1
+     },
+     "levelId": {
+      "None": 1
+     },
+     "nearestLadderFloor": {
+      "floor": "B2",
+      "ladderM": 145.0,
+      "kind": "extrap",
+      "storedMinusLadderM": 0.8
+     }
+    }
+   ],
+   "stepsBetweenStoredLevelsM": [],
+   "connectors": []
+  },
+  "문예관": {
+   "serverBuildingId": "문예관",
+   "indoorRoads": 4,
+   "storedLevels": [
+    {
+     "storedM": [
+      136.39,
+      136.39
+     ],
+     "roads": 2,
+     "roadIds": [
+      "66f166a8",
+      "131616f9"
+     ],
+     "namedFloor": {
+      "지하": 1,
+      "None": 1
+     },
+     "levelId": {
+      "None": 2
+     },
+     "nearestLadderFloor": {
+      "floor": "1",
+      "ladderM": 134.7,
+      "kind": "extrap",
+      "storedMinusLadderM": 1.7
+     }
+    },
+    {
+     "storedM": [
+      142.44,
+      142.44
+     ],
+     "roads": 1,
+     "roadIds": [
+      "23de6a42"
+     ],
+     "namedFloor": {
+      "None": 1
+     },
+     "levelId": {
+      "None": 1
+     },
+     "nearestLadderFloor": {
+      "floor": "3",
+      "ladderM": 143.1,
+      "kind": "extrap",
+      "storedMinusLadderM": -0.7
+     }
+    }
+   ],
+   "stepsBetweenStoredLevelsM": [
+    6.05
+   ],
+   "connectors": [
+    {
+     "id": "48061bd1",
+     "structure": "stairs",
+     "fromM": 136.39,
+     "toM": 142.44,
+     "riseM": 6.05,
+     "name": "문예관 내부 하행계단 (C02 seq 855–878·단차 약6m 추정)",
+     "levelId": null
+    }
+   ]
+  },
+  "북악관": {
+   "serverBuildingId": "북악관",
+   "indoorRoads": 71,
+   "storedLevels": [
+    {
+     "storedM": [
+      131.1,
+      132.08
+     ],
+     "roads": 1,
+     "roadIds": [
+      "f99540e3"
+     ],
+     "namedFloor": {
+      "B1": 1
+     },
+     "levelId": {
+      "None": 1
+     },
+     "nearestLadderFloor": {
+      "floor": "1",
+      "ladderM": 133.1,
+      "kind": "anchor",
+      "storedMinusLadderM": -1.5
+     }
+    },
+    {
+     "storedM": [
+      132.08,
+      132.8
+     ],
+     "roads": 6,
+     "roadIds": [
+      "1fc3a2f5",
+      "23283481",
+      "95632bb8",
+      "05378724",
+      "cc1b136f",
+      "499d8625"
+     ],
+     "namedFloor": {
+      "B1": 6
+     },
+     "levelId": {
+      "None": 6
+     },
+     "nearestLadderFloor": {
+      "floor": "1",
+      "ladderM": 133.1,
+      "kind": "anchor",
+      "storedMinusLadderM": -0.7
+     }
+    },
+    {
+     "storedM": [
+      136.2,
+      136.84
+     ],
+     "roads": 10,
+     "roadIds": [
+      "de66c1f1",
+      "2677d707",
+      "384246b2",
+      "5e2f8114",
+      "a350a80e",
+      "a648c084",
+      "aa988488",
+      "c683f1f8",
+      "344d1f3f",
+      "51001632"
+     ],
+     "namedFloor": {
+      "None": 5,
+      "1F": 5
+     },
+     "levelId": {
+      "None": 10
+     },
+     "nearestLadderFloor": {
+      "floor": "2",
+      "ladderM": 136.5,
+      "kind": "extrap",
+      "storedMinusLadderM": 0.0
+     }
+    },
+    {
+     "storedM": [
+      140.6,
+      140.6
+     ],
+     "roads": 7,
+     "roadIds": [
+      "69dd7d08",
+      "9be4bca2",
+      "0ed024f9",
+      "427ac753",
+      "0d4b3980",
+      "2b3d1698",
+      "fbfd71bc"
+     ],
+     "namedFloor": {
+      "None": 4,
+      "2F": 3
+     },
+     "levelId": {
+      "None": 7
+     },
+     "nearestLadderFloor": {
+      "floor": "3",
+      "ladderM": 140.0,
+      "kind": "extrap",
+      "storedMinusLadderM": 0.6
+     }
+    },
+    {
+     "storedM": [
+      143.47,
+      143.5
+     ],
+     "roads": 5,
+     "roadIds": [
+      "83109850",
+      "2ecf4f90",
+      "bc582299",
+      "d25e1c6d",
+      "0dc5293d"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "None": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "5",
+      "ladderM": 143.4,
+      "kind": "extrap",
+      "storedMinusLadderM": 0.1
+     }
+    },
+    {
+     "storedM": [
+      146.18,
+      146.18
+     ],
+     "roads": 5,
+     "roadIds": [
+      "981f886c",
+      "b5895273",
+      "fb9063c7",
+      "5ceb6a04",
+      "b9b7cc0e"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "북악관_Z146.18_추정": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "6",
+      "ladderM": 146.8,
+      "kind": "extrap",
+      "storedMinusLadderM": -0.6
+     }
+    },
+    {
+     "storedM": [
+      148.92,
+      148.92
+     ],
+     "roads": 5,
+     "roadIds": [
+      "5b75b809",
+      "d21b1693",
+      "da914768",
+      "0bb9d397",
+      "b36ea64e"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "북악관_Z148.92_추정": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "7",
+      "ladderM": 150.3,
+      "kind": "extrap",
+      "storedMinusLadderM": -1.4
+     }
+    },
+    {
+     "storedM": [
+      151.79,
+      151.79
+     ],
+     "roads": 5,
+     "roadIds": [
+      "3623188a",
+      "6d2cc67e",
+      "a169f6f9",
+      "d71001fc",
+      "bb3ea136"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "북악관_Z151.79_추정": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "7",
+      "ladderM": 150.3,
+      "kind": "extrap",
+      "storedMinusLadderM": 1.5
+     }
+    },
+    {
+     "storedM": [
+      154.51,
+      154.51
+     ],
+     "roads": 5,
+     "roadIds": [
+      "8aa3e856",
+      "b6003357",
+      "e518e939",
+      "769252fb",
+      "9556d4b6"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "북악관_Z154.51_추정": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "8",
+      "ladderM": 153.7,
+      "kind": "extrap",
+      "storedMinusLadderM": 0.8
+     }
+    }
+   ],
+   "stepsBetweenStoredLevelsM": [
+    0.98,
+    4.12,
+    4.4,
+    2.87,
+    2.71,
+    2.74,
+    2.87,
+    2.72
+   ],
+   "connectors": [
+    {
+     "id": "00ad9781",
+     "structure": "stairs",
+     "fromM": 136.84,
+     "toM": 140.6,
+     "riseM": 3.76,
+     "name": null,
+     "levelId": null
+    },
+    {
+     "id": "bb1a4cfc",
+     "structure": "stairs",
+     "fromM": 140.6,
+     "toM": 143.5,
+     "riseM": 2.9,
+     "name": null,
+     "levelId": null
+    },
+    {
+     "id": "71335ce0",
+     "structure": "stairs",
+     "fromM": 140.6,
+     "toM": 143.47,
+     "riseM": 2.87,
+     "name": null,
+     "levelId": null
+    },
+    {
+     "id": "bfabfade",
+     "structure": "stairs",
+     "fromM": 136.7,
+     "toM": 140.6,
+     "riseM": 3.9,
+     "name": null,
+     "levelId": null
+    },
+    {
+     "id": "3e22ef54",
+     "structure": "elevator",
+     "fromM": 132.8,
+     "toM": 136.7,
+     "riseM": 3.9,
+     "name": "북악관 엘리베이터 B1-1F (추정)",
+     "levelId": null
+    },
+    {
+     "id": "4800e550",
+     "structure": "elevator",
+     "fromM": 136.7,
+     "toM": 140.6,
+     "riseM": 3.9,
+     "name": "북악관 엘리베이터 1F-2F (추정)",
+     "levelId": null
+    },
+    {
+     "id": "2c9fe889",
+     "structure": "elevator",
+     "fromM": 146.18,
+     "toM": 148.92,
+     "riseM": 2.74,
+     "name": "북악관 146.18→148.92m 엘리베이터 (추정)",
+     "levelId": "북악관_Z146.18_추정"
+    },
+    {
+     "id": "391630e3",
+     "structure": "stairs",
+     "fromM": 148.92,
+     "toM": 151.79,
+     "riseM": 2.87,
+     "name": "C01·C02 공통 상층 계단 148.92–151.79m (추정)",
+     "levelId": "북악관_Z148.92_추정"
+    },
+    {
+     "id": "b11c08e0",
+     "structure": "elevator",
+     "fromM": 143.47,
+     "toM": 146.18,
+     "riseM": 2.71,
+     "name": "북악관 143.47→146.18m 엘리베이터 (추정)",
+     "levelId": "북악관_Z143.47_추정"
+    },
+    {
+     "id": "bd2df230",
+     "structure": "stairs",
+     "fromM": 143.47,
+     "toM": 146.18,
+     "riseM": 2.71,
+     "name": "C01·C02 공통 상층 계단 143.47–146.18m (추정)",
+     "levelId": "북악관_Z143.47_추정"
+    },
+    {
+     "id": "cca24e70",
+     "structure": "elevator",
+     "fromM": 148.92,
+     "toM": 151.79,
+     "riseM": 2.87,
+     "name": "북악관 148.92→151.79m 엘리베이터 (추정)",
+     "levelId": "북악관_Z148.92_추정"
+    },
+    {
+     "id": "ec2088ac",
+     "structure": "elevator",
+     "fromM": 151.79,
+     "toM": 154.51,
+     "riseM": 2.72,
+     "name": "북악관 151.79→154.51m 엘리베이터 (추정)",
+     "levelId": "북악관_Z151.79_추정"
+    },
+    {
+     "id": "ec66a05b",
+     "structure": "stairs",
+     "fromM": 146.18,
+     "toM": 148.92,
+     "riseM": 2.74,
+     "name": "C01·C02 공통 상층 계단 146.18–148.92m (추정)",
+     "levelId": "북악관_Z146.18_추정"
+    },
+    {
+     "id": "f1d0ee7b",
+     "structure": "stairs",
+     "fromM": 151.79,
+     "toM": 154.51,
+     "riseM": 2.72,
+     "name": "C01·C02 공통 상층 계단 151.79–154.51m (추정)",
+     "levelId": "북악관_Z151.79_추정"
+    },
+    {
+     "id": "c14a8753",
+     "structure": "elevator",
+     "fromM": 136.7,
+     "toM": 140.6,
+     "riseM": 3.9,
+     "name": "북악관 2호기 1F–2F (배치·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "d0ee3d82",
+     "structure": "elevator",
+     "fromM": 132.8,
+     "toM": 136.7,
+     "riseM": 3.9,
+     "name": "북악관 2호기 B1–1F (배치·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "53bd7d38",
+     "structure": "elevator",
+     "fromM": 140.6,
+     "toM": 143.47,
+     "riseM": 2.87,
+     "name": "북악관 1호기 2F–143.47m (층·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "081bd92e",
+     "structure": "elevator",
+     "fromM": 148.92,
+     "toM": 151.79,
+     "riseM": 2.87,
+     "name": "북악관 2호기 148.92–151.79m (층·고도 추정)",
+     "levelId": "북악관_Z148.92_추정"
+    },
+    {
+     "id": "123bdf83",
+     "structure": "elevator",
+     "fromM": 146.18,
+     "toM": 148.92,
+     "riseM": 2.74,
+     "name": "북악관 2호기 146.18–148.92m (층·고도 추정)",
+     "levelId": "북악관_Z146.18_추정"
+    },
+    {
+     "id": "1c04557f",
+     "structure": "elevator",
+     "fromM": 151.79,
+     "toM": 154.51,
+     "riseM": 2.72,
+     "name": "북악관 2호기 151.79–154.51m (층·고도 추정)",
+     "levelId": "북악관_Z151.79_추정"
+    },
+    {
+     "id": "6e61a9c3",
+     "structure": "elevator",
+     "fromM": 140.6,
+     "toM": 143.47,
+     "riseM": 2.87,
+     "name": "북악관 2호기 140.6–143.47m (층·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "bfc76c5f",
+     "structure": "elevator",
+     "fromM": 143.47,
+     "toM": 146.18,
+     "riseM": 2.71,
+     "name": "북악관 2호기 143.47–146.18m (층·고도 추정)",
+     "levelId": null
+    }
+   ]
+  },
+  "유담관": {
+   "serverBuildingId": "유담관",
+   "indoorRoads": 13,
+   "storedLevels": [
+    {
+     "storedM": [
+      129.38,
+      129.6
+     ],
+     "roads": 5,
+     "roadIds": [
+      "6b1caa1e",
+      "8cb797d8",
+      "99c5e3df",
+      "b6f48838",
+      "d468a7c5"
+     ],
+     "namedFloor": {
+      "None": 5
+     },
+     "levelId": {
+      "None": 5
+     },
+     "nearestLadderFloor": {
+      "floor": "10",
+      "ladderM": 131.3,
+      "kind": "extrap",
+      "storedMinusLadderM": -1.8
+     }
+    },
+    {
+     "storedM": [
+      152.84,
+      152.84
+     ],
+     "roads": 4,
+     "roadIds": [
+      "307a8b1b",
+      "41f8f6bb",
+      "455d51e2",
+      "939842ce"
+     ],
+     "namedFloor": {
+      "None": 4
+     },
+     "levelId": {
+      "None": 4
+     },
+     "nearestLadderFloor": {
+      "floor": "16",
+      "ladderM": 153.5,
+      "kind": "extrap",
+      "storedMinusLadderM": -0.7
+     }
+    }
+   ],
+   "stepsBetweenStoredLevelsM": [
+    23.46
+   ],
+   "connectors": [
+    {
+     "id": "32bfe8b6",
+     "structure": "elevator",
+     "fromM": 129.6,
+     "toM": 145.22,
+     "riseM": 15.62,
+     "name": "유담관 1호기 129.6–145.22m (층·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "807392da",
+     "structure": "elevator",
+     "fromM": 129.6,
+     "toM": 145.22,
+     "riseM": 15.62,
+     "name": "유담관 2호기 129.6–145.22m (층·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "b95a79a7",
+     "structure": "elevator",
+     "fromM": 145.22,
+     "toM": 152.84,
+     "riseM": 7.62,
+     "name": "유담관 1호기 145.22–152.84m (층·고도 추정)",
+     "levelId": null
+    },
+    {
+     "id": "cc578ff6",
+     "structure": "elevator",
+     "fromM": 145.22,
+     "toM": 152.84,
+     "riseM": 7.62,
+     "name": "유담관 2호기 145.22–152.84m (층·고도 추정)",
+     "levelId": null
+    }
+   ]
+  },
+  "혜인관": {
+   "serverBuildingId": "건물5",
+   "indoorRoads": 8,
+   "storedLevels": [
+    {
+     "storedM": [
+      150.26,
+      150.94
+     ],
+     "roads": 4,
+     "roadIds": [
+      "5544cab2",
+      "96511fe1",
+      "89ce1806",
+      "fa7d28d0"
+     ],
+     "namedFloor": {
+      "B1": 4
+     },
+     "levelId": {
+      "None": 4
+     },
+     "nearestLadderFloor": {
+      "floor": "B1",
+      "ladderM": 149.3,
+      "kind": "anchor",
+      "storedMinusLadderM": 1.3
+     }
+    },
+    {
+     "storedM": [
+      154.25,
+      155.09
+     ],
+     "roads": 1,
+     "roadIds": [
+      "0d88669d"
+     ],
+     "namedFloor": {
+      "1층": 1
+     },
+     "levelId": {
+      "None": 1
+     },
+     "nearestLadderFloor": {
+      "floor": "1",
+      "ladderM": 152.9,
+      "kind": "extrap",
+      "storedMinusLadderM": 1.8
+     }
+    }
+   ],
+   "stepsBetweenStoredLevelsM": [
+    3.99
+   ],
+   "connectors": [
+    {
+     "id": "20277429",
+     "structure": "stairs",
+     "fromM": 150.84,
+     "toM": 154.25,
+     "riseM": 3.41,
+     "name": "혜인관 1층-B1 계단 (추정)",
+     "levelId": null
+    },
+    {
+     "id": "5aea9b42",
+     "structure": "stairs",
+     "fromM": 146.94,
+     "toM": 150.71,
+     "riseM": 3.77,
+     "name": "혜인관 B1-지하주차장 계단 (추정)",
+     "levelId": null
+    },
+    {
+     "id": "2e0d36ec",
+     "structure": "elevator",
+     "fromM": 150.8,
+     "toM": 171,
+     "riseM": 20.2,
+     "name": "혜인관 엘리베이터 B1–6F (추정)",
+     "levelId": null
+    }
+   ]
+  }
+ },
+ "bukakLadderVsRoof": {
+  "storedLadderM": [
+   132.8,
+   136.7,
+   140.6,
+   143.47,
+   146.18,
+   148.92,
+   151.79,
+   154.51
+  ],
+  "stepsM": [
+   3.9,
+   3.9,
+   2.87,
+   2.71,
+   2.74,
+   2.87,
+   2.72
+  ],
+  "smapRoofM": 160.6,
+  "if8StoreysRoofM": 157.2,
+  "if8StoreysMinusSmapRoofM": -3.4,
+  "if9StoreysRoofM": 159.9,
+  "if9StoreysMinusSmapRoofM": -0.7,
+  "entrances1F": {
+   "북악관 입구(1)": [
+    133.1,
+    [
+     132.6,
+     133.3
+    ]
+   ],
+   "북악관 입구(2)": [
+    132.4,
+    [
+     132.3,
+     132.6
+    ]
+   ],
+   "북악관 입구(3)": [
+    131.8,
+    [
+     131.3,
+     132.5
+    ]
+   ]
+  },
+  "entranceB1": [
+   131.8,
+   [
+    131.6,
+    131.9
+   ]
+  ],
+  "reading": "8단이 건물의 모든 층이면(4 건너뜀: 1,2,3,5~9층) 맨 위 단 위로 한 층 높이를 더한 지붕이 S-MAP 지붕보다 낮다. 한 층이 더 있으면(9개 층) 차이가 1 m 안이다. 보행이 맨 위층까지 갔는지는 기록에 없다"
+ },
+ "proposals": [
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "05378724-6530-4c5e-8918-c8c2bad2f4f5",
+    "1fc3a2f5-3958-43b7-935b-1be869a6ac13",
+    "23283481-90c5-4985-a86e-0fa00cd9b902",
+    "499d8625-25f7-4045-96bf-508f66d89a3d",
+    "95632bb8-5143-4de5-8633-e894697a3841",
+    "cc1b136f-ea3f-4975-bb88-8ac6ac9e6925",
+    "f99540e3-b6fe-47c7-994d-469bf008c8f6"
+   ],
+   "fromLabel": "이름 'B1' (levelId 없음)",
+   "toLabel": "1층",
+   "grade": "원천+S-MAP",
+   "evidence": "학교 출입구 목록: 정면 입구 3곳이 1층(로비·복도), S-MAP 지면 131.8~133.1 m. 저장 높이 132.8 m 가 그 범위 안. B1층 입구는 따로 있다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "2677d707-2eec-4cf4-839a-acc83d3faa1b",
+    "344d1f3f-6175-4932-9f27-59aa120fdace",
+    "384246b2-f7bb-4afb-aeb7-707a6265847e",
+    "51001632-02d7-4852-8f8e-2f4feb06cfda",
+    "5e2f8114-5be6-4674-90d0-73e6d2119828",
+    "a350a80e-5d20-4c5f-ac9b-2f1c6ad13cb2",
+    "a648c084-deeb-42c0-821f-1acebf23746d",
+    "aa988488-d892-4632-bae4-55dc0a42de91",
+    "c683f1f8-be42-4daf-ad25-513b5586402e",
+    "de66c1f1-54f1-47f7-8388-f60a96d671f6"
+   ],
+   "fromLabel": "이름 '1F'",
+   "toLabel": "2층",
+   "grade": "원천+S-MAP(순서)",
+   "evidence": "132.8 m 가 1층이면 그 위 단(136.7 m)은 2층"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "0d4b3980-e030-4de9-bd32-b0408882c9d4",
+    "0ed024f9-e1dd-4b3d-b82e-1668bac21c74",
+    "2b3d1698-726e-4122-840d-24928872a8ad",
+    "427ac753-4c1e-4c0a-a404-8217058f3ca2",
+    "69dd7d08-ba81-4ee0-9784-a71fcc15c1bf",
+    "9be4bca2-ebf2-4b2b-8283-d766200a2254",
+    "fbfd71bc-f33c-41ad-94a7-aed53ee23e99"
+   ],
+   "fromLabel": "이름 '2F'",
+   "toLabel": "3층",
+   "grade": "원천+S-MAP(순서)",
+   "evidence": "같은 이유. 140.6 m 는 3층"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "0dc5293d-646f-413d-af95-324716677939",
+    "2ecf4f90-57a9-49c8-9e04-a46c7da7b659",
+    "bc582299-13e2-458d-a8a2-58acfc8c5df6",
+    "d25e1c6d-839d-478f-9cf0-ac66fabbd573"
+   ],
+   "fromLabel": "levelId 북악관_Z143.47_추정 또는 없음",
+   "toLabel": "5층(4층 번호가 없을 때) 또는 4층",
+   "grade": "추정",
+   "evidence": "4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+    "981f886c-9429-4f48-aa71-701a741d0241",
+    "b5895273-5301-4145-9073-50f94199db29",
+    "b9b7cc0e-70de-4389-b392-1d72c2006045",
+    "fb9063c7-95fc-440b-b23f-5b6acff85cf1"
+   ],
+   "fromLabel": "levelId 북악관_Z146.18_추정 또는 없음",
+   "toLabel": "6층 또는 5층",
+   "grade": "추정",
+   "evidence": "4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "0bb9d397-9c75-495e-99f7-5439f032c325",
+    "5b75b809-0764-40ab-9686-7c02beac6a54",
+    "b36ea64e-113c-475b-8a40-648faf789aa4",
+    "d21b1693-a659-41c4-aedc-d98191848484",
+    "da914768-93f2-45a9-8fc8-f0a96c7f45e8"
+   ],
+   "fromLabel": "levelId 북악관_Z148.92_추정 또는 없음",
+   "toLabel": "7층 또는 6층",
+   "grade": "추정",
+   "evidence": "4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "3623188a-8a6c-4d39-9f33-1193c94419b2",
+    "6d2cc67e-e183-49b4-9eeb-8da2ba0eeff6",
+    "a169f6f9-9624-44f6-b8f7-4ebf4a19ecdd",
+    "bb3ea136-968e-41be-a002-198998286f87",
+    "d71001fc-4918-48b3-ad45-8eba5f6c6b91"
+   ],
+   "fromLabel": "levelId 북악관_Z151.79_추정 또는 없음",
+   "toLabel": "8층 또는 7층",
+   "grade": "추정",
+   "evidence": "4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "769252fb-0df6-4f8d-ba3e-cd2b15e37d43",
+    "8aa3e856-d5d7-4bfb-a450-eb4dd782ce4c",
+    "9556d4b6-0484-44ce-9b70-fdc9b4087264",
+    "b6003357-d22d-494c-b66c-600be0fdf83c",
+    "e518e939-8007-410f-a9ea-40066525647a"
+   ],
+   "fromLabel": "levelId 북악관_Z154.51_추정 또는 없음",
+   "toLabel": "9층 또는 8층",
+   "grade": "추정",
+   "evidence": "4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다"
+  },
+  {
+   "building": "북악관",
+   "op": "relabel_level",
+   "roadIds": [
+    "3e22ef54-36d0-44b7-9212-d451abe3f400",
+    "4800e550-71c4-46f3-8aea-fc5002df6d80",
+    "53bd7d38-a552-48bb-8310-cb6803e9ba34",
+    "c14a8753-ae0a-4650-ac2b-57b0c9373a69",
+    "d0ee3d82-b9cd-4b69-82a9-f246d9eface7"
+   ],
+   "fromLabel": "계단·승강기 이름의 'B1-1F', '1F-2F', '2F-…'",
+   "toLabel": "'1층-2층', '2층-3층', '3층-…'",
+   "grade": "원천+S-MAP(순서)",
+   "evidence": "층 이름이 한 층씩 밀려 있다"
+  },
+  {
+   "building": "유담관",
+   "op": "relabel_level",
+   "roadIds": [
+    "6b1caa1e-f87a-42c8-a923-1dee7551fcbe",
+    "8cb797d8-618d-4a41-8583-76e7bc2e3840",
+    "99c5e3df-b265-427c-8aa2-a153b161261a",
+    "b6f48838-d3d6-434b-84a4-948ad46c6a4d",
+    "d468a7c5-6c73-4f97-b014-480365d8e67d"
+   ],
+   "fromLabel": "이름 '하부', levelId 없음",
+   "toLabel": "9층",
+   "grade": "확정+원천",
+   "evidence": "사용자 확정: 버스 정류장 쪽에서 들어간 자리가 9층. 학교 출입구 목록: 입구(2) = 9층. 이 묶음은 그 입구 옆(북쪽 면)에서 시작한다"
+  },
+  {
+   "building": "유담관",
+   "op": "shift_z",
+   "roadIds": [
+    "307a8b1b-6c76-405e-be09-e35f7227148d",
+    "32bfe8b6-7697-459a-9a85-cb77bec9333c",
+    "41f8f6bb-5799-49b9-ac96-5b7662f24438",
+    "455d51e2-e380-47cd-9442-0487af1bdf63",
+    "6b1caa1e-f87a-42c8-a923-1dee7551fcbe",
+    "807392da-a5f4-4c8e-99e8-22b823126d03",
+    "8cb797d8-618d-4a41-8583-76e7bc2e3840",
+    "939842ce-bf43-489d-a54e-551abf89a57e",
+    "99c5e3df-b265-427c-8aa2-a153b161261a",
+    "b6f48838-d3d6-434b-84a4-948ad46c6a4d",
+    "b95a79a7-cbe1-4fc4-8c0a-9e774ed8c742",
+    "cc578ff6-1324-493c-9649-f8f1a29fc96f",
+    "d468a7c5-6c73-4f97-b014-480365d8e67d"
+   ],
+   "deltaM": -2.7,
+   "deltaRangeM": [
+    -3.1,
+    -1.0
+   ],
+   "grade": "추정",
+   "evidence": "9층 입구 앞 S-MAP 지면 126.9 m (벽 앞 126.5~127.7, 북쪽 면 서쪽 끝은 128.6). 저장 높이 129.6 m. 문 자리가 ±수 m 불확실해 옮길 양이 -1.0~-3.1 m 로 벌어진다. 실내 13개가 한 묶음이라 통째로 옮기는 것만 뜻이 있다. 옛 지형 오류와는 무관"
+  },
+  {
+   "building": "유담관",
+   "op": "relabel_level",
+   "roadIds": [
+    "307a8b1b-6c76-405e-be09-e35f7227148d",
+    "41f8f6bb-5799-49b9-ac96-5b7662f24438",
+    "455d51e2-e380-47cd-9442-0487af1bdf63",
+    "939842ce-bf43-489d-a54e-551abf89a57e"
+   ],
+   "fromLabel": "이름 '상부', levelId 없음",
+   "toLabel": "모름",
+   "grade": "모름",
+   "evidence": "승강기 정지 높이가 입구 층보다 15.62 m, 23.24 m 높다. 3~9층 층고(4.4 m 안팎)로 나누면 3.5개·5.2개 층이라 정수가 아니다. 층당 3.9 m 면 4개·6개 층. 어느 층에서 내렸는지 기록이 필요하다"
+  },
+  {
+   "building": "대일관",
+   "op": "shift_z",
+   "roadIds": [
+    "9a3cce3f-8640-430e-9ab8-41806697359f"
+   ],
+   "deltaM": 6.0,
+   "deltaRangeM": [
+    5.7,
+    6.4
+   ],
+   "grade": "S-MAP",
+   "evidence": "1층 복도 입구 두 곳의 S-MAP 벽 앞 지면 151.7, 152.0 m -> 1층 151.8 m. 저장 145.80 m 는 옛 운동장 높이(141.73)에 맞춘 값. 운동장 쪽 오차 +7.2 m 와 같은 종류지만 양은 다르다(+6.0)"
+  },
+  {
+   "building": "대일관",
+   "op": "relabel_level",
+   "roadIds": [
+    "9a3cce3f-8640-430e-9ab8-41806697359f"
+   ],
+   "fromLabel": "levelId 없음",
+   "toLabel": "1층",
+   "grade": "원천",
+   "evidence": "길 이름이 이미 '1층 내부 통로'. 학교 출입구 목록의 1층 복도 입구와 같은 층"
+  },
+  {
+   "building": "대일관",
+   "op": "shift_z",
+   "scope": "건물 id 가 없는 대일관 앞·옆 실외 계단 6개(141.73~145.80 m)",
+   "roadIds": [
+    "1d10b963-7f99-4879-bbf3-71ea9006d64f",
+    "2f206e6c-6a72-473a-a455-d1ef2acc62f1",
+    "88ba01e6-7ed5-4b85-a757-fd0fc1416c75",
+    "a714275b-1647-4e6b-b5ba-067820204bd3",
+    "b14ac1da-f26e-4fa7-a953-ed55397bbfa9"
+   ],
+   "deltaM": null,
+   "grade": "추정",
+   "evidence": "아래 끝은 운동장(148.9, 측정) 또는 현관 앞 바닥(149.9, S-MAP), 위 끝은 1층(151.8). 저장된 단차 4.07 m 대 실제 약 1.9~2.9 m 라 통째 이동으로는 맞지 않는다. 끝점마다 다시 정해야 한다(E07 의 대일관 앞 145.80 평탄면과 같은 문제)"
+  },
+  {
+   "building": "문예관",
+   "op": "relabel_level",
+   "roadIds": [
+    "23de6a42-cec7-4f92-b856-c1c043944a95"
+   ],
+   "fromLabel": "이름 '상부 진입 통로', levelId 없음",
+   "toLabel": "3층",
+   "grade": "원천+S-MAP",
+   "evidence": "학교 출입구 목록: 입구(1) = 3층 로비. 저장 142.44 m 는 입구 둘레 S-MAP 지면 139.1~142.6 m 의 위쪽 끝과 맞고, 2층 입구 지면 138.9 m 보다 3.5 m 높다(한 층)"
+  },
+  {
+   "building": "문예관",
+   "op": "relabel_level",
+   "roadIds": [
+    "131616f9-8371-4661-80d1-4e13fc0b5609",
+    "66f166a8-f9fc-49ea-b5ef-ec4b45cfd145"
+   ],
+   "fromLabel": "이름 '지하'",
+   "toLabel": "1층(추정) — 지하는 아님",
+   "grade": "추정",
+   "evidence": "136.39 m 는 3층(142.44)보다 6.05 m, 2층 입구 지면(138.9)보다 2.5 m 낮다. 2개 층 아래(층당 3.0 m)면 1층이다. 학교 표기의 B1 은 그보다 더 아래다"
+  },
+  {
+   "building": "혜인관",
+   "op": "rename_building_id",
+   "roadIds": [
+    "0d88669d-bd1a-4417-aaf4-8938b64073e4",
+    "20277429-1d12-4a0d-9c23-dad4b3574de5",
+    "2e0d36ec-82bc-47ca-8870-30384eebdfee",
+    "5544cab2-86e9-4cf6-94b1-ea319606e83b",
+    "5aea9b42-15e8-4fa1-be44-50e22922d65a",
+    "89ce1806-d956-4d8e-93b0-9a52f517187d",
+    "96511fe1-a1f0-4326-8c04-7dc1b6746d7d",
+    "fa7d28d0-2aee-4d69-b872-eed9c1221284"
+   ],
+   "fromLabel": "buildingId '건물5'",
+   "toLabel": "혜인관",
+   "grade": "확정",
+   "evidence": "혜인관 노트(H02): 서버 건물 id 가 뒤바뀌어 있다. 건물 id 정리와 함께 해야 한다"
+  },
+  {
+   "building": "혜인관",
+   "op": "shift_z",
+   "roadIds": [
+    "0d88669d-bd1a-4417-aaf4-8938b64073e4",
+    "20277429-1d12-4a0d-9c23-dad4b3574de5",
+    "2e0d36ec-82bc-47ca-8870-30384eebdfee",
+    "5544cab2-86e9-4cf6-94b1-ea319606e83b",
+    "5aea9b42-15e8-4fa1-be44-50e22922d65a",
+    "89ce1806-d956-4d8e-93b0-9a52f517187d",
+    "96511fe1-a1f0-4326-8c04-7dc1b6746d7d",
+    "fa7d28d0-2aee-4d69-b872-eed9c1221284"
+   ],
+   "deltaM": null,
+   "deltaRangeM": [
+    -1.6,
+    -0.9
+   ],
+   "grade": "추정",
+   "evidence": "'B1' 통로 150.26~150.94 m 대 B1 입구 두 곳의 S-MAP 지면 149.3 m (운동장 높이). 0.9~1.6 m 높다. 승강기 6F 171.0 m 는 사다리 6층 170.9 m 와 맞는다. 차이가 작고 S-MAP 지면 = 바닥이라는 가정이 필요해 옮기지 않는 쪽을 권한다"
+  }
+ ],
+ "proposalCounts": {
+  "relabel_level / 모름": 1,
+  "relabel_level / 원천": 1,
+  "relabel_level / 원천+S-MAP": 2,
+  "relabel_level / 원천+S-MAP(순서)": 3,
+  "relabel_level / 추정": 6,
+  "relabel_level / 확정+원천": 1,
+  "rename_building_id / 확정": 1,
+  "shift_z / S-MAP": 1,
+  "shift_z / 추정": 3
+ }
+}

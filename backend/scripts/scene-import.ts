@@ -13,7 +13,8 @@
  *   An override may state the floor count ("floors"); without it only a register count is kept (an assumed one is dropped).
  *   The same file can leave a GeoPackage building out of the scene ("hidden") or draw one footprint as several blocks
  *   with their own roofs ("parts": polygons that tile the footprint; the first part keeps the building id, the others
- *   get <id>#<part id>). --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
+ *   get <id>#<part id>). A split that states "uncovered" may leave part of the footprint undrawn (parts inside it, no
+ *   overlaps); a part that states "terrace" may have its roof below the highest ground on its outline (above the median). --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
  * - The source files are copied to backend/data/scene/source with their SHA-256 (SOURCES.json).
  */
 import { createHash } from 'node:crypto';
@@ -115,6 +116,13 @@ async function main() {
       const area = polygons.reduce((s, poly) => s + polygonArea(poly), 0);
       const bad = partsAreaProblem(split, area);
       if (bad) problems.push(bad);
+      if (split.uncovered !== undefined) { // without tiling, equal areas no longer rule out overlapping parts
+        const { rows: [ov] } = await pool.query<{ overlap: number }>(
+          `SELECT COALESCE(SUM(ST_Area(g)) - ST_Area(ST_Union(g)), 0) overlap FROM (SELECT ST_SetSRID(ST_GeomFromGeoJSON(j), 5186) g FROM unnest($1::text[]) j) t`,
+          [split.parts.map((part) => JSON.stringify({ type: 'MultiPolygon', coordinates: [part.polygon] }))],
+        );
+        if (ov.overlap > 0.5) problems.push(`parts of ${p.name} overlap by ${ov.overlap.toFixed(1)} m2`);
+      }
       for (const [k, part] of split.parts.entries()) {
         const label = `${p.name} part ${part.id}`;
         const ring: Ring[][] = [part.polygon];
@@ -134,14 +142,14 @@ async function main() {
         const ph = blockHeights(ps as number[], 0); // base and ground under this part; the roof is the part's own
         let partHeight = 0;
         try {
-          partHeight = overrideHeights(ps as number[], ph, part.roofM).heightM;
+          partHeight = overrideHeights(ps as number[], ph, part.roofM, part.terrace !== undefined).heightM;
         } catch (err) {
           problems.push(`${label}: ${(err as Error).message}`);
         }
         const buildingId = partBuildingId(best.building_id, split.parts, k);
         out.push({ buildingId, name: part.name, heightM: partHeight, source: split.heightSource, registerId: p.register_id || null, floors: part.name ? split.floors ?? null : null,
           baseM: ph.baseM, roofM: part.roofM, tMin: ph.terrainMinM, tMax: ph.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, geojson: partJson,
-          note: `part "${part.id}" of ${p.name} (${split.parts.length} parts); flat roof ${part.roofM} m from ${split.evidence.source} (${split.evidence.collectedOn}, ${split.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); whole building in the GeoPackage: ${p.height_m} m ${p.height_source}, ${p.ground_floors ?? '?'} floors` });
+          note: `part "${part.id}" of ${p.name} (${split.parts.length} parts${split.uncovered === undefined ? '' : '; the rest of the footprint is not drawn'})${part.terrace === undefined ? '' : '; terrace, roof below the highest ground on its outline'}; flat roof ${part.roofM} m from ${split.evidence.source} (${split.evidence.collectedOn}, ${split.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); whole building in the GeoPackage: ${p.height_m} m ${p.height_source}, ${p.ground_floors ?? '?'} floors` });
         rows.push({ name: `${p.name} / ${part.id}`, building: buildingId, iou: k === 0 ? r2(best.iou) : '', height: partHeight, source: split.heightSource, base: ph.baseM, roof: part.roofM,
           'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(part.roofM - p.roof_m), raised: '' });
       }

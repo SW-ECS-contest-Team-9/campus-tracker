@@ -1,0 +1,2013 @@
+{
+ "method": "B03 1단계 — 학교 캠퍼스맵 출입구(몇 층 입구인지)와 S-MAP 지면으로 동별 층 바닥 높이를 구한다. 읽기 전용, DB 없음.\n\n  python docs/audit/b03/anchors.py <audit-dir> <backend-dir> <out.json>\n\n입력: <audit-dir>/e05/smap-mesh-*.txt (S-MAP 3D 화면 표면 z 와 모델 id, 2026-10-10 판독. 독립 측량 아님),\n<backend-dir>/data/terrain/source/skuniv_places.json (출입구 설명 = 원천), <backend-dir>/data/scene/source/campus.gpkg.\n\n지면 읽는 법(모든 출입구 같음): 표지점 5 m 안(지형 칸이 5개 미만이면 8 m)의 S-MAP 지형 칸 = \"둘레\", 6 m 안에서 S-MAP 건물 칸에 맞닿은\n지형 칸 = \"벽 앞\". 벽 앞 칸이 3개 이상이면 벽 앞 중앙값을, 아니면 둘레 중앙값을 쓴다. 다르게 고른 곳은 OVERRIDE 에 이유와 함께 적는다.\n운동장 쪽 문은 운동장 바닥 측정값(E06, 148.9 m)을 쓰고 S-MAP 값과의 차를 남긴다.\n\n층 높이: 기준층은 그 높이, 기준 사이 층은 실제 층 수로 고르게 나눔, 기준 밖은 PLAN 에 적은 층고로 늘림(등급 추정).\n층 번호 4·13 을 건너뛰는지는 동마다 두 가설을 모두 계산해 (1) 기준 사이 층고 (2) 가장 높은 기준층에서 S-MAP 지붕까지의 층고로 견준다.\n층고 2.7 m 미만·5.5 m 초과는 implausible 로 표시한다. 어느 가설을 층 사다리에 쓸지는 PLAN 에 이유와 함께 적는다(자동 선택 아님).\n",
+ "fieldM": 148.9,
+ "entrances": [
+  {
+   "name": "서경대본관 2115번 버스정류장",
+   "x": 201031.0,
+   "y": 557319.0,
+   "text": "",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 15,
+    "min": 128.3,
+    "median": 128.7,
+    "max": 128.9
+   },
+   "wallFoot": {
+    "n": 8,
+    "min": 128.2,
+    "median": 128.6,
+    "max": 128.9
+   },
+   "groundM": 128.6,
+   "groundFrom": "wallFoot",
+   "spread": [
+    128.2,
+    128.9
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "서경대본관 1164번 버스정류장",
+   "x": 201023.3,
+   "y": 557317.0,
+   "text": "",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 18,
+    "min": 128.6,
+    "median": 128.9,
+    "max": 130.3
+   },
+   "wallFoot": {
+    "n": 0
+   },
+   "groundM": 128.9,
+   "groundFrom": "around",
+   "spread": [
+    128.6,
+    130.3
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "본관-한림관 연결통로",
+   "x": 201098.0,
+   "y": 557302.7,
+   "text": "본관 5층과 한림관 3층을 연결하는 통로입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 6,
+    "min": 129.6,
+    "median": 130.5,
+    "max": 131.6
+   },
+   "wallFoot": {
+    "n": 7,
+    "min": 129.6,
+    "median": 130.7,
+    "max": 132.1
+   },
+   "groundM": 130.7,
+   "groundFrom": "wallFoot",
+   "spread": [
+    129.6,
+    132.1
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "본관"
+   ]
+  },
+  {
+   "name": "한림관-은주관 연결통로",
+   "x": 201131.7,
+   "y": 557297.5,
+   "text": "한림관 3층과 은주1관 2층을 연결하기도 하며, 한림관 6층과 은주1관 5층을 연결하는 통로입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 28,
+    "min": 133.1,
+    "median": 135.1,
+    "max": 139.7
+   },
+   "wallFoot": {
+    "n": 28,
+    "min": 132.9,
+    "median": 135.1,
+    "max": 144.1
+   },
+   "groundM": 135.1,
+   "groundFrom": "wallFoot",
+   "spread": [
+    132.9,
+    144.1
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "은주관"
+   ]
+  },
+  {
+   "name": "유담관 입구(1)",
+   "x": 201057.2,
+   "y": 557234.5,
+   "text": "유담관 6층 로비 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 56,
+    "min": 114.1,
+    "median": 119.3,
+    "max": 125.8
+   },
+   "wallFoot": {
+    "n": 17,
+    "min": 114.3,
+    "median": 120.4,
+    "max": 125.5
+   },
+   "groundM": 114.1,
+   "groundFrom": "override",
+   "spread": [
+    114.0,
+    116.3
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "유담관"
+   ],
+   "overrideCells": 150,
+   "why": "표지는 비탈 끝(둘레 114~126 m)에 찍혀 있다. 학교 사진의 입구는 평평한 광장 바닥에 있고, 표지 동남쪽 3~15 m 가 분수 광장 평탄면이다(x 201060~201072, y 557222~557234)"
+  },
+  {
+   "name": "유담관 입구(2)",
+   "x": 201038.5,
+   "y": 557283.0,
+   "text": "유담관 9층 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 8,
+   "around": {
+    "n": 13,
+    "min": 125.9,
+    "median": 126.7,
+    "max": 127.8
+   },
+   "wallFoot": {
+    "n": 5,
+    "min": 126.5,
+    "median": 126.9,
+    "max": 127.7
+   },
+   "groundM": 126.9,
+   "groundFrom": "wallFoot",
+   "spread": [
+    126.5,
+    127.7
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "유담관"
+   ]
+  },
+  {
+   "name": "유담관 입구(3)",
+   "x": 201001.5,
+   "y": 557290.0,
+   "text": "유담관 3층 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 21,
+    "min": 100.2,
+    "median": 121.4,
+    "max": 130.9
+   },
+   "wallFoot": {
+    "n": 0
+   },
+   "groundM": 100.3,
+   "groundFrom": "override",
+   "spread": [
+    99.6,
+    101.3
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "유담관"
+   ],
+   "overrideCells": 25,
+   "why": "표지는 서쪽 벽 비탈(104~119 m) 위에 찍혀 있다. 벽 발치의 낮은 길(표지 서쪽 3.5~11.5 m, 남북 ±4 m)을 읽었다. 길이 남북으로 기울어 4 m 에 0.6 m 달라진다"
+  },
+  {
+   "name": "본관 입구(1)",
+   "x": 201060.8,
+   "y": 557304.0,
+   "text": "본관 1층과 2층으로 갈 수 있는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 7,
+    "min": 127.8,
+    "median": 127.8,
+    "max": 127.9
+   },
+   "wallFoot": {
+    "n": 7,
+    "min": 127.8,
+    "median": 127.8,
+    "max": 127.8
+   },
+   "groundM": 127.8,
+   "groundFrom": "wallFoot",
+   "spread": [
+    127.8,
+    127.8
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "본관"
+   ]
+  },
+  {
+   "name": "본관 입구(2)",
+   "x": 201041.5,
+   "y": 557338.5,
+   "text": "지하주차장과 본관 2층으로 연결되는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 10,
+    "min": 130.2,
+    "median": 130.6,
+    "max": 131.2
+   },
+   "wallFoot": {
+    "n": 8,
+    "min": 129.9,
+    "median": 130.7,
+    "max": 131.2
+   },
+   "groundM": 130.7,
+   "groundFrom": "wallFoot",
+   "spread": [
+    129.9,
+    131.2
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "본관 입구(3)",
+   "x": 201097.8,
+   "y": 557317.0,
+   "text": "본관 5층, 6층 사이 계단으로 연결되는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 5,
+    "min": 139.4,
+    "median": 139.9,
+    "max": 140.5
+   },
+   "wallFoot": {
+    "n": 6,
+    "min": 139.4,
+    "median": 139.9,
+    "max": 140.5
+   },
+   "groundM": 139.9,
+   "groundFrom": "wallFoot",
+   "spread": [
+    139.4,
+    140.5
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "본관"
+   ]
+  },
+  {
+   "name": "한림관 입구",
+   "x": 201105.7,
+   "y": 557280.5,
+   "text": "한림관 1층 로비 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 33,
+    "min": 125.8,
+    "median": 126.9,
+    "max": 127.5
+   },
+   "wallFoot": {
+    "n": 11,
+    "min": 125.8,
+    "median": 126.5,
+    "max": 126.9
+   },
+   "groundM": 126.5,
+   "groundFrom": "wallFoot",
+   "spread": [
+    125.8,
+    126.9
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "은주1관 입구(1)",
+   "x": 201120.8,
+   "y": 557252.7,
+   "text": "은주1관 1층 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 29,
+    "min": 130.0,
+    "median": 131.2,
+    "max": 132.0
+   },
+   "wallFoot": {
+    "n": 18,
+    "min": 129.7,
+    "median": 131.3,
+    "max": 132.4
+   },
+   "groundM": 131.3,
+   "groundFrom": "wallFoot",
+   "spread": [
+    129.7,
+    132.4
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "은주관"
+   ]
+  },
+  {
+   "name": "은주1관 입구(2)",
+   "x": 201135.8,
+   "y": 557250.2,
+   "text": "은주1관 5층 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 35,
+    "min": 148.9,
+    "median": 149.0,
+    "max": 149.3
+   },
+   "wallFoot": {
+    "n": 13,
+    "min": 148.9,
+    "median": 149.0,
+    "max": 149.3
+   },
+   "groundM": 148.9,
+   "groundFrom": "field (E06)",
+   "spread": [
+    148.9,
+    149.3
+   ],
+   "grade": "측정",
+   "insideOutlineOf": [
+    "은주관"
+   ],
+   "smapGroundM": 149.0,
+   "smapMinusFieldM": 0.1,
+   "why": "운동장 쪽 문: 운동장 바닥 측정값(E06)"
+  },
+  {
+   "name": "은주2관 입구(1)",
+   "x": 201125.0,
+   "y": 557201.3,
+   "text": "은주2관 1층 로비 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 44,
+    "min": 131.5,
+    "median": 132.1,
+    "max": 132.2
+   },
+   "wallFoot": {
+    "n": 17,
+    "min": 131.8,
+    "median": 132.2,
+    "max": 132.2
+   },
+   "groundM": 132.2,
+   "groundFrom": "wallFoot",
+   "spread": [
+    131.8,
+    132.2
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "수인관"
+   ]
+  },
+  {
+   "name": "은주2관 입구(2)",
+   "x": 201201.8,
+   "y": 557168.3,
+   "text": "은주2관 5층 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 24,
+    "min": 148.7,
+    "median": 149.1,
+    "max": 149.2
+   },
+   "wallFoot": {
+    "n": 16,
+    "min": 148.6,
+    "median": 149.0,
+    "max": 149.3
+   },
+   "groundM": 148.9,
+   "groundFrom": "field (E06)",
+   "spread": [
+    148.6,
+    149.3
+   ],
+   "grade": "측정",
+   "insideOutlineOf": [],
+   "smapGroundM": 149.0,
+   "smapMinusFieldM": 0.1,
+   "why": "운동장 쪽 문: 운동장 바닥 측정값(E06)"
+  },
+  {
+   "name": "혜인관 입구(1)",
+   "x": 201218.7,
+   "y": 557213.7,
+   "text": "혜인관 1층 로비와 B1층으로 갈 수 있는 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 11,
+    "min": 148.9,
+    "median": 149.0,
+    "max": 149.4
+   },
+   "wallFoot": {
+    "n": 0
+   },
+   "groundM": 149.0,
+   "groundFrom": "around",
+   "spread": [
+    148.9,
+    149.4
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "혜인관 입구(2)",
+   "x": 201247.7,
+   "y": 557255.8,
+   "text": "혜인관 B1층 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 14,
+    "min": 149.2,
+    "median": 149.5,
+    "max": 149.8
+   },
+   "wallFoot": {
+    "n": 10,
+    "min": 149.1,
+    "median": 149.6,
+    "max": 149.8
+   },
+   "groundM": 149.6,
+   "groundFrom": "wallFoot",
+   "spread": [
+    149.1,
+    149.8
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "청운관 입구",
+   "x": 201216.5,
+   "y": 557279.8,
+   "text": "청운관 1층 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 21,
+    "min": 148.9,
+    "median": 148.9,
+    "max": 150.5
+   },
+   "wallFoot": {
+    "n": 7,
+    "min": 148.9,
+    "median": 149.1,
+    "max": 151.0
+   },
+   "groundM": 148.9,
+   "groundFrom": "field (E06)",
+   "spread": [
+    148.9,
+    151.0
+   ],
+   "grade": "측정",
+   "insideOutlineOf": [
+    "청운관"
+   ],
+   "smapGroundM": 149.1,
+   "smapMinusFieldM": 0.2,
+   "why": "운동장 쪽 문: 운동장 바닥 측정값(E06)"
+  },
+  {
+   "name": "상승관 입구",
+   "x": 201200.5,
+   "y": 557294.2,
+   "text": "상승관(학군단) 1층 로비 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 33,
+    "min": 148.9,
+    "median": 150.3,
+    "max": 151.4
+   },
+   "wallFoot": {
+    "n": 15,
+    "min": 150.3,
+    "median": 150.9,
+    "max": 151.4
+   },
+   "groundM": 150.9,
+   "groundFrom": "wallFoot",
+   "spread": [
+    150.3,
+    151.4
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "대일관"
+   ]
+  },
+  {
+   "name": "대일관 입구(1)",
+   "x": 201155.2,
+   "y": 557310.0,
+   "text": "대일관 1층 로비 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 31,
+    "min": 148.8,
+    "median": 149.4,
+    "max": 150.1
+   },
+   "wallFoot": {
+    "n": 11,
+    "min": 149.6,
+    "median": 149.9,
+    "max": 150.1
+   },
+   "groundM": 149.9,
+   "groundFrom": "wallFoot",
+   "spread": [
+    149.6,
+    150.1
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "대일관 입구(2)",
+   "x": 201186.0,
+   "y": 557302.2,
+   "text": "대일관 1층 복도로 연결되는 입구입니다.",
+   "gridStepM": 1,
+   "radiusM": 5,
+   "around": {
+    "n": 32,
+    "min": 150.4,
+    "median": 151.3,
+    "max": 151.9
+   },
+   "wallFoot": {
+    "n": 15,
+    "min": 151.5,
+    "median": 151.7,
+    "max": 151.9
+   },
+   "groundM": 151.7,
+   "groundFrom": "wallFoot",
+   "spread": [
+    151.5,
+    151.9
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "대일관"
+   ]
+  },
+  {
+   "name": "대일관 입구(3)",
+   "x": 201181.5,
+   "y": 557319.5,
+   "text": "산책로에서 대일관 1층 복도로 연결되는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 8,
+   "around": {
+    "n": 16,
+    "min": 151.9,
+    "median": 152.0,
+    "max": 152.5
+   },
+   "wallFoot": {
+    "n": 6,
+    "min": 151.9,
+    "median": 152.0,
+    "max": 152.2
+   },
+   "groundM": 152.0,
+   "groundFrom": "wallFoot",
+   "spread": [
+    151.9,
+    152.2
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "대일관"
+   ]
+  },
+  {
+   "name": "문예관 입구(1)",
+   "x": 201102.0,
+   "y": 557338.5,
+   "text": "문예관 3층 로비 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 8,
+   "around": {
+    "n": 13,
+    "min": 139.1,
+    "median": 140.8,
+    "max": 142.6
+   },
+   "wallFoot": {
+    "n": 2,
+    "min": 139.9,
+    "median": 140.9,
+    "max": 141.8
+   },
+   "groundM": 140.8,
+   "groundFrom": "around",
+   "spread": [
+    139.1,
+    142.6
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "문예관 입구(2)",
+   "x": 201093.0,
+   "y": 557342.5,
+   "text": "문예관 2층 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 11,
+    "min": 138.7,
+    "median": 139.0,
+    "max": 140.7
+   },
+   "wallFoot": {
+    "n": 8,
+    "min": 138.7,
+    "median": 138.9,
+    "max": 139.9
+   },
+   "groundM": 138.9,
+   "groundFrom": "wallFoot",
+   "spread": [
+    138.7,
+    139.9
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "북악관 입구(1)",
+   "x": 201043.7,
+   "y": 557368.7,
+   "text": "북악관 1층 로비 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 8,
+   "around": {
+    "n": 17,
+    "min": 131.6,
+    "median": 132.7,
+    "max": 133.3
+   },
+   "wallFoot": {
+    "n": 6,
+    "min": 132.6,
+    "median": 133.1,
+    "max": 133.3
+   },
+   "groundM": 133.1,
+   "groundFrom": "wallFoot",
+   "spread": [
+    132.6,
+    133.3
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "북악관 입구(2)",
+   "x": 201074.0,
+   "y": 557356.5,
+   "text": "북악관 1층 복도로 연결되는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 9,
+    "min": 132.3,
+    "median": 132.4,
+    "max": 132.6
+   },
+   "wallFoot": {
+    "n": 6,
+    "min": 132.3,
+    "median": 132.4,
+    "max": 132.6
+   },
+   "groundM": 132.4,
+   "groundFrom": "wallFoot",
+   "spread": [
+    132.3,
+    132.6
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "북악관"
+   ]
+  },
+  {
+   "name": "북악관 입구(3)",
+   "x": 201013.8,
+   "y": 557382.7,
+   "text": "북악관 1층 복도로 연결되는 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 11,
+    "min": 131.3,
+    "median": 131.9,
+    "max": 132.5
+   },
+   "wallFoot": {
+    "n": 8,
+    "min": 131.3,
+    "median": 131.8,
+    "max": 132.5
+   },
+   "groundM": 131.8,
+   "groundFrom": "wallFoot",
+   "spread": [
+    131.3,
+    132.5
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": []
+  },
+  {
+   "name": "북악관 입구(4)",
+   "x": 201009.8,
+   "y": 557395.0,
+   "text": "북악관 B1층 입구입니다.",
+   "gridStepM": 2,
+   "radiusM": 5,
+   "around": {
+    "n": 6,
+    "min": 131.6,
+    "median": 131.8,
+    "max": 131.9
+   },
+   "wallFoot": {
+    "n": 8,
+    "min": 131.6,
+    "median": 131.8,
+    "max": 131.9
+   },
+   "groundM": 131.8,
+   "groundFrom": "wallFoot",
+   "spread": [
+    131.6,
+    131.9
+   ],
+   "grade": "S-MAP",
+   "insideOutlineOf": [
+    "북악관"
+   ]
+  }
+ ],
+ "buildings": {
+  "유담관": {
+   "labels": [
+    "B2",
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "anchors": [
+    {
+     "floor": 3,
+     "heightM": 100.3
+    },
+    {
+     "floor": 6,
+     "heightM": 114.1
+    },
+    {
+     "floor": 9,
+     "heightM": 126.9
+    }
+   ],
+   "smapRoofM": 167.4,
+   "hypotheses": {
+    "13 건너뜀": {
+     "skip": [
+      13
+     ],
+     "storeysAboveGround": 15,
+     "betweenAnchors": [
+      {
+       "from": 3,
+       "to": 6,
+       "storeys": 3,
+       "storeyHeightM": 4.6,
+       "implausible": false
+      },
+      {
+       "from": 6,
+       "to": 9,
+       "storeys": 3,
+       "storeyHeightM": 4.27,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.43,
+     "topAnchorToSmapRoof": {
+      "storeys": 7,
+      "storeyHeightM": 5.79,
+      "implausible": true
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 157.9,
+      "minusSmapRoofM": -9.5
+     }
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 16,
+     "betweenAnchors": [
+      {
+       "from": 3,
+       "to": 6,
+       "storeys": 3,
+       "storeyHeightM": 4.6,
+       "implausible": false
+      },
+      {
+       "from": 6,
+       "to": 9,
+       "storeys": 3,
+       "storeyHeightM": 4.27,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.43,
+     "topAnchorToSmapRoof": {
+      "storeys": 8,
+      "storeyHeightM": 5.06,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 162.4,
+      "minusSmapRoofM": -5.0
+     }
+    }
+   },
+   "roofNote": "기운 지붕의 낮은 끝(남동 띠 중앙 167.4, tower.py). 높은 끝은 179.2",
+   "ladderHypothesis": "13 건너뜀",
+   "ladderWhy": "3·6·9층 기준 사이는 번호가 빠지지 않아 두 가설이 같다. 9층 위는 건너뜀 여부를 가르지 못해 호실 목록대로(13층 호실 없음) 두고, 9층 위 층고는 3~9층 평균을 쓴다(추정)",
+   "storeyHeightBelowAnchorsM": 4.43,
+   "storeyHeightAboveAnchorsM": 4.43,
+   "storeyHeightAboveFrom": "기준 사이 평균(지붕까지 나눈 값은 5.5 m 초과)",
+   "ladder": {
+    "B2": [
+     82.6,
+     "extrap"
+    ],
+    "B1": [
+     87.0,
+     "extrap"
+    ],
+    "1": [
+     91.4,
+     "extrap"
+    ],
+    "2": [
+     95.9,
+     "extrap"
+    ],
+    "3": [
+     100.3,
+     "anchor"
+    ],
+    "4": [
+     104.9,
+     "interp"
+    ],
+    "5": [
+     109.5,
+     "interp"
+    ],
+    "6": [
+     114.1,
+     "anchor"
+    ],
+    "7": [
+     118.4,
+     "interp"
+    ],
+    "8": [
+     122.6,
+     "interp"
+    ],
+    "9": [
+     126.9,
+     "anchor"
+    ],
+    "10": [
+     131.3,
+     "extrap"
+    ],
+    "11": [
+     135.8,
+     "extrap"
+    ],
+    "12": [
+     140.2,
+     "extrap"
+    ],
+    "14": [
+     144.6,
+     "extrap"
+    ],
+    "15": [
+     149.1,
+     "extrap"
+    ],
+    "16": [
+     153.5,
+     "extrap"
+    ]
+   }
+  },
+  "본관": {
+   "labels": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "anchors": [
+    {
+     "floor": 2,
+     "heightM": 130.7
+    },
+    {
+     "floor": 5.5,
+     "heightM": 139.9
+    }
+   ],
+   "smapRoofM": 153.8,
+   "hypotheses": {
+    "4 건너뜀": {
+     "skip": [
+      4
+     ],
+     "storeysAboveGround": 7,
+     "betweenAnchors": [
+      {
+       "from": 2,
+       "to": 5.5,
+       "storeys": 2.5,
+       "storeyHeightM": 3.68,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 3.68,
+     "topAnchorToSmapRoof": {
+      "storeys": 3.5,
+      "storeyHeightM": 3.97,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 152.8,
+      "minusSmapRoofM": -1.0
+     }
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 8,
+     "betweenAnchors": [
+      {
+       "from": 2,
+       "to": 5.5,
+       "storeys": 3.5,
+       "storeyHeightM": 2.63,
+       "implausible": true
+      }
+     ],
+     "meanBetweenAnchorsM": 2.63,
+     "topAnchorToSmapRoof": {
+      "storeys": 3.5,
+      "storeyHeightM": 3.97,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 149.1,
+      "minusSmapRoofM": -4.7
+     }
+    }
+   },
+   "roofNote": "S-MAP 건물 칸 중앙값(E05)",
+   "ladderHypothesis": "4 건너뜀",
+   "ladderWhy": "2층 입구와 5·6층 사이 계단참 입구로 층고를 내면 4를 건너뛸 때 3.7 m 안팎이고 그 층고로 올린 지붕이 S-MAP 지붕과 1 m 안에서 맞는다. 건너뛰지 않으면 층고 2.7 m 미만에 지붕이 4.6 m 모자란다. 5.5 = 5층과 6층의 한가운데로 본 가정",
+   "storeyHeightBelowAnchorsM": 3.67,
+   "storeyHeightAboveAnchorsM": 4.03,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "1": [
+     127.0,
+     "extrap"
+    ],
+    "2": [
+     130.7,
+     "anchor"
+    ],
+    "3": [
+     134.4,
+     "interp"
+    ],
+    "5": [
+     138.1,
+     "interp"
+    ],
+    "6": [
+     141.7,
+     "interp"
+    ],
+    "7": [
+     145.7,
+     "extrap"
+    ],
+    "8": [
+     149.8,
+     "extrap"
+    ]
+   }
+  },
+  "한림관": {
+   "labels": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 126.5
+    },
+    {
+     "floor": 6,
+     "heightM": 148.9
+    }
+   ],
+   "smapRoofM": 188.1,
+   "hypotheses": {
+    "4·13 건너뜀": {
+     "skip": [
+      4,
+      13
+     ],
+     "storeysAboveGround": 14,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 6,
+       "storeys": 4,
+       "storeyHeightM": 5.6,
+       "implausible": true
+      }
+     ],
+     "meanBetweenAnchorsM": 5.6,
+     "topAnchorToSmapRoof": {
+      "storeys": 10,
+      "storeyHeightM": 3.92,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 204.9,
+      "minusSmapRoofM": 16.8
+     }
+    },
+    "13만 건너뜀": {
+     "skip": [
+      13
+     ],
+     "storeysAboveGround": 15,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 6,
+       "storeys": 5,
+       "storeyHeightM": 4.48,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.48,
+     "topAnchorToSmapRoof": {
+      "storeys": 10,
+      "storeyHeightM": 3.92,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 193.7,
+      "minusSmapRoofM": 5.6
+     }
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 16,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 6,
+       "storeys": 5,
+       "storeyHeightM": 4.48,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.48,
+     "topAnchorToSmapRoof": {
+      "storeys": 11,
+      "storeyHeightM": 3.56,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 198.2,
+      "minusSmapRoofM": 10.1
+     }
+    }
+   },
+   "roofNote": "바깥 고리 지붕(B02). 가운데 원판은 197.3",
+   "ladderHypothesis": "13만 건너뜀",
+   "ladderWhy": "6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 22.4 m 라서 4를 건너뛰면 층당 5.6 m(지나침), 건너뛰지 않으면 4.5 m. 13은 가르지 못해 호실 목록대로 둔다",
+   "storeyHeightBelowAnchorsM": 4.48,
+   "storeyHeightAboveAnchorsM": 3.92,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "1": [
+     126.5,
+     "anchor"
+    ],
+    "2": [
+     131.0,
+     "interp"
+    ],
+    "3": [
+     135.5,
+     "interp"
+    ],
+    "4": [
+     139.9,
+     "interp"
+    ],
+    "5": [
+     144.4,
+     "interp"
+    ],
+    "6": [
+     148.9,
+     "anchor"
+    ],
+    "7": [
+     152.8,
+     "extrap"
+    ],
+    "8": [
+     156.7,
+     "extrap"
+    ],
+    "9": [
+     160.7,
+     "extrap"
+    ],
+    "10": [
+     164.6,
+     "extrap"
+    ],
+    "11": [
+     168.5,
+     "extrap"
+    ],
+    "12": [
+     172.4,
+     "extrap"
+    ],
+    "14": [
+     176.3,
+     "extrap"
+    ],
+    "15": [
+     180.3,
+     "extrap"
+    ],
+    "16": [
+     184.2,
+     "extrap"
+    ]
+   }
+  },
+  "은주1관": {
+   "labels": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 131.3
+    },
+    {
+     "floor": 5,
+     "heightM": 148.9
+    }
+   ],
+   "smapRoofM": 156.8,
+   "hypotheses": {
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 6,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 5,
+       "storeys": 4,
+       "storeyHeightM": 4.4,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.4,
+     "topAnchorToSmapRoof": {
+      "storeys": 2,
+      "storeyHeightM": 3.95,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 157.7,
+      "minusSmapRoofM": 0.9
+     }
+    }
+   },
+   "roofNote": "1관 지붕(E05). 경사 지붕이라 층고 계산에는 참고만",
+   "ladderHypothesis": "건너뛰지 않음",
+   "ladderWhy": "호실 목록에 4층이 있다. 6층은 사용자 확정(있다는 사실만)",
+   "storeyHeightBelowAnchorsM": 4.4,
+   "storeyHeightAboveAnchorsM": 3.95,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "1": [
+     131.3,
+     "anchor"
+    ],
+    "2": [
+     135.7,
+     "interp"
+    ],
+    "3": [
+     140.1,
+     "interp"
+    ],
+    "4": [
+     144.5,
+     "interp"
+    ],
+    "5": [
+     148.9,
+     "anchor"
+    ],
+    "6": [
+     152.9,
+     "extrap"
+    ]
+   }
+  },
+  "은주2관": {
+   "labels": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 132.2
+    },
+    {
+     "floor": 5,
+     "heightM": 148.9
+    }
+   ],
+   "smapRoofM": 159.7,
+   "hypotheses": {
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 6,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 5,
+       "storeys": 4,
+       "storeyHeightM": 4.18,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 4.18,
+     "topAnchorToSmapRoof": {
+      "storeys": 2,
+      "storeyHeightM": 5.4,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 157.2,
+      "minusSmapRoofM": -2.4
+     }
+    }
+   },
+   "roofNote": "2관 높은 지붕(E05). 경사 지붕이라 참고만",
+   "ladderHypothesis": "건너뛰지 않음",
+   "ladderWhy": "1관과 같은 층 번호로 본다(추정: 2관 호실은 5층만 등록)",
+   "storeyHeightBelowAnchorsM": 4.18,
+   "storeyHeightAboveAnchorsM": 5.4,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "1": [
+     132.2,
+     "anchor"
+    ],
+    "2": [
+     136.4,
+     "interp"
+    ],
+    "3": [
+     140.6,
+     "interp"
+    ],
+    "4": [
+     144.7,
+     "interp"
+    ],
+    "5": [
+     148.9,
+     "anchor"
+    ],
+    "6": [
+     154.3,
+     "extrap"
+    ]
+   }
+  },
+  "대일관": {
+   "labels": [
+    "B2",
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 151.8
+    }
+   ],
+   "smapRoofM": 172.1,
+   "hypotheses": {
+    "4 건너뜀": {
+     "skip": [
+      4
+     ],
+     "storeysAboveGround": 6,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 6,
+      "storeyHeightM": 3.38,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 7,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 7,
+      "storeyHeightM": 2.9,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    }
+   },
+   "roofNote": "본체 지붕(B02). 처마 168~171",
+   "ladderHypothesis": "4 건너뜀",
+   "ladderWhy": "기준이 1층 하나라 가르지 못한다. 호실 목록대로(4층 호실 없음) 두었다. 공식 사진의 창 줄 5개 + 지붕창 층 = 6개 층과 맞는다(추정)",
+   "storeyHeightBelowAnchorsM": 3.38,
+   "storeyHeightAboveAnchorsM": 3.38,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "B2": [
+     145.0,
+     "extrap"
+    ],
+    "B1": [
+     148.4,
+     "extrap"
+    ],
+    "1": [
+     151.8,
+     "anchor"
+    ],
+    "2": [
+     155.2,
+     "extrap"
+    ],
+    "3": [
+     158.6,
+     "extrap"
+    ],
+    "5": [
+     161.9,
+     "extrap"
+    ],
+    "6": [
+     165.3,
+     "extrap"
+    ],
+    "7": [
+     168.7,
+     "extrap"
+    ]
+   }
+  },
+  "청운관": {
+   "labels": [
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 148.9
+    }
+   ],
+   "smapRoofM": 187.8,
+   "hypotheses": {
+    "4 건너뜀": {
+     "skip": [
+      4
+     ],
+     "storeysAboveGround": 10,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 10,
+      "storeyHeightM": 3.89,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 11,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 11,
+      "storeyHeightM": 3.54,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    }
+   },
+   "roofNote": "본체 지붕(B02)",
+   "ladderHypothesis": "4 건너뜀",
+   "ladderWhy": "기준이 1층 하나라 가르지 못한다. 호실 목록대로(4층 호실 없음) 두었다",
+   "storeyHeightBelowAnchorsM": 3.89,
+   "storeyHeightAboveAnchorsM": 3.89,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "B1": [
+     145.0,
+     "extrap"
+    ],
+    "1": [
+     148.9,
+     "anchor"
+    ],
+    "2": [
+     152.8,
+     "extrap"
+    ],
+    "3": [
+     156.7,
+     "extrap"
+    ],
+    "5": [
+     160.6,
+     "extrap"
+    ],
+    "6": [
+     164.5,
+     "extrap"
+    ],
+    "7": [
+     168.4,
+     "extrap"
+    ],
+    "8": [
+     172.2,
+     "extrap"
+    ],
+    "9": [
+     176.1,
+     "extrap"
+    ],
+    "10": [
+     180.0,
+     "extrap"
+    ],
+    "11": [
+     183.9,
+     "extrap"
+    ]
+   }
+  },
+  "혜인관": {
+   "labels": [
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ],
+   "anchors": [
+    {
+     "floor": "B1",
+     "heightM": 149.3
+    }
+   ],
+   "smapRoofM": 178.1,
+   "hypotheses": {
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 7,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 8,
+      "storeyHeightM": 3.6,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    }
+   },
+   "roofNote": "S-MAP 건물 칸 중앙값(E05). 여러 단 166~182",
+   "ladderHypothesis": "건너뛰지 않음",
+   "ladderWhy": "호실 목록에 1~7층이 다 있다. 운동장 높이의 두 입구를 B1 로 읽었다(본문 참조: 대장으로는 1층일 수도 있다)",
+   "storeyHeightBelowAnchorsM": 3.6,
+   "storeyHeightAboveAnchorsM": 3.6,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "B1": [
+     149.3,
+     "anchor"
+    ],
+    "1": [
+     152.9,
+     "extrap"
+    ],
+    "2": [
+     156.5,
+     "extrap"
+    ],
+    "3": [
+     160.1,
+     "extrap"
+    ],
+    "4": [
+     163.7,
+     "extrap"
+    ],
+    "5": [
+     167.3,
+     "extrap"
+    ],
+    "6": [
+     170.9,
+     "extrap"
+    ],
+    "7": [
+     174.5,
+     "extrap"
+    ]
+   }
+  },
+  "문예관": {
+   "labels": [
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15"
+   ],
+   "anchors": [
+    {
+     "floor": 2,
+     "heightM": 138.9
+    },
+    {
+     "floor": 3,
+     "heightM": 140.8
+    }
+   ],
+   "smapRoofM": 189.4,
+   "hypotheses": {
+    "4·13 건너뜀": {
+     "skip": [
+      4,
+      13
+     ],
+     "storeysAboveGround": 13,
+     "betweenAnchors": [
+      {
+       "from": 2,
+       "to": 3,
+       "storeys": 1,
+       "storeyHeightM": 1.9,
+       "implausible": true
+      }
+     ],
+     "meanBetweenAnchorsM": 1.9,
+     "topAnchorToSmapRoof": {
+      "storeys": 11,
+      "storeyHeightM": 4.42,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 161.7,
+      "minusSmapRoofM": -27.7
+     }
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 15,
+     "betweenAnchors": [
+      {
+       "from": 2,
+       "to": 3,
+       "storeys": 1,
+       "storeyHeightM": 1.9,
+       "implausible": true
+      }
+     ],
+     "meanBetweenAnchorsM": 1.9,
+     "topAnchorToSmapRoof": {
+      "storeys": 13,
+      "storeyHeightM": 3.74,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 165.5,
+      "minusSmapRoofM": -23.9
+     }
+    }
+   },
+   "roofNote": "지붕(E02). 지붕판 188.8~190.2",
+   "ladderHypothesis": "4·13 건너뜀",
+   "ladderWhy": "두 기준(2층·3층 입구)의 지면 차가 2.0 m 라 층고로 쓸 수 없다(3층 로비 표지가 낮은 날개 지붕 아래라 문 앞 지면을 못 읽음). 2층 기준만 쓰고 층고는 2층~지붕 평균으로 둔다. 건너뜀은 가르지 못해 호실 목록대로",
+   "storeyHeightBelowAnchorsM": 4.21,
+   "storeyHeightAboveAnchorsM": 4.21,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "B1": [
+     130.5,
+     "extrap"
+    ],
+    "1": [
+     134.7,
+     "extrap"
+    ],
+    "2": [
+     138.9,
+     "anchor"
+    ],
+    "3": [
+     143.1,
+     "extrap"
+    ],
+    "5": [
+     147.3,
+     "extrap"
+    ],
+    "6": [
+     151.5,
+     "extrap"
+    ],
+    "7": [
+     155.7,
+     "extrap"
+    ],
+    "8": [
+     159.9,
+     "extrap"
+    ],
+    "9": [
+     164.2,
+     "extrap"
+    ],
+    "10": [
+     168.4,
+     "extrap"
+    ],
+    "11": [
+     172.6,
+     "extrap"
+    ],
+    "12": [
+     176.8,
+     "extrap"
+    ],
+    "14": [
+     181.0,
+     "extrap"
+    ],
+    "15": [
+     185.2,
+     "extrap"
+    ]
+   }
+  },
+  "북악관": {
+   "labels": [
+    "B1",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "anchors": [
+    {
+     "floor": 1,
+     "heightM": 133.1
+    }
+   ],
+   "smapRoofM": 160.6,
+   "hypotheses": {
+    "4 건너뜀": {
+     "skip": [
+      4
+     ],
+     "storeysAboveGround": 8,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 8,
+      "storeyHeightM": 3.44,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    },
+    "건너뛰지 않음": {
+     "skip": [],
+     "storeysAboveGround": 9,
+     "betweenAnchors": [],
+     "meanBetweenAnchorsM": null,
+     "topAnchorToSmapRoof": {
+      "storeys": 9,
+      "storeyHeightM": 3.06,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": null
+    }
+   },
+   "roofNote": "S-MAP 건물 칸 중앙값(E05)",
+   "ladderHypothesis": "4 건너뜀",
+   "ladderWhy": "기준이 1층 하나라 S-MAP 만으로는 가르지 못한다. 보행 기록의 8단(132.8~154.51)은 analysis 의 bukak 항목에서 따로 견준다",
+   "storeyHeightBelowAnchorsM": 3.44,
+   "storeyHeightAboveAnchorsM": 3.44,
+   "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
+   "ladder": {
+    "B1": [
+     129.7,
+     "extrap"
+    ],
+    "1": [
+     133.1,
+     "anchor"
+    ],
+    "2": [
+     136.5,
+     "extrap"
+    ],
+    "3": [
+     140.0,
+     "extrap"
+    ],
+    "5": [
+     143.4,
+     "extrap"
+    ],
+    "6": [
+     146.8,
+     "extrap"
+    ],
+    "7": [
+     150.3,
+     "extrap"
+    ],
+    "8": [
+     153.7,
+     "extrap"
+    ],
+    "9": [
+     157.2,
+     "extrap"
+    ]
+   }
+  }
+ },
+ "connectors": [
+  {
+   "statement": "본관 5층 = 한림관 3층",
+   "a": [
+    "본관",
+    5,
+    138.1
+   ],
+   "b": [
+    "한림관",
+    3,
+    135.5
+   ],
+   "residualM": 2.6
+  },
+  {
+   "statement": "한림관 3층 = 은주1관 2층",
+   "a": [
+    "한림관",
+    3,
+    135.5
+   ],
+   "b": [
+    "은주1관",
+    2,
+    135.7
+   ],
+   "residualM": -0.2
+  },
+  {
+   "statement": "한림관 6층 = 은주1관 5층",
+   "a": [
+    "한림관",
+    6,
+    148.9
+   ],
+   "b": [
+    "은주1관",
+    5,
+    148.9
+   ],
+   "residualM": 0.0
+  },
+  {
+   "statement": "은주1관 5층 = 운동장 바닥(E06)",
+   "a": [
+    "은주1관",
+    5,
+    148.9
+   ],
+   "b": [
+    "운동장",
+    "-",
+    148.9
+   ],
+   "residualM": 0.0
+  }
+ ],
+ "hallimFourthFloorTest": {
+  "은주1관 2→5층 높이차 M": 13.2,
+  "은주1관 층고 M": 4.4,
+  "한림관 3→6층이 2개 층이면 층고 M": 6.6,
+  "한림관 3→6층이 3개 층이면 층고 M": 4.4,
+  "주의": "은주1관 2층 높이는 1층 입구 지면과 5층(운동장) 사이를 고르게 나눈 값이다(직접 잰 값 아님)"
+ }
+}

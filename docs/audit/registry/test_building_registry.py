@@ -77,6 +77,19 @@ class Registry(unittest.TestCase):
         self.assertEqual(p['parts'][1]['polygon'][0][1], [20, 0])
         self.assertNotIn('floors', p)
 
+    def test_partial_cover_and_terrace_come_only_from_the_note(self):
+        note = PARTS.replace('근거: {', '덮지_않는_곳: "맨땅", 근거: {', 1).replace('모델_부분: {id: "낮은쪽", 표지: null}', '모델_부분: {id: "낮은쪽", 표지: null, 지면과_같은_지붕: "윗길과 같은 높이의 데크"}')
+        doc, problems = br.build(folder(나관=note))
+        self.assertEqual(problems, {})
+        p = doc['parts'][0]
+        self.assertEqual(p['uncovered'], '맨땅')
+        self.assertEqual([q.get('terrace') for q in p['parts']], [None, '윗길과 같은 높이의 데크'])
+        plain, _ = br.build(folder(나관=PARTS))
+        self.assertNotIn('uncovered', plain['parts'][0])
+        self.assertTrue(all('terrace' not in q for q in plain['parts'][0]['parts']))
+        d = br.diff(doc, json.loads(br.dumps(plain)))                 # a file without the two statements does not match the note
+        self.assertTrue(any('uncovered' in m for m in d['나관']) and any('terrace' in m for m in d['나관']))
+
     def test_round_trip_and_diff(self):
         doc, _ = br.build(folder(가관=ROOF, 나관=PARTS, 다관=HIDDEN))
         text = br.dumps(doc)
