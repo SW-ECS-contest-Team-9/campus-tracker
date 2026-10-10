@@ -4,6 +4,7 @@
 //   / kind=clip (이 평면 안 렌더 지형을 잘라냄, globe clippingPolygons) / kind=skirt (3D 선 z ↔ otherZ 세로 면)
 //   / kind=override (원본 건물 하나의 평면을 표시용으로 대체, 끄면 원본). 모든 피처는 properties.source 필수.
 // 그룹: corrected(원천 표면) / estimated(추정 구조 — 모든 피처에 estimated=true·assumption 필수, 별도 토글).
+import { setTerrainClip } from './terrain-clip';
 import { tmInverse } from './tm';
 
 type CesiumNS = typeof import('cesium');
@@ -110,11 +111,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   };
   // 지형 잘라냄: 보정 면 구역 안 렌더 지형만 숨김(DEM 자료 불변). 끄면 clippingPolygons를 비활성화해 원본 그대로.
   const clips = byGroup.corrected.filter((f) => f.kind === 'clip');
-  const clipping = clips.length ? new C.ClippingPolygonCollection({
-    enabled: false,
-    polygons: clips.map((f) => new C.ClippingPolygon({ positions: C.Cartesian3.fromDegreesArray(f.polygons[0][0].slice(0, -1).flatMap(([lon, lat]) => [lon, lat])) })),
-  }) : null;
-  if (clipping) viewer.scene.globe.clippingPolygons = clipping;
+  const clipPolygons = clips.map((f) => C.Cartesian3.fromDegreesArray(f.polygons[0][0].slice(0, -1).flatMap(([lon, lat]) => [lon, lat])));
   const replacedBy = (g: CorrectionGroup) => byGroup[g].map((f) => f.replaces).filter(Boolean) as string[];
   const state: Record<CorrectionGroup, boolean> = { corrected: false, estimated: false, stairCandidate: false, stairV6: false, pathGraph: false };
   const apply = () => {
@@ -132,7 +129,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
         if (a?.show) a.show = C.ShowGeometryInstanceAttribute.toValue(!hide, a.show);
       }
     }
-    if (clipping) clipping.enabled = state.corrected;
+    if (clipPolygons.length) setTerrainClip(viewer, 'corrections', state.corrected ? clipPolygons : []); // 길 면(road-surface-layer)과 한 벌을 같이 씀
   };
   if (errors.length) console.warn('local corrections rejected', errors);
   return {

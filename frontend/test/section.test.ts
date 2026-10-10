@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { clipLonLatPolygons, clipMesh, clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile } = await import('../src/section.ts');
+const { clipLonLatPolygons, clipMesh, clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, meshCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile } = await import('../src/section.ts');
 const { tmForward, tmInverse } = await import('../src/tm.ts');
 
 type P = number[];
@@ -62,6 +62,27 @@ test('삼각형 묶음 자르기: 남는 넓이, 저장 높이 유지', () => {
   assert.ok(out.positions.filter((_: number, i: number) => i % 3 === 2).every((z: number) => z === 5));
   assert.ok(out.positions.filter((_: number, i: number) => i % 3 === 1).every((y: number) => y >= 10));
   assert.equal(clipMesh(sectionPlane([0, 30], [100, 30]), mesh).indices.length, 0);
+});
+
+test('합친 길 면 자르기: 꼭짓점마다 값이 넷(x, y, 높이, 가장자리)이어도 잘린 곳에서 함께 보간, 단면선과 만나는 구간', () => {
+  // 남→북으로 오르는 면(높이 100 → 120), 가장자리 값은 남쪽 0 → 북쪽 1
+  const mesh = { positions: [0, 0, 100, 0, 20, 0, 100, 0, 20, 20, 120, 1, 0, 20, 120, 1], indices: [0, 1, 2, 0, 2, 3] };
+  const out = clipMesh(EAST, mesh, 4);
+  assert.equal(out.positions.length % 4, 0);
+  let area = 0;
+  for (let i = 0; i < out.indices.length; i += 3) area += ringArea([0, 1, 2].map((k) => [out.positions[out.indices[i + k] * 4], out.positions[out.indices[i + k] * 4 + 1]]));
+  assert.ok(Math.abs(area - 200) < 1e-9);
+  for (let i = 0; i < out.positions.length; i += 4) {
+    assert.ok(out.positions[i + 1] >= 10);
+    assert.ok(Math.abs(out.positions[i + 2] - (100 + out.positions[i + 1])) < 1e-9, '높이');
+    assert.ok(Math.abs(out.positions[i + 3] - out.positions[i + 1] / 20) < 1e-9, '가장자리 값');
+  }
+  // 단면선(y = 10)과 만나는 구간: 삼각형마다 하나, 합치면 x 0~20, 높이 110
+  const cuts = meshCrossings(EAST, mesh, 4);
+  assert.equal(cuts.length, 2);
+  assert.ok(cuts.flat().every(([, z]: P) => Math.abs(z - 110) < 1e-9));
+  assert.deepEqual([Math.min(...cuts.flat().map(([d]: P) => d)), Math.max(...cuts.flat().map(([d]: P) => d))], [0, 20]);
+  assert.deepEqual(meshCrossings(sectionPlane([0, 30], [100, 30]), mesh, 4), []);
 });
 
 test('경위도 건물 평면 자르기: 좌표 변환을 거쳐도 넓이가 맞고, 다 숨는 건물은 빠진다', () => {

@@ -281,6 +281,7 @@ function startRealtime() {
     },
     onMobilityChanged() {
       void mobilityLayer?.reload().then(() => scheduleRender()).catch((err) => console.error('mobility reload failed', err));
+      void roadSurfaces?.reload().catch(() => undefined); // 포장면·운동장 영역이 길 면에 합쳐져 있음
     },
     onFusionSensorEvents({ sessionId, algorithmVersion, events }) {
       if (algorithmVersion !== 'fusion-v3.1') return;
@@ -977,7 +978,7 @@ async function boot() {
         if (r.warning) showMessage(r.warning);
         setupSceneControls();
         // 길 면(편집기 도로, 읽기 전용): '차도'·'보행로' 기본 표시, '지하 길'은 체크 시
-        roadSurfaces = new RoadSurfaceLayer(r.viewer);
+        roadSurfaces = new RoadSurfaceLayer(r.viewer, { ground: sampler(r.grid), buildings: () => r.scene?.scene.buildings ?? [] });
         void roadSurfaces.reload().catch((err) => console.error('road surfaces unavailable', err));
         $<HTMLInputElement>('scene-roads').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked));
         $<HTMLInputElement>('scene-roads-pedestrian').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'pedestrian'));
@@ -989,6 +990,7 @@ async function boot() {
           box: { minX: g.originX, minY: g.originY, maxX: g.originX + g.width * g.resolution, maxY: g.originY + g.height * g.resolution },
           buildings: () => r.scene?.scene.buildings ?? [],
           roads: () => roadSurfaces?.roads ?? [],
+          surfaces: () => roadSurfaces?.surfaces() ?? [],
           areas: () => mobilityLayer?.data.openAreas ?? [],
           layers: () => [r.scene, roadSurfaces, mobilityLayer],
         }, (text) => {
@@ -1027,8 +1029,12 @@ async function boot() {
       if (import.meta.env.DEV) (window as any).__previewViewer = v; // debugging in the browser console
       enablePicking(v);
       mobilityLayer = new MobilityLayer(v);
+      mobilityLayer.surfacesElsewhere = roadSurfaces !== null; // 포장면·운동장은 길 면과 합쳐 그림(운동장은 Paths 토글을 따름)
       void mobilityLayer.reload().catch((err) => console.error('mobility spaces unavailable', err));
-      $<HTMLInputElement>('scene-mobility').addEventListener('change', (e) => mobilityLayer?.setVisible((e.target as HTMLInputElement).checked));
+      $<HTMLInputElement>('scene-mobility').addEventListener('change', (e) => {
+        mobilityLayer?.setVisible((e.target as HTMLInputElement).checked);
+        roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'area');
+      });
       $('scene-controls').hidden = false;
       // the campus model draws its own buildings and campus outline; the VWorld map needs the 2D overlay
       if (MAP_ENGINE === 'vworld') {

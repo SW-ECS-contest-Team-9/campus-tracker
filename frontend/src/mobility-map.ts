@@ -35,6 +35,11 @@ export class MobilityLayer {
   private readonly fills: any;
   private visible = true;
   private section: SectionPlane | null = null;
+  /**
+   * True when road-surface-layer.ts draws the outdoor filled areas (merged with the roads, smooth-edged, at their own
+   * height): they are then left out here. False (the VWorld map): drawn here as before.
+   */
+  surfacesElsewhere = false;
   data: MobilitySpaces = { corridors: [], openAreas: [], portals: [] };
 
   constructor(private readonly viewer: Viewer) {
@@ -89,6 +94,7 @@ export class MobilityLayer {
       if (fill) {
         const attributes = () => ({ color: C.ColorGeometryInstanceAttribute.fromColor(color(fill.color, 1)) });
         const indoor = a.elevationM != null && (a.buildingId || a.floor);
+        if (this.surfacesElsewhere && !indoor) continue;
         if (!indoor) onGround.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: hierarchy }), id: { mobilityPick: pick }, attributes: attributes() }));
         if (a.elevationM != null && (indoor || fill.flat)) {
           for (const rings of this.section ? clipLonLatPolygons(this.section, [a.geometry.coordinates]) : [a.geometry.coordinates]) {

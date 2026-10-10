@@ -13,8 +13,8 @@ import type { CarriagewayRoad, MobilityOpenArea, SceneBuilding } from './api';
 import { AREA_FILLS } from './mobility-map';
 import { ROAD_SURFACE, isUnderground, roadWidthM, surfaceKind } from './road-surface';
 import {
-  clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile,
-  type SectionPlane, type XY,
+  clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, meshCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile,
+  type Mesh, type SectionPlane, type XY,
 } from './section';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
@@ -43,6 +43,8 @@ export type SectionSources = {
   buildings: () => SceneBuilding[];
   roads: () => CarriagewayRoad[];
   areas: () => MobilityOpenArea[];
+  /** The merged ground surfaces as drawn (road-surface-layer.ts): x, y, height, edge per vertex. */
+  surfaces: () => { color: string; mesh: Mesh }[];
   /** The layers that cut their own shapes. */
   layers: () => (Cuttable | null)[];
 };
@@ -239,7 +241,8 @@ export class SectionTool {
       const kind = surfaceKind(road);
       const onGround = kind !== null && !isUnderground(road);
       return { road, kind, onGround, d: hit.d, z: onGround ? profileHeight(profile, hit.d) : hit.z ?? profileHeight(profile, hit.d), half: roadWidthM(road) / 2 };
-    }));
+    })).filter((r) => !r.onGround); // roads on the ground are part of the merged surfaces below
+    const surfaces = this.src.surfaces().map((s) => ({ color: s.color, cuts: meshCrossings(plane, s.mesh, 4) }));
     const areas = this.src.areas().filter((a) => a.elevationM != null).flatMap((a) => ringIntervals(plane, metres(a.geometry.coordinates[0])).map(([from, to]) => ({ a, from, to })));
 
     // heights on the face: along the whole line for the face itself, between A and B for the camera
@@ -248,7 +251,7 @@ export class SectionTool {
       const near = (from: number, to = from) => all || (to >= lo && from <= hi);
       return [
         ...profile.filter((s) => near(s.d)).map((s) => s.z), ...buildings.filter((x) => near(x.from, x.to)).flatMap((x) => [x.b.baseM, x.b.roofM]),
-        ...roads.filter((r) => near(r.d)).map((r) => r.z), ...areas.filter((x) => near(x.from, x.to)).map((x) => x.a.elevationM!),
+        ...roads.filter((r) => near(r.d)).map((r) => r.z), ...surfaces.flatMap((s) => s.cuts.filter((c) => near(c[0][0])).map((c) => c[0][1])), ...areas.filter((x) => near(x.from, x.to)).map((x) => x.a.elevationM!),
       ];
     };
     const floor5 = (zs: number[]) => Math.floor((Math.min(...zs) - SECTION.baseMarginM) / 5) * 5;
@@ -300,20 +303,16 @@ export class SectionTool {
       line([front(from, b.baseM), front(from, b.roofM), front(to, b.roofM), front(to, b.baseM), front(from, b.baseM)], SECTION.lineColor, 2);
       label((from + to) / 2, b.roofM, `${b.name ?? ''} ${b.baseM.toFixed(1)}–${b.roofM.toFixed(1)} m`.trim());
     }
+    // the merged ground surfaces where the plane cuts them, at the height they are drawn at
+    for (const s of surfaces) for (const [p, q] of s.cuts) line([front(p[0], p[1] + 0.05), front(q[0], q[1] + 0.05)], s.color, 6);
     for (const { a, from, to } of areas) {
       const css = AREA_FILLS.find((f) => f.match(a))?.color ?? SECTION.areaColor;
-      line([front(from, a.elevationM!), front(to, a.elevationM!)], css, 4);
+      if (!AREA_FILLS.some((f) => f.match(a))) line([front(from, a.elevationM!), front(to, a.elevationM!)], css, 4);
       label((from + to) / 2, a.elevationM!, `${a.name ?? '영역'} ${a.elevationM!.toFixed(1)} m`);
     }
     const labelled = new Set<string>();
     for (const r of roads) {
       const css = r.kind ? ROAD_SURFACE.colors[r.kind] : SECTION.indoorColor;
-      if (r.onGround) {
-        // a road laid on the ground: a thick stretch of the profile, as wide as the road (its width across the road, not along the cut)
-        const ds = [r.d - r.half, ...profile.map((s) => s.d).filter((d) => d > r.d - r.half && d < r.d + r.half), r.d + r.half];
-        line(ds.map((d) => front(d, profileHeight(profile, d) + 0.1)), css, 6);
-        continue;
-      }
       line([front(r.d - r.half, r.z), front(r.d + r.half, r.z)], css, 6);
       const key = `${Math.round(r.d / 5)}:${r.z.toFixed(1)}`;
       if (labelled.has(key)) continue;

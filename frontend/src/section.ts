@@ -60,18 +60,35 @@ export function clipRing(plane: SectionPlane, ring: number[][]): number[][] {
 }
 
 export type Mesh = { positions: number[]; indices: number[] };
-/** Triangles (x, y, z) cut at the plane: only the kept part remains. */
-export function clipMesh(plane: SectionPlane, mesh: Mesh): Mesh {
+/**
+ * Triangles cut at the plane: only the kept part remains. `stride` numbers per vertex, starting with x, y (then
+ * height and whatever else the mesh carries, e.g. a colour weight): all of them are interpolated at the cut.
+ */
+export function clipMesh(plane: SectionPlane, mesh: Mesh, stride = 3): Mesh {
   const out: Mesh = { positions: [], indices: [] };
   for (let i = 0; i < mesh.indices.length; i += 3) {
-    const tri = [0, 1, 2].map((k) => { const j = mesh.indices[i + k] * 3; return [mesh.positions[j], mesh.positions[j + 1], mesh.positions[j + 2]]; });
+    const tri = [0, 1, 2].map((k) => mesh.positions.slice(mesh.indices[i + k] * stride, (mesh.indices[i + k] + 1) * stride));
     const kept = clipRing(plane, tri);
     for (let k = 1; k + 1 < kept.length; k++) {
       for (const p of [kept[0], kept[k], kept[k + 1]]) {
-        out.indices.push(out.positions.length / 3);
-        out.positions.push(p[0], p[1], p[2]);
+        out.indices.push(out.positions.length / stride);
+        out.positions.push(...p);
       }
     }
+  }
+  return out;
+}
+
+/**
+ * Where the triangles of a mesh (x, y, height first in each vertex) meet the section line between A and B: one
+ * stretch [distance from A, height] – [distance from A, height] per triangle that the plane cuts.
+ */
+export function meshCrossings(plane: SectionPlane, mesh: Mesh, stride = 3): [[number, number], [number, number]][] {
+  const out: [[number, number], [number, number]][] = [];
+  for (let i = 0; i < mesh.indices.length; i += 3) {
+    const tri = [0, 1, 2].map((k) => mesh.positions.slice(mesh.indices[i + k] * stride, mesh.indices[i + k] * stride + 3));
+    const hits = lineCrossings(plane, tri, true);
+    if (hits.length === 2) out.push([[hits[0].d, hits[0].z!], [hits[1].d, hits[1].z!]]);
   }
   return out;
 }
