@@ -32,6 +32,8 @@ export const PAVED = {
   keepRadiusM: 0.8,
   /** Leftovers thinner than twice this are dropped (crescents between the two openings, slivers along a building wall). */
   sliverM: 0.3,
+  /** The surfaces stop this far before a building wall (they are cut by the footprints as drawn, grown by this), so no edge lies exactly in a wall. */
+  buildingGapM: 0.1,
   /** Offset arcs are polygons that stay within this of the true arc. */
   arcToleranceM: 0.005,
   /** After the offsets the outline is resampled at this spacing and corner-cut (Chaikin) this many times. */
@@ -464,7 +466,7 @@ export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: Surface
   for (const m of MATERIALS) raw.set(m, union(raw.get(m)!));
 
   // one outline for everything, pooled, kept out of the buildings
-  const buildings = union(...input.buildings.map(polygonShape));
+  const buildings = grow(union(...input.buildings.map(polygonShape)), PAVED.buildingGapM);
   const everything = union(...raw.values());
   const whole = opening(minus(pool(everything), buildings), PAVED.sliverM);
 
@@ -516,7 +518,7 @@ export const pavedGeometry = {
   /** The pooled outline of the union of the polygons, with the buildings cut out. */
   pool(polys: Ring[][], buildings: Ring[][] = []): Ring[] {
     origin = polys[0][0][0].map(Math.floor);
-    return opening(minus(pool(union(...polys.map(polygonShape))), union(...buildings.map(polygonShape))), PAVED.sliverM).map(toRing);
+    return opening(minus(pool(union(...polys.map(polygonShape))), grow(union(...buildings.map(polygonShape)), PAVED.buildingGapM)), PAVED.sliverM).map(toRing);
   },
   /** A road band (centreline widened to the width). */
   band(centre: number[][], widthM: number): Ring[] {

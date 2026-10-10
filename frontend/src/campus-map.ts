@@ -294,8 +294,16 @@ export class CampusSceneLayer {
       }) : new C.PerInstanceColorAppearance({ translucent: this.opacity < 1, closed: true }),
       asynchronous: false,
     });
-    if (this.primitive) this.viewer.scene.primitives.remove(this.primitive);
-    this.primitive = this.viewer.scene.primitives.add(next);
+    // The new primitive takes the place of the old one in the draw order. Opaque things are drawn in that order, and the
+    // underground ways (road-surface-layer.ts) only show through what was drawn before them: appended at the end, the
+    // rebuilt buildings were drawn over them (after a cross-section, a selection or the x-ray toggle).
+    const primitives = this.viewer.scene.primitives;
+    let index: number | undefined;
+    if (this.primitive) {
+      for (let i = 0; i < primitives.length; i++) if (primitives.get(i) === this.primitive) index = i;
+      primitives.remove(this.primitive);
+    }
+    this.primitive = primitives.add(next, index);
     // Selection remains visible without replacing the altitude colour of the selected surface.
     for (let i = 0; i < this.edges.length; i++) {
       const edge = this.edges.get(i);

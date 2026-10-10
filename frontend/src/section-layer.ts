@@ -60,6 +60,8 @@ export class SectionTool {
   private undo: (() => void)[] = [];
   private handler: any = null;
   private marker: any = null;
+  /** The perspective frustum of the view before lookAt() switched to the orthographic one. */
+  private perspective: any = null;
 
   constructor(private readonly viewer: Viewer, private readonly src: SectionSources, private readonly onStatus: (text: string) => void) {}
 
@@ -107,7 +109,9 @@ export class SectionTool {
     this.endPlacing();
     this.clear();
     this.picked = null;
-    this.viewer.camera.switchToPerspectiveFrustum();
+    // back to the frustum the view had (switchToPerspectiveFrustum would make a default one: near 1 m instead of 0.1 m)
+    if (this.perspective) this.viewer.camera.frustum = this.perspective;
+    this.perspective = null;
     this.onStatus('');
   }
 
@@ -122,6 +126,7 @@ export class SectionTool {
     const length = Math.abs(to - from);
     const camera = this.viewer.camera;
     const [x, y] = planePoint(this.plane, (from + to) / 2, -Math.max(300, length * 1.5));
+    if (!this.perspective) this.perspective = camera.frustum.clone();
     camera.switchToOrthographicFrustum();
     camera.setView({ destination: this.position(x, y, (base + top) / 2), orientation: { heading: Math.atan2(this.plane.n[0], this.plane.n[1]), pitch: 0, roll: 0 } });
     // after setView: it resets the width from the camera height

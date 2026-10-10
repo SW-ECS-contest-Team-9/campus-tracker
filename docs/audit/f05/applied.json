@@ -1,0 +1,14 @@
+{
+  "appliedTo": "시험용 DB (campus-tracker-test-db, 127.0.0.1:5544) 만. 운영 접속 없음",
+  "date": "2026-10-11",
+  "area": { "id": 1, "name": "운동장", "before": { "vertices": 45, "areaM2": 8012.0, "revision": "897", "file": "docs/audit/e10/field-area.geojson" }, "after": { "vertices": 22, "areaM2": 8455.2, "revision": "2375", "file": "docs/audit/e10/field-area-f05.geojson" }, "how": "편집기 REST PUT areas/1 (docs/audit/t05/editor-api.ts)" },
+  "terrain": { "base": "seoul5000-2015-ba7fcb19", "recipe": "backend/data/terrain/recipes/f05-smooth-ground.json", "id": "recipe-ab443660e96d2cbe", "gridSha256": "a348a7687235633aad98dc2630876d93fa5969db664e788db688dee06496caed", "previousActive": "recipe-ee7396b9671416c8", "cellsChangedVsPrevious": 133, "deltaVsPreviousM": [-2.04, 6.76], "storedEqualsRerun": true },
+  "relevel": { "roadsToMove": 0, "nodesToMove": 0, "saved": false, "ownHeightRoadsOnChangedTerrain": 11 },
+  "scene": { "before": "campus3d-ee89d971", "after": "campus3d-c673e3aa", "buildings": 28, "baseOrRoofChanged": 0 },
+  "field": { "cellsInside": 2116, "cellsInBuildingFootprint": 0, "maxAbsAtCellCentresM": 0, "halfMetreSamples": 33824, "over5cm": 113, "edgeSamples": 775, "edgeTerrainAboveFloorBy5cm": 26, "edgeAllWithin3mOfBuilding": true, "edgeMaxAboveM": 0.95 },
+  "spillBeyondBlend": 0, "steepCells": { "before": 15228, "after": 15226 },
+  "validator": { "before": { "total": 194, "OFF_TERRAIN": 45 }, "after": { "total": 195, "OFF_TERRAIN": 46 }, "new": ["45682ee7", "8e71c240 (둘 다 대일관 서쪽 끝 201139.1, 557309.5 에서 지형이 1.5 m 올라감)"], "gone": ["2f206e6c"] },
+  "reachability": { "pairs": 33, "reachableChanged": 0, "lengthChanged": "daeil1>hyeinB1 132.05 → 132.04 m" },
+  "rollback": ["PUT areas/1 에 옛 경계(docs/audit/e10/field-area.geojson)", "terrain:activate -- recipe-ee7396b9671416c8", "scene:import -- --dir=data/scene/source", "또는 볼트 f05/00-backup-*.sql 둘"],
+  "outputs": "볼트 데이터/보완자료/3d-map-audit-20261009/f05/"
+}

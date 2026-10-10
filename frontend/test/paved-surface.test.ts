@@ -89,7 +89,9 @@ test('건물 안으로 넘치지 않는다', () => {
   assert.ok(geo.overlap(pooled, [building]) < 0.05);
   assert.ok(inside(10, 10, pooled) && !inside(17, 10, pooled));
   // 건물에 닿는 벽 쪽은 곧게 남는다(벽을 따라 물이 닿은 모양)
-  assert.ok(inside(14.9, 10, pooled));
+  assert.ok(inside(14.8, 10, pooled));
+  // 벽에서 0.1 m(buildingGapM) 앞에서 멈춘다: 가장자리가 벽면과 겹치지 않는다
+  assert.ok(!inside(14.95, 10, pooled));
 });
 
 test('검은 포장면에 드는 보행로: 포장면 안에 든 길, 폭이 적힌 넓은 길이 포장면·차도에 닿을 때', () => {

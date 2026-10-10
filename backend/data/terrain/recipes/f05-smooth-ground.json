@@ -1,0 +1,42 @@
+{
+  "crs": "EPSG:5186",
+  "reason": "F05: T06 조리법에서 운동장 다각형만 새 경계(곧은 변 22개, 8,455㎡)로 바꿈. 나머지(포장면 130.6 m, 차도 띠, 표본 구역)는 T06 과 같다.",
+  "protectBuildings": true,
+  "steps": [
+    {
+      "type": "local-samples",
+      "files": [
+        "../samples/smap_samples_5186.json",
+        "../samples/smap_samples_roads_5186.json",
+        "../samples/smap_samples_roadprofile_5186.json"
+      ],
+      "areas": [
+        "field",
+        "road_profile",
+        "gate_road_rest",
+        "s06_rest",
+        "turnaround_rest"
+      ]
+    },
+    {
+      "type": "plateau",
+      "file": "f05-plateaus.geojson",
+      "noBlend": "f05-no-blend.geojson"
+    },
+    {
+      "type": "corridor",
+      "file": "t06-road-corridors.json",
+      "lines": [
+        "V1",
+        "V2",
+        "V3",
+        "V4a",
+        "V4b",
+        "P-LOW",
+        "P-UP",
+        "UPHILL"
+      ],
+      "keep": "f05-plateaus.geojson"
+    }
+  ]
+}

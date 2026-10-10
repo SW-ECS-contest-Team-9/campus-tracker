@@ -1,0 +1,947 @@
+{
+ "about": "F05 운동장 경계: S-MAP 평지 가장자리와 건물 원천 외곽에 맞춘 곧은 변",
+ "floorM": 148.9,
+ "bandM": 0.5,
+ "vertices": 22,
+ "areaM2": 8455.2,
+ "oldVertices": 45,
+ "oldAreaM2": 8012.0,
+ "onlyInNewM2": 486.3,
+ "onlyInOldM2": 43.1,
+ "ring": [
+  [
+   201197.68,
+   557175.65
+  ],
+  [
+   201135.95,
+   557230.72
+  ],
+  [
+   201137.27,
+   557243.5
+  ],
+  [
+   201134.79,
+   557243.5
+  ],
+  [
+   201136.75,
+   557255.5
+  ],
+  [
+   201140.1,
+   557255.5
+  ],
+  [
+   201146.24,
+   557293.5
+  ],
+  [
+   201143.2,
+   557293.5
+  ],
+  [
+   201145.05,
+   557311.01
+  ],
+  [
+   201178.11,
+   557300.1
+  ],
+  [
+   201179.43,
+   557296.96
+  ],
+  [
+   201206.06,
+   557288.63
+  ],
+  [
+   201213.32,
+   557280.0
+  ],
+  [
+   201221.2,
+   557275.0
+  ],
+  [
+   201227.21,
+   557273.8
+  ],
+  [
+   201237.3,
+   557262.9
+  ],
+  [
+   201244.16,
+   557257.31
+  ],
+  [
+   201228.26,
+   557229.99
+  ],
+  [
+   201229.84,
+   557229.09
+  ],
+  [
+   201219.73,
+   557212.37
+  ],
+  [
+   201217.86,
+   557213.44
+  ],
+  [
+   201201.71,
+   557185.81
+  ],
+  [
+   201197.68,
+   557175.65
+  ]
+ ],
+ "sides": [
+  {
+   "side": "남서 은주2관",
+   "kind": "fit",
+   "from": [
+    201197.68,
+    557175.65
+   ],
+   "to": [
+    201135.95,
+    557230.72
+   ],
+   "lengthM": 82.7,
+   "basis": "S-MAP: 평지가 끝나고 은주2관 벽 앞 꺼진 틈(-1~-6 m)이 시작되는 선. 사진: 낮은 담",
+   "fit": {
+    "points": 101,
+    "rmsM": 0.4,
+    "maxM": 1.2,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 0.6,
+   "vsOldPolygon_maxM": 2.0,
+   "vsSmapFlatEdge_medianM": 0.4,
+   "vsSmapFlatEdge_maxM": 2.3,
+   "midpointToNearestSourceOutlineM": 2.8,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "서 은주1관 남쪽 화단",
+   "kind": "fit",
+   "from": [
+    201135.95,
+    557230.72
+   ],
+   "to": [
+    201137.27,
+    557243.5
+   ],
+   "lengthM": 12.8,
+   "basis": "S-MAP: 은주1관 벽 앞 +0.5~1.0 m 띠(화단)의 발치",
+   "fit": {
+    "points": 12,
+    "rmsM": 0.32,
+    "maxM": 0.61,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 1.1,
+   "vsOldPolygon_maxM": 2.2,
+   "vsSmapFlatEdge_medianM": 0.3,
+   "vsSmapFlatEdge_maxM": 1.6,
+   "midpointToNearestSourceOutlineM": 2.9,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "서 은주1관 문 앞 남쪽 턱",
+   "kind": "fixed",
+   "from": [
+    201137.27,
+    557243.5
+   ],
+   "to": [
+    201134.79,
+    557243.5
+   ],
+   "lengthM": 2.5,
+   "basis": "화단 끝에서 벽으로 꺾임(S-MAP 칸 경계)",
+   "fit": null,
+   "vsOldPolygon_medianM": 0.8,
+   "vsOldPolygon_maxM": 1.9,
+   "vsSmapFlatEdge_medianM": 1.0,
+   "vsSmapFlatEdge_maxM": 1.6,
+   "midpointToNearestSourceOutlineM": 1.3,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "서 은주1관 벽(입구(2) 앞)",
+   "kind": "fixed",
+   "from": [
+    201134.79,
+    557243.5
+   ],
+   "to": [
+    201136.75,
+    557255.5
+   ],
+   "lengthM": 12.2,
+   "basis": "건물 원천 외곽의 동쪽 변. 평지가 벽에 닿는 구간",
+   "fit": null,
+   "vsOldPolygon_medianM": 1.3,
+   "vsOldPolygon_maxM": 4.1,
+   "vsSmapFlatEdge_medianM": 0.6,
+   "vsSmapFlatEdge_maxM": 0.9,
+   "midpointToNearestSourceOutlineM": 0.0,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "서 은주1관 문 앞 북쪽 턱",
+   "kind": "fixed",
+   "from": [
+    201136.75,
+    557255.5
+   ],
+   "to": [
+    201140.1,
+    557255.5
+   ],
+   "lengthM": 3.4,
+   "basis": "벽에서 화단 발치로 꺾임(S-MAP 칸 경계)",
+   "fit": null,
+   "vsOldPolygon_medianM": 3.5,
+   "vsOldPolygon_maxM": 4.1,
+   "vsSmapFlatEdge_medianM": 0.1,
+   "vsSmapFlatEdge_maxM": 0.6,
+   "midpointToNearestSourceOutlineM": 2.2,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "서 은주1관 북쪽 화단",
+   "kind": "fit",
+   "from": [
+    201140.1,
+    557255.5
+   ],
+   "to": [
+    201146.24,
+    557293.5
+   ],
+   "lengthM": 38.5,
+   "basis": "S-MAP: 은주1관 벽 앞 +0.5~1.0 m 띠(화단)의 발치",
+   "fit": {
+    "points": 39,
+    "rmsM": 0.51,
+    "maxM": 1.25,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 1.6,
+   "vsOldPolygon_maxM": 2.7,
+   "vsSmapFlatEdge_medianM": 0.6,
+   "vsSmapFlatEdge_maxM": 1.2,
+   "midpointToNearestSourceOutlineM": 3.3,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "북서 화단 끝",
+   "kind": "fixed",
+   "from": [
+    201146.24,
+    557293.5
+   ],
+   "to": [
+    201143.2,
+    557293.5
+   ],
+   "lengthM": 3.0,
+   "basis": "화단 북쪽 끝에서 벽 쪽으로 꺾임(S-MAP 칸 경계)",
+   "fit": null,
+   "vsOldPolygon_medianM": 1.8,
+   "vsOldPolygon_maxM": 1.9,
+   "vsSmapFlatEdge_medianM": 0.6,
+   "vsSmapFlatEdge_maxM": 0.9,
+   "midpointToNearestSourceOutlineM": 1.2,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "북서 한림관 쪽 계단 위",
+   "kind": "fixed",
+   "from": [
+    201143.2,
+    557293.5
+   ],
+   "to": [
+    201145.05,
+    557311.01
+   ],
+   "lengthM": 17.6,
+   "basis": "은주1관 북동 모서리 옆에서 대일관 화단 벽 서쪽 끝까지. S-MAP 이 148.9 m 아래로 내려가기 시작하는 선(6칸 계단 위 끝, ±2 m)",
+   "fit": null,
+   "vsOldPolygon_medianM": 3.2,
+   "vsOldPolygon_maxM": 4.6,
+   "vsSmapFlatEdge_medianM": 0.5,
+   "vsSmapFlatEdge_maxM": 1.3,
+   "midpointToNearestSourceOutlineM": 3.0,
+   "nearestBuilding": "은주관"
+  },
+  {
+   "side": "북 대일관 화단 벽 서쪽",
+   "kind": "fit",
+   "from": [
+    201145.05,
+    557311.01
+   ],
+   "to": [
+    201178.11,
+    557300.1
+   ],
+   "lengthM": 34.8,
+   "basis": "S-MAP: 지면이 0.5 m 넘게 오르기 시작하는 선(흰 화단 벽 발치, 현관 계단 아래 포함)",
+   "fit": {
+    "points": 36,
+    "rmsM": 0.52,
+    "maxM": 1.18,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 0.6,
+   "vsOldPolygon_maxM": 4.4,
+   "vsSmapFlatEdge_medianM": 0.4,
+   "vsSmapFlatEdge_maxM": 1.1,
+   "midpointToNearestSourceOutlineM": 6.0,
+   "nearestBuilding": "대일관"
+  },
+  {
+   "side": "북 화단 벽 꺾임",
+   "kind": "fit",
+   "from": [
+    201178.11,
+    557300.1
+   ],
+   "to": [
+    201179.43,
+    557296.96
+   ],
+   "lengthM": 3.4,
+   "basis": "S-MAP: 벽 선이 남쪽으로 물러나는 곳",
+   "fit": {
+    "points": 7,
+    "rmsM": 0.26,
+    "maxM": 0.47,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 0.3,
+   "vsOldPolygon_maxM": 0.6,
+   "vsSmapFlatEdge_medianM": 0.5,
+   "vsSmapFlatEdge_maxM": 0.6,
+   "midpointToNearestSourceOutlineM": 5.8,
+   "nearestBuilding": "대일관"
+  },
+  {
+   "side": "북 대일관 화단 벽 동쪽",
+   "kind": "fit",
+   "from": [
+    201179.43,
+    557296.96
+   ],
+   "to": [
+    201206.06,
+    557288.63
+   ],
+   "lengthM": 27.9,
+   "basis": "S-MAP: 지면이 0.5 m 넘게 오르기 시작하는 선",
+   "fit": {
+    "points": 28,
+    "rmsM": 0.54,
+    "maxM": 1.28,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 1.4,
+   "vsOldPolygon_maxM": 2.3,
+   "vsSmapFlatEdge_medianM": 0.4,
+   "vsSmapFlatEdge_maxM": 1.6,
+   "midpointToNearestSourceOutlineM": 3.2,
+   "nearestBuilding": "대일관"
+  },
+  {
+   "side": "북동 상승관 계단 쪽 벽",
+   "kind": "fit",
+   "from": [
+    201206.06,
+    557288.63
+   ],
+   "to": [
+    201213.32,
+    557280.0
+   ],
+   "lengthM": 11.3,
+   "basis": "S-MAP: 화단 벽 동쪽 끝에서 청운관 돌출부 모서리로 내려오는 선(두 계단 아래 끝이 이 선 위)",
+   "fit": {
+    "points": 8,
+    "rmsM": 0.31,
+    "maxM": 0.47,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 0.8,
+   "vsOldPolygon_maxM": 1.4,
+   "vsSmapFlatEdge_medianM": 0.4,
+   "vsSmapFlatEdge_maxM": 1.5,
+   "midpointToNearestSourceOutlineM": 2.0,
+   "nearestBuilding": "청운관"
+  },
+  {
+   "side": "북동 청운관 돌출부 앞",
+   "kind": "fixed",
+   "from": [
+    201213.32,
+    557280.0
+   ],
+   "to": [
+    201221.2,
+    557275.0
+   ],
+   "lengthM": 9.3,
+   "basis": "건물 원천 외곽의 변",
+   "fit": null,
+   "vsOldPolygon_medianM": 0.4,
+   "vsOldPolygon_maxM": 0.8,
+   "vsSmapFlatEdge_medianM": 1.4,
+   "vsSmapFlatEdge_maxM": 1.9,
+   "midpointToNearestSourceOutlineM": 0.0,
+   "nearestBuilding": "청운관"
+  },
+  {
+   "side": "북동 청운관 돌출부 앞 2",
+   "kind": "fixed",
+   "from": [
+    201221.2,
+    557275.0
+   ],
+   "to": [
+    201227.21,
+    557273.8
+   ],
+   "lengthM": 6.1,
+   "basis": "건물 원천 외곽의 변",
+   "fit": null,
+   "vsOldPolygon_medianM": 0.5,
+   "vsOldPolygon_maxM": 0.8,
+   "vsSmapFlatEdge_medianM": 1.1,
+   "vsSmapFlatEdge_maxM": 1.7,
+   "midpointToNearestSourceOutlineM": 0.0,
+   "nearestBuilding": "청운관"
+  },
+  {
+   "side": "동 청운관 남동 벽 앞",
+   "kind": "fixed",
+   "from": [
+    201227.21,
+    557273.8
+   ],
+   "to": [
+    201237.3,
+    557262.9
+   ],
+   "lengthM": 14.9,
+   "basis": "건물 원천 외곽의 남서 변을 1.5 m 앞으로 옮긴 선. S-MAP: 벽 앞 +0.5~1.2 m 띠(폭 1~2 m)의 발치",
+   "fit": null,
+   "vsOldPolygon_medianM": 1.1,
+   "vsOldPolygon_maxM": 1.4,
+   "vsSmapFlatEdge_medianM": 0.4,
+   "vsSmapFlatEdge_maxM": 1.4,
+   "midpointToNearestSourceOutlineM": 1.5,
+   "nearestBuilding": "청운관"
+  },
+  {
+   "side": "동 청운관–혜인관 사이",
+   "kind": "fixed",
+   "from": [
+    201237.3,
+    557262.9
+   ],
+   "to": [
+    201244.16,
+    557257.31
+   ],
+   "lengthM": 8.8,
+   "basis": "트인 곳(동쪽 마당으로 이어짐). 청운관 앞 띠 끝에서 혜인관 원천 외곽 북서 모서리까지 닫는 선",
+   "fit": null,
+   "vsOldPolygon_medianM": 1.2,
+   "vsOldPolygon_maxM": 3.7,
+   "vsSmapFlatEdge_medianM": 0.7,
+   "vsSmapFlatEdge_maxM": 2.1,
+   "midpointToNearestSourceOutlineM": 4.4,
+   "nearestBuilding": "청운관"
+  },
+  {
+   "side": "남동 혜인관 북쪽 화단",
+   "kind": "fit",
+   "from": [
+    201244.16,
+    557257.31
+   ],
+   "to": [
+    201228.26,
+    557229.99
+   ],
+   "lengthM": 31.6,
+   "basis": "S-MAP 2 m: 혜인관 벽 앞 화단 발치(±1 m)",
+   "fit": {
+    "points": 27,
+    "rmsM": 0.72,
+    "maxM": 1.29,
+    "from1mMesh_pct": 0
+   },
+   "vsOldPolygon_medianM": 1.9,
+   "vsOldPolygon_maxM": 3.7,
+   "vsSmapFlatEdge_medianM": 0.6,
+   "vsSmapFlatEdge_maxM": 1.2,
+   "midpointToNearestSourceOutlineM": 2.1,
+   "nearestBuilding": "혜인관"
+  },
+  {
+   "side": "남동 혜인관 입구 북쪽 턱",
+   "kind": "fixed",
+   "from": [
+    201228.26,
+    557229.99
+   ],
+   "to": [
+    201229.84,
+    557229.09
+   ],
+   "lengthM": 1.8,
+   "basis": "화단 끝에서 벽으로 꺾임(S-MAP 칸 경계, 벽에 수직)",
+   "fit": null,
+   "vsOldPolygon_medianM": 4.0,
+   "vsOldPolygon_maxM": 4.0,
+   "vsSmapFlatEdge_medianM": 2.3,
+   "vsSmapFlatEdge_maxM": 2.3,
+   "midpointToNearestSourceOutlineM": 0.0,
+   "nearestBuilding": "혜인관"
+  },
+  {
+   "side": "남동 혜인관 벽(입구(1) 앞)",
+   "kind": "fixed",
+   "from": [
+    201229.84,
+    557229.09
+   ],
+   "to": [
+    201219.73,
+    557212.37
+   ],
+   "lengthM": 19.5,
+   "basis": "건물 원천 외곽의 북서 변. 평지가 벽에 닿는 구간",
+   "fit": null,
+   "vsOldPolygon_medianM": 4.2,
+   "vsOldPolygon_maxM": 5.5,
+   "vsSmapFlatEdge_medianM": 2.7,
+   "vsSmapFlatEdge_maxM": 3.3,
+   "midpointToNearestSourceOutlineM": 0.0,
+   "nearestBuilding": "혜인관"
+  },
+  {
+   "side": "남동 혜인관 입구 남쪽 턱",
+   "kind": "fixed",
+   "from": [
+    201219.73,
+    557212.37
+   ],
+   "to": [
+    201217.86,
+    557213.44
+   ],
+   "lengthM": 2.2,
+   "basis": "벽에서 화단 발치로 꺾임(S-MAP 칸 경계, 벽에 수직)",
+   "fit": null,
+   "vsOldPolygon_medianM": 3.3,
+   "vsOldPolygon_maxM": 4.3,
+   "vsSmapFlatEdge_medianM": 1.6,
+   "vsSmapFlatEdge_maxM": 2.3,
+   "midpointToNearestSourceOutlineM": 1.1,
+   "nearestBuilding": "혜인관"
+  },
+  {
+   "side": "남동 혜인관 남쪽 화단",
+   "kind": "fit",
+   "from": [
+    201217.86,
+    557213.44
+   ],
+   "to": [
+    201201.71,
+    557185.81
+   ],
+   "lengthM": 32.0,
+   "basis": "S-MAP 1 m: 혜인관 벽 앞 +0.5~1.3 m 띠(화단)의 발치",
+   "fit": {
+    "points": 37,
+    "rmsM": 0.26,
+    "maxM": 0.58,
+    "from1mMesh_pct": 100
+   },
+   "vsOldPolygon_medianM": 0.7,
+   "vsOldPolygon_maxM": 3.3,
+   "vsSmapFlatEdge_medianM": 0.3,
+   "vsSmapFlatEdge_maxM": 1.6,
+   "midpointToNearestSourceOutlineM": 1.9,
+   "nearestBuilding": "혜인관"
+  },
+  {
+   "side": "남 은주2관–혜인관 사이",
+   "kind": "fixed",
+   "from": [
+    201201.71,
+    557185.81
+   ],
+   "to": [
+    201197.68,
+    557175.65
+   ],
+   "lengthM": 10.9,
+   "basis": "트인 곳(남쪽으로 이어짐). 혜인관 원천 외곽 서쪽 모서리 옆에서 은주2관 앞 선의 동쪽 끝(평지 끝)까지 닫는 선",
+   "fit": null,
+   "vsOldPolygon_medianM": 0.7,
+   "vsOldPolygon_maxM": 1.3,
+   "vsSmapFlatEdge_medianM": 0.8,
+   "vsSmapFlatEdge_maxM": 3.8,
+   "midpointToNearestSourceOutlineM": 1.0,
+   "nearestBuilding": "혜인관"
+  }
+ ],
+ "smapInside": {
+  "cells": 8456,
+  "terrainWithin0.5m_pct": 98.6,
+  "terrainHigherThan0.5m_cells": 41,
+  "terrainLowerThan0.5m_cells": 11,
+  "buildingModel_cells": 64
+ },
+ "sourceOutlineOverlapM2": {
+  "은주관": 0.3,
+  "청운관": 0.8
+ },
+ "nodes": [
+  {
+   "node": "17256a9b",
+   "zM": 148.9,
+   "xy": [
+    201157.4,
+    557306.2
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 0.7,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0,
+   "accessOld": true,
+   "accessNew": true
+  },
+  {
+   "node": "435187c0",
+   "zM": 150.26,
+   "xy": [
+    201224.38,
+    557230.25
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 3.89,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.39,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "561a12b4",
+   "zM": 148.9,
+   "xy": [
+    201157.33,
+    557301.3
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 5.37,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 2.38,
+   "accessOld": true,
+   "accessNew": true
+  },
+  {
+   "node": "5c2a526c",
+   "zM": 148.9,
+   "xy": [
+    201149,
+    557304
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 4.66,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0,
+   "accessOld": true,
+   "accessNew": true
+  },
+  {
+   "node": "62a3ac5d",
+   "zM": 150.8,
+   "xy": [
+    201203,
+    557280.5
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 7.58,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 6.93,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "6532adf0",
+   "zM": 150.84,
+   "xy": [
+    201219.81,
+    557227.79
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 7.91,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 3.03,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "70261794",
+   "zM": 146.33,
+   "xy": [
+    201210.58,
+    557271.18
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 8.92,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 8.97,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "79988154",
+   "zM": 146.94,
+   "xy": [
+    201220.61,
+    557232.88
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 8.18,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 4.07,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "7feecc0a",
+   "zM": 148.9,
+   "xy": [
+    201204.98,
+    557287.4
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 1.5,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0,
+   "accessOld": true,
+   "accessNew": true
+  },
+  {
+   "node": "9fb1fd71",
+   "zM": 150.66,
+   "xy": [
+    201214.63,
+    557269.03
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 8.56,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 9.08,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "ba1296cf",
+   "zM": 154.25,
+   "xy": [
+    201223.93,
+    557229.44
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 4.36,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.25,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "db8b4e68",
+   "zM": 150.83,
+   "xy": [
+    201221.75,
+    557230.35
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 6.52,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 2.11,
+   "accessOld": false,
+   "accessNew": false
+  },
+  {
+   "node": "ea9b5a91",
+   "zM": 148.9,
+   "xy": [
+    201213.72,
+    557213.9
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 3.81,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.35,
+   "accessOld": true,
+   "accessNew": true
+  },
+  {
+   "node": "f261eaa5",
+   "zM": 148.9,
+   "xy": [
+    201212.6,
+    557280.2
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 0.42,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0,
+   "accessOld": true,
+   "accessNew": true
+  }
+ ],
+ "accessPointProposals": [
+  {
+   "id": "AP-DAEIL-FRONT",
+   "xy": [
+    201157.33,
+    557301.3
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 5.37,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 2.38
+  },
+  {
+   "id": "AP-SANGSEUNG-STAIR-L",
+   "xy": [
+    201204.98,
+    557287.4
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 1.5,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-SANGSEUNG-STAIR-R",
+   "xy": [
+    201212.6,
+    557280.2
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 0.42,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-CHEONGUN-1F",
+   "xy": [
+    201215.88,
+    557278.56
+   ],
+   "insideNew": false,
+   "toNewBoundaryM": 0.16,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-HYEIN-B1",
+   "xy": [
+    201217.27,
+    557215.85
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 2.48,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": true,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-HYEIN-B1-2",
+   "xy": [
+    201240.34,
+    557257.03
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 2.63,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-EUNJU1-5F",
+   "xy": [
+    201136.09,
+    557249.82
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 0.26,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-EUNJU2-5F",
+   "xy": [
+    201197,
+    557175
+   ],
+   "insideNew": false,
+   "toNewBoundaryM": 0.94,
+   "onOrInsideNew_0.5m": false,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0
+  },
+  {
+   "id": "AP-HANLIM-6F",
+   "xy": [
+    201149,
+    557304
+   ],
+   "insideNew": true,
+   "toNewBoundaryM": 4.66,
+   "onOrInsideNew_0.5m": true,
+   "insideOld": false,
+   "toOldBoundaryM": 0.0
+  }
+ ]
+}
