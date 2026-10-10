@@ -1,0 +1,497 @@
+{
+ "type": "FeatureCollection",
+ "name": "z05-west",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "provenance": {
+  "builder": "docs/audit/z05/build_inputs.py",
+  "basePlanes": "backend/data/terrain/recipes/z05-surface.geojson",
+  "schema": "docs/audit/g02/STRUCTURES.md",
+  "zone": "서문과 서쪽 옹벽",
+  "note": "기단은 손으로 정한 곧은 변의 큰 평면이다(평지 또는 한 경사면). 높이는 S-MAP 1 m 메시·사용자 핀, 외곽과 벽면 자리는 추정(±2 m). 상자 치수는 사진 눈대중이라 전부 estimated."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-PLATFORM-WEST-STREET",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "S-MAP(종단), 추정(폭 11 m, 북쪽 끝)",
+    "surfaceName": "Z05-WEST-STREET",
+    "bottomM": 92.0,
+    "bottomNote": "둘레 4 m 안 S-MAP 지면·지형의 가장 낮은 값보다 1 m 아래(옆 기단의 윗면보다 아래로 내려 틈이 없게)",
+    "material": "paving",
+    "assumption": "서쪽 옹벽 아래 공도: 옹벽을 따라 북으로 오르는 한 경사면(종단은 메시의 평평한 띠 값, 10 m 마디). 북좌표 557380 위는 메시 범위 밖이라 서문 앞 117.0 m(E09)에 맞춰 이음",
+    "source": "S-MAP 3D 뷰어 메시 1 m 판독(z04/smap-mesh-z04-1m-w0~e3.txt, 2026-10-11), 구역 노트",
+    "topProfile": {
+     "origin": [
+      201007.69,
+      557250.0
+     ],
+     "direction": [
+      -0.1362,
+      0.9907
+     ],
+     "points": [
+      [
+       0,
+       94.0
+      ],
+      [
+       10,
+       95.6
+      ],
+      [
+       20,
+       97.3
+      ],
+      [
+       30,
+       98.7
+      ],
+      [
+       40,
+       100.2
+      ],
+      [
+       50,
+       101.8
+      ],
+      [
+       60,
+       103.4
+      ],
+      [
+       70,
+       104.5
+      ],
+      [
+       80,
+       105.7
+      ],
+      [
+       90,
+       107.3
+      ],
+      [
+       100,
+       108.9
+      ],
+      [
+       110,
+       110.5
+      ],
+      [
+       120,
+       112.3
+      ],
+      [
+       130,
+       114.0
+      ],
+      [
+       150,
+       117.1
+      ],
+      [
+       163,
+       119.0
+      ]
+     ]
+    }
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       200974.41,
+       557412.0
+      ],
+      [
+       200985.41,
+       557412.0
+      ],
+      [
+       201008.24,
+       557246.0
+      ],
+      [
+       200997.24,
+       557246.0
+      ],
+      [
+       200974.41,
+       557412.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-PLATFORM-WEST-WALLTOP-PLANTER",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "확정(옹벽 위에 소나무 화단이 있음: 서문 사진), 추정(높이·폭)",
+    "surfaceName": "Z05-WEST-WALLTOP-PLANTER",
+    "bottomM": 100.9,
+    "bottomNote": "둘레 4 m 안 S-MAP 지면·지형의 가장 낮은 값보다 1 m 아래(옆 기단의 윗면보다 아래로 내려 틈이 없게)",
+    "material": "planting",
+    "assumption": "서쪽 옹벽 위 화단 띠(소나무): 포장면 가장자리(130.6~130.7 m)보다 한 턱 높은 한 높이. 메시는 133~135.4 m 로 읽지만 나무 수관으로 봄(위성 그림의 나무 띠 자리와 같다)",
+    "source": "S-MAP 3D 뷰어 메시 1 m 판독(z04/smap-mesh-z04-1m-w0~e3.txt, 2026-10-11), 구역 노트",
+    "topM": 131.2
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201000.8,
+       557368.0
+      ],
+      [
+       201000.8,
+       557362.52
+      ],
+      [
+       201000.8,
+       557362.5
+      ],
+      [
+       201000.81,
+       557362.49
+      ],
+      [
+       201003.2,
+       557359.0
+      ],
+      [
+       201005.2,
+       557353.0
+      ],
+      [
+       201005.9,
+       557350.28
+      ],
+      [
+       201012.26,
+       557304.0
+      ],
+      [
+       201000.26,
+       557304.0
+      ],
+      [
+       200994.01,
+       557349.45
+      ],
+      [
+       200991.46,
+       557368.0
+      ],
+      [
+       201000.8,
+       557368.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-PLATFORM-WEST-WALLTOP-NORTH",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
+    "surfaceName": "Z05-WEST-WALLTOP-NORTH",
+    "bottomM": 110.0,
+    "bottomNote": "둘레 4 m 안 S-MAP 지면·지형의 가장 낮은 값보다 1 m 아래(옆 기단의 윗면보다 아래로 내려 틈이 없게)",
+    "material": "paving",
+    "assumption": "옹벽 위 북쪽 끝(포장면이 옹벽까지 닿는 곳): 한 높이(메시 131.1~132.1)",
+    "source": "S-MAP 3D 뷰어 메시 1 m 판독(z04/smap-mesh-z04-1m-w0~e3.txt, 2026-10-11), 구역 노트",
+    "topM": 131.3
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201000.8,
+       557368.0
+      ],
+      [
+       200991.46,
+       557368.0
+      ],
+      [
+       200989.12,
+       557385.0
+      ],
+      [
+       201000.8,
+       557385.0
+      ],
+      [
+       201000.8,
+       557368.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-PLATFORM-WEST-GATE-BANK",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "S-MAP(높이), 확정(옹벽 위 화단: 서문 사진), 추정(외곽)",
+    "surfaceName": "Z05-WEST-GATE-BANK",
+    "bottomM": 117.3,
+    "bottomNote": "둘레 4 m 안 S-MAP 지면·지형의 가장 낮은 값보다 1 m 아래(옆 기단의 윗면보다 아래로 내려 틈이 없게)",
+    "material": "planting",
+    "assumption": "서문 위 화단 비탈: 옹벽 머리(126~127 m)에서 옆길(131.5 m)까지 오르는 한 경사면. 메시 131칸에 맞춘 평면 하나: 경사 29.3 %, 맞춤 잔차 90 % 0.39 m",
+    "source": "S-MAP 3D 뷰어 메시 1 m 판독(z04/smap-mesh-z04-1m-w0~e3.txt, 2026-10-11), 구역 노트",
+    "topProfile": {
+     "origin": [
+      200993.88,
+      557405.04
+     ],
+     "direction": [
+      0.9863,
+      0.1651
+     ],
+     "points": [
+      [
+       -8.0,
+       126.65
+      ],
+      [
+       10.15,
+       131.96
+      ]
+     ]
+    }
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201000.8,
+       557385.5
+      ],
+      [
+       201000.73,
+       557385.0
+      ],
+      [
+       200989.12,
+       557385.0
+      ],
+      [
+       200984.32,
+       557419.92
+      ],
+      [
+       200994.18,
+       557424.0
+      ],
+      [
+       201001.0,
+       557424.0
+      ],
+      [
+       201001.0,
+       557385.67
+      ],
+      [
+       201000.8,
+       557385.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-WESTGATE-PIER-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리 ±3 m, 문 앞 높이), 추정(치수)",
+    "basePlane": "서문 앞 공도 117.0",
+    "fromM": 117.0,
+    "toM": 121.5,
+    "assumption": "서문 출입구 기둥(가운데 기둥으로 두 칸): 자리는 옹벽 면 x 200980.8~200986.6, 북좌표 557397~557402(S-MAP), 높이 4.5 m·칸 폭 2.9 m 는 사진 눈대중",
+    "source": "사용자-서문-공연실습소-생활관-20261010/서문.jpg, 실험 E09(터널 입구 자리, 문 앞 117.0 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       200985.2,
+       557396.25
+      ],
+      [
+       200983.6,
+       557396.25
+      ],
+      [
+       200983.6,
+       557396.95
+      ],
+      [
+       200985.2,
+       557396.95
+      ],
+      [
+       200985.2,
+       557396.25
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-WESTGATE-PIER-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리 ±3 m, 문 앞 높이), 추정(치수)",
+    "basePlane": "서문 앞 공도 117.0",
+    "fromM": 117.0,
+    "toM": 121.5,
+    "assumption": "서문 출입구 기둥(가운데 기둥으로 두 칸): 자리는 옹벽 면 x 200980.8~200986.6, 북좌표 557397~557402(S-MAP), 높이 4.5 m·칸 폭 2.9 m 는 사진 눈대중",
+    "source": "사용자-서문-공연실습소-생활관-20261010/서문.jpg, 실험 E09(터널 입구 자리, 문 앞 117.0 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       200985.2,
+       557399.15
+      ],
+      [
+       200983.6,
+       557399.15
+      ],
+      [
+       200983.6,
+       557399.85
+      ],
+      [
+       200985.2,
+       557399.85
+      ],
+      [
+       200985.2,
+       557399.15
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-WESTGATE-PIER-3",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리 ±3 m, 문 앞 높이), 추정(치수)",
+    "basePlane": "서문 앞 공도 117.0",
+    "fromM": 117.0,
+    "toM": 121.5,
+    "assumption": "서문 출입구 기둥(가운데 기둥으로 두 칸): 자리는 옹벽 면 x 200980.8~200986.6, 북좌표 557397~557402(S-MAP), 높이 4.5 m·칸 폭 2.9 m 는 사진 눈대중",
+    "source": "사용자-서문-공연실습소-생활관-20261010/서문.jpg, 실험 E09(터널 입구 자리, 문 앞 117.0 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       200985.2,
+       557402.05
+      ],
+      [
+       200983.6,
+       557402.05
+      ],
+      [
+       200983.6,
+       557402.75
+      ],
+      [
+       200985.2,
+       557402.75
+      ],
+      [
+       200985.2,
+       557402.05
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z05-WESTGATE-LINTEL",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z05-WESTGATE-PIER",
+    "fromM": 121.5,
+    "toM": 123.0,
+    "assumption": "서문 문틀 윗보(\"SEOKYEONG UNIVERSITY WEST GATE\" 글자가 있는 돌 옹벽 부분): 두께 1.5 m(눈대중). 터널 안쪽(층·경사·갈림)은 모름이라 만들지 않음",
+    "source": "서문.jpg"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       200985.2,
+       557396.2
+      ],
+      [
+       200983.6,
+       557396.2
+      ],
+      [
+       200983.6,
+       557402.8
+      ],
+      [
+       200985.2,
+       557402.8
+      ],
+      [
+       200985.2,
+       557396.2
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

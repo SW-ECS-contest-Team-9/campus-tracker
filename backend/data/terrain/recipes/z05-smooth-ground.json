@@ -1,0 +1,66 @@
+{
+ "crs": "EPSG:5186",
+ "protectBuildings": true,
+ "reason": "Z05: Z03 조리법에 캠퍼스 안 나머지 구역의 기단을 더함(Z04 의 자동 기단·2 m 띠의 단을 손으로 정한 큰 평면과 옹벽 한 면으로 바꿈: 서쪽 옹벽과 아래 공도, 가운데 옹벽, 남서쪽 공도, 뒤편 단과 숲 비탈, 정문 안 포장). 캠퍼스 밖 남서·남쪽 지형은 S-MAP 지면 표본으로 낮춤. 지형 칸은 구조물 파일(frontend/public/structures/z05-*.geojson)의 기단 윗면에서 나온다.",
+ "steps": [
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_5186.json",
+    "../samples/smap_samples_roads_5186.json",
+    "../samples/smap_samples_roadprofile_5186.json"
+   ],
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ]
+  },
+  {
+   "type": "plateau",
+   "file": "f05-plateaus.geojson",
+   "noBlend": "f05-no-blend.geojson"
+  },
+  {
+   "type": "corridor",
+   "file": "t06-road-corridors.json",
+   "lines": [
+    "V1",
+    "V2",
+    "V3",
+    "V4a",
+    "V4b",
+    "P-LOW",
+    "P-UP"
+   ],
+   "keep": "f05-plateaus.geojson"
+  },
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_z05_edge_5186.json"
+   ],
+   "areas": [
+    "z05_edge_sw"
+   ]
+  },
+  {
+   "type": "surface",
+   "file": "g02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z03-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z05-surface.geojson"
+  }
+ ]
+}

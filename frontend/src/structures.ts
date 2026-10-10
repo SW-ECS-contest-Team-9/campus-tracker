@@ -20,6 +20,8 @@ export const STRUCTURES = {
   materials: { paving: '#9a9388', concrete: '#b9b6ad', rock: '#8d887d', timber: '#a47551', wood: '#a47551', field: '#c9956b' } as Record<string, string>,
   /** Colour of a box by `type`: light granite steps and landings, grey planter walls, white retaining walls, timber deck, dark tiled canopy, yellow barrier. */
   types: { stair_step: '#d2cdc0', landing: '#c4bfb2', planter: '#a9a59b', wall: '#dfdcd3', deck: '#a47551', canopy: '#7b7068', barrier: '#d8b23f' } as Record<string, string>,
+  /** A `planting` platform (a planted bank or a planter band on a wall): its top is the planted green, its sides are this wall colour. */
+  plantingSide: '#a9a59b',
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
   /** A material or type this table does not know. */
@@ -402,5 +404,6 @@ export function solidColors(solid: Solid): { body: string; top: string } {
   if (solid.role === 'void') return { body: STRUCTURES.void, top: STRUCTURES.void };
   const body = solid.role === 'platform' ? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown
     : STRUCTURES.types[solid.type] ?? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown;
+  if (solid.role === 'platform' && solid.material === 'planting') return { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop };
   return { body, top: solid.type === 'planter' ? STRUCTURES.planterTop : body };
 }
