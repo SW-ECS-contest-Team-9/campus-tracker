@@ -61,24 +61,25 @@ bukak = {'storedLadderM': walk, 'stepsM': [r2(b - a) for a, b in zip(walk, walk[
          'if8StoreysRoofM': r1(walk[-1] + top_step), 'if8StoreysMinusSmapRoofM': r1(walk[-1] + top_step - bk['smapRoofM']),
          'if9StoreysRoofM': r1(walk[-1] + 2 * top_step), 'if9StoreysMinusSmapRoofM': r1(walk[-1] + 2 * top_step - bk['smapRoofM']),
          'entrances1F': {n: [e[n]['groundM'], e[n]['spread']] for n in ('북악관 입구(1)', '북악관 입구(2)', '북악관 입구(3)')}, 'entranceB1': [e['북악관 입구(4)']['groundM'], e['북악관 입구(4)']['spread']],
-         'reading': '8단이 건물의 모든 층이면(4 건너뜀: 1,2,3,5~9층) 맨 위 단 위로 한 층 높이를 더한 지붕이 S-MAP 지붕보다 낮다. 한 층이 더 있으면(9개 층) 차이가 1 m 안이다. 보행이 맨 위층까지 갔는지는 기록에 없다'}
+         'reading': '4층 없음(사용자 확정)이면 8단 = 1,2,3,5~9층으로 건물의 모든 층이다. 맨 위 단 위로 한 층 높이를 더한 지붕이 S-MAP 지붕보다 3.4 m 낮다(난간·지붕 구조물이거나 저장 Z 가 낮은 것. 남는 차이)'}
 P = []
 add = lambda **k: P.append(k)
 add(building='북악관', op='relabel_level', roadIds=touch('북악관', 132.8) and ids('북악관', 131.0, 132.9), fromLabel="이름 'B1' (levelId 없음)", toLabel='1층', grade='원천+S-MAP',
     evidence=f"학교 출입구 목록: 정면 입구 3곳이 1층(로비·복도), S-MAP 지면 {e['북악관 입구(3)']['groundM']}~{e['북악관 입구(1)']['groundM']} m. 저장 높이 132.8 m 가 그 범위 안. B1층 입구는 따로 있다")
 add(building='북악관', op='relabel_level', roadIds=ids('북악관', 136.2, 136.9), fromLabel="이름 '1F'", toLabel='2층', grade='원천+S-MAP(순서)', evidence='132.8 m 가 1층이면 그 위 단(136.7 m)은 2층')
 add(building='북악관', op='relabel_level', roadIds=ids('북악관', 140.6, 140.6), fromLabel="이름 '2F'", toLabel='3층', grade='원천+S-MAP(순서)', evidence='같은 이유. 140.6 m 는 3층')
-for z, lab in zip(walk[3:], ('5층(4층 번호가 없을 때) 또는 4층', '6층 또는 5층', '7층 또는 6층', '8층 또는 7층', '9층 또는 8층')):
-    add(building='북악관', op='relabel_level', roadIds=ids('북악관', z, z), fromLabel=f'levelId 북악관_Z{z}_추정 또는 없음', toLabel=lab, grade='추정', evidence='4층 번호를 건너뛰는지 정해지지 않았다(호실 목록에 4층 호실 없음. 지붕 높이는 9개 층 쪽). 정해지면 한 번에 붙인다')
+for z, lab in zip(walk[3:], ('5층', '6층', '7층', '8층', '9층')):
+    add(building='북악관', op='relabel_level', roadIds=ids('북악관', z, z), fromLabel=f'levelId 북악관_Z{z}_추정 또는 없음', toLabel=lab, grade='확정+원천(순서)', evidence='사용자 확정 2026-10-10: 학교 건물에는 4층이 없다(3층 다음이 5층). 132.8 m 가 1층이면 8단은 1·2·3·5·6·7·8·9층이다. 단 높이(저장 Z)는 보행 기록 추정 그대로')
 add(building='북악관', op='relabel_level', roadIds=sorted(r['id'] for r in by['북악관'] if r['structure'] != 'indoor_corridor' and max(c[2] for c in r['coordinates']) - min(c[2] for c in r['coordinates']) >= 1.0 and re.search(r'B1|1F|2F', r['name'] or '')),
     fromLabel="계단·승강기 이름의 'B1-1F', '1F-2F', '2F-…'", toLabel="'1층-2층', '2층-3층', '3층-…'", grade='원천+S-MAP(순서)', evidence='층 이름이 한 층씩 밀려 있다')
 y9 = e['유담관 입구(2)']
 add(building='유담관', op='relabel_level', roadIds=ids('유담관', 129.3, 129.7), fromLabel="이름 '하부', levelId 없음", toLabel='9층', grade='확정+원천',
     evidence='사용자 확정: 버스 정류장 쪽에서 들어간 자리가 9층. 학교 출입구 목록: 입구(2) = 9층. 이 묶음은 그 입구 옆(북쪽 면)에서 시작한다')
-add(building='유담관', op='shift_z', roadIds=sorted(r['id'] for r in by['유담관']), deltaM=r1(y9['groundM'] - 129.6), deltaRangeM=[r1(y9['spread'][0] - 129.6), r1(128.6 - 129.6)], grade='추정',
-    evidence=f"9층 입구 앞 S-MAP 지면 {y9['groundM']} m (벽 앞 {y9['spread'][0]}~{y9['spread'][1]}, 북쪽 면 서쪽 끝은 128.6). 저장 높이 129.6 m. 문 자리가 ±수 m 불확실해 옮길 양이 -1.0~-3.1 m 로 벌어진다. 실내 13개가 한 묶음이라 통째로 옮기는 것만 뜻이 있다. 옛 지형 오류와는 무관")
-add(building='유담관', op='relabel_level', roadIds=ids('유담관', 145.22, 145.22) + ids('유담관', 152.84, 152.84), fromLabel="이름 '상부', levelId 없음", toLabel='모름', grade='모름',
-    evidence='승강기 정지 높이가 입구 층보다 15.62 m, 23.24 m 높다. 3~9층 층고(4.4 m 안팎)로 나누면 3.5개·5.2개 층이라 정수가 아니다. 층당 3.9 m 면 4개·6개 층. 어느 층에서 내렸는지 기록이 필요하다')
+yl = A['buildings']['유담관']['ladder']
+add(building='유담관', op='no_change', roadIds=sorted(r['id'] for r in by['유담관']), deltaM=0, grade='추정',
+    evidence=f"입구 층 저장 129.38~129.6 m 대 탑 북서 모서리 앞마당 S-MAP 지면 {yl['9'][0]} m: 맞는다. 입구(2) 표지의 벽 앞 지면은 {y9['groundM']} m 로 2.7 m 낮지만 표지가 문에서 어긋난 것으로 본다(추정). 옮기지 않는다")
+add(building='유담관', op='relabel_level', roadIds=ids('유담관', 145.22, 145.22) + ids('유담관', 152.84, 152.84), fromLabel="이름 '상부', levelId 없음", toLabel='14층·16층(13층 번호가 없을 때) 또는 13층·15층', grade='추정',
+    evidence=f"승강기 정지 높이가 입구 층(9층)보다 15.62 m, 23.24 m 높다 = 층당 3.9 m 로 4개·6개 층. 계산한 14층 {yl['14'][0]} m, 16층 {yl['16'][0]} m 와 0.7 m 안에서 맞는다. 13층 번호가 있는지에 따라 이름이 달라진다. 사용자가 본 16층 호실(1613~1624)과 어긋나지 않는다")
 d = A['buildings']['대일관']['ladder']['1'][0]
 add(building='대일관', op='shift_z', roadIds=sorted(r['id'] for r in by['대일관']), deltaM=r1(d - 145.8), deltaRangeM=[r1(e['대일관 입구(2)']['spread'][0] - 145.8), r1(e['대일관 입구(3)']['spread'][1] - 145.8)], grade='S-MAP',
     evidence=f"1층 복도 입구 두 곳의 S-MAP 벽 앞 지면 {e['대일관 입구(2)']['groundM']}, {e['대일관 입구(3)']['groundM']} m -> 1층 {d} m. 저장 145.80 m 는 옛 운동장 높이(141.73)에 맞춘 값. 운동장 쪽 오차 +7.2 m 와 같은 종류지만 양은 다르다(+6.0)")
@@ -92,8 +93,8 @@ add(building='문예관', op='relabel_level', roadIds=ids('문예관', 136.39, 1
     evidence=f"136.39 m 는 3층(142.44)보다 6.05 m, 2층 입구 지면({e['문예관 입구(2)']['groundM']})보다 2.5 m 낮다. 2개 층 아래(층당 3.0 m)면 1층이다. 학교 표기의 B1 은 그보다 더 아래다")
 h = A['buildings']['혜인관']['ladder']
 add(building='혜인관', op='rename_building_id', roadIds=sorted(r['id'] for r in by['혜인관']), fromLabel="buildingId '건물5'", toLabel='혜인관', grade='확정', evidence='혜인관 노트(H02): 서버 건물 id 가 뒤바뀌어 있다. 건물 id 정리와 함께 해야 한다')
-add(building='혜인관', op='shift_z', roadIds=sorted(r['id'] for r in by['혜인관']), deltaM=None, deltaRangeM=[-1.6, -0.9], grade='추정',
-    evidence=f"'B1' 통로 150.26~150.94 m 대 B1 입구 두 곳의 S-MAP 지면 {h['B1'][0]} m (운동장 높이). 0.9~1.6 m 높다. 승강기 6F 171.0 m 는 사다리 6층 {h['6'][0]} m 와 맞는다. 차이가 작고 S-MAP 지면 = 바닥이라는 가정이 필요해 옮기지 않는 쪽을 권한다")
+add(building='혜인관', op='shift_z', roadIds=sorted(r['id'] for r in by['혜인관']), deltaM=-1.1, deltaRangeM=[-1.7, -0.9], grade='추정',
+    evidence=f"'B1' 통로 150.26~150.94 m 대 B1 입구 두 곳의 S-MAP 지면 {h['B1'][0]} m (운동장 높이). 0.9~1.6 m 높다. '1층' 154.25~155.09 m 대 사다리 1층 {h['1'][0]} m, 승강기 6F 171.0 m 대 사다리 6층 {h['6'][0]} m: 세 층 모두 약 1.1 m 높다(층 간격은 맞음). B1 바닥이 바깥 지면보다 1 m 높을 수도 있어(문턱·계단) 옮기지 않는 쪽을 권한다")
 count = collections.Counter((p['op'], p['grade']) for p in P)
 json.dump({'method': __doc__, 'snapshot': 'roads-live-2.json (128 roads)', 'applied': False, 'perBuilding': T, 'bukakLadderVsRoof': bukak,
            'proposals': P, 'proposalCounts': {f'{a} / {b}': c for (a, b), c in sorted(count.items())}}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

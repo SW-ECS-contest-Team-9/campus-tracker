@@ -95,7 +95,7 @@ class Registry(unittest.TestCase):
         text = br.dumps(doc)
         self.assertEqual(br.diff(doc, json.loads(text)), {})
         self.assertEqual(text, br.dumps(json.loads(text)))            # stable text
-        self.assertIn('[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]', text)   # one ring per line
+        self.assertIn('\n              [0, 0], [10, 0], [10, 10], [0, 10], [0, 0]\n', text)   # one ring per line (its brackets are on the lines around it)
         stored = json.loads(text)
         stored['buildings'][0]['roofM'] = 190.0
         stored['parts'][0]['parts'][1]['polygon'][0][1] = [21, 0]

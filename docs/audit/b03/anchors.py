@@ -105,41 +105,43 @@ def study(labels, skips, anchors, roof_m, top):
     return res
 
 
-# 동별 계획: 층 표기(학교 호실 목록 = 원천), 가설, 기준(층, 높이), S-MAP 지붕, 사다리에 쓴 가설·층고와 이유
-S4 = {'4 건너뜀': [4], '건너뛰지 않음': []}
+# 유담관 9층의 두 번째 읽기: 탑 북서 모서리 앞마당(운영 길의 입구 통로가 시작하는 자리, x 201018~201030, y 557288~557296)의 S-MAP 지면
+YUDAM_9F = r1(med(box(201018, 557288, 201030, 557296)))
+# 동별 계획: 층 표기(학교 호실 목록 = 원천), 가설, 기준(층, 높이), S-MAP 지붕, 사다리에 쓴 가설과 이유.
+# 4층 없음은 사용자 확정(2026-10-10 "확실히 4층이 없어. 실제로 가보면 3층 다음 바로 5층이야"): 모든 동에 적용한다.
+# 13층 건너뜀은 추정(호실 목록에 13층 호실이 없는 동). ladderAnchors = 사다리에 쓰는 기준(없으면 anchors 전부).
+S4 = {'4 건너뜀': [4]}; S413 = {'4·13 건너뜀': [4, 13], '4만 건너뜀': [4]}
 PLAN = {
-    '유담관': dict(labels=['B2', 'B1', *range(1, 17)], skips={'13 건너뜀': [13], '건너뛰지 않음': []}, top=16, roof=167.4,
-                roofNote='기운 지붕의 낮은 끝(남동 띠 중앙 167.4, tower.py). 높은 끝은 179.2',
-                anchors=[(3, g('유담관 입구(3)')), (6, g('유담관 입구(1)')), (9, g('유담관 입구(2)'))], use='13 건너뜀',
-                why='3·6·9층 기준 사이는 번호가 빠지지 않아 두 가설이 같다. 9층 위는 건너뜀 여부를 가르지 못해 호실 목록대로(13층 호실 없음) 두고, 9층 위 층고는 3~9층 평균을 쓴다(추정)'),
+    '유담관': dict(labels=['B2', 'B1', *range(1, 17)], skips=S413, top=16, roof=167.4,
+                roofNote='기운 지붕의 낮은 끝(tower.py 직선 맞춤 167.4). 높은 끝은 180.4',
+                anchors=[(3, g('유담관 입구(3)')), (6, g('유담관 입구(1)')), (9, YUDAM_9F)], ladderAnchors=[6, 9], use='4·13 건너뜀', doubleHeight=6,
+                why='6층(분수 광장, 확정)과 9층(버스 정류장 쪽, 확정)만 기준으로 쓴다. 9층 높이는 탑 북서 모서리 앞마당 지면(YUDAM_9F)이고 입구(2) 표지의 벽 앞 지면(126.9)은 따로 남긴다. 6층은 거의 두 층 높이(사용자 확정, 값은 추정)라 6→9층을 6층 2 : 7층 1 : 8층 1 로 나눴다. 3층 입구 기준은 의심(본문). 13은 추정'),
     '본관': dict(labels=[*range(1, 9)], skips=S4, top=8, roof=153.8, roofNote='S-MAP 건물 칸 중앙값(E05)',
                anchors=[(2, g('본관 입구(2)')), (5.5, g('본관 입구(3)'))], use='4 건너뜀',
-               why='2층 입구와 5·6층 사이 계단참 입구로 층고를 내면 4를 건너뛸 때 3.7 m 안팎이고 그 층고로 올린 지붕이 S-MAP 지붕과 1 m 안에서 맞는다. 건너뛰지 않으면 층고 2.7 m 미만에 지붕이 4.6 m 모자란다. 5.5 = 5층과 6층의 한가운데로 본 가정'),
-    '한림관': dict(labels=[*range(1, 17)], skips={'4·13 건너뜀': [4, 13], '13만 건너뜀': [13], '건너뛰지 않음': []}, top=16, roof=188.1, roofNote='바깥 고리 지붕(B02). 가운데 원판은 197.3',
-                anchors=[(1, g('한림관 입구')), (6, FIELD_M)], use='13만 건너뜀',
-                why='6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 22.4 m 라서 4를 건너뛰면 층당 5.6 m(지나침), 건너뛰지 않으면 4.5 m. 13은 가르지 못해 호실 목록대로 둔다'),
-    '은주1관': dict(labels=[*range(1, 7)], skips={'건너뛰지 않음': []}, top=6, roof=156.8, roofNote='1관 지붕(E05). 경사 지붕이라 층고 계산에는 참고만',
-                 anchors=[(1, g('은주1관 입구(1)')), (5, FIELD_M)], use='건너뛰지 않음', why='호실 목록에 4층이 있다. 6층은 사용자 확정(있다는 사실만)'),
-    '은주2관': dict(labels=[*range(1, 7)], skips={'건너뛰지 않음': []}, top=6, roof=159.7, roofNote='2관 높은 지붕(E05). 경사 지붕이라 참고만',
-                 anchors=[(1, g('은주2관 입구(1)')), (5, FIELD_M)], use='건너뛰지 않음', why='1관과 같은 층 번호로 본다(추정: 2관 호실은 5층만 등록)'),
+               why='2층 입구와 5·6층 사이 계단참 입구. 5.5 = 5층과 6층의 한가운데로 본 가정. 그 층고로 올린 지붕이 S-MAP 지붕과 1 m 안에서 맞는다'),
+    '한림관': dict(labels=[*range(1, 17)], skips=S413, top=16, roof=188.1, roofNote='바깥 고리 지붕(B02). 가운데 원판은 197.3',
+                anchors=[(1, g('한림관 입구')), (6, FIELD_M)], use='4·13 건너뜀',
+                why='6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 4개 층 22.4 m, 층당 5.6 m 로 범위(5.5 m)를 조금 넘는다. 13은 추정'),
+    '은주1관': dict(labels=[*range(1, 7)], skips=S4, top=6, roof=156.8, roofNote='1관 지붕(E05). 경사 지붕이라 층고 계산에는 참고만',
+                 anchors=[(1, g('은주1관 입구(1)')), (5, FIELD_M)], use='4 건너뜀', why='1→5층이 3개 층 17.6 m, 층당 5.87 m 로 범위를 넘는다. 6층은 사용자 확정(있다는 사실만)'),
+    '은주2관': dict(labels=[*range(1, 7)], skips=S4, top=6, roof=159.7, roofNote='2관 높은 지붕(E05). 경사 지붕이라 참고만',
+                 anchors=[(1, g('은주2관 입구(1)')), (5, FIELD_M)], use='4 건너뜀', why='1관과 같은 층 번호로 본다(추정: 2관 호실은 5층만 등록). 1→5층 3개 층, 층당 5.57 m'),
     '대일관': dict(labels=['B2', 'B1', *range(1, 8)], skips=S4, top=7, roof=172.1, roofNote='본체 지붕(B02). 처마 168~171',
-                anchors=[(1, r1(med([g('대일관 입구(2)'), g('대일관 입구(3)')])))], use='4 건너뜀',
-                why='기준이 1층 하나라 가르지 못한다. 호실 목록대로(4층 호실 없음) 두었다. 공식 사진의 창 줄 5개 + 지붕창 층 = 6개 층과 맞는다(추정)'),
-    '청운관': dict(labels=['B1', *range(1, 12)], skips=S4, top=11, roof=187.8, roofNote='본체 지붕(B02)',
-                anchors=[(1, FIELD_M)], use='4 건너뜀', why='기준이 1층 하나라 가르지 못한다. 호실 목록대로(4층 호실 없음) 두었다'),
-    '혜인관': dict(labels=['B1', *range(1, 8)], skips={'건너뛰지 않음': []}, top=7, roof=178.1, roofNote='S-MAP 건물 칸 중앙값(E05). 여러 단 166~182',
-                anchors=[('B1', r1(med([g('혜인관 입구(1)'), g('혜인관 입구(2)')])))], use='건너뛰지 않음', why='호실 목록에 1~7층이 다 있다. 운동장 높이의 두 입구를 B1 로 읽었다(본문 참조: 대장으로는 1층일 수도 있다)'),
-    '문예관': dict(labels=['B1', *range(1, 16)], skips={'4·13 건너뜀': [4, 13], '건너뛰지 않음': []}, top=15, roof=189.4, roofNote='지붕(E02). 지붕판 188.8~190.2',
-                anchors=[(2, g('문예관 입구(2)')), (3, g('문예관 입구(1)'))], use='4·13 건너뜀',
-                why='두 기준(2층·3층 입구)의 지면 차가 2.0 m 라 층고로 쓸 수 없다(3층 로비 표지가 낮은 날개 지붕 아래라 문 앞 지면을 못 읽음). 2층 기준만 쓰고 층고는 2층~지붕 평균으로 둔다. 건너뜀은 가르지 못해 호실 목록대로'),
+                anchors=[(1, r1(med([g('대일관 입구(2)'), g('대일관 입구(3)')])))], use='4 건너뜀', why='기준은 1층 하나(1층 복도 입구 두 곳의 S-MAP 지면). 지상 6개 층'),
+    '청운관': dict(labels=['B1', *range(1, 12)], skips=S4, top=11, roof=187.8, roofNote='본체 지붕(B02)', anchors=[(1, FIELD_M)], use='4 건너뜀', why='기준은 1층 하나(운동장). 지상 10개 층'),
+    '혜인관': dict(labels=['B1', *range(1, 8)], skips=S4, top=7, roof=178.1, roofNote='S-MAP 건물 칸 중앙값(E05). 여러 단 166~182',
+                anchors=[('B1', r1(med([g('혜인관 입구(1)'), g('혜인관 입구(2)')])))], use='4 건너뜀', why='운동장 높이의 두 입구를 B1 로 읽었다. B1 포함 7개 층 = 대장의 지상 7층과 같은 수'),
+    '문예관': dict(labels=['B1', *range(1, 16)], skips=S413, top=15, roof=189.4, roofNote='지붕(E02). 지붕판 188.8~190.2',
+                anchors=[(2, g('문예관 입구(2)')), (3, g('문예관 입구(1)'))], ladderAnchors=[2], use='4·13 건너뜀',
+                why='두 기준(2층·3층 입구)의 지면 차가 1.9 m 라 층고로 쓸 수 없다(3층 로비 표지가 낮은 날개 지붕 아래라 문 앞 지면을 못 읽음). 2층 기준만 쓰고 층고는 2층~지붕 평균. 13은 추정'),
     '북악관': dict(labels=['B1', *range(1, 10)], skips=S4, top=9, roof=160.6, roofNote='S-MAP 건물 칸 중앙값(E05)',
-                anchors=[(1, g('북악관 입구(1)'))], use='4 건너뜀', why='기준이 1층 하나라 S-MAP 만으로는 가르지 못한다. 보행 기록의 8단(132.8~154.51)은 analysis 의 bukak 항목에서 따로 견준다'),
+                anchors=[(1, g('북악관 입구(1)'))], use='4 건너뜀', why='기준은 1층 하나. 지상 8개 층 = 보행 기록의 8단'),
 }
 B = {}
 for name, p in PLAN.items():
     s = study(p['labels'], p['skips'], p['anchors'], p['roof'], p['top'])
-    skip = p['skips'][p['use']]; anchors = list(p['anchors']); derived = []
-    if name == '문예관': anchors = anchors[:1]          # 3층 로비 기준은 층고로 쓸 수 없어 2층만 쓴다(PLAN 의 why)
+    skip = p['skips'][p['use']]; derived = []
+    anchors = [q for q in p['anchors'] if 'ladderAnchors' not in p or q[0] in p['ladderAnchors']]
     half = [(l, z) for l, z in anchors if not isinstance(l, str) and not float(l).is_integer()]
     if half:  # 계단참 기준(5층과 6층 사이): 아래 기준과의 층고로 아래·위 층 높이를 낸다
         (l, z), = half; anchors.remove(half[0]); l0, z0 = anchors[0]; hh = (z - z0) / (idx(l, skip) - idx(l0, skip))
@@ -148,10 +150,19 @@ for name, p in PLAN.items():
     h_mean = (a[-1][1] - a[0][1]) / n if n else None
     h_roof = (p['roof'] - a[-1][1]) / (idx(p['top'], skip) - idx(a[-1][0], skip) + 1)
     h_above = h_roof if ok(h_roof) else h_mean          # 위쪽: S-MAP 지붕에 맞춘 층고(그럴듯할 때), 아니면 기준 사이 평균
-    h_below = h_mean if h_mean and ok(h_mean) else h_roof
+    h_below = h_mean if h_mean else h_roof              # 아래쪽: 기준 사이 평균(범위를 넘어도 확정 층 수를 따른 값), 기준이 하나면 지붕까지 평균
     s.update(roofNote=p['roofNote'], ladderHypothesis=p['use'], ladderWhy=p['why'], storeyHeightBelowAnchorsM=r2(h_below), storeyHeightAboveAnchorsM=r2(h_above),
              storeyHeightAboveFrom='S-MAP 지붕까지를 층 수로 나눔(난간 포함)' if ok(h_roof) else '기준 사이 평균(지붕까지 나눈 값은 5.5 m 초과)',
              ladder=ladder(anchors, p['labels'], skip, h_below, h_above, derived))
+    if p.get('doubleHeight'):  # 한 층이 두 층 높이: 기준 사이 층 수에 하나를 더해 층고를 내고 그 층만 두 배로 둔다
+        d = p['doubleHeight']; z0 = dict(anchors)[d]; z1 = a[-1][1]; hh = (z1 - z0) / (n + 1); lad = s['ladder']
+        for l in p['labels']:
+            if isinstance(l, str) or l in skip or str(l) not in lad or lad[str(l)][1] == 'anchor': continue
+            k = idx(l, skip) - idx(d, skip)
+            lad[str(l)] = [r1(z0 + hh * (k + 1)) if 0 < k < n else r1(z1 + hh * (k - n)) if k > n else r1(z0 + hh * k), 'interp' if 0 < k < n else 'extrap']
+        for l in ('B1', 'B2'): lad[l] = [r1(z0 + hh * (idx(l, skip) - idx(d, skip))), 'extrap']
+        s.update(storeyHeightBelowAnchorsM=r2(hh), storeyHeightAboveAnchorsM=r2(hh), doubleHeightFloor={'floor': d, 'heightM': r2(2 * hh), 'otherStoreysM': r2(hh)},
+                 storeyHeightAboveFrom='6층을 두 층 높이로 보고 6→9층을 4등분한 층고(지붕까지 나눈 값은 5.5 m 초과)', alternative9F={'markerWallFootM': g('유담관 입구(2)'), 'thenStoreyM': r2((g('유담관 입구(2)') - z0) / (n + 1))})
     B[name] = s
 
 # 연결통로: 두 동의 층 높이가 같아야 한다
@@ -163,12 +174,11 @@ CONN = [
     {'statement': '은주1관 5층 = 운동장 바닥(E06)', 'a': ['은주1관', 5, L('은주1관', 5)], 'b': ['운동장', '-', FIELD_M]},
 ]
 for c in CONN: c['residualM'] = r1(c['a'][2] - c['b'][2])
-# 한림관 4층 직접 시험: 은주1관 2→5층은 3개 층. 한림관 3→6층이 같은 높이를 2개 층(4 건너뜀) 또는 3개 층으로 오른다
-d = L('한림관', 6) - L('은주1관', 2)
-test = {'은주1관 2→5층 높이차 M': r1(L('은주1관', 5) - L('은주1관', 2)), '은주1관 층고 M': r2((L('은주1관', 5) - L('은주1관', 2)) / 3),
-        '한림관 3→6층이 2개 층이면 층고 M': r2(d / 2), '한림관 3→6층이 3개 층이면 층고 M': r2(d / 3),
-        '주의': '은주1관 2층 높이는 1층 입구 지면과 5층(운동장) 사이를 고르게 나눈 값이다(직접 잰 값 아님)'}
-json.dump({'method': __doc__, 'fieldM': FIELD_M, 'entrances': ENT, 'buildings': B, 'connectors': CONN, 'hallimFourthFloorTest': test}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+# 세 동의 사슬이 한 높이에서 만나는지: 본관 5층(본관 서쪽 입구들) / 한림관 3층(한림관 1층 로비 + 운동장) / 은주1관 2층(1관 1층 입구 + 운동장)
+test = {'본관 5층 M': L('본관', 5), '한림관 3층 M': L('한림관', 3), '은주1관 2층 M': L('은주1관', 2), '세 값의 범위 M': r1(max(L('본관', 5), L('한림관', 3), L('은주1관', 2)) - min(L('본관', 5), L('한림관', 3), L('은주1관', 2))),
+        '한림관 1→6층 층고 M': r2((L('한림관', 6) - L('한림관', 1)) / 4), '은주1관 1→5층 층고 M': r2((L('은주1관', 5) - L('은주1관', 1)) / 3), '본관 층고 M': B['본관']['storeyHeightBelowAnchorsM'],
+        '읽기': '본관 사슬은 층고 3.7 m 의 독립된 기준이다. 세 값이 1 m 안에서 만나면 한림관·은주1관의 1층 기준과 운동장 아래 높은 층고(5.6~5.9 m)가 서로 맞는다는 뜻이다'}
+json.dump({'method': __doc__, 'fieldM': FIELD_M, 'entrances': ENT, 'buildings': B, 'connectors': CONN, 'connectorChainTest': test}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 for e in ENT: print(f"{e['name']:<20} {e['groundM']:6.1f} {str(e['spread']):<16} {e['grade']:<5} {e['groundFrom']:<11} 둘레 {e['around']} 벽앞 {e['wallFoot']}")
 for n, s in B.items():
     print(f"\n{n}: 기준 {s['anchors']} 지붕 {s['smapRoofM']}")
