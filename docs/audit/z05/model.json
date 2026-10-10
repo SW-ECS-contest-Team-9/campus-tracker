@@ -5,7 +5,7 @@
   "roadPieces": 37,
   "handOther": 5,
   "planes": 48,
-  "boxes": 218,
+  "boxes": 230,
   "terrainSurfaces": 90,
   "edgeSamples": 1855,
   "z04": {
@@ -595,7 +595,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 89
+   "boxes": 97
   },
   "hyein": {
    "title": "혜인관 둘레",
@@ -611,7 +611,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 51
+   "boxes": 55
   },
   "eunju": {
    "title": "은주관 둘레(풋살장·수인관)",

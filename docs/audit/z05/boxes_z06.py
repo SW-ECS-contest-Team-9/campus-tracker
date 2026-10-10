@@ -26,9 +26,9 @@ box('cheongun', 'Z06-CHEONGUN-PORCH-ROOF', 'canopy', cR(CS0 - 0.6, CS1 + 0.6, 0.
 for tag, s_foot, s_top in (('L', 3.1, 10.4), ('R', 20.3, 13.0)):
     stairs('cheongun', f'Z06-CHEONGUN-PORCH-STAIR-{tag}', cP(s_foot, CD + 1.2), cP(s_top, CD + 1.2), 2.0, 26, 148.9, 153.1,
            f'청운관 현관으로 오르는 {"왼쪽" if tag == "L" else "오른쪽"} 비스듬한 계단(운동장에서 볼 때): 앞면과 나란히 바깥 끝에서 가운데로 오른다. 26단 = 4.2 m ÷ 0.162, 디딤 0.28 m, 폭 2 m. 계단 밑은 막힌 덩어리(사진의 흰 밑단)', CSRC, grade=CG6, basePlane='운동장 148.9')
-    for j in range(4):
-        a, b = s_foot + (s_top - s_foot) * j / 4, s_foot + (s_top - s_foot) * (j + 1) / 4; zt = 148.9 + 4.2 * (j + 1) / 4
-        box('cheongun', f'Z06-CHEONGUN-PORCH-STAIR-{tag}-RAIL{j + 1}', 'wall', cR(min(a, b), max(a, b), CD + 2.2, CD + 2.38), 148.6, zt + 0.9, '계단 바깥쪽 흰 난간벽(네 마디로 줄임)', CSRC, grade=CG6, basePlane='운동장 148.9', material='white_stone')
+    for j in range(8):
+        a, b = s_foot + (s_top - s_foot) * j / 8, s_foot + (s_top - s_foot) * (j + 1) / 8; zt = 148.9 + 4.2 * (j + 1) / 8
+        box('cheongun', f'Z06-CHEONGUN-PORCH-STAIR-{tag}-RAIL{j + 1}', 'wall', cR(min(a, b), max(a, b), CD + 2.2, CD + 2.38), 148.6, zt + 0.9, '계단 바깥쪽 흰 난간벽(여덟 마디로 줄임)', CSRC, grade=CG6, basePlane='운동장 148.9', material='white_stone')
 box('cheongun', 'Z06-CHEONGUN-PORCH-LANDING', 'deck', cR(10.4, 13.0, CD, CD + 2.2), 152.5, 153.1, '좌우 계단이 만나는 참(1층 현관 판과 이어짐). 아래는 비어 있다: 지하 1층 문(운동장 높이)으로 드나드는 자리', CSRC, grade=CG6, basePlane='없음(뜬 판)', material='concrete')
 box('cheongun', 'Z06-CHEONGUN-PORCH-LANDING-RAIL', 'wall', cR(10.4, 13.0, CD + 2.2, CD + 2.38), 153.1, 154.0, '참 앞 난간벽', CSRC, grade=CG6, basePlane='Z06-CHEONGUN-PORCH-LANDING', material='white_stone')
 
@@ -50,9 +50,9 @@ box('hyein', 'Z06-HYEIN-PORCH-EAVE', 'canopy', hRc(-4.3, 4.3, 0, 4.5), 156.3, 15
 box('hyein', 'Z06-HYEIN-PORCH-ROOF-1', 'canopy', hRc(-3.9, 3.9, 0, 4.1), 156.7, 157.7, '붉은 기와 모임지붕 아랫단(기울기를 두 단 상자로 줄임)', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-EAVE', material='roof_red')
 box('hyein', 'Z06-HYEIN-PORCH-ROOF-2', 'canopy', hRc(-2.6, 2.6, 0, 2.8), 157.7, 158.6, '붉은 기와 모임지붕 윗단', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-ROOF-1', material='roof_red')
 stairs('hyein', 'Z06-HYEIN-PORCH-STAIR', hP(-11.1, 1.6), hP(-3.6, 1.6), 2.6, 26, 149.0, 153.1, '혜인관 현관 오른쪽 계단(운동장에서 볼 때): 벽을 따라 현관 쪽으로 올라 1층 바닥에 닿는다. 26단 = 4.1 m ÷ 0.158, 디딤 0.29 m, 폭 2.6 m(사진 눈대중)', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0')
-for j in range(4):
-    a, b = -11.1 + 7.5 * j / 4, -11.1 + 7.5 * (j + 1) / 4
-    box('hyein', f'Z06-HYEIN-PORCH-STAIR-RAIL{j + 1}', 'wall', hRc(a, b, 2.9, 3.1), 148.7, 149.0 + 4.1 * (j + 1) / 4 + 0.9, '계단 운동장 쪽 돌 난간벽(네 마디로 줄임)', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='white_stone')
+for j in range(8):
+    a, b = -11.1 + 7.5 * j / 8, -11.1 + 7.5 * (j + 1) / 8
+    box('hyein', f'Z06-HYEIN-PORCH-STAIR-RAIL{j + 1}', 'wall', hRc(a, b, 2.9, 3.1), 148.7, 149.0 + 4.1 * (j + 1) / 8 + 0.9, '계단 운동장 쪽 돌 난간벽(여덟 마디로 줄임)', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='white_stone')
 
 # ---- 서문: 사진처럼 넓은 문 세 칸(차량 두 칸 3.8·3.4 m + 좁은 칸 2.0 m), 그 위는 글자가 있는 돌 옹벽 면. Z05 는 2.9 m 두 칸이라 좁았다 ----
 _w0 = np.array([wx(557399.5), 557399.5]); wR, wP = frame(_w0, WDIR, (-1.0, -0.1375))   # s = 옹벽 면을 따라 북으로, d = 공도 쪽
