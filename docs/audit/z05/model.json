@@ -25,7 +25,7 @@
  "vsSmap1m": {
   "points": 28857,
   "p50abs": 0.44,
-  "p90abs": 6.0
+  "p90abs": 6.01
  },
  "zones": {
   "turnaround": {
@@ -347,7 +347,7 @@
      "id": "Z05-PLATFORM-UPPER-HANLIM-1F",
      "what": "한림관 1층 로비 문 앞 단(계단 위)",
      "top": 127.2,
-     "area": 87.2,
+     "area": 89.2,
      "grade": "확정(한림관 1층은 앞 길에서 계단 몇 개 위), S-MAP(126.9~127.5)",
      "material": "paving",
      "terrain": true,
@@ -429,7 +429,7 @@
       125.55,
       127.39
      ],
-     "area": 104.8,
+     "area": 109.6,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -657,13 +657,10 @@
     },
     {
      "id": "Z05-PLATFORM-EUNJU-EUNJU1-NW",
-     "what": "은주1관 북서 모서리 앞(위쪽 갈래에서 건물 쪽으로 오르는 면). 메시 20칸에 맞춘 평면 하나",
-     "top": [
-      126.5,
-      127.82
-     ],
-     "area": 219.9,
-     "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
+     "what": "은주1관 북서 모서리 앞",
+     "top": 127.6,
+     "area": 213.1,
+     "grade": "S-MAP(차도 쪽 높이), 추정(한 높이)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -671,7 +668,10 @@
     {
      "id": "Z05-PLATFORM-EUNJU-EUNJU1-WEST",
      "what": "은주1관 서쪽(위쪽 갈래와 건물 사이 보도·화단 띠, 입구(1) 131.3 m)",
-     "top": 131.8,
+     "top": [
+      131.8,
+      128.2
+     ],
      "area": 314.5,
      "grade": "S-MAP(높이), 원천(입구(1) 표지), 추정(외곽)",
      "material": "paving",
@@ -1363,9 +1363,9 @@
    157
   ],
   "Z05-PLATFORM-UPPER-HANLIM-1F": [
-   0.6,
-   1.04,
-   71
+   0.63,
+   1.09,
+   75
   ],
   "Z05-PLATFORM-YUDAM9-FORECOURT-9F": [
    0.3,
@@ -1469,8 +1469,8 @@
   ],
   "Z05-PLATFORM-UPPER-HANLIM-SOUTH": [
    -0.32,
-   2.67,
-   92
+   2.65,
+   95
   ],
   "Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP": [
    5.41,
@@ -1483,13 +1483,13 @@
    245
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-NW": [
-   -1.38,
-   5.58,
-   208
+   -0.79,
+   5.74,
+   201
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-WEST": [
-   0.48,
-   2.43,
+   -0.51,
+   1.9,
    288
   ],
   "Z05-PLATFORM-EUNJU-EUNJU2-ENTRANCE": [

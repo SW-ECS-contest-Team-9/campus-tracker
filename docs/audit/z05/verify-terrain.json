@@ -1,23 +1,23 @@
 {
- "new": "terrain-recipe-db6f273b5da6c35c.f32",
+ "new": "terrain-recipe-dbb97463bfc0a8ab.f32",
  "old": "terrain-recipe-a334b116df79c91e.f32",
  "finished_zones": {
   "g02": {
-   "platform_cells": 554,
+   "platform_cells": 556,
    "changed_vs_z04": 0,
    "max_abs_off_plane_m": 0.2825,
    "cells_off_plane_0.3m_old": 0,
    "cells_off_plane_0.3m_new": 0
   },
   "z02": {
-   "platform_cells": 200,
+   "platform_cells": 207,
    "changed_vs_z04": 0,
    "max_abs_off_plane_m": 0.0,
    "cells_off_plane_0.3m_old": 0,
    "cells_off_plane_0.3m_new": 0
   },
   "z03": {
-   "platform_cells": 597,
+   "platform_cells": 611,
    "changed_vs_z04": 0,
    "max_abs_off_plane_m": 0.0002,
    "cells_off_plane_0.3m_old": 0,
@@ -25,16 +25,16 @@
   }
  },
  "changed": {
-  "cells": 11681,
+  "cells": 11596,
   "building_cells": 0,
-  "in_z05_platforms": 7130,
+  "in_z05_platforms": 6936,
   "in_finished_zone_platforms": 0,
-  "elsewhere": 4551,
+  "elsewhere": 4660,
   "min": -34.68,
   "max": 17.0
  },
- "z05_platform_cells": 7353,
- "z05_max_abs_off_plane_m": 16.8,
+ "z05_platform_cells": 7141,
+ "z05_max_abs_off_plane_m": 8.8461,
  "vs_smap_1m_in_campus": {
   "points": 32137,
   "z04": {
@@ -45,7 +45,7 @@
   "z05": {
    "median": -0.02,
    "p50_abs": 0.14,
-   "p90_abs": 2.3
+   "p90_abs": 2.22
   }
  },
  "vs_smap_1m_outside_sw": {
@@ -55,14 +55,14 @@
    "p90_abs": 3.29
   },
   "z05": {
-   "median": 0.1,
-   "p90_abs": 1.49
+   "median": 0.09,
+   "p90_abs": 1.45
   }
  },
  "user_pins": {
   "n": 84,
   "z04_p90_abs": 1.73,
-  "z05_p90_abs": 1.04,
+  "z05_p90_abs": 0.83,
   "z05_over_1m": [
    {
     "id": "U013",
@@ -101,16 +101,10 @@
     "z05": 127.2
    },
    {
-    "id": "U061",
-    "user_m": 122.6,
-    "z04": 122.12,
-    "z05": 124.91
-   },
-   {
     "id": "U068",
     "user_m": 124.8,
     "z04": 124.6,
-    "z05": 126.09
+    "z05": 126.27
    },
    {
     "id": "U082",
