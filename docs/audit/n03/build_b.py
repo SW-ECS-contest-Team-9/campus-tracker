@@ -3,6 +3,7 @@
   D  본관 5층–한림관 3층 데크를 지하 보행 구간의 높이로 내리고 보행 구간을 데크까지 늘여 잇기(높이 차 없음, 계단 없음: 확정)
   S  정문 ~ 제2주차장 차도 양쪽 인도 두 줄(보행 허용, 선은 추정), 제2주차장 위쪽 차도와 한림관 1층 가는 길의 보행 허용
   C  인도와 차도 갈림 노드를 잇는 횡단(인도가 저장된 뒤의 상태로 만든다)
+  E  유담관 6층 ↔ 9층 임시 승강기 하나(자리표), H  청운관 좌우 계단과 1층 현관
   structures  frontend/public/structures/n03b-sidewalks.geojson (인도 띠 = 얇은 포장 상자, 지형에는 싣지 않는다)
 인도 자리: 차도 가운데 선에서 양쪽 4.25 m (Z03 판독: 차도 약 7 m + 보도 약 1.5 m), 폭 1.5 m. 높이는 그 자리 차도 종단(V02)과 같다."""
 import sys, json, math, pathlib
@@ -87,6 +88,8 @@ def group_C():
         n = node_at(xy, None, 1.0)
         ops.append(road(f'횡단 {what}', 'pedestrian', f'차도 횡단: {what} (서쪽 인도 ~ 차도 ~ 동쪽 인도. 횡단보도 표시가 있는지는 모름)', 'crossing',
                         [at_road(piece('서쪽', xy), xy), at_node(n), at_road(piece('동쪽', xy), xy)], '추정(양쪽 인도를 오가는 자리)', EV_SW + '. 횡단 자리는 갈림 노드에 둔 추정', widthM=3))
+    import os
+    if os.environ.get('N03B_ONE'): ops = [ops[int(os.environ['N03B_ONE'])]]   # 횡단 하나가 인도를 나누면 다음 횡단이 가리킬 조각 id 가 바뀌므로 하나씩 만든다
     return {'id': 'C', 'zone': '밖', 'comment': '인도와 차도 갈림 노드를 잇는 횡단 셋', 'ops': ops}
 
 def structures():
@@ -116,6 +119,21 @@ def group_E():
              [pt(*nxy(lobby), z9), at_node(hall)], '추정(임시 연결선)', ev + '. 9층 높이는 이미 있는 9층 홀 노드(129.6 m, 노트의 9층 128.4~129.6)를 그대로 씀', buildingId='유담관'),
     ]
     return {'id': 'E', 'zone': '안', 'comment': '유담관 6층 ↔ 9층 임시 승강기 하나와 9층 홀까지의 임시 연결선', 'ops': ops}
+
+def group_H():
+    """청운관(사용자 확정 2026-10-11, Z05 노트): 운동장 높이 문은 지하 1층, 1층 로비 문은 열린 기둥부의 좌우 계단이 만나는 한 층 위 현관(153.1 m 추정). 계단 자리는 구조물 파일 z05-cheongun."""
+    e = ENT['청운관 입구(1층, 현관 위)']; ops = []; F = json.loads((REPO / 'frontend/public/structures/z05-cheongun.geojson').read_text(encoding='utf-8'))['features']
+    def centre(i):
+        g = next(f for f in F if f['properties']['id'] == i)['geometry']['coordinates'][0][:-1]; return [sum(q[0] for q in g) / len(g), sum(q[1] for q in g) / len(g)]
+    top = centre('Z05-CHEONGUN-PORCH-LANDING'); ev = '사용자 확정 2026-10-11(청운관 노트): 좌우 계단은 한 층 위 1층 로비 앞 현관에서 만난다. 계단 자리·단 수는 구조물 파일 z05-cheongun(사진 16·23, 추정), 현관 높이 153.1 m 는 S-MAP'
+    old = road_by('청운관 1층 입구(학교 표지) ~ 운동장')
+    ops.append(op('청운관 운동장 쪽 문 이름', 'update_road', {'id': old['id'], 'expectedRevision': old['revision'], 'attrs': {'name': '청운관 운동장 쪽 문(지하 1층, 148.9 m) ~ 운동장 (열린 기둥부 아래. 문 자리는 모름, 학교 표지 자리에 둠)'}},
+                  '확정(운동장 높이 문 = 지하 1층), 측정(148.9), 문 자리는 추정', '사용자 확정 2026-10-11. N03 에서는 이 문을 1층으로 잘못 적었다'))
+    ops.append(road('청운관 1층 현관', 'pedestrian', '청운관 1층 현관 (좌우 계단 위 참 ~ 1층 로비 문, 153.1 m 추정. 문 자리는 학교 표지)', 'ordinary', [pt(*top, e['z']), pt(*e['xy'], e['z'])], '확정(계단 위 현관), 높이·자리는 추정', ev, widthM=3))
+    for tag, side in (('L', '왼쪽(서)'), ('R', '오른쪽(동)')):
+        foot = centre(f'Z05-CHEONGUN-PORCH-STAIR-{tag}-S01'); a = pt(*(foot if NET._on([FRING], foot) else into_field(foot, 0.6)), FZ)
+        ops.append(road(f'청운관 {side} 계단', 'pedestrian', f'청운관 열린 기둥부 {side} 계단 (운동장 148.9 → 1층 현관 153.1 m, 26단 추정)', 'stairs', [a, pt(*top, e['z'])], '확정(좌우 계단이 현관에서 만남), 자리·단 수는 추정', ev, widthM=2))
+    return {'id': 'H', 'zone': '안', 'comment': '청운관: 운동장 높이 문은 지하 1층으로 고쳐 적고, 좌우 계단과 1층 현관 문을 잇기', 'ops': ops}
 
 if __name__ == '__main__':
     what = sys.argv[3]

@@ -1,0 +1,111 @@
+{
+ "id": "bG",
+ "zone": "밖",
+ "comment": "보행 허용인 길의 보행 방향을 양쪽으로",
+ "ops": [
+  {
+   "ref": "보행 방향 양쪽 4ee99835 C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "4ee99835-2ccb-424c-9415-8370f290156d",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 b17424ba C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "b17424ba-23eb-427f-b651-ba390b405e7f",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 192703b3 P1 주차장 차로 (본관 남서 모서리, 표지",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "192703b3-1c53-4602-8435-bba8533e93e8",
+    "expectedRevision": 8,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 bf2acf00 C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "bf2acf00-c9eb-47d9-90d0-157496599d62",
+    "expectedRevision": 3,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 07615440 본관 서쪽 회차 공간 내리막 (P1 분기 ~",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "07615440-e6c0-4f7b-9a01-982ea7a4af68",
+    "expectedRevision": 6,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 67e234b5 본관 서쪽 회차 공간 내리막 (P1 분기 ~",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "67e234b5-f38c-4400-b046-975d0125ebc6",
+    "expectedRevision": 8,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 9481b33d 본관·한림관 사이 지선 ~ 은주관 서쪽 윗길",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "9481b33d-489d-4cc2-94e9-ebebbaea14a4",
+    "expectedRevision": 1,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "보행 방향 양쪽 fc8528d9 본관·한림관 사이 지선 ~ 은주관 서쪽 윗길",
+   "op": "update_road",
+   "grade": "확정(자유 보행·걷는 길)",
+   "evidence": "보행 허용으로 바꾼 공용 길의 보행 방향이 \"모름\"으로 남아 서버 도달 검사가 막혔다. 일방통행 없음(사용자 확정 2026-10-10)",
+   "args": {
+    "id": "fc8528d9-8db3-445c-bcc7-81f641432010",
+    "expectedRevision": 1,
+    "attrs": {
+     "pedestrianDirection": "both"
+    }
+   }
+  }
+ ]
+}
