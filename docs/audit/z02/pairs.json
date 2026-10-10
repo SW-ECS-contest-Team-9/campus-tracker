@@ -1,0 +1,104 @@
+{
+ "note": "Z02 도달 검사 쌍. point 는 가장 가까운 노드(평면, snapRadiusM 안)로 붙는다.",
+ "pairs": [
+  {
+   "id": "daeil1F>field",
+   "label": "대일관 현관 문(1층) → 혜인관 B1 문 안(운동장을 건넘)",
+   "from": {
+    "point": [
+     201157.64,
+     557311.69
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  },
+  {
+   "id": "daeil1F>sangseung",
+   "label": "대일관 현관 문(1층) → 상승관 입구(추정 위치)",
+   "from": {
+    "point": [
+     201157.64,
+     557311.69
+    ]
+   },
+   "to": {
+    "point": [
+     201217.6,
+     557306.4
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  },
+  {
+   "id": "sangseung>field",
+   "label": "상승관 입구(추정 위치) → 혜인관 B1 문 안(운동장을 건넘)",
+   "from": {
+    "point": [
+     201217.6,
+     557306.4
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  },
+  {
+   "id": "daeil1F>munye3F",
+   "label": "대일관 현관 문(1층) → 문예관 쪽 계단 아래(문예관 3층 로비로 가는 길)",
+   "from": {
+    "point": [
+     201157.64,
+     557311.69
+    ]
+   },
+   "to": {
+    "point": [
+     201115.7,
+     557329.2
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  },
+  {
+   "id": "daeil1F>hanlim6F",
+   "label": "대일관 현관 문(1층) → 한림관 6층 쪽 계단 아래",
+   "from": {
+    "point": [
+     201157.64,
+     557311.69
+    ]
+   },
+   "to": {
+    "point": [
+     201140.0,
+     557304.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  },
+  {
+   "id": "deck>field",
+   "label": "높은 가장자리 길 서쪽 끝 → 혜인관 B1 문 안(운동장을 건넘)",
+   "from": {
+    "point": [
+     201164.61,
+     557309.39
+    ]
+   },
+   "to": {
+    "nodeId": "435187c0-ea06-454e-86e5-8796e094b28a"
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  }
+ ]
+}

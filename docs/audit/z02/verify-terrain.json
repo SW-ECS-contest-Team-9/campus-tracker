@@ -1,0 +1,149 @@
+{
+ "changedCells": 363,
+ "changedBuildingCells": 0,
+ "platforms": {
+  "Z02-PLATFORM-FIELD": {
+   "topM": 148.9,
+   "cells": 2116,
+   "before_min_med_max": [
+    148.18,
+    148.9,
+    148.9
+   ],
+   "after_min_max": [
+    148.81,
+    148.9
+   ],
+   "after_max_abs_dev": 0.087
+  },
+  "Z02-PLATFORM-APRON": {
+   "topM": 148.9,
+   "cells": 133,
+   "before_min_med_max": [
+    142.82,
+    148.9,
+    150.69
+   ],
+   "after_min_max": [
+    148.9,
+    148.9
+   ],
+   "after_max_abs_dev": 0.0
+  },
+  "Z02-PLATFORM-ENTRANCE": {
+   "topM": 151.0,
+   "cells": 19,
+   "before_min_med_max": [
+    147.5,
+    148.9,
+    149.94
+   ],
+   "after_min_max": [
+    151.0,
+    151.0
+   ],
+   "after_max_abs_dev": 0.0
+  },
+  "Z02-PLATFORM-PASSAGE": {
+   "topM": 151.25,
+   "cells": 26,
+   "before_min_med_max": [
+    148.9,
+    151.08,
+    151.74
+   ],
+   "after_min_max": [
+    151.25,
+    151.25
+   ],
+   "after_max_abs_dev": 0.0
+  },
+  "Z02-PLATFORM-PLAZA": {
+   "topM": 151.0,
+   "cells": 6,
+   "before_min_med_max": [
+    144.26,
+    148.73,
+    148.97
+   ],
+   "after_min_max": [
+    151.0,
+    151.0
+   ],
+   "after_max_abs_dev": 0.0
+  },
+  "Z02-PLATFORM-YARD": {
+   "topM": 153.1,
+   "cells": 26,
+   "before_min_med_max": [
+    141.49,
+    141.52,
+    145.73
+   ],
+   "after_min_max": [
+    153.1,
+    153.1
+   ],
+   "after_max_abs_dev": 0.0
+  }
+ },
+ "frontZone": {
+  "cells": 210,
+  "belowTopBy0.3_before": 68,
+  "belowTopBy0.3_after": 0,
+  "deepestBefore_m": 11.61,
+  "deepestAfter_m": 0.0
+ },
+ "bilinearNearFrontWall": {
+  "wall+0.5m": {
+   "before_min_med": [
+    142.69,
+    150.67
+   ],
+   "after_min_med": [
+    146.39,
+    151.26
+   ]
+  },
+  "wall+1.5m": {
+   "before_min_med": [
+    143.58,
+    150.07
+   ],
+   "after_min_med": [
+    148.83,
+    150.99
+   ]
+  },
+  "wall+3.0m": {
+   "before_min_med": [
+    147.66,
+    148.91
+   ],
+   "after_min_med": [
+    148.79,
+    149.63
+   ]
+  }
+ },
+ "smapAt": {
+  "entrance": [
+   NaN
+  ],
+  "passage": [
+   151.36,
+   151.7,
+   151.5,
+   151.2,
+   151.4,
+   151.4,
+   151.1
+  ],
+  "plaza": [
+   150.9
+  ],
+  "yard": [
+   153.1
+  ]
+ }
+}
