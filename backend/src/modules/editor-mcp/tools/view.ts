@@ -13,6 +13,7 @@ import { editorQueries, roadLength, type NetworkNode, type NetworkRoad } from '.
 import { round2, roundXYZ, simplifyIndices } from '../geometry.js';
 import { renderMapSvg } from '../map-render.js';
 import { SCOPE_READ, defineTool, type AgentContext } from '../mcp.context.js';
+import { areaLinks } from '../area-links.js';
 import { checkReachability } from '../reachability.js';
 import { terrainContext } from '../terrain-access.js';
 
@@ -107,7 +108,8 @@ const checkReachabilityTool = defineTool({
   title: 'Is B reachable from A',
   description: 'Network check, not a route planner: can you get from one place to another along the drawn roads on foot, by vehicle or by wheelchair? '
     + 'Returns the connecting roads and length, or how far the search got and which roads block it. Access "unknown"/"restricted" counts as not passable '
-    + 'unless assumeUnknownAllowed is set. Start and end snap to the nearest network node.',
+    + 'unless assumeUnknownAllowed is set. Start and end snap to the nearest network node. Open areas count as walkable space: nodes standing on an '
+    + 'area at its floor height are joined across it (roadId "area:<areaId>:<node>:<node>", pedestrians only).',
   input: z.object({
     from: Where, to: Where,
     mode: z.enum(['pedestrian', 'vehicle', 'wheelchair']).default('pedestrian'),
@@ -117,7 +119,7 @@ const checkReachabilityTool = defineTool({
   scope: SCOPE_READ,
   annotations: { readOnlyHint: true, idempotentHint: true },
   async run(a) {
-    const [roads, nodes] = await Promise.all([editorQueries.roads(), editorQueries.nodes()]);
+    const [roads, nodes, areas] = await Promise.all([editorQueries.roads(), editorQueries.nodes(), editorQueries.areas()]);
     const used = new Set(roads.flatMap((r) => [r.fromNodeId, r.toNodeId]));
     const end = async (where: z.infer<typeof Where>, name: string) => {
       if (where.nodeId) { if (!used.has(where.nodeId)) throw AppError.badRequest('NODE_UNUSED', `${name}: no active road uses that node`); return { nodeId: where.nodeId, snapDistanceM: 0 }; }
@@ -128,7 +130,7 @@ const checkReachabilityTool = defineTool({
       return { nodeId: hit.node.id, snapDistanceM: round2(hit.d) };
     };
     const [from, to] = [await end(a.from, 'from'), await end(a.to, 'to')];
-    const graph = roads.map((r: NetworkRoad) => ({ ...r, lengthM: roadLength(r) }));
+    const graph = [...roads.map((r: NetworkRoad) => ({ ...r, lengthM: roadLength(r) })), ...areaLinks(areas, nodes)];
     const result = checkReachability(graph, nodes, from.nodeId, to.nodeId, a.mode, a.assumeUnknownAllowed);
     if (result.reachable) return { mode: a.mode, from, to, reachable: true, lengthM: round2(result.lengthM), roads: result.roads.map((r) => ({ ...r, lengthM: round2(r.lengthM) })) };
     return { mode: a.mode, from, to, ...result, closestReached: result.closestReached && { ...result.closestReached, distanceM: round2(result.closestReached.distanceM) } };

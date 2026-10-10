@@ -1,0 +1,715 @@
+{
+ "title": "E10 운동장을 면으로",
+ "applied": false,
+ "inputs": {
+  "snapshot": "claude-live/roads-live-2.json (128) / nodes-live-2.json (118) / mobility-live.json",
+  "openAreasToday": 0,
+  "polygonSource": "frontend/public/corrections/field-surfaces-v3.geojson SF-FIELD",
+  "floorM": 148.9
+ },
+ "polygon": {
+  "vertices": 45,
+  "areaM2": 8012,
+  "sourceCellVertices": 178,
+  "sourceCellAreaM2": 7968,
+  "simplifyToleranceM": 2,
+  "photo15AreaM2": 7749,
+  "sides": {
+   "서": {
+    "boundaryM": 82,
+    "vsPhoto15_medianM": 1.6,
+    "vsPhoto15_p90M": 3,
+    "vsPhoto15_maxM": 3.8,
+    "vsCells_maxM": 1.4
+   },
+   "북": {
+    "boundaryM": 117,
+    "vsPhoto15_medianM": 2.4,
+    "vsPhoto15_p90M": 4.1,
+    "vsPhoto15_maxM": 6.4,
+    "vsCells_maxM": 1.3
+   },
+   "동": {
+    "boundaryM": 93,
+    "vsPhoto15_medianM": 2.8,
+    "vsPhoto15_p90M": 5.4,
+    "vsPhoto15_maxM": 6.2,
+    "vsCells_maxM": 1.3
+   },
+   "남": {
+    "boundaryM": 114,
+    "vsPhoto15_medianM": 1.1,
+    "vsPhoto15_p90M": 2.4,
+    "vsPhoto15_maxM": 3.6,
+    "vsCells_maxM": 2
+   }
+  },
+  "overlapWithBuildingOutlinesM2": [
+   {
+    "name": "은주관",
+    "m2": 4
+   },
+   {
+    "name": "청운관",
+    "m2": 4
+   }
+  ],
+  "terrainMinusFloor": {
+   "old": {
+    "minM": -8.91,
+    "p05M": -8.64,
+    "medianM": -7.19,
+    "p95M": 1.36,
+    "maxM": 1.86,
+    "areaAboveFloorBy5cm_pct": 20,
+    "areaAboveFloorBy15cm_pct": 19.9,
+    "areaBelowFloorBy50cm_pct": 79.5
+   },
+   "fieldCandidateT01": {
+    "minM": -2.54,
+    "p05M": -0.39,
+    "medianM": 0.02,
+    "p95M": 0.46,
+    "maxM": 1.69,
+    "areaAboveFloorBy5cm_pct": 16.8,
+    "areaAboveFloorBy15cm_pct": 8.2,
+    "areaBelowFloorBy50cm_pct": 4.2
+   }
+  }
+ },
+ "access": [
+  {
+   "id": "AP-DAEIL-FRONT",
+   "name": "대일관 현관 앞 계단 아래 (= 사잇길 쪽 길 45682ee7이 닿는 곳)",
+   "xy": [
+    201157.33,
+    557301.3
+   ],
+   "node": "561a12b4",
+   "leadsTo": "계단 13단쯤 → 대일관 1층 로비(151.0 m 추정). 서쪽 길 45682ee7 → 사잇길",
+   "grade": "위치 추정(운영 노드 자리, 길 이름에 \"추정\") / 높이 측정(E06, E07의 이동값 148.958)",
+   "note": "운영 노드 재사용. 저장 높이 141.73 m라 D04(지형+도로 이동) 뒤에만 접근점이 된다. 학교 표지 대일관 입구(1) (201155.2, 557310.0)에서 8.9 m 남쪽",
+   "placed": true,
+   "insideArea": true,
+   "distanceToBoundaryM": 2.4,
+   "side": "북",
+   "accessXY": [
+    201157.33,
+    557301.3
+   ],
+   "terrainOldM": 141.97,
+   "terrainFieldCandidateM": 148.92
+  },
+  {
+   "id": "AP-DAEIL-EAST-STAIR",
+   "name": "대일관 화단 벽 동쪽 끝 계단 아래 (2차 주석 A2)",
+   "xy": [
+    201207.5,
+    557288.4
+   ],
+   "leadsTo": "높은 띠(151.1 m, S-MAP) → 대일관 입구(2) 1층 복도 151.7 m, 상승관 입구 150.9 m",
+   "grade": "추정(±8 m): 2차 주석 ST-A2 평면의 아래 끝. 사진의 \"오른쪽 끝 계단\"과 같은 계단인지는 추정",
+   "note": "운영 노드 없음. 상승관은 운동장에 바로 열리지 않고 이 계단 위 띠에 있다(높이 150.9 m, S-MAP)",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 1.5,
+   "side": "북",
+   "accessXY": [
+    201207,
+    557287
+   ],
+   "terrainOldM": 141.56,
+   "terrainFieldCandidateM": 148.92
+  },
+  {
+   "id": "AP-CHEONGUN-1F",
+   "name": "청운관 1층 입구",
+   "xy": [
+    201216.5,
+    557279.8
+   ],
+   "leadsTo": "청운관 1층(148.9 m)",
+   "grade": "원천(학교 표지: 위치·층) / 측정(높이). 문의 정확한 자리는 모름(현장 요청 F5 ①)",
+   "note": "운영 노드 없음. 가까운 62a3ac5d(150.8 m)는 높이가 달라 같은 점으로 보지 않는다",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 1.4,
+   "side": "동",
+   "accessXY": [
+    201215.88,
+    557278.56
+   ],
+   "terrainOldM": 145.95,
+   "terrainFieldCandidateM": 149.7
+  },
+  {
+   "id": "AP-CHEONGUN-A5",
+   "name": "청운관에서 내려오는 계단 아래 (2차 주석 A5)",
+   "xy": null,
+   "leadsTo": "청운관 쪽 위",
+   "grade": "모름: 후보 (201231.4, 557271.4)~(201234, 557264) ±8 m, 어느 끝이 운동장 바닥인지 모름(F5 ②)",
+   "note": "좌표를 정하지 않았다",
+   "placed": false
+  },
+  {
+   "id": "AP-HYEIN-B1",
+   "name": "혜인관 입구(1): 운동장 높이 문 = B1, 오른쪽 계단 위가 1층 로비",
+   "xy": [
+    201218.7,
+    557213.7
+   ],
+   "leadsTo": "혜인관 B1(149.3 m, S-MAP) → 계단 → 1층 로비(153.4 m 추정)",
+   "grade": "원천(학교 표지: 위치) / 확정(사용자: 운동장 높이 문 = B1) / S-MAP(높이)",
+   "note": "운영 길 3910b4a5가 5.0 m 서쪽 (201213.72, 557213.9)을 지나 B1 노드 435187c0(150.26 m)로 간다. 그 꼭짓점에서 길을 자르면 생기는 노드를 접근점으로 쓴다(제안)",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 2.6,
+   "side": "동",
+   "accessXY": [
+    201217.27,
+    557215.85
+   ],
+   "terrainOldM": 149.48,
+   "terrainFieldCandidateM": 148.85
+  },
+  {
+   "id": "AP-HYEIN-B1-2",
+   "name": "혜인관 입구(2) B1층",
+   "xy": [
+    201247.7,
+    557255.8
+   ],
+   "leadsTo": "혜인관 B1(149.6 m, S-MAP)",
+   "grade": "원천(학교 표지: 위치·층) / S-MAP(높이)",
+   "note": "운영 노드 없음",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 7.5,
+   "side": "동",
+   "accessXY": [
+    201240.34,
+    557257.03
+   ],
+   "terrainOldM": 150.56,
+   "terrainFieldCandidateM": 148.94
+  },
+  {
+   "id": "AP-EUNJU1-5F",
+   "name": "은주1관 입구(2) 5층",
+   "xy": [
+    201135.8,
+    557250.2
+   ],
+   "leadsTo": "은주1관 5층(148.9 m)",
+   "grade": "원천(학교 표지: 위치·층) / 확정(사용자: 운동장에서 바로 들어가는 문 = 5층) / 측정(높이)",
+   "note": "운영 노드 없음. 은주관 실내 길 0개",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 0.5,
+   "side": "서",
+   "accessXY": [
+    201136.09,
+    557249.82
+   ],
+   "terrainOldM": 141.8,
+   "terrainFieldCandidateM": 148.93
+  },
+  {
+   "id": "AP-EUNJU2-5F",
+   "name": "은주2관 입구(2) 5층",
+   "xy": [
+    201201.8,
+    557168.3
+   ],
+   "leadsTo": "은주2관 5층(148.9 m)",
+   "grade": "원천(학교 표지: 위치·층) / 확정(사용자) / 측정(높이)",
+   "note": "운영 노드 없음",
+   "placed": true,
+   "insideArea": false,
+   "distanceToBoundaryM": 8.2,
+   "side": "남",
+   "accessXY": [
+    201197,
+    557175
+   ],
+   "terrainOldM": 142.03,
+   "terrainFieldCandidateM": 148.94
+  },
+  {
+   "id": "AP-HANLIM-6F",
+   "name": "한림관 6층에서 올라오는 계단 6칸쯤의 위 끝",
+   "xy": null,
+   "leadsTo": "한림관 6층(147.9 m, 운동장보다 약 1 m 아래)",
+   "grade": "확정(사용자: 계단 6칸쯤을 올라와 운동장 높이 길) / 위치 모름",
+   "note": "좌표 자료 없음. 운동장 면의 변이 아니라 \"운동장 높이 길\"에 닿는다고만 알려져 있다",
+   "placed": false
+  }
+ ],
+ "nodesOnField": [
+  {
+   "id": "435187c0",
+   "z": 150.26,
+   "offFloorM": 1.36,
+   "accessToday": false,
+   "roads": [
+    "4ee99835",
+    "89ce1806",
+    "fa7d28d0",
+    "3910b4a5"
+   ]
+  },
+  {
+   "id": "561a12b4",
+   "z": 141.73,
+   "offFloorM": -7.17,
+   "accessToday": false,
+   "roads": [
+    "3910b4a5",
+    "45682ee7",
+    "88ba01e6"
+   ]
+  },
+  {
+   "id": "62a3ac5d",
+   "z": 150.8,
+   "offFloorM": 1.9,
+   "accessToday": false,
+   "roads": [
+    "02d30f2b"
+   ]
+  },
+  {
+   "id": "6532adf0",
+   "z": 150.84,
+   "offFloorM": 1.94,
+   "accessToday": false,
+   "roads": [
+    "20277429",
+    "5544cab2"
+   ]
+  },
+  {
+   "id": "70261794",
+   "z": 146.33,
+   "offFloorM": -2.57,
+   "accessToday": false,
+   "roads": [
+    "a789c985",
+    "b17424ba"
+   ]
+  },
+  {
+   "id": "79988154",
+   "z": 146.94,
+   "offFloorM": -1.96,
+   "accessToday": false,
+   "roads": [
+    "5aea9b42",
+    "a789c985"
+   ]
+  },
+  {
+   "id": "9fb1fd71",
+   "z": 150.66,
+   "offFloorM": 1.76,
+   "accessToday": false,
+   "roads": [
+    "02d30f2b",
+    "4ee99835",
+    "b17424ba"
+   ]
+  },
+  {
+   "id": "ba1296cf",
+   "z": 154.25,
+   "offFloorM": 5.35,
+   "accessToday": false,
+   "roads": [
+    "0d88669d",
+    "20277429"
+   ]
+  },
+  {
+   "id": "db8b4e68",
+   "z": 150.83,
+   "offFloorM": 1.93,
+   "accessToday": false,
+   "roads": [
+    "5544cab2",
+    "89ce1806"
+   ]
+  }
+ ],
+ "roadsOnField": [
+  {
+   "id": "20277429",
+   "name": "혜인관 1층-B1 계단 (추정)",
+   "structure": "stairs",
+   "buildingId": "건물5",
+   "updatedBy": "C01",
+   "vertices": 4,
+   "verticesInside": 3,
+   "lengthM": 8.2,
+   "zMinM": 150.84,
+   "zMaxM": 154.25,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "5aea9b42",
+   "name": "혜인관 B1-지하주차장 계단 (추정)",
+   "structure": "stairs",
+   "buildingId": "건물5",
+   "updatedBy": "C01",
+   "vertices": 4,
+   "verticesInside": 2,
+   "lengthM": 12.8,
+   "zMinM": 146.94,
+   "zMaxM": 150.71,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "5544cab2",
+   "name": "혜인관 B1 통로 (추정)",
+   "structure": "indoor_corridor",
+   "buildingId": "건물5",
+   "updatedBy": "C01",
+   "vertices": 2,
+   "verticesInside": 2,
+   "lengthM": 3.2,
+   "zMinM": 150.83,
+   "zMaxM": 150.84,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "02d30f2b",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 4,
+   "verticesInside": 4,
+   "lengthM": 17.1,
+   "zMinM": 150.66,
+   "zMaxM": 150.8,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "4ee99835",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 4,
+   "verticesInside": 3,
+   "lengthM": 52.6,
+   "zMinM": 149.73,
+   "zMaxM": 150.66,
+   "pedestrianAccess": "unknown",
+   "revision": 1
+  },
+  {
+   "id": "89ce1806",
+   "name": "혜인관 B1 통로 (추정)",
+   "structure": "indoor_corridor",
+   "buildingId": "건물5",
+   "updatedBy": "C02",
+   "vertices": 2,
+   "verticesInside": 1,
+   "lengthM": 2.6,
+   "zMinM": 150.26,
+   "zMaxM": 150.83,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "a789c985",
+   "name": "지하주차장 통로 (추정)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 5,
+   "verticesInside": 5,
+   "lengthM": 52.2,
+   "zMinM": 146.33,
+   "zMaxM": 146.94,
+   "pedestrianAccess": "prohibited",
+   "revision": 1
+  },
+  {
+   "id": "b17424ba",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 4,
+   "verticesInside": 4,
+   "lengthM": 4.6,
+   "zMinM": 145.83,
+   "zMaxM": 150.66,
+   "pedestrianAccess": "unknown",
+   "revision": 1
+  },
+  {
+   "id": "3910b4a5",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 13,
+   "verticesInside": 12,
+   "lengthM": 148.9,
+   "zMinM": 140,
+   "zMaxM": 150.26,
+   "pedestrianAccess": "unknown",
+   "revision": 1
+  },
+  {
+   "id": "45682ee7",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "structure": "ordinary",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 2,
+   "verticesInside": 1,
+   "lengthM": 20,
+   "zMinM": 141.73,
+   "zMaxM": 141.73,
+   "pedestrianAccess": "allowed",
+   "revision": 1
+  },
+  {
+   "id": "88ba01e6",
+   "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+   "structure": "stairs",
+   "buildingId": null,
+   "updatedBy": "C02",
+   "vertices": 2,
+   "verticesInside": 1,
+   "lengthM": 8.7,
+   "zMinM": 141.73,
+   "zMaxM": 145.8,
+   "pedestrianAccess": "unknown",
+   "revision": 1
+  }
+ ],
+ "routing": {
+  "pair": "561a12b4(대일관 현관 앞 계단 아래) → 435187c0(혜인관 B1 통로 노드)",
+  "today": {
+   "strict": {
+    "reachable": false
+   },
+   "unknownAllowed": {
+    "lengthM": 148.9,
+    "via": [
+     "3910b4a5"
+    ]
+   }
+  },
+  "areaLinksWithTodayHeights": 0,
+  "areaLinksAfterD04Only": 0,
+  "afterD04AndSplit": {
+   "newNode": {
+    "id": "E10-X-hyein-door",
+    "kind": "junction",
+    "levelId": null,
+    "coordinate": [
+     201213.72,
+     557213.9,
+     149.25
+    ]
+   },
+   "lineOnly": {
+    "strict": {
+     "reachable": false
+    },
+    "unknownAllowed": {
+     "lengthM": 148.9,
+     "via": [
+      "3910b4a5",
+      "3910b4a5"
+     ]
+    }
+   },
+   "withArea": {
+    "strict": {
+     "reachable": false
+    },
+    "unknownAllowed": {
+     "lengthM": 123.5,
+     "via": [
+      "면(104 m)",
+      "3910b4a5"
+     ]
+    }
+   },
+   "withAreaAndFieldPieceRetired": {
+    "strict": {
+     "reachable": false
+    },
+    "unknownAllowed": {
+     "lengthM": 123.5,
+     "via": [
+      "면(104 m)",
+      "3910b4a5"
+     ]
+    }
+   },
+   "fieldPieceLengthM": 129.4,
+   "areaLinkLengthM": 104,
+   "areaLinkBends": 0
+  },
+  "ifEveryAccessPointWereANode": [
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-DAEIL-EAST-STAIR",
+    "lengthM": 51.8,
+    "straightM": 51.7,
+    "bends": 2
+   },
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-CHEONGUN-1F",
+    "lengthM": 62.8,
+    "straightM": 62.8,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-HYEIN-B1",
+    "lengthM": 104.4,
+    "straightM": 104.4,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-HYEIN-B1-2",
+    "lengthM": 94.1,
+    "straightM": 94.1,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-EUNJU1-5F",
+    "lengthM": 57.1,
+    "straightM": 55.7,
+    "bends": 1
+   },
+   {
+    "from": "AP-DAEIL-FRONT",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 132.4,
+    "straightM": 132.4,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-EAST-STAIR",
+    "to": "AP-CHEONGUN-1F",
+    "lengthM": 12.7,
+    "straightM": 12.3,
+    "bends": 1
+   },
+   {
+    "from": "AP-DAEIL-EAST-STAIR",
+    "to": "AP-HYEIN-B1",
+    "lengthM": 71.9,
+    "straightM": 71.9,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-EAST-STAIR",
+    "to": "AP-HYEIN-B1-2",
+    "lengthM": 45.1,
+    "straightM": 44.8,
+    "bends": 1
+   },
+   {
+    "from": "AP-DAEIL-EAST-STAIR",
+    "to": "AP-EUNJU1-5F",
+    "lengthM": 80.1,
+    "straightM": 80.1,
+    "bends": 0
+   },
+   {
+    "from": "AP-DAEIL-EAST-STAIR",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 112.5,
+    "straightM": 112.4,
+    "bends": 1
+   },
+   {
+    "from": "AP-CHEONGUN-1F",
+    "to": "AP-HYEIN-B1",
+    "lengthM": 62.7,
+    "straightM": 62.7,
+    "bends": 0
+   },
+   {
+    "from": "AP-CHEONGUN-1F",
+    "to": "AP-HYEIN-B1-2",
+    "lengthM": 32.6,
+    "straightM": 32.6,
+    "bends": 0
+   },
+   {
+    "from": "AP-CHEONGUN-1F",
+    "to": "AP-EUNJU1-5F",
+    "lengthM": 84.8,
+    "straightM": 84.8,
+    "bends": 0
+   },
+   {
+    "from": "AP-CHEONGUN-1F",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 105.3,
+    "straightM": 105.3,
+    "bends": 1
+   },
+   {
+    "from": "AP-HYEIN-B1",
+    "to": "AP-HYEIN-B1-2",
+    "lengthM": 47.3,
+    "straightM": 47.2,
+    "bends": 1
+   },
+   {
+    "from": "AP-HYEIN-B1",
+    "to": "AP-EUNJU1-5F",
+    "lengthM": 88,
+    "straightM": 88,
+    "bends": 0
+   },
+   {
+    "from": "AP-HYEIN-B1",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 46.7,
+    "straightM": 45.6,
+    "bends": 3
+   },
+   {
+    "from": "AP-HYEIN-B1-2",
+    "to": "AP-EUNJU1-5F",
+    "lengthM": 104.5,
+    "straightM": 104.5,
+    "bends": 0
+   },
+   {
+    "from": "AP-HYEIN-B1-2",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 93.4,
+    "straightM": 92.8,
+    "bends": 4
+   },
+   {
+    "from": "AP-EUNJU1-5F",
+    "to": "AP-EUNJU2-5F",
+    "lengthM": 96.5,
+    "straightM": 96.5,
+    "bends": 1
+   }
+  ]
+ }
+}

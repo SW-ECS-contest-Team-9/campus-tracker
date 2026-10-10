@@ -3,6 +3,7 @@ import { pool } from '../../config/database.js';
 import { AppError } from '../../common/errors/app-error.js';
 import { projectOnLine, type XYZ } from '../editor/topology.js';
 import { roundXYZ, round2, simplifyIndices } from './geometry.js';
+import type { WalkArea } from './area-links.js';
 
 export interface NetworkRoad {
   id: string; name: string | null; roadClass: string; structure: string;
@@ -74,6 +75,13 @@ export const editorQueries = {
       `SELECT id, kind, level_id "levelId", (ST_AsGeoJSON(geom)::json->'coordinates') coordinate FROM mobility.network_nodes n
         WHERE ${w.sql.replace(ACTIVE, 'true')} AND EXISTS (SELECT 1 FROM mobility.road_segments r WHERE r.${ACTIVE} AND (r.from_node_id = n.id OR r.to_node_id = n.id))
         ORDER BY id`, w.params);
+    return rows;
+  },
+
+  /** Open areas (editor "공간 영역", mobility.open_areas) for the network check: rings in EPSG:5186. */
+  async areas(): Promise<WalkArea[]> {
+    const { rows } = await pool.query<WalkArea>(
+      `SELECT id, name, elevation_m "elevationM", floor, (ST_AsGeoJSON(geom)::json->'coordinates') rings FROM mobility.open_areas ORDER BY id`);
     return rows;
   },
 

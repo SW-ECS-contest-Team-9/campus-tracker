@@ -1,0 +1,208 @@
+{
+ "type": "FeatureCollection",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-DAEIL-FRONT",
+    "name": "대일관 현관 앞 계단 아래 (= 사잇길 쪽 길 45682ee7이 닿는 곳)",
+    "node": "561a12b4",
+    "leadsTo": "계단 13단쯤 → 대일관 1층 로비(151.0 m 추정). 서쪽 길 45682ee7 → 사잇길",
+    "grade": "위치 추정(운영 노드 자리, 길 이름에 \"추정\") / 높이 측정(E06, E07의 이동값 148.958)",
+    "note": "운영 노드 재사용. 저장 높이 141.73 m라 D04(지형+도로 이동) 뒤에만 접근점이 된다. 학교 표지 대일관 입구(1) (201155.2, 557310.0)에서 8.9 m 남쪽",
+    "placed": true,
+    "insideArea": true,
+    "distanceToBoundaryM": 2.4,
+    "side": "북",
+    "terrainOldM": 141.97,
+    "terrainFieldCandidateM": 148.92,
+    "markerXY": [
+     201157.33,
+     557301.3
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201157.33,
+     557301.3
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-DAEIL-EAST-STAIR",
+    "name": "대일관 화단 벽 동쪽 끝 계단 아래 (2차 주석 A2)",
+    "leadsTo": "높은 띠(151.1 m, S-MAP) → 대일관 입구(2) 1층 복도 151.7 m, 상승관 입구 150.9 m",
+    "grade": "추정(±8 m): 2차 주석 ST-A2 평면의 아래 끝. 사진의 \"오른쪽 끝 계단\"과 같은 계단인지는 추정",
+    "note": "운영 노드 없음. 상승관은 운동장에 바로 열리지 않고 이 계단 위 띠에 있다(높이 150.9 m, S-MAP)",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 1.5,
+    "side": "북",
+    "terrainOldM": 141.56,
+    "terrainFieldCandidateM": 148.92,
+    "markerXY": [
+     201207.5,
+     557288.4
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201207,
+     557287
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-CHEONGUN-1F",
+    "name": "청운관 1층 입구",
+    "leadsTo": "청운관 1층(148.9 m)",
+    "grade": "원천(학교 표지: 위치·층) / 측정(높이). 문의 정확한 자리는 모름(현장 요청 F5 ①)",
+    "note": "운영 노드 없음. 가까운 62a3ac5d(150.8 m)는 높이가 달라 같은 점으로 보지 않는다",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 1.4,
+    "side": "동",
+    "terrainOldM": 145.95,
+    "terrainFieldCandidateM": 149.7,
+    "markerXY": [
+     201216.5,
+     557279.8
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201215.88,
+     557278.56
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-HYEIN-B1",
+    "name": "혜인관 입구(1): 운동장 높이 문 = B1, 오른쪽 계단 위가 1층 로비",
+    "leadsTo": "혜인관 B1(149.3 m, S-MAP) → 계단 → 1층 로비(153.4 m 추정)",
+    "grade": "원천(학교 표지: 위치) / 확정(사용자: 운동장 높이 문 = B1) / S-MAP(높이)",
+    "note": "운영 길 3910b4a5가 5.0 m 서쪽 (201213.72, 557213.9)을 지나 B1 노드 435187c0(150.26 m)로 간다. 그 꼭짓점에서 길을 자르면 생기는 노드를 접근점으로 쓴다(제안)",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 2.6,
+    "side": "동",
+    "terrainOldM": 149.48,
+    "terrainFieldCandidateM": 148.85,
+    "markerXY": [
+     201218.7,
+     557213.7
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201217.27,
+     557215.85
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-HYEIN-B1-2",
+    "name": "혜인관 입구(2) B1층",
+    "leadsTo": "혜인관 B1(149.6 m, S-MAP)",
+    "grade": "원천(학교 표지: 위치·층) / S-MAP(높이)",
+    "note": "운영 노드 없음",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 7.5,
+    "side": "동",
+    "terrainOldM": 150.56,
+    "terrainFieldCandidateM": 148.94,
+    "markerXY": [
+     201247.7,
+     557255.8
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201240.34,
+     557257.03
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-EUNJU1-5F",
+    "name": "은주1관 입구(2) 5층",
+    "leadsTo": "은주1관 5층(148.9 m)",
+    "grade": "원천(학교 표지: 위치·층) / 확정(사용자: 운동장에서 바로 들어가는 문 = 5층) / 측정(높이)",
+    "note": "운영 노드 없음. 은주관 실내 길 0개",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 0.5,
+    "side": "서",
+    "terrainOldM": 141.8,
+    "terrainFieldCandidateM": 148.93,
+    "markerXY": [
+     201135.8,
+     557250.2
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201136.09,
+     557249.82
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "AP-EUNJU2-5F",
+    "name": "은주2관 입구(2) 5층",
+    "leadsTo": "은주2관 5층(148.9 m)",
+    "grade": "원천(학교 표지: 위치·층) / 확정(사용자) / 측정(높이)",
+    "note": "운영 노드 없음",
+    "placed": true,
+    "insideArea": false,
+    "distanceToBoundaryM": 8.2,
+    "side": "남",
+    "terrainOldM": 142.03,
+    "terrainFieldCandidateM": 148.94,
+    "markerXY": [
+     201201.8,
+     557168.3
+    ],
+    "elevationM": 148.9
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201197,
+     557175
+    ]
+   }
+  }
+ ]
+}
