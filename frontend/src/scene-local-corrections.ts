@@ -152,6 +152,7 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
   const extrudes: any[] = [];
   const surfaces: any[] = [];
   const walls: any[] = [];
+  const comparisonLines: any[] = [];
   const outlines = new C.PolylineCollection({ show: false });
   features.forEach((f, i) => {
     const css = estimated ? EST_COLORS[f.type ?? ''] ?? '#fb923c' : f.kind === 'extrude' ? TYPE_COLORS[f.type ?? ''] ?? '#60a5fa' : TYPE_COLORS[f.type ?? ''] ?? PALETTE[i % PALETTE.length];
@@ -169,6 +170,20 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
     }
     for (const poly of f.polygons) {
       if (f.kind === 'line') {
+        if (f.file === 'access-comparison-v1.geojson') {
+          const color = C.Color.fromCssColorString(css);
+          comparisonLines.push(viewer.entities.add({
+            show: false,
+            name: `${f.id} · 비교용·물리 접속 미검증`,
+            polyline: {
+              positions: C.Cartesian3.fromDegreesArrayHeights(poly[0].flat()),
+              width: 3, arcType: C.ArcType.NONE,
+              material: color,
+              depthFailMaterial: new C.PolylineDashMaterialProperty({ color: color.withAlpha(0.65), dashLength: 16 }),
+            },
+          }));
+          continue;
+        }
         outlines.add({ positions: C.Cartesian3.fromDegreesArrayHeights(poly[0].flatMap(([lon, lat, z]) => [lon, lat, z + 0.1])), width: 3, material: C.Material.fromType('Color', { color: C.Color.fromCssColorString(css) }) });
         continue;
       }
@@ -196,5 +211,5 @@ function draw(C: CesiumNS, viewer: any, features: CorrectionFeature[], estimated
     }))
     : null;
   // 보정 면은 불투명: 잘라낸 지형 자리를 면이 덮음(깊이 검사는 그대로)
-  return [add(surfaces, estimated, true), add(extrudes, !estimated, false), add(walls, true, false), viewer.scene.primitives.add(outlines)].filter(Boolean);
+  return [add(surfaces, estimated, true), add(extrudes, !estimated, false), add(walls, true, false), viewer.scene.primitives.add(outlines), ...comparisonLines].filter(Boolean);
 }
