@@ -1,5 +1,5 @@
 {
-  "about": "Roof overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts). Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
+  "about": "Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): \"buildings\" = roof elevation of one building, \"hidden\" = a GeoPackage building that is not drawn, \"parts\" = one footprint drawn as several flat-roofed blocks. Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
   "buildings": [
     {
       "name": "문예관",
@@ -17,6 +17,135 @@
         "notCovered": "base, floor count, the low wing south of the footprint (S-MAP 148.8 m, 48 m2, outside the footprint), roof structures up to 193.5 m, vertical datum of S-MAP (one direct comparison, +0.03 m)",
         "reproduce": "docs/audit/e02/munye_evidence.py -> docs/audit/e02/results.json"
       }
+    }
+  ],
+  "hidden": [
+    {
+      "name": "공연실습소",
+      "reason": "The polygon carrying the register record 53636 (공연실습소) lies on 혜인관 and is not the 공연실습소 building; the real building is elsewhere (user, 2026-10-10). Its location is not in the campus map yet, so nothing is drawn for it.",
+      "evidence": {
+        "source": "user statement 2026-10-10; register AL_D010 record 53636; S-MAP 3D viewer building model, 2 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "user-confirmed fact, supported by source data",
+        "independentSurvey": false,
+        "register": "record 53636 states footprint 570.29 m2, its polygon is 1511.9 m2 and 96 % of it lies on the 혜인관 polygon 42232",
+        "mesh": "364 of 380 grid cells under the polygon are the single S-MAP 혜인관 model (roof median 178.1 m); the 14 cells outside the 혜인관 polygon are open ground (149.1 m). No second volume",
+        "notCovered": "the real 공연실습소 (user-marked cluster south-west of 유담관, outside the campus map footprints); campus_buildings still has this polygon as building id 혜인관",
+        "reproduce": "docs/audit/e05/analyze.py -> docs/audit/e05/results.json (B_공연실습소)"
+      }
+    }
+  ],
+  "parts": [
+    {
+      "name": "은주관",
+      "heightSource": "SMAP_MESH",
+      "evidence": {
+        "source": "S-MAP 3D viewer building model surface picks, 1 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "source data (one provider), not field verified; part boundaries read from the grid (+-0.5 m)",
+        "independentSurvey": false,
+        "footprint": "unchanged: 2896 of 3109 grid cells inside the source footprint are the S-MAP building model, 80 model cells lie outside (max 3.9 m)",
+        "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 1관: 156.8 (p10-p90 155.5-157.8, 919 cells, 99 % within 1.5 m); 2관: 159.7 (p10-p90 158.5-161.0, 935 cells, 97 % within 1.5 m); 2관-낮은단: 146.8 (p10-p90 146.8-155.4, 502 cells, 86 % within 1.5 m); 탑: 162.5 (p10-p90 158.3-162.5, 70 cells, 84 % within 1.5 m); 접합부: 157.6 (p10-p90 152.7-158.6, 275 cells, 64 % within 1.5 m); 접합부-남서날개: 159.2 (p10-p90 157.9-160.4, 42 cells, 93 % within 1.5 m); 동쪽끝-높은부분: 162.0 (p10-p90 162.0-163.0, 65 cells, 88 % within 1.5 m); 동쪽끝-낮은부분: 155.0 (p10-p90 155.0-159.7, 47 cells, 66 % within 1.5 m); 동쪽끝-남쪽날개: 159.0 (p10-p90 157.8-160.4, 41 cells, 95 % within 1.5 m)",
+        "roofForm": "1관: gable in the S-MAP model, eaves 155.3 m, ridge 157.9 m. 2관: one plane rising from 158.3 m (south-west) to 161.3 m at the field edge, beside a 146.8 m flat strip 7 m wide on the south-west side. Tower: 162.5 m flat top, radius 4.8 m, drawn as a 24-gon. Dormers, the antenna mast and roof slopes are not modelled",
+        "replaces": "one block, roof 167.627 m (register height 25.5 m on the server DEM median); that is 5.1-20.8 m above the parts",
+        "notCovered": "ground heights (S-MAP: field side 148.9 m, west of 1관 127-135 m, south-west of 2관 132.1 m; the server DEM has 141-144 m here), bases, floors, vertical datum of S-MAP",
+        "reproduce": "docs/audit/e05/analyze.py + eunju_parts.py -> docs/audit/e05/results.json (A_은주관); this block is written by docs/audit/e05/build_overrides.py"
+      },
+      "parts": [
+        {
+          "id": "1관",
+          "name": "은주1관",
+          "roofM": 156.8,
+          "polygon": [
+            [
+              [201118.53, 557246.9], [201120.46, 557258.18], [201124.53, 557257.51], [201131.69, 557301.74], [201144.04, 557299.78], [201132.45, 557229.52], [201135.29, 557227.04], [201119.84, 557229.54], [201122.3, 557246.32], [201118.53, 557246.9]
+            ]
+          ]
+        },
+        {
+          "id": "2관",
+          "name": "은주2관",
+          "roofM": 159.7,
+          "polygon": [
+            [
+              [201199.01, 557171.44], [201189.76, 557160.88], [201132.96, 557210.62], [201142.12, 557221.08], [201199.01, 557171.44]
+            ]
+          ]
+        },
+        {
+          "id": "2관-낮은단",
+          "name": null,
+          "roofM": 146.8,
+          "polygon": [
+            [
+              [201181.42, 557158.88], [201181.42, 557158.89], [201176.23, 557163.43], [201128.35, 557205.36], [201132.96, 557210.62], [201189.76, 557160.88], [201185.15, 557155.62], [201181.42, 557158.88]
+            ]
+          ]
+        },
+        {
+          "id": "탑",
+          "name": null,
+          "roofM": 162.5,
+          "polygon": [
+            [
+              [201136.34, 557218.96], [201135.86, 557217.8], [201135.09, 557216.81], [201134.1, 557216.04], [201132.94, 557215.56], [201131.7, 557215.4], [201130.46, 557215.56], [201129.3, 557216.04], [201128.31, 557216.81], [201127.54, 557217.8], [201127.06, 557218.96], [201126.9, 557220.2], [201127.06, 557221.44], [201127.54, 557222.6], [201128.31, 557223.59], [201129.3, 557224.36], [201130.46, 557224.84], [201131.7, 557225.0], [201132.94, 557224.84], [201134.1, 557224.36], [201135.09, 557223.59], [201135.86, 557222.6], [201136.34, 557221.44], [201136.5, 557220.2], [201136.34, 557218.96]
+            ]
+          ]
+        },
+        {
+          "id": "접합부",
+          "name": null,
+          "roofM": 157.6,
+          "polygon": [
+            [
+              [201120.69, 557212.07], [201120.96, 557212.44], [201117.73, 557215.21], [201119.84, 557229.54], [201135.29, 557227.04], [201142.12, 557221.08], [201128.35, 557205.36], [201120.69, 557212.07]
+            ],
+            [
+              [201136.34, 557221.44], [201135.86, 557222.6], [201135.09, 557223.59], [201134.1, 557224.36], [201132.94, 557224.84], [201131.7, 557225.0], [201130.46, 557224.84], [201129.3, 557224.36], [201128.31, 557223.59], [201127.54, 557222.6], [201127.06, 557221.44], [201126.9, 557220.2], [201127.06, 557218.96], [201127.54, 557217.8], [201128.31, 557216.81], [201129.3, 557216.04], [201130.46, 557215.56], [201131.7, 557215.4], [201132.94, 557215.56], [201134.1, 557216.04], [201135.09, 557216.81], [201135.86, 557217.8], [201136.34, 557218.96], [201136.5, 557220.2], [201136.34, 557221.44]
+            ]
+          ]
+        },
+        {
+          "id": "접합부-남서날개",
+          "name": null,
+          "roofM": 159.2,
+          "polygon": [
+            [
+              [201126.28, 557201.22], [201118.23, 557208.75], [201120.69, 557212.07], [201176.23, 557163.43], [201129.07, 557204.68], [201126.28, 557201.22]
+            ]
+          ]
+        },
+        {
+          "id": "동쪽끝-높은부분",
+          "name": null,
+          "roofM": 162.0,
+          "polygon": [
+            [
+              [201201.73, 557169.07], [201195.61, 557160.06], [201194.18, 557157.01], [201189.76, 557160.88], [201199.01, 557171.44], [201201.73, 557169.07]
+            ]
+          ]
+        },
+        {
+          "id": "동쪽끝-낮은부분",
+          "name": null,
+          "roofM": 155.0,
+          "polygon": [
+            [
+              [201185.15, 557155.62], [201189.76, 557160.88], [201194.18, 557157.01], [201191.83, 557152.01], [201190.6, 557150.84], [201185.15, 557155.62]
+            ]
+          ]
+        },
+        {
+          "id": "동쪽끝-남쪽날개",
+          "name": null,
+          "roofM": 159.0,
+          "polygon": [
+            [
+              [201178.7, 557155.35], [201181.42, 557158.88], [201190.6, 557150.84], [201188.14, 557148.54], [201178.7, 557155.35]
+            ]
+          ]
+        }
+      ]
     }
   ]
 }

@@ -5,7 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { decodeGpkgGeometry, readGpkgLayer } from '../src/geo/gpkg.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
-import { overrideHeights, parseRoofOverrides, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
+import { overrideHeights, parseRoofOverrides, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, ringArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 /** GeoPackage blob: "GP", version 0, flags (little endian, no envelope), srs 5186, then WKB polygon. */
 function gpkgPolygon(ring: [number, number][]): Uint8Array {
@@ -68,4 +68,46 @@ test('scene version id: unchanged without roof overrides (the live id), differen
   const live = ['26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13', 'seoul5000-2015-ba7fcb19', '28265795d5fb0966', 'RECOMPUTED'] as const;
   assert.equal(sceneVersionId(...live), 'campus3d-ae7db7a7');
   assert.notEqual(sceneVersionId(...live, 'abc'), 'campus3d-ae7db7a7');
+});
+
+test('scene overrides: hidden buildings and split footprints of the stored file match the model; bad entries are refused', () => {
+  const dir = path.resolve(import.meta.dirname, '../data/scene');
+  const doc = JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8'));
+  const all = parseSceneOverrides(doc);
+  const features = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features;
+  const names = features.map((f) => f.properties.name);
+  assert.deepEqual(all.roofs, parseRoofOverrides(doc)); // roof entries read as before
+  assert.ok([...all.hidden, ...all.parts].every((o) => names.includes(o.name) && o.evidence.independentSurvey === false));
+  assert.equal(new Set([...all.roofs, ...all.hidden, ...all.parts].map((o) => o.name)).size, all.roofs.length + all.hidden.length + all.parts.length);
+  for (const o of all.parts) {
+    const g = features.find((f) => f.properties.name === o.name)!.geometry as { type: 'MultiPolygon'; coordinates: [number, number][][][] };
+    const area = g.coordinates.reduce((s, poly) => s + polygonArea(poly), 0);
+    assert.equal(partsAreaProblem(o, area), null); // the parts tile the GeoPackage footprint (within 1 m2)
+    const xs = g.coordinates.flatMap((poly) => poly[0].map((c) => c[0]));
+    const ys = g.coordinates.flatMap((poly) => poly[0].map((c) => c[1]));
+    assert.ok(o.parts.every((p) => p.polygon.flat().every(([x, y]) => x >= Math.min(...xs) - 0.01 && x <= Math.max(...xs) + 0.01 && y >= Math.min(...ys) - 0.01 && y <= Math.max(...ys) + 0.01)));
+    assert.equal(partBuildingId('B', o.parts, 0), 'B'); // references to the building id stay valid
+    assert.equal(new Set(o.parts.map((_, k) => partBuildingId('B', o.parts, k))).size, o.parts.length);
+    assert.ok(o.parts.slice(1).every((p, k) => partBuildingId('B', o.parts, k + 1) === `B#${p.id}`));
+  }
+
+  const evidence = { source: 's', collectedOn: '2026-10-10', level: 'l', independentSurvey: false };
+  const sq = (x: number): [number, number][] => [[x, 0], [x + 10, 0], [x + 10, 10], [x, 10], [x, 0]];
+  const split = { name: 'A', heightSource: 'SMAP_MESH', evidence, parts: [{ id: 'a', name: 'A1', roofM: 20, polygon: [sq(0)] }, { id: 'b', roofM: 30, polygon: [sq(10)] }] };
+  const ok = parseSceneOverrides({ buildings: [], hidden: [{ name: 'H', reason: 'r', evidence }], parts: [split] });
+  assert.equal(ok.hidden[0].name, 'H');
+  assert.deepEqual(ok.parts[0].parts.map((p) => [p.id, p.name, p.roofM]), [['a', 'A1', 20], ['b', null, 30]]);
+  assert.equal(ringArea(sq(0)), 100);
+  assert.equal(polygonArea([sq(0), [[2, 2], [4, 2], [4, 4], [2, 4], [2, 2]]]), 96);
+  assert.equal(partsAreaProblem(ok.parts[0], 200), null);
+  assert.match(partsAreaProblem(ok.parts[0], 230)!, /cover 200.0 m2/);
+  assert.deepEqual(parseSceneOverrides({ buildings: [] }), { roofs: [], hidden: [], parts: [] });
+  assert.throws(() => parseSceneOverrides({ buildings: [], hidden: [{ name: 'H', evidence }] }), /reason/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], hidden: [{ name: 'A', reason: 'r', evidence }], parts: [split] }), /twice/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0]] }] }), /two parts/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0], { ...split.parts[1], id: 'a' }] }] }), /id must be unique/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0], { ...split.parts[1], id: 'x#y' }] }] }), /id must be unique/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, parts: [split.parts[0], { ...split.parts[1], polygon: [sq(10).slice(0, 4)] }] }] }), /closed/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, evidence: { source: 's' } }] }), /evidence/);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, heightSource: 'ESTIMATE' }] }), /heightSource/);
 });

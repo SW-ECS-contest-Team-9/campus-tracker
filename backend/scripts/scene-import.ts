@@ -10,7 +10,9 @@
  *   footprint of the active campus map (IoU >= 0.99), all under the DEM, roof above and base below the ground.
  * - Roof overrides (data/scene/overrides/building-roofs.json): a listed building takes the given roof elevation and
  *   height source instead of the GeoPackage height; the base is unchanged. They give the scene another version id.
- *   --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
+ *   The same file can leave a GeoPackage building out of the scene ("hidden") or draw one footprint as several blocks
+ *   with their own roofs ("parts": polygons that tile the footprint; the first part keeps the building id, the others
+ *   get <id>#<part id>). --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
  * - The source files are copied to backend/data/scene/source with their SHA-256 (SOURCES.json).
  */
 import { createHash } from 'node:crypto';
@@ -21,7 +23,7 @@ import { pool, withTransaction } from '../src/config/database.js';
 import { readGpkgLayer, type Ring } from '../src/geo/gpkg.js';
 import { terrain } from '../src/geo/terrain.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
-import { overrideHeights, parseRoofOverrides, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
+import { overrideHeights, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 const { values: args } = parseArgs({ options: { dir: { type: 'string' }, 'keep-absolute': { type: 'boolean', default: false }, 'no-overrides': { type: 'boolean', default: false }, 'dry-run': { type: 'boolean', default: false } } });
 const DEST = path.resolve(import.meta.dirname, '../data/scene/source');
@@ -44,14 +46,16 @@ async function main() {
   if (!mv.length) throw new Error('No active campus map (npm run spatial:import)');
   const mapVersion = mv[0].id;
   const mode = args['keep-absolute'] ? 'ABSOLUTE' : 'RECOMPUTED';
-  const overrides = args['no-overrides'] || !fs.existsSync(OVERRIDES) ? [] : parseRoofOverrides(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
+  const all = args['no-overrides'] || !fs.existsSync(OVERRIDES) ? { roofs: [], hidden: [], parts: [] } : parseSceneOverrides(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
+  const overrides = all.roofs;
+  const applied = overrides.length + all.hidden.length + all.parts.length;
 
   const problems: string[] = [];
   const rows: Record<string, unknown>[] = [];
   const out: { buildingId: string; name: string | null; heightM: number; source: string; registerId: string | null; floors: number | null;
     baseM: number; roofM: number; tMin: number; tMax: number; srcBase: number | null; srcRoof: number | null; note: string | null; geojson: string }[] = [];
   const used = new Set<string>();
-  for (const o of overrides) if (!layer.features.some((f) => f.properties.name === o.name)) problems.push(`roof override ${o.name}: no such building in buildings_3d`);
+  for (const o of [...overrides, ...all.hidden, ...all.parts]) if (!layer.features.some((f) => f.properties.name === o.name)) problems.push(`override ${o.name}: no such building in buildings_3d`);
   for (const f of layer.features) {
     const p = f.properties as { name: string | null; height_m: number | null; height_source: string | null; register_id: string | null; ground_floors: number | null; base_m: number | null; roof_m: number | null; note: string | null };
     const g = f.geometry;
@@ -101,6 +105,47 @@ async function main() {
     if (p.name && best.display && p.name !== best.display) problems.push(`${p.name}: building metadata calls ${best.building_id} "${best.display}"`);
     const note = [p.note, h.roofRaised && mode === 'RECOMPUTED' && !o ? 'roof raised to DEM max + 3 m on the server DEM' : null,
       o ? `roof ${o.roofM} m from ${o.evidence.source} (${o.evidence.collectedOn}, ${o.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); GeoPackage height ${p.height_m} m ${p.height_source}` : null].filter(Boolean).join('; ') || null;
+    if (all.hidden.some((x) => x.name === p.name)) { // checked like any building of the model, but not drawn
+      rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), source: 'hidden (override)' });
+      continue;
+    }
+    const split = all.parts.find((x) => x.name === p.name);
+    if (split) {
+      const area = polygons.reduce((s, poly) => s + polygonArea(poly), 0);
+      const bad = partsAreaProblem(split, area);
+      if (bad) problems.push(bad);
+      for (const [k, part] of split.parts.entries()) {
+        const label = `${p.name} part ${part.id}`;
+        const ring: Ring[][] = [part.polygon];
+        const partJson = JSON.stringify({ type: 'MultiPolygon', coordinates: ring });
+        const { rows: [q] } = await pool.query<{ valid: boolean; outside: number; px: number; py: number }>(
+          `WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 5186) g, ST_SetSRID(ST_GeomFromGeoJSON($2), 5186) f)
+           SELECT ST_IsValid(g) valid, ST_Area(ST_Difference(g, f)) outside, ST_X(ST_PointOnSurface(g)) px, ST_Y(ST_PointOnSurface(g)) py FROM g`,
+          [partJson, geojson],
+        );
+        if (!q.valid) problems.push(`${label}: invalid geometry`);
+        if (q.outside > 0.5) problems.push(`${label}: ${q.outside.toFixed(1)} m2 outside the footprint of ${p.name}`);
+        const ps = [...outlineSamples(ring), [q.px, q.py] as [number, number]].map(([x, y]) => terrain.sampleXY(ctx, x, y)?.height ?? null);
+        if (ps.some((s) => s === null)) {
+          problems.push(`${label}: outside the terrain DEM`);
+          continue;
+        }
+        const ph = blockHeights(ps as number[], 0); // base and ground under this part; the roof is the part's own
+        let partHeight = 0;
+        try {
+          partHeight = overrideHeights(ps as number[], ph, part.roofM).heightM;
+        } catch (err) {
+          problems.push(`${label}: ${(err as Error).message}`);
+        }
+        const buildingId = partBuildingId(best.building_id, split.parts, k);
+        out.push({ buildingId, name: part.name, heightM: partHeight, source: split.heightSource, registerId: p.register_id || null, floors: null,
+          baseM: ph.baseM, roofM: part.roofM, tMin: ph.terrainMinM, tMax: ph.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, geojson: partJson,
+          note: `part "${part.id}" of ${p.name} (${split.parts.length} parts); flat roof ${part.roofM} m from ${split.evidence.source} (${split.evidence.collectedOn}, ${split.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); whole building in the GeoPackage: ${p.height_m} m ${p.height_source}, ${p.ground_floors ?? '?'} floors` });
+        rows.push({ name: `${p.name} / ${part.id}`, building: buildingId, iou: k === 0 ? r2(best.iou) : '', height: partHeight, source: split.heightSource, base: ph.baseM, roof: part.roofM,
+          'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(part.roofM - p.roof_m), raised: '' });
+      }
+      continue;
+    }
     out.push({ buildingId: best.building_id, name: p.name, heightM, source: o?.heightSource ?? p.height_source ?? 'ESTIMATE', registerId: p.register_id || null,
       floors: p.ground_floors, baseM, roofM, tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, note, geojson });
     rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), height: heightM, source: o?.heightSource ?? p.height_source, base: baseM, roof: roofM,
@@ -112,9 +157,9 @@ async function main() {
     throw new Error('Gates failed: nothing imported');
   }
   const gpkgSha = sha(gpkg);
-  const id = sceneVersionId(gpkgSha, terrainVersion, mapVersion, mode, overrides.length ? sha(OVERRIDES) : undefined);
+  const id = sceneVersionId(gpkgSha, terrainVersion, mapVersion, mode, applied ? sha(OVERRIDES) : undefined);
   if (args['dry-run']) {
-    console.log(`\ndry run: would activate ${id} (terrain ${terrainVersion}, map ${mapVersion}, ${mode}, roof overrides ${overrides.length})`);
+    console.log(`\ndry run: would activate ${id} (terrain ${terrainVersion}, map ${mapVersion}, ${mode}, roof overrides ${overrides.length}, hidden ${all.hidden.length}, split ${all.parts.length})`);
     return;
   }
 
@@ -133,7 +178,8 @@ async function main() {
     await client.query('UPDATE scene_versions SET active = false WHERE active');
     await client.query(
       `INSERT INTO scene_versions (id, source_sha256, terrain_version_id, map_version_id, height_mode, active, metadata) VALUES ($1, $2, $3, $4, $5, true, $6)`,
-      [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows, ...(overrides.length ? { roofOverrides: overrides } : {}) })],
+      [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows, ...(overrides.length ? { roofOverrides: overrides } : {}),
+        ...(all.hidden.length ? { hiddenBuildings: all.hidden } : {}), ...(all.parts.length ? { buildingParts: all.parts } : {}) })],
     );
     for (const b of out) {
       await client.query(
@@ -144,7 +190,7 @@ async function main() {
       );
     }
   });
-  console.log(`\nactivated ${id}: ${out.length} buildings on terrain ${terrainVersion} (${mode}, roof overrides ${overrides.length}). Reload the preview.`);
+  console.log(`\nactivated ${id}: ${out.length} buildings on terrain ${terrainVersion} (${mode}, roof overrides ${overrides.length}, hidden ${all.hidden.length}, split ${all.parts.length}). Reload the preview.`);
 }
 
 main()

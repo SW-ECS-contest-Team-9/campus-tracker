@@ -1,0 +1,2188 @@
+{
+ "A_은주관": {
+  "source": "S-MAP 3D viewer building model 172556289 surface, 1 m grid x 201105-201215, y 557140-557310 (18,981 points, 0 missing)",
+  "footprint": {
+   "sourceOutlineAreaM2": 3111.1,
+   "gridCellsInsideOutline": 3109,
+   "ofThemBuildingModel": 2896,
+   "modelCells": 2976,
+   "modelCellsInsideOutline": 2896,
+   "modelCellsOutside": 80,
+   "modelCellsOutsideMaxDistM": 3.9,
+   "notModelInsideOutline": {
+    "n": 213,
+    "min": 130.1,
+    "p10": 132.8,
+    "median": 144.2,
+    "p90": 148.9,
+    "max": 149.7
+   }
+  },
+  "current": {
+   "baseM": 140.042,
+   "roofM": 167.627,
+   "heightM": 25.5,
+   "heightSource": "REGISTER",
+   "terrainMinM": 141.042,
+   "terrainMaxM": 143.957
+  },
+  "parts": [
+   {
+    "part": "은주1관",
+    "areaM2": 962.8,
+    "gridCells": 961,
+    "buildingModelCells": 919,
+    "meshRoof": {
+     "n": 919,
+     "min": 144.5,
+     "p10": 155.5,
+     "median": 156.8,
+     "p90": 157.8,
+     "max": 158.5
+    },
+    "chosenFlatRoofM": 156.8,
+    "cellsWithin1m": 0.77,
+    "cellsWithin1_5m": 0.99,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 10.8,
+    "onServerDem": {
+     "baseM": 140.042,
+     "terrainMinM": 141.042,
+     "terrainMedianM": 142.394,
+     "terrainMaxM": 143.957,
+     "roofM": 156.8,
+     "heightM": 14.406
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201118.53,
+       557246.9
+      ],
+      [
+       201120.46,
+       557258.18
+      ],
+      [
+       201124.53,
+       557257.51
+      ],
+      [
+       201131.69,
+       557301.74
+      ],
+      [
+       201144.04,
+       557299.78
+      ],
+      [
+       201132.45,
+       557229.52
+      ],
+      [
+       201135.29,
+       557227.04
+      ],
+      [
+       201119.84,
+       557229.54
+      ],
+      [
+       201122.3,
+       557246.32
+      ],
+      [
+       201118.53,
+       557246.9
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "접합부",
+    "areaM2": 286.9,
+    "gridCells": 290,
+    "buildingModelCells": 275,
+    "meshRoof": {
+     "n": 275,
+     "min": 136.7,
+     "p10": 152.7,
+     "median": 157.6,
+     "p90": 158.6,
+     "max": 162.5
+    },
+    "chosenFlatRoofM": 157.6,
+    "cellsWithin1m": 0.56,
+    "cellsWithin1_5m": 0.64,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 10.0,
+    "onServerDem": {
+     "baseM": 140.118,
+     "terrainMinM": 141.118,
+     "terrainMedianM": 141.481,
+     "terrainMaxM": 142.844,
+     "roofM": 157.6,
+     "heightM": 16.119
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201120.69,
+       557212.07
+      ],
+      [
+       201120.96,
+       557212.44
+      ],
+      [
+       201117.73,
+       557215.21
+      ],
+      [
+       201119.84,
+       557229.54
+      ],
+      [
+       201135.29,
+       557227.04
+      ],
+      [
+       201142.12,
+       557221.08
+      ],
+      [
+       201128.35,
+       557205.36
+      ],
+      [
+       201120.69,
+       557212.07
+      ]
+     ],
+     [
+      [
+       201136.34,
+       557221.44
+      ],
+      [
+       201135.86,
+       557222.6
+      ],
+      [
+       201135.09,
+       557223.59
+      ],
+      [
+       201134.1,
+       557224.36
+      ],
+      [
+       201132.94,
+       557224.84
+      ],
+      [
+       201131.7,
+       557225.0
+      ],
+      [
+       201130.46,
+       557224.84
+      ],
+      [
+       201129.3,
+       557224.36
+      ],
+      [
+       201128.31,
+       557223.59
+      ],
+      [
+       201127.54,
+       557222.6
+      ],
+      [
+       201127.06,
+       557221.44
+      ],
+      [
+       201126.9,
+       557220.2
+      ],
+      [
+       201127.06,
+       557218.96
+      ],
+      [
+       201127.54,
+       557217.8
+      ],
+      [
+       201128.31,
+       557216.81
+      ],
+      [
+       201129.3,
+       557216.04
+      ],
+      [
+       201130.46,
+       557215.56
+      ],
+      [
+       201131.7,
+       557215.4
+      ],
+      [
+       201132.94,
+       557215.56
+      ],
+      [
+       201134.1,
+       557216.04
+      ],
+      [
+       201135.09,
+       557216.81
+      ],
+      [
+       201135.86,
+       557217.8
+      ],
+      [
+       201136.34,
+       557218.96
+      ],
+      [
+       201136.5,
+       557220.2
+      ],
+      [
+       201136.34,
+       557221.44
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "접합부 남서 날개",
+    "areaM2": 48.8,
+    "gridCells": 50,
+    "buildingModelCells": 42,
+    "meshRoof": {
+     "n": 42,
+     "min": 133.4,
+     "p10": 157.9,
+     "median": 159.2,
+     "p90": 160.4,
+     "max": 160.4
+    },
+    "chosenFlatRoofM": 159.2,
+    "cellsWithin1m": 0.71,
+    "cellsWithin1_5m": 0.93,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 8.4,
+    "onServerDem": {
+     "baseM": 140.318,
+     "terrainMinM": 141.318,
+     "terrainMedianM": 142.056,
+     "terrainMaxM": 142.518,
+     "roofM": 159.2,
+     "heightM": 17.144
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201126.28,
+       557201.22
+      ],
+      [
+       201118.23,
+       557208.75
+      ],
+      [
+       201120.69,
+       557212.07
+      ],
+      [
+       201176.23,
+       557163.43
+      ],
+      [
+       201129.07,
+       557204.68
+      ],
+      [
+       201126.28,
+       557201.22
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "탑",
+    "areaM2": 71.6,
+    "gridCells": 70,
+    "buildingModelCells": 70,
+    "meshRoof": {
+     "n": 70,
+     "min": 158.3,
+     "p10": 158.3,
+     "median": 162.5,
+     "p90": 162.5,
+     "max": 162.5
+    },
+    "chosenFlatRoofM": 162.5,
+    "cellsWithin1m": 0.84,
+    "cellsWithin1_5m": 0.84,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 5.1,
+    "onServerDem": {
+     "baseM": 140.354,
+     "terrainMinM": 141.354,
+     "terrainMedianM": 141.617,
+     "terrainMaxM": 141.932,
+     "roofM": 162.5,
+     "heightM": 20.883
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201136.34,
+       557218.96
+      ],
+      [
+       201135.86,
+       557217.8
+      ],
+      [
+       201135.09,
+       557216.81
+      ],
+      [
+       201134.1,
+       557216.04
+      ],
+      [
+       201132.94,
+       557215.56
+      ],
+      [
+       201131.7,
+       557215.4
+      ],
+      [
+       201130.46,
+       557215.56
+      ],
+      [
+       201129.3,
+       557216.04
+      ],
+      [
+       201128.31,
+       557216.81
+      ],
+      [
+       201127.54,
+       557217.8
+      ],
+      [
+       201127.06,
+       557218.96
+      ],
+      [
+       201126.9,
+       557220.2
+      ],
+      [
+       201127.06,
+       557221.44
+      ],
+      [
+       201127.54,
+       557222.6
+      ],
+      [
+       201128.31,
+       557223.59
+      ],
+      [
+       201129.3,
+       557224.36
+      ],
+      [
+       201130.46,
+       557224.84
+      ],
+      [
+       201131.7,
+       557225.0
+      ],
+      [
+       201132.94,
+       557224.84
+      ],
+      [
+       201134.1,
+       557224.36
+      ],
+      [
+       201135.09,
+       557223.59
+      ],
+      [
+       201135.86,
+       557222.6
+      ],
+      [
+       201136.34,
+       557221.44
+      ],
+      [
+       201136.5,
+       557220.2
+      ],
+      [
+       201136.34,
+       557218.96
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "은주2관",
+    "areaM2": 1054.6,
+    "gridCells": 1053,
+    "buildingModelCells": 935,
+    "meshRoof": {
+     "n": 935,
+     "min": 147.7,
+     "p10": 158.5,
+     "median": 159.7,
+     "p90": 161.0,
+     "max": 161.3
+    },
+    "chosenFlatRoofM": 159.7,
+    "cellsWithin1m": 0.66,
+    "cellsWithin1_5m": 0.97,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 7.9,
+    "onServerDem": {
+     "baseM": 140.277,
+     "terrainMinM": 141.277,
+     "terrainMedianM": 141.759,
+     "terrainMaxM": 142.615,
+     "roofM": 159.7,
+     "heightM": 17.941
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201199.01,
+       557171.44
+      ],
+      [
+       201189.76,
+       557160.88
+      ],
+      [
+       201132.96,
+       557210.62
+      ],
+      [
+       201142.12,
+       557221.08
+      ],
+      [
+       201199.01,
+       557171.44
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "은주2관 낮은 단",
+    "areaM2": 528.5,
+    "gridCells": 527,
+    "buildingModelCells": 502,
+    "meshRoof": {
+     "n": 502,
+     "min": 133.6,
+     "p10": 146.8,
+     "median": 146.8,
+     "p90": 155.4,
+     "max": 159.7
+    },
+    "chosenFlatRoofM": 146.8,
+    "cellsWithin1m": 0.86,
+    "cellsWithin1_5m": 0.86,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 20.8,
+    "onServerDem": {
+     "baseM": 140.362,
+     "terrainMinM": 141.362,
+     "terrainMedianM": 142.17,
+     "terrainMaxM": 142.554,
+     "roofM": 146.8,
+     "heightM": 4.63
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201181.42,
+       557158.88
+      ],
+      [
+       201181.42,
+       557158.89
+      ],
+      [
+       201176.23,
+       557163.43
+      ],
+      [
+       201128.35,
+       557205.36
+      ],
+      [
+       201132.96,
+       557210.62
+      ],
+      [
+       201189.76,
+       557160.88
+      ],
+      [
+       201185.15,
+       557155.62
+      ],
+      [
+       201181.42,
+       557158.88
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "동쪽 끝 높은 부분",
+    "areaM2": 63.8,
+    "gridCells": 65,
+    "buildingModelCells": 65,
+    "meshRoof": {
+     "n": 65,
+     "min": 155.0,
+     "p10": 162.0,
+     "median": 162.0,
+     "p90": 163.0,
+     "max": 163.6
+    },
+    "chosenFlatRoofM": 162.0,
+    "cellsWithin1m": 0.82,
+    "cellsWithin1_5m": 0.88,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 5.6,
+    "onServerDem": {
+     "baseM": 141.375,
+     "terrainMinM": 142.375,
+     "terrainMedianM": 142.655,
+     "terrainMaxM": 143.148,
+     "roofM": 162.0,
+     "heightM": 19.345
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201201.73,
+       557169.07
+      ],
+      [
+       201195.61,
+       557160.06
+      ],
+      [
+       201194.18,
+       557157.01
+      ],
+      [
+       201189.76,
+       557160.88
+      ],
+      [
+       201199.01,
+       557171.44
+      ],
+      [
+       201201.73,
+       557169.07
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "동쪽 끝 낮은 부분",
+    "areaM2": 47.7,
+    "gridCells": 47,
+    "buildingModelCells": 47,
+    "meshRoof": {
+     "n": 47,
+     "min": 151.8,
+     "p10": 155.0,
+     "median": 155.0,
+     "p90": 159.7,
+     "max": 160.5
+    },
+    "chosenFlatRoofM": 155.0,
+    "cellsWithin1m": 0.64,
+    "cellsWithin1_5m": 0.66,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 12.6,
+    "onServerDem": {
+     "baseM": 141.343,
+     "terrainMinM": 142.343,
+     "terrainMedianM": 142.694,
+     "terrainMaxM": 143.245,
+     "roofM": 155.0,
+     "heightM": 12.306
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201185.15,
+       557155.62
+      ],
+      [
+       201189.76,
+       557160.88
+      ],
+      [
+       201194.18,
+       557157.01
+      ],
+      [
+       201191.83,
+       557152.01
+      ],
+      [
+       201190.6,
+       557150.84
+      ],
+      [
+       201185.15,
+       557155.62
+      ]
+     ]
+    ]
+   },
+   {
+    "part": "동쪽 끝 남쪽 날개",
+    "areaM2": 46.4,
+    "gridCells": 46,
+    "buildingModelCells": 41,
+    "meshRoof": {
+     "n": 41,
+     "min": 142.4,
+     "p10": 157.8,
+     "median": 159.0,
+     "p90": 160.4,
+     "max": 160.6
+    },
+    "chosenFlatRoofM": 159.0,
+    "cellsWithin1m": 0.61,
+    "cellsWithin1_5m": 0.95,
+    "currentRoofM": 167.627,
+    "currentMinusMeshMedianM": 8.6,
+    "onServerDem": {
+     "baseM": 141.297,
+     "terrainMinM": 142.297,
+     "terrainMedianM": 142.546,
+     "terrainMaxM": 143.057,
+     "roofM": 159.0,
+     "heightM": 16.454
+    },
+    "gateRoofAboveGround": true,
+    "polygon5186": [
+     [
+      [
+       201178.7,
+       557155.35
+      ],
+      [
+       201181.42,
+       557158.88
+      ],
+      [
+       201190.6,
+       557150.84
+      ],
+      [
+       201188.14,
+       557148.54
+      ],
+      [
+       201178.7,
+       557155.35
+      ]
+     ]
+    ]
+   }
+  ],
+  "profileAcross1관": {
+   "convention": "offset from the west edge line, + = west (outside), - = east (field side); s 20-86 m without the west bay",
+   "bins": [
+    {
+     "offsetM": -22,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -21,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -20,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -19,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -18,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -17,
+     "medianZ": 149.2,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -16,
+     "medianZ": 149.4,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -15,
+     "medianZ": 149.7,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -14,
+     "medianZ": 149.8,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -13,
+     "medianZ": 149.6,
+     "buildingShare": 0.19
+    },
+    {
+     "offsetM": -12,
+     "medianZ": 155.6,
+     "buildingShare": 0.98
+    },
+    {
+     "offsetM": -11,
+     "medianZ": 156.1,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -10,
+     "medianZ": 156.6,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -9,
+     "medianZ": 157.0,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -8,
+     "medianZ": 157.4,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -7,
+     "medianZ": 157.9,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -6,
+     "medianZ": 157.6,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -5,
+     "medianZ": 157.2,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -4,
+     "medianZ": 156.7,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -3,
+     "medianZ": 156.3,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -2,
+     "medianZ": 155.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": -1,
+     "medianZ": 155.3,
+     "buildingShare": 0.79
+    },
+    {
+     "offsetM": 0,
+     "medianZ": 134.3,
+     "buildingShare": 0.02
+    },
+    {
+     "offsetM": 1,
+     "medianZ": 134.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 2,
+     "medianZ": 134.3,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 3,
+     "medianZ": 133.6,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 4,
+     "medianZ": 132.4,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 5,
+     "medianZ": 131.4,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 6,
+     "medianZ": 130.6,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 7,
+     "medianZ": 130.8,
+     "buildingShare": 0.0
+    }
+   ]
+  },
+  "profileAcross2관": {
+   "convention": "offset from the south-west edge line, + = north-east (field side); t 2-66 m",
+   "bins": [
+    {
+     "offsetM": -8,
+     "medianZ": 132.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -7,
+     "medianZ": 132.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -6,
+     "medianZ": 132.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -5,
+     "medianZ": 132.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": -4,
+     "medianZ": 132.3,
+     "buildingShare": 0.14
+    },
+    {
+     "offsetM": -3,
+     "medianZ": 132.5,
+     "buildingShare": 0.12
+    },
+    {
+     "offsetM": -2,
+     "medianZ": 132.6,
+     "buildingShare": 0.11
+    },
+    {
+     "offsetM": -1,
+     "medianZ": 132.9,
+     "buildingShare": 0.12
+    },
+    {
+     "offsetM": 0,
+     "medianZ": 152.3,
+     "buildingShare": 0.6
+    },
+    {
+     "offsetM": 1,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 2,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 3,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 4,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 5,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 6,
+     "medianZ": 146.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 7,
+     "medianZ": 158.3,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 8,
+     "medianZ": 158.5,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 9,
+     "medianZ": 158.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 10,
+     "medianZ": 159.1,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 11,
+     "medianZ": 159.3,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 12,
+     "medianZ": 159.6,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 13,
+     "medianZ": 159.8,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 14,
+     "medianZ": 160.1,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 15,
+     "medianZ": 160.3,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 16,
+     "medianZ": 160.6,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 17,
+     "medianZ": 160.9,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 18,
+     "medianZ": 161.1,
+     "buildingShare": 1.0
+    },
+    {
+     "offsetM": 19,
+     "medianZ": 145.5,
+     "buildingShare": 0.38
+    },
+    {
+     "offsetM": 20,
+     "medianZ": 144.8,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 21,
+     "medianZ": 146.1,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 22,
+     "medianZ": 147.4,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 23,
+     "medianZ": 148.2,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 24,
+     "medianZ": 148.8,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 25,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 26,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    },
+    {
+     "offsetM": 27,
+     "medianZ": 148.9,
+     "buildingShare": 0.0
+    }
+   ]
+  },
+  "ground": {
+   "1관 서쪽 3-8 m 밖": {
+    "n": 208,
+    "min": 127.1,
+    "p10": 128.0,
+    "median": 130.7,
+    "p90": 132.7,
+    "max": 134.8
+   },
+   "1관 동쪽(운동장) 5-10 m 밖": {
+    "n": 330,
+    "min": 148.9,
+    "p10": 148.9,
+    "median": 148.9,
+    "p90": 149.0,
+    "max": 149.1
+   },
+   "2관 남서쪽 3-8 m 밖": {
+    "n": 311,
+    "min": 132.0,
+    "p10": 132.0,
+    "median": 132.1,
+    "p90": 132.3,
+    "max": 133.3
+   },
+   "2관 북동쪽(운동장) 5-9 m 밖": {
+    "n": 254,
+    "min": 148.1,
+    "p10": 148.7,
+    "median": 148.9,
+    "p90": 148.9,
+    "max": 149.0
+   },
+   "2관 운동장 쪽 벽 바로 앞 0-2 m": {
+    "n": 103,
+    "min": 143.0,
+    "p10": 143.6,
+    "median": 144.6,
+    "p90": 146.2,
+    "max": 146.8
+   }
+  },
+  "tower": {
+   "cellsAt162_5": 72,
+   "centre": [
+    201131.7,
+    557220.2
+   ],
+   "equivalentRadiusM": 4.8,
+   "usedCircle": {
+    "centre": [
+     201131.7,
+     557220.2
+    ],
+    "radiusM": 4.8
+   },
+   "bbox": [
+    201127.0,
+    557215.0,
+    201136.0,
+    557225.0
+   ]
+  },
+  "universityPoints": {
+   "은주1관": [
+    201126.0,
+    557249.3
+   ],
+   "은주2관": [
+    201154.4,
+    557191.6
+   ]
+  },
+  "universityEntrances": [
+   {
+    "name": "한림관-은주관 연결통로",
+    "xy": [
+     201131.7,
+     557297.5
+    ],
+    "text": "한림관 3층과 은주1관 2층을 연결하기도 하며, 한림관 6층과 은주1관 5층을 연결하는 통로입니다."
+   },
+   {
+    "name": "은주1관 입구(1)",
+    "xy": [
+     201120.8,
+     557252.7
+    ],
+    "text": "은주1관 1층 입구입니다."
+   },
+   {
+    "name": "은주1관 입구(2)",
+    "xy": [
+     201135.8,
+     557250.2
+    ],
+    "text": "은주1관 5층 입구입니다."
+   },
+   {
+    "name": "은주2관 입구(1)",
+    "xy": [
+     201125.0,
+     557201.3
+    ],
+    "text": "은주2관 1층 로비 입구입니다."
+   },
+   {
+    "name": "은주2관 입구(2)",
+    "xy": [
+     201201.8,
+     557168.3
+    ],
+    "text": "은주2관 5층 입구입니다."
+   }
+  ],
+  "register42228": {
+   "heightM": 25.5,
+   "groundFloors": 7
+  },
+  "derived": {
+   "1관 roof - west ground": 26.1,
+   "1관 roof - field": 7.9,
+   "2관 roof - south-west ground": 27.6,
+   "2관 roof - field": 10.8,
+   "field - 1관 west ground": 18.2,
+   "field - 2관 south-west ground": 16.8
+  }
+ },
+ "B_공연실습소": {
+  "label평생교육원": {
+   "smapLabelOn": "유담관 외곽 위의 타원형 건물(같은 건물 위에 \"평생교육원\", \"YUDAM도서관\" 표기)",
+   "register42013dongName": "M동(사회교육원 및 도서관)",
+   "universityPoint유담관": [
+    201040.6,
+    557258.9
+   ],
+   "universityPointInsideOutline": true
+  },
+  "userImageOrientation": "화면 위쪽이 대략 남쪽(은주2관 왼쪽 위, 한림관 왼쪽 아래, 평생교육원 가운데). 회전교차로는 (200990, 557237) 부근이고 묶음은 그 남쪽, 유담관에서 길 건너 남서쪽",
+  "cluster": {
+   "bbox5186": [
+    200982,
+    557184,
+    201050,
+    557232
+   ],
+   "candidates": [
+    {
+     "label": "A 큰 흰 지붕 건물",
+     "smapModelId": 171376641,
+     "cells": 627,
+     "areaM2approx": 627,
+     "bbox5186": [
+      201012.0,
+      557184.0,
+      201049.0,
+      557216.0
+     ],
+     "centre": [
+      201031.5,
+      557200.6
+     ],
+     "roof": {
+      "n": 627,
+      "min": 91.7,
+      "p10": 105.5,
+      "median": 107.0,
+      "p90": 108.7,
+      "max": 113.8
+     },
+     "groundRing2to6m": {
+      "n": 514,
+      "min": 84.6,
+      "p10": 86.2,
+      "median": 91.3,
+      "p90": 94.7,
+      "max": 95.6
+     },
+     "smapElevationApi": {
+      "x": 201032,
+      "y": 557198,
+      "dem_z": 89.59600830078125,
+      "buld_z": 27.181
+     },
+     "roofMinusSmapDem": 17.4,
+     "registerPolygonsUnder": [],
+     "hull5186": [
+      [
+       201035.0,
+       557184.0
+      ],
+      [
+       201023.0,
+       557192.0
+      ],
+      [
+       201022.0,
+       557193.0
+      ],
+      [
+       201012.0,
+       557209.0
+      ],
+      [
+       201012.0,
+       557210.0
+      ],
+      [
+       201014.0,
+       557213.0
+      ],
+      [
+       201017.0,
+       557216.0
+      ],
+      [
+       201027.0,
+       557215.0
+      ],
+      [
+       201037.0,
+       557209.0
+      ],
+      [
+       201049.0,
+       557201.0
+      ],
+      [
+       201049.0,
+       557199.0
+      ],
+      [
+       201046.0,
+       557194.0
+      ],
+      [
+       201044.0,
+       557191.0
+      ],
+      [
+       201039.0,
+       557186.0
+      ],
+      [
+       201036.0,
+       557184.0
+      ],
+      [
+       201035.0,
+       557184.0
+      ]
+     ]
+    },
+    {
+     "label": "B 팔각 건물",
+     "smapModelId": 172359682,
+     "cells": 309,
+     "areaM2approx": 309,
+     "bbox5186": [
+      200982.0,
+      557218.0,
+      201010.0,
+      557232.0
+     ],
+     "centre": [
+      200995.6,
+      557225.1
+     ],
+     "roof": {
+      "n": 309,
+      "min": 92.7,
+      "p10": 105.5,
+      "median": 106.6,
+      "p90": 107.0,
+      "max": 107.0
+     },
+     "groundRing2to6m": {
+      "n": 387,
+      "min": 81.1,
+      "p10": 83.3,
+      "median": 90.0,
+      "p90": 92.5,
+      "max": 92.7
+     },
+     "smapElevationApi": {
+      "x": 200996,
+      "y": 557224,
+      "dem_z": 89.98123931884766,
+      "buld_z": 21.564
+     },
+     "roofMinusSmapDem": 16.6,
+     "registerPolygonsUnder": [
+      {
+       "sourceId": "30791",
+       "shareOfModelCells": 0.82,
+       "jibun": "266-419",
+       "use": "",
+       "footprintM2": "0.000000000000000",
+       "heightM": "0.000000000000000",
+       "groundFloors": "0",
+       "undergroundFloors": "0",
+       "approvedOn": "",
+       "dongName": ""
+      }
+     ],
+     "hull5186": [
+      [
+       200993.0,
+       557218.0
+      ],
+      [
+       200990.0,
+       557219.0
+      ],
+      [
+       200983.0,
+       557222.0
+      ],
+      [
+       200982.0,
+       557223.0
+      ],
+      [
+       200984.0,
+       557228.0
+      ],
+      [
+       200985.0,
+       557230.0
+      ],
+      [
+       200986.0,
+       557231.0
+      ],
+      [
+       200988.0,
+       557232.0
+      ],
+      [
+       200997.0,
+       557232.0
+      ],
+      [
+       201001.0,
+       557231.0
+      ],
+      [
+       201003.0,
+       557230.0
+      ],
+      [
+       201009.0,
+       557226.0
+      ],
+      [
+       201010.0,
+       557225.0
+      ],
+      [
+       201010.0,
+       557224.0
+      ],
+      [
+       201007.0,
+       557219.0
+      ],
+      [
+       200997.0,
+       557218.0
+      ],
+      [
+       200993.0,
+       557218.0
+      ]
+     ]
+    },
+    {
+     "label": "C 작은 건물",
+     "smapModelId": 171311108,
+     "cells": 141,
+     "areaM2approx": 141,
+     "bbox5186": [
+      201004.0,
+      557185.0,
+      201021.0,
+      557202.0
+     ],
+     "centre": [
+      201012.4,
+      557194.3
+     ],
+     "roof": {
+      "n": 141,
+      "min": 93.0,
+      "p10": 93.2,
+      "median": 93.3,
+      "p90": 94.3,
+      "max": 95.0
+     },
+     "groundRing2to6m": {
+      "n": 210,
+      "min": 80.9,
+      "p10": 81.1,
+      "median": 85.1,
+      "p90": 88.1,
+      "max": 89.7
+     },
+     "smapElevationApi": {
+      "x": 201012,
+      "y": 557194,
+      "dem_z": 84.13801574707031,
+      "buld_z": 13.459
+     },
+     "roofMinusSmapDem": 9.2,
+     "registerPolygonsUnder": [
+      {
+       "sourceId": "32420",
+       "shareOfModelCells": 0.88,
+       "jibun": "266-557",
+       "use": "공동주택",
+       "footprintM2": "126.68000000000000",
+       "heightM": "0.000000000000000",
+       "groundFloors": "3",
+       "undergroundFloors": "1",
+       "approvedOn": "1986-09-11",
+       "dongName": ""
+      }
+     ],
+     "hull5186": [
+      [
+       201008.0,
+       557185.0
+      ],
+      [
+       201007.0,
+       557186.0
+      ],
+      [
+       201004.0,
+       557190.0
+      ],
+      [
+       201004.0,
+       557191.0
+      ],
+      [
+       201015.0,
+       557202.0
+      ],
+      [
+       201018.0,
+       557202.0
+      ],
+      [
+       201019.0,
+       557201.0
+      ],
+      [
+       201021.0,
+       557197.0
+      ],
+      [
+       201016.0,
+       557192.0
+      ],
+      [
+       201008.0,
+       557185.0
+      ]
+     ]
+    },
+    {
+     "label": "D 작은 건물",
+     "smapModelId": 171311113,
+     "cells": 103,
+     "areaM2approx": 103,
+     "bbox5186": [
+      201003.0,
+      557196.0,
+      201015.0,
+      557210.0
+     ],
+     "centre": [
+      201008.5,
+      557203.1
+     ],
+     "roof": {
+      "n": 103,
+      "min": 88.0,
+      "p10": 91.4,
+      "median": 92.2,
+      "p90": 92.2,
+      "max": 92.2
+     },
+     "groundRing2to6m": {
+      "n": 148,
+      "min": 80.5,
+      "p10": 80.8,
+      "median": 82.5,
+      "p90": 88.2,
+      "max": 90.7
+     },
+     "smapElevationApi": {
+      "x": 201008,
+      "y": 557203,
+      "dem_z": 83.46841430664062,
+      "buld_z": 10.673
+     },
+     "roofMinusSmapDem": 8.7,
+     "registerPolygonsUnder": [
+      {
+       "sourceId": "21878",
+       "shareOfModelCells": 0.69,
+       "jibun": "266-557",
+       "use": "",
+       "footprintM2": "0.000000000000000",
+       "heightM": "0.000000000000000",
+       "groundFloors": "0",
+       "undergroundFloors": "0",
+       "approvedOn": "",
+       "dongName": ""
+      }
+     ],
+     "hull5186": [
+      [
+       201006.0,
+       557196.0
+      ],
+      [
+       201003.0,
+       557199.0
+      ],
+      [
+       201003.0,
+       557202.0
+      ],
+      [
+       201005.0,
+       557206.0
+      ],
+      [
+       201008.0,
+       557210.0
+      ],
+      [
+       201009.0,
+       557210.0
+      ],
+      [
+       201015.0,
+       557205.0
+      ],
+      [
+       201015.0,
+       557204.0
+      ],
+      [
+       201010.0,
+       557199.0
+      ],
+      [
+       201006.0,
+       557196.0
+      ]
+     ]
+    }
+   ]
+  },
+  "register53636": {
+   "sourceId": "53636",
+   "jibun": "16-1",
+   "use": "교육연구시설",
+   "footprintM2": "570.29000000000000",
+   "approvedOn": "2015-04-02",
+   "heightM": "16.770000000000000",
+   "dataDate": "20260906",
+   "name": "",
+   "dongName": "공연실습소",
+   "groundFloors": "5",
+   "undergroundFloors": "3",
+   "polygonAreaM2": 1511.9,
+   "polygonBounds": [
+    201202.6,
+    557167.2,
+    201260.3,
+    557248.9
+   ],
+   "overlapWith42232": {
+    "shareOf53636": 0.96,
+    "iou": 0.73
+   },
+   "gpkg공연실습소AreaM2": 1512.0,
+   "gpkgVsRegisterPolygonSymDiffM2": 0.04
+  },
+  "meshOn혜인관": {
+   "under42232(혜인관)": {
+    "cells": 484,
+    "models": {
+     "172621825": 478,
+     "419430528": 6
+    },
+    "buildingZ": {
+     "n": 478,
+     "min": 151.3,
+     "p10": 166.1,
+     "median": 178.1,
+     "p90": 179.7,
+     "max": 182.0
+    },
+    "terrainZ": {
+     "n": 6,
+     "min": 149.2,
+     "p10": 149.2,
+     "median": 149.8,
+     "p90": 150.2,
+     "max": 150.2
+    }
+   },
+   "under53636(공연실습소 표기 도형)": {
+    "cells": 380,
+    "models": {
+     "172621825": 364,
+     "419430528": 16
+    },
+    "buildingZ": {
+     "n": 364,
+     "min": 156.9,
+     "p10": 172.4,
+     "median": 178.1,
+     "p90": 179.7,
+     "max": 182.0
+    },
+    "terrainZ": {
+     "n": 16,
+     "min": 149.0,
+     "p10": 149.0,
+     "median": 149.1,
+     "p90": 149.3,
+     "max": 149.4
+    }
+   },
+   "modelId": 172621825,
+   "modelCells": 512,
+   "modelCellsInside42232": 478,
+   "modelCellsInside53636": 364,
+   "in53636notIn42232": {
+    "cells": 14,
+    "models": {
+     "419430528": 14
+    },
+    "buildingZ": {
+     "n": 0
+    },
+    "terrainZ": {
+     "n": 14,
+     "min": 149.0,
+     "p10": 149.0,
+     "median": 149.1,
+     "p90": 149.1,
+     "max": 149.3
+    }
+   },
+   "in42232notIn53636": {
+    "cells": 118,
+    "models": {
+     "172621825": 114,
+     "419430528": 4
+    },
+    "buildingZ": {
+     "n": 114,
+     "min": 151.3,
+     "p10": 166.1,
+     "median": 172.7,
+     "p90": 179.8,
+     "max": 180.3
+    },
+    "terrainZ": {
+     "n": 4,
+     "min": 149.2,
+     "p10": 149.2,
+     "median": 150.1,
+     "p90": 150.2,
+     "max": 150.2
+    }
+   }
+  }
+ },
+ "C_screen": [
+  {
+   "name": "공연실습소",
+   "buildingId": "혜인관",
+   "outlineAreaM2": 1512,
+   "gridCoverage": 1.0,
+   "cellsInside": 380,
+   "currentBaseM": 140.355,
+   "currentRoofM": 166.15,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "172621825": 363
+   },
+   "buildingModelShareInside": 0.96,
+   "terrainCellsInside": {
+    "n": 17,
+    "min": 149.0,
+    "p10": 149.0,
+    "median": 149.1,
+    "p90": 149.3,
+    "max": 149.4
+   },
+   "meshRoof": {
+    "n": 363,
+    "min": 166.1,
+    "p10": 172.4,
+    "median": 178.1,
+    "p90": 179.7,
+    "max": 182.0
+   },
+   "currentMinusMeshMedianM": -11.9,
+   "currentMinusMeshP90M": -13.5,
+   "modelCellsOutsideOutline": 145,
+   "modelCellsOutsideBeyond2m": 70,
+   "iouModelVsOutline": 0.69
+  },
+  {
+   "name": "유담관",
+   "buildingId": "유담관",
+   "outlineAreaM2": 4464,
+   "gridCoverage": 1.0,
+   "cellsInside": 1116,
+   "currentBaseM": 95.055,
+   "currentRoofM": 169.739,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "172425217": 484,
+    "173408257": 10
+   },
+   "buildingModelShareInside": 0.44,
+   "terrainCellsInside": {
+    "n": 622,
+    "min": 102.0,
+    "p10": 115.9,
+    "median": 129.1,
+    "p90": 134.6,
+    "max": 136.2
+   },
+   "meshRoof": {
+    "n": 494,
+    "min": 133.1,
+    "p10": 168.1,
+    "median": 174.6,
+    "p90": 179.0,
+    "max": 182.6
+   },
+   "currentMinusMeshMedianM": -4.9,
+   "currentMinusMeshP90M": -9.3,
+   "modelCellsOutsideOutline": 41,
+   "modelCellsOutsideBeyond2m": 14,
+   "iouModelVsOutline": 0.43
+  },
+  {
+   "name": "은주관",
+   "buildingId": "은주관",
+   "outlineAreaM2": 3111,
+   "gridCoverage": 1.0,
+   "cellsInside": 777,
+   "currentBaseM": 140.042,
+   "currentRoofM": 167.627,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "172556289": 721
+   },
+   "buildingModelShareInside": 0.93,
+   "terrainCellsInside": {
+    "n": 56,
+    "min": 131.1,
+    "p10": 132.6,
+    "median": 144.1,
+    "p90": 149.1,
+    "max": 149.7
+   },
+   "meshRoof": {
+    "n": 721,
+    "min": 133.6,
+    "p10": 146.8,
+    "median": 157.6,
+    "p90": 160.8,
+    "max": 162.9
+   },
+   "currentMinusMeshMedianM": 10.0,
+   "currentMinusMeshP90M": 6.8,
+   "modelCellsOutsideOutline": 21,
+   "modelCellsOutsideBeyond2m": 4,
+   "iouModelVsOutline": 0.9
+  },
+  {
+   "name": "본관",
+   "buildingId": "본관",
+   "outlineAreaM2": 1822,
+   "gridCoverage": 1.0,
+   "cellsInside": 450,
+   "currentBaseM": 130.446,
+   "currentRoofM": 154.683,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "173473793": 448
+   },
+   "buildingModelShareInside": 1.0,
+   "terrainCellsInside": {
+    "n": 2,
+    "min": 127.4,
+    "p10": 127.4,
+    "median": 127.6,
+    "p90": 127.7,
+    "max": 127.7
+   },
+   "meshRoof": {
+    "n": 448,
+    "min": 149.5,
+    "p10": 151.5,
+    "median": 153.8,
+    "p90": 155.7,
+    "max": 156.3
+   },
+   "currentMinusMeshMedianM": 0.9,
+   "currentMinusMeshP90M": -1.0,
+   "modelCellsOutsideOutline": 31,
+   "modelCellsOutsideBeyond2m": 0,
+   "iouModelVsOutline": 0.93
+  },
+  {
+   "name": "혜인관",
+   "buildingId": "건물5",
+   "outlineAreaM2": 1933,
+   "gridCoverage": 1.0,
+   "cellsInside": 484,
+   "currentBaseM": 139.955,
+   "currentRoofM": 178.509,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "172621825": 475
+   },
+   "buildingModelShareInside": 0.98,
+   "terrainCellsInside": {
+    "n": 9,
+    "min": 149.1,
+    "p10": 149.1,
+    "median": 150.0,
+    "p90": 150.2,
+    "max": 150.2
+   },
+   "meshRoof": {
+    "n": 475,
+    "min": 166.1,
+    "p10": 166.1,
+    "median": 178.1,
+    "p90": 179.7,
+    "max": 182.0
+   },
+   "currentMinusMeshMedianM": 0.4,
+   "currentMinusMeshP90M": -1.2,
+   "modelCellsOutsideOutline": 34,
+   "modelCellsOutsideBeyond2m": 8,
+   "iouModelVsOutline": 0.92
+  },
+  {
+   "name": "한림관",
+   "buildingId": "한림관",
+   "outlineAreaM2": 688,
+   "gridCoverage": 1.0,
+   "cellsInside": 170,
+   "currentBaseM": 135.66,
+   "currentRoofM": 196.398,
+   "heightSource": "REGISTER",
+   "buildingModelsInside": {
+    "173539329": 164
+   },
+   "buildingModelShareInside": 0.96,
+   "terrainCellsInside": {
+    "n": 6,
+    "min": 126.5,
+    "p10": 126.5,
+    "median": 135.2,
+    "p90": 136.0,
+    "max": 136.0
+   },
+   "meshRoof": {
+    "n": 164,
+    "min": 135.5,
+    "p10": 188.1,
+    "median": 188.1,
+    "p90": 197.3,
+    "max": 197.3
+   },
+   "currentMinusMeshMedianM": 8.3,
+   "currentMinusMeshP90M": -0.9,
+   "modelCellsOutsideOutline": 5,
+   "modelCellsOutsideBeyond2m": 0,
+   "iouModelVsOutline": 0.94
+  },
+  {
+   "name": "청운관",
+   "buildingId": "청운관",
+   "outlineAreaM2": 1335,
+   "gridCoverage": 1.0,
+   "cellsInside": 336,
+   "currentBaseM": 140.5,
+   "currentRoofM": 165.135,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {
+    "173670401": 329
+   },
+   "buildingModelShareInside": 0.98,
+   "terrainCellsInside": {
+    "n": 7,
+    "min": 148.9,
+    "p10": 148.9,
+    "median": 149.1,
+    "p90": 150.2,
+    "max": 150.2
+   },
+   "meshRoof": {
+    "n": 329,
+    "min": 161.0,
+    "p10": 161.0,
+    "median": 186.8,
+    "p90": 188.4,
+    "max": 191.9
+   },
+   "currentMinusMeshMedianM": -21.7,
+   "currentMinusMeshP90M": -23.3,
+   "modelCellsOutsideOutline": 6,
+   "modelCellsOutsideBeyond2m": 0,
+   "iouModelVsOutline": 0.96
+  },
+  {
+   "name": "문예관",
+   "buildingId": "문예관",
+   "outlineAreaM2": 856,
+   "gridCoverage": 1.0,
+   "cellsInside": 216,
+   "currentBaseM": 130.013,
+   "currentRoofM": 153.238,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {
+    "174587905": 213
+   },
+   "buildingModelShareInside": 0.99,
+   "terrainCellsInside": {
+    "n": 3,
+    "min": 138.2,
+    "p10": 138.2,
+    "median": 139.1,
+    "p90": 144.9,
+    "max": 144.9
+   },
+   "meshRoof": {
+    "n": 213,
+    "min": 158.6,
+    "p10": 189.0,
+    "median": 190.4,
+    "p90": 191.4,
+    "max": 193.5
+   },
+   "currentMinusMeshMedianM": -37.2,
+   "currentMinusMeshP90M": -38.2,
+   "modelCellsOutsideOutline": 21,
+   "modelCellsOutsideBeyond2m": 10,
+   "iouModelVsOutline": 0.9
+  },
+  {
+   "name": "북악관",
+   "buildingId": "북악관",
+   "outlineAreaM2": 2396,
+   "gridCoverage": 1.0,
+   "cellsInside": 600,
+   "currentBaseM": 128.448,
+   "currentRoofM": 161.744,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {
+    "174522369": 592
+   },
+   "buildingModelShareInside": 0.99,
+   "terrainCellsInside": {
+    "n": 8,
+    "min": 131.6,
+    "p10": 131.6,
+    "median": 132.2,
+    "p90": 134.7,
+    "max": 134.7
+   },
+   "meshRoof": {
+    "n": 592,
+    "min": 132.9,
+    "p10": 158.4,
+    "median": 160.7,
+    "p90": 160.7,
+    "max": 161.1
+   },
+   "currentMinusMeshMedianM": 1.0,
+   "currentMinusMeshP90M": 1.0,
+   "modelCellsOutsideOutline": 20,
+   "modelCellsOutsideBeyond2m": 3,
+   "iouModelVsOutline": 0.95
+  },
+  {
+   "name": "대일관",
+   "buildingId": "대일관",
+   "outlineAreaM2": 2166,
+   "gridCoverage": 1.0,
+   "cellsInside": 540,
+   "currentBaseM": 138.993,
+   "currentRoofM": 159.105,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {
+    "173604865": 453,
+    "173604866": 66
+   },
+   "buildingModelShareInside": 0.96,
+   "terrainCellsInside": {
+    "n": 21,
+    "min": 145.3,
+    "p10": 145.7,
+    "median": 151.4,
+    "p90": 152.4,
+    "max": 153.2
+   },
+   "meshRoof": {
+    "n": 519,
+    "min": 154.9,
+    "p10": 163.1,
+    "median": 172.1,
+    "p90": 172.2,
+    "max": 176.9
+   },
+   "currentMinusMeshMedianM": -13.0,
+   "currentMinusMeshP90M": -13.1,
+   "modelCellsOutsideOutline": 35,
+   "modelCellsOutsideBeyond2m": 18,
+   "iouModelVsOutline": 0.9
+  },
+  {
+   "name": "수인관",
+   "buildingId": "수인관",
+   "outlineAreaM2": 3790,
+   "gridCoverage": 1.0,
+   "cellsInside": 950,
+   "currentBaseM": 110.047,
+   "currentRoofM": 147.799,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {
+    "172556289": 5
+   },
+   "buildingModelShareInside": 0.01,
+   "terrainCellsInside": {
+    "n": 945,
+    "min": 126.4,
+    "p10": 131.9,
+    "median": 132.1,
+    "p90": 132.1,
+    "max": 133.5
+   },
+   "meshRoof": {
+    "n": 5,
+    "min": 132.5,
+    "p10": 132.5,
+    "median": 133.3,
+    "p90": 158.5,
+    "max": 158.5
+   },
+   "currentMinusMeshMedianM": 14.5,
+   "currentMinusMeshP90M": -10.7,
+   "modelCellsOutsideOutline": 407,
+   "modelCellsOutsideBeyond2m": 393,
+   "iouModelVsOutline": 0.0
+  },
+  {
+   "name": "상승관",
+   "buildingId": "상승관",
+   "outlineAreaM2": 228,
+   "gridCoverage": 1.0,
+   "cellsInside": 59,
+   "currentBaseM": 140.559,
+   "currentRoofM": 148.753,
+   "heightSource": "ESTIMATE",
+   "buildingModelsInside": {},
+   "buildingModelShareInside": 0.0,
+   "surfaceInside": {
+    "n": 59,
+    "min": 148.1,
+    "p10": 148.1,
+    "median": 148.5,
+    "p90": 148.8,
+    "max": 148.9
+   },
+   "currentMinusSurfaceMedianM": 0.3
+  }
+ ],
+ "roadReferences": {
+  "roads": 128,
+  "byBuildingId": {
+   "None": 31,
+   "북악관": 71,
+   "건물5": 8,
+   "문예관": 4,
+   "유담관": 13,
+   "대일관": 1
+  },
+  "은주관": 0,
+  "혜인관(공연실습소 표기 도형의 buildingId)": 0,
+  "건물5(혜인관 도형의 buildingId)": 8
+ }
+}
