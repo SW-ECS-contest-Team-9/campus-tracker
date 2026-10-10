@@ -31,6 +31,9 @@
     "check:delayed-upload": "tsx scripts/check-delayed-upload.ts",
     "terrain:extract": "tsx scripts/terrain-extract.ts",
     "terrain:import": "tsx scripts/terrain-import.ts",
+    "terrain:local-samples": "tsx scripts/terrain-local-samples.ts",
+    "terrain:list": "tsx scripts/terrain-versions.ts list",
+    "terrain:activate": "tsx scripts/terrain-versions.ts activate",
     "buildings:calibrate": "tsx scripts/buildings-calibrate.ts"
   },
   "dependencies": {

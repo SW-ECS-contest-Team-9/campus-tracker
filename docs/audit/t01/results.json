@@ -1,0 +1,1261 @@
+{
+ "created": "2026-10-10",
+ "samples": 2508,
+ "reproduction": {
+  "note": "가장자리 줄임·가드를 끈 applyLocalSamples 대 E01 dem-V2e.f32, 최대 |차| m",
+  "e01Samples": 0,
+  "committedSamplesRounded": 0.00032806396484375
+ },
+ "neighbours": {
+  "within4m": {
+   "min": 2,
+   "lt2": 0,
+   "lt3": 5,
+   "lt5": 11
+  },
+  "within6m": {
+   "min": 3,
+   "lt2": 0,
+   "lt3": 0,
+   "lt5": 2
+  },
+  "within8m": {
+   "min": 8,
+   "lt2": 0,
+   "lt3": 0,
+   "lt5": 0
+  }
+ },
+ "settings": {
+  "E01 V2e (줄임 없음, 가드 없음)": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": "무한",
+    "fadeM": 0,
+    "minNeighbours": 0,
+    "neighbourRadiusM": 0
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.3,
+     "maxAbs": 2.47
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.08,
+     "p90Abs": 1.25,
+     "maxAbs": 3.28
+    }
+   },
+   "changedCells": 5220,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 10.53,
+    "areaOver05M2": 8672,
+    "areaOver01M2": 9492
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     33
+    ],
+    "band2to30m": [
+     740,
+     939
+    ],
+    "bandNew": 223,
+    "bandGone": 24,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 북쪽": {
+      "cells": 67,
+      "maxAbsDeltaM": 7.66,
+      "distToSampleMedianM": 13.34,
+      "distToSampleMaxM": 15.81,
+      "bbox": [
+       201163,
+       557289,
+       201223,
+       557321
+      ]
+     },
+     "운동장 남쪽": {
+      "cells": 66,
+      "maxAbsDeltaM": 5.52,
+      "distToSampleMedianM": 13.93,
+      "distToSampleMaxM": 15.56,
+      "bbox": [
+       201145,
+       557167,
+       201219,
+       557207
+      ]
+     },
+     "운동장 서쪽": {
+      "cells": 53,
+      "maxAbsDeltaM": 5.05,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 15.56,
+      "bbox": [
+       201123,
+       557207,
+       201143,
+       557289
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 14,
+      "maxAbsDeltaM": 4.76,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 14.76,
+      "bbox": [
+       201143,
+       557321,
+       201161,
+       557333
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 9,
+      "maxAbsDeltaM": 4.19,
+      "distToSampleMedianM": 13.93,
+      "distToSampleMaxM": 16.55,
+      "bbox": [
+       201033,
+       557291,
+       201077,
+       557315
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 8,
+      "maxAbsDeltaM": 3.24,
+      "distToSampleMedianM": 12.73,
+      "distToSampleMaxM": 15.81,
+      "bbox": [
+       201083,
+       557245,
+       201103,
+       557289
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 3,
+      "maxAbsDeltaM": 1.84,
+      "distToSampleMedianM": 13.34,
+      "distToSampleMaxM": 14.21,
+      "bbox": [
+       201121,
+       557343,
+       201127,
+       557345
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 1.54,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 13.19,
+      "bbox": [
+       201057,
+       557231,
+       201099,
+       557265
+      ]
+     },
+     "사잇길 서쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 0.31,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 13.04,
+      "bbox": [
+       201095,
+       557309,
+       201095,
+       557309
+      ]
+     }
+    }
+   }
+  },
+  "줄임 없음 + 가드 3/6m": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": "무한",
+    "fadeM": 0,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.54,
+     "maxAbs": 2.55
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.07,
+     "p90Abs": 1.29,
+     "maxAbs": 3.28
+    }
+   },
+   "changedCells": 5220,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 10.53,
+    "areaOver05M2": 8672,
+    "areaOver01M2": 9492
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     33
+    ],
+    "band2to30m": [
+     740,
+     939
+    ],
+    "bandNew": 223,
+    "bandGone": 24,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 북쪽": {
+      "cells": 67,
+      "maxAbsDeltaM": 7.66,
+      "distToSampleMedianM": 13.34,
+      "distToSampleMaxM": 15.81,
+      "bbox": [
+       201163,
+       557289,
+       201223,
+       557321
+      ]
+     },
+     "운동장 남쪽": {
+      "cells": 66,
+      "maxAbsDeltaM": 5.52,
+      "distToSampleMedianM": 13.93,
+      "distToSampleMaxM": 15.56,
+      "bbox": [
+       201145,
+       557167,
+       201219,
+       557207
+      ]
+     },
+     "운동장 서쪽": {
+      "cells": 53,
+      "maxAbsDeltaM": 5.05,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 15.56,
+      "bbox": [
+       201123,
+       557207,
+       201143,
+       557289
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 14,
+      "maxAbsDeltaM": 4.76,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 14.76,
+      "bbox": [
+       201143,
+       557321,
+       201161,
+       557333
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 9,
+      "maxAbsDeltaM": 4.19,
+      "distToSampleMedianM": 13.93,
+      "distToSampleMaxM": 16.55,
+      "bbox": [
+       201033,
+       557291,
+       201077,
+       557315
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 8,
+      "maxAbsDeltaM": 3.24,
+      "distToSampleMedianM": 12.73,
+      "distToSampleMaxM": 15.81,
+      "bbox": [
+       201083,
+       557245,
+       201103,
+       557289
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 3,
+      "maxAbsDeltaM": 1.84,
+      "distToSampleMedianM": 13.34,
+      "distToSampleMaxM": 14.21,
+      "bbox": [
+       201121,
+       557343,
+       201127,
+       557345
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 1.54,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 13.19,
+      "bbox": [
+       201057,
+       557231,
+       201099,
+       557265
+      ]
+     },
+     "사잇길 서쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 0.31,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 13.04,
+      "bbox": [
+       201095,
+       557309,
+       201095,
+       557309
+      ]
+     }
+    }
+   }
+  },
+  "support 10 fade 5": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": 10,
+    "fadeM": 5,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.54,
+     "maxAbs": 2.47
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.07,
+     "p90Abs": 1.29,
+     "maxAbs": 3.28
+    }
+   },
+   "changedCells": 5220,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 10.53,
+    "areaOver05M2": 7624,
+    "areaOver01M2": 8832
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     33
+    ],
+    "band2to30m": [
+     740,
+     989
+    ],
+    "bandNew": 270,
+    "bandGone": 21,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 남쪽": {
+      "cells": 81,
+      "maxAbsDeltaM": 6.64,
+      "distToSampleMedianM": 12.08,
+      "distToSampleMaxM": 13.93,
+      "bbox": [
+       201145,
+       557165,
+       201225,
+       557207
+      ]
+     },
+     "운동장 서쪽": {
+      "cells": 74,
+      "maxAbsDeltaM": 5.66,
+      "distToSampleMedianM": 11.4,
+      "distToSampleMaxM": 13.34,
+      "bbox": [
+       201123,
+       557209,
+       201145,
+       557291
+      ]
+     },
+     "운동장 북쪽": {
+      "cells": 70,
+      "maxAbsDeltaM": 8.61,
+      "distToSampleMedianM": 12.08,
+      "distToSampleMaxM": 13.93,
+      "bbox": [
+       201161,
+       557287,
+       201221,
+       557321
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 14,
+      "maxAbsDeltaM": 6.16,
+      "distToSampleMedianM": 11.4,
+      "distToSampleMaxM": 13.04,
+      "bbox": [
+       201147,
+       557319,
+       201159,
+       557331
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 11,
+      "maxAbsDeltaM": 3.43,
+      "distToSampleMedianM": 11.4,
+      "distToSampleMaxM": 14.1,
+      "bbox": [
+       201081,
+       557245,
+       201103,
+       557291
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 11,
+      "maxAbsDeltaM": 4.19,
+      "distToSampleMedianM": 11.4,
+      "distToSampleMaxM": 13.93,
+      "bbox": [
+       201035,
+       557291,
+       201077,
+       557313
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 5,
+      "maxAbsDeltaM": 3.36,
+      "distToSampleMedianM": 12.08,
+      "distToSampleMaxM": 13.34,
+      "bbox": [
+       201121,
+       557333,
+       201139,
+       557345
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 0.46,
+      "distToSampleMedianM": 13.19,
+      "distToSampleMaxM": 13.19,
+      "bbox": [
+       201099,
+       557231,
+       201099,
+       557231
+      ]
+     },
+     "S06 서쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 1.99,
+      "distToSampleMedianM": 12.08,
+      "distToSampleMaxM": 12.08,
+      "bbox": [
+       201033,
+       557279,
+       201033,
+       557279
+      ]
+     },
+     "사잇길 남쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 2.11,
+      "distToSampleMedianM": 12.08,
+      "distToSampleMaxM": 12.08,
+      "bbox": [
+       201131,
+       557293,
+       201131,
+       557293
+      ]
+     },
+     "사잇길 서쪽": {
+      "cells": 1,
+      "maxAbsDeltaM": 0.11,
+      "distToSampleMedianM": 13.04,
+      "distToSampleMaxM": 13.04,
+      "bbox": [
+       201095,
+       557309,
+       201095,
+       557309
+      ]
+     }
+    }
+   }
+  },
+  "support 6 fade 6": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": 6,
+    "fadeM": 6,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.01,
+     "p90Abs": 0.73,
+     "maxAbs": 2.55
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.09,
+     "p90Abs": 1.41,
+     "maxAbs": 2.6
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.07,
+     "p90Abs": 1.29,
+     "maxAbs": 3.28
+    }
+   },
+   "changedCells": 4602,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 10.53,
+    "areaOver05M2": 5488,
+    "areaOver01M2": 6560
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     33
+    ],
+    "band2to30m": [
+     740,
+     1007
+    ],
+    "bandNew": 288,
+    "bandGone": 21,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 남쪽": {
+      "cells": 92,
+      "maxAbsDeltaM": 6.98,
+      "distToSampleMedianM": 8.6,
+      "distToSampleMaxM": 10.3,
+      "bbox": [
+       201147,
+       557167,
+       201217,
+       557211
+      ]
+     },
+     "운동장 북쪽": {
+      "cells": 78,
+      "maxAbsDeltaM": 8.98,
+      "distToSampleMedianM": 8.6,
+      "distToSampleMaxM": 11.05,
+      "bbox": [
+       201159,
+       557285,
+       201217,
+       557317
+      ]
+     },
+     "운동장 서쪽": {
+      "cells": 77,
+      "maxAbsDeltaM": 6.4,
+      "distToSampleMedianM": 9.06,
+      "distToSampleMaxM": 10.3,
+      "bbox": [
+       201127,
+       557211,
+       201147,
+       557293
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 22,
+      "maxAbsDeltaM": 7,
+      "distToSampleMedianM": 8.6,
+      "distToSampleMaxM": 10.3,
+      "bbox": [
+       201141,
+       557315,
+       201157,
+       557329
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 7,
+      "maxAbsDeltaM": 4.85,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 9.9,
+      "bbox": [
+       201047,
+       557291,
+       201079,
+       557307
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 6,
+      "maxAbsDeltaM": 2.84,
+      "distToSampleMedianM": 8.6,
+      "distToSampleMaxM": 9.9,
+      "bbox": [
+       201081,
+       557245,
+       201099,
+       557285
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 4,
+      "maxAbsDeltaM": 4.01,
+      "distToSampleMedianM": 7.07,
+      "distToSampleMaxM": 9.9,
+      "bbox": [
+       201119,
+       557335,
+       201125,
+       557339
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 2.11,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 8.6,
+      "bbox": [
+       201077,
+       557229,
+       201081,
+       557239
+      ]
+     }
+    }
+   }
+  },
+  "support 4 fade 4": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": 4,
+    "fadeM": 4,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.02,
+     "p90Abs": 1.06,
+     "maxAbs": 3.82
+    },
+    "사잇길": {
+     "n": 215,
+     "median": 0.01,
+     "p90Abs": 1.37,
+     "maxAbs": 5.23
+    },
+    "S06": {
+     "n": 246,
+     "median": 0.04,
+     "p90Abs": 1.4,
+     "maxAbs": 3.28
+    }
+   },
+   "changedCells": 3831,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 10.42,
+    "areaOver05M2": 3128,
+    "areaOver01M2": 3852
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     33
+    ],
+    "band2to30m": [
+     740,
+     1066
+    ],
+    "bandNew": 337,
+    "bandGone": 11,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 남쪽": {
+      "cells": 93,
+      "maxAbsDeltaM": 7.69,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.62,
+      "bbox": [
+       201149,
+       557169,
+       201213,
+       557213
+      ]
+     },
+     "운동장 서쪽": {
+      "cells": 88,
+      "maxAbsDeltaM": 7.04,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.62,
+      "bbox": [
+       201129,
+       557213,
+       201149,
+       557295
+      ]
+     },
+     "운동장 북쪽": {
+      "cells": 81,
+      "maxAbsDeltaM": 10.42,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.62,
+      "bbox": [
+       201139,
+       557283,
+       201217,
+       557315
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 26,
+      "maxAbsDeltaM": 8.56,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.62,
+      "bbox": [
+       201137,
+       557313,
+       201155,
+       557327
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 16,
+      "maxAbsDeltaM": 4.74,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 8.6,
+      "bbox": [
+       201043,
+       557291,
+       201077,
+       557307
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 14,
+      "maxAbsDeltaM": 3.92,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 8.6,
+      "bbox": [
+       201109,
+       557329,
+       201133,
+       557339
+      ]
+     },
+     "S06 서쪽": {
+      "cells": 8,
+      "maxAbsDeltaM": 3.6,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201031,
+       557283,
+       201041,
+       557305
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 5,
+      "maxAbsDeltaM": 2.26,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.55,
+      "bbox": [
+       201081,
+       557245,
+       201099,
+       557285
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 4,
+      "maxAbsDeltaM": 1.61,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.07,
+      "bbox": [
+       201077,
+       557235,
+       201079,
+       557241
+      ]
+     },
+     "사잇길 남쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 2.16,
+      "distToSampleMedianM": 5.83,
+      "distToSampleMaxM": 7.07,
+      "bbox": [
+       201133,
+       557297,
+       201137,
+       557299
+      ]
+     }
+    }
+   }
+  },
+  "support 2 fade 4": {
+   "options": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": 2,
+    "fadeM": 4,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "skippedSamples": 0,
+   "fitAllIn": {
+    "운동장": {
+     "n": 2047,
+     "median": 0,
+     "p90Abs": 0.32,
+     "maxAbs": 1.13
+    },
+    "사잇길": {
+     "n": 215,
+     "median": -0.01,
+     "p90Abs": 0.4,
+     "maxAbs": 0.93
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.03,
+     "p90Abs": 0.57,
+     "maxAbs": 1.11
+    }
+   },
+   "holdoutBlock10m": {
+    "운동장": {
+     "n": 2047,
+     "median": 0.76,
+     "p90Abs": 3.99,
+     "maxAbs": 9.21
+    },
+    "사잇길": {
+     "n": 215,
+     "median": 0.45,
+     "p90Abs": 3,
+     "maxAbs": 8.25
+    },
+    "S06": {
+     "n": 246,
+     "median": -0.41,
+     "p90Abs": 2.17,
+     "maxAbs": 4.28
+    }
+   },
+   "changedCells": 3499,
+   "beyond30mMaxAbsM": 0,
+   "band2to30m": {
+    "maxAbsM": 7.84,
+    "areaOver05M2": 1676,
+    "areaOver01M2": 2092
+   },
+   "steepOver45deg": {
+    "within2m": [
+     221,
+     84
+    ],
+    "band2to30m": [
+     740,
+     988
+    ],
+    "bandNew": 260,
+    "bandGone": 12,
+    "bandMaxSlope": 4.9,
+    "bandNewWhere": {
+     "운동장 서쪽": {
+      "cells": 84,
+      "maxAbsDeltaM": 5.91,
+      "distToSampleMedianM": 4.24,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201131,
+       557215,
+       201151,
+       557289
+      ]
+     },
+     "운동장 남쪽": {
+      "cells": 80,
+      "maxAbsDeltaM": 6.25,
+      "distToSampleMedianM": 4.24,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201151,
+       557171,
+       201211,
+       557213
+      ]
+     },
+     "운동장 북쪽": {
+      "cells": 56,
+      "maxAbsDeltaM": 7.8,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201139,
+       557283,
+       201215,
+       557313
+      ]
+     },
+     "사잇길 동쪽": {
+      "cells": 12,
+      "maxAbsDeltaM": 3.54,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 5.1,
+      "bbox": [
+       201137,
+       557311,
+       201153,
+       557325
+      ]
+     },
+     "S06 북쪽": {
+      "cells": 9,
+      "maxAbsDeltaM": 1.96,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 5.1,
+      "bbox": [
+       201043,
+       557293,
+       201067,
+       557305
+      ]
+     },
+     "S06 서쪽": {
+      "cells": 7,
+      "maxAbsDeltaM": 3.45,
+      "distToSampleMedianM": 4.24,
+      "distToSampleMaxM": 4.24,
+      "bbox": [
+       201033,
+       557287,
+       201037,
+       557303
+      ]
+     },
+     "사잇길 북쪽": {
+      "cells": 5,
+      "maxAbsDeltaM": 1.87,
+      "distToSampleMedianM": 5.1,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201123,
+       557327,
+       201131,
+       557335
+      ]
+     },
+     "사잇길 남쪽": {
+      "cells": 3,
+      "maxAbsDeltaM": 4.75,
+      "distToSampleMedianM": 3.16,
+      "distToSampleMaxM": 5.1,
+      "bbox": [
+       201139,
+       557299,
+       201141,
+       557301
+      ]
+     },
+     "S06 남쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 2.5,
+      "distToSampleMedianM": 3.3,
+      "distToSampleMaxM": 5.83,
+      "bbox": [
+       201077,
+       557239,
+       201093,
+       557239
+      ]
+     },
+     "S06 동쪽": {
+      "cells": 2,
+      "maxAbsDeltaM": 1.69,
+      "distToSampleMedianM": 4.24,
+      "distToSampleMaxM": 4.24,
+      "bbox": [
+       201083,
+       557277,
+       201085,
+       557279
+      ]
+     }
+    }
+   }
+  }
+ },
+ "loneSamples": {
+  "note": "세 구역 표본에 기타 구역 흩어진 api 31개를 더했을 때, 그 31개 때문에 달라지는 최대값",
+  "others": 31,
+  "noGuard": {
+   "skipped": 0,
+   "maxAbsChangeFromOthersM": 12.17
+  },
+  "guard": {
+   "skipped": 31,
+   "maxAbsChangeFromOthersM": 0
+  }
+ }
+}
