@@ -1,0 +1,110 @@
+{
+ "crs": "EPSG:5186",
+ "heights": {
+  "plaza": 114.1,
+  "terraceS": 114.3,
+  "roadAtEntry": 114.0,
+  "roadAtFountain": 112.2,
+  "roadAtNorthEnd": 118.8
+ },
+ "fountain": {
+  "centre": [
+   201073.0,
+   557203.0
+  ],
+  "rimRadiusM": 6.3,
+  "grade": "S-MAP 정사 그림 ±1 m"
+ },
+ "colonnade": {
+  "radiusM": 12.0,
+  "fromDeg": 66.0,
+  "toDeg": 155.0,
+  "columns": 7,
+  "grade": "추정(사진에서 셈)"
+ },
+ "areas_m2": {
+  "Z03-PLATFORM-ROAD-A": 456.8,
+  "Z03-PLATFORM-ROAD-B": 608.2,
+  "Z03-PLATFORM-BANK-S": 72.8,
+  "Z03-PLATFORM-BANK-N-LOW": 61.3,
+  "Z03-PLATFORM-BANK-N-UP": 56.7,
+  "Z03-PLATFORM-TERRACE-S": 180.7,
+  "Z03-PLATFORM-PLAZA": 1025.2
+ },
+ "door6F": {
+  "xy": [
+   201067.7,
+   557231.2
+  ],
+  "z": 114.1,
+  "grade": "추정(차양 가운데, ±3 m)"
+ },
+ "entry": {
+  "xy": [
+   201084.6,
+   557218.5
+  ],
+  "z": 114.1,
+  "grade": "S-MAP(광장과 보도가 같은 높이인 자리) + 거리뷰 Y05·Y08(붉은 말뚝)"
+ },
+ "eastStair": {
+  "riseM": 0.155,
+  "runM": 0.35,
+  "risersPerFlight": 6,
+  "flights": [
+   {
+    "flight": 1,
+    "y0": 212.0,
+    "y1": 214.1,
+    "landingTo": 219.32,
+    "baseM": 113.18,
+    "topM": 114.11
+   },
+   {
+    "flight": 2,
+    "y0": 219.32,
+    "y1": 221.42,
+    "landingTo": 225.74,
+    "baseM": 114.11,
+    "topM": 115.04
+   },
+   {
+    "flight": 3,
+    "y0": 225.74,
+    "y1": 227.84,
+    "landingTo": 231.89,
+    "baseM": 115.04,
+    "topM": 115.97
+   },
+   {
+    "flight": 4,
+    "y0": 231.89,
+    "y1": 233.99,
+    "landingTo": 237.87,
+    "baseM": 115.97,
+    "topM": 116.9
+   },
+   {
+    "flight": 5,
+    "y0": 237.87,
+    "y1": 239.97,
+    "landingTo": 243.63,
+    "baseM": 116.9,
+    "topM": 117.83
+   },
+   {
+    "flight": 6,
+    "y0": 243.63,
+    "y1": 245.73,
+    "landingTo": 249.71,
+    "baseM": 117.83,
+    "topM": 118.76
+   }
+  ],
+  "grade": "추정"
+ },
+ "counts": {
+  "platform": 7,
+  "extrude": 122
+ }
+}

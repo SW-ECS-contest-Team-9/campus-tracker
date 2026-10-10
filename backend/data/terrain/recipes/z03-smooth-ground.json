@@ -1,0 +1,53 @@
+{
+ "crs": "EPSG:5186",
+ "protectBuildings": true,
+ "reason": "Z03: Z02 조리법에 유담관 분수 광장과 주변의 기단을 더함: 광장 슬래브 114.1 m, 남쪽 나무 단 114.3 m, 광장 옆 차도 포장 띠(V02 종단, 두 조각), 광장과 차도 사이 둑(남쪽 한 단, 북쪽 두 단). 지형 칸은 구조물 파일(frontend/public/structures/z03-fountain.geojson)의 기단 윗면에서 나온다. 분수·열주·차양·난간·계단식 보도는 구조물 파일이 싣는다.",
+ "steps": [
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_5186.json",
+    "../samples/smap_samples_roads_5186.json",
+    "../samples/smap_samples_roadprofile_5186.json"
+   ],
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ]
+  },
+  {
+   "type": "plateau",
+   "file": "f05-plateaus.geojson",
+   "noBlend": "f05-no-blend.geojson"
+  },
+  {
+   "type": "corridor",
+   "file": "t06-road-corridors.json",
+   "lines": [
+    "V1",
+    "V2",
+    "V3",
+    "V4a",
+    "V4b",
+    "P-LOW",
+    "P-UP"
+   ],
+   "keep": "f05-plateaus.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "g02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z03-surface.geojson"
+  }
+ ]
+}
