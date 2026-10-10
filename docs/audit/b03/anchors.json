@@ -193,18 +193,18 @@
    "wallFoot": {
     "n": 0
    },
-   "groundM": 100.3,
+   "groundM": 103.0,
    "groundFrom": "override",
    "spread": [
-    99.6,
-    101.3
+    102.4,
+    103.9
    ],
    "grade": "S-MAP",
    "insideOutlineOf": [
     "유담관"
    ],
-   "overrideCells": 25,
-   "why": "표지는 서쪽 벽 비탈(104~119 m) 위에 찍혀 있다. 벽 발치의 낮은 길(표지 서쪽 3.5~11.5 m, 남북 ±4 m)을 읽었다. 길이 남북으로 기울어 4 m 에 0.6 m 달라진다"
+   "overrideCells": 15,
+   "why": "B06: 사용자가 표시한 자리(우편취급국 옆 표지 200994.6, 557307.6)의 바깥 길 쪽 지면. 벽은 x 200996 부터 솟는다. 표지 서쪽 0.6~4.6 m, 남북 ±4 m 의 길 칸. 길이 북쪽으로 오르막(4 m 에 0.3 m). 옛 읽기(19 m 남쪽 100.3 m)는 거둔다"
   },
   {
    "name": "본관 입구(1)",
@@ -313,14 +313,16 @@
     "median": 126.5,
     "max": 126.9
    },
-   "groundM": 126.5,
-   "groundFrom": "wallFoot",
+   "groundM": 127.2,
+   "groundFrom": "override",
    "spread": [
-    125.8,
-    126.9
+    126.9,
+    127.5
    ],
    "grade": "S-MAP",
-   "insideOutlineOf": []
+   "insideOutlineOf": [],
+   "overrideCells": 12,
+   "why": "B06: 표지 옆 계단 위 평탄면(x 201105~201108, y 557278~557280). 계단 아래 차도는 125.1~125.2 m. 옛 읽기(벽 앞 칸 중앙값 126.5)는 계단 위·아래가 섞인 값"
   },
   {
    "name": "은주1관 입구(1)",
@@ -848,7 +850,7 @@
    "anchors": [
     {
      "floor": 3,
-     "heightM": 100.3
+     "heightM": 104.0
     },
     {
      "floor": 6,
@@ -861,39 +863,6 @@
    ],
    "smapRoofM": 167.4,
    "hypotheses": {
-    "4·13 건너뜀": {
-     "skip": [
-      4,
-      13
-     ],
-     "storeysAboveGround": 14,
-     "betweenAnchors": [
-      {
-       "from": 3,
-       "to": 6,
-       "storeys": 2,
-       "storeyHeightM": 6.9,
-       "implausible": true
-      },
-      {
-       "from": 6,
-       "to": 9,
-       "storeys": 3,
-       "storeyHeightM": 5.03,
-       "implausible": false
-      }
-     ],
-     "meanBetweenAnchorsM": 5.78,
-     "topAnchorToSmapRoof": {
-      "storeys": 7,
-      "storeyHeightM": 5.46,
-      "implausible": false
-     },
-     "roofAtAnchorStoreyHeight": {
-      "roofM": 169.7,
-      "minusSmapRoofM": 2.3
-     }
-    },
     "4만 건너뜀": {
      "skip": [
       4
@@ -904,8 +873,8 @@
        "from": 3,
        "to": 6,
        "storeys": 2,
-       "storeyHeightM": 6.9,
-       "implausible": true
+       "storeyHeightM": 5.05,
+       "implausible": false
       },
       {
        "from": 6,
@@ -915,48 +884,81 @@
        "implausible": false
       }
      ],
-     "meanBetweenAnchorsM": 5.78,
+     "meanBetweenAnchorsM": 5.04,
      "topAnchorToSmapRoof": {
       "storeys": 8,
       "storeyHeightM": 4.78,
       "implausible": false
      },
      "roofAtAnchorStoreyHeight": {
-      "roofM": 175.4,
-      "minusSmapRoofM": 8.0
+      "roofM": 169.5,
+      "minusSmapRoofM": 2.1
+     }
+    },
+    "4·13 건너뜀(거둠)": {
+     "skip": [
+      4,
+      13
+     ],
+     "storeysAboveGround": 14,
+     "betweenAnchors": [
+      {
+       "from": 3,
+       "to": 6,
+       "storeys": 2,
+       "storeyHeightM": 5.05,
+       "implausible": false
+      },
+      {
+       "from": 6,
+       "to": 9,
+       "storeys": 3,
+       "storeyHeightM": 5.03,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 5.04,
+     "topAnchorToSmapRoof": {
+      "storeys": 7,
+      "storeyHeightM": 5.46,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 164.5,
+      "minusSmapRoofM": -2.9
      }
     }
    },
    "roofNote": "기운 지붕의 낮은 끝(tower.py 직선 맞춤 167.4). 높은 끝은 180.4",
-   "ladderHypothesis": "4·13 건너뜀",
-   "ladderWhy": "6층(분수 광장, 확정)과 9층(버스 정류장 쪽, 확정)만 기준으로 쓴다. 9층 높이는 탑 북서 모서리 앞마당 지면(YUDAM_9F)이고 입구(2) 표지의 벽 앞 지면(126.9)은 따로 남긴다. 6층은 거의 두 층 높이(사용자 확정, 값은 추정)라 6→9층을 6층 2 : 7층 1 : 8층 1 로 나눴다. 3층 입구 기준은 의심(본문). 13은 추정",
+   "ladderHypothesis": "4만 건너뜀",
+   "ladderWhy": "6층(분수 광장, 확정)과 9층(버스 정류장 쪽, 확정)만 기준으로 쓴다. 9층 높이는 탑 북서 모서리 앞마당 지면(YUDAM_9F)이고 입구(2) 표지의 벽 앞 지면(126.9)은 따로 남긴다. 6층은 거의 두 층 높이(사용자 확정, 값은 추정)라 6→9층을 6층 2 : 7층 1 : 8층 1 로 나눴다. 3층(B06): 우편취급국 옆 문 앞 지면 + 사진 06 의 계단 약 1.0 m(추정). 6층 아래는 3→6층 2개 층을 고르게 나눈다. 13층은 있다(확정)",
    "storeyHeightBelowAnchorsM": 3.77,
    "storeyHeightAboveAnchorsM": 3.77,
-   "storeyHeightAboveFrom": "6층을 두 층 높이로 보고 6→9층을 4등분한 층고(지붕까지 나눈 값은 5.5 m 초과)",
+   "storeyHeightAboveFrom": "6층을 두 층 높이로 보고 6→9층을 4등분한 층고. S-MAP 지붕 낮은 끝까지를 층 수로 나누면 4.78 m",
    "ladder": {
     "B2": [
-     91.5,
+     83.8,
      "extrap"
     ],
     "B1": [
-     95.2,
+     88.9,
      "extrap"
     ],
     "1": [
-     99.0,
+     93.9,
      "extrap"
     ],
     "2": [
-     102.8,
+     99.0,
      "extrap"
     ],
     "3": [
-     106.5,
-     "extrap"
+     104.0,
+     "lowAnchor"
     ],
     "5": [
-     110.3,
-     "extrap"
+     109.0,
+     "interp"
     ],
     "6": [
      114.1,
@@ -986,19 +988,39 @@
      140.5,
      "extrap"
     ],
-    "14": [
+    "13": [
      144.3,
      "extrap"
     ],
-    "15": [
+    "14": [
      148.1,
      "extrap"
     ],
-    "16": [
+    "15": [
      151.8,
+     "extrap"
+    ],
+    "16": [
+     155.6,
      "extrap"
     ]
    },
+   "lowAnchor": {
+    "floor": 3,
+    "heightM": 104.0,
+    "groundM": 103.0,
+    "stepsAssumedM": 1.0,
+    "storeysToDouble": 2,
+    "storeyHeightM": 5.05,
+    "storeyHeightFromGroundM": 5.55,
+    "implausible": false
+   },
+   "topFloorCeilingM": 159.4,
+   "smapRoofMinusCeilingM": [
+    8.0,
+    21.0
+   ],
+   "storeysFromTopAnchorToRoof": 8,
    "doubleHeightFloor": {
     "floor": 6,
     "heightM": 7.55,
@@ -1117,7 +1139,7 @@
    "anchors": [
     {
      "floor": 1,
-     "heightM": 126.5
+     "heightM": 127.2
     },
     {
      "floor": 6,
@@ -1126,32 +1148,6 @@
    ],
    "smapRoofM": 188.1,
    "hypotheses": {
-    "4·13 건너뜀": {
-     "skip": [
-      4,
-      13
-     ],
-     "storeysAboveGround": 14,
-     "betweenAnchors": [
-      {
-       "from": 1,
-       "to": 6,
-       "storeys": 4,
-       "storeyHeightM": 5.6,
-       "implausible": true
-      }
-     ],
-     "meanBetweenAnchorsM": 5.6,
-     "topAnchorToSmapRoof": {
-      "storeys": 10,
-      "storeyHeightM": 3.92,
-      "implausible": false
-     },
-     "roofAtAnchorStoreyHeight": {
-      "roofM": 204.9,
-      "minusSmapRoofM": 16.8
-     }
-    },
     "4만 건너뜀": {
      "skip": [
       4
@@ -1162,43 +1158,69 @@
        "from": 1,
        "to": 6,
        "storeys": 4,
-       "storeyHeightM": 5.6,
-       "implausible": true
+       "storeyHeightM": 5.43,
+       "implausible": false
       }
      ],
-     "meanBetweenAnchorsM": 5.6,
+     "meanBetweenAnchorsM": 5.43,
      "topAnchorToSmapRoof": {
       "storeys": 11,
       "storeyHeightM": 3.56,
       "implausible": false
      },
      "roofAtAnchorStoreyHeight": {
-      "roofM": 210.5,
-      "minusSmapRoofM": 22.4
+      "roofM": 208.6,
+      "minusSmapRoofM": 20.5
+     }
+    },
+    "4·13 건너뜀(거둠)": {
+     "skip": [
+      4,
+      13
+     ],
+     "storeysAboveGround": 14,
+     "betweenAnchors": [
+      {
+       "from": 1,
+       "to": 6,
+       "storeys": 4,
+       "storeyHeightM": 5.43,
+       "implausible": false
+      }
+     ],
+     "meanBetweenAnchorsM": 5.43,
+     "topAnchorToSmapRoof": {
+      "storeys": 10,
+      "storeyHeightM": 3.92,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 203.2,
+      "minusSmapRoofM": 15.1
      }
     }
    },
    "roofNote": "바깥 고리 지붕(B02). 가운데 원판은 197.3",
-   "ladderHypothesis": "4·13 건너뜀",
-   "ladderWhy": "6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 4개 층 22.4 m, 층당 5.6 m 로 범위(5.5 m)를 조금 넘는다. 13은 추정",
-   "storeyHeightBelowAnchorsM": 5.6,
-   "storeyHeightAboveAnchorsM": 3.92,
+   "ladderHypothesis": "4만 건너뜀",
+   "ladderWhy": "6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 4개 층 22.4 m, B06: 1층 기준을 계단 위 평탄면으로 다시 읽었다. 13층은 있다(확정)",
+   "storeyHeightBelowAnchorsM": 5.43,
+   "storeyHeightAboveAnchorsM": 3.56,
    "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
    "ladder": {
     "1": [
-     126.5,
+     127.2,
      "anchor"
     ],
     "2": [
-     132.1,
+     132.6,
      "interp"
     ],
     "3": [
-     137.7,
+     138.1,
      "interp"
     ],
     "5": [
-     143.3,
+     143.5,
      "interp"
     ],
     "6": [
@@ -1206,39 +1228,43 @@
      "anchor"
     ],
     "7": [
-     152.8,
+     152.5,
      "extrap"
     ],
     "8": [
-     156.7,
+     156.0,
      "extrap"
     ],
     "9": [
-     160.7,
+     159.6,
      "extrap"
     ],
     "10": [
-     164.6,
+     163.2,
      "extrap"
     ],
     "11": [
-     168.5,
+     166.7,
      "extrap"
     ],
     "12": [
-     172.4,
+     170.3,
+     "extrap"
+    ],
+    "13": [
+     173.8,
      "extrap"
     ],
     "14": [
-     176.3,
+     177.4,
      "extrap"
     ],
     "15": [
-     180.3,
+     181.0,
      "extrap"
     ],
     "16": [
-     184.2,
+     184.5,
      "extrap"
     ]
    }
@@ -1664,32 +1690,6 @@
    ],
    "smapRoofM": 189.4,
    "hypotheses": {
-    "4·13 건너뜀": {
-     "skip": [
-      4,
-      13
-     ],
-     "storeysAboveGround": 13,
-     "betweenAnchors": [
-      {
-       "from": 2,
-       "to": 3,
-       "storeys": 1,
-       "storeyHeightM": 1.9,
-       "implausible": true
-      }
-     ],
-     "meanBetweenAnchorsM": 1.9,
-     "topAnchorToSmapRoof": {
-      "storeys": 11,
-      "storeyHeightM": 4.42,
-      "implausible": false
-     },
-     "roofAtAnchorStoreyHeight": {
-      "roofM": 161.7,
-      "minusSmapRoofM": -27.7
-     }
-    },
     "4만 건너뜀": {
      "skip": [
       4
@@ -1714,21 +1714,47 @@
       "roofM": 163.6,
       "minusSmapRoofM": -25.8
      }
+    },
+    "4·13 건너뜀(거둠)": {
+     "skip": [
+      4,
+      13
+     ],
+     "storeysAboveGround": 13,
+     "betweenAnchors": [
+      {
+       "from": 2,
+       "to": 3,
+       "storeys": 1,
+       "storeyHeightM": 1.9,
+       "implausible": true
+      }
+     ],
+     "meanBetweenAnchorsM": 1.9,
+     "topAnchorToSmapRoof": {
+      "storeys": 11,
+      "storeyHeightM": 4.42,
+      "implausible": false
+     },
+     "roofAtAnchorStoreyHeight": {
+      "roofM": 161.7,
+      "minusSmapRoofM": -27.7
+     }
     }
    },
    "roofNote": "지붕(E02). 지붕판 188.8~190.2",
-   "ladderHypothesis": "4·13 건너뜀",
-   "ladderWhy": "두 기준(2층·3층 입구)의 지면 차가 1.9 m 라 층고로 쓸 수 없다(3층 로비 표지가 낮은 날개 지붕 아래라 문 앞 지면을 못 읽음). 2층 기준만 쓰고 층고는 2층~지붕 평균. 13은 추정",
-   "storeyHeightBelowAnchorsM": 4.21,
-   "storeyHeightAboveAnchorsM": 4.21,
+   "ladderHypothesis": "4만 건너뜀",
+   "ladderWhy": "두 기준(2층·3층 입구)의 지면 차가 1.9 m 라 층고로 쓸 수 없다(3층 로비 표지가 낮은 날개 지붕 아래라 문 앞 지면을 못 읽음). 2층 기준만 쓰고 층고는 2층~지붕 평균. 13층은 있다(확정). B06: 3층 로비 문 앞은 사용자 그림(사진 10)의 갈림 지점 평탄면 144.2 m + 계단 3~4단으로 읽히나 운영 길 142.44 m 와 어긋나 사다리에 쓰지 않았다",
+   "storeyHeightBelowAnchorsM": 3.88,
+   "storeyHeightAboveAnchorsM": 3.88,
    "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
    "ladder": {
     "B1": [
-     130.5,
+     131.1,
      "extrap"
     ],
     "1": [
-     134.7,
+     135.0,
      "extrap"
     ],
     "2": [
@@ -1736,47 +1762,51 @@
      "anchor"
     ],
     "3": [
-     143.1,
+     142.8,
      "extrap"
     ],
     "5": [
-     147.3,
+     146.7,
      "extrap"
     ],
     "6": [
-     151.5,
+     150.6,
      "extrap"
     ],
     "7": [
-     155.7,
+     154.4,
      "extrap"
     ],
     "8": [
-     159.9,
+     158.3,
      "extrap"
     ],
     "9": [
-     164.2,
+     162.2,
      "extrap"
     ],
     "10": [
-     168.4,
+     166.1,
      "extrap"
     ],
     "11": [
-     172.6,
+     170.0,
      "extrap"
     ],
     "12": [
-     176.8,
+     173.9,
+     "extrap"
+    ],
+    "13": [
+     177.7,
      "extrap"
     ],
     "14": [
-     181.0,
+     181.6,
      "extrap"
     ],
     "15": [
-     185.2,
+     185.5,
      "extrap"
     ]
    }
@@ -1874,23 +1904,23 @@
    "b": [
     "한림관",
     3,
-    137.7
+    138.1
    ],
-   "residualM": 0.4
+   "residualM": 0.0
   },
   {
    "statement": "한림관 3층 = 은주1관 2층",
    "a": [
     "한림관",
     3,
-    137.7
+    138.1
    ],
    "b": [
     "은주1관",
     2,
     137.2
    ],
-   "residualM": 0.5
+   "residualM": 0.9
   },
   {
    "statement": "한림관 6층 = 은주1관 5층",
@@ -1923,12 +1953,12 @@
  ],
  "connectorChainTest": {
   "본관 5층 M": 138.1,
-  "한림관 3층 M": 137.7,
+  "한림관 3층 M": 138.1,
   "은주1관 2층 M": 137.2,
   "세 값의 범위 M": 0.9,
-  "한림관 1→6층 층고 M": 5.6,
+  "한림관 1→6층 층고 M": 5.43,
   "은주1관 1→5층 층고 M": 5.87,
   "본관 층고 M": 3.67,
-  "읽기": "본관 사슬은 층고 3.7 m 의 독립된 기준이다. 세 값이 1 m 안에서 만나면 한림관·은주1관의 1층 기준과 운동장 아래 높은 층고(5.6~5.9 m)가 서로 맞는다는 뜻이다"
+  "읽기": "본관 사슬은 층고 3.7 m 의 독립된 기준이다. 세 값이 1 m 안에서 만나면 한림관·은주1관의 1층 기준과 운동장 아래 높은 층고(5.4~5.9 m)가 서로 맞는다는 뜻이다"
  }
 }

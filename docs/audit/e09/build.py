@@ -134,7 +134,7 @@ for s in SEG:
                          geometry=dict(type='LineString', coordinates=coords)))
     ops.append(dict(id='E09-' + s['id'], op='create_road', grade=s['grade'], args=dict(
         roadClass=s['roadClass'], name=f"{s['name']} (S-MAP 판독)", structure=s['structure'], vehicleAccess='allowed', pedestrianAccess='unknown',
-        vehicleDirection='unknown', pedestrianDirection='unknown', **({'widthM': s['widthM']} if s['widthM'] else {}),
+        vehicleDirection='both', pedestrianDirection='unknown',  # B06: 사용자 확정 2026-10-10 '일방통행 없음' **({'widthM': s['widthM']} if s['widthM'] else {}),
         path=[dict(xy=c[:2], z=c[2]) for c in coords], zMode='explicit', densify=False)))
 
 # 학교 표지와 주차장 입구
@@ -148,19 +148,19 @@ def marker(name):
 wall = [p for p in P['westGateRowY557397'] if 117.5 < p[2] < 126]  # 옹벽 면(메시가 급히 오르는 칸)
 ENT = [
     dict(id='G-MAIN', name='정문', category='landmark', xy=marker('정문'), z=API['gate marker']['dem_z'], grade='원천(위치) / S-MAP(높이)',
-         leadsTo='차도 위. 차단기는 북쪽 약 55 m(거리뷰 Y01, 위치 추정)', unknown='차단기 정확한 자리, 일반 차량 통과 조건'),
+         leadsTo='차도 위. 차단기는 북쪽 약 55 m(거리뷰 Y01, 위치 추정). B06 사용자 확정: 정문으로 차가 드나든다', unknown='차단기 정확한 자리'),
     dict(id='G-WEST', name='서문(후문) = 서문 주차장 출입구(추정)', category='parking', xy=[round(float(np.mean([p[0] for p in wall])), 1), 557399.5], z=API['westGate road']['dem_z'],
          grade='S-MAP(옹벽 면 x·앞 도로 높이) / 추정(벽을 따른 남북 위치, 두 표지가 같은 문이라는 것)',
          leadsTo='옹벽 밑 터널형 차량 출입구 두 칸(사용자 사진 서문.jpg). 옹벽 위는 식재 비탈 126~129 m, 그 뒤 북악관 앞 포장면 130.6~131.3 m(S-MAP) → 문 바닥이 약 14 m 아래',
-         unknown='터널 안 배치·층·경사로, P1 주차장과 이어지는지, 일반 차량 개방 여부. 학교 표지 2개(서문 200967.8, 557401.5 / 서문 주차장 출입구 200969.0, 557402.8)는 옹벽 면에서 서쪽 약 13~15 m 공도 위'),
-    dict(id='P-LOW', name='하단 주차장 입구 (표지판 P2, 학교 표지 "제1주차장 출입구")', category='parking', xy=[round(v, 1) for v in P['lowerPortalLane'][-1][:2]], z=P['lowerPortalLane'][-1][2],
+         unknown='터널 안 배치·층·경사로, 다른 주차장과 이어지는지. B06 사용자 확정: 서문으로 차가 드나든다. 학교 표지 2개(서문 200967.8, 557401.5 / 서문 주차장 출입구 200969.0, 557402.8)는 옹벽 면에서 서쪽 약 13~15 m 공도 위'),
+    dict(id='P-LOW', name='하단 주차장 입구 (사용자: 제1주차장 / 현장 표지판 P2 / 학교 표지 "제1주차장 출입구")', category='parking', xy=[round(v, 1) for v in P['lowerPortalLane'][-1][:2]], z=P['lowerPortalLane'][-1][2],
          grade='S-MAP(차로·덮개 직전 높이) / 원천(학교 표지 201096.7, 557150.7: 5.5 m 거리, 지면 106.1 m)',
-         leadsTo='모름(어느 건물 몇 층인지 원천 없음)', unknown='표지판은 P2인데 학교 목록은 제1주차장: 같은 곳인지. 안쪽 층·배치. 실제 문턱은 덮개 아래라 S-MAP에 안 보임'),
-    dict(id='P-UP', name='P1 주차장 입구 (표지판 P1, 본관 남서 화단 아래)', category='parking', xy=thr[:2], z=thr[2], grade='S-MAP(문턱선 CT-M16 S07-C1, 높이 ±1.5 m)',
+         leadsTo='모름(어느 건물 몇 층인지 원천 없음)', unknown='B06: 사용자 확정 = 제1주차장 입구는 정문 바로 옆(사진 02: 오르막 차도 왼쪽 옹벽 아래 입구, 뒤에 유담관 기단부). 이 입구가 그 사진의 입구로 읽힌다(추정: 정문에서 44.5 m, 학교 표지에서 5.5 m). 거리뷰 Y01 의 표지판은 P2 로 읽혔다: 두 이름을 함께 적고 하나로 정하지 않는다. 안쪽 층·배치 모름. 실제 문턱은 덮개 아래라 S-MAP 에 안 보임'),
+    dict(id='P-UP', name='표지판 P1 입구 (본관 남서 화단 아래. 어느 주차장인지 미정)', category='parking', xy=thr[:2], z=thr[2], grade='S-MAP(문턱선 CT-M16 S07-C1, 높이 ±1.5 m)',
          leadsTo='화단 아래로 내려감(거리뷰 M06). 본관 입구(2)가 "지하주차장과 본관 2층 연결"(원천)이고 그 표지 지면이 130.5 m → 북악관·본관 앞 포장면 아래 주차장으로 보임(추정)',
-         unknown='지하 바닥 높이·배치, 서문 터널과 이어지는지. 학교 표지 "제2주차장 출입구"(201057.8, 557267.2)는 유담관 외곽 안(문턱에서 53 m)이라 이 문을 가리키는지 모름'),
+         unknown='지하 바닥 높이·배치, 서문 터널과 이어지는지. 학교 표지 "제2주차장 출입구"(201057.8, 557267.2)는 유담관 외곽 안(문턱에서 53 m)이라 이 문을 가리키는지 모름. B06 사용자 말: 제2주차장은 버스 정류장 근처이고 유담관 9층으로 가는 보행 길이 그 위를 지붕처럼 덮는다(위치 그림 없음). 이 입구는 버스정류장 표지에서 10~15 m 지만 그 제2주차장인지는 정하지 않는다(사용자: 이 일대 옹벽과 주차장 범위가 꼬여 있음, 더 물을 것)'),
     dict(id='P-M2', name='학교 표지 "제2주차장 출입구"', category='parking', xy=marker('제2주차장 출입구'), z=API['P2lot marker']['dem_z'], grade='원천(표지 위치만)',
-         leadsTo='모름. 표지가 유담관 지붕 아래(S-MAP 건물 높이 값이 있는 칸)이고 S-MAP·거리뷰 Y02~Y08에서 차량 문이 확인되지 않음', unknown='실제 문 위치, P1 표지판 문과 같은지', propose=False),
+         leadsTo='모름. 표지가 유담관 지붕 아래(S-MAP 건물 높이 값이 있는 칸)이고 S-MAP·거리뷰 Y02~Y08에서 차량 문이 확인되지 않음', unknown='실제 문 위치, P1 표지판 문과 같은지. B06 사용자 말(제2주차장 = 버스 정류장 근처, 유담관 9층 보행 길 아래)과 이 표지 자리(버스정류장에서 58~61 m)의 관계 모름', propose=False),
     dict(id='E-MAIN2', name='본관 입구(2)', category='building_entrance', xy=marker('본관 입구(2)'), z=API['main entrance(2) marker']['dem_z'], grade='원천(위치·설명) / S-MAP(지면)',
          leadsTo='지하주차장과 본관 2층(원천 문구). 보행 입구', unknown='문 바닥 높이, 주차장으로 내려가는 계단·승강기', buildingId='본관'),
     dict(id='BUS-2115', name='서경대본관 2115번 버스정류장', category='bus_stop', xy=marker('서경대본관 2115번 버스정류장'), z=API['bus 2115 marker']['dem_z'], grade='원천(위치) / S-MAP(높이)', leadsTo='회차 공간 남쪽', unknown='승하차 자리'),
@@ -198,13 +198,18 @@ for j in junctions:
 
 total = sum(r['lengthM'] for r in results_seg)
 (HERE / 'vehicle-roads-proposal.geojson').write_text(json.dumps(dict(type='FeatureCollection', name='e09-vehicle-roads-proposal', crs=dict(type='name', properties=dict(name='urn:ogc:def:crs:EPSG::5186')),
-    provenance=dict(created='2026-10-10', by='Claude', applied=False, note='제안. 운영 DB에 쓰지 않음. 평면은 S-MAP 화면 판독(오차 가정 1.5 m), 높이는 S-MAP 메시(독립 측량 아님). 지하·터널 안은 없음(모름).'), features=features), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    provenance=dict(created='2026-10-10', updated='2026-10-10 B06 (사용자 확정: 양방향, 정문·서문 차량 통행, 제1주차장 = 정문 옆)', by='Claude', applied=False, note='제안. 운영 DB에 쓰지 않음. 평면은 S-MAP 화면 판독(오차 가정 1.5 m), 높이는 S-MAP 메시(독립 측량 아님). 지하·터널 안은 없음(모름).'), features=features), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 (HERE / 'editor-ops.json').write_text(json.dumps(dict(title='E09 차량 도로·주차장 입구 편집 제안', applied=False, requiresUserApproval=True,
     basedOn=dict(snapshot='claude-live/roads-live-2.json (128 roads) / nodes-live-2.json (118 nodes)', coordinatePrecisionM=0.01),
     howToApply='편집기 MCP apply_changes 에 operations[].{op,args} 를 그대로 넘긴다. 먼저 dryRun=true. create_road 는 zMode explicit 이라 서버 지형과 무관한 절대 높이다. connect_roads 는 새 길들을 분기점에서 한 노드로 묶는다. update_road 의 expectedRevision 은 스냅숏 값이라 적용 전에 get_feature 로 다시 확인한다.',
     notProposed=['지하주차장 안, 서문 터널 안의 길(모름)', '서쪽 공도(서경로·보국문로16라길): 학교 길이 아니라 넣지 않음', '기존 지하주차장 경사로 951c157d·8fde6a04 의 삭제나 이동(사용자 결정 필요)', '회차 공간의 도는 궤적, 본관 쪽 계단식 보도'],
     operations=ops), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
-out = dict(created='2026-10-10', totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
+USER_B06 = dict(date='2026-10-10', grade='확정(사용자 말 그대로)', gates='정문·서문 둘 다 차가 드나든다', oneWay='일방통행 없음 -> create_road 의 vehicleDirection 을 both 로',
+                lot1='제1주차장 입구는 정문 바로 옆(사진 02-제1주차장-정문옆.jpg)', lot2='제2주차장은 버스 정류장 근처이고 유담관 9층으로 들어가는 보행 길이 그 위를 지붕처럼 덮는다(사진·그림 없음, 위치 모름)',
+                photo03='사진 03-지하경사로-입구.jpg 가 어느 입구인지는 미정(Claude 의 첫 해석은 사용자가 틀렸다고 함). 어느 E09 입구에도 대응시키지 않는다',
+                undergroundPassage='사용자 말: 한림관 1층 로비로 가는 길 하나가 "지하 경사로 통로에서 들어가는 길", 북악관 B1(GS25 문)로 가는 길 하나가 "지하 경사길이 시작하는 부근에서 들어가는 방법". 통로의 선·문 위치 모름. 길을 만들지 않는다',
+                bank='신한은행은 한림관이 아니라 학교 바깥 옹벽 길 바로 앞에 있다(건물·층 모름)')
+out = dict(created='2026-10-10', updated='2026-10-10 B06', userStatementsB06=USER_B06, totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
            entrances=ENT, existingVehicleRoads=existing, c951OnPedestrianPath=dict(planDistanceToC52095adM=[round(v, 2) for v in sep]),
            westGate=dict(wallFaceX=[round(p[0], 1) for p in wall], roadZ=API['westGate road']['dem_z'], plazaZ=[130.63, 131.26], markerToWallM=round(float(np.mean([p[0] for p in wall])) - 200967.8, 1)),
            inventory=dict(roads=len(roads), byClass={k: sum(r['roadClass'] == k for r in roads) for k in ('pedestrian', 'shared', 'vehicle')}, vehicleAllowed=sum(r['vehicleAccess'] == 'allowed' for r in roads),
