@@ -5,3 +5,4 @@ _src = re.sub(r"stairs\('upper-branch', 'Z04-HANLIM-WGAP-STAIR'.*?basePlane='Z04
 _src = _src.replace('WG = np.array([200984.0, 557399.5])', 'WG = np.array([wx(557399.5) - 1.3, 557399.5])'); assert 'wx(557399.5)' in _src   # 서문 문틀을 옹벽 면(wx)에 붙인다
 exec(_src.replace('Z04-', 'Z05-').replace('Z04 ', 'Z05 '))
 if (HERE5 / 'boxes_z05.py').exists(): exec((HERE5 / 'boxes_z05.py').read_text(encoding='utf-8'))
+if (HERE5 / 'boxes_z06.py').exists(): exec((HERE5 / 'boxes_z06.py').read_text(encoding='utf-8'))

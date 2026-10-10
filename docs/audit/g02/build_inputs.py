@@ -23,7 +23,7 @@ CRS = {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}}
 # ---------- 1. 기본 평면 (지형이 싣는 것) ----------
 T_S, T_N = -5.5, 17.5   # 본관 북벽(t=-4.9)과 북쪽 건물 벽 안쪽까지 덮는다(건물 칸은 조리법이 그대로 둔다)
 planes = [
-  dict(name='WAY', st=[(3, T_S), (69.3, T_S), (69.3, -2.5), (101, -2.5), (101, -3), (113.2, -3), (112.6, -1), (108.3, 10), (107.5, T_N), (0, T_N), (0, 8.5), (-2, 8.5), (-2, 7), (0, 3), (3, -3)],
+  dict(name='WAY', st=[(-3.42, T_S), (69.3, T_S), (69.3, -2.5), (101, -2.5), (101, -3), (113.2, -3), (112.6, -1), (108.3, 10), (107.5, T_N), (0, T_N), (0, 8.5), (0.65, 8.5)],   # 발치 선(Z06): s = −1.82 + 0.291 t, 길 평면과 회차 공간 포장면이 같은 높이인 직선
        profile=True, grade='S-MAP',
        reason='G02 내리막길 기본 경사면: 가운데 경사로의 S-MAP 높이에 맞춘 평면 조각 4개(폭 방향 평평). 본관 북벽에서 북쪽 건물 벽까지 한 평면. 아래 끝은 회차 공간 포장면(Z04 경사면, 이 자리 131.16 m), 위 끝은 운동장 148.9 m(F05 경계)에 벽 없이 닿는다.'),
   dict(name='LANE', st=rect(0, 31.5, 8.5, T_N), heightM=132.5, grade='S-MAP',
@@ -118,8 +118,17 @@ for k in range(12):
         '북악관 정문 바깥 계단: 12단(확정), 폭 9 m·디딤 0.4 m(거리뷰 눈대중). 맨 위 132.9 m(S-MAP). 발치 131.39 m = 회차 공간 경사면(Z04)이 이 자리에서 갖는 높이(S-MAP 131.4), 한 단 약 0.126 m', PB, basePlane='Z04-TURN-PLAZA', stair='G02-BUKAK-MAIN-STAIR', riseM=r2((132.9 - BUKAK_FOOT) / 12), runM=0.4, widthM=9.0)
 box('G02-BUKAK-PORCH-FLOOR', 'landing', ring(rect(-14.3, -3.3, 12.2, 17.0)), 130.6, 132.9, '북악관 현관 바닥(돌출부): 132.9 m, 앞뒤 4.8 m·폭 11 m(추정)', PB, basePlane='Z04-TURN-PLAZA')
 for k, sc in enumerate((-13.8, -8.8, -3.8)):
-    box(f'G02-BUKAK-PORCH-PIER{k + 1}', 'wall', ring(rect(sc - 0.5, sc + 0.5, 12.3, 13.3)), 132.9, 137.6, '현관 아치 기둥(아치 둘 = 기둥 셋), 1 m 각, 높이 4.7 m(추정)', PB, basePlane='G02-BUKAK-PORCH-FLOOR')
-box('G02-BUKAK-PORCH-CANOPY', 'canopy', ring(rect(-15.3, -2.3, 11.3, 17.0)), 137.6, 139.6, '현관 기와 차양: 기둥 위 2 m 덩어리(지붕 기울기는 표현 안 함), 추정', PB, basePlane='G02-BUKAK-PORCH-FLOOR')
+    box(f'G02-BUKAK-PORCH-PIER{k + 1}', 'wall', ring(rect(sc - 0.5, sc + 0.5, 12.3, 13.3)), 132.9, 137.6, '현관 아치 기둥(아치 둘 = 기둥 셋), 1 m 각, 높이 4.7 m(추정)', PB, basePlane='G02-BUKAK-PORCH-FLOOR', material='stone')
+# Z06: 현관을 거리뷰 10 처럼(돌 벽에 아치 둘, 흰 처마 띠, 짙은 기와 모임지붕을 두 단 상자로). 치수는 전부 눈대중(추정)
+for k, (ta, tb) in enumerate(((12.3, 13.3), (16.0, 17.0))):
+    for j2, sc2 in enumerate((-14.3, -4.3)):
+        box(f'G02-BUKAK-PORCH-SIDE-{k + 1}{j2 + 1}', 'wall', ring(rect(sc2, sc2 + 1.0, ta, tb)), 132.9, 137.6, '현관 옆면의 돌 기둥(옆면도 아치로 뚫려 있어 모서리 기둥만 세움), 추정', PB, basePlane='G02-BUKAK-PORCH-FLOOR', material='stone')
+box('G02-BUKAK-PORCH-HEADER', 'wall', ring(rect(-14.3, -3.3, 12.3, 13.3)), 136.3, 137.6, '아치 위 돌 벽(아치 꼭대기 136.3 m = 바닥 + 3.4 m, 눈대중). 아치의 둥근 모양은 싣지 않음. 현수막 자리', PB, basePlane='없음(기둥 위)', material='stone')
+for j2, sc2 in enumerate((-14.3, -4.3)):
+    box(f'G02-BUKAK-PORCH-SIDE-HEADER-{j2 + 1}', 'wall', ring(rect(sc2, sc2 + 1.0, 13.3, 16.0)), 136.3, 137.6, '현관 옆면 아치 위 돌 벽, 추정', PB, basePlane='없음(기둥 위)', material='stone')
+box('G02-BUKAK-PORCH-EAVE', 'canopy', ring(rect(-15.5, -2.1, 11.1, 17.0)), 137.6, 138.0, '현관 처마 띠(흰 돌), 벽보다 1.2 m 내밂(눈대중)', PB, basePlane='없음(벽 위)', material='stone')
+box('G02-BUKAK-PORCH-CANOPY', 'canopy', ring(rect(-14.6, -3.0, 12.0, 17.0)), 138.0, 138.9, '현관 기와 모임지붕 아랫단(지붕 기울기를 두 단 상자로 줄임), 추정', PB, basePlane='G02-BUKAK-PORCH-EAVE', material='roof_tile')
+box('G02-BUKAK-PORCH-CANOPY-2', 'canopy', ring(rect(-12.8, -4.8, 13.8, 17.0)), 138.9, 139.6, '현관 기와 모임지붕 윗단, 추정', PB, basePlane='G02-BUKAK-PORCH-CANOPY', material='roof_tile')
 for nm, (sa, sb) in {'W': (-13.9, -13.3), 'E': (-4.3, -3.7)}.items():
     box(f'G02-BUKAK-STAIR-CHEEK-{nm}1', 'wall', ring(rect(sa, sb, 7.4, 9.8)), 130.6, 132.3, '계단 옆 벽(아래 반), 추정', PB, basePlane='Z04-TURN-PLAZA')
     box(f'G02-BUKAK-STAIR-CHEEK-{nm}2', 'wall', ring(rect(sa, sb, 9.8, 12.2)), 130.6, 133.4, '계단 옆 벽(위 반), 추정', PB, basePlane='Z04-TURN-PLAZA')

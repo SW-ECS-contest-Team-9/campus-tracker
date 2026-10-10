@@ -200,7 +200,10 @@ export class StructuresLayer {
         ...platforms.map((s) => ({ polygons: this.platformPolygons.get(s)!, mesh: topMesh(s, this.platformPolygons.get(s)!), stride: 3 })),
         ...this.drawnSurfaces.surfaces,
       ];
-      const ground = buildCampusGround({ campus: this.campusRegion(), terrain: this.src.terrain, buildings, known });
+      // a platform that reaches outside the campus (a public street below a retaining wall) belongs to the cleared region too:
+      // its outer edge then meets the terrain along a straight line (the apron of campus-ground.ts), not along the terrain cells
+      const region = platforms.length ? polygonOps('union', [...this.campusRegion(), ...platforms.map((s) => this.platformPolygons.get(s)!).flat()]) : this.campusRegion();
+      const ground = buildCampusGround({ campus: region, terrain: this.src.terrain, buildings, known });
       this.ground = ground;
       const floor = css(GROUND.color);
       const outside = css(GROUND.outsideColor);

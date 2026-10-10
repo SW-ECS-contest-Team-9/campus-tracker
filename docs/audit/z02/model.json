@@ -17,7 +17,8 @@
  },
  "levels": {
   "field": 148.9,
-  "entrance": 151.0,
+  "entrance": 151.3,
+  "floor1F": 151.8,
   "passage": 151.3,
   "planterTop": 150.2,
   "plaza": 151.0,
@@ -27,7 +28,7 @@
  "stairs": {
   "front": {
    "risers": 13,
-   "riseM": 0.16
+   "riseM": 0.18
   },
   "east": {
    "risers": 13,
@@ -38,9 +39,9 @@
    "riseM": 0.16
   },
   "side": {
-   "risers": 34,
+   "risers": 36,
    "riseM": 0.16,
-   "goingM": 0.51,
+   "goingM": 0.48,
    "landingM": 2.0
   }
  },
@@ -81,7 +82,7 @@
    201133.7,
    557321.1
   ],
-  "sideStairLandingZ": 148.25,
+  "sideStairLandingZ": 148.4,
   "deckWest": [
    201164.61,
    557309.39
@@ -141,11 +142,11 @@
  },
  "counts": {
   "canopy": 3,
-  "deck": 2,
-  "landing": 1,
+  "deck": 3,
+  "landing": 2,
   "planter": 6,
   "platform": 6,
-  "stair_step": 70,
+  "stair_step": 73,
   "wall": 23
  }
 }

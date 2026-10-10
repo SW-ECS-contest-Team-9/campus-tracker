@@ -288,6 +288,9 @@ test('화단 기단은 윗면만 초록이고 옆면은 벽 색, 상자의 재�
   const solid = (role: string, type: string, material?: string) => ({ role, type, material }) as any;
   assert.deepEqual(solidColors(solid('platform', 'platform', 'planting')), { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop });
   assert.deepEqual(solidColors(solid('platform', 'platform', 'paving')), { body: STRUCTURES.materials.paving, top: STRUCTURES.materials.paving });
+  // 캠퍼스 밖 공도(asphalt): 윗면은 차도 색, 옆면은 벽 색. 상자의 material(벽돌·유리 등)은 종류 색보다 먼저다
+  assert.deepEqual(solidColors(solid('platform', 'platform', 'asphalt')), { body: STRUCTURES.asphaltSide, top: STRUCTURES.materials.asphalt });
+  assert.equal(solidColors(solid('box', 'wall', 'brick')).body, STRUCTURES.boxMaterials.brick);
   assert.equal(solidColors(solid('box', 'deck', 'concrete')).body, STRUCTURES.boxMaterials.concrete);
   assert.equal(solidColors(solid('box', 'deck', 'timber')).body, STRUCTURES.types.deck);
   assert.equal(solidColors(solid('box', 'canopy', 'opening')).top, STRUCTURES.boxMaterials.opening);

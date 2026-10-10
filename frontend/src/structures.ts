@@ -17,13 +17,15 @@ export const STRUCTURES = {
   indexFile: 'index.json',
   files: ['g02-way.geojson', 'z02-daeil-front.geojson', 'z03-fountain.geojson'],
   /** Top face colour of a platform by `material`. Paving = the pedestrian paving of the road surfaces (road-surface.ts). */
-  materials: { paving: '#9a9388', concrete: '#b9b6ad', rock: '#8d887d', timber: '#a47551', wood: '#a47551', field: '#c9956b' } as Record<string, string>,
+  materials: { paving: '#9a9388', concrete: '#b9b6ad', rock: '#8d887d', timber: '#a47551', wood: '#a47551', field: '#c9956b', asphalt: '#1b1d20' } as Record<string, string>,
+  /** An `asphalt` platform (a public street outside the campus): the carriageway black on top (ROAD_SURFACE.colors.carriageway), these sides. */
+  asphaltSide: '#8d887d',
   /** Colour of a box by `type`: light granite steps and landings, grey planter walls, white retaining walls, timber deck, dark tiled canopy, yellow barrier. */
   types: { stair_step: '#d2cdc0', landing: '#c4bfb2', planter: '#a9a59b', wall: '#dfdcd3', deck: '#a47551', canopy: '#7b7068', barrier: '#d8b23f' } as Record<string, string>,
   /** A `planting` platform (a planted bank or a planter band on a wall): its top is the planted green, its sides are this wall colour. */
   plantingSide: '#a9a59b',
-  /** A box whose `material` is one of these is drawn in this colour instead of the colour of its `type` (a concrete slab is not a timber deck; `opening` = a dark panel marking a portal in a wall). */
-  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136' } as Record<string, string>,
+  /** A box whose `material` is one of these is drawn in this colour instead of the colour of its `type` (a concrete slab is not a timber deck; `opening` = a dark panel marking a portal in a wall; brick, glass, stone, roof tiles, railings and the trunk and foliage of a simple tree are what the zone files name). */
+  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551' } as Record<string, string>,
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
   /** A material or type this table does not know. */
@@ -407,5 +409,6 @@ export function solidColors(solid: Solid): { body: string; top: string } {
   const body = solid.role === 'platform' ? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown
     : STRUCTURES.boxMaterials[solid.material ?? ''] ?? STRUCTURES.types[solid.type] ?? STRUCTURES.materials[solid.material ?? ''] ?? STRUCTURES.unknown;
   if (solid.role === 'platform' && solid.material === 'planting') return { body: STRUCTURES.plantingSide, top: STRUCTURES.planterTop };
+  if (solid.role === 'platform' && solid.material === 'asphalt') return { body: STRUCTURES.asphaltSide, top: STRUCTURES.materials.asphalt };
   return { body, top: solid.type === 'planter' ? STRUCTURES.planterTop : body };
 }

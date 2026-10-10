@@ -41,7 +41,8 @@ export const GROUND = {
   color: '#e7e5dd',
   /** The outside ground of campus-map.ts (COLORS.outside). */
   outsideColor: '#d6e4be',
-  foundationColor: '#cfccc4',
+  /** The concrete of a retaining wall (STRUCTURES.plantingSide): a foundation is a base, not a lit building wall. */
+  foundationColor: '#a9a59b',
   maxSweeps: 4000,
   toleranceM: 0.0005,
 };
