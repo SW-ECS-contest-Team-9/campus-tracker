@@ -192,10 +192,13 @@ for r in roads:
 # B07 사용자 확정(2026-10-10): 위 보행로보다 한 층 아래에 나란히 "지하 경사로 통로" = 지하 차도가 있다. 서문과 제2 지하주차장(버스 정류장 근처) 입구로
 # 드나드는 차가 이 차도를 쓰고, 오르막 방향 오른쪽이 보행 구간이다. 본관 5층–한림관 3층 연결 데크는 이 길에서만 간다.
 # 운영 길 951c157d 가 이 지하 차도의 일부라는 것은 추정(선의 근거는 여전히 없음). 선을 새로 만들지 않는다. 보행 금지로 저장된 속성만 확정과 어긋난다.
-r = byid['951c157d']
-ops.append(dict(id='E09-FIX-951c157d', op='update_road', grade='확정(지하 차도에 보행 구간이 있다) / 추정(이 선이 그 지하 차도라는 것)', applyOnlyAfter='사용자가 지하 차도의 선을 확인한 뒤. 사용자 그림 14 의 지하 공간 띠는 본관 벽에서 1.9~3.8 m, 이 선은 8.5~9.2 m 라 평면도 5~7 m 본관 쪽으로 옮겨야 그림과 맞는다(옮기는 것은 제안하지 않음: 깊이·끝을 모름)',
-                why='B07: 지하 차도는 차량 길이고 오르막 방향 오른쪽에 보행 구간이 있다(사용자 확정). 저장된 pedestrianAccess=prohibited 는 어긋난다. 평면·높이는 그대로 둔다(위 보행로 c52095ad 와 층이 다른 별개 길)',
-                args=dict(id=r['id'], expectedRevision=r['revision'], attrs=dict(name='지하 차도 (선은 추정)', pedestrianAccess='allowed'))))
+# B08 사용자 확정(2026-10-10): 본관 옆 붉은 띠는 보행 구간이고 양방향 차도는 그 옆, 폭 = 그림의 횡단보도 길이. 차는 제2주차장 입구와 서문에서 들어온다.
+# 두 지하 공간은 지하에서 이어지지 않는다. 계산은 docs/audit/b08/b08.py. 951c157d 는 차도 선으로 두고(보행 금지 그대로) 이름·폭만, 8fde6a04 는 없앤다.
+B08 = json.loads((HERE.parent / 'b08/results.json').read_text(encoding='utf-8'))
+for o in B08['operations']:
+    if o['kind'] == 'vehicle':
+        ops.append(dict(id='E09-' + o['id'], op=o['op'], grade=o['grade'], why=o['why'], expectedPreState=o['pre'], rollback=o['rollback'], args=o.get('args') or dict(type='road', id=o['target'], expectedRevision=o['pre']['revision']),
+                        **({'supersedes': o['supersedes']} if o.get('supersedes') else {})))
 c5 = byid['c52095ad']['coordinates']
 sep = [min(math.hypot(p[0] - q[0], p[1] - q[1]) for q in c5) for p in byid['951c157d']['coordinates']]
 
@@ -205,11 +208,11 @@ for j in junctions:
 
 total = sum(r['lengthM'] for r in results_seg)
 (HERE / 'vehicle-roads-proposal.geojson').write_text(json.dumps(dict(type='FeatureCollection', name='e09-vehicle-roads-proposal', crs=dict(type='name', properties=dict(name='urn:ogc:def:crs:EPSG::5186')),
-    provenance=dict(created='2026-10-10', updated='2026-10-10 B07 (사용자 확정: 양방향, 정문·서문 차량 통행, 제1주차장 = 정문 옆. 지하 차도는 선을 모름이라 여기에 없다)', by='Claude', applied=False, note='제안. 운영 DB에 쓰지 않음. 평면은 S-MAP 화면 판독(오차 가정 1.5 m), 높이는 S-MAP 메시(독립 측량 아님). 지하·터널 안은 없음(모름). 여기 있는 것은 전부 지상 차도다.'), features=features), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    provenance=dict(created='2026-10-10', updated='2026-10-10 B08 (지하 차도는 여전히 여기에 없다: 951c157d 는 운영 길이고 나머지 선은 모름. B07: 사용자 확정: 양방향, 정문·서문 차량 통행, 제1주차장 = 정문 옆. 지하 차도는 선을 모름이라 여기에 없다)', by='Claude', applied=False, note='제안. 운영 DB에 쓰지 않음. 평면은 S-MAP 화면 판독(오차 가정 1.5 m), 높이는 S-MAP 메시(독립 측량 아님). 지하·터널 안은 없음(모름). 여기 있는 것은 전부 지상 차도다.'), features=features), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 (HERE / 'editor-ops.json').write_text(json.dumps(dict(title='E09 차량 도로·주차장 입구 편집 제안', applied=False, requiresUserApproval=True,
     basedOn=dict(snapshot='claude-live/roads-live-2.json (128 roads) / nodes-live-2.json (118 nodes)', coordinatePrecisionM=0.01),
     howToApply='편집기 MCP apply_changes 에 operations[].{op,args} 를 그대로 넘긴다. 먼저 dryRun=true. create_road 는 zMode explicit 이라 서버 지형과 무관한 절대 높이다. connect_roads 는 새 길들을 분기점에서 한 노드로 묶는다. update_road 의 expectedRevision 은 스냅숏 값이라 적용 전에 get_feature 로 다시 확인한다.',
-    notProposed=['지하주차장 안, 서문 터널 안의 길(모름)', '서쪽 공도(서경로·보국문로16라길): 학교 길이 아니라 넣지 않음', '지하 차도(서문 터널 ~ 제2 지하주차장 입구 ~ 본관·한림관 연결 데크 아래쪽)의 새 선: 사용자 그림을 받기 전에는 만들지 않는다(results.json 의 undergroundRoadB07 에 알려진 점만)', '운영 길 951c157d·8fde6a04 의 삭제·이동·높이 변경: 하지 않는다(B07: 지하 차도의 일부일 수 있는 유일한 기존 선)', '회차 공간의 도는 궤적, 본관 쪽 계단식 보도'],
+    notProposed=['지하주차장 안, 서문 터널 안의 길(모름)', '서쪽 공도(서경로·보국문로16라길): 학교 길이 아니라 넣지 않음', '지하 차도의 새 선(951c157d 아래 끝 ~ 서문 터널, ~ 제2주차장 입구, 위 끝 너머): 선을 모른다. results.json 의 undergroundRoadB08.unresolvedLinks 에 양 끝만 적는다', '951c157d 의 이동·높이 변경: 하지 않는다(평면은 그림과 맞고, 높이는 어느 쪽도 측정이 아니다)', '지하 차도의 보행 구간·계단·횡단보도: 보행 제안 목록 docs/audit/b03/network.json (B08-2~5)', '회차 공간의 도는 궤적, 본관 쪽 계단식 보도'],
     operations=ops), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 USER_B06 = dict(date='2026-10-10', grade='확정(사용자 말 그대로)', gates='정문·서문 둘 다 차가 드나든다', oneWay='일방통행 없음 -> create_road 의 vehicleDirection 을 both 로',
                 lot1='제1주차장 입구는 정문 바로 옆(사진 02-제1주차장-정문옆.jpg)', lot2='제2주차장은 버스 정류장 근처이고 유담관 9층으로 들어가는 보행 길이 그 위를 지붕처럼 덮는다(사진·그림 없음, 위치 모름)',
@@ -223,7 +226,14 @@ USER_B07 = dict(date='2026-10-10', grade='확정(사용자 말)', twoPaths='문�
                 drawing14='사용자 그림(사진 14, 범례 확정): 본관 북쪽 벽 옆에 지하 공간(붉은 두 줄), 그 회차 공간 쪽 끝에 계단, 거기서 북악관 쪽으로 횡단보도, 건너편에 통로(상자)와 계단, 북악관 남쪽 벽을 따라 지하 공간(붉은 선). 좌표는 docs/audit/b07/drawing14.json (평면 ±2 m, 추정)',
                 withdrawn='"북악관 B1(GS25 문)로 가는 길은 지하 차도가 시작하는 부근"이라는 Claude 의 이해는 사용자가 틀렸다고 했다. 쓰지 않는다',
                 surface='회차 공간에서 서문으로 가는 지상 차도가 없다는 E09 판정은 지상에 한해 그대로다. 지하로는 이어진다')
-out = dict(created='2026-10-10', updated='2026-10-10 B07', userStatementsB06=USER_B06, userStatementsB07=USER_B07, undergroundRoadB07=dict(B07['undergroundRoad'], fit951=B07['fit951'], drawing14=json.loads((HERE.parent / 'b07/drawing14.json').read_text(encoding='utf-8'))['features']), totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
+USER_B08 = dict(date='2026-10-10', grade='확정(사용자 말)', strip='본관 옆 긴 붉은 띠는 지하 차도의 보행 구간이다. 양방향 차도는 그 옆(북악관·문예관 쪽)이고 폭은 그림의 횡단보도 길이와 같다',
+                entries='차는 제2주차장 입구와 서문 두 곳에서 그 지하 차도로 들어간다. 두 자리는 사용자가 S-MAP 화면에 표시(사용자-서문·제2주차장·수인관-20261010/01)', stairs='본관 쪽·북악관 쪽 계단은 둘 다 지상에서 아래로 내려간다',
+                notLinked='본관 옆 지하 공간과 북악관 벽 쪽 지하 공간은 지하에서 이어지지 않는다. 지상 횡단보도로만 오간다', deck='본관 5층–한림관 3층 연결 데크는 아래 길(보행 구간)에서만 간다')
+UG_B08 = dict(what='B07 의 undergroundRoadB07 을 고친다: 951c157d = 차도 선(추정), 붉은 띠 = 보행 구간(확정)', carriageway=dict(road='951c157d', crossing=B08['crossing'], fit=B08['fit951']),
+              pedestrianStrip=dict(B08['strip'], note='보행 제안 B08-5 (docs/audit/b03/network.json). 차도 선과 잇지 않는다'), mainSideStair=B08['mainSideStair'], deck=B08['deck'],
+              knownVehicleEntries=[dict(what='서문 터널 입구 두 칸', xy=[200984.0, 557399.5], z=117.0, grade='확정(여기로 들어온다) / 좌표·높이 S-MAP·사진(E09)'), dict(what='제2주차장 입구 = 표지판 P1 입구(E09 P-UP 끝)', xy=[201021.9, 557307.1], z=127.9, grade='확정(여기로 들어온다, 자리는 사용자 표시) / 좌표·문턱 S-MAP 판독(E09), 표시와 4.3 m 차(대응 추정)', lot2=B08['lot2'])], userDrawingGates=B08['gates'],
+              unresolvedLinks=[u for u in B08['unresolvedLinks'] if u['id'] in ('U1', 'U2', 'U5')], noUndergroundLink=B08['noUndergroundLink'])
+out = dict(created='2026-10-10', updated='2026-10-10 B08', userStatementsB06=USER_B06, userStatementsB07=USER_B07, userStatementsB08=USER_B08, undergroundRoadB08=UG_B08, undergroundRoadB07=dict(B07['undergroundRoad'], fit951=B07['fit951'], drawing14=json.loads((HERE.parent / 'b07/drawing14.json').read_text(encoding='utf-8'))['features']), totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
            entrances=ENT, existingVehicleRoads=existing, c951OnPedestrianPath=dict(planDistanceToC52095adM=[round(v, 2) for v in sep]),
            westGate=dict(wallFaceX=[round(p[0], 1) for p in wall], roadZ=API['westGate road']['dem_z'], plazaZ=[130.63, 131.26], markerToWallM=round(float(np.mean([p[0] for p in wall])) - 200967.8, 1)),
            inventory=dict(roads=len(roads), byClass={k: sum(r['roadClass'] == k for r in roads) for k in ('pedestrian', 'shared', 'vehicle')}, vehicleAllowed=sum(r['vehicleAccess'] == 'allowed' for r in roads),

@@ -10,8 +10,9 @@
  "notProposed": [
   "지하주차장 안, 서문 터널 안의 길(모름)",
   "서쪽 공도(서경로·보국문로16라길): 학교 길이 아니라 넣지 않음",
-  "지하 차도(서문 터널 ~ 제2 지하주차장 입구 ~ 본관·한림관 연결 데크 아래쪽)의 새 선: 사용자 그림을 받기 전에는 만들지 않는다(results.json 의 undergroundRoadB07 에 알려진 점만)",
-  "운영 길 951c157d·8fde6a04 의 삭제·이동·높이 변경: 하지 않는다(B07: 지하 차도의 일부일 수 있는 유일한 기존 선)",
+  "지하 차도의 새 선(951c157d 아래 끝 ~ 서문 터널, ~ 제2주차장 입구, 위 끝 너머): 선을 모른다. results.json 의 undergroundRoadB08.unresolvedLinks 에 양 끝만 적는다",
+  "951c157d 의 이동·높이 변경: 하지 않는다(평면은 그림과 맞고, 높이는 어느 쪽도 측정이 아니다)",
+  "지하 차도의 보행 구간·계단·횡단보도: 보행 제안 목록 docs/audit/b03/network.json (B08-2~5)",
   "회차 공간의 도는 궤적, 본관 쪽 계단식 보도"
  ],
  "operations": [
@@ -817,19 +818,45 @@
    }
   },
   {
-   "id": "E09-FIX-951c157d",
+   "id": "E09-B08-1",
+   "op": "retire_feature",
+   "grade": "확정",
+   "why": "두 지하 공간은 지하에서 이어지지 않는다(사용자 확정). 이 선은 951c157d 아래 끝에서 북악관 계단 아래로 가는 지하 차량 선이다(\"지하주차장-북악관 B1 연결 (추정)\")",
+   "expectedPreState": {
+    "revision": 2,
+    "status": "DRAFT",
+    "fromNode": "81ff89df",
+    "toNode": "18b2d87e",
+    "note": "지금 북악관 묶음(길 70개)과 나머지를 잇는 유일한 선이다. B08-2·B08-3 과 함께 적용해야 묶음이 갈라지지 않는다"
+   },
+   "rollback": "revert_changeset(이 작업의 변경 묶음): RETIRED 가 DRAFT 로 돌아온다",
+   "args": {
+    "type": "road",
+    "id": "8fde6a04-a05d-474f-b427-f8a83b6bb307",
+    "expectedRevision": 2
+   }
+  },
+  {
+   "id": "E09-B08-6",
    "op": "update_road",
-   "grade": "확정(지하 차도에 보행 구간이 있다) / 추정(이 선이 그 지하 차도라는 것)",
-   "applyOnlyAfter": "사용자가 지하 차도의 선을 확인한 뒤. 사용자 그림 14 의 지하 공간 띠는 본관 벽에서 1.9~3.8 m, 이 선은 8.5~9.2 m 라 평면도 5~7 m 본관 쪽으로 옮겨야 그림과 맞는다(옮기는 것은 제안하지 않음: 깊이·끝을 모름)",
-   "why": "B07: 지하 차도는 차량 길이고 오르막 방향 오른쪽에 보행 구간이 있다(사용자 확정). 저장된 pedestrianAccess=prohibited 는 어긋난다. 평면·높이는 그대로 둔다(위 보행로 c52095ad 와 층이 다른 별개 길)",
+   "grade": "확정(양방향 지하 차도, 폭 = 횡단보도 길이) / 추정(이 선이 그 차도라는 것, 폭의 값)",
+   "why": "종류(차량)·양방향·보행 금지는 지금 값이 맞다. 이름과 폭만 고친다. 평면·높이는 그대로",
+   "expectedPreState": {
+    "revision": 4,
+    "pedestrianAccess": "prohibited",
+    "vehicleDirection": "both",
+    "widthM": null
+   },
+   "rollback": "revert_changeset",
    "args": {
     "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
     "expectedRevision": 4,
     "attrs": {
-     "name": "지하 차도 (선은 추정)",
-     "pedestrianAccess": "allowed"
+     "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+     "widthM": 7.2
     }
-   }
+   },
+   "supersedes": "E09-FIX-951c157d (보행 허용으로 고치기: 거둠)"
   },
   {
    "id": "E09-JOIN-N1",

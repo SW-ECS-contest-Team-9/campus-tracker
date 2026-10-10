@@ -6,6 +6,7 @@
 - 동별로 실내 길(복도·계단·승강기)의 평평한 높이를 모아 "저장된 층"으로 묶고, 사다리에서 가장 가까운 층과 차이를 적는다.
 - 길 이름에 적힌 층(B1, 1F, 2F, 1층 ...)과 levelId 를 함께 적는다.
 - B06 갱신: docs/audit/b06/results.json (사용자 확정 2026-10-10 과 S-MAP 판독)을 읽어 북악관 B1·사슬 2a·2c·1a 제안을 더한다.
+- B08 갱신: docs/audit/b08/results.json 의 보행·실내 편집 작업을 제안 목록 끝에 더하고, 그 때문에 바뀌는 앞 제안에 status 를 적는다. 이 파일이 보행·실내 제안의 하나뿐인 목록이다(차량은 docs/audit/e09/editor-ops.json).
 - 제안(PROPOSALS)은 사람이 정한 규칙표다: 층 이름 바꾸기(relabel_level), 이어진 실내 묶음의 높이 옮기기(shift_z). 근거 등급을 붙인다. 적용하지 않는다.
 """
 import json, pathlib, re, sys, collections
@@ -122,8 +123,26 @@ add(building='북악관', op='no_change', roadIds=sorted(r['id'] for r in roads 
     evidence=f"운영 길 f99540e3('북악관 B1 진입 계단 (추정)')과 8fde6a04 의 북악관 쪽 끝은 사용자 그림 14 의 북악관 벽 앞 계단에서 {D14['compare']['markers']['8fde6a04 끝(북악관 B1 진입 계단 아래)']['toBukakStairsM']} m 다. 계단 자리는 그림과 맞는다. 다만 8fde6a04 는 951c157d 아래 끝에서 지하로 곧장 이어지는 차량 선으로 저장돼 있고, 그림은 그 사이를 지상의 횡단보도와 통로로 그렸다. 두 지하 공간이 지하로 이어지는지는 모름: 그대로 두고 사용자 확인 뒤 정한다")
 add(building='북악관', op='record_only', roadIds=[], coordinates=[f14['bukakWallStrip']['from']['xy'], f14['bukakWallStrip']['to']['xy']], grade='확정(북악관 남쪽 벽을 따라 지하 공간이 있다: 사용자 그림 14) / 평면 추정(±2 m) / 깊이 모름',
     evidence=f"붉은 선 길이 {f14['bukakWallStrip']['lengthM']} m. B06 의 GS25 문 (201008.5, 557395.0)은 이 선의 서쪽 끝에서 {D14['compare']['markers']['B06 GS25 문(북악관 입구(4)를 서쪽 끝 벽 앞으로 옮긴 자리)']['toBukakWallStripM']} m 떨어진 서쪽 끝 벽에 있고 그림 범위 밖이다. 이 지하 공간이 B1(GS25) 층인지는 그림에 없다(모름). 실내 길을 만들지 않는다")
+# ---- B08 (2026-10-10): 사용자 확정(두 계단은 지상에서 내려간다, 두 지하 공간은 지하에서 이어지지 않는다, 북악관 B1 길, 붉은 띠 = 보행 구간). 계산은 docs/audit/b08/b08.py -> results.json. 모두 제안만.
+B08 = json.loads((pathlib.Path(__file__).resolve().parent.parent / 'b08/results.json').read_text(encoding='utf-8')); bh = B08['bukak']['b1Height']
+for p in P:  # 앞 제안 중 B08 로 상태가 바뀌는 것
+    if p['building'] == '북악관' and p['op'] == 'relabel_level': p['status'] = '보류(B08)'; p['holdReason'] = B08['hold']['why']
+    if p['op'] == 'add_level': p.update(heightM=None, heightProposedM=bh['proposedM'], heightBoundsM=bh['boundsM'], heightGrade='추정', question=bh['question'], floorsB08=B08['bukak']['floors']['table'], status='보류(B08): 계단 단수 뒤')
+    if p.get('chain') == '2c' and p['op'] == 'create_node': p['status'] = '바뀜: B08-7 (같은 문, 장소로)'
+    if p.get('chain') == '2c' and p['op'] == 'create_road': p['status'] = '바뀜: B08-9 (옆길에서 문 앞까지)'
+    if p.get('chain') == '2a': p['status'] = '그대로: B08-8 로 다시 적음'
+    if p.get('chain') == '2d': p['status'] = '바뀜: B08-2 (북악관 쪽 끝을 운영 노드 18b2d87e 에 붙임)'
+    if p['op'] == 'no_change' and p['building'] == '북악관': p['status'] = '바뀜: 8fde6a04 는 B08-1 로 없앰(지하 연결 없음, 확정). f99540e3 는 자리가 맞고 높이 방향이 확정과 반대(B08)'
+    if p['op'] == 'record_only': p['status'] = 'B08: 벽 쪽 지하 공간 = B1 복도(계단 아래에서 좌회전, GS25 출입구까지 직진. 확정). 그린 선은 복도 가운데 선으로 쓰지 않는다'
+for o in B08['operations']:
+    if o['kind'] == 'pedestrian' or o['id'] == 'B08-1':
+        a = o.get('args', {})
+        add(building='북악관' if a.get('buildingId') == '북악관' or o['id'] in ('B08-1', 'B08-8', 'B08-9') else '본관·북악관 사이', op=o['op'], b08Id=o['id'], roadIds=[o['target']] if o.get('target') else [], name=a.get('name'), structure=a.get('structure'),
+            coordinates=o.get('geometry') or a.get('path') or (a.get('position') and [a['position']]), grade=o['grade'], gradeClass=o['gradeClass'], evidence=o['why'], expectedPreState=o['pre'], rollback=o['rollback'],
+            **({'blocked': o['blocked']} if o.get('blocked') else {}), **({'alsoIn': 'docs/audit/e09/editor-ops.json'} if o['kind'] == 'vehicle' else {}))
 count = collections.Counter((p['op'], p['grade']) for p in P)
 json.dump({'method': __doc__, 'snapshot': 'roads-live-2.json (128 roads)', 'applied': False, 'perBuilding': T, 'bukakLadderVsRoof': bukak,
+           'b08': {'hold': B08['hold'], 'unresolvedLinks': B08['unresolvedLinks'], 'noUndergroundLink': B08['noUndergroundLink'], 'simulation': B08['simulation'], 'b1Height': bh, 'countsByGradeClass': B08['operationCountsByLeadGrade']},
            'proposals': P, 'proposalCounts': {f'{a} / {b}': c for (a, b), c in sorted(count.items())}}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 for b, t in T.items():
     print(f"\n{b} (서버 id {t['serverBuildingId']}, 실내 길 {t['indoorRoads']}개) 단 사이 {t['stepsBetweenStoredLevelsM']}")
