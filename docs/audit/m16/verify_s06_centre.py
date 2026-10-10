@@ -7,7 +7,8 @@ from shapely.ops import unary_union
 
 ROOT = Path(__file__).resolve().parents[3]
 base = ROOT / 'frontend/public/corrections'
-fc = json.loads((base/'s06-centre-surface-v1.geojson').read_text(encoding='utf-8'))
+surface_path = Path(sys.argv[2]) if len(sys.argv) > 2 else base/'s06-centre-surface-v1.geojson'
+fc = json.loads(surface_path.read_text(encoding='utf-8'))
 surfaces = [f for f in fc['features'] if f['properties']['kind'] == 'surface']
 triangles = [shape(f['geometry']) for f in surfaces]
 union = unary_union(triangles)
