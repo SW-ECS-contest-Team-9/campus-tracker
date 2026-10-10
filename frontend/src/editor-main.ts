@@ -8,6 +8,9 @@ import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, ty
 import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
 import { AreaEditor } from './editor-areas';
 import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
+import { areaSurfacePart } from './road-surface-layer';
+import { SceneLayers, bindLayerControls } from './scene-layers';
+import { editorLayerData } from './scene-layer-data';
 
 let areaEditor: AreaEditor | null = null;
 
@@ -148,6 +151,16 @@ root.innerHTML = `
           <div class="feature-actions"><button id="editor-edit" disabled>선택 편집</button><button id="editor-save" class="active" disabled>저장</button><button id="editor-delete" disabled>삭제</button></div>
           <div id="selected-info" class="editor-hint" style="margin-top:8px"></div>
         </section>
+        <section class="editor-section"><h2>면 표시 · 단면도</h2>
+          <label class="inline-check" title="차도·포장면 영역과 거기에 붙은 넓은 보행로를 한 검은 면으로 (프리뷰의 '차도'와 같음)"><input id="layer-ground" type="checkbox"> 차도 면</label>
+          <label class="inline-check" title="실외 보행로·계단·횡단 길을 회색 면으로 (프리뷰의 '보행로'와 같음)"><input id="layer-pedestrian" type="checkbox"> 보행로 면</label>
+          <label class="inline-check" title="지하에 있는 길을 저장된 높이에 면으로. 땅·건물에 가린 부분도 비쳐 보임"><input id="layer-underground" type="checkbox"> 지하 길</label>
+          <label class="inline-check" title="운동장처럼 면으로 채우는 공간 영역. 포장면 영역은 '차도 면'에 들어 있음"><input id="layer-area" type="checkbox"> 영역</label>
+          <label class="inline-check" title="켜고 지도에서 두 점을 찍으면 그 선을 따라 세로로 잘라 카메라 쪽 절반을 숨김. 끄면 원래대로"><input id="layer-section" type="checkbox"> 단면도</label>
+          <div id="layer-section-tools" hidden><div class="feature-actions"><button id="layer-section-look" type="button" title="자른 면을 정면에서 멀리 보기(원근 없는 보기)">단면 보기</button><button id="layer-section-flip" type="button" title="숨기는 쪽을 반대로">반대쪽</button></div></div>
+          <div id="layer-section-status" class="editor-hint"></div>
+          <div class="editor-hint">면은 편집 선 아래에 깔리는 보기 전용입니다(눌리지 않음). 선의 색(층)·모양(유형)은 그대로이고, 저장 전 편집도 잠시 뒤 면에 반영됩니다.</div>
+        </section>
         <section class="editor-section"><h2>경로 표시</h2>
           <div id="road-color-row" class="editor-color-row" hidden><label class="editor-field">선택 경로 색 · 모든 편집자와 공유<input id="road-color" type="color"></label><button id="road-color-reset" type="button" title="공유 색을 지우고 자동 색으로">자동</button></div>
           <label class="editor-field">자동 색 기준<select id="color-mode"><option value="floor">층별 (낮을수록 어둡게)</option><option value="type">도로 유형별</option></select></label>
@@ -262,6 +275,10 @@ let cursorDepthOutline: any;
 let cursorGroundPoint: any;
 let cursorAxisEntities: any[] = [];
 let buildingScene: CampusSceneLayer | null = null;
+// Surfaces and the cross-section of the preview (scene-layers.ts), fed from this page's own roads and areas.
+let sceneLayers: SceneLayers | null = null;
+let layerTimer: ReturnType<typeof setTimeout> | null = null;
+const drawnEntities = new Set<any>(); // what drawAll() drew: the entities the cross-section cuts
 let xrayPaths: XrayPaths | null = null;
 let ownCursor: XYZ = [ORIGIN.x, ORIGIN.y, 135];
 let heading = 0;
@@ -367,8 +384,14 @@ function cursorGroundOffset(): { ground: number; clearance: number } | null {
   const ground = terrainAt(ownCursor[0], ownCursor[1]);
   return ground != null && Number.isFinite(ground) ? { ground, clearance: ownCursor[2] - ground } : null;
 }
-function addEntity(e: any) { const entity = viewer.entities.add(e); entities.push(entity); return entity; }
-function cleanMapEntities() { for (const e of entities) viewer.entities.remove(e); entities = []; }
+function addEntity(e: any) { const entity = viewer.entities.add(e); entities.push(entity); drawnEntities.add(entity); return entity; }
+function cleanMapEntities() { for (const e of entities) viewer.entities.remove(e); entities = []; drawnEntities.clear(); }
+/** The surfaces follow the editor's current roads (the unsaved draft too) and areas, a little after the last change. */
+function scheduleLayers() {
+  if (!sceneLayers) return;
+  if (layerTimer) clearTimeout(layerTimer);
+  layerTimer = setTimeout(() => sceneLayers?.setData(editorLayerData(roads, roadDraft, areaEditor?.saved ?? [])), 500);
+}
 function drawLine(points: XYZ[], color: any, width: number, outlined = true, dashed = false, id?: string) {
   if (points.length < 2) return;
   const positions = points.map(drawPoint);
@@ -454,7 +477,7 @@ function updateCursorGraphics() {
     cursorGroundPoint.position = groundPosition;
   }
 }
-const isConnectorRoad = (r: Road) => r.structure === 'stairs' || r.structure === 'elevator';
+const isConnectorRoad = (r: Road) => r.structure === 'stairs' || r.structure === 'ramp' || r.structure === 'elevator';
 /** Floor of a road: the levelId when it names one, otherwise estimated from its height above the terrain (lowest point for stairs/elevators). */
 function roadFloor(r: Road): FloorInfo {
   const key = `${r.id}:${r.revision}:${r.levelId}:${prefs.floorHeightM}`;
@@ -510,7 +533,7 @@ function computeRoadStyle(r: Road) {
 }
 function updateRoadStyles() {
   if (!viewer) return;
-  xrayPaths?.setVisible(prefs.xrayPaths);
+  xrayPaths?.setVisible(prefs.xrayPaths && !sceneLayers?.section.active); // a cut hides one half; the see-through lines would show it again
   for (const r of roads) if (roadWorld.has(r.id)) {
     computeRoadStyle(r);
     const dimmed = !!selectedRoad && selectedRoad.id !== r.id;
@@ -617,6 +640,7 @@ function drawEndpoints(coords: XYZ[], labelled: boolean) {
 }
 function drawAll() {
   if (!viewer) return;
+  sceneLayers?.section.uncutObjects();
   cleanMapEntities();
   roadWorld.clear();
   for (const r of roads) drawRoad(r);
@@ -658,6 +682,8 @@ function drawAll() {
     color: i === selectedVertex ? C.Color.ORANGE : C.Color.WHITE, outlineColor: C.Color.fromCssColorString('#14251d'),
     outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY } }));
   drawFusionOverlay();
+  sceneLayers?.section.cutObjects();
+  scheduleLayers();
   updateReadouts(); renderLists();
 }
 async function loadSnapshot() {
@@ -1294,6 +1320,10 @@ function viewCommand(kind: string) {
   else if (kind === 'isolate') toggleIsolate();
   else if (kind === 'cursor') nav.frame([drawPoint(ownCursor)]);
   lastFollowTarget = null;
+  showOrthoState();
+}
+function showOrthoState() {
+  if (!nav) return;
   $('view-ortho').textContent = nav.isOrtho() ? '정사영' : '원근';
   $('view-ortho').classList.toggle('active', nav.isOrtho());
 }
@@ -1689,7 +1719,8 @@ function installSocket() {
 
 function installControls() {
   areaEditor = new AreaEditor({ viewer, C, point: drawPoint, cursor: () => ownCursor, terrain: terrainAt,
-    request, say: (text) => say(text), start: () => {
+    request, say: (text) => say(text), changed: scheduleLayers,
+    filled: (area) => { const part = areaSurfacePart(area); return part !== null && !!sceneLayers?.surfaces.isVisible(part); }, start: () => {
       if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 공간을 그릴까요?')) return false;
       clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); return true;
     } });
@@ -1819,8 +1850,9 @@ function installControls() {
   viewer.scene.preRender.addEventListener(updateRoadStyles);
   mouseHandler = new C.ScreenSpaceEventHandler(viewer.scene.canvas);
   mouseHandler.setInputAction((movement: any) => {
+    if (sceneLayers?.section.placing) return; // the click places the section line
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
-    const feature = tool === 'select' && !areaEditor?.active ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
+    const feature = tool === 'select' && !areaEditor?.active ? hits.map((h: any) => h.id?.cutFrom ?? h.id?.id).find((id: unknown) =>
       typeof id === 'string' && /^editor:(road|place):/.test(id))?.replace(/:(tube|shaft)$/, '') : null;
     if (feature?.startsWith('editor:road:')) { selectRoad(feature.slice('editor:road:'.length)); setTool('select'); return; }
     if (feature?.startsWith('editor:place:')) { selectPlace(feature.slice('editor:place:'.length)); setTool('select'); return; }
@@ -1862,6 +1894,17 @@ async function startEditor() {
   buildingScene = result.scene;
   buildingScene?.setOpacity(prefs.buildingOpacity);
   xrayPaths = new XrayPaths(C, viewer);
+  // Surfaces start off: the editor is for the lines, and a surface hides the ground inside its outline.
+  sceneLayers = new SceneLayers(viewer, { grid: result.grid, scene: result.scene, pickable: false,
+    visible: { ground: false, pedestrian: false, area: false, underground: false }, sectionObjects: (entity) => drawnEntities.has(entity) });
+  bindLayerControls(sceneLayers, {
+    parts: { ground: $('layer-ground'), pedestrian: $('layer-pedestrian'), underground: $('layer-underground'), area: $('layer-area') },
+    section: $('layer-section'), sectionTools: $<HTMLElement>('layer-section-tools'), sectionLook: $<HTMLElement>('layer-section-look'), sectionFlip: $<HTMLElement>('layer-section-flip'), sectionStatus: $<HTMLElement>('layer-section-status'),
+  });
+  // after the tool's own handlers: the lines are cut with the new plane, and the 원근/정사영 button follows the view
+  for (const id of ['layer-section', 'layer-section-look', 'layer-section-flip']) $(id).addEventListener(id === 'layer-section' ? 'change' : 'click', () => { drawAll(); showOrthoState(); });
+  for (const id of ['layer-ground', 'layer-area']) $(id).addEventListener('change', () => areaEditor?.refresh());
+  if (import.meta.env.DEV) (window as any).__editor = { viewer, layers: sceneLayers };
   // The terrain-grid endpoint is binary; read it directly, matching the Preview's grid DTO.
   try {
     const res = await fetch(`${API_BASE_URL}/api/v1/terrain/grid`);

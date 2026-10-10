@@ -15,11 +15,10 @@ import {
 import { connectPreview } from './socket';
 import { Lab } from './lab';
 import { initVWorld, type Viewer } from './vworld';
-import { initCampusMap, sampler, type BuildingPick, type CampusSceneLayer } from './campus-map';
+import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campus-map';
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
-import { RoadSurfaceLayer } from './road-surface-layer';
-import { SectionTool } from './section-layer';
+import { SceneLayers, bindLayerControls, loadPublicLayerData } from './scene-layers';
 
 /** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
 const MAP_ENGINE: 'campus' | 'vworld' = import.meta.env.VITE_MAP_ENGINE === 'vworld' ? 'vworld' : 'campus';
@@ -61,8 +60,9 @@ const lab = new Lab(document.getElementById('lab-panel')!, () => viewer);
 let spatialMapOverlay: SpatialMapOverlay | null = null;
 let campusScene: CampusSceneLayer | null = null;
 let mobilityLayer: MobilityLayer | null = null;
-let roadSurfaces: RoadSurfaceLayer | null = null;
-let sectionTool: SectionTool | null = null;
+let sceneLayers: SceneLayers | null = null;
+/** Roads and areas of the shared layers, read again from the public endpoints. */
+const reloadSceneLayers = () => loadPublicLayerData().then((data) => sceneLayers?.setData(data));
 const tracks = new Map<string, SessionTrack>(); // sessionId -> track
 const trackLoads = new Map<string, Promise<void>>();
 const liveSessionIds = new Set<string>(); // sessions drawn in Live mode
@@ -202,7 +202,7 @@ async function loadInitial() {
 /** After a preview socket reconnect: reload lists and re-fetch loaded tracks (fills any gap). */
 async function onReconnect() {
   void mobilityLayer?.reload().catch(() => undefined); // QGIS edits made while disconnected
-  void roadSurfaces?.reload().catch(() => undefined); // roads edited while disconnected
+  void reloadSceneLayers().catch(() => undefined); // roads edited while disconnected
   await loadInitial();
   await Promise.all([...tracks.keys()].map((id) => reloadTrack(id, true)));
 }
@@ -281,7 +281,7 @@ function startRealtime() {
     },
     onMobilityChanged() {
       void mobilityLayer?.reload().then(() => scheduleRender()).catch((err) => console.error('mobility reload failed', err));
-      void roadSurfaces?.reload().catch(() => undefined); // 포장면·운동장 영역이 길 면에 합쳐져 있음
+      void reloadSceneLayers().catch(() => undefined); // 포장면·운동장 영역이 길 면에 합쳐져 있음
     },
     onFusionSensorEvents({ sessionId, algorithmVersion, events }) {
       if (algorithmVersion !== 'fusion-v3.1') return;
@@ -907,7 +907,7 @@ function enablePicking(v: Viewer) {
   const C = (window as any).Cesium;
   const handler = new C.ScreenSpaceEventHandler(v.scene.canvas);
   handler.setInputAction((movement: { position: unknown }) => {
-    if (sectionTool?.placing) return; // the click places the section line
+    if (sceneLayers?.section.placing) return; // the click places the section line
     // drillPick: dots usually sit on top of a polyline, which would win a plain pick().
     const hits: { id?: unknown }[] = v.scene.drillPick(movement.position, 10);
     const id = hits.map((h) => h.id as PickId | undefined).find((x) => x?.kind === 'raw' || x?.kind === 'fused');
@@ -978,30 +978,16 @@ async function boot() {
         if (r.warning) showMessage(r.warning);
         setupSceneControls();
         // 길 면(편집기 도로, 읽기 전용): '차도'·'보행로' 기본 표시, '지하 길'은 체크 시
-        roadSurfaces = new RoadSurfaceLayer(r.viewer, { ground: sampler(r.grid), buildings: () => r.scene?.scene.buildings ?? [] });
-        void roadSurfaces.reload().catch((err) => console.error('road surfaces unavailable', err));
-        $<HTMLInputElement>('scene-roads').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked));
-        $<HTMLInputElement>('scene-roads-pedestrian').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'pedestrian'));
-        $<HTMLInputElement>('scene-roads-underground').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'underground'));
-        // 단면도: 체크 뒤 지도에서 두 점을 찍으면 그 선으로 자름. 끄면 원래대로
-        const g = r.grid;
-        const section = new SectionTool(r.viewer, {
-          height: sampler(g),
-          box: { minX: g.originX, minY: g.originY, maxX: g.originX + g.width * g.resolution, maxY: g.originY + g.height * g.resolution },
-          buildings: () => r.scene?.scene.buildings ?? [],
-          roads: () => roadSurfaces?.roads ?? [],
-          surfaces: () => roadSurfaces?.surfaces() ?? [],
-          areas: () => mobilityLayer?.data.openAreas ?? [],
-          layers: () => [r.scene, roadSurfaces, mobilityLayer],
-        }, (text) => {
-          $('scene-section-status').textContent = text;
-          $('scene-section-tools').hidden = !section.active;
+        // 단면도: 체크 뒤 지도에서 두 점을 찍으면 그 선으로 자름. 끄면 원래대로 (편집기와 같은 scene-layers.ts)
+        const layers = new SceneLayers(r.viewer, { grid: r.grid, scene: r.scene });
+        sceneLayers = layers;
+        layers.addLayer(() => mobilityLayer);
+        bindLayerControls(layers, {
+          parts: { ground: $<HTMLInputElement>('scene-roads'), pedestrian: $<HTMLInputElement>('scene-roads-pedestrian'), underground: $<HTMLInputElement>('scene-roads-underground') },
+          section: $<HTMLInputElement>('scene-section'), sectionTools: $('scene-section-tools'), sectionLook: $('scene-section-look'), sectionFlip: $('scene-section-flip'), sectionStatus: $('scene-section-status'),
         });
-        sectionTool = section;
-        $<HTMLInputElement>('scene-section').addEventListener('change', (e) => ((e.target as HTMLInputElement).checked ? section.start() : section.stop()));
-        $('scene-section-look').addEventListener('click', () => section.lookAt());
-        $('scene-section-flip').addEventListener('click', () => section.flip());
-        if (import.meta.env.DEV) (window as any).__section = section;
+        void reloadSceneLayers().catch((err) => console.error('road surfaces unavailable', err));
+        if (import.meta.env.DEV) (window as any).__section = layers.section;
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));
@@ -1029,11 +1015,11 @@ async function boot() {
       if (import.meta.env.DEV) (window as any).__previewViewer = v; // debugging in the browser console
       enablePicking(v);
       mobilityLayer = new MobilityLayer(v);
-      mobilityLayer.surfacesElsewhere = roadSurfaces !== null; // 포장면·운동장은 길 면과 합쳐 그림(운동장은 Paths 토글을 따름)
+      mobilityLayer.surfacesElsewhere = sceneLayers !== null; // 포장면·운동장은 길 면과 합쳐 그림(운동장은 Paths 토글을 따름)
       void mobilityLayer.reload().catch((err) => console.error('mobility spaces unavailable', err));
       $<HTMLInputElement>('scene-mobility').addEventListener('change', (e) => {
         mobilityLayer?.setVisible((e.target as HTMLInputElement).checked);
-        roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'area');
+        sceneLayers?.setVisible('area', (e.target as HTMLInputElement).checked);
       });
       $('scene-controls').hidden = false;
       // the campus model draws its own buildings and campus outline; the VWorld map needs the 2D overlay

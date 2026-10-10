@@ -4,7 +4,11 @@ type Area = { id: number; name: string; kind: string; elevationM: number | null;
   floor: string | null; note: string | null; revision: string; areaM2: number; geometry: { coordinates: XY[][] } };
 type Context = { viewer: any; C: any; point: (p: XYZ) => any; cursor: () => XYZ;
   terrain: (x: number, y: number) => number | null;
-  request: <T>(path: string, init?: RequestInit) => Promise<T>; start: () => boolean; say: (text: string) => void };
+  request: <T>(path: string, init?: RequestInit) => Promise<T>; start: () => boolean; say: (text: string) => void;
+  /** Called when the saved areas were read again. */
+  changed?: () => void;
+  /** True when something else already fills this area on the map: only its outline is drawn then (two fills at one height flicker). */
+  filled?: (area: Area) => boolean };
 const escape = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 
 /** Area boundaries are independent of routing centerlines. Existing paths are never removed automatically. */
@@ -52,6 +56,10 @@ export class AreaEditor {
     this.field('elevationM').oninput = () => this.render();
   }
   get active() { return this.vertices !== null; }
+  /** The saved areas as last read from the server. */
+  get saved() { return this.areas; }
+  /** Draw again (what `filled` answers changed). */
+  refresh() { this.render(); }
   private get form() { return this.root.querySelector<HTMLElement>('[data-form]')!; }
   private field(key: string) { return this.root.querySelector<HTMLInputElement>(`[data-field="${key}"]`)!; }
   private button(key: string) { return this.root.querySelector<HTMLButtonElement>(`[data-action="${key}"]`)!; }
@@ -78,6 +86,7 @@ export class AreaEditor {
   async load() {
     this.areas = await this.ctx.request<Area[]>('/api/v1/editor/areas');
     this.render();
+    this.ctx.changed?.();
   }
   private edit(area: Area) {
     if (this.busy || this.active && !confirm('작성 중인 공간을 취소할까요?')) return;
@@ -121,17 +130,17 @@ export class AreaEditor {
     for (const e of this.entities) this.ctx.viewer.entities.remove(e);
     this.entities = [];
     const {C,viewer,point} = this.ctx;
-    const draw = (vertices: XY[], height: number | null, draft: boolean, name: string, holes: XY[][] = []) => {
+    const draw = (vertices: XY[], height: number | null, draft: boolean, name: string, holes: XY[][] = [], fill = true) => {
       const color = draft ? C.Color.YELLOW : C.Color.fromCssColorString('#29a7bb');
       const positions = vertices.map(([x,y])=>point([x,y,height ?? this.ctx.terrain(x,y) ?? 0]));
       const holePositions = holes.map(ring => ring.map(([x,y])=>point([x,y,height ?? this.ctx.terrain(x,y) ?? 0])));
-      if (positions.length >= 3) this.entities.push(viewer.entities.add({polygon:{hierarchy:new C.PolygonHierarchy(positions,holePositions.map(p=>new C.PolygonHierarchy(p))),perPositionHeight:true,material:color.withAlpha(0.25),arcType:C.ArcType.NONE}}));
+      if (fill && positions.length >= 3) this.entities.push(viewer.entities.add({polygon:{hierarchy:new C.PolygonHierarchy(positions,holePositions.map(p=>new C.PolygonHierarchy(p))),perPositionHeight:true,material:color.withAlpha(0.25),arcType:C.ArcType.NONE}}));
       for (const p of holePositions) this.entities.push(viewer.entities.add({polyline:{positions:[...p,p[0]],width:3,material:color,depthFailMaterial:color,arcType:C.ArcType.NONE}}));
       if (positions.length >= 2) this.entities.push(viewer.entities.add({polyline:{positions:[...positions,...(positions.length>=3?[positions[0]]:[])],width:3,material:color,arcType:C.ArcType.NONE}}));
       if (positions.length) this.entities.push(viewer.entities.add({position:positions[0],label:{text:name,font:'12px system-ui',fillColor:color,showBackground:true,disableDepthTestDistance:Number.POSITIVE_INFINITY}}));
       if (draft) for (const position of positions) this.entities.push(viewer.entities.add({position,point:{pixelSize:8,color,disableDepthTestDistance:Number.POSITIVE_INFINITY}}));
     };
-    for (const area of this.areas) if (area.id !== this.selected?.id) draw(area.geometry.coordinates[0].slice(0,-1),area.elevationM,false,area.name,area.geometry.coordinates.slice(1).map(r=>r.slice(0,-1)));
+    for (const area of this.areas) if (area.id !== this.selected?.id) draw(area.geometry.coordinates[0].slice(0,-1),area.elevationM,false,area.name,area.geometry.coordinates.slice(1).map(r=>r.slice(0,-1)),!this.ctx.filled?.(area));
     const height = Number(this.field('elevationM').value);
     if (this.vertices && Number.isFinite(height)) draw(this.vertices,height,true,this.field('name').value || '공간 초안',this.holes);
     this.root.querySelector('[data-info]')!.textContent = this.active ? `경계점 ${this.vertices!.length}개 · 같은 바닥 고도의 닫힌 면 · Space 추가 / Enter 저장` : '공간은 경로와 별개인 면입니다. 기존 도로는 자동 정리·연결되지 않습니다.';

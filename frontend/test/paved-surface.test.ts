@@ -119,11 +119,44 @@ test('길 높이: 저장 높이가 지면과 0.5 m 안이면 저장 높이, 아�
   const p = roadProfile(buried, ground);
   assert.equal(p.source, 'ground');
   assert.ok(p.line.every((q: P, i: number) => Math.abs(q[2] - (100 + 0.1 * i)) < 1e-6), '고른 비탈은 그대로');
-  // 울퉁불퉁한 지면은 고르게: 양 끝은 지면 높이 그대로, 가운데 톱니는 줄어든다
-  const bumpy = (x: number) => 100 + (Math.round(x - X) % 2 === 0 ? 0.6 : -0.6);
-  const flat = roadProfile(buried, bumpy).line;
-  assert.equal(flat[0][2], bumpy(X));
-  assert.ok(Math.max(...flat.slice(8, 32).map((q: P) => Math.abs(q[2] - 100))) < 0.1);
+});
+
+test('길 높이(지면): 길보다 좁은 골은 따라 내려가지 않고, 짧은 길은 양 끝을 곧게 잇고, 한 점에서 만나는 길은 높이가 같다', () => {
+  // 고른 비탈(10 m에 1 m) 위에, 길을 가로지르는 폭 2 m·깊이 3 m 골
+  const trench = (x: number) => 100 + 0.1 * (x - X) - (Math.abs(x - X - 20) < 1 ? 3 : 0);
+  const long = Array.from({ length: 41 }, (_, i) => [X + i, Y, 90] as [number, number, number]);
+  const line = roadProfile(long, trench, 2.5).line;
+  assert.ok(line.every((q: P, i: number) => Math.abs(q[2] - (100 + 0.1 * i)) < 0.1), `골에서 ${Math.min(...line.map((q: P, i: number) => q[2] - (100 + 0.1 * i))).toFixed(2)} m`);
+  // 골 폭이 넓으면(10 m) 진짜 지형이다: 따라 내려간다
+  const valley = (x: number) => 100 - (Math.abs(x - X - 20) < 5 ? 3 : 0);
+  assert.ok(roadProfile(long, valley, 2.5).line[20][2] < 98.5);
+  // 12 m보다 짧은 길: 가운데에 골이 있어도 양 끝 높이를 곧게 잇는다(한 방향으로만 오르내림)
+  const short = Array.from({ length: 9 }, (_, i) => [X + 16 + i, Y, 90] as [number, number, number]);
+  const ramp = roadProfile(short, valley, 2.5).line;
+  assert.ok(ramp.every((q: P, i: number) => Math.abs(q[2] - (ramp[0][2] + ((ramp[8][2] - ramp[0][2]) * i) / 8)) < 1e-9));
+  // 끝 높이는 그 자리 지면에서만 정해진다: 폭·방향이 다른 길도 같은 점에서 같은 높이
+  const bumpy = (x: number, y: number) => 100 + Math.sin(x * 1.3) + Math.cos(y * 0.7);
+  const a = roadProfile([[X, Y, 0], [X + 30, Y, 0]], bumpy, 2).line;
+  const b = roadProfile([[X, Y, 0], [X, Y + 8, 0]], bumpy, 9).line;
+  assert.equal(a[0][2], b[0][2]);
+});
+
+test('갈림길: 좁은 길 셋이 만나는 곳이 길 폭보다 큰 덩어리가 되지 않는다', () => {
+  // 폭 2.5 m 길 셋: 서쪽에서 와서 40°로 갈라진다
+  const w = 2.5, c = [X + 30, Y + 30];
+  const arm = (deg: number) => geo.band([c, [c[0] + 25 * Math.cos((deg * Math.PI) / 180), c[1] + 25 * Math.sin((deg * Math.PI) / 180)]], w).map((r: P[]) => [r]);
+  const disc = [Array.from({ length: 48 }, (_, k) => [c[0] + (w / 2) * Math.cos((k * Math.PI) / 24), c[1] + (w / 2) * Math.sin((k * Math.PI) / 24)])];
+  const pieces = [...arm(180), ...arm(20), ...arm(-20), disc];
+  const fork = geo.paths(pieces);
+  assert.equal(fork.length, 1, '한 면으로 이어진다');
+  // 두 길의 안쪽 가장자리는 갈림에서 3.65 m에서 갈라진다. 거기서 0.8 m 안쪽까지만 둥글게 메워지고(반지름 0.4 m),
+  // 5 m 지점은 비어 있다. 넓은 면용 다듬기(1 m 닫기)는 1.9 m를 메워 그 지점까지 덩어리가 된다
+  assert.ok(!inside(35, 30, fork), '두 길 사이는 빈 채');
+  assert.ok(inside(35, 30, geo.pool(pieces)), '넓은 면용 다듬기와의 차이');
+  // 길은 제 폭 그대로: 넓이가 원래 합친 모양에서 3% 안, 길 가운데는 남는다
+  const raw = geo.union(pieces);
+  assert.ok(Math.abs(geo.area(fork) - geo.area(raw)) < 0.03 * geo.area(raw));
+  assert.ok(inside(36, 30 + 6 * Math.tan((20 * Math.PI) / 180), fork) && inside(20, 30, fork));
 });
 
 test('면 높이: 평평한 영역 안은 바닥 높이, 길 위는 길 높이, 사이는 턱 없이 이어진다', () => {
@@ -149,6 +182,7 @@ test('면 만들기: 재질끼리 겹치지 않고, 가장자리 띠·치마·�
       road('car', [[20, 10, 100.2], [60, 10, 100.2]], { toNodeId: 'n' }),
       road('walk', [[60, 10, 100], [60, 40, 100]], { roadClass: 'pedestrian', fromNodeId: 'n', toNodeId: 'm' }),
       road('walkOnField', [[60, 40, 103], [100, 40, 103]], { roadClass: 'pedestrian', fromNodeId: 'm' }),
+      road('stairsOnField', [[90, 14, 103], [90, 30, 103]], { roadClass: 'pedestrian', structure: 'stairs' }),
       road('under', [[0, 50, 90], [30, 50, 90]], { name: '지하 차도' }),
     ],
     areas: [
@@ -158,18 +192,22 @@ test('면 만들기: 재질끼리 겹치지 않고, 가장자리 띠·치마·�
     buildings: [[rect(30, 12, 40, 30)]],
     ground,
   });
-  assert.deepEqual(out.surfaces.map((s: { material: string }) => s.material), ['carriageway', 'pedestrian', 'field']);
-  assert.deepEqual(out.heightSource, { car: 'stored', walk: 'stored', walkOnField: 'ground' });
-  const [black, grey, field] = out.surfaces;
+  assert.deepEqual(out.surfaces.map((s: { material: string }) => s.material), ['carriageway', 'stairs', 'field', 'pedestrian']);
+  assert.deepEqual(out.heightSource, { car: 'stored', walk: 'stored', walkOnField: 'ground', stairsOnField: 'ground' });
+  const [black, stairs, field, grey] = out.surfaces;
   // 넓이: 삼각형 넓이의 합 = 다듬은 전체 윤곽의 넓이(겹침도 빈틈도 없다)
-  const total = meshArea(black.mesh, 4) + meshArea(grey.mesh, 4) + meshArea(field.mesh, 4);
+  const total = meshArea(black.mesh, 4) + meshArea(grey.mesh, 4) + meshArea(field.mesh, 4) + meshArea(stairs.mesh, 4);
   assert.ok(Math.abs(total - geo.area(out.outline)) < 0.01 * total, `${total} / ${geo.area(out.outline)}`);
   assert.ok(geo.overlap(out.outline, [rect(30, 12, 40, 30)]) < 0.05, '건물과 안 겹친다');
-  // 높이: 포장면·차도는 100.2, 운동장은 103으로 평평. 운동장 위를 지나는 길도 운동장 높이
+  // 보행로는 운동장 면 위에 칠해지지 않는다: 운동장 윤곽에서 끝난다. 계단은 운동장 위에서도 제 색으로 남는다
+  assert.ok(geo.overlap(grey.outline, [rect(72, 22, 108, 58)]) < 0.05, '운동장 안에 회색 띠 없음');
+  assert.ok(geo.overlap(field.outline, [rect(75, 39, 88, 41)]) > 25, '길이 지나던 자리도 운동장 면');
+  assert.ok(geo.overlap(stairs.outline, [rect(89, 21, 91, 29)]) > 15, '계단은 남는다');
+  // 높이: 포장면·차도는 100.2, 운동장은 103으로 평평. 운동장에 닿는 길 끝도 운동장 높이
   const heights = (mesh: { positions: number[] }, pick: (x: number, y: number) => boolean) => mesh.positions.filter((_: number, i: number) => i % 4 === 2 && pick(mesh.positions[i - 2] - X, mesh.positions[i - 1] - Y));
   assert.ok(heights(black.mesh, (x) => x < 55).every((z: number) => Math.abs(z - 100.2) < 1e-6));
   assert.ok(heights(field.mesh, () => true).every((z: number) => z === 103));
-  assert.ok(heights(grey.mesh, (x) => x > 72).every((z: number) => z === 103));
+  assert.ok(heights(grey.mesh, (x, y) => x > 69 && y > 30).every((z: number) => z === 103));
   // 가장자리 띠: 바깥 윤곽 위의 점은 1, 띠 폭보다 안쪽은 0, 그 사이만 0~1
   const edgeAt = (x: number, y: number) => {
     let best = Infinity;
@@ -191,15 +229,15 @@ test('면 만들기: 재질끼리 겹치지 않고, 가장자리 띠·치마·�
     }
   }
   assert.ok(rim > 100 && body > 100);
-  // 재질이 만나는 안쪽 경계(운동장 위를 지나는 보행로의 양옆)에는 띠가 없다
-  const crossing = grey.mesh.positions.filter((_: number, i: number) => i % 4 === 3 && grey.mesh.positions[i - 3] - X > 75 && grey.mesh.positions[i - 3] - X < 95);
-  assert.ok(crossing.length > 8 && crossing.every((t: number) => t === 0));
+  // 재질이 만나는 안쪽 경계(운동장 위 계단의 양옆)에는 띠가 없다
+  const onField = stairs.mesh.positions.filter((_: number, i: number) => i % 4 === 3 && stairs.mesh.positions[i - 2] - Y > 21 && stairs.mesh.positions[i - 2] - Y < 29);
+  assert.ok(onField.length >= 4 && onField.every((t: number) => t === 0), `${onField.length} ${Math.max(...onField)}`);
   // 치마: 면이 지면보다 높은 운동장 가장자리에서 지면 아래 0.5 m까지
   const zs = field.skirt.positions.filter((_: number, i: number) => i % 3 === 2);
   assert.equal(Math.max(...zs), 103);
   assert.equal(Math.min(...zs), 100 - PAVED.skirtDepthM);
-  // 지형을 숨길 윤곽: 넓이는 그 재질의 삼각형 넓이와 같다
-  for (const s of out.surfaces) assert.ok(Math.abs(geo.area(s.outline) - meshArea(s.mesh, 4)) < 0.01 * meshArea(s.mesh, 4));
+  // 지형을 숨길 윤곽: 넓이는 그 재질의 삼각형 넓이와 같다(윤곽은 2 cm 안의 점을 정리하므로 좁은 계단 면에서 2% 안)
+  for (const s of out.surfaces) assert.ok(Math.abs(geo.area(s.outline) - meshArea(s.mesh, 4)) < 0.02 * meshArea(s.mesh, 4), `${s.material} ${geo.area(s.outline)} ${meshArea(s.mesh, 4)} rings ${s.outline.length}`);
 });
 
 test('지형을 숨길 윤곽은 구멍 없는 고리로 나뉜다(고리 모양 길)', () => {

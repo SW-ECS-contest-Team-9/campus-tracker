@@ -1,9 +1,11 @@
 // Draws the ground surfaces of paved-surface.ts (merged, smooth-edged roads, paved areas and the sports field) and the
-// underground roads of road-surface.ts on the Cesium preview map (see those files for what and why).
-import { api, type CarriagewayRoad, type MobilityOpenArea, type SceneBuilding } from './api';
+// underground roads of road-surface.ts on a Cesium map: the preview and the editor both mount it through scene-layers.ts
+// (see those files for what and why).
+import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS, type MobilityPick } from './mobility-map';
 import { PAVED, buildPavedSurfaces, type Material, type PavedSurfaces, type SurfaceArea } from './paved-surface';
 import { ROAD_SURFACE, buildRoadSurfaces } from './road-surface';
+import type { LayerArea } from './scene-layer-data';
 import { clipMesh, type Mesh, type SectionPlane } from './section';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
@@ -20,10 +22,14 @@ export type RoadSurfaceSources = {
   /** Ground height at an EPSG:5186 point (the terrain grid the map is drawn from). */
   ground: (x: number, y: number) => number;
   buildings: () => SceneBuilding[];
+  /** Which parts show at first (default: all but the underground ways). */
+  visible?: Partial<Record<RoadSurfacePart, boolean>>;
+  /** false: a click goes through the surfaces (the editor picks its lines and the ground, never a surface). */
+  pickable?: boolean;
 };
 
 /** The filled open areas of mobility-map.ts (AREA_FILLS) that are outdoors: these are drawn here, merged with the roads. */
-export function surfaceAreas(areas: MobilityOpenArea[]): SurfaceArea[] {
+export function surfaceAreas(areas: LayerArea[]): SurfaceArea[] {
   const metres = (ring: number[][]) => ring.slice(0, -1).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
   return areas.flatMap((a) => {
     const fill = AREA_FILLS.find((f) => f.match(a));
@@ -32,13 +38,22 @@ export function surfaceAreas(areas: MobilityOpenArea[]): SurfaceArea[] {
   });
 }
 
+/** The part an open area is drawn in as a filled surface, or null (an indoor area, or a kind that is not filled). */
+export function areaSurfacePart(area: { kind: string; name: string | null; elevationM: number | null; buildingId: string | null; floor: string | null }): RoadSurfacePart | null {
+  const fill = AREA_FILLS.find((f) => f.match(area));
+  if (!fill || (area.elevationM != null && (area.buildingId || area.floor))) return null;
+  return fill.id === 'field' ? 'area' : 'ground';
+}
+
 export class RoadSurfaceLayer {
   private readonly prims: any;
   private parts: { part: RoadSurfacePart; prim: any }[] = [];
   private visible: Record<RoadSurfacePart, boolean> = { ground: true, pedestrian: true, area: true, underground: false };
   private section: SectionPlane | null = null;
-  private areas: MobilityOpenArea[] = [];
-  /** Built once per data load (reload), not per frame and not per toggle. */
+  private areas: LayerArea[] = [];
+  /** The data changed since the surfaces were built (they are built only while a part is shown). */
+  private stale = false;
+  /** Built once per data change, not per frame and not per toggle. */
   private paved: PavedSurfaces = { surfaces: [], joinedRoadIds: [], heightSource: {}, rawOutline: [], outline: [] };
   private underground: ReturnType<typeof buildRoadSurfaces>['underground'] = [];
   roads: CarriagewayRoad[] = [];
@@ -47,12 +62,27 @@ export class RoadSurfaceLayer {
 
   constructor(private readonly viewer: Viewer, private readonly src: RoadSurfaceSources) {
     this.prims = viewer.scene.primitives.add(new (window as any).Cesium.PrimitiveCollection());
+    Object.assign(this.visible, src.visible);
   }
 
-  async reload() {
-    const [roads, mobility] = await Promise.all([api.roads(), api.mobility()]);
-    this.roads = roads.roads;
-    this.areas = mobility.openAreas;
+  /** New roads and areas. The surfaces are built now if any part is shown, otherwise when one is turned on. */
+  setData(roads: CarriagewayRoad[], areas: LayerArea[]) {
+    this.roads = roads;
+    this.areas = areas;
+    this.stale = true;
+    this.build();
+  }
+
+  private build() {
+    if (!this.stale) return;
+    if (!Object.values(this.visible).some(Boolean)) {
+      // nothing shown: drop what was drawn from the old data, build when a part is turned on
+      this.paved = { surfaces: [], joinedRoadIds: [], heightSource: {}, rawOutline: [], outline: [] };
+      this.underground = [];
+      this.draw();
+      return;
+    }
+    this.stale = false;
     const started = performance.now();
     const metres = (ring: number[][]) => ring.slice(0, -1).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
     this.paved = buildPavedSurfaces({
@@ -62,11 +92,13 @@ export class RoadSurfaceLayer {
     this.underground = buildRoadSurfaces(this.roads).underground;
     this.buildMs = performance.now() - started;
     this.draw();
-    return this.roads;
   }
+
+  isVisible(part: RoadSurfacePart) { return this.visible[part]; }
 
   setVisible(visible: boolean, part: RoadSurfacePart = 'ground') {
     this.visible[part] = visible;
+    this.build();
     for (const p of this.parts) if (p.part === part) p.prim.show = visible;
     this.clipGround();
   }
@@ -123,6 +155,7 @@ export class RoadSurfaceLayer {
       }),
       appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
       asynchronous: false,
+      allowPicking: this.src.pickable !== false,
     });
   }
 
@@ -175,6 +208,7 @@ export class RoadSurfaceLayer {
         appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
         depthFailAppearance: new C.PerInstanceColorAppearance({ flat: true, translucent: true, closed: false }),
         asynchronous: false,
+        allowPicking: this.src.pickable !== false,
       }));
     }
     this.clipGround();

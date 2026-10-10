@@ -13,8 +13,11 @@ import { ROAD_SURFACE, isUnderground, roadWidthM, smoothCentreline, surfaceKind,
 /** A polygon ring in metres, not closed. */
 export type Ring = number[][];
 export type Material = SurfaceKind | 'field';
-/** Which material wins where two overlap in plan: the first. The last takes what is left of the merged shape. */
-export const MATERIALS: Material[] = ['crossing', 'carriageway', 'stairs', 'pedestrian', 'field'];
+/**
+ * Which material wins where two overlap in plan: the first. A pedestrian way does not paint over the field (the field
+ * is itself the walking surface there): its ribbon ends at the field's outline.
+ */
+export const MATERIALS: Material[] = ['crossing', 'carriageway', 'stairs', 'field', 'pedestrian'];
 
 /** Every constant of the merged surfaces. Lengths in metres. */
 export const PAVED = {
@@ -30,6 +33,12 @@ export const PAVED = {
   cornerRadiusM: 1.5,
   /** Opening of the narrower parts: a way at least twice this wide survives (the 2 m default of stairs does), thinner spikes vanish. */
   keepRadiusM: 0.8,
+  /**
+   * The narrow ways (pedestrian ways, stairs, crossings) are only closed and opened by this: a fork stays a fork of
+   * ribbons of their own width (the 1 m closing of the wide surfaces filled the notch of a fork into a blob), the
+   * corner where two ways meet gets this radius, a square end loses 0.17 m at its two corners.
+   */
+  pathRadiusM: 0.4,
   /** Leftovers thinner than twice this are dropped (crescents between the two openings, slivers along a building wall). */
   sliverM: 0.3,
   /** The surfaces stop this far before a building wall (they are cut by the footprints as drawn, grown by this), so no edge lies exactly in a wall. */
@@ -50,8 +59,16 @@ export const PAVED = {
   // --- height ---
   /** A road is drawn at its stored height when that is within this of the ground along its whole centreline. */
   agreeToleranceM: 0.5,
-  /** Otherwise: the ground under the centreline, averaged over this distance to either side (twice). */
+  /** Otherwise: the firm ground under the centreline, averaged over this distance to either side (twice). */
   profileWindowM: 6,
+  /**
+   * Firm ground = the median of the ground within half this of a point (or half the road width, if that is more): a
+   * groove or a spike of the terrain narrower than this (two cells of the 2 m terrain grid) does not move it. Dips of
+   * the firm ground shorter than this along the road are bridged, not followed.
+   */
+  grooveM: 4,
+  /** A road no longer than this runs straight from the height of one end to the other (no room for a smoothed profile). */
+  shortRoadM: 12,
   /** Around a level area the height changes over to the road heights within this distance. */
   areaBlendM: 3,
   /** A point takes its height from the roads within their half width plus this (weighted by nearness). */
@@ -138,10 +155,22 @@ const disc = (c: number[], r: number): Shape => [toPath(Array.from({ length: PAV
  * narrow way, so that the way stays), a second closing rounds the inner corners where the two meet.
  */
 function pool(shape: Shape): Shape {
+  if (!shape.length) return shape;
   const closed = closing(shape, PAVED.closeRadiusM);
   const wide = opening(closed, PAVED.cornerRadiusM);
   const narrow = opening(minus(opening(closed, PAVED.keepRadiusM), wide), PAVED.sliverM);
   return smooth(closing(union(wide, narrow), PAVED.closeRadiusM));
+}
+/** The outline of the narrow ways: ribbons of their own width, joined with a small radius (PAVED.pathRadiusM). */
+function poolPaths(shape: Shape): Shape {
+  return shape.length ? smooth(opening(closing(shape, PAVED.pathRadiusM), PAVED.pathRadiusM)) : shape;
+}
+const NARROW: Material[] = ['crossing', 'stairs', 'pedestrian'];
+const pooledOf = (m: Material, shape: Shape) => (NARROW.includes(m) ? poolPaths(shape) : pool(shape));
+/** Everything as one outline: the wide surfaces pooled, the narrow ways as ribbons, joined where they meet. */
+function poolAll(raw: Map<Material, Shape>): Shape {
+  const pick = (narrow: boolean) => union(...MATERIALS.filter((m) => NARROW.includes(m) === narrow).map((m) => raw.get(m) ?? []));
+  return closing(union(pool(pick(false)), poolPaths(pick(true))), PAVED.pathRadiusM);
 }
 
 /** Points every `step` metres (or closer, evenly) along a closed ring. */
@@ -268,24 +297,53 @@ export function pavedRoadIds(roads: SurfaceRoad[], pavedAreas: Ring[][]): string
 }
 
 // ---------- height ----------
+/** The median of the ground at a point and on two rings around it (radius `reachM` and half of it). */
+function firmGround(ground: (x: number, y: number) => number, x: number, y: number, reachM: number) {
+  const zs = [ground(x, y)];
+  for (const r of [reachM / 2, reachM]) for (let k = 0; k < 8; k++) zs.push(ground(x + r * Math.cos((k * Math.PI) / 4), y + r * Math.sin((k * Math.PI) / 4)));
+  return zs.sort((p, q) => p - q)[zs.length >> 1];
+}
+/** Dips shorter than 2 * `half` samples are filled (running maximum, then running minimum); both ends and every slope stay. */
+function bridgeDips(zs: number[], half: number): number[] {
+  const at = (i: number) => zs[Math.min(zs.length - 1, Math.max(0, i))];
+  const highest = (j: number) => { let m = -Infinity; for (let k = j - half; k <= j + half; k++) m = Math.max(m, at(k)); return m; };
+  const maxima = Array.from({ length: zs.length + 2 * half }, (_, j) => highest(j - half));
+  return zs.map((_, i) => { let m = Infinity; for (let j = i; j <= i + 2 * half; j++) m = Math.min(m, maxima[j]); return m; });
+}
+
 /**
  * The height line of a road along its smoothed centreline: the stored heights where they are within
- * PAVED.agreeToleranceM of the ground everywhere, otherwise the ground under the centreline, smoothed (moving
- * average over PAVED.profileWindowM to either side, twice; both ends keep the ground height, so roads meeting at a
- * node meet at one height).
+ * PAVED.agreeToleranceM of the ground everywhere. Otherwise a line on the firm ground (firmGround: grooves and spikes
+ * of the terrain narrower than the road, or than PAVED.grooveM, do not count):
+ *  - both ends at the firm ground there (the same for every road at that node, so they meet at one height);
+ *  - a road no longer than PAVED.shortRoadM runs straight from one end height to the other;
+ *  - a longer road follows the firm ground, with short dips bridged and then smoothed (moving average over
+ *    PAVED.profileWindowM to either side, twice).
  */
-export function roadProfile(centre: P3[], ground: (x: number, y: number) => number): { line: P3[]; source: 'stored' | 'ground' } {
+export function roadProfile(centre: P3[], ground: (x: number, y: number) => number, widthM = PAVED.grooveM): { line: P3[]; source: 'stored' | 'ground' } {
   const onGround = centre.map((p) => ground(p[0], p[1]));
   if (centre.every((p, i) => Math.abs(p[2] - onGround[i]) <= PAVED.agreeToleranceM)) return { line: centre, source: 'stored' };
-  const n = Math.round(PAVED.profileWindowM / ROAD_SURFACE.sampleStepM);
-  let zs = onGround;
-  for (let pass = 0; pass < 2; pass++) {
-    zs = zs.map((_, i) => {
-      const half = Math.min(n, i, zs.length - 1 - i);
-      let sum = 0;
-      for (let k = i - half; k <= i + half; k++) sum += zs[k];
-      return sum / (2 * half + 1);
-    });
+  const last = centre.length - 1;
+  const reach = Math.max(widthM, PAVED.grooveM) / 2;
+  const from = firmGround(ground, centre[0][0], centre[0][1], PAVED.grooveM / 2);
+  const to = firmGround(ground, centre[last][0], centre[last][1], PAVED.grooveM / 2);
+  const along = [0];
+  for (let i = 1; i <= last; i++) along.push(along[i - 1] + Math.hypot(centre[i][0] - centre[i - 1][0], centre[i][1] - centre[i - 1][1]));
+  let zs: number[];
+  if (along[last] <= PAVED.shortRoadM) {
+    zs = along.map((d) => from + ((to - from) * d) / (along[last] || 1));
+  } else {
+    zs = centre.map((p, i) => (i === 0 ? from : i === last ? to : firmGround(ground, p[0], p[1], reach)));
+    zs = bridgeDips(zs, Math.round(reach / ROAD_SURFACE.sampleStepM));
+    const n = Math.round(PAVED.profileWindowM / ROAD_SURFACE.sampleStepM);
+    for (let pass = 0; pass < 2; pass++) {
+      zs = zs.map((_, i) => {
+        const half = Math.min(n, i, zs.length - 1 - i);
+        let sum = 0;
+        for (let k = i - half; k <= i + half; k++) sum += zs[k];
+        return sum / (2 * half + 1);
+      });
+    }
   }
   return { line: centre.map((p, i) => [p[0], p[1], zs[i]] as P3), source: 'ground' };
 }
@@ -451,7 +509,7 @@ export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: Surface
     if (centre.length < 2) continue;
     const width = roadWidthM(road);
     raw.get(material)!.push(...band(centre, width));
-    const profile = roadProfile(centre, input.ground);
+    const profile = roadProfile(centre, input.ground, width);
     lines.push({ line: profile.line, halfWidthM: width / 2 });
     heightSource[road.id] = profile.source;
     for (const [id, at] of [[road.fromNodeId, centre[0]], [road.toNodeId, centre[centre.length - 1]]] as const) {
@@ -468,22 +526,24 @@ export function buildPavedSurfaces(input: { roads: SurfaceRoad[]; areas: Surface
   // one outline for everything, pooled, kept out of the buildings
   const buildings = grow(union(...input.buildings.map(polygonShape)), PAVED.buildingGapM);
   const everything = union(...raw.values());
-  const whole = opening(minus(pool(everything), buildings), PAVED.sliverM);
+  const whole = opening(minus(poolAll(raw), buildings), PAVED.sliverM);
 
-  // split by material: each takes its own pooled shape out of the whole, in order; what is left over (the rounded
-  // inner corners between two materials, and the field) goes to the field where it lies on the field, otherwise to the pedestrian ways
+  // split by material: each takes its own outline out of the whole, in order. What is left over (the rounded inner
+  // corners where two materials meet) goes to the field where it lies on the field, otherwise to the lowest material it touches
   const parts = new Map<Material, Shape>();
   let rest = whole;
-  for (const m of MATERIALS.slice(0, -1)) {
-    const mine = raw.get(m)!.length ? both(rest, grow(pool(raw.get(m)!), 0.05)) : [];
+  for (const m of MATERIALS) {
+    const mine = raw.get(m)!.length ? both(rest, grow(pooledOf(m, raw.get(m)!), 0.05)) : [];
     parts.set(m, mine);
     rest = minus(rest, mine);
   }
   const field = raw.get('field')!;
-  const leftovers = polygons(rest).map(({ outer, holes }) => [outer, ...holes]);
-  const onField = (piece: Shape) => field.length > 0 && both(piece, field).length > 0;
-  parts.set('pedestrian', union(parts.get('pedestrian')!, leftovers.filter((p) => !onField(p)).flat()));
-  parts.set('field', leftovers.filter(onField).flat());
+  const touches = (piece: Shape, shape: Shape) => shape.length > 0 && both(grow(piece, 0.06), shape).length > 0;
+  for (const { outer, holes } of polygons(rest)) {
+    const piece = [outer, ...holes];
+    const to = both(piece, field).length ? 'field' : [...MATERIALS].reverse().find((m) => touches(piece, parts.get(m)!)) ?? 'pedestrian';
+    parts.set(to, union(parts.get(to)!, piece));
+  }
 
   const levels = input.areas.filter((a) => a.elevationM != null).map((a) => ({ ring: a.rings[0], z: a.elevationM! }));
   const height = surfaceHeight(lines, levels, input.ground);
@@ -519,6 +579,11 @@ export const pavedGeometry = {
   pool(polys: Ring[][], buildings: Ring[][] = []): Ring[] {
     origin = polys[0][0][0].map(Math.floor);
     return opening(minus(pool(union(...polys.map(polygonShape))), grow(union(...buildings.map(polygonShape)), PAVED.buildingGapM)), PAVED.sliverM).map(toRing);
+  },
+  /** The outline of narrow ways (bands of pedestrian ways, stairs, crossings) as drawn: ribbons joined with a small radius. */
+  paths(polys: Ring[][]): Ring[] {
+    origin = polys[0][0][0].map(Math.floor);
+    return poolPaths(union(...polys.map(polygonShape))).map(toRing);
   },
   /** A road band (centreline widened to the width). */
   band(centre: number[][], widthM: number): Ring[] {

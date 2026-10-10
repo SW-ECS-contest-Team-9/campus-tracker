@@ -9,9 +9,10 @@
 //    afterwards are not cut until the plane is set again (approximate). The review layers of scene-local-corrections.ts are not cut.
 // The cut face: the ground profile along the line down to a base level, a height scale, the outline of each cut
 // building with its base and roof height, and a mark where a road or a level area meets the plane.
-import type { CarriagewayRoad, MobilityOpenArea, SceneBuilding } from './api';
+import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS } from './mobility-map';
 import { ROAD_SURFACE, isUnderground, roadWidthM, surfaceKind } from './road-surface';
+import type { LayerArea } from './scene-layer-data';
 import {
   clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, meshCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile,
   type Mesh, type SectionPlane, type XY,
@@ -34,7 +35,7 @@ export const SECTION = {
   offsetM: 0.05,
 };
 
-type Cuttable = { setSection(plane: SectionPlane | null): void };
+export type Cuttable = { setSection(plane: SectionPlane | null): void };
 export type SectionSources = {
   /** Ground height at an EPSG:5186 point. */
   height: (x: number, y: number) => number;
@@ -42,11 +43,16 @@ export type SectionSources = {
   box: { minX: number; minY: number; maxX: number; maxY: number };
   buildings: () => SceneBuilding[];
   roads: () => CarriagewayRoad[];
-  areas: () => MobilityOpenArea[];
+  areas: () => LayerArea[];
   /** The merged ground surfaces as drawn (road-surface-layer.ts): x, y, height, edge per vertex. */
   surfaces: () => { color: string; mesh: Mesh }[];
   /** The layers that cut their own shapes. */
   layers: () => (Cuttable | null)[];
+  /**
+   * Which map objects (entities) are cut; default: all. A page that draws its entities again and again (the editor)
+   * names the ones it redraws and calls uncutObjects() before and cutObjects() after each redraw.
+   */
+  objects?: (entity: any) => boolean;
 };
 
 export class SectionTool {
@@ -95,6 +101,24 @@ export class SectionTool {
     const camera = this.xy(this.viewer.camera.positionWC);
     this.picked = { a, b, flip: planeSide(sectionPlane(a, b), camera) > 0 };
     this.apply();
+  }
+
+  /** Cut again with the same line (the data on the cut face changed). */
+  refresh() {
+    if (this.plane && this.picked) this.apply();
+  }
+
+  /** Take back the cuts of the map objects (the layers and the ground stay cut). */
+  uncutObjects() {
+    for (const restore of this.undo.reverse()) restore();
+    this.undo = [];
+  }
+
+  /** Cut the map objects that are in the scene now. */
+  cutObjects() {
+    if (!this.plane) return;
+    this.uncutObjects();
+    this.cutMapObjects(this.plane);
   }
 
   /** Hide the other half instead. */
@@ -160,8 +184,7 @@ export class SectionTool {
     this.plane = null;
     this.viewer.scene.globe.clippingPlanes = undefined;
     for (const layer of this.src.layers()) layer?.setSection(null);
-    for (const restore of this.undo.reverse()) restore();
-    this.undo = [];
+    this.uncutObjects();
     for (const p of this.drawn) this.viewer.scene.primitives.remove(p);
     this.drawn = [];
   }
@@ -198,7 +221,7 @@ export class SectionTool {
       this.undo.push(() => { o.show = true; });
     };
     for (const e of [...this.viewer.entities.values]) {
-      if (!e.show) continue;
+      if (!e.show || (this.src.objects && !this.src.objects(e))) continue;
       if (e.polyline) {
         const positions: any[] | undefined = e.polyline.positions?.getValue(now);
         if (!positions?.length || e.polyline.clampToGround?.getValue(now)) continue; // on the ground: cut with the ground
@@ -207,6 +230,7 @@ export class SectionTool {
         hide(e);
         for (const piece of pieces) {
           const part = this.viewer.entities.add({ polyline: { positions: piece.map((p) => new C.Cartesian3(p[2], p[3], p[4])), width: e.polyline.width, material: e.polyline.material, depthFailMaterial: e.polyline.depthFailMaterial, arcType: e.polyline.arcType } });
+          part.cutFrom = e.id; // a click on the piece is a click on the line it was cut from
           this.undo.push(() => this.viewer.entities.remove(part));
         }
       } else if (e.polygon && e.polygon.height?.getValue(now) != null) {
