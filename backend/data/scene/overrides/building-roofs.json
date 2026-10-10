@@ -602,7 +602,8 @@
           "azimuth": 205,
           "grade": "확정(기둥 넷과 보), 추정(자리·치수)",
           "spread": 30,
-          "columns": 4
+          "columns": 4,
+          "columnsFromM": 134.2
         }
       ],
       "roof": {

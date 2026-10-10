@@ -51,11 +51,11 @@ box('Z07-YUDAM-WING-WALL', 'wall', L.buffer(-0.5, single_sided=True, join_style=
 n = 0
 for (ax, ay), (bx, by) in zip(EDGE, EDGE[1:]):
     a, b = np.array([ax, ay]), np.array([bx, by]); u = unit(b - a); out = np.array([-u[1], u[0]]) * -1.0; ln = float(np.hypot(*(b - a)))   # 진행 방향(남동)의 오른쪽 = 남서 = 바깥
-    cnt = max(1, int(ln // 3.2)); s0 = (ln - cnt * 3.2) / 2 + 0.7
+    cnt = max(1, int(ln // 2.4)); s0 = (ln - cnt * 2.4) / 2 + 0.5
     for c in range(cnt):
-        n += 1; p = a + u * (s0 + c * 3.2)
+        n += 1; p = a + u * (s0 + c * 2.4)
         for name, z in (('5F', 109.0), ('3F', 104.0), ('2F', 99.0)):
-            box(f'Z07-YUDAM-WING-WINDOW-{n:02d}-{name}', 'wall', Polygon([p + out * 0.45, p + u * 1.8 + out * 0.45, p + u * 1.8 + out * 0.62, p + out * 0.62]), z + 1.0, z + 2.6, f'낮은 날개의 흰 틀 창({name[0]}층 줄, 층 표 바닥 {z} m 위 1.0~2.6 m, 폭 1.8 m·간격 3.2 m)', WSRC, WG, 'Z07-YUDAM-WING-WALL', color='#e4e8e6')
+            box(f'Z07-YUDAM-WING-WINDOW-{n:02d}-{name}', 'wall', Polygon([p + out * 0.45, p + u * 1.4 + out * 0.45, p + u * 1.4 + out * 0.62, p + out * 0.62]), z + 1.0, z + 2.3, f'낮은 날개의 흰 틀 창({name[0]}층 줄, 층 표 바닥 {z} m 위 1.0~2.3 m, 폭 1.4 m·간격 2.4 m)', WSRC, WG, 'Z07-YUDAM-WING-WALL', color='#e4e8e6')
 GL = LineString(EDGE[:5])   # 옥상 화단: 분수 둘레 기둥 열에 닿기 전까지(북서쪽 26 m)
 box('Z07-YUDAM-WING-GARDEN', 'planter', GL.buffer(3.2, single_sided=True, join_style=2).difference(GL.buffer(0.3, single_sided=True, join_style=2)), ZP, ZP + 0.45, '낮은 날개 옥상의 나무 심은 띠(광장 서쪽 가장자리 안쪽 0.3~3.2 m, 광장 + 0.45 m). 분수 둘레 기둥 열에 닿기 전까지만', WSRC, WG, 'Z03-PLATFORM-PLAZA 114.1')
 for k in range(4):

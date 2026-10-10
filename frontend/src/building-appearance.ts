@@ -178,15 +178,15 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         if (a.roof?.rim && hidden < top - 1) out.panel(p, u, n, 0, len, top - 1.2, top, 0.1, hex(a.roof.rim));
         if (a.roof?.eaveBandM && hidden < top - 1) out.panel(p, u, n, 0, len, top - a.roof.eaveBandM, top, 0.12, hex(WINDOW.cornice));
         // tall columns with a beam on top, centred on the longest wall of the face; no windows behind them
-        let clear: [number, number] | null = null;
+        let clear: [number, number, number] | null = null; // along the wall from, to; from this height up
         if (face?.columns && longest.get(face) === len && levels.length && hidden < levels[0][0]) {
           const k = Math.max(2, Math.min(face.columns, Math.floor((len - 1) / COLONNADE.pitch) + 1));
           const span = (k - 1) * COLONNADE.pitch + COLONNADE.width, s0 = (len - span) / 2;
-          const z0 = levels[0][0], z1 = top - (a.roof?.eaveBandM ?? 0) - 0.2, col = hex(COLONNADE.color);
+          const z0 = Math.max(levels[0][0], face.columnsFromM ?? -Infinity), z1 = top - (a.roof?.eaveBandM ?? 0) - 0.2, col = hex(COLONNADE.color);
           out.panel(p, u, n, s0, s0 + span, z0, z1 - COLONNADE.beam, 0.06, hex(COLONNADE.recess));
           for (let c = 0; c < k; c++) out.pier(p, u, n, s0 + c * COLONNADE.pitch, s0 + c * COLONNADE.pitch + COLONNADE.width, z0, z1 - COLONNADE.beam, COLONNADE.depth, col);
           out.pier(p, u, n, s0 - 0.4, s0 + span + 0.4, z1 - COLONNADE.beam, z1, COLONNADE.depth + 0.2, col);
-          clear = [s0 - 0.5, s0 + span + 0.5];
+          clear = [s0 - 0.5, s0 + span + 0.5, z0 - 0.5];
         }
         const style = face?.style === 'none' ? null : face?.style ? STYLES[face.style] : baseStyle;
         const kind = face?.style ?? a.windows?.style;
@@ -194,7 +194,7 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         let count = Math.floor((len - 0.6) / style.pitch), width: number = style.width, pitch: number = style.pitch;
         if (count < 1) { count = 1; width = Math.min(width, len - 0.3); pitch = len - 0.6; }
         const start = (len - count * pitch) / 2 + (pitch - width) / 2;
-        const behind = (s: number) => clear !== null && s + width > clear[0] && s < clear[1];
+        const behind = (s: number, z = Infinity) => clear !== null && s + width > clear[0] && s < clear[1] && z >= clear[2];
         if (kind === 'bays') { // one bay through the storeys that show above a neighbour: glass, a round head, a wall band at each floor
           const seen = levels.filter(([z0]) => z0 >= hidden - 0.5);
           if (!seen.length) continue;
@@ -218,7 +218,7 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
           const sill = z0 + style.sill, head = Math.min(z0 + style.head, z1 - style.gap);
           for (let c = 0; c < count; c++) {
             const s = start + c * pitch;
-            if (behind(s)) continue;
+            if (behind(s, z0)) continue;
             out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
             // the panel under the window: the accent colour and grey in a checker (the real pattern is irregular)
             if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);

@@ -329,7 +329,7 @@ export interface BuildingAppearance {
    * `spread`: how far off a wall may face, default 45): another wall material or colour, another window style ('none': no
    * windows), `columns`: that many tall columns with a beam in front of the longest wall of the face.
    */
-  faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; grade?: string }[];
+  faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; /** the columns stand on this height (default: the lowest storey shown) */ columnsFromM?: number; grade?: string }[];
   /** A band of another colour on the walls above a height (upper storeys clad differently). */
   upper?: { fromM: number; color: string };
   roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string };
