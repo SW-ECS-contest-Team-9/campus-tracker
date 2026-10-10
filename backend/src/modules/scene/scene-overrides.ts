@@ -104,7 +104,7 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
     if (badEvidence(o.evidence)) throw new Error(`${at} ${o.name}: evidence needs source, collectedOn, level and independentSurvey`);
     if (badFloors(o.floors)) throw new Error(`${at} ${o.name}: floors must be a positive whole number`);
     if (badReason(o.uncovered)) throw new Error(`${at} ${o.name}: uncovered must say what the rest of the footprint is`);
-    if (!Array.isArray(o.parts) || o.parts.length < 2) throw new Error(`${at} ${o.name}: at least two parts`);
+    if (!Array.isArray(o.parts) || o.parts.length < (o.uncovered === undefined ? 2 : 1)) throw new Error(`${at} ${o.name}: at least two parts (one when "uncovered" says what the rest is)`);
     const ids = new Set<string>();
     const list = o.parts.map((p, k) => {
       const pat = `${at} ${o.name} part ${k}`;

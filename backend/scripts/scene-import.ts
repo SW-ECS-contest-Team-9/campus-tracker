@@ -58,6 +58,7 @@ async function main() {
   const applied = overrides.length + all.hidden.length + all.parts.length + all.added.length;
 
   const problems: string[] = [];
+  const freed = { ids: [] as string[], drawn: [] as string[] }; // split buildings that leave part of their footprint undrawn: their campus ids and the parts they do draw
   const rows: Record<string, unknown>[] = [];
   const out: { buildingId: string; name: string | null; heightM: number; source: string; registerId: string | null; floors: number | null;
     baseM: number; roofM: number; tMin: number; tMax: number; srcBase: number | null; srcRoof: number | null; note: string | null; geojson: string }[] = [];
@@ -122,6 +123,8 @@ async function main() {
       const bad = partsAreaProblem(split, area);
       if (bad) problems.push(bad);
       if (split.uncovered !== undefined) { // without tiling, equal areas no longer rule out overlapping parts
+        freed.ids.push(best.building_id); // the undrawn rest of this footprint is free ground for an added building
+        freed.drawn.push(...split.parts.map((part) => JSON.stringify({ type: 'MultiPolygon', coordinates: [part.polygon] })));
         const { rows: [ov] } = await pool.query<{ overlap: number }>(
           `SELECT COALESCE(SUM(ST_Area(g)) - ST_Area(ST_Union(g)), 0) overlap FROM (SELECT ST_SetSRID(ST_GeomFromGeoJSON(j), 5186) g FROM unnest($1::text[]) j) t`,
           [split.parts.map((part) => JSON.stringify({ type: 'MultiPolygon', coordinates: [part.polygon] }))],
@@ -173,9 +176,10 @@ async function main() {
       `WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 5186) g)
        SELECT ST_IsValid(g.g) valid, ST_X(ST_PointOnSurface(g.g)) px, ST_Y(ST_PointOnSurface(g.g)) py,
               EXISTS (SELECT 1 FROM campus_buildings b WHERE b.map_version_id = $2 AND b.building_id = $3) taken,
-              COALESCE((SELECT SUM(ST_Area(ST_Intersection(b.geom, g.g))) FROM campus_buildings b WHERE b.map_version_id = $2 AND ST_Intersects(b.geom, g.g)), 0) overlap
+              COALESCE((SELECT SUM(ST_Area(ST_Intersection(b.geom, g.g))) FROM campus_buildings b WHERE b.map_version_id = $2 AND b.building_id <> ALL($4::text[]) AND ST_Intersects(b.geom, g.g)), 0)
+              + COALESCE((SELECT SUM(ST_Area(ST_Intersection(ST_SetSRID(ST_GeomFromGeoJSON(j), 5186), g.g))) FROM unnest($5::text[]) j), 0) overlap
          FROM g`,
-      [geojson, mapVersion, a.id],
+      [geojson, mapVersion, a.id, freed.ids, freed.drawn],
     );
     if (!q.valid) problems.push(`${label}: invalid geometry`);
     if (q.taken) problems.push(`${label}: id ${a.id} is a campus map building`);

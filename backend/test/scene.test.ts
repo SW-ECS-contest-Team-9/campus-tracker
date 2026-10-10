@@ -125,6 +125,7 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.match(partsAreaProblem(ok.parts[0], 230)!, /cover 200.0 m2/); // without "uncovered" a gap is still refused
   const partial = parseSceneOverrides({ buildings: [], parts: [{ ...split, uncovered: 'open ground', parts: [split.parts[0], { ...split.parts[1], terrace: 'deck level with the upper ground' }] }] }).parts[0];
   assert.equal(partial.uncovered, 'open ground');
+  assert.equal(parseSceneOverrides({ buildings: [], parts: [{ ...split, uncovered: 'another building, drawn as an added one', parts: [split.parts[0]] }] }).parts[0].parts.length, 1); // one part is enough when the rest is stated
   assert.deepEqual(partial.parts.map((p) => p.terrace), [undefined, 'deck level with the upper ground']);
   assert.equal(partsAreaProblem(partial, 230), null);
   assert.equal(partsAreaProblem(partial, 200), null);
@@ -137,8 +138,8 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.deepEqual(overrideHeights(slope, sh, 129.3, true), { heightM: 7.3, roofM: 129.3 }); // 129.3 - median 122
   assert.throws(() => overrideHeights(slope, sh, 121.9, true), /terrace roof 121.9 is not above the median ground 122/);
   assert.equal(sh.baseM, 107); // the base is still 1 m below the lowest ground
-  // the stored file: only 유담관 uses the relaxed gates; its tower keeps the building id and the ordinary gate
-  assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['유담관']);
+  // the stored file: 유담관 uses the relaxed gates, 대일관 leaves the 상승관 strip undrawn; its tower keeps the building id and the ordinary gate
+  assert.deepEqual(all.parts.filter((o) => o.uncovered !== undefined || o.parts.some((p) => p.terrace !== undefined)).map((o) => o.name), ['대일관', '유담관']);
   const yudam = all.parts.find((o) => o.name === '유담관')!;
   assert.ok(yudam.uncovered && yudam.parts[0].terrace === undefined && yudam.parts.filter((p) => p.terrace !== undefined).length === 1);
 });
@@ -147,10 +148,10 @@ test('scene overrides: added buildings (not in the GeoPackage) carry their own o
   const dir = path.resolve(import.meta.dirname, '../data/scene');
   const all = parseSceneOverrides(JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8')));
   const names = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features.map((f) => f.properties.name);
-  // the stored file: two buildings; a GeoPackage name is reused only where that GeoPackage building is hidden
-  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
+  // the stored file: three buildings; a GeoPackage name is reused only where that GeoPackage building is hidden
+  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-상승관', '상승관', 163.1, undefined, undefined], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
   assert.ok(all.added.every((a) => !names.includes(a.id) && a.evidence.independentSurvey === false && (!names.includes(a.name) || all.hidden.some((h) => h.name === a.name))));
-  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 311]);
+  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 293, 311]);
   // same rules as any block: base 1 m below the lowest ground of the outline, height = stated roof - median ground
   const ground = [85.31, 86, 88.049, 90, 94.033];
   const h = blockHeights(ground, 0);

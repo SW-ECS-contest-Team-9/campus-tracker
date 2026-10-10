@@ -54,6 +54,18 @@
         "notCovered": "campus_buildings still has this polygon as building id 혜인관 (the real 혜인관 is 건물5); the real 공연실습소 is the added entry 추가-공연실습소",
         "reproduce": "docs/audit/e05/analyze.py -> docs/audit/e05/results.json (B_공연실습소)"
       }
+    },
+    {
+      "name": "상승관",
+      "reason": "The GeoPackage polygon of 상승관 lies on bare ground behind 대일관 (S-MAP: 229 of 229 cells are ground, 148.1-148.9 m). The user confirmed (2026-10-11) that this block is to be removed and that 상승관 is the low building between 대일관 and 청운관; that building is drawn from the added entry 추가-상승관.",
+      "evidence": {
+        "source": "user statement and drawings 2026-10-11 (12-SMAP, 13-SMAP); S-MAP 3D viewer mesh, 1 m grid (b09)",
+        "collectedOn": "2026-10-11",
+        "level": "user-confirmed fact, supported by source data",
+        "independentSurvey": false,
+        "mesh": "all 229 one-metre cells under the GeoPackage polygon are S-MAP ground (148.1-148.9 m); no building model there",
+        "notCovered": "campus_buildings (the 2D campus map) still has the polygon at the wrong place"
+      }
     }
   ],
   "parts": [
@@ -61,12 +73,13 @@
       "name": "대일관",
       "heightSource": "SMAP_MESH",
       "floors": 7,
+      "uncovered": "The north strip of the east block (292 m2, roof 163.1 m) is 상승관, a separate building (user, 2026-10-11); it is drawn by the added entry 추가-상승관.",
       "evidence": {
         "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
         "collectedOn": "2026-10-10",
         "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
         "independentSurvey": false,
-        "footprint": "unchanged; parts tile it (2165.8 of 2165.8 m2). The east annex is the strip within 9.95 m of the north edge of the east block (edge v8-v9)",
+        "footprint": "unchanged; the main part covers 1873 of 2165.8 m2. The strip within 9.95 m of the north edge of the east block (edge v8-v9, 292 m2) is 상승관 (user, 2026-10-11) and is not drawn as 대일관",
         "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 본체: 172.1 (p10-p90 169.2-172.4, 450 cells, 77 % within 1.5 m); 동쪽부속부: 163.1 (p10-p90 163.1-163.1, 68 cells, 94 % within 1.5 m)",
         "roofForm": "본체: one roof level at 172.1 m with lower eaves (168-171 m) and roof structures to 176.9 m in the S-MAP model; the official photo shows a pitched roof with dormers, not modelled. 동쪽부속부: flat 163.1 m, a separate S-MAP building object (173604866) inside the source footprint; which building it is, is not established",
         "floors": "7: user statement 2026-10-10 (whether basement levels are included was not stated). Stored on the main part only",
@@ -83,16 +96,6 @@
           "polygon": [
             [
               [201145.07, 557338.38], [201146.12, 557341.5], [201161.01, 557335.65], [201161.44, 557336.52], [201173.51, 557330.86], [201171.77, 557326.43], [201190.98, 557317.42], [201195.62, 557327.77], [201191.55, 557318.68], [201216.71, 557306.86], [201212.17, 557294.37], [201207.67, 557296.19], [201205.56, 557290.82], [201192.81, 557296.3], [201193.3, 557297.91], [201156.91, 557314.21], [201156.05, 557312.63], [201142.71, 557318.23], [201143.38, 557320.19], [201119.73, 557330.87], [201126.81, 557347.24], [201131.28, 557344.98], [201130.75, 557343.82], [201145.07, 557338.38]
-            ]
-          ]
-        },
-        {
-          "id": "동쪽부속부",
-          "name": null,
-          "roofM": 163.1,
-          "polygon": [
-            [
-              [201195.62, 557327.77], [201221.91, 557315.41], [201218.54, 557306.02], [201216.83, 557307.19], [201216.71, 557306.86], [201191.55, 557318.68], [201195.62, 557327.77]
             ]
           ]
         }
@@ -389,6 +392,26 @@
         "terrain": "server DEM seoul5000-2015-ba7fcb19 against S-MAP ground 2-6 m outside the outline, by direction: -2.0 to +2.1 m (22-93 cells each). Base on the server DEM 84.3 m; the lowest S-MAP side is 86.0 m",
         "notCovered": "the tower and the roof steps, the rooftop concrete frame, entrances, street address; campus_buildings and building_metadata do not have this building (the terrain model's building lookup does not know it); vertical datum of S-MAP",
         "reproduce": "docs/audit/b05/sites.py -> docs/audit/b05/sites.json"
+      }
+    },
+    {
+      "id": "추가-상승관",
+      "name": "상승관",
+      "roofM": 163.1,
+      "heightSource": "SMAP_MESH",
+      "polygon": [
+        [
+          [201195.62, 557327.77], [201221.91, 557315.41], [201218.54, 557306.02], [201216.83, 557307.19], [201216.71, 557306.86], [201191.55, 557318.68], [201195.62, 557327.77]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model 173604866 (2 m grid, B02; 1 m grid, B09); user statement and drawings 2026-10-11",
+        "collectedOn": "2026-10-11",
+        "level": "which building is 상승관 is user-confirmed (the low building with the 우편취급국 label between 대일관 and 청운관); outline and roof are S-MAP source data (one provider), not field verified",
+        "independentSurvey": false,
+        "outline": "the strip of the 대일관 GeoPackage footprint within 9.95 m of the north edge of its east block (B02 derive.py, boundary read from the S-MAP grid, +-1 m; 292 m2). The S-MAP model 173604866 has 321 one-metre cells here",
+        "roof": "flat block at 163.1 m, the median of the S-MAP model cells (p10-p90 163.1-163.1, 94 % within 1.5 m)",
+        "notCovered": "floors, the entrance (south end towards the inner yard, estimated), ground behind the building (server DEM is old there)"
       }
     },
     {

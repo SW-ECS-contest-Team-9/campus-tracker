@@ -1,0 +1,151 @@
+{
+ "crs": "EPSG:5186",
+ "axis": {
+  "origin": [
+   201156.91,
+   557314.21
+  ],
+  "u": [
+   0.9126287217643678,
+   -0.40878945217646706
+  ],
+  "v": [
+   -0.40878945217646706,
+   -0.9126287217643678
+  ],
+  "note": "u = 대일관 정면 벽을 따라 동쪽, v = 벽에서 운동장 쪽"
+ },
+ "levels": {
+  "field": 148.9,
+  "entrance": 151.0,
+  "passage": 151.3,
+  "planterTop": 150.2,
+  "plaza": 151.0,
+  "yard": 153.1,
+  "sideStairFoot": 145.5
+ },
+ "stairs": {
+  "front": {
+   "risers": 13,
+   "riseM": 0.16
+  },
+  "east": {
+   "risers": 13,
+   "riseM": 0.16
+  },
+  "right": {
+   "risers": 13,
+   "riseM": 0.16
+  },
+  "side": {
+   "risers": 34,
+   "riseM": 0.16,
+   "goingM": 0.51,
+   "landingM": 2.0
+  }
+ },
+ "points": {
+  "frontStairFoot": [
+   201154.46,
+   557304.57
+  ],
+  "frontStairTop": [
+   201155.93,
+   557307.86
+  ],
+  "entranceDoor": [
+   201157.64,
+   557311.69
+  ],
+  "entranceWest": [
+   201150.4,
+   557311.43
+  ],
+  "entranceEast": [
+   201163.61,
+   557309.84
+  ],
+  "sideStairTop": [
+   201150.49,
+   557313.58
+  ],
+  "sideStairLandingE": [
+   201143.01,
+   557316.93
+  ],
+  "sideStairLandingW": [
+   201141.18,
+   557317.75
+  ],
+  "sideStairFoot": [
+   201133.7,
+   557321.1
+  ],
+  "sideStairLandingZ": 148.25,
+  "deckWest": [
+   201164.61,
+   557309.39
+  ],
+  "deckDoor2": [
+   201185.51,
+   557300.03
+  ],
+  "deckJog": [
+   201192.61,
+   557295.81
+  ],
+  "deckEast": [
+   201204.58,
+   557290.01
+  ],
+  "plazaW": [
+   201205.84,
+   557289.88
+  ],
+  "plaza": [
+   201208.18,
+   557290.7
+  ],
+  "eastStairFoot": [
+   201205.81,
+   557285.4
+  ],
+  "eastStairTop": [
+   201207.28,
+   557288.69
+  ],
+  "rightStairFoot": [
+   201209.2,
+   557290.79
+  ],
+  "rightStairTop": [
+   201212.49,
+   557289.31
+  ],
+  "yardSouth": [
+   201214.35,
+   557291.77
+  ],
+  "yardNorth": [
+   201217.9,
+   557305.0
+  ],
+  "sangseungDoor": [
+   201217.6,
+   557306.4
+  ],
+  "rearDoor": [
+   201182.5,
+   557321.4
+  ]
+ },
+ "counts": {
+  "canopy": 3,
+  "deck": 2,
+  "landing": 1,
+  "planter": 6,
+  "platform": 6,
+  "stair_step": 70,
+  "wall": 23
+ }
+}

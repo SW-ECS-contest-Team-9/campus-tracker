@@ -138,7 +138,7 @@ def source_entry(head, used, problems):
             problems.append(f"부분 '{p.get('이름')}': 모델_부분.id 와 외곽.좌표 가 있어야 한다")
             continue
         out.append({'id': str(mp['id']), 'name': mp.get('표지'), 'roofM': p['지붕_높이']['값'], 'polygon': rings, **({'terrace': mp['지면과_같은_지붕']} if mp.get('지면과_같은_지붕') else {})})
-    if len(out) < 2: problems.append('부분 보정은 모델_반영 예인 부분이 둘 이상이어야 한다')
+    if len(out) < (1 if m.get('덮지_않는_곳') else 2): problems.append('부분 보정은 모델_반영 예인 부분이 둘 이상이어야 한다(덮지_않는_곳 을 적으면 하나도 됨)')
     return 'parts', {'name': src, 'heightSource': m.get('높이_출처'), **floors, **({'uncovered': m['덮지_않는_곳']} if m.get('덮지_않는_곳') else {}), 'evidence': ev, 'parts': out}, problems
 
 

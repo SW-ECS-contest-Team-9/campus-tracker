@@ -1,0 +1,5305 @@
+{
+ "type": "FeatureCollection",
+ "name": "z02-daeil-front",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "provenance": {
+  "builder": "docs/audit/z02/build_inputs.py",
+  "basePlanes": "backend/data/terrain/recipes/z02-surface.geojson",
+  "schema": "docs/audit/g02/STRUCTURES.md",
+  "note": "기단이 먼저이고 상자는 그 위에 얹힌다. 상자에도 material 을 적었다(brick, stone, white_stone, timber, red_railing, roof_tile). 치수는 대부분 추정이라 estimated."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-FIELD",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "측정(높이 148.9 m: E06), S-MAP(외곽: F05 곧은 변 22개)",
+    "surfaceName": "field (f05-plateaus.geojson)",
+    "topM": 148.9,
+    "bottomM": 141.0,
+    "bottomNote": "옛 지형(141.6 m)보다 아래의 안전 깊이",
+    "material": "paving",
+    "assumption": "외곽은 F05 운동장 영역 그대로(다시 그리지 않음). 북쪽 변은 화단 벽 선과 최대 2 m 어긋난다(위에 얹은 화단 상자가 덮는다)",
+    "source": "docs/audit/e10/field-area-f05.geojson, 실험 E06"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201197.68,
+       557175.65
+      ],
+      [
+       201135.95,
+       557230.72
+      ],
+      [
+       201137.27,
+       557243.5
+      ],
+      [
+       201134.79,
+       557243.5
+      ],
+      [
+       201136.75,
+       557255.5
+      ],
+      [
+       201140.1,
+       557255.5
+      ],
+      [
+       201146.24,
+       557293.5
+      ],
+      [
+       201143.2,
+       557293.5
+      ],
+      [
+       201145.05,
+       557311.01
+      ],
+      [
+       201178.11,
+       557300.1
+      ],
+      [
+       201179.43,
+       557296.96
+      ],
+      [
+       201206.06,
+       557288.63
+      ],
+      [
+       201213.32,
+       557280.0
+      ],
+      [
+       201221.2,
+       557275.0
+      ],
+      [
+       201227.21,
+       557273.8
+      ],
+      [
+       201237.3,
+       557262.9
+      ],
+      [
+       201244.16,
+       557257.31
+      ],
+      [
+       201228.26,
+       557229.99
+      ],
+      [
+       201229.84,
+       557229.09
+      ],
+      [
+       201219.73,
+       557212.37
+      ],
+      [
+       201217.86,
+       557213.44
+      ],
+      [
+       201201.71,
+       557185.81
+      ],
+      [
+       201197.68,
+       557175.65
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-APRON",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "측정(높이: 운동장과 같은 슬래브), 추정(외곽)",
+    "surfaceName": "Z02-APRON",
+    "topM": 148.9,
+    "bottomM": 141.0,
+    "bottomNote": "옛 지형(141.6 m)보다 아래의 안전 깊이",
+    "material": "paving",
+    "assumption": "운동장 슬래브를 대일관 정면 벽까지 이은 바닥 기단. 현관 단·통로·광장·화단·계단은 모두 이 위에 얹는다. 서쪽 끝(u −9.5)은 G02 길 경사면 기단과 맞닿는다",
+    "source": "S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201148.44,
+       557318.55
+      ],
+      [
+       201193.62,
+       557298.31
+      ],
+      [
+       201192.88,
+       557296.67
+      ],
+      [
+       201205.57,
+       557290.99
+      ],
+      [
+       201208.06,
+       557296.56
+      ],
+      [
+       201211.99,
+       557294.8
+      ],
+      [
+       201212.37,
+       557290.03
+      ],
+      [
+       201211.97,
+       557280.56
+      ],
+      [
+       201211.03,
+       557278.46
+      ],
+      [
+       201143.95,
+       557308.51
+      ],
+      [
+       201148.44,
+       557318.55
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-ENTRANCE",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "추정(높이 151.0 ±0.3 = 운동장 + 13단), S-MAP(자리: 현관 지붕 아래와 앞), 추정(외곽 ±1 m)",
+    "surfaceName": "Z02-ENTRANCE",
+    "topM": 151.0,
+    "bottomM": 148.9,
+    "bottomNote": "바닥 기단 Z02-PLATFORM-APRON 윗면",
+    "material": "paving",
+    "assumption": "현관 단(문 앞 바닥). 현관 지붕 아래 바닥과 계단 위 참을 한 평면으로 봄. 깊이 = 벽에서 6.2 m(계단 13단이 v 9.8 에서 끝나도록)",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201151.1,
+       557314.95
+      ],
+      [
+       201156.12,
+       557312.7
+      ],
+      [
+       201156.99,
+       557314.39
+      ],
+      [
+       201164.66,
+       557310.96
+      ],
+      [
+       201162.04,
+       557305.12
+      ],
+      [
+       201149.26,
+       557310.84
+      ],
+      [
+       201151.1,
+       557314.95
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-PASSAGE",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "확정(있음, 운동장보다 2 m 이상 높음, 양 끝: 사용자 그림 02), S-MAP·사용자 핀(높이 151.0~151.8 범위), 추정(151.3 으로 고른 것, 폭)",
+    "surfaceName": "Z02-PASSAGE",
+    "topM": 151.25,
+    "bottomM": 148.9,
+    "bottomNote": "바닥 기단 Z02-PLATFORM-APRON 윗면",
+    "material": "concrete",
+    "assumption": "높은 가장자리 길의 몸통(옹벽 + 채움). 길이 방향으로 평평하다(S-MAP 벽 앞 값이 u 10~40 에서 ±0.15 m). 높이는 현관 단에서 2칸 위로 고름(사용자: 그대로 또는 1~2칸). 폭 2.5 m(동쪽 돌출 구간 1.9 m)",
+    "source": "사용자 그림 02, 사용자 사진 14, 사진 6(핀 151.3 / 151.6), S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201164.66,
+       557310.96
+      ],
+      [
+       201193.5,
+       557298.04
+      ],
+      [
+       201192.91,
+       557296.48
+      ],
+      [
+       201205.59,
+       557290.79
+      ],
+      [
+       201204.72,
+       557288.85
+      ],
+      [
+       201192.03,
+       557294.53
+      ],
+      [
+       201192.48,
+       557295.54
+      ],
+      [
+       201163.55,
+       557308.49
+      ],
+      [
+       201164.66,
+       557310.96
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-PLAZA",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "S-MAP(높이 150.9~151.0), 추정(외곽 ±1.5 m)",
+    "surfaceName": "Z02-PLAZA",
+    "topM": 151.0,
+    "bottomM": 148.9,
+    "bottomNote": "바닥 기단 Z02-PLATFORM-APRON 윗면",
+    "material": "paving",
+    "assumption": "동쪽 끝 계단을 올라선 작은 광장. 외곽은 대일관 동쪽 끝 벽과 계단 사이",
+    "source": "S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m), 사용자 그림 07, 사용자 사진 23"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201208.07,
+       557296.33
+      ],
+      [
+       201212.0,
+       557294.58
+      ],
+      [
+       201212.2,
+       557291.85
+      ],
+      [
+       201210.1,
+       557292.79
+      ],
+      [
+       201208.1,
+       557288.32
+      ],
+      [
+       201205.09,
+       557289.67
+      ],
+      [
+       201208.07,
+       557296.33
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLATFORM-YARD",
+    "type": "platform",
+    "kind": "platform",
+    "estimated": true,
+    "grade": "S-MAP(높이 152.9~153.3, 60칸), 확정(상승관으로 가는 안쪽 자리: 사용자 그림 07), 추정(외곽 = 건물 외곽 사이)",
+    "surfaceName": "Z02-YARD",
+    "topM": 153.1,
+    "bottomM": 148.9,
+    "bottomNote": "바닥 기단 높이(148.9 m). 북쪽 뒤편 땅도 S-MAP 148.9 m",
+    "material": "paving",
+    "assumption": "대일관 동쪽 끝과 청운관 사이 안쪽 마당. 남쪽 끝 한 조각(약 6 ㎡)은 청운관 원천 외곽 안이지만 S-MAP 은 그 자리를 153.1 m 땅으로 읽는다(청운관 열린 돌출부 아래 단으로 보임, 추정)",
+    "source": "S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m), 사용자 그림 07·13, b09/상승관-사용자그림-좌표.png"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201212.9,
+       557290.23
+      ],
+      [
+       201209.34,
+       557291.82
+      ],
+      [
+       201210.74,
+       557294.95
+      ],
+      [
+       201212.17,
+       557294.37
+      ],
+      [
+       201216.83,
+       557307.19
+      ],
+      [
+       201218.54,
+       557306.01
+      ],
+      [
+       201219.15,
+       557307.7
+      ],
+      [
+       201225.11,
+       557305.03
+      ],
+      [
+       201224.51,
+       557303.67
+      ],
+      [
+       201223.3,
+       557304.69
+      ],
+      [
+       201218.91,
+       557297.69
+      ],
+      [
+       201219.5,
+       557296.53
+      ],
+      [
+       201214.24,
+       557291.82
+      ],
+      [
+       201215.63,
+       557291.19
+      ],
+      [
+       201214.81,
+       557289.37
+      ],
+      [
+       201214.36,
+       557289.57
+      ],
+      [
+       201213.13,
+       557286.84
+      ],
+      [
+       201211.67,
+       557287.49
+      ],
+      [
+       201212.9,
+       557290.23
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-PIER-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리), 추정(치수)",
+    "basePlane": "Z02-PLATFORM-ENTRANCE",
+    "fromM": 151.0,
+    "toM": 155.2,
+    "assumption": "현관 앞면 벽돌 기둥. 아치 문 둘(폭 3.0 m, 추정)은 기둥 사이의 빈 곳. 벽돌 상자 폭 9.2 m = 지붕 폭 13.4 m x 사진의 폭 비 0.69",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201152.87,
+       557312.29
+      ],
+      [
+       201153.79,
+       557311.88
+      ],
+      [
+       201153.54,
+       557311.34
+      ],
+      [
+       201152.63,
+       557311.74
+      ],
+      [
+       201152.87,
+       557312.29
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-PIER-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리), 추정(치수)",
+    "basePlane": "Z02-PLATFORM-ENTRANCE",
+    "fromM": 151.0,
+    "toM": 155.2,
+    "assumption": "현관 앞면 벽돌 기둥. 아치 문 둘(폭 3.0 m, 추정)은 기둥 사이의 빈 곳. 벽돌 상자 폭 9.2 m = 지붕 폭 13.4 m x 사진의 폭 비 0.69",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201156.52,
+       557310.66
+      ],
+      [
+       201157.62,
+       557310.17
+      ],
+      [
+       201157.37,
+       557309.62
+      ],
+      [
+       201156.28,
+       557310.11
+      ],
+      [
+       201156.52,
+       557310.66
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-PIER-3",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(자리), 추정(치수)",
+    "basePlane": "Z02-PLATFORM-ENTRANCE",
+    "fromM": 151.0,
+    "toM": 155.2,
+    "assumption": "현관 앞면 벽돌 기둥. 아치 문 둘(폭 3.0 m, 추정)은 기둥 사이의 빈 곳. 벽돌 상자 폭 9.2 m = 지붕 폭 13.4 m x 사진의 폭 비 0.69",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201160.36,
+       557308.94
+      ],
+      [
+       201161.27,
+       557308.53
+      ],
+      [
+       201161.02,
+       557307.98
+      ],
+      [
+       201160.11,
+       557308.39
+      ],
+      [
+       201160.36,
+       557308.94
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-HEADER",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "없음(기둥 위에 걸침)",
+    "fromM": 154.2,
+    "toM": 155.2,
+    "assumption": "아치 위 벽돌 벽. 아치 꼭대기 154.2 m(바닥 + 3.2 m, 사진 눈대중). 아치의 둥근 모양은 싣지 않음",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201152.87,
+       557312.29
+      ],
+      [
+       201161.27,
+       557308.53
+      ],
+      [
+       201161.02,
+       557307.98
+      ],
+      [
+       201152.63,
+       557311.74
+      ],
+      [
+       201152.87,
+       557312.29
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-SIDE-W",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-ENTRANCE",
+    "fromM": 151.0,
+    "toM": 155.2,
+    "assumption": "현관 서쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201153.49,
+       557313.66
+      ],
+      [
+       201154.03,
+       557313.42
+      ],
+      [
+       201153.42,
+       557312.05
+      ],
+      [
+       201152.87,
+       557312.29
+      ],
+      [
+       201153.49,
+       557313.66
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-SIDE-E",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-ENTRANCE",
+    "fromM": 151.0,
+    "toM": 155.2,
+    "assumption": "현관 동쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201162.11,
+       557311.88
+      ],
+      [
+       201162.66,
+       557311.63
+      ],
+      [
+       201161.27,
+       557308.53
+      ],
+      [
+       201160.72,
+       557308.78
+      ],
+      [
+       201162.11,
+       557311.88
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-EAVE",
+    "type": "canopy",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(외곽·처마 155.8), 추정(두께)",
+    "basePlane": "없음(벽돌 상자 위)",
+    "fromM": 155.2,
+    "toM": 155.8,
+    "assumption": "흰 처마 띠. 외곽은 S-MAP 건물 모델의 낮은 지붕 칸(u −5.0~8.4, 벽에서 5.0 m)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201151.57,
+       557314.52
+      ],
+      [
+       201156.13,
+       557312.48
+      ],
+      [
+       201156.91,
+       557314.21
+      ],
+      [
+       201164.58,
+       557310.78
+      ],
+      [
+       201162.53,
+       557306.21
+      ],
+      [
+       201150.3,
+       557311.69
+      ],
+      [
+       201151.57,
+       557314.52
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-ROOF-1",
+    "type": "canopy",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(높이), 추정(계단식으로 줄인 것)",
+    "basePlane": "Z02-PORCH-EAVE",
+    "fromM": 155.8,
+    "toM": 156.9,
+    "assumption": "기와 경사 지붕을 두 단 상자로 줄임(평평한 윗면만 그릴 수 있어서). 처마 155.8 → 용마루 158.0",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "roof_tile"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201152.48,
+       557314.11
+      ],
+      [
+       201156.13,
+       557312.48
+      ],
+      [
+       201156.91,
+       557314.21
+      ],
+      [
+       201163.66,
+       557311.18
+      ],
+      [
+       201162.03,
+       557307.53
+      ],
+      [
+       201151.62,
+       557312.19
+      ],
+      [
+       201152.48,
+       557314.11
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-ROOF-2",
+    "type": "canopy",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(높이), 추정(계단식으로 줄인 것)",
+    "basePlane": "Z02-PORCH-ROOF-1",
+    "fromM": 156.9,
+    "toM": 158.0,
+    "assumption": "기와 경사 지붕 윗단. 용마루 158.0 m 는 벽 쪽",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "roof_tile"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201153.4,
+       557313.7
+      ],
+      [
+       201156.13,
+       557312.48
+      ],
+      [
+       201156.91,
+       557314.21
+      ],
+      [
+       201162.75,
+       557311.59
+      ],
+      [
+       201161.52,
+       557308.86
+      ],
+      [
+       201152.95,
+       557312.7
+      ],
+      [
+       201153.4,
+       557313.7
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.06,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.74,
+       557307.01
+      ],
+      [
+       201159.41,
+       557302.68
+      ],
+      [
+       201159.29,
+       557302.4
+      ],
+      [
+       201149.62,
+       557306.74
+      ],
+      [
+       201149.74,
+       557307.01
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.22,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.86,
+       557307.29
+      ],
+      [
+       201159.54,
+       557302.95
+      ],
+      [
+       201159.41,
+       557302.68
+      ],
+      [
+       201149.74,
+       557307.01
+      ],
+      [
+       201149.86,
+       557307.29
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.38,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.99,
+       557307.56
+      ],
+      [
+       201159.66,
+       557303.23
+      ],
+      [
+       201159.54,
+       557302.95
+      ],
+      [
+       201149.86,
+       557307.29
+      ],
+      [
+       201149.99,
+       557307.56
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.55,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.11,
+       557307.83
+      ],
+      [
+       201159.78,
+       557303.5
+      ],
+      [
+       201159.66,
+       557303.23
+      ],
+      [
+       201149.99,
+       557307.56
+      ],
+      [
+       201150.11,
+       557307.83
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.71,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.23,
+       557308.11
+      ],
+      [
+       201159.91,
+       557303.77
+      ],
+      [
+       201159.78,
+       557303.5
+      ],
+      [
+       201150.11,
+       557307.83
+      ],
+      [
+       201150.23,
+       557308.11
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.87,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.35,
+       557308.38
+      ],
+      [
+       201160.03,
+       557304.05
+      ],
+      [
+       201159.91,
+       557303.77
+      ],
+      [
+       201150.23,
+       557308.11
+      ],
+      [
+       201150.35,
+       557308.38
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.03,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.48,
+       557308.65
+      ],
+      [
+       201160.15,
+       557304.32
+      ],
+      [
+       201160.03,
+       557304.05
+      ],
+      [
+       201150.35,
+       557308.38
+      ],
+      [
+       201150.48,
+       557308.65
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.19,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.6,
+       557308.93
+      ],
+      [
+       201160.27,
+       557304.6
+      ],
+      [
+       201160.15,
+       557304.32
+      ],
+      [
+       201150.48,
+       557308.65
+      ],
+      [
+       201150.6,
+       557308.93
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.35,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.72,
+       557309.2
+      ],
+      [
+       201160.4,
+       557304.87
+      ],
+      [
+       201160.27,
+       557304.6
+      ],
+      [
+       201150.6,
+       557308.93
+      ],
+      [
+       201150.72,
+       557309.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.52,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.84,
+       557309.48
+      ],
+      [
+       201160.52,
+       557305.14
+      ],
+      [
+       201160.4,
+       557304.87
+      ],
+      [
+       201150.72,
+       557309.2
+      ],
+      [
+       201150.84,
+       557309.48
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.68,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.97,
+       557309.75
+      ],
+      [
+       201160.64,
+       557305.42
+      ],
+      [
+       201160.52,
+       557305.14
+      ],
+      [
+       201150.84,
+       557309.48
+      ],
+      [
+       201150.97,
+       557309.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-S12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정(13단 ±1: 사진에서 셈), 측정(아래 148.9)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.84,
+    "assumption": "현관 앞 넓은 돌계단: 13단(디딤판 12 + 현관 단), 한 단 0.1615 m, 디딤 0.30 m(가정), 폭 10.6 m(사진 눈대중), 곧은 한 줄",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18, 건물 노트 대일관(13단)",
+    "stair": "Z02-FRONT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 10.6,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201151.09,
+       557310.02
+      ],
+      [
+       201160.76,
+       557305.69
+      ],
+      [
+       201160.64,
+       557305.42
+      ],
+      [
+       201150.97,
+       557309.75
+      ],
+      [
+       201151.09,
+       557310.02
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-CHEEK-W1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.5,
+    "assumption": "계단 옆벽(흰 돌). 실제는 비스듬한데 두 단으로 줄임",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.63,
+       557310.23
+      ],
+      [
+       201151.09,
+       557310.02
+      ],
+      [
+       201150.35,
+       557308.38
+      ],
+      [
+       201149.9,
+       557308.59
+      ],
+      [
+       201150.63,
+       557310.23
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-CHEEK-W2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.3,
+    "assumption": "계단 옆벽(흰 돌). 실제는 비스듬한데 두 단으로 줄임",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.9,
+       557308.59
+      ],
+      [
+       201150.35,
+       557308.38
+      ],
+      [
+       201149.62,
+       557306.74
+      ],
+      [
+       201149.16,
+       557306.94
+      ],
+      [
+       201149.9,
+       557308.59
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-CHEEK-E1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.5,
+    "assumption": "계단 옆벽(흰 돌). 실제는 비스듬한데 두 단으로 줄임",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201160.76,
+       557305.69
+      ],
+      [
+       201161.22,
+       557305.49
+      ],
+      [
+       201160.48,
+       557303.84
+      ],
+      [
+       201160.03,
+       557304.05
+      ],
+      [
+       201160.76,
+       557305.69
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-FRONT-STAIR-CHEEK-E2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.3,
+    "assumption": "계단 옆벽(흰 돌). 실제는 비스듬한데 두 단으로 줄임",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201160.03,
+       557304.05
+      ],
+      [
+       201160.48,
+       557303.84
+      ],
+      [
+       201159.75,
+       557302.2
+      ],
+      [
+       201159.29,
+       557302.4
+      ],
+      [
+       201160.03,
+       557304.05
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLANTER-W1",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 147.9,
+    "toM": 150.3,
+    "assumption": "계단 서쪽 화단(철쭉). 서쪽으로 층층이 낮아지는 것을 두 덩어리로 줄임",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.26,
+       557310.84
+      ],
+      [
+       201150.63,
+       557310.23
+      ],
+      [
+       201149.65,
+       557308.04
+      ],
+      [
+       201148.28,
+       557308.65
+      ],
+      [
+       201149.26,
+       557310.84
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLANTER-W2",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 147.4,
+    "toM": 149.6,
+    "assumption": "계단 서쪽 화단의 낮은 단. G02 길 경사면(이 자리 148.4~148.9 m)과 맞닿는 턱을 덮는다",
+    "source": "대일관-현관-계단-가까이.webp, 사용자 사진 18",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201146.32,
+       557313.8
+      ],
+      [
+       201149.88,
+       557312.21
+      ],
+      [
+       201148.53,
+       557309.2
+      ],
+      [
+       201144.97,
+       557310.79
+      ],
+      [
+       201146.32,
+       557313.8
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLANTER-BASTION",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(앞선: 148.9 가 되는 곳 v 9→6.5), 추정(윗면)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.2,
+    "assumption": "계단 동쪽 옆에서 앞으로 나온 화단 모서리(계단 발치까지 나왔다가 물러남)",
+    "source": "대일관-운동장에서-정면.webp, 사용자 사진 18, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201161.22,
+       557305.49
+      ],
+      [
+       201162.04,
+       557305.12
+      ],
+      [
+       201163.55,
+       557308.49
+      ],
+      [
+       201166.38,
+       557307.23
+      ],
+      [
+       201164.83,
+       557303.76
+      ],
+      [
+       201161.12,
+       557301.59
+      ],
+      [
+       201159.75,
+       557302.2
+      ],
+      [
+       201161.22,
+       557305.49
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLANTER-MAIN",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(앞선 v 6~7, 윗면 150.1~150.2 한 곳), 추정(직선으로 본 것)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.2,
+    "assumption": "흰 돌 화단 벽과 그 위 화단(소나무·철쭉). 벽 높이 1.3 m. S-MAP 이 u 27~33 에서 v 8~9 까지 150 m 로 부풀어 읽히는 것은 게시판·글자 조형물로 보고 넣지 않음(추정)",
+    "source": "대일관-운동장에서-정면.webp, 사용자 사진 18, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201166.38,
+       557307.23
+      ],
+      [
+       201192.48,
+       557295.54
+      ],
+      [
+       201190.93,
+       557292.07
+      ],
+      [
+       201164.83,
+       557303.76
+      ],
+      [
+       201166.38,
+       557307.23
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PLANTER-EAST",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(앞선), 추정(윗면)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.2,
+    "assumption": "동쪽 돌출 구간 앞 화단(Skon Square 글자 조형물 자리). 동쪽 끝 계단에서 끝남",
+    "source": "대일관-운동장에서-정면.webp, 사용자 사진 18, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201192.03,
+       557294.53
+      ],
+      [
+       201204.72,
+       557288.85
+      ],
+      [
+       201203.62,
+       557286.39
+      ],
+      [
+       201190.93,
+       557292.07
+      ],
+      [
+       201192.03,
+       557294.53
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-DECK-MAIN",
+    "type": "deck",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(나무 데크, 양 끝: 사용자 그림 02), 추정(높이 151.3, 폭 2.5)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 151.25,
+    "toM": 151.3,
+    "assumption": "통로 바닥의 나무 데크(사용자 말). 사진에는 바닥이 안 보여 판 두께·결 방향은 가정",
+    "source": "사용자 그림 02, 사용자 사진 14",
+    "material": "timber"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201165.12,
+       557310.53
+      ],
+      [
+       201193.51,
+       557297.82
+      ],
+      [
+       201192.48,
+       557295.54
+      ],
+      [
+       201164.1,
+       557308.25
+      ],
+      [
+       201165.12,
+       557310.53
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-DECK-EAST",
+    "type": "deck",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(나무 데크, 동쪽 끝은 약간 튀어나온 곳 근처: 사용자 그림 02), 추정(높이, 폭 1.9)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 151.25,
+    "toM": 151.3,
+    "assumption": "통로 바닥의 나무 데크(사용자 말). 사진에는 바닥이 안 보여 판 두께·결 방향은 가정",
+    "source": "사용자 그림 02, 사용자 사진 14",
+    "material": "timber"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201192.82,
+       557296.29
+      ],
+      [
+       201204.96,
+       557290.86
+      ],
+      [
+       201204.17,
+       557289.1
+      ],
+      [
+       201192.03,
+       557294.53
+      ],
+      [
+       201192.82,
+       557296.29
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-DECK-STEP-W",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(그대로 또는 1~2칸), 추정(2칸으로 고름)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 148.9,
+    "toM": 151.15,
+    "assumption": "현관 단(151.0)에서 통로(151.3)로 오르는 2칸 중 첫 칸",
+    "source": "사용자 답 2026-10-11",
+    "stair": "Z02-DECK-STEPS-W",
+    "riseM": 0.15,
+    "runM": 0.6,
+    "widthM": 2.5,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201164.58,
+       557310.78
+      ],
+      [
+       201165.12,
+       557310.53
+      ],
+      [
+       201164.1,
+       557308.25
+      ],
+      [
+       201163.55,
+       557308.49
+      ],
+      [
+       201164.58,
+       557310.78
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-DECK-STEP-E",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 148.9,
+    "toM": 151.15,
+    "assumption": "통로 동쪽 끝에서 광장(151.0)으로 내려서는 2칸 중 가운데 칸",
+    "source": "사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-DECK-STEPS-E",
+    "riseM": 0.15,
+    "runM": 0.6,
+    "widthM": 1.93,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.96,
+       557290.86
+      ],
+      [
+       201205.51,
+       557290.61
+      ],
+      [
+       201204.72,
+       557288.85
+      ],
+      [
+       201204.17,
+       557289.1
+      ],
+      [
+       201204.96,
+       557290.86
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RAILING-MAIN",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(붉은 난간이 있음: 사진), 추정(높이 1.1 m)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 151.3,
+    "toM": 152.4,
+    "assumption": "통로의 운동장 쪽 붉은 난간. 그 아래 어두운 돌 옹벽은 통로 기단의 옆면(화단 윗면 위로 1.1 m)",
+    "source": "사용자 사진 18, 사용자 사진 24",
+    "material": "red_railing"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201163.6,
+       557308.6
+      ],
+      [
+       201192.53,
+       557295.65
+      ],
+      [
+       201192.48,
+       557295.54
+      ],
+      [
+       201163.55,
+       557308.49
+      ],
+      [
+       201163.6,
+       557308.6
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RAILING-JOG",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(붉은 난간이 있음: 사진), 추정(높이 1.1 m)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 151.3,
+    "toM": 152.4,
+    "assumption": "통로의 운동장 쪽 붉은 난간. 그 아래 어두운 돌 옹벽은 통로 기단의 옆면(화단 윗면 위로 1.1 m)",
+    "source": "사용자 사진 18, 사용자 사진 24",
+    "material": "red_railing"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201192.37,
+       557295.59
+      ],
+      [
+       201192.48,
+       557295.54
+      ],
+      [
+       201192.03,
+       557294.53
+      ],
+      [
+       201191.93,
+       557294.58
+      ],
+      [
+       201192.37,
+       557295.59
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RAILING-EAST",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(붉은 난간이 있음: 사진), 추정(높이 1.1 m)",
+    "basePlane": "Z02-PLATFORM-PASSAGE",
+    "fromM": 151.3,
+    "toM": 152.4,
+    "assumption": "통로의 운동장 쪽 붉은 난간. 그 아래 어두운 돌 옹벽은 통로 기단의 옆면(화단 윗면 위로 1.1 m)",
+    "source": "사용자 사진 18, 사용자 사진 24",
+    "material": "red_railing"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201192.08,
+       557294.64
+      ],
+      [
+       201204.77,
+       557288.96
+      ],
+      [
+       201204.72,
+       557288.85
+      ],
+      [
+       201192.03,
+       557294.53
+      ],
+      [
+       201192.08,
+       557294.64
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.06,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201203.92,
+       557286.58
+      ],
+      [
+       201207.94,
+       557284.78
+      ],
+      [
+       201207.81,
+       557284.51
+      ],
+      [
+       201203.8,
+       557286.3
+      ],
+      [
+       201203.92,
+       557286.58
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.22,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.04,
+       557286.85
+      ],
+      [
+       201208.06,
+       557285.05
+      ],
+      [
+       201207.94,
+       557284.78
+      ],
+      [
+       201203.92,
+       557286.58
+      ],
+      [
+       201204.04,
+       557286.85
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.38,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.17,
+       557287.13
+      ],
+      [
+       201208.18,
+       557285.33
+      ],
+      [
+       201208.06,
+       557285.05
+      ],
+      [
+       201204.04,
+       557286.85
+      ],
+      [
+       201204.17,
+       557287.13
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.55,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.29,
+       557287.4
+      ],
+      [
+       201208.31,
+       557285.6
+      ],
+      [
+       201208.18,
+       557285.33
+      ],
+      [
+       201204.17,
+       557287.13
+      ],
+      [
+       201204.29,
+       557287.4
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.71,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.41,
+       557287.67
+      ],
+      [
+       201208.43,
+       557285.87
+      ],
+      [
+       201208.31,
+       557285.6
+      ],
+      [
+       201204.29,
+       557287.4
+      ],
+      [
+       201204.41,
+       557287.67
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 149.87,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.53,
+       557287.95
+      ],
+      [
+       201208.55,
+       557286.15
+      ],
+      [
+       201208.43,
+       557285.87
+      ],
+      [
+       201204.41,
+       557287.67
+      ],
+      [
+       201204.53,
+       557287.95
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.03,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.66,
+       557288.22
+      ],
+      [
+       201208.67,
+       557286.42
+      ],
+      [
+       201208.55,
+       557286.15
+      ],
+      [
+       201204.53,
+       557287.95
+      ],
+      [
+       201204.66,
+       557288.22
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.19,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.78,
+       557288.49
+      ],
+      [
+       201208.8,
+       557286.7
+      ],
+      [
+       201208.67,
+       557286.42
+      ],
+      [
+       201204.66,
+       557288.22
+      ],
+      [
+       201204.78,
+       557288.49
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.35,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201204.9,
+       557288.77
+      ],
+      [
+       201208.92,
+       557286.97
+      ],
+      [
+       201208.8,
+       557286.7
+      ],
+      [
+       201204.78,
+       557288.49
+      ],
+      [
+       201204.9,
+       557288.77
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.52,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201205.03,
+       557289.04
+      ],
+      [
+       201209.04,
+       557287.24
+      ],
+      [
+       201208.92,
+       557286.97
+      ],
+      [
+       201204.9,
+       557288.77
+      ],
+      [
+       201205.03,
+       557289.04
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.68,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201205.15,
+       557289.32
+      ],
+      [
+       201209.16,
+       557287.52
+      ],
+      [
+       201209.04,
+       557287.24
+      ],
+      [
+       201205.03,
+       557289.04
+      ],
+      [
+       201205.15,
+       557289.32
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-S12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07), S-MAP(높이 148.9 → 151.0), 추정(단 수·폭·자리 ±1.5 m)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.84,
+    "assumption": "대일관·청운관 사이, 운동장에서 광장으로 오르는 넓은 돌계단: 13단 = 2.1 ÷ 0.16(사진에 열 단쯤 보임), 디딤 0.30, 폭 4.4 m",
+    "source": "사용자 그림 07, 사용자 사진 23, 사용자 사진 24, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-EAST-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.4,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201205.27,
+       557289.59
+      ],
+      [
+       201209.29,
+       557287.79
+      ],
+      [
+       201209.16,
+       557287.52
+      ],
+      [
+       201205.15,
+       557289.32
+      ],
+      [
+       201205.27,
+       557289.59
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-EAST-STAIR-BLOCK",
+    "type": "planter",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 150.6,
+    "assumption": "동쪽 끝 계단 오른쪽의 돌 화단 덩어리(청운관 돌출부 왼쪽 계단 발치). 평면·높이 모두 사진 눈대중",
+    "source": "사용자 사진 23, 사용자 사진 24",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201209.29,
+       557287.79
+      ],
+      [
+       201211.67,
+       557287.49
+      ],
+      [
+       201213.13,
+       557286.84
+      ],
+      [
+       201211.96,
+       557280.79
+      ],
+      [
+       201207.81,
+       557284.51
+      ],
+      [
+       201209.29,
+       557287.79
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.16,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201210.02,
+       557292.61
+      ],
+      [
+       201210.29,
+       557292.49
+      ],
+      [
+       201208.66,
+       557288.84
+      ],
+      [
+       201208.39,
+       557288.96
+      ],
+      [
+       201210.02,
+       557292.61
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.32,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201210.29,
+       557292.49
+      ],
+      [
+       201210.57,
+       557292.37
+      ],
+      [
+       201208.93,
+       557288.72
+      ],
+      [
+       201208.66,
+       557288.84
+      ],
+      [
+       201210.29,
+       557292.49
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.48,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201210.57,
+       557292.37
+      ],
+      [
+       201210.84,
+       557292.24
+      ],
+      [
+       201209.21,
+       557288.59
+      ],
+      [
+       201208.93,
+       557288.72
+      ],
+      [
+       201210.57,
+       557292.37
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.65,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201210.84,
+       557292.24
+      ],
+      [
+       201211.12,
+       557292.12
+      ],
+      [
+       201209.48,
+       557288.47
+      ],
+      [
+       201209.21,
+       557288.59
+      ],
+      [
+       201210.84,
+       557292.24
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.81,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201211.12,
+       557292.12
+      ],
+      [
+       201211.39,
+       557292.0
+      ],
+      [
+       201209.75,
+       557288.35
+      ],
+      [
+       201209.48,
+       557288.47
+      ],
+      [
+       201211.12,
+       557292.12
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 151.97,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201211.39,
+       557292.0
+      ],
+      [
+       201211.66,
+       557291.88
+      ],
+      [
+       201210.03,
+       557288.23
+      ],
+      [
+       201209.75,
+       557288.35
+      ],
+      [
+       201211.39,
+       557292.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.13,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201211.66,
+       557291.88
+      ],
+      [
+       201211.94,
+       557291.75
+      ],
+      [
+       201210.3,
+       557288.1
+      ],
+      [
+       201210.03,
+       557288.23
+      ],
+      [
+       201211.66,
+       557291.88
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.29,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201211.94,
+       557291.75
+      ],
+      [
+       201212.21,
+       557291.63
+      ],
+      [
+       201210.58,
+       557287.98
+      ],
+      [
+       201210.3,
+       557288.1
+      ],
+      [
+       201211.94,
+       557291.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.45,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201212.21,
+       557291.63
+      ],
+      [
+       201212.49,
+       557291.51
+      ],
+      [
+       201210.85,
+       557287.86
+      ],
+      [
+       201210.58,
+       557287.98
+      ],
+      [
+       201212.21,
+       557291.63
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.62,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201212.49,
+       557291.51
+      ],
+      [
+       201212.76,
+       557291.39
+      ],
+      [
+       201211.12,
+       557287.73
+      ],
+      [
+       201210.85,
+       557287.86
+      ],
+      [
+       201212.49,
+       557291.51
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.78,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201212.76,
+       557291.39
+      ],
+      [
+       201213.03,
+       557291.26
+      ],
+      [
+       201211.4,
+       557287.61
+      ],
+      [
+       201211.12,
+       557287.73
+      ],
+      [
+       201212.76,
+       557291.39
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-RIGHT-STAIR-S12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 그림 07, 주석 \"광장에서 청운관으로 가는 계단\"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)",
+    "basePlane": "Z02-PLATFORM-APRON",
+    "fromM": 148.9,
+    "toM": 152.94,
+    "assumption": "광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)",
+    "source": "사용자 그림 07, 운동장 구조 주석, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-RIGHT-STAIR",
+    "riseM": 0.16,
+    "runM": 0.3,
+    "widthM": 4.0,
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201213.03,
+       557291.26
+      ],
+      [
+       201213.31,
+       557291.14
+      ],
+      [
+       201211.67,
+       557287.49
+      ],
+      [
+       201211.4,
+       557287.61
+      ],
+      [
+       201213.03,
+       557291.26
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 145.66,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201134.15,
+       557322.1
+      ],
+      [
+       201134.62,
+       557321.89
+      ],
+      [
+       201133.72,
+       557319.89
+      ],
+      [
+       201133.25,
+       557320.1
+      ],
+      [
+       201134.15,
+       557322.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 145.82,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201134.62,
+       557321.89
+      ],
+      [
+       201135.08,
+       557321.69
+      ],
+      [
+       201134.18,
+       557319.68
+      ],
+      [
+       201133.72,
+       557319.89
+      ],
+      [
+       201134.62,
+       557321.89
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 145.99,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201135.08,
+       557321.69
+      ],
+      [
+       201135.55,
+       557321.48
+      ],
+      [
+       201134.65,
+       557319.47
+      ],
+      [
+       201134.18,
+       557319.68
+      ],
+      [
+       201135.08,
+       557321.69
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.15,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201135.55,
+       557321.48
+      ],
+      [
+       201136.02,
+       557321.27
+      ],
+      [
+       201135.12,
+       557319.26
+      ],
+      [
+       201134.65,
+       557319.47
+      ],
+      [
+       201135.55,
+       557321.48
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.31,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201136.02,
+       557321.27
+      ],
+      [
+       201136.49,
+       557321.06
+      ],
+      [
+       201135.59,
+       557319.05
+      ],
+      [
+       201135.12,
+       557319.26
+      ],
+      [
+       201136.02,
+       557321.27
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.47,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201136.49,
+       557321.06
+      ],
+      [
+       201136.95,
+       557320.85
+      ],
+      [
+       201136.06,
+       557318.84
+      ],
+      [
+       201135.59,
+       557319.05
+      ],
+      [
+       201136.49,
+       557321.06
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.63,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201136.95,
+       557320.85
+      ],
+      [
+       201137.42,
+       557320.64
+      ],
+      [
+       201136.52,
+       557318.63
+      ],
+      [
+       201136.06,
+       557318.84
+      ],
+      [
+       201136.95,
+       557320.85
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.79,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201137.42,
+       557320.64
+      ],
+      [
+       201137.89,
+       557320.43
+      ],
+      [
+       201136.99,
+       557318.42
+      ],
+      [
+       201136.52,
+       557318.63
+      ],
+      [
+       201137.42,
+       557320.64
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 146.96,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201137.89,
+       557320.43
+      ],
+      [
+       201138.36,
+       557320.22
+      ],
+      [
+       201137.46,
+       557318.21
+      ],
+      [
+       201136.99,
+       557318.42
+      ],
+      [
+       201137.89,
+       557320.43
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.12,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201138.36,
+       557320.22
+      ],
+      [
+       201138.83,
+       557320.01
+      ],
+      [
+       201137.93,
+       557318.0
+      ],
+      [
+       201137.46,
+       557318.21
+      ],
+      [
+       201138.36,
+       557320.22
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.28,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201138.83,
+       557320.01
+      ],
+      [
+       201139.29,
+       557319.8
+      ],
+      [
+       201138.39,
+       557317.79
+      ],
+      [
+       201137.93,
+       557318.0
+      ],
+      [
+       201138.83,
+       557320.01
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.44,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201139.29,
+       557319.8
+      ],
+      [
+       201139.76,
+       557319.59
+      ],
+      [
+       201138.86,
+       557317.58
+      ],
+      [
+       201138.39,
+       557317.79
+      ],
+      [
+       201139.29,
+       557319.8
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S13",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.6,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201139.76,
+       557319.59
+      ],
+      [
+       201140.23,
+       557319.38
+      ],
+      [
+       201139.33,
+       557317.37
+      ],
+      [
+       201138.86,
+       557317.58
+      ],
+      [
+       201139.76,
+       557319.59
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S14",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.76,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201140.23,
+       557319.38
+      ],
+      [
+       201140.7,
+       557319.17
+      ],
+      [
+       201139.8,
+       557317.16
+      ],
+      [
+       201139.33,
+       557317.37
+      ],
+      [
+       201140.23,
+       557319.38
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S15",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 147.93,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201140.7,
+       557319.17
+      ],
+      [
+       201141.16,
+       557318.96
+      ],
+      [
+       201140.26,
+       557316.95
+      ],
+      [
+       201139.8,
+       557317.16
+      ],
+      [
+       201140.7,
+       557319.17
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S16",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.09,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201141.16,
+       557318.96
+      ],
+      [
+       201141.63,
+       557318.75
+      ],
+      [
+       201140.73,
+       557316.74
+      ],
+      [
+       201140.26,
+       557316.95
+      ],
+      [
+       201141.16,
+       557318.96
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S17",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.25,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 2.0,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201141.63,
+       557318.75
+      ],
+      [
+       201143.46,
+       557317.93
+      ],
+      [
+       201142.56,
+       557315.93
+      ],
+      [
+       201140.73,
+       557316.74
+      ],
+      [
+       201141.63,
+       557318.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S18",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.41,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201143.46,
+       557317.93
+      ],
+      [
+       201143.92,
+       557317.73
+      ],
+      [
+       201143.03,
+       557315.72
+      ],
+      [
+       201142.56,
+       557315.93
+      ],
+      [
+       201143.46,
+       557317.93
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S19",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.57,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201143.92,
+       557317.73
+      ],
+      [
+       201144.39,
+       557317.52
+      ],
+      [
+       201143.49,
+       557315.51
+      ],
+      [
+       201143.03,
+       557315.72
+      ],
+      [
+       201143.92,
+       557317.73
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S20",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.74,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201144.39,
+       557317.52
+      ],
+      [
+       201144.86,
+       557317.31
+      ],
+      [
+       201143.96,
+       557315.3
+      ],
+      [
+       201143.49,
+       557315.51
+      ],
+      [
+       201144.39,
+       557317.52
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S21",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 148.9,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201144.86,
+       557317.31
+      ],
+      [
+       201145.33,
+       557317.1
+      ],
+      [
+       201144.43,
+       557315.09
+      ],
+      [
+       201143.96,
+       557315.3
+      ],
+      [
+       201144.86,
+       557317.31
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S22",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.06,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201145.33,
+       557317.1
+      ],
+      [
+       201145.8,
+       557316.89
+      ],
+      [
+       201144.9,
+       557314.88
+      ],
+      [
+       201144.43,
+       557315.09
+      ],
+      [
+       201145.33,
+       557317.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S23",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.22,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201145.8,
+       557316.89
+      ],
+      [
+       201146.26,
+       557316.68
+      ],
+      [
+       201145.36,
+       557314.67
+      ],
+      [
+       201144.9,
+       557314.88
+      ],
+      [
+       201145.8,
+       557316.89
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S24",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.38,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201146.26,
+       557316.68
+      ],
+      [
+       201146.73,
+       557316.47
+      ],
+      [
+       201145.83,
+       557314.46
+      ],
+      [
+       201145.36,
+       557314.67
+      ],
+      [
+       201146.26,
+       557316.68
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S25",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.54,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201146.73,
+       557316.47
+      ],
+      [
+       201147.2,
+       557316.26
+      ],
+      [
+       201146.3,
+       557314.25
+      ],
+      [
+       201145.83,
+       557314.46
+      ],
+      [
+       201146.73,
+       557316.47
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S26",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.71,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201147.2,
+       557316.26
+      ],
+      [
+       201147.67,
+       557316.05
+      ],
+      [
+       201146.77,
+       557314.04
+      ],
+      [
+       201146.3,
+       557314.25
+      ],
+      [
+       201147.2,
+       557316.26
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S27",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 149.87,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201147.67,
+       557316.05
+      ],
+      [
+       201148.13,
+       557315.84
+      ],
+      [
+       201147.24,
+       557313.83
+      ],
+      [
+       201146.77,
+       557314.04
+      ],
+      [
+       201147.67,
+       557316.05
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S28",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.03,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201148.13,
+       557315.84
+      ],
+      [
+       201148.6,
+       557315.63
+      ],
+      [
+       201147.7,
+       557313.62
+      ],
+      [
+       201147.24,
+       557313.83
+      ],
+      [
+       201148.13,
+       557315.84
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S29",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.19,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201148.6,
+       557315.63
+      ],
+      [
+       201149.07,
+       557315.42
+      ],
+      [
+       201148.17,
+       557313.41
+      ],
+      [
+       201147.7,
+       557313.62
+      ],
+      [
+       201148.6,
+       557315.63
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S30",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.35,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.07,
+       557315.42
+      ],
+      [
+       201149.54,
+       557315.21
+      ],
+      [
+       201148.64,
+       557313.2
+      ],
+      [
+       201148.17,
+       557313.41
+      ],
+      [
+       201149.07,
+       557315.42
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S31",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.51,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.54,
+       557315.21
+      ],
+      [
+       201150.01,
+       557315.0
+      ],
+      [
+       201149.11,
+       557312.99
+      ],
+      [
+       201148.64,
+       557313.2
+      ],
+      [
+       201149.54,
+       557315.21
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S32",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.68,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.01,
+       557315.0
+      ],
+      [
+       201150.47,
+       557314.79
+      ],
+      [
+       201149.57,
+       557312.78
+      ],
+      [
+       201149.11,
+       557312.99
+      ],
+      [
+       201150.01,
+       557315.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-S33",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)",
+    "basePlane": "G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)",
+    "fromM": 145.0,
+    "toM": 150.84,
+    "assumption": "현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: 34단 = 5.5 ÷ 0.16, 한 단 0.162 m, 디딤 0.51 m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다",
+    "source": "사용자 사진 27, 사용자 사진 18, 사용자 확정 2026-10-11, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m)",
+    "stair": "Z02-SIDE-STAIR",
+    "riseM": 0.16,
+    "runM": 0.51,
+    "widthM": 2.2,
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201150.47,
+       557314.79
+      ],
+      [
+       201150.94,
+       557314.58
+      ],
+      [
+       201150.04,
+       557312.57
+      ],
+      [
+       201149.57,
+       557312.78
+      ],
+      [
+       201150.47,
+       557314.79
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-01",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 147.05,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201133.25,
+       557320.1
+      ],
+      [
+       201135.07,
+       557319.28
+      ],
+      [
+       201134.95,
+       557319.01
+      ],
+      [
+       201133.13,
+       557319.82
+      ],
+      [
+       201133.25,
+       557320.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-02",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 147.69,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201135.07,
+       557319.28
+      ],
+      [
+       201136.9,
+       557318.46
+      ],
+      [
+       201136.78,
+       557318.19
+      ],
+      [
+       201134.95,
+       557319.01
+      ],
+      [
+       201135.07,
+       557319.28
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-03",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 148.34,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201136.9,
+       557318.46
+      ],
+      [
+       201138.72,
+       557317.64
+      ],
+      [
+       201138.6,
+       557317.37
+      ],
+      [
+       201136.78,
+       557318.19
+      ],
+      [
+       201136.9,
+       557318.46
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-04",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 148.99,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201138.72,
+       557317.64
+      ],
+      [
+       201140.55,
+       557316.83
+      ],
+      [
+       201140.43,
+       557316.55
+      ],
+      [
+       201138.6,
+       557317.37
+      ],
+      [
+       201138.72,
+       557317.64
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-05",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 149.15,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201140.55,
+       557316.83
+      ],
+      [
+       201142.38,
+       557316.01
+      ],
+      [
+       201142.25,
+       557315.73
+      ],
+      [
+       201140.43,
+       557316.55
+      ],
+      [
+       201140.55,
+       557316.83
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-06",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 149.8,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201142.38,
+       557316.01
+      ],
+      [
+       201144.2,
+       557315.19
+      ],
+      [
+       201144.08,
+       557314.92
+      ],
+      [
+       201142.25,
+       557315.73
+      ],
+      [
+       201142.38,
+       557316.01
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-07",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 150.44,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201144.2,
+       557315.19
+      ],
+      [
+       201146.03,
+       557314.37
+      ],
+      [
+       201145.9,
+       557314.1
+      ],
+      [
+       201144.08,
+       557314.92
+      ],
+      [
+       201144.2,
+       557315.19
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-08",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 151.09,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201146.03,
+       557314.37
+      ],
+      [
+       201147.85,
+       557313.56
+      ],
+      [
+       201147.73,
+       557313.28
+      ],
+      [
+       201145.9,
+       557314.1
+      ],
+      [
+       201146.03,
+       557314.37
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-09",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 151.74,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201147.85,
+       557313.56
+      ],
+      [
+       201149.68,
+       557312.74
+      ],
+      [
+       201149.55,
+       557312.46
+      ],
+      [
+       201147.73,
+       557313.28
+      ],
+      [
+       201147.85,
+       557313.56
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-SIDE-STAIR-WALL-10",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "G02-PLATFORM-WAY",
+    "fromM": 145.0,
+    "toM": 151.74,
+    "assumption": "하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)",
+    "source": "사용자 사진 27, 사용자 사진 18",
+    "material": "stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201149.68,
+       557312.74
+      ],
+      [
+       201150.04,
+       557312.57
+      ],
+      [
+       201149.92,
+       557312.3
+      ],
+      [
+       201149.55,
+       557312.46
+      ],
+      [
+       201149.68,
+       557312.74
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
