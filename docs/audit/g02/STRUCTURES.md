@@ -53,3 +53,10 @@
 - 기단은 손으로 정한 곧은 변의 큰 평면으로 적는다(`docs/audit/z05/build_inputs.py`). 가파른 곳을 높이 띠로 나눈 단을 만들지 않는다: 두 평면은 벽면 하나로 만난다.
 - 구조물 파일의 기단 외곽은 더 높은 이웃 밑으로 0.5 m 들어가 있다(벽면에 틈이 없게). 지형 조리법 입력(`z05-surface.geojson`)은 겹치지 않는 외곽이다.
 - 상자의 `material` 이 `concrete`·`opening` 이면 종류 색 대신 그 색으로 그린다(`opening` = 벽면의 뚫린 곳을 나타내는 어두운 판. 안쪽 빈 곳은 아니다).
+
+## Z06 에서 더한 것
+- 기단 `material: asphalt` = 캠퍼스 밖 공도. 윗면은 차도 색, 옆면은 벽 색.
+- 상자의 `material` 은 종류 색보다 먼저다: `brick`, `glass`, `stone`, `white_stone`, `roof_tile`, `roof_red`, `red_railing`, `timber`, `water`, `fence`, `trunk`, `foliage`, `concrete`, `opening`(색은 `frontend/src/structures.ts` 의 `boxMaterials`).
+- `type: tree` = 단순한 나무(줄기 상자 + 잎 상자 둘). `frontend/public/structures/z06-trees.geojson`, 만드는 스크립트 `docs/audit/z06/trees.py`. 사진에 나무 줄이 있는 화단에만 두고, 자리는 화단 상자의 긴 축을 고르게 나눈 것이다(추정).
+- 캠퍼스 밖으로 나간 기단도 지형을 숨기는 구역에 넣는다: 기단 바깥 가장자리가 지형 칸을 따라 톱니로 보이지 않고 곧은 선이 된다(`structures-layer.ts`).
+- 청운관·혜인관·서문 상자는 `docs/audit/z05/boxes_z06.py` 가 Z05 상자를 걷고 다시 만든다(id 머리말 `Z06-`, 파일 이름은 그대로 `z05-*.geojson`).
