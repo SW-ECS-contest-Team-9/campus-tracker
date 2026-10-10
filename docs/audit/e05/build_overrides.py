@@ -1,5 +1,7 @@
 """E05: results.json 의 은주관 부분과 공연실습소 숨김을 건물 보정 파일에 써 넣는다(문예관 지붕 항목은 그대로 둔다).
 
+2026-10-10 B02 이후로는 쓰지 않는다: 보정 파일은 동 노트에서 docs/audit/registry/building_registry.py 로 만든다(이 스크립트를 돌리면 check 가 실패한다).
+
   python build_overrides.py <results.json> <backend/data/scene/overrides/building-roofs.json>
 """
 import json, sys, pathlib

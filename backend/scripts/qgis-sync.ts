@@ -38,6 +38,9 @@ async function main() {
     `SELECT b.name, b.base_m, b.roof_m, b.terrain_min_m, b.terrain_max_m FROM scene_buildings b JOIN scene_versions v ON v.id = b.scene_version_id AND v.active`,
   );
   if (!buildings.length) throw new Error('No active campus scene (npm run scene:import)');
+  // Buildings the scene overrides hide or split into parts have no row of their own name in the scene: their GeoPackage rows are left as they are.
+  const { rows: [sv] } = await pool.query<{ metadata: { hiddenBuildings?: { name: string }[]; buildingParts?: { name: string }[] } | null }>('SELECT metadata FROM scene_versions WHERE active');
+  const overridden = new Set([...(sv?.metadata?.hiddenBuildings ?? []), ...(sv?.metadata?.buildingParts ?? [])].map((o) => o.name));
 
   // 1. server DEM -> GeoTIFF (rows north to south; the stored grid's row 0 is the south edge)
   const g = ctx.grid;
@@ -63,14 +66,15 @@ async function main() {
   const current = db.prepare('SELECT name, base_m, roof_m FROM buildings_3d').all() as { name: string; base_m: number; roof_m: number }[];
   const table = current.map((c) => {
     const s = buildings.find((b) => b.name === c.name);
-    return { name: c.name, 'base (gpkg)': c.base_m, 'base (server)': s?.base_m ?? '–', 'roof (gpkg)': c.roof_m, 'roof (server)': s?.roof_m ?? '–' };
+    return { name: c.name, 'base (gpkg)': c.base_m, 'base (server)': s?.base_m ?? '–', 'roof (gpkg)': c.roof_m, 'roof (server)': s?.roof_m ?? (overridden.has(c.name) ? 'hidden / split (kept)' : '–') };
   });
   console.table(table);
-  const missing = current.filter((c) => !buildings.some((b) => b.name === c.name)).map((c) => c.name);
+  const synced = buildings.filter((b) => current.some((c) => c.name === b.name)); // rows of parts carry the part's label, not a GeoPackage name
+  const missing = current.filter((c) => !overridden.has(c.name) && !buildings.some((b) => b.name === c.name)).map((c) => c.name);
   if (missing.length) throw new Error(`Not in the active scene: ${missing.join(', ')} (run scene:import with this folder first)`);
   if (args['dry-run']) {
     db.close();
-    console.log(`dry run: would write ${tif} (${(geotiff.length / 1024).toFixed(0)} KB, terrain ${ctx.versionId}) and update ${current.length} buildings`);
+    console.log(`dry run: would write ${tif} (${(geotiff.length / 1024).toFixed(0)} KB, terrain ${ctx.versionId}) and update ${synced.length} buildings (${[...overridden].join(', ') || 'none'} left as they are: hidden or split by the scene overrides)`);
     return;
   }
   const gpkgBackup = backupOnce(gpkg, 'codex');
@@ -78,7 +82,7 @@ async function main() {
   try {
     const update = db.prepare('UPDATE buildings_3d SET base_m = ?, roof_m = ?, extrusion_m = ?, terrain_min = ?, terrain_max = ? WHERE name = ?');
     db.exec('BEGIN');
-    for (const b of buildings) update.run(b.base_m, b.roof_m, Math.round((b.roof_m - b.base_m) * 1000) / 1000, b.terrain_min_m, b.terrain_max_m, b.name);
+    for (const b of synced) update.run(b.base_m, b.roof_m, Math.round((b.roof_m - b.base_m) * 1000) / 1000, b.terrain_min_m, b.terrain_max_m, b.name);
     db.exec('COMMIT');
   } catch (err) {
     if (db.isTransaction) db.exec('ROLLBACK');
@@ -88,7 +92,7 @@ async function main() {
   }
   fs.writeFileSync(tif, geotiff);
   console.log(`\nwrote ${tif} = server DEM ${ctx.versionId} (${g.width}x${g.height}, ${g.resolution} m)`);
-  console.log(`updated ${buildings.length} buildings in ${gpkg}`);
+  console.log(`updated ${synced.length} buildings in ${gpkg}${overridden.size ? ` (${[...overridden].join(', ')} left as they are: hidden or split by the scene overrides)` : ''}`);
   console.log(`originals kept: ${path.basename(gpkgBackup)}, ${path.basename(tifBackup)}`);
   console.log('Trajectories in QGIS: add PostGIS layers from schema "qgis" (Z = MSL like the preview), 3D altitude clamping = Absolute.');
 }

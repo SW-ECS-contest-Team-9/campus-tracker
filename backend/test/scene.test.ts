@@ -62,6 +62,9 @@ test('roof overrides: stored file carries provenance and names buildings of the 
   assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, evidence: { source: 's' } }] }), /evidence/);
   assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, heightSource: 'REGISTER' }] }), /heightSource/);
   assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, roofM: '189' }] }), /roofM/);
+  assert.equal('floors' in parseRoofOverrides({ buildings: [entry] })[0], false); // no stated floor count: nothing is made up
+  assert.equal(parseRoofOverrides({ buildings: [{ ...entry, floors: 15 }] })[0].floors, 15);
+  assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, floors: 3.5 }] }), /floors/);
 });
 
 test('scene version id: unchanged without roof overrides (the live id), different with them', () => {
@@ -100,6 +103,8 @@ test('scene overrides: hidden buildings and split footprints of the stored file 
   assert.equal(ringArea(sq(0)), 100);
   assert.equal(polygonArea([sq(0), [[2, 2], [4, 2], [4, 4], [2, 4], [2, 2]]]), 96);
   assert.equal(partsAreaProblem(ok.parts[0], 200), null);
+  assert.equal(parseSceneOverrides({ buildings: [], parts: [{ ...split, floors: 7 }] }).parts[0].floors, 7);
+  assert.throws(() => parseSceneOverrides({ buildings: [], parts: [{ ...split, floors: 0 }] }), /floors/);
   assert.match(partsAreaProblem(ok.parts[0], 230)!, /cover 200.0 m2/);
   assert.deepEqual(parseSceneOverrides({ buildings: [] }), { roofs: [], hidden: [], parts: [] });
   assert.throws(() => parseSceneOverrides({ buildings: [], hidden: [{ name: 'H', evidence }] }), /reason/);

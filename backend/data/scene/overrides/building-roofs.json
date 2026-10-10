@@ -1,10 +1,12 @@
 {
   "about": "Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): \"buildings\" = roof elevation of one building, \"hidden\" = a GeoPackage building that is not drawn, \"parts\" = one footprint drawn as several flat-roofed blocks. Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
+  "generated": "Generated from the building notes by docs/audit/registry/building_registry.py (write); do not edit by hand.",
   "buildings": [
     {
       "name": "문예관",
       "roofM": 189.4,
       "heightSource": "SMAP_MESH",
+      "floors": 15,
       "evidence": {
         "source": "S-MAP 3D viewer mesh surface picks, 2 m grid",
         "collectedOn": "2026-10-10",
@@ -14,7 +16,8 @@
         "footprint": "212 of 216 grid cells inside the footprint are roof (>= 181.3 m); roof edge vs footprint: median offset 0.0 m, 90 % within 0.85 m, max 1.25 m (grid 2 m). The footprint is one high block, not two parts",
         "crossCheck": "same grid, register-height buildings: 한림관 scene roof 196.4 vs mesh top 197.3 m, 본관 154.7 vs mesh median 153.8 m",
         "replaces": "GeoPackage height 14 m ESTIMATE (4 floors x 3.5 m), roof 153.238 m on the server DEM",
-        "notCovered": "base, floor count, the low wing south of the footprint (S-MAP 148.8 m, 48 m2, outside the footprint), roof structures up to 193.5 m, vertical datum of S-MAP (one direct comparison, +0.03 m)",
+        "floors": "15: user statement 2026-10-10 (whether basement levels are included was not stated); replaces the assumed 4",
+        "notCovered": "base, the low wing south of the footprint (S-MAP 148.8 m, 48 m2, outside the footprint), roof structures up to 193.5 m, vertical datum of S-MAP (one direct comparison, +0.03 m)",
         "reproduce": "docs/audit/e02/munye_evidence.py -> docs/audit/e02/results.json"
       }
     }
@@ -36,6 +39,47 @@
     }
   ],
   "parts": [
+    {
+      "name": "대일관",
+      "heightSource": "SMAP_MESH",
+      "floors": 7,
+      "evidence": {
+        "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
+        "independentSurvey": false,
+        "footprint": "unchanged; parts tile it (2165.8 of 2165.8 m2). The east annex is the strip within 9.95 m of the north edge of the east block (edge v8-v9)",
+        "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 본체: 172.1 (p10-p90 169.2-172.4, 450 cells, 77 % within 1.5 m); 동쪽부속부: 163.1 (p10-p90 163.1-163.1, 68 cells, 94 % within 1.5 m)",
+        "roofForm": "본체: one roof level at 172.1 m with lower eaves (168-171 m) and roof structures to 176.9 m in the S-MAP model; the official photo shows a pitched roof with dormers, not modelled. 동쪽부속부: flat 163.1 m, a separate S-MAP building object (173604866) inside the source footprint; which building it is, is not established",
+        "floors": "7: user statement 2026-10-10 (whether basement levels are included was not stated). Stored on the main part only",
+        "replaces": "one block, roof 159.105 m (assumed 5 floors x 3.5 m = 17.5 m on the server DEM median 141.605 m)",
+        "terrainVsHeight": "old roof - S-MAP main roof = -13.0 m = -7.2 m (server DEM median 141.605 vs S-MAP ground 148.8 m around the building) + -5.8 m (assumed height 17.5 m vs S-MAP roof - ground 23.3 m). The register polygon 33138 has no height",
+        "notCovered": "ground heights and bases (the server DEM is about 7 m low here; the sports field is 148.9 m, E06), which stored road level is which floor, the entrance canopy, vertical datum of S-MAP",
+        "reproduce": "docs/audit/b02/derive.py -> docs/audit/b02/results.json (대일관); values copied to the building note 대일관.md, this file is written from the notes by docs/audit/registry/building_registry.py"
+      },
+      "parts": [
+        {
+          "id": "본체",
+          "name": "대일관",
+          "roofM": 172.1,
+          "polygon": [
+            [
+              [201145.07, 557338.38], [201146.12, 557341.5], [201161.01, 557335.65], [201161.44, 557336.52], [201173.51, 557330.86], [201171.77, 557326.43], [201190.98, 557317.42], [201195.62, 557327.77], [201191.55, 557318.68], [201216.71, 557306.86], [201212.17, 557294.37], [201207.67, 557296.19], [201205.56, 557290.82], [201192.81, 557296.3], [201193.3, 557297.91], [201156.91, 557314.21], [201156.05, 557312.63], [201142.71, 557318.23], [201143.38, 557320.19], [201119.73, 557330.87], [201126.81, 557347.24], [201131.28, 557344.98], [201130.75, 557343.82], [201145.07, 557338.38]
+            ]
+          ]
+        },
+        {
+          "id": "동쪽부속부",
+          "name": null,
+          "roofM": 163.1,
+          "polygon": [
+            [
+              [201195.62, 557327.77], [201221.91, 557315.41], [201218.54, 557306.02], [201216.83, 557307.19], [201216.71, 557306.86], [201191.55, 557318.68], [201195.62, 557327.77]
+            ]
+          ]
+        }
+      ]
+    },
     {
       "name": "은주관",
       "heightSource": "SMAP_MESH",
@@ -142,6 +186,98 @@
           "polygon": [
             [
               [201178.7, 557155.35], [201181.42, 557158.88], [201190.6, 557150.84], [201188.14, 557148.54], [201178.7, 557155.35]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "청운관",
+      "heightSource": "SMAP_MESH",
+      "evidence": {
+        "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
+        "independentSurvey": false,
+        "footprint": "unchanged; parts tile it (1334.8 of 1334.8 m2). Cut by two lines parallel to the north-east edge, 14.6 m and 32.5 m from it",
+        "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 본체: 187.8 (p10-p90 186.8-190.0, 170 cells, 86 % within 1.5 m); 북동저층부: 162.9 (p10-p90 161.0-164.0, 140 cells, 57 % within 1.5 m); 운동장쪽돌출부: 163.8 (p10-p90 163.8-163.8, 19 cells, 100 % within 1.5 m)",
+        "roofForm": "본체: flat roof with roof structures up to 191.9 m at its north-west end. 북동저층부: two levels (161.0 and 163-164 m) drawn as one. 운동장쪽돌출부: the roof over the open multi-storey porch on the field side (user photos); drawn as a closed block because the model has no open structures",
+        "replaces": "one block, roof 165.135 m (assumed 6 floors x 3.5 m = 21 m on the server DEM median 144.135 m)",
+        "terrainVsHeight": "old roof - S-MAP main roof = -22.7 m = -5.0 m (server DEM median 144.135 vs S-MAP ground 149.1 m around the building) + -17.7 m (assumed height 21 m vs S-MAP roof - ground 38.7 m). The register polygon 33137 has no height",
+        "notCovered": "ground heights and bases (the server DEM is about 5 m low here; the sports field is 148.9 m, E06), floors (a 6th floor exists, total unknown), the open porch and its stairs, vertical datum of S-MAP",
+        "reproduce": "docs/audit/b02/derive.py -> docs/audit/b02/results.json (청운관); values copied to the building note 청운관.md, this file is written from the notes by docs/audit/registry/building_registry.py"
+      },
+      "parts": [
+        {
+          "id": "본체",
+          "name": "청운관",
+          "roofM": 187.8,
+          "polygon": [
+            [
+              [201246.78, 557271.99], [201248.0, 557270.34], [201244.08, 557264.57], [201241.41, 557265.89], [201238.35, 557263.87], [201229.69, 557273.3], [201228.91, 557273.46], [201212.59, 557290.34], [201219.5, 557296.53], [201218.91, 557297.69], [201223.3, 557304.69], [201225.03, 557303.23], [201251.12, 557276.23], [201246.78, 557271.99]
+            ]
+          ]
+        },
+        {
+          "id": "북동저층부",
+          "name": null,
+          "roofM": 162.9,
+          "polygon": [
+            [
+              [201261.22, 557286.79], [201251.2, 557276.31], [201251.12, 557276.23], [201225.03, 557303.23], [201225.62, 557302.73], [201235.3, 557313.61], [201261.22, 557286.79]
+            ]
+          ]
+        },
+        {
+          "id": "운동장쪽돌출부",
+          "name": null,
+          "roofM": 163.8,
+          "polygon": [
+            [
+              [201221.15, 557275.04], [201211.87, 557280.87], [201212.23, 557290.03], [201212.59, 557290.34], [201228.91, 557273.46], [201221.15, 557275.04]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "한림관",
+      "heightSource": "SMAP_MESH",
+      "floors": 12,
+      "evidence": {
+        "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
+        "independentSurvey": false,
+        "footprint": "unchanged; parts tile it (688.0 of 688.0 m2). The upper level is a circle (24-gon) of radius 7.4 m around (201114.0, 557294.8), 0.4 m from the footprint centroid; the ring is the footprint without it",
+        "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 원판: 197.3 (p10-p90 197.3-197.3, 42 cells, 100 % within 1.5 m); 고리: 188.1 (p10-p90 188.1-188.1, 122 cells, 94 % within 1.5 m)",
+        "roofForm": "two concentric flat levels in the S-MAP model; the spire and the terrace railings are not modelled",
+        "floors": "12 ground floors: register 42233 (2 basement floors; the university lists a 16th floor)",
+        "replaces": "one block, roof 196.398 m (register height 55.05 m on the server DEM median); the top level agrees within 0.9 m, the ring was 8.3 m too high",
+        "notCovered": "ground heights and bases (S-MAP ground 125-138 m, server DEM 137-144 m), the passage to 본관, vertical datum of S-MAP",
+        "reproduce": "docs/audit/b02/derive.py -> docs/audit/b02/results.json (한림관); values copied to the building note 한림관.md, this file is written from the notes by docs/audit/registry/building_registry.py"
+      },
+      "parts": [
+        {
+          "id": "원판",
+          "name": "한림관",
+          "roofM": 197.3,
+          "polygon": [
+            [
+              [201121.4, 557294.8], [201121.15, 557292.88], [201120.41, 557291.1], [201119.23, 557289.57], [201117.7, 557288.39], [201115.92, 557287.65], [201114.0, 557287.4], [201112.08, 557287.65], [201110.3, 557288.39], [201108.77, 557289.57], [201107.59, 557291.1], [201106.85, 557292.88], [201106.6, 557294.8], [201106.85, 557296.72], [201107.59, 557298.5], [201108.77, 557300.03], [201110.3, 557301.21], [201112.08, 557301.95], [201114.0, 557302.2], [201115.92, 557301.95], [201117.7, 557301.21], [201119.23, 557300.03], [201120.41, 557298.5], [201121.15, 557296.72], [201121.4, 557294.8]
+            ]
+          ]
+        },
+        {
+          "id": "고리",
+          "name": null,
+          "roofM": 188.1,
+          "polygon": [
+            [
+              [201115.67, 557280.2], [201109.54, 557281.17], [201104.18, 557283.58], [201100.77, 557289.05], [201099.4, 557294.9], [201099.79, 557299.28], [201102.41, 557304.47], [201106.93, 557308.1], [201112.82, 557310.06], [201118.23, 557309.37], [201123.15, 557307.15], [201127.14, 557303.42], [201128.99, 557298.14], [201128.74, 557293.6], [201127.64, 557288.75], [201125.05, 557284.97], [201121.28, 557281.36], [201115.67, 557280.2]
+            ],
+            [
+              [201121.15, 557296.72], [201120.41, 557298.5], [201119.23, 557300.03], [201117.7, 557301.21], [201115.92, 557301.95], [201114.0, 557302.2], [201112.08, 557301.95], [201110.3, 557301.21], [201108.77, 557300.03], [201107.59, 557298.5], [201106.85, 557296.72], [201106.6, 557294.8], [201106.85, 557292.88], [201107.59, 557291.1], [201108.77, 557289.57], [201110.3, 557288.39], [201112.08, 557287.65], [201114.0, 557287.4], [201115.92, 557287.65], [201117.7, 557288.39], [201119.23, 557289.57], [201120.41, 557291.1], [201121.15, 557292.88], [201121.4, 557294.8], [201121.15, 557296.72]
             ]
           ]
         }

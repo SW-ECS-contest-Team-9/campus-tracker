@@ -605,7 +605,7 @@ function renderBuildingDetail(el: HTMLElement, buildingId: string) {
   el.innerHTML = `<table>
     ${row('Building', `<b>${esc(b.name ?? buildingId)}</b>`)}
     ${row('Height', `${b.heightM.toFixed(1)} m <span class="tag ${b.heightSource === 'REGISTER' ? '' : 'warn'}">${b.heightSource === 'REGISTER' ? 'building register' : 'estimate'}</span>`)}
-    ${row('Ground floors', b.groundFloors == null ? '–' : `${b.groundFloors}${b.heightSource === 'REGISTER' ? '' : ' (assumed)'}`)}
+    ${row('Ground floors', b.groundFloors == null ? '–' : `${b.groundFloors}${b.heightSource === 'ESTIMATE' ? ' (assumed)' : ''}`)}
     ${row('Base / roof', `${b.baseM.toFixed(1)} / ${b.roofM.toFixed(1)} m MSL`)}
     ${row('Ground under it', b.terrainMinM == null ? '–' : `${b.terrainMinM.toFixed(1)} – ${b.terrainMaxM?.toFixed(1)} m MSL`)}
     ${c ? row('Calibration', `entrance floor ${c.entranceFloorOrthometricM.toFixed(2)} m · floor height ${c.floorHeightM.toFixed(2)} m`) : ''}

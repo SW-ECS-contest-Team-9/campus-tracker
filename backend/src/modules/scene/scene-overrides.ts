@@ -11,17 +11,20 @@ export interface RoofOverride {
   name: string;          // buildings_3d.name in the GeoPackage
   roofM: number;         // roof elevation, orthometric (Incheon MSL)
   heightSource: string;  // stored in scene_buildings.height_source (VARCHAR(16)); not REGISTER / ESTIMATE
+  floors?: number;       // stated floor count (scene_buildings.ground_floors); without it an assumed GeoPackage count is not carried over
   evidence: Evidence;
 }
 export interface HiddenBuilding { name: string; reason: string; evidence: Evidence }
 export type PartRing = [number, number][];
 /** One block of a split footprint: an EPSG:5186 polygon (outer ring, then holes) with a flat roof. `name` is the map label (null = no label). */
 export interface BuildingPart { id: string; name: string | null; roofM: number; polygon: PartRing[] }
-export interface BuildingParts { name: string; heightSource: string; evidence: Evidence; parts: BuildingPart[] }
+/** `floors` (stated floor count of the building) is stored on the parts that carry a label. */
+export interface BuildingParts { name: string; heightSource: string; floors?: number; evidence: Evidence; parts: BuildingPart[] }
 export interface SceneOverrides { roofs: RoofOverride[]; hidden: HiddenBuilding[]; parts: BuildingParts[] }
 
 const badEvidence = (e: Evidence | undefined) =>
   !e || [e.source, e.collectedOn, e.level].some((v) => typeof v !== 'string' || !v) || typeof e.independentSurvey !== 'boolean';
+const badFloors = (v: unknown) => v !== undefined && !(Number.isInteger(v) && (v as number) > 0 && (v as number) < 200);
 const badSource = (v: unknown) => typeof v !== 'string' || !/^[A-Z_]{1,16}$/.test(v) || v === 'REGISTER' || v === 'ESTIMATE';
 
 export function parseRoofOverrides(doc: unknown): RoofOverride[] {
@@ -35,8 +38,9 @@ export function parseRoofOverrides(doc: unknown): RoofOverride[] {
     seen.add(o.name);
     if (!Number.isFinite(o.roofM)) throw new Error(`${at} ${o.name}: roofM must be a number`);
     if (badSource(o.heightSource)) throw new Error(`${at} ${o.name}: heightSource must be its own label (A-Z_, at most 16 characters)`);
+    if (badFloors(o.floors)) throw new Error(`${at} ${o.name}: floors must be a positive whole number`);
     if (badEvidence(o.evidence)) throw new Error(`${at} ${o.name}: evidence needs source, collectedOn, level and independentSurvey`);
-    return { name: o.name, roofM: o.roofM, heightSource: o.heightSource, evidence: o.evidence };
+    return { name: o.name, roofM: o.roofM, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), evidence: o.evidence };
   });
 }
 
@@ -76,6 +80,7 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
     once(at, o?.name);
     if (badSource(o.heightSource)) throw new Error(`${at} ${o.name}: heightSource must be its own label (A-Z_, at most 16 characters)`);
     if (badEvidence(o.evidence)) throw new Error(`${at} ${o.name}: evidence needs source, collectedOn, level and independentSurvey`);
+    if (badFloors(o.floors)) throw new Error(`${at} ${o.name}: floors must be a positive whole number`);
     if (!Array.isArray(o.parts) || o.parts.length < 2) throw new Error(`${at} ${o.name}: at least two parts`);
     const ids = new Set<string>();
     const list = o.parts.map((p, k) => {
@@ -89,7 +94,7 @@ export function parseSceneOverrides(doc: unknown): SceneOverrides {
       if (!(polygonArea(p.polygon) > 1)) throw new Error(`${pat}: polygon area must be over 1 m2`);
       return { id: p.id, name: p.name ?? null, roofM: p.roofM, polygon: p.polygon };
     });
-    return { name: o.name, heightSource: o.heightSource, evidence: o.evidence, parts: list };
+    return { name: o.name, heightSource: o.heightSource, ...(o.floors === undefined ? {} : { floors: o.floors }), evidence: o.evidence, parts: list };
   });
   return { roofs, hidden, parts };
 }

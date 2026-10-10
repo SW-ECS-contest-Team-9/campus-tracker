@@ -10,6 +10,7 @@
  *   footprint of the active campus map (IoU >= 0.99), all under the DEM, roof above and base below the ground.
  * - Roof overrides (data/scene/overrides/building-roofs.json): a listed building takes the given roof elevation and
  *   height source instead of the GeoPackage height; the base is unchanged. They give the scene another version id.
+ *   An override may state the floor count ("floors"); without it only a register count is kept (an assumed one is dropped).
  *   The same file can leave a GeoPackage building out of the scene ("hidden") or draw one footprint as several blocks
  *   with their own roofs ("parts": polygons that tile the footprint; the first part keeps the building id, the others
  *   get <id>#<part id>). --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
@@ -138,7 +139,7 @@ async function main() {
           problems.push(`${label}: ${(err as Error).message}`);
         }
         const buildingId = partBuildingId(best.building_id, split.parts, k);
-        out.push({ buildingId, name: part.name, heightM: partHeight, source: split.heightSource, registerId: p.register_id || null, floors: null,
+        out.push({ buildingId, name: part.name, heightM: partHeight, source: split.heightSource, registerId: p.register_id || null, floors: part.name ? split.floors ?? null : null,
           baseM: ph.baseM, roofM: part.roofM, tMin: ph.terrainMinM, tMax: ph.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, geojson: partJson,
           note: `part "${part.id}" of ${p.name} (${split.parts.length} parts); flat roof ${part.roofM} m from ${split.evidence.source} (${split.evidence.collectedOn}, ${split.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); whole building in the GeoPackage: ${p.height_m} m ${p.height_source}, ${p.ground_floors ?? '?'} floors` });
         rows.push({ name: `${p.name} / ${part.id}`, building: buildingId, iou: k === 0 ? r2(best.iou) : '', height: partHeight, source: split.heightSource, base: ph.baseM, roof: part.roofM,
@@ -147,7 +148,7 @@ async function main() {
       continue;
     }
     out.push({ buildingId: best.building_id, name: p.name, heightM, source: o?.heightSource ?? p.height_source ?? 'ESTIMATE', registerId: p.register_id || null,
-      floors: p.ground_floors, baseM, roofM, tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, note, geojson });
+      floors: o ? o.floors ?? (p.height_source === 'REGISTER' ? p.ground_floors : null) : p.ground_floors, baseM, roofM, tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, note, geojson });
     rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), height: heightM, source: o?.heightSource ?? p.height_source, base: baseM, roof: roofM,
       'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(roofM - p.roof_m), raised: h.roofRaised ? 'yes' : '' });
   }
