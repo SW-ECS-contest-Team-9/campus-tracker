@@ -10,7 +10,8 @@
  "notProposed": [
   "지하주차장 안, 서문 터널 안의 길(모름)",
   "서쪽 공도(서경로·보국문로16라길): 학교 길이 아니라 넣지 않음",
-  "기존 지하주차장 경사로 951c157d·8fde6a04 의 삭제나 이동(사용자 결정 필요)",
+  "지하 차도(서문 터널 ~ 제2 지하주차장 입구 ~ 본관·한림관 연결 데크 아래쪽)의 새 선: 사용자 그림을 받기 전에는 만들지 않는다(results.json 의 undergroundRoadB07 에 알려진 점만)",
+  "운영 길 951c157d·8fde6a04 의 삭제·이동·높이 변경: 하지 않는다(B07: 지하 차도의 일부일 수 있는 유일한 기존 선)",
   "회차 공간의 도는 궤적, 본관 쪽 계단식 보도"
  ],
  "operations": [
@@ -811,6 +812,21 @@
     "attrs": {
      "roadClass": "pedestrian",
      "vehicleAccess": "restricted",
+     "pedestrianAccess": "allowed"
+    }
+   }
+  },
+  {
+   "id": "E09-FIX-951c157d",
+   "op": "update_road",
+   "grade": "확정(지하 차도에 보행 구간이 있다) / 추정(이 선이 그 지하 차도라는 것)",
+   "applyOnlyAfter": "사용자가 지하 차도의 선을 그려 이 선이 맞다고 확인한 뒤",
+   "why": "B07: 지하 차도는 차량 길이고 오르막 방향 오른쪽에 보행 구간이 있다(사용자 확정). 저장된 pedestrianAccess=prohibited 는 어긋난다. 평면·높이는 그대로 둔다(위 보행로 c52095ad 와 층이 다른 별개 길)",
+   "args": {
+    "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
+    "expectedRevision": 4,
+    "attrs": {
+     "name": "지하 차도 (선은 추정)",
      "pedestrianAccess": "allowed"
     }
    }

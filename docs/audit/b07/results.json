@@ -1,0 +1,776 @@
+{
+ "method": "B07 — 한림관 층 높이 다시 추론, 나란한 두 내리막길(위 보행로 / 한 층 아래 지하 차도) 대조. 읽기 전용, DB 없음, 적용 없음.\n\n  python docs/audit/b07/b07.py <audit-dir> docs/audit/b07/results.json\n\n입력: <audit-dir>/e05/smap-mesh-*.txt (S-MAP 화면 판독 격자, 독립 측량 아님), <audit-dir>/claude-live/roads-live-2.json (운영 스냅숏 2).\n사용자 확정(2026-10-10, 근거: <audit-dir>/사용자-출입구·주차장-20261010/근거.md 와 허브 표):\n  - 한림관 6층에서 운동장 높이 길로 나가려면 계단 6칸쯤을 올라간다 -> 6층 바닥 = 운동장 148.9 − 6단.\n  - 한림관 1층은 앞 길(사용자 S-MAP 판독 125.1~126.1 m)에서 계단 몇 개 위.\n  - 문예관·대일관 쪽과 본관·한림관 쪽 사이에 내리막길이 두 줄 나란히 있다. 위 = 문예관 3층 계단으로 이어지는 바깥 보행로,\n    한 층 아래 = \"지하 경사로 통로\" = 지하 차도(서문·제2 지하주차장 입구로 드나드는 차가 씀, 오르막 방향 오른쪽이 보행 구간).\n    본관 5층–한림관 3층 연결(실외 나무 데크)은 아래 길에서만 갈 수 있다.\n여기서 계산한 층 높이는 기준 3개를 빼면 전부 추정이다. 지하 차도의 선은 자료에 없다(모름): 알려진 점만 적는다.\n",
+ "fieldM": 148.9,
+ "hanlim": {
+  "anchors": [
+   {
+    "floor": 1,
+    "heightM": 127.2,
+    "rangeM": [
+     126.6,
+     127.5
+    ],
+    "grade": "확정(앞 길에서 계단 몇 개 위) + S-MAP(계단 위 평탄면 126.9~127.5, 앞 길 사용자 판독 125.1~126.1)"
+   },
+   {
+    "floor": 3,
+    "heightM": 137.8,
+    "rangeM": [
+     137.4,
+     138.9
+    ],
+    "grade": "원천(본관 5층과 이어진다) + 추정(높이: 본관 5층 계산값과 고른 간격 값의 가운데)"
+   },
+   {
+    "floor": 6,
+    "heightM": 147.9,
+    "rangeM": [
+     147.8,
+     148.0
+    ],
+    "grade": "확정(운동장 높이 길보다 계단 6칸쯤 아래) + 측정(운동장 148.9) + 추정(한 단 0.15~0.18 m)"
+   }
+  ],
+  "mainBuilding5F": {
+   "f2M": 130.7,
+   "landingBetween5And6M": 139.9,
+   "byLandingFraction": {
+    "0.25": {
+     "f5M": 138.9,
+     "storeyM": 4.09
+    },
+    "0.5": {
+     "f5M": 138.1,
+     "storeyM": 3.68
+    },
+    "0.75": {
+     "f5M": 137.4,
+     "storeyM": 3.35
+    }
+   },
+   "note": "입구(3)이 5층과 6층의 한가운데라는 것은 가정. 1/4~3/4 지점이면 5층은 137.4~138.9 m"
+  },
+  "uniformTests": [
+   {
+    "case": "6층 = 운동장 − 6단 (확정 방향)",
+    "f6M": 147.9,
+    "uniformStoreyM": 5.18,
+    "f3UniformM": 137.6,
+    "f3UniformMinusMain5M": -0.5,
+    "storey1to3IfF3IsMain5M": 5.45,
+    "storey3to6IfF3IsMain5M": 4.9
+   },
+   {
+    "case": "견주기: 6층 = 운동장",
+    "f6M": 148.9,
+    "uniformStoreyM": 5.43,
+    "f3UniformM": 138.1,
+    "f3UniformMinusMain5M": -0.0,
+    "storey1to3IfF3IsMain5M": 5.45,
+    "storey3to6IfF3IsMain5M": 5.4
+   },
+   {
+    "case": "견주기: 6층 = 운동장 + 6단 (사용자 답과 반대, 거둠)",
+    "f6M": 149.9,
+    "uniformStoreyM": 5.68,
+    "f3UniformM": 138.6,
+    "f3UniformMinusMain5M": 0.5,
+    "storey1to3IfF3IsMain5M": 5.45,
+    "storey3to6IfF3IsMain5M": 5.9
+   }
+  ],
+  "storeysBelowFieldM": {
+   "1to3": 5.3,
+   "3to6": 5.05,
+   "uniform1to6": 5.18
+  },
+  "residualsM": {
+   "f3Table minus main5F(138.1)": -0.3,
+   "f3Table minus uniform": 0.2,
+   "uniform minus main5F": -0.5
+  },
+  "ladderBelowField": {
+   "1": 127.2,
+   "2": 132.5,
+   "3": 137.8,
+   "5": 142.9,
+   "6": 147.9
+  },
+  "aboveField": {
+   "A ring roof is the roof of 16F": {
+    "storeyM": 3.65,
+    "floors": {
+     "6": 147.9,
+     "7": 151.6,
+     "8": 155.2,
+     "9": 158.9,
+     "10": 162.5,
+     "11": 166.2,
+     "12": 169.8,
+     "13": 173.5,
+     "14": 177.1,
+     "15": 180.8,
+     "16": 184.4
+    }
+   },
+   "B ring roof is the 15F floor (terrace), 15-16F in the inner drum": {
+    "storey6to15M": 4.47,
+    "storey15to16M": 4.6,
+    "floors": {
+     "6": 147.9,
+     "7": 152.4,
+     "8": 156.8,
+     "9": 161.3,
+     "10": 165.8,
+     "11": 170.2,
+     "12": 174.7,
+     "13": 179.2,
+     "14": 183.6,
+     "15": 188.1,
+     "16": 192.7
+    },
+    "roofM": 197.3
+   },
+   "check: uniform to the disc roof": {
+    "storeyM": 4.49,
+    "f15M": 188.3,
+    "f15MinusRingRoofM": 0.2
+   },
+   "maxDifferenceAminusBM": {
+    "10": -3.3,
+    "14": -6.5,
+    "16": -8.3
+   }
+  },
+  "register": {
+   "heightM": 55.05,
+   "groundFloors": 12,
+   "discRoofMinusHeightM": 142.25,
+   "schoolFloors5to16": 12,
+   "f5M": 142.9,
+   "meanStoreyM": 4.59,
+   "readingBTotal5toRoofM": 54.4,
+   "note": "대장 지상 12층 = 학교 표기 5~16층(4 없음, 13 있음) 12개 층으로 읽을 수 있다(추정). 원판 지붕 − 대장 높이 = 142.25 m 는 5층 바닥(142.9)·북쪽 위 보행로 지면(141~143)과 가깝다. 대장 지하 2층 대 학교 1·2·3층 3개 층은 하나 어긋난다"
+  }
+ },
+ "eunju1": {
+  "f1GroundM": 131.3,
+  "f2M": 137.8,
+  "f5M": 148.9,
+  "storey1to2M": 6.5,
+  "storey2to5M": 5.55,
+  "storeys2to5": 2,
+  "f1IfUniformM": 132.2,
+  "f1UniformMinusGroundM": 0.9,
+  "hanlim6FMinusEunju5FM": -1.0,
+  "note": "2→5층이 층당 5.55 m 이면 1→2층 6.5 m 는 그보다 1 m 크다. 1층 바닥이 입구 지면보다 약 1 m 높거나(문 앞 계단), 1층이 실제로 높거나, 연결통로에 단이 있다: 미정"
+ },
+ "corridor": {
+  "roads": {
+   "c52095ad": {
+    "name": null,
+    "roadClass": "shared",
+    "structure": "ramp",
+    "vehicleAccess": "allowed",
+    "pedestrianAccess": "allowed",
+    "lengthM": 54.5,
+    "gradePct": 21.9,
+    "vertices": [
+     {
+      "i": 0,
+      "xy": [
+       201106.2,
+       557324.7
+      ],
+      "storedZ": 141.73,
+      "smap": 141.0,
+      "smapKind": "terrain",
+      "storedMinusSmapM": 0.7
+     },
+     {
+      "i": 5,
+      "xy": [
+       201096.7,
+       557329.2
+      ],
+      "storedZ": 139.43,
+      "smap": 139.1,
+      "smapKind": "terrain",
+      "storedMinusSmapM": 0.3
+     },
+     {
+      "i": 10,
+      "xy": [
+       201089.9,
+       557332.3
+      ],
+      "storedZ": 137.78,
+      "smap": 138.1,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -0.3
+     },
+     {
+      "i": 15,
+      "xy": [
+       201082.7,
+       557335.7
+      ],
+      "storedZ": 136.03,
+      "smap": 136.7,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -0.7
+     },
+     {
+      "i": 20,
+      "xy": [
+       201075.0,
+       557339.3
+      ],
+      "storedZ": 134.16,
+      "smap": 135.5,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -1.3
+     },
+     {
+      "i": 25,
+      "xy": [
+       201066.3,
+       557343.3
+      ],
+      "storedZ": 132.08,
+      "smap": 134.2,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -2.1
+     },
+     {
+      "i": 29,
+      "xy": [
+       201056.8,
+       557347.8
+      ],
+      "storedZ": 129.78,
+      "smap": 132.7,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -2.9
+     }
+    ]
+   },
+   "951c157d": {
+    "name": "지하주차장 경사로 (추정)",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "vehicleAccess": "allowed",
+    "pedestrianAccess": "prohibited",
+    "lengthM": 51.19,
+    "gradePct": 18.7,
+    "vertices": [
+     {
+      "i": 0,
+      "xy": [
+       201100.3,
+       557327.6
+      ],
+      "storedZ": 136.39,
+      "smap": 139.8,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -3.4
+     },
+     {
+      "i": 1,
+      "xy": [
+       201081.2,
+       557336.5
+      ],
+      "storedZ": 132.21,
+      "smap": 136.7,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -4.5
+     },
+     {
+      "i": 2,
+      "xy": [
+       201056.2,
+       557348.2
+      ],
+      "storedZ": 127.21,
+      "smap": 132.7,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -5.5
+     },
+     {
+      "i": 3,
+      "xy": [
+       201053.9,
+       557349.2
+      ],
+      "storedZ": 126.82,
+      "smap": 132.4,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -5.6
+     }
+    ]
+   },
+   "8fde6a04": {
+    "name": "지하주차장-북악관 B1 연결 (추정)",
+    "roadClass": "vehicle",
+    "structure": "ordinary",
+    "vehicleAccess": "allowed",
+    "pedestrianAccess": "prohibited",
+    "lengthM": 16.06,
+    "gradePct": 26.7,
+    "vertices": [
+     {
+      "i": 0,
+      "xy": [
+       201053.9,
+       557349.2
+      ],
+      "storedZ": 126.82,
+      "smap": 132.4,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -5.6
+     },
+     {
+      "i": 1,
+      "xy": [
+       201047.3,
+       557363.9
+      ],
+      "storedZ": 131.1,
+      "smap": 138.4,
+      "smapKind": "building",
+      "storedMinusSmapM": null
+     }
+    ]
+   },
+   "66f166a8": {
+    "name": "문예관 지하–지하 통로 수평 직결 (고도 추정)",
+    "roadClass": "pedestrian",
+    "structure": "indoor_corridor",
+    "vehicleAccess": "unknown",
+    "pedestrianAccess": "unknown",
+    "lengthM": 13.57,
+    "gradePct": 0.0,
+    "vertices": [
+     {
+      "i": 0,
+      "xy": [
+       201105.7,
+       557340.0
+      ],
+      "storedZ": 136.39,
+      "smap": 190.8,
+      "smapKind": "building",
+      "storedMinusSmapM": null
+     },
+     {
+      "i": 1,
+      "xy": [
+       201100.3,
+       557327.6
+      ],
+      "storedZ": 136.39,
+      "smap": 139.8,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -3.4
+     }
+    ]
+   },
+   "8e71c240": {
+    "name": "혜인관 방향 지상 경사로 연장 (추정)",
+    "roadClass": "shared",
+    "structure": "ramp",
+    "vehicleAccess": "allowed",
+    "pedestrianAccess": "allowed",
+    "lengthM": 36.24,
+    "gradePct": 0.0,
+    "vertices": [
+     {
+      "i": 0,
+      "xy": [
+       201106.2,
+       557324.7
+      ],
+      "storedZ": 141.73,
+      "smap": 141.0,
+      "smapKind": "terrain",
+      "storedMinusSmapM": 0.7
+     },
+     {
+      "i": 1,
+      "xy": [
+       201122.5,
+       557317.2
+      ],
+      "storedZ": 141.73,
+      "smap": 144.0,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -2.3
+     },
+     {
+      "i": 2,
+      "xy": [
+       201139.1,
+       557309.5
+      ],
+      "storedZ": 141.73,
+      "smap": 147.2,
+      "smapKind": "terrain",
+      "storedMinusSmapM": -5.5
+     }
+    ]
+   }
+  },
+  "upperPathCrossSections": [
+   {
+    "at": [
+     201106.2,
+     557324.7
+    ],
+    "offsetsM": [
+     -8,
+     -6,
+     -4,
+     -2,
+     0,
+     2,
+     4,
+     6,
+     8
+    ],
+    "smap": [
+     143.7,
+     142.5,
+     141.8,
+     141.3,
+     141.0,
+     141.2,
+     140.8,
+     140.9,
+     139.9
+    ],
+    "terrainRangeM": 3.8
+   },
+   {
+    "at": [
+     201094.0,
+     557330.4
+    ],
+    "offsetsM": [
+     -8,
+     -6,
+     -4,
+     -2,
+     0,
+     2,
+     4,
+     6,
+     8
+    ],
+    "smap": [
+     "B",
+     140.8,
+     140.1,
+     138.8,
+     138.7,
+     138.9,
+     138.7,
+     138.7,
+     138.2
+    ],
+    "terrainRangeM": 2.6
+   },
+   {
+    "at": [
+     201084.5,
+     557334.9
+    ],
+    "offsetsM": [
+     -8,
+     -6,
+     -4,
+     -2,
+     0,
+     2,
+     4,
+     6,
+     8
+    ],
+    "smap": [
+     138.7,
+     138.7,
+     138.4,
+     137.6,
+     137.0,
+     137.0,
+     136.9,
+     137.1,
+     136.6
+    ],
+    "terrainRangeM": 2.1
+   },
+   {
+    "at": [
+     201073.1,
+     557340.2
+    ],
+    "offsetsM": [
+     -8,
+     -6,
+     -4,
+     -2,
+     0,
+     2,
+     4,
+     6,
+     8
+    ],
+    "smap": [
+     132.5,
+     133.5,
+     134.4,
+     135.4,
+     135.5,
+     135.3,
+     135.4,
+     134.9,
+     "B"
+    ],
+    "terrainRangeM": 3.0
+   },
+   {
+    "at": [
+     201056.8,
+     557347.8
+    ],
+    "offsetsM": [
+     -8,
+     -6,
+     -4,
+     -2,
+     0,
+     2,
+     4,
+     6,
+     8
+    ],
+    "smap": [
+     132.7,
+     132.6,
+     132.6,
+     132.8,
+     132.7,
+     132.8,
+     132.9,
+     132.7,
+     "B"
+    ],
+    "terrainRangeM": 0.3
+   }
+  ],
+  "fit951": {
+   "oneStoreyBelowUpperPath": {
+    "belowSmapSurfaceM": [
+     3.4,
+     4.5,
+     5.5,
+     5.6
+    ],
+    "reading": "저장된 선은 위 보행로 면보다 3.4~5.6 m 아래 = 한 층 안팎. 사용자 말 \"한 층 아래 나란히\"와 맞는다"
+   },
+   "deckEnd": {
+    "deckMarker": [
+     201098.0,
+     557302.7
+    ],
+    "top951": [
+     201100.3,
+     557327.6,
+     136.39
+    ],
+    "planDistanceM": 25.0,
+    "hanlim3FTableM": 137.8,
+    "main5FM": 138.1,
+    "top951MinusHanlim3FM": -1.4,
+    "reading": "위 끝 136.39 m 는 한림관 3층·본관 5층 계산값보다 1.4~1.7 m 낮다. 136.39 는 문예관 아래층 추정 높이를 옮긴 값이라 이 차이로 가르지 못한다"
+   },
+   "westGateEnd": {
+    "portal": [
+     200984.0,
+     557399.5,
+     117.0
+    ],
+    "bottom951": [
+     201053.9,
+     557349.2,
+     126.82
+    ],
+    "planDistanceM": 86.1,
+    "dropM": 9.8,
+    "gradePctStraight": 11.4,
+    "stored951GradePct": 18.7,
+    "reading": "아래 끝 126.82 m 에서 서문 117.0 m 까지 직선 86 m 에 9.8 m 내림(11 %): 차도로 가능한 경사. 그 사이 선은 자료에 없다(모름). 저장된 선 자체는 19 % 로 차도로는 가파르다(높이가 추정값)"
+   },
+   "busStopSide": {
+    "bottom951ToP1SignEntranceM": 52.9,
+    "p1ThresholdM": 127.9,
+    "bottom951ToBusStopsM": {
+     "1164": 44.4,
+     "2115": 37.9
+    },
+    "busStopGroundM": {
+     "1164": 129.0,
+     "2115": 128.9
+    },
+    "bottom951ToMainEntrance2M": 16.4,
+    "mainEntrance2GroundM": 130.5,
+    "surfaceAbove951BottomM": 132.4,
+    "p1ToBusStopsM": {
+     "1164": 10.0,
+     "2115": 15.0
+    },
+    "reading": "아래 끝은 본관 입구(2)(\"지하주차장과 본관 2층 연결\", 원천)에서 16 m, 표지판 P1 입구에서 53 m. 그 자리 지면 132.4 m 보다 5.6 m 아래. 표지판 P1 입구는 버스 정류장에서 10~15 m 이고 문턱 127.9 m: 사용자의 \"버스 정류장 근처 제2 지하주차장 입구\" 후보(추정, 확인 전)"
+   }
+  },
+  "nook": {
+   "northOfHanlim": {
+    "box": [
+     201104,
+     557309,
+     201114,
+     557314
+    ],
+    "cells": 31,
+    "min": 133.8,
+    "median": 135.1,
+    "max": 141.2
+   },
+   "gapMainHanlimWest": {
+    "box": [
+     201099,
+     557296,
+     201104,
+     557308
+    ],
+    "cells": 8,
+    "min": 130.3,
+    "median": 131.8,
+    "max": 133.3
+   },
+   "eastStrip": {
+    "box": [
+     201128,
+     557286,
+     201131,
+     557303
+    ],
+    "cells": 48,
+    "min": 130.8,
+    "median": 134.5,
+    "max": 137.9
+   },
+   "terraceSE": {
+    "box": [
+     201126,
+     557273,
+     201128,
+     557282
+    ],
+    "cells": 25,
+    "min": 135.1,
+    "median": 136.3,
+    "max": 136.4
+   },
+   "reading": "한림관 북쪽 모퉁이(본관 동쪽 벽·한림관 북쪽 벽·위 보행로 사이)는 S-MAP 에서 하늘이 보이는 낮은 면이다(133.8~141.2, 중앙 135.1 m, 북쪽으로 오름). 위 보행로(같은 자리 북쪽 141~143 m)보다 낮아 나무 데크가 이 모퉁이일 수 있다(추정). 중앙값은 한림관 3층 계산값(137.8)보다 2.7 m 낮다: 벽 사이 좁은 곳의 1~2 m 격자라 데크 높이로 쓰지 않고, 어긋남으로만 적는다"
+  },
+  "undergroundRoad": {
+   "what": "지하 차도 + 오르막 방향 오른쪽 보행 구간(사용자 확정). 위 보행로와 층이 다르다",
+   "geometry": "모름(사용자 그림 대기). 선을 만들지 않는다",
+   "knownPoints": [
+    {
+     "what": "서문 터널 입구 두 칸",
+     "xy": [
+      200984.0,
+      557399.5
+     ],
+     "z": 117.0,
+     "grade": "확정(서문으로 드나드는 차가 이 차도를 쓴다) / 좌표·높이 S-MAP·사진(E09)"
+    },
+    {
+     "what": "제2 지하주차장 입구",
+     "xy": null,
+     "z": null,
+     "grade": "확정(버스 정류장 근처, 유담관 9층으로 가는 보행 길 아래) / 위치 모름",
+     "candidate": {
+      "what": "표지판 P1 입구",
+      "xy": [
+       201021.9,
+       557307.1
+      ],
+      "z": 127.9,
+      "grade": "추정"
+     }
+    },
+    {
+     "what": "본관 5층–한림관 3층 연결 데크(보행)",
+     "xy": [
+      201098.0,
+      557302.7
+     ],
+     "z": 137.8,
+     "grade": "확정(이 길에서만 간다) / 좌표 = 학교 표지(원천) / 높이 추정"
+    },
+    {
+     "what": "북악관 B1(GS25 문)로 가는 길이 갈리는 곳",
+     "xy": null,
+     "z": null,
+     "grade": "확정(지하 차도가 시작하는 부근) / 위치 모름"
+    },
+    {
+     "what": "본관 입구(2): 지하주차장과 본관 2층 연결",
+     "xy": [
+      201041.5,
+      557338.5
+     ],
+     "z": 130.5,
+     "grade": "원천(학교 문구). 이 지하 차도와 이어지는지는 모름"
+    }
+   ],
+   "onlyExistingGeometryHint": {
+    "roads": [
+     "951c157d",
+     "8fde6a04",
+     "66f166a8"
+    ],
+    "grade": "추정(운영 도로망의 \"추정\" 선. 이 지하 차도라는 확인은 없다)"
+   },
+   "openToSky": "S-MAP 에서 951c157d 의 선 위는 끊김 없는 포장면(위 보행로)이다: 그 구간은 덮여 있다. 열린 곳으로 보이는 것은 서문 입구, 표지판 P1 입구, 한림관 북쪽 모퉁이뿐(추정)"
+  },
+  "upperPath": {
+   "road": "c52095ad",
+   "smapAlongM": [
+    141.0,
+    139.1,
+    138.1,
+    136.7,
+    135.5,
+    134.2,
+    132.7
+   ],
+   "sideStairToMunye3F": {
+    "leavesAt": [
+     201108.9,
+     557326.2
+    ],
+    "smapM": 141.3,
+    "topAt": [
+     201113.5,
+     557332.9
+    ],
+    "topSmapM": 144.1,
+    "source": "B06 사용자 그림(사진 10) 옮김, 평면 ±3 m"
+   },
+   "reading": "S-MAP 은 이 통로에서 이어진 한 면만 보인다(가로 단면은 가장자리에서 0.3~3.8 m 기울 뿐, 한 층 높이의 단이 길을 따라 이어지지 않는다). 그 면이 위 보행로다. 아래 길은 S-MAP 에 보이지 않는다"
+  }
+ }
+}

@@ -1143,7 +1143,7 @@
     },
     {
      "floor": 6,
-     "heightM": 148.9
+     "heightM": 147.9
     }
    ],
    "smapRoofM": 188.1,
@@ -1158,19 +1158,19 @@
        "from": 1,
        "to": 6,
        "storeys": 4,
-       "storeyHeightM": 5.43,
+       "storeyHeightM": 5.18,
        "implausible": false
       }
      ],
-     "meanBetweenAnchorsM": 5.43,
+     "meanBetweenAnchorsM": 5.18,
      "topAnchorToSmapRoof": {
       "storeys": 11,
-      "storeyHeightM": 3.56,
+      "storeyHeightM": 3.65,
       "implausible": false
      },
      "roofAtAnchorStoreyHeight": {
-      "roofM": 208.6,
-      "minusSmapRoofM": 20.5
+      "roofM": 204.8,
+      "minusSmapRoofM": 16.7
      }
     },
     "4·13 건너뜀(거둠)": {
@@ -1184,27 +1184,27 @@
        "from": 1,
        "to": 6,
        "storeys": 4,
-       "storeyHeightM": 5.43,
+       "storeyHeightM": 5.18,
        "implausible": false
       }
      ],
-     "meanBetweenAnchorsM": 5.43,
+     "meanBetweenAnchorsM": 5.18,
      "topAnchorToSmapRoof": {
       "storeys": 10,
-      "storeyHeightM": 3.92,
+      "storeyHeightM": 4.02,
       "implausible": false
      },
      "roofAtAnchorStoreyHeight": {
-      "roofM": 203.2,
-      "minusSmapRoofM": 15.1
+      "roofM": 199.7,
+      "minusSmapRoofM": 11.6
      }
     }
    },
    "roofNote": "바깥 고리 지붕(B02). 가운데 원판은 197.3",
    "ladderHypothesis": "4만 건너뜀",
-   "ladderWhy": "6층 = 은주1관 5층 = 운동장 높이(학교 연결통로 설명 + E06). 1→6층이 4개 층 22.4 m, B06: 1층 기준을 계단 위 평탄면으로 다시 읽었다. 13층은 있다(확정)",
-   "storeyHeightBelowAnchorsM": 5.43,
-   "storeyHeightAboveAnchorsM": 3.56,
+   "ladderWhy": "B07: 6층 바닥은 운동장 높이 길보다 계단 6칸쯤(약 1.0 m) 아래다(사용자 확정 2026-10-10). 1층은 계단 위 평탄면(B06). 13층은 있다(확정). 여기서는 1→6층을 고르게 나누고 고리 지붕까지 올린다. 3층을 본관 5층과 견준 값과 6층 위 두 읽기는 docs/audit/b07/b07.py",
+   "storeyHeightBelowAnchorsM": 5.18,
+   "storeyHeightAboveAnchorsM": 3.65,
    "storeyHeightAboveFrom": "S-MAP 지붕까지를 층 수로 나눔(난간 포함)",
    "ladder": {
     "1": [
@@ -1212,59 +1212,59 @@
      "anchor"
     ],
     "2": [
-     132.6,
+     132.4,
      "interp"
     ],
     "3": [
-     138.1,
+     137.6,
      "interp"
     ],
     "5": [
-     143.5,
+     142.7,
      "interp"
     ],
     "6": [
-     148.9,
+     147.9,
      "anchor"
     ],
     "7": [
-     152.5,
+     151.6,
      "extrap"
     ],
     "8": [
-     156.0,
+     155.2,
      "extrap"
     ],
     "9": [
-     159.6,
+     158.9,
      "extrap"
     ],
     "10": [
-     163.2,
+     162.5,
      "extrap"
     ],
     "11": [
-     166.7,
+     166.2,
      "extrap"
     ],
     "12": [
-     170.3,
+     169.8,
      "extrap"
     ],
     "13": [
-     173.8,
+     173.5,
      "extrap"
     ],
     "14": [
-     177.4,
+     177.1,
      "extrap"
     ],
     "15": [
-     181.0,
+     180.8,
      "extrap"
     ],
     "16": [
-     184.5,
+     184.4,
      "extrap"
     ]
    }
@@ -1904,37 +1904,37 @@
    "b": [
     "한림관",
     3,
-    138.1
+    137.6
    ],
-   "residualM": 0.0
+   "residualM": 0.5
   },
   {
    "statement": "한림관 3층 = 은주1관 2층",
    "a": [
     "한림관",
     3,
-    138.1
+    137.6
    ],
    "b": [
     "은주1관",
     2,
     137.2
    ],
-   "residualM": 0.9
+   "residualM": 0.4
   },
   {
    "statement": "한림관 6층 = 은주1관 5층",
    "a": [
     "한림관",
     6,
-    148.9
+    147.9
    ],
    "b": [
     "은주1관",
     5,
     148.9
    ],
-   "residualM": 0.0
+   "residualM": -1.0
   },
   {
    "statement": "은주1관 5층 = 운동장 바닥(E06)",
@@ -1953,10 +1953,10 @@
  ],
  "connectorChainTest": {
   "본관 5층 M": 138.1,
-  "한림관 3층 M": 138.1,
+  "한림관 3층 M": 137.6,
   "은주1관 2층 M": 137.2,
   "세 값의 범위 M": 0.9,
-  "한림관 1→6층 층고 M": 5.43,
+  "한림관 1→6층 층고 M": 5.18,
   "은주1관 1→5층 층고 M": 5.87,
   "본관 층고 M": 3.67,
   "읽기": "본관 사슬은 층고 3.7 m 의 독립된 기준이다. 세 값이 1 m 안에서 만나면 한림관·은주1관의 1층 기준과 운동장 아래 높은 층고(5.4~5.9 m)가 서로 맞는다는 뜻이다"
