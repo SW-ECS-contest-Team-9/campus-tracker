@@ -10,7 +10,7 @@ X, Y = np.meshgrid(gx, gy)
 bl = unary_union([Polygon(b['coordinates'][0] if isinstance(b['coordinates'][0][0][0], (int, float)) else b['coordinates'][0][0]).buffer(0) for b in buildings()])
 inb = contains_xy(bl, X, Y)
 d = json.loads((REPO / 'frontend/public/structures/z02-daeil-front.geojson').read_text(encoding='utf-8'))
-plats = [(f['properties'], shape(f['geometry']).buffer(0)) for f in d['features'] if f['properties']['kind'] == 'platform']
+plats = [(f['properties'], shape(f['geometry']).buffer(0)) for f in d['features'] if f['properties']['kind'] == 'platform' and not f['properties']['surfaceName'].startswith('없음')]  # 지형에 싣지 않는 좁은 기단은 뺀다
 res = {'changedCells': int((tb != ta).sum()), 'changedBuildingCells': int(((tb != ta) & inb).sum()), 'platforms': {}}
 top = np.full(ta.shape, np.nan)
 for p, g in plats:   # 뒤의 기단이 이긴다

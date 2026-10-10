@@ -1,5 +1,5 @@
 {
- "changedCells": 363,
+ "changedCells": 355,
  "changedBuildingCells": 0,
  "platforms": {
   "Z02-PLATFORM-FIELD": {
@@ -18,11 +18,11 @@
   },
   "Z02-PLATFORM-APRON": {
    "topM": 148.9,
-   "cells": 133,
+   "cells": 159,
    "before_min_med_max": [
     142.82,
     148.9,
-    150.69
+    151.74
    ],
    "after_min_max": [
     148.9,
@@ -41,20 +41,6 @@
    "after_min_max": [
     151.0,
     151.0
-   ],
-   "after_max_abs_dev": 0.0
-  },
-  "Z02-PLATFORM-PASSAGE": {
-   "topM": 151.25,
-   "cells": 26,
-   "before_min_med_max": [
-    148.9,
-    151.08,
-    151.74
-   ],
-   "after_min_max": [
-    151.25,
-    151.25
    ],
    "after_max_abs_dev": 0.0
   },
@@ -89,7 +75,7 @@
  },
  "frontZone": {
   "cells": 210,
-  "belowTopBy0.3_before": 68,
+  "belowTopBy0.3_before": 56,
   "belowTopBy0.3_after": 0,
   "deepestBefore_m": 11.61,
   "deepestAfter_m": 0.0
@@ -102,7 +88,7 @@
    ],
    "after_min_med": [
     146.39,
-    151.26
+    149.74
    ]
   },
   "wall+1.5m": {
@@ -112,7 +98,7 @@
    ],
    "after_min_med": [
     148.83,
-    150.99
+    148.99
    ]
   },
   "wall+3.0m": {
@@ -122,7 +108,7 @@
    ],
    "after_min_med": [
     148.79,
-    149.63
+    148.9
    ]
   }
  },
