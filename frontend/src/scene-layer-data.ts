@@ -9,7 +9,7 @@ export type LayerData = { roads: CarriagewayRoad[]; areas: LayerArea[] };
 
 /** A road of the editor snapshot (only what the surfaces read). Coordinates: EPSG:5186 x, y, MSL height. */
 export type EditorRoad = {
-  id: string; name: string | null; roadClass: string; structure: string; widthM: number | null; levelId: string | null; buildingId: string | null;
+  id: string; name: string | null; roadClass: string; structure: string; vehicleAccess?: string | null; widthM: number | null; levelId: string | null; buildingId: string | null;
   fromNodeId?: string; toNodeId?: string; geometry: { coordinates: number[][] };
 };
 /** The road being drawn or edited and not saved yet: its vertices so far and the attributes in the form. */
@@ -17,7 +17,7 @@ export type EditorDraft = { id: string; coordinates: number[][]; attrs: Record<s
 /** An area of the editor (GET /api/v1/editor/areas): rings in EPSG:5186 metres, closed. */
 export type EditorArea = { id: number; name: string; kind: string; elevationM: number | null; buildingId: string | null; floor: string | null; geometry: { coordinates: number[][][] } };
 
-const ATTRS = ['name', 'roadClass', 'structure', 'widthM', 'levelId', 'buildingId'] as const;
+const ATTRS = ['name', 'roadClass', 'structure', 'vehicleAccess', 'widthM', 'levelId', 'buildingId'] as const;
 
 /**
  * The editor's current state as layer data, so the surfaces show what the editor shows (saved or not):
@@ -38,7 +38,7 @@ export function editorLayerData(roads: EditorRoad[], draft: EditorDraft | null, 
   }
   return {
     roads: all.filter((r) => r.structure !== 'elevator' && r.geometry.coordinates.length >= 2).map((r) => ({
-      id: r.id, name: r.name, roadClass: r.roadClass as CarriagewayRoad['roadClass'], structure: r.structure, widthM: r.widthM, levelId: r.levelId, buildingId: r.buildingId,
+      id: r.id, name: r.name, roadClass: r.roadClass as CarriagewayRoad['roadClass'], structure: r.structure, vehicleAccess: r.vehicleAccess ?? null, widthM: r.widthM, levelId: r.levelId, buildingId: r.buildingId,
       fromNodeId: r.fromNodeId ?? `draft:${r.id}:from`, toNodeId: r.toNodeId ?? `draft:${r.id}:to`,
       geometry: { type: 'LineString', coordinates: r.geometry.coordinates },
     })),

@@ -365,7 +365,7 @@ export interface MobilityPortal extends MobilityBase { geometry: { type: 'Point'
 export interface MobilitySpaces { corridors: MobilityCorridor[]; openAreas: MobilityOpenArea[]; portals: MobilityPortal[] }
 /** Editor road segment (carriageway or pedestrian way, no elevators), read-only for the preview. Coordinates: EPSG:5186 x, y, MSL height. */
 export interface CarriagewayRoad {
-  id: string; name: string | null; roadClass: 'vehicle' | 'shared' | 'pedestrian'; structure: string; widthM: number | null; levelId: string | null; buildingId: string | null;
+  id: string; name: string | null; roadClass: 'vehicle' | 'shared' | 'pedestrian'; structure: string; vehicleAccess?: string | null; widthM: number | null; levelId: string | null; buildingId: string | null;
   fromNodeId: string; toNodeId: string; geometry: { type: 'LineString'; coordinates: number[][] };
 }
 

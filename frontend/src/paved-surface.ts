@@ -17,15 +17,13 @@ export type Material = SurfaceKind | 'field';
  * Which material wins where two overlap in plan: the first. A pedestrian way does not paint over the field (the field
  * is itself the walking surface there): its ribbon ends at the field's outline.
  */
-export const MATERIALS: Material[] = ['crossing', 'carriageway', 'stairs', 'field', 'pedestrian'];
+export const MATERIALS: Material[] = ['crossing', 'carriageway', 'stairs', 'field', 'block', 'sidewalk', 'pedestrian'];
 
 /** Every constant of the merged surfaces. Lengths in metres. */
 export const PAVED = {
   // --- which pedestrian ways are part of the black paved surface (rule in pavedRoadIds) ---
   /** A pedestrian way with at least this share of its centreline inside a paved area is part of that area. */
   joinInsideShare: 0.5,
-  /** A pedestrian way with a written width of at least this (wide enough for a vehicle) that touches the paved surface is part of it. */
-  joinMinWidthM: 4,
   // --- the "pooled water" outline (pool) ---
   /** Closing (grow, then shrink by this): notches narrower than twice this fill up, pieces closer than that join, inner corners get this radius. */
   closeRadiusM: 1,
@@ -170,7 +168,7 @@ function pool(shape: Shape): Shape {
 function poolPaths(shape: Shape): Shape {
   return shape.length ? smooth(opening(closing(shape, PAVED.pathRadiusM), PAVED.pathRadiusM)) : shape;
 }
-const NARROW: Material[] = ['crossing', 'stairs', 'pedestrian'];
+const NARROW: Material[] = ['crossing', 'stairs', 'sidewalk', 'pedestrian'];
 const pooledOf = (m: Material, shape: Shape) => (NARROW.includes(m) ? poolPaths(shape) : pool(shape));
 /** Everything as one outline: the wide surfaces pooled, the narrow ways as ribbons, joined where they meet. */
 function poolAll(raw: Map<Material, Shape>): Shape {
@@ -262,43 +260,29 @@ function ringGrid(rings: Ring[], reachM: number) {
 
 // ---------- which roads, which material ----------
 export type SurfaceRoad = {
-  id: string; name: string | null; roadClass: string; structure?: string; widthM: number | null; levelId: string | null; buildingId?: string | null;
+  id: string; name: string | null; roadClass: string; structure?: string; vehicleAccess?: string | null; widthM: number | null; levelId: string | null; buildingId?: string | null;
   fromNodeId: string; toNodeId: string; geometry: { coordinates: number[][] };
 };
-/** A filled open area: `asphalt` is part of the black paved surface, `field` its own surface. Rings in metres, outer first. */
-export type SurfaceArea = { id: number; fill: 'asphalt' | 'field'; elevationM: number | null; rings: Ring[] };
+/** A filled open area: `asphalt` is part of the black paved surface, `block` a pedestrian plaza (block paving), `field` its own surface. Rings in metres, outer first. */
+export type SurfaceArea = { id: number; fill: 'asphalt' | 'block' | 'field'; elevationM: number | null; rings: Ring[] };
 
 /**
- * The pedestrian ways drawn as part of the black paved surface (the one rule for it):
- *  - at least PAVED.joinInsideShare of the centreline lies inside a paved area, or
- *  - the way has a written width of at least PAVED.joinMinWidthM and touches the paved surface: an end inside (or
- *    within the closing radius of) a paved area, or at a node of a carriageway or of a way that already joined.
- * Only plain outdoor ways above ground (surface kind `pedestrian`): stairs and crossings keep their own tone.
+ * The pedestrian ways drawn as part of the black paved surface (the one rule for it): at least PAVED.joinInsideShare
+ * of the centreline lies inside an asphalt area (a walking line across a turnaround is not a strip of other paving).
+ * Z08: a wide way that only touches the asphalt no longer joins it: it is pedestrian-priority block paving
+ * (road-surface.ts surfaceKind). Only plain outdoor ways above ground (kind `pedestrian` or `block`).
  */
 export function pavedRoadIds(roads: SurfaceRoad[], pavedAreas: Ring[][]): string[] {
   if (pavedAreas.length) origin = pavedAreas[0][0][0].map(Math.floor);
-  const near = grow(union(...pavedAreas.map(polygonShape)), PAVED.closeRadiusM).map(toRing);
   const inside = (p: number[], rings: Ring[]) => rings.reduce((n, r) => n + (ringContains(p[0], p[1], r) ? 1 : 0), 0) % 2 === 1;
   const exact = pavedAreas.flat();
   const surface = roads.filter((r) => surfaceKind(r) !== null && !isUnderground(r));
-  const nodes = new Set(surface.filter((r) => surfaceKind(r) === 'carriageway').flatMap((r) => [r.fromNodeId, r.toNodeId]));
-  const joined = new Set<string>();
-  for (let changed = true; changed;) {
-    changed = false;
-    for (const road of surface) {
-      if (joined.has(road.id) || surfaceKind(road) !== 'pedestrian') continue;
-      const centre = smoothCentreline(road.geometry.coordinates);
-      if (centre.length < 2) continue;
-      const share = centre.filter((p) => inside(p, exact)).length / centre.length;
-      const touches = nodes.has(road.fromNodeId) || nodes.has(road.toNodeId) || inside(centre[0], near) || inside(centre[centre.length - 1], near);
-      if (share >= PAVED.joinInsideShare || ((road.widthM ?? 0) >= PAVED.joinMinWidthM && touches)) {
-        joined.add(road.id);
-        nodes.add(road.fromNodeId).add(road.toNodeId);
-        changed = true;
-      }
-    }
-  }
-  return [...joined];
+  return surface.filter((road) => {
+    const kind = surfaceKind(road);
+    if (kind !== 'pedestrian' && kind !== 'block') return false;
+    const centre = smoothCentreline(road.geometry.coordinates);
+    return centre.length >= 2 && centre.filter((p) => inside(p, exact)).length / centre.length >= PAVED.joinInsideShare;
+  }).map((road) => road.id);
 }
 
 // ---------- height ----------
@@ -569,7 +553,7 @@ export function buildPavedSurfaces(input: {
     }
   }
   for (const [key, node] of nodes) if (node.roads >= 2) raw.get(key.split(':')[0] as Material)!.push(...disc(node.at, node.radius));
-  for (const area of input.areas) raw.get(area.fill === 'field' ? 'field' : 'carriageway')!.push(...polygonShape(area.rings));
+  for (const area of input.areas) raw.get(area.fill === 'asphalt' ? 'carriageway' : area.fill)!.push(...polygonShape(area.rings));
   for (const m of MATERIALS) raw.set(m, union(raw.get(m)!));
 
   // one outline for everything, pooled, kept out of the buildings

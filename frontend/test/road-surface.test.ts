@@ -77,6 +77,12 @@ test('면 종류: 차도·보행로·계단·횡단, 실내 지상 길과 승강
   assert.equal(k({ roadClass: 'shared' }), 'carriageway');
   assert.equal(k({}), 'pedestrian');
   assert.equal(k({ structure: 'ramp' }), 'pedestrian');
+  // Z08: 포장은 누가 쓰느냐로 정한다(저장된 속성). 차가 제한적으로만 지나는 보행 길·폭 4 m 이상 보행 길은 블록 포장, 인도는 인도
+  assert.equal(k({ structure: 'ramp', vehicleAccess: 'restricted', widthM: 9, name: '차도처럼 보이는 이름' }), 'block');
+  assert.equal(k({ vehicleAccess: 'prohibited', widthM: 6 }), 'block');
+  assert.equal(k({ vehicleAccess: 'prohibited', widthM: 3 }), 'pedestrian');
+  assert.equal(k({ structure: 'sidewalk', widthM: 1.5 }), 'sidewalk');
+  assert.equal(k({ roadClass: 'vehicle', vehicleAccess: 'restricted' }), 'carriageway');
   assert.equal(k({ structure: 'stairs' }), 'stairs');
   assert.equal(k({ structure: 'crossing' }), 'crossing');
   assert.equal(k({ structure: 'elevator' }), null);

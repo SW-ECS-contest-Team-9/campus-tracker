@@ -13,9 +13,17 @@ import { floorFromLevelId } from './floor-colors';
 
 export type P3 = [number, number, number];
 
-export type SurfaceKind = 'pedestrian' | 'stairs' | 'carriageway' | 'crossing';
+/**
+ * Z08: the paving follows who uses the way (decided from the stored attributes, never from the name):
+ *  - carriageway: a real vehicle road (road_class vehicle or shared): asphalt black;
+ *  - block: a pedestrian-priority way a vehicle could pass (vehicle_access restricted: service vehicles only, or a
+ *    written width of at least ROAD_SURFACE.blockMinWidthM) and the plazas: stone / block grey with a block pattern;
+ *  - sidewalk: structure sidewalk: lighter grey slabs (its kerb is the raised structure box where one is modelled);
+ *  - pedestrian: the other, narrow pedestrian ways.
+ */
+export type SurfaceKind = 'pedestrian' | 'sidewalk' | 'block' | 'stairs' | 'carriageway' | 'crossing';
 /** Draw order on the ground: a later kind lies on top where two overlap (a crossing shows on the carriageway). */
-export const SURFACE_KINDS: SurfaceKind[] = ['pedestrian', 'stairs', 'carriageway', 'crossing'];
+export const SURFACE_KINDS: SurfaceKind[] = ['pedestrian', 'sidewalk', 'block', 'stairs', 'carriageway', 'crossing'];
 
 /** Every display constant of the road surfaces. Widths are display defaults, not measurements. */
 export const ROAD_SURFACE = {
@@ -35,7 +43,11 @@ export const ROAD_SURFACE = {
    * grey paving, darker than the ivory campus ground and far from the black. stairs: a darker warm grey.
    * A crossing has the pedestrian tone (no stripes are invented).
    */
-  colors: { carriageway: '#1b1d20', pedestrian: '#9a9388', stairs: '#6b6257', crossing: '#9a9388' } as Record<SurfaceKind, string>,
+  colors: { carriageway: '#1b1d20', pedestrian: '#9a9388', sidewalk: '#c6c2b8', block: '#a5a299', stairs: '#6b6257', crossing: '#9a9388' } as Record<SurfaceKind, string>,
+  /** A pedestrian way with a written width of at least this is pedestrian-priority block paving (wide enough for a service vehicle). */
+  blockMinWidthM: 4,
+  /** The procedural joint pattern of a kind (paving-pattern.ts): 1 = paving blocks in running bond, 2 = square slabs; none for the others. */
+  patterns: { block: 1, sidewalk: 2 } as Partial<Record<SurfaceKind, number>>,
   /** Opacity of an underground way where the ground or a building is in front of it (underground toggle on). */
   undergroundHiddenAlpha: 0.8,
   /** Underground pedestrian ways are drawn this much above their stored height, so they do not flicker on a carriageway at the same height. */
@@ -60,11 +72,12 @@ export function usesNameForUnderground(road: LevelNamed): boolean {
 }
 
 /** Which surface a road is drawn as; null = not drawn (elevators, indoor ways above ground). */
-export function surfaceKind(road: { roadClass: string; structure?: string; buildingId?: string | null; levelId: string | null; name: string | null }): SurfaceKind | null {
+export function surfaceKind(road: { roadClass: string; structure?: string; vehicleAccess?: string | null; widthM?: number | null; buildingId?: string | null; levelId: string | null; name: string | null }): SurfaceKind | null {
   if (road.structure === 'elevator') return null;
   if ((road.buildingId || road.structure === 'indoor_corridor') && !isUnderground(road)) return null;
   if (road.roadClass !== 'pedestrian') return 'carriageway';
-  return road.structure === 'stairs' ? 'stairs' : road.structure === 'crossing' ? 'crossing' : 'pedestrian';
+  if (road.structure === 'stairs' || road.structure === 'crossing' || road.structure === 'sidewalk') return road.structure;
+  return road.vehicleAccess === 'restricted' || (road.widthM ?? 0) >= ROAD_SURFACE.blockMinWidthM ? 'block' : 'pedestrian';
 }
 
 export function roadWidthM(road: { widthM: number | null; roadClass: string; structure?: string }): number {
@@ -193,7 +206,7 @@ export function junctionDisc(center: P3, radiusM: number, arms: P3[], segments =
 }
 
 export type RoadMesh = { positions: number[]; indices: number[] };
-type SurfaceRoad = Pick<CarriagewayRoad, 'name' | 'widthM' | 'levelId' | 'fromNodeId' | 'toNodeId'> & { roadClass: string; structure?: string; buildingId?: string | null; geometry: { coordinates: number[][] } };
+type SurfaceRoad = Pick<CarriagewayRoad, 'name' | 'widthM' | 'levelId' | 'fromNodeId' | 'toNodeId'> & { roadClass: string; structure?: string; vehicleAccess?: string | null; buildingId?: string | null; geometry: { coordinates: number[][] } };
 
 /** Road bands, and a filled circle at every node where two or more of these roads meet (a dead end keeps its square end). */
 function shapes(roads: SurfaceRoad[]) {

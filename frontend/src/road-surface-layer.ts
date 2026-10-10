@@ -3,8 +3,9 @@
 // (see those files for what and why).
 import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS, type MobilityPick } from './mobility-map';
+import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { PAVED, buildPavedSurfaces, type Material, type PavedSurfaces, type SurfaceArea } from './paved-surface';
-import { ROAD_SURFACE, buildRoadSurfaces } from './road-surface';
+import { ROAD_SURFACE, buildRoadSurfaces, isUnderground } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import { clipMesh, type Mesh, type SectionPlane } from './section';
 import { setTerrainClip } from './terrain-clip';
@@ -12,11 +13,12 @@ import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
 
 /**
- * ground: the black paved surface (carriageways, paved areas and the pedestrian ways that belong to them);
- * pedestrian: the other pedestrian ways, stairs and crossings; area: the sports field; underground: every underground way.
+ * ground: the wide paved surfaces: the asphalt of the vehicle roads and vehicle areas, and the block paving of the
+ * pedestrian-priority ways and plazas; pedestrian: the other pedestrian ways, sidewalks, stairs and crossings;
+ * area: the sports field; underground: every underground way.
  */
 export type RoadSurfacePart = 'ground' | 'pedestrian' | 'area' | 'underground';
-const PART: Record<Material, RoadSurfacePart> = { carriageway: 'ground', crossing: 'pedestrian', stairs: 'pedestrian', pedestrian: 'pedestrian', field: 'area' };
+const PART: Record<Material, RoadSurfacePart> = { carriageway: 'ground', block: 'ground', crossing: 'pedestrian', stairs: 'pedestrian', sidewalk: 'pedestrian', pedestrian: 'pedestrian', field: 'area' };
 
 export type RoadSurfaceSources = {
   /** Ground height at an EPSG:5186 point (the terrain grid the map is drawn from). */
@@ -28,21 +30,33 @@ export type RoadSurfaceSources = {
   pickable?: boolean;
 };
 
-/** The filled open areas of mobility-map.ts (AREA_FILLS) that are outdoors: these are drawn here, merged with the roads. */
-export function surfaceAreas(areas: LayerArea[]): SurfaceArea[] {
+/**
+ * The outdoor open areas that are drawn here as filled surfaces, merged with the roads. Z08: what an area is paved
+ * with follows who uses it, from the stored attributes: `asphalt` when vehicles drive on it (kind parking, or a
+ * vehicle / shared road above ground ends inside it: a turnaround), `block` for the other plazas (pedestrian),
+ * `field` for the sports field (AREA_FILLS).
+ */
+export function surfaceAreas(areas: LayerArea[], roads: Pick<CarriagewayRoad, 'roadClass' | 'levelId' | 'name' | 'buildingId' | 'geometry'>[] = []): SurfaceArea[] {
   const metres = (ring: number[][]) => ring.slice(0, -1).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
+  const inside = (p: number[], ring: number[][]) => {
+    let hit = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) if (ring[i][1] > p[1] !== ring[j][1] > p[1] && p[0] < ((ring[j][0] - ring[i][0]) * (p[1] - ring[i][1])) / (ring[j][1] - ring[i][1]) + ring[i][0]) hit = !hit;
+    return hit;
+  };
+  const ends = roads.filter((r) => r.roadClass !== 'pedestrian' && !isUnderground(r)).flatMap((r) => [r.geometry.coordinates[0], r.geometry.coordinates[r.geometry.coordinates.length - 1]]);
   return areas.flatMap((a) => {
-    const fill = AREA_FILLS.find((f) => f.match(a));
-    if (!fill || (a.elevationM != null && (a.buildingId || a.floor))) return [];
-    return [{ id: a.id, fill: fill.id === 'field' ? 'field' as const : 'asphalt' as const, elevationM: a.elevationM, rings: a.geometry.coordinates.map(metres) }];
+    if (areaSurfacePart(a) === null) return [];
+    const rings = a.geometry.coordinates.map(metres);
+    const fill = AREA_FILLS.find((f) => f.match(a))?.id === 'field' ? 'field' as const : a.kind === 'parking' || ends.some((p) => inside(p, rings[0])) ? 'asphalt' as const : 'block' as const;
+    return [{ id: a.id, fill, elevationM: a.elevationM, rings }];
   });
 }
 
-/** The part an open area is drawn in as a filled surface, or null (an indoor area, or a kind that is not filled). */
+/** The part an open area is drawn in as a filled surface, or null (an indoor area, or a kind that is not filled: only plazas, parking areas and the field are). */
 export function areaSurfacePart(area: { kind: string; name: string | null; elevationM: number | null; buildingId: string | null; floor: string | null }): RoadSurfacePart | null {
-  const fill = AREA_FILLS.find((f) => f.match(area));
-  if (!fill || (area.elevationM != null && (area.buildingId || area.floor))) return null;
-  return fill.id === 'field' ? 'area' : 'ground';
+  if (area.elevationM != null && (area.buildingId || area.floor)) return null;
+  if (AREA_FILLS.find((f) => f.match(area))?.id === 'field') return 'area';
+  return area.kind === 'parking' || area.kind === 'plaza' ? 'ground' : null;
 }
 
 /** What the structures layer tells the surfaces (scene-layers.ts passes it on): `key` changes when anything in it does. */
@@ -96,7 +110,7 @@ export class RoadSurfaceLayer {
     const started = performance.now();
     const metres = (ring: number[][]) => ring.slice(0, -1).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
     this.paved = buildPavedSurfaces({
-      roads: this.roads, areas: surfaceAreas(this.areas), ground: this.src.ground,
+      roads: this.roads, areas: surfaceAreas(this.areas, this.roads), ground: this.src.ground,
       buildings: this.src.buildings().flatMap((b) => b.geometry.coordinates.map((poly) => poly.map(metres))),
       exclude: this.context.exclude, flush: this.context.flush,
     });
@@ -123,7 +137,7 @@ export class RoadSurfaceLayer {
     const shown = (m: Material) => this.visible[PART[m]];
     return {
       surfaces: this.paved.surfaces.filter((s) => shown(s.material)).map((s) => ({ polygons: s.drawn, mesh: s.mesh, stride: 4 })),
-      covered: this.paved.covered.filter((c) => shown(c.material)).map((c) => ({ color: this.color(c.material), polygons: c.polygons })),
+      covered: this.paved.covered.filter((c) => shown(c.material)).map((c) => ({ color: this.color(c.material), pattern: this.pattern(c.material), polygons: c.polygons })),
     };
   }
 
@@ -149,6 +163,10 @@ export class RoadSurfaceLayer {
     return material === 'field' ? AREA_FILLS.find((f) => f.id === 'field')!.color : ROAD_SURFACE.colors[material];
   }
 
+  private pattern(material: Material) {
+    return material === 'field' ? 0 : ROAD_SURFACE.patterns[material] ?? 0;
+  }
+
   private position(x: number, y: number, z = 0) {
     const { latitude, longitude } = tmInverse(x, y);
     return (window as any).Cesium.Cartesian3.fromDegrees(longitude, latitude, z);
@@ -161,7 +179,7 @@ export class RoadSurfaceLayer {
   }
 
   /** Triangles (x, y, height first in each vertex) as one unlit primitive with a colour (r, g, b in 0..255) per vertex. */
-  private primitive(mesh: Mesh, stride: number, rgb: (vertex: number) => number[], id?: object) {
+  private primitive(mesh: Mesh, stride: number, rgb: (vertex: number) => number[], id?: object, pattern = 0) {
     const C = (window as any).Cesium;
     const n = mesh.positions.length / stride;
     const values = new Float64Array(n * 3);
@@ -177,6 +195,7 @@ export class RoadSurfaceLayer {
           attributes: {
             position: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.DOUBLE, componentsPerAttribute: 3, values }),
             color: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.UNSIGNED_BYTE, componentsPerAttribute: 4, normalize: true, values: colors }),
+            paving: pavingAttribute(C, mesh.positions, stride, pattern),
           } as any,
           indices: new Uint32Array(mesh.indices),
           primitiveType: C.PrimitiveType.TRIANGLES,
@@ -184,7 +203,7 @@ export class RoadSurfaceLayer {
         }),
         id,
       }),
-      appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
+      appearance: pavingAppearance(C),
       asynchronous: false,
       allowPicking: this.src.pickable !== false,
     });
@@ -209,7 +228,7 @@ export class RoadSurfaceLayer {
       const mesh = cut(s.mesh, 4);
       // the area keeps its click (Detail panel) where the surface is one area
       const pick: MobilityPick | undefined = s.material === 'field' && field ? { kind: 'mobility', table: 'openAreas', id: field.id } : undefined;
-      if (mesh.indices.length) add(PART[s.material], this.primitive(mesh, 4, (i) => { const t = mesh.positions[i * 4 + 3]; return body.map((v, k) => v + (rim[k] - v) * t); }, pick && { mobilityPick: pick }));
+      if (mesh.indices.length) add(PART[s.material], this.primitive(mesh, 4, (i) => { const t = mesh.positions[i * 4 + 3]; return body.map((v, k) => v + (rim[k] - v) * t); }, pick && { mobilityPick: pick }, this.pattern(s.material)));
       const skirt = cut(s.skirt, 3);
       if (skirt.indices.length) add(PART[s.material], this.primitive(skirt, 3, () => skirtColor));
     }

@@ -33,7 +33,7 @@ mobilityRoutes.get('/mobility', async (req: Request, res: Response) => {
 // preview's road surfaces. Coordinates stay in EPSG:5186 with the stored MSL height (the preview builds metre geometry).
 mobilityRoutes.get('/mobility/roads', async (_req, res) => {
   const { rows } = await pool.query(
-    `SELECT id, name, road_class "roadClass", structure, width_m "widthM", level_id "levelId", building_id "buildingId",
+    `SELECT id, name, road_class "roadClass", structure, vehicle_access "vehicleAccess", width_m "widthM", level_id "levelId", building_id "buildingId",
             from_node_id "fromNodeId", to_node_id "toNodeId", ST_AsGeoJSON(geom, 3)::json geometry
        FROM mobility.road_segments WHERE status IN ('DRAFT', 'APPROVED') AND structure <> 'elevator' ORDER BY created_at, id`,
   );

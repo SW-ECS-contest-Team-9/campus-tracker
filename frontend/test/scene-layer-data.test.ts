@@ -15,7 +15,7 @@ const road = (id: string, more: object = {}) => ({
 test('편집기 자료 → 면 자료: 승강기는 빼고, 나머지 도로는 그대로', () => {
   const data = editorLayerData([road('a'), road('lift', { structure: 'elevator' }), road('car', { roadClass: 'vehicle', widthM: 7.2 })], null, []);
   assert.deepEqual(data.roads.map((r: { id: string }) => r.id), ['a', 'car']);
-  assert.deepEqual(data.roads[1], { id: 'car', name: null, roadClass: 'vehicle', structure: 'ordinary', widthM: 7.2, levelId: null, buildingId: null,
+  assert.deepEqual(data.roads[1], { id: 'car', name: null, roadClass: 'vehicle', structure: 'ordinary', vehicleAccess: null, widthM: 7.2, levelId: null, buildingId: null,
     fromNodeId: 'car-a', toNodeId: 'car-b', geometry: { type: 'LineString', coordinates: [[201100, 557250, 135], [201110, 557250, 135]] } });
 });
 

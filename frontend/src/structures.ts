@@ -52,7 +52,7 @@ export const STRUCTURES = {
  * place for these rules:
  *  1. Inside the outline of a platform the platform is the geometry. A road or an area there is not drawn at its own
  *     height: its material only colours the top of the platform (a carriageway on a platform is a black part of that
- *     platform's plane). Only the materials of `platformTints` do: a pedestrian way does not paint over a platform
+ *     platform's plane; block paving of a pedestrian-priority way likewise, Z08). Only the materials of `platformTints` do: a narrow pedestrian way does not paint over a platform
  *     (the platform is itself the walking surface, as with the sports field), and a `stairs` ribbon does not either
  *     (a platform top is a plane; a stair on it has to be a structure).
  *     Where one material covers at least `sameSurfaceShare` of a platform, the two describe the same surface: the
@@ -67,7 +67,7 @@ export const STRUCTURES = {
  *  4. An open area that is only drawn as a translucent overlay (mobility-map.ts) is not drawn when at least
  *     `areaOnPlatformShare` of it lies on platforms: the platform is that ground.
  */
-export const PRECEDENCE = { stairRibbonReachM: 1, platformTints: ['carriageway', 'crossing', 'field'], sameSurfaceShare: 0.8, areaOnPlatformShare: 0.5 };
+export const PRECEDENCE = { stairRibbonReachM: 1, platformTints: ['carriageway', 'block', 'crossing', 'field'], sameSurfaceShare: 0.8, areaOnPlatformShare: 0.5 };
 
 /** An inclined top: height at a point = the value at its distance along `direction` from `origin` (linear between points, the end values outside). */
 export type TopProfile = { origin: number[]; direction: number[]; points: number[][] };

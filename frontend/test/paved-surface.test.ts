@@ -94,7 +94,7 @@ test('건물 안으로 넘치지 않는다', () => {
   assert.ok(!inside(14.95, 10, pooled));
 });
 
-test('검은 포장면에 드는 보행로: 포장면 안에 든 길, 폭이 적힌 넓은 길이 포장면·차도에 닿을 때', () => {
+test('검은 포장면에 드는 보행로: 포장면 안에 든 길만 (Z08: 닿기만 하는 넓은 보행 길은 블록 포장으로 따로)', () => {
   const plaza = [rect(0, 0, 20, 20)];
   const roads = [
     road('in', [[2, 2, 0], [18, 18, 0]], { roadClass: 'pedestrian' }), // 포장면 안
@@ -106,8 +106,12 @@ test('검은 포장면에 드는 보행로: 포장면 안에 든 길, 폭이 적
     road('car', [[200, 0, 0], [230, 0, 0]], { toNodeId: 'n2' }),
     road('byCar', [[230, 0, 0], [260, 0, 0]], { roadClass: 'pedestrian', widthM: 4, fromNodeId: 'n2' }), // 차도 끝에 이어진 폭 4 m
   ];
-  assert.deepEqual(pavedRoadIds(roads, [plaza]).sort(), ['byCar', 'in', 'wide', 'wide2']);
-  assert.deepEqual(pavedRoadIds(roads, []).sort(), ['byCar']);
+  assert.deepEqual(pavedRoadIds(roads, [plaza]).sort(), ['in']);
+  assert.deepEqual(pavedRoadIds(roads, []).sort(), []);
+  const built = buildPavedSurfaces({ roads, areas: [{ id: 1, fill: 'asphalt', elevationM: null, rings: plaza }], buildings: [], ground: () => 0 });
+  assert.ok(built.surfaces.some((s) => s.material === 'block'), '넓은 보행 길은 블록 포장 면');
+  const blockArea = buildPavedSurfaces({ roads: [], areas: [{ id: 2, fill: 'block', elevationM: 5, rings: plaza }], buildings: [], ground: () => 0 });
+  assert.deepEqual(blockArea.surfaces.map((s) => s.material), ['block'], '보행 광장은 블록 포장 면');
 });
 
 test('길 높이: 저장 높이가 지면과 0.5 m 안이면 저장 높이, 아니면 다듬은 지면', () => {

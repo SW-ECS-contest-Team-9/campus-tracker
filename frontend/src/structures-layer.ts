@@ -7,6 +7,7 @@
 // campus-map.ts already colours ivory), read here in campusRegion().
 import type { SceneBuilding } from './api';
 import { GROUND, buildCampusGround, type CampusGround, type GroundBuilding, type KnownSurface } from './campus-ground';
+import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
@@ -18,7 +19,7 @@ import type { Viewer } from './vworld';
 export type StructurePart = 'structures' | 'ground';
 export type StructurePick = { kind: 'structure'; id: string };
 /** The visible road / area surfaces as drawn (RoadSurfaceLayer.drawn()). */
-export type DrawnSurfaces = { surfaces: KnownSurface[]; covered: { color: string; polygons: Polygon[] }[] };
+export type DrawnSurfaces = { surfaces: KnownSurface[]; covered: { color: string; pattern?: number; polygons: Polygon[] }[] };
 
 export type StructureSources = {
   /** The natural terrain at an EPSG:5186 point (the server grid). */
@@ -36,7 +37,7 @@ export type StructureSources = {
 };
 
 /** Triangles in metres with a colour (0..255) per vertex, and what a click on them selects. */
-type Drawable = { mesh: Mesh; stride: number; rgb: (vertex: number) => number[]; pick?: StructurePick };
+type Drawable = { mesh: Mesh; stride: number; rgb: (vertex: number) => number[]; pick?: StructurePick; /** Joint pattern of the faces (paving-pattern.ts), 0 or missing = none. */ pattern?: number };
 
 async function loadJson(url: string): Promise<any | null> {
   try {
@@ -233,15 +234,15 @@ export class StructuresLayer {
       if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
       if (!polygons) continue;
       const whole = polygons.reduce((sum, q) => sum + polygonArea(q), 0);
-      let covered = this.drawnSurfaces.covered.map((c) => ({ rgb: css(c.color), polygons: polygonOps('both', polygons, c.polygons) }))
+      let covered = this.drawnSurfaces.covered.map((c) => ({ rgb: css(c.color), pattern: c.pattern ?? 0, polygons: polygonOps('both', polygons, c.polygons) }))
         .map((c) => ({ ...c, share: c.polygons.reduce((sum, q) => sum + polygonArea(q), 0) / (whole || 1) })).filter((c) => c.polygons.length);
       // one material over (nearly) the whole platform: the same surface, so the platform top is that material, with the platform's own outline
       const same = covered.find((c) => c.share >= PRECEDENCE.sameSurfaceShare);
       if (same) covered = covered.filter((c) => c !== same && c.share < same.share);
       const plain = covered.length ? polygonOps('minus', polygons, covered.flatMap((c) => c.polygons)) : polygons;
-      for (const part of [{ rgb: same?.rgb ?? top, polygons: plain }, ...covered]) {
+      for (const part of [{ rgb: same?.rgb ?? top, pattern: same?.pattern ?? 0, polygons: plain }, ...covered]) {
         const piece = topMesh(solid, part.polygons);
-        if (piece.indices.length) this.structureParts.push({ mesh: piece, stride: 3, pick, rgb: () => part.rgb });
+        if (piece.indices.length) this.structureParts.push({ mesh: piece, stride: 3, pick, rgb: () => part.rgb, pattern: part.pattern });
       }
     }
   }
@@ -266,6 +267,7 @@ export class StructuresLayer {
         attributes: {
           position: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.DOUBLE, componentsPerAttribute: 3, values }),
           color: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.UNSIGNED_BYTE, componentsPerAttribute: 4, normalize: true, values: colors }),
+          paving: pavingAttribute(C, d.mesh.positions, d.stride, d.pattern ?? 0),
         } as any,
         indices: new Uint32Array(d.mesh.indices),
         primitiveType: C.PrimitiveType.TRIANGLES,
@@ -283,7 +285,7 @@ export class StructuresLayer {
     if (!instances.length) return;
     this.prims.add(new C.Primitive({
       geometryInstances: instances,
-      appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
+      appearance: pavingAppearance(C),
       asynchronous: false,
       allowPicking: pickable && this.src.pickable !== false,
     }));
@@ -379,7 +381,7 @@ export class StructuresLayer {
     }
     // not cut again: the faces lie in the plane
     const instances = parts.map((d) => this.instance(d));
-    if (instances.length) this.prims.add(new C.Primitive({ geometryInstances: instances, appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }), asynchronous: false, allowPicking: false }));
+    if (instances.length) this.prims.add(new C.Primitive({ geometryInstances: instances, appearance: pavingAppearance(C), asynchronous: false, allowPicking: false }));
     this.prims.add(labels);
   }
 
