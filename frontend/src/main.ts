@@ -18,6 +18,7 @@ import { initVWorld, type Viewer } from './vworld';
 import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campus-map';
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
+import { RoadSurfaceLayer } from './road-surface-layer';
 
 /** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
 const MAP_ENGINE: 'campus' | 'vworld' = import.meta.env.VITE_MAP_ENGINE === 'vworld' ? 'vworld' : 'campus';
@@ -59,6 +60,7 @@ const lab = new Lab(document.getElementById('lab-panel')!, () => viewer);
 let spatialMapOverlay: SpatialMapOverlay | null = null;
 let campusScene: CampusSceneLayer | null = null;
 let mobilityLayer: MobilityLayer | null = null;
+let roadSurfaces: RoadSurfaceLayer | null = null;
 const tracks = new Map<string, SessionTrack>(); // sessionId -> track
 const trackLoads = new Map<string, Promise<void>>();
 const liveSessionIds = new Set<string>(); // sessions drawn in Live mode
@@ -198,6 +200,7 @@ async function loadInitial() {
 /** After a preview socket reconnect: reload lists and re-fetch loaded tracks (fills any gap). */
 async function onReconnect() {
   void mobilityLayer?.reload().catch(() => undefined); // QGIS edits made while disconnected
+  void roadSurfaces?.reload().catch(() => undefined); // roads edited while disconnected
   await loadInitial();
   await Promise.all([...tracks.keys()].map((id) => reloadTrack(id, true)));
 }
@@ -970,6 +973,11 @@ async function boot() {
         campusScene = r.scene;
         if (r.warning) showMessage(r.warning);
         setupSceneControls();
+        // 차도 면(편집기 도로 중 차가 다니는 길, 읽기 전용): '차도' 기본 표시, '지하 차도'는 체크 시
+        roadSurfaces = new RoadSurfaceLayer(r.viewer);
+        void roadSurfaces.reload().catch((err) => console.error('carriageways unavailable', err));
+        $<HTMLInputElement>('scene-roads').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked));
+        $<HTMLInputElement>('scene-roads-underground').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'underground'));
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));

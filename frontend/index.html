@@ -38,6 +38,8 @@
         <label title="경쟁 후보: v6 표면 후보 끝점에 맞춘 새 추정 계단(출구 옆·A14) + 그 자리 사잇길 면 대체. 끄면 S-MAP 경사면. Corrected 위에서만, 켜면 DRAFT 계단 숨김. 연결 미검증"><input type="checkbox" id="scene-stair-v6" /> v6 계단 후보</label>
         <label title="길 사슬 후보(건물 내외 연결 길). 그래프 상태(아래 선): 초록 = 그래프상 연결, 회색 = 그림만, 주황 = 미검증·보류·끊김, 보라 막대 = 그래프 후보 노드(미검증). 표면 접속(위 선): 노랑 = 미검증(후보 노드 포함), 파랑 = 운영 노드만(물리 접속 별도 검증)"><input type="checkbox" id="scene-path-graph" /> 길 사슬 후보</label>
         <label title="Corridors / open areas / portals drawn in QGIS (schema mobility); updates live when QGIS saves"><input type="checkbox" id="scene-mobility" checked /> Paths</label>
+        <label title="차가 다니는 길(편집기 도로의 차도·보차 혼용)을 검은 면으로 표시. 폭은 도로에 적힌 값, 없으면 표시용 기본값(차도 6 m, 혼용 4 m)"><input type="checkbox" id="scene-roads" checked /> 차도</label>
+        <label title="땅 밑(지형보다 1.5 m 넘게 낮거나 지하층)에 있는 차도. 켜면 땅에 가린 부분이 흐리게 비쳐 보임"><input type="checkbox" id="scene-roads-underground" /> 지하 차도</label>
         <button id="scene-home" type="button" title="Whole campus">⌂</button>
         <button id="scene-top" type="button" title="Top view">⊤</button>
       </span>

@@ -29,6 +29,18 @@ mobilityRoutes.get('/mobility', async (req: Request, res: Response) => {
   res.json({ corridors: corridors.rows, openAreas: areas.rows, portals: portals.rows });
 });
 
+// GET /api/v1/mobility/roads — editor road segments a vehicle drives on (road_class vehicle / shared), read-only, for the
+// preview's carriageway surfaces. Coordinates stay in EPSG:5186 with the stored MSL height (the preview builds metre geometry).
+mobilityRoutes.get('/mobility/roads', async (_req, res) => {
+  const { rows } = await pool.query(
+    `SELECT id, name, road_class "roadClass", structure, width_m "widthM", level_id "levelId",
+            from_node_id "fromNodeId", to_node_id "toNodeId", ST_AsGeoJSON(geom, 3)::json geometry
+       FROM mobility.road_segments WHERE status IN ('DRAFT', 'APPROVED') AND road_class IN ('vehicle', 'shared') ORDER BY created_at, id`,
+  );
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ roads: rows });
+});
+
 // GET /api/v1/mobility/edits?limit=50 — latest QGIS edits (audit log)
 mobilityRoutes.get('/mobility/edits', async (req, res) => {
   const { limit } = z.object({ limit: z.coerce.number().int().min(1).max(500).default(50) }).parse(req.query);

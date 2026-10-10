@@ -267,6 +267,7 @@ QGIS에서 PostGIS 스키마 `mobility`를 직접 편집한다. 저장하면 DB�
 - 모든 추가·수정·삭제는 `mobility.edits`에 이전/이후 값과 함께 남는다(`GET /api/v1/mobility/edits`).
 - 흐름: 저장 → 트리거가 `NOTIFY mobility_changed` → 백엔드 → 소켓 `mobility:changed` → 프리뷰가 `GET /api/v1/mobility`를 다시 읽는다.
 - 프리뷰: 상단 Buildings 그룹의 Paths 토글. 통로는 실제 폭의 띠 + 중심선(일방통행은 화살표), 광장은 반투명 면, 출입구는 이름 붙은 점으로 그린다. 클릭하면 Detail에 속성이 나온다.
+- 차도 면: 편집기 도로(`mobility.road_segments`) 중 차가 다니는 길(`road_class` vehicle·shared)은 `GET /api/v1/mobility/roads`(읽기 전용)로 받아 프리뷰에 검은 면으로 그린다. 토글 `차도`(지상, 지면에 얹음)·`지하 차도`(저장된 높이, 기본 꺼짐). 폭은 `width_m`, 없으면 표시용 기본값(`frontend/src/road-surface.ts`). 편집기 화면의 색·선 규칙은 그대로다.
 
 ### Lab · 반복 측정 이동 지도 (docs/MOBILITY_MAP_PLAN.md 묶음 1)
 

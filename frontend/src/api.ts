@@ -341,6 +341,11 @@ export interface MobilityCorridor extends MobilityBase { widthM: number; oneWay:
 export interface MobilityOpenArea extends MobilityBase { areaM2: number; geometry: { type: 'Polygon'; coordinates: number[][][] } }
 export interface MobilityPortal extends MobilityBase { geometry: { type: 'Point'; coordinates: number[] } }
 export interface MobilitySpaces { corridors: MobilityCorridor[]; openAreas: MobilityOpenArea[]; portals: MobilityPortal[] }
+/** Editor road segment a vehicle drives on (road_class vehicle / shared), read-only for the preview. Coordinates: EPSG:5186 x, y, MSL height. */
+export interface CarriagewayRoad {
+  id: string; name: string | null; roadClass: 'vehicle' | 'shared'; structure: string; widthM: number | null; levelId: string | null;
+  fromNodeId: string; toNodeId: string; geometry: { type: 'LineString'; coordinates: number[][] };
+}
 
 /** Must match the backend (COLLECTOR_DELETE_CONFIRM_TEXT). */
 export const DELETE_CONFIRM_TEXT = '제거하겠습니다.';
@@ -374,6 +379,7 @@ export const api = {
     send<{ ok: true }>('DELETE', `/api/v1/collectors/${encodeURIComponent(collectorId)}`, { confirmText }),
   scene: () => get<CampusScene>('/api/v1/scene'),
   mobility: () => get<MobilitySpaces>('/api/v1/mobility'),
+  roads: () => get<{ roads: CarriagewayRoad[] }>('/api/v1/mobility/roads'),
   terrainGrid: async (): Promise<TerrainGrid> => {
     const res = await fetch(`${API_BASE_URL}/api/v1/terrain/grid`);
     if (!res.ok) throw new Error(`terrain grid: HTTP ${res.status}`);
