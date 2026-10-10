@@ -1,0 +1,206 @@
+{
+ "new": "terrain-z03-preview.f32",
+ "old": "terrain-after-recipe-17f07ed60e1e84cd.f32",
+ "platforms": {
+  "Z03-ROAD-A": {
+   "cells": 114,
+   "old_minus_plane_m": [
+    -8.73,
+    -0.01,
+    0.07
+   ]
+  },
+  "Z03-ROAD-B": {
+   "cells": 152,
+   "old_minus_plane_m": [
+    -1.95,
+    -0.0,
+    4.61
+   ]
+  },
+  "Z03-BANK-S": {
+   "cells": 18,
+   "old_minus_plane_m": [
+    -10.33,
+    -7.73,
+    -4.27
+   ]
+  },
+  "Z03-BANK-N-LOW": {
+   "cells": 15,
+   "old_minus_plane_m": [
+    -0.15,
+    3.03,
+    5.4
+   ]
+  },
+  "Z03-BANK-N-UP": {
+   "cells": 14,
+   "old_minus_plane_m": [
+    -1.07,
+    -0.24,
+    1.45
+   ]
+  },
+  "Z03-TERRACE-S": {
+   "cells": 44,
+   "old_minus_plane_m": [
+    -14.53,
+    -12.99,
+    -7.55
+   ]
+  },
+  "Z03-PLAZA": {
+   "cells": 253,
+   "old_minus_plane_m": [
+    -13.18,
+    -3.44,
+    10.13
+   ]
+  }
+ },
+ "changed": {
+  "cells": 614,
+  "in_platforms": 610,
+  "outside_platforms": 4,
+  "building_cells": 0,
+  "min": -10.13,
+  "max": 14.53
+ },
+ "plane_fit_max_abs_m": 0.0,
+ "old_cells_off_plane_by_0.3m": 351,
+ "new_cells_off_plane_by_0.3m": 0,
+ "vs_smap_Z03-PLAZA": {
+  "points": 3423,
+  "old": {
+   "median": -2.4,
+   "p90_abs": 8.32,
+   "max_abs": 13.02
+  },
+  "new": {
+   "median": 0.09,
+   "p90_abs": 0.42,
+   "max_abs": 10.0
+  }
+ },
+ "vs_smap_Z03-ROAD-A": {
+  "points": 1392,
+  "old": {
+   "median": 0.04,
+   "p90_abs": 0.47,
+   "max_abs": 5.09
+  },
+  "new": {
+   "median": 0.1,
+   "p90_abs": 0.41,
+   "max_abs": 0.93
+  }
+ },
+ "vs_smap_Z03-ROAD-B": {
+  "points": 1949,
+  "old": {
+   "median": -0.09,
+   "p90_abs": 1.02,
+   "max_abs": 5.5
+  },
+  "new": {
+   "median": -0.08,
+   "p90_abs": 0.79,
+   "max_abs": 1.88
+  }
+ },
+ "vs_smap_Z03-TERRACE-S": {
+  "points": 414,
+  "old": {
+   "median": -12.87,
+   "p90_abs": 13.52,
+   "max_abs": 14.35
+  },
+  "new": {
+   "median": 0.07,
+   "p90_abs": 0.45,
+   "max_abs": 7.47
+  }
+ },
+ "user_pins": [
+  {
+   "id": "U019",
+   "user_m": 111.3,
+   "platform": "Z03-TERRACE-S",
+   "old": 105.57,
+   "new": 114.3
+  },
+  {
+   "id": "U023",
+   "user_m": 114.1,
+   "platform": "Z03-TERRACE-S",
+   "old": 101.38,
+   "new": 114.3
+  },
+  {
+   "id": "U025",
+   "user_m": 109.7,
+   "platform": "Z03-ROAD-A",
+   "old": 109.83,
+   "new": 109.8
+  },
+  {
+   "id": "U027",
+   "user_m": 114.1,
+   "platform": "Z03-PLAZA",
+   "old": 106.29,
+   "new": 114.1
+  },
+  {
+   "id": "U029",
+   "user_m": 110.9,
+   "platform": "Z03-ROAD-A",
+   "old": 110.88,
+   "new": 110.87
+  },
+  {
+   "id": "U038",
+   "user_m": 113.9,
+   "platform": "Z03-ROAD-B",
+   "old": 113.83,
+   "new": 113.84
+  },
+  {
+   "id": "U039",
+   "user_m": 114.1,
+   "platform": "Z03-PLAZA",
+   "old": 106.59,
+   "new": 114.1
+  },
+  {
+   "id": "U040",
+   "user_m": 114.1,
+   "platform": "Z03-PLAZA",
+   "old": 106.81,
+   "new": 114.1
+  },
+  {
+   "id": "U041",
+   "user_m": 114.1,
+   "platform": "Z03-PLAZA",
+   "old": 116.02,
+   "new": 114.1
+  },
+  {
+   "id": "U045",
+   "user_m": 114.2,
+   "platform": "Z03-PLAZA",
+   "old": 118.85,
+   "new": 114.1
+  },
+  {
+   "id": "U048",
+   "user_m": 116.9,
+   "platform": "Z03-ROAD-B",
+   "old": 116.76,
+   "new": 116.75
+  }
+ ],
+ "user_pins_max_abs_new": 3.0,
+ "user_pins_max_abs_old": 12.72
+}

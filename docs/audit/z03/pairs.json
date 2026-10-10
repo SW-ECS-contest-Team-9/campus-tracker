@@ -1,0 +1,77 @@
+{
+ "note": "Z03 도달 검사 쌍. point 는 가장 가까운 노드(평면, snapRadiusM 안)로 붙는다.",
+ "pairs": [
+  {
+   "id": "gate>yudam6F",
+   "label": "정문(공도 분기) → 유담관 6층 로비 문(학교 표지)",
+   "from": {
+    "point": [
+     201134.83,
+     557097.35
+    ]
+   },
+   "to": {
+    "point": [
+     201057.2,
+     557234.5
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "yudam6F>turn",
+   "label": "유담관 6층 로비 문 → 회차 공간(차도가 포장면에 닿는 곳)",
+   "from": {
+    "point": [
+     201057.2,
+     557234.5
+    ]
+   },
+   "to": {
+    "point": [
+     201017.81,
+     557344.49
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "yudam6F>yudam9F",
+   "label": "유담관 6층 로비 문 → 유담관 9층 쪽 실내 홀(129.6 m)",
+   "from": {
+    "point": [
+     201057.2,
+     557234.5
+    ]
+   },
+   "to": {
+    "point": [
+     201040.0,
+     557275.0
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 3
+  },
+  {
+   "id": "yudam6F>bukak1F",
+   "label": "유담관 6층 로비 문 → 북악관 정문 계단 아래",
+   "from": {
+    "point": [
+     201057.2,
+     557234.5
+    ]
+   },
+   "to": {
+    "point": [
+     201041.7,
+     557360.5
+    ]
+   },
+   "vehicle": false,
+   "snapRadiusM": 5
+  }
+ ]
+}
