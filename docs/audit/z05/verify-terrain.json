@@ -1,0 +1,123 @@
+{
+ "new": "terrain-recipe-db6f273b5da6c35c.f32",
+ "old": "terrain-recipe-a334b116df79c91e.f32",
+ "finished_zones": {
+  "g02": {
+   "platform_cells": 554,
+   "changed_vs_z04": 0,
+   "max_abs_off_plane_m": 0.2825,
+   "cells_off_plane_0.3m_old": 0,
+   "cells_off_plane_0.3m_new": 0
+  },
+  "z02": {
+   "platform_cells": 200,
+   "changed_vs_z04": 0,
+   "max_abs_off_plane_m": 0.0,
+   "cells_off_plane_0.3m_old": 0,
+   "cells_off_plane_0.3m_new": 0
+  },
+  "z03": {
+   "platform_cells": 597,
+   "changed_vs_z04": 0,
+   "max_abs_off_plane_m": 0.0002,
+   "cells_off_plane_0.3m_old": 0,
+   "cells_off_plane_0.3m_new": 0
+  }
+ },
+ "changed": {
+  "cells": 11681,
+  "building_cells": 0,
+  "in_z05_platforms": 7130,
+  "in_finished_zone_platforms": 0,
+  "elsewhere": 4551,
+  "min": -34.68,
+  "max": 17.0
+ },
+ "z05_platform_cells": 7353,
+ "z05_max_abs_off_plane_m": 16.8,
+ "vs_smap_1m_in_campus": {
+  "points": 32137,
+  "z04": {
+   "median": -0.0,
+   "p50_abs": 0.11,
+   "p90_abs": 1.34
+  },
+  "z05": {
+   "median": -0.02,
+   "p50_abs": 0.14,
+   "p90_abs": 2.3
+  }
+ },
+ "vs_smap_1m_outside_sw": {
+  "points": 9423,
+  "z04": {
+   "median": 0.14,
+   "p90_abs": 3.29
+  },
+  "z05": {
+   "median": 0.1,
+   "p90_abs": 1.49
+  }
+ },
+ "user_pins": {
+  "n": 84,
+  "z04_p90_abs": 1.73,
+  "z05_p90_abs": 1.04,
+  "z05_over_1m": [
+   {
+    "id": "U013",
+    "user_m": 105.9,
+    "z04": 111.0,
+    "z05": 107.96
+   },
+   {
+    "id": "U016",
+    "user_m": 106.4,
+    "z04": 111.0,
+    "z05": 108.15
+   },
+   {
+    "id": "U019",
+    "user_m": 111.3,
+    "z04": 114.3,
+    "z05": 114.3
+   },
+   {
+    "id": "U037",
+    "user_m": 114.1,
+    "z04": 94.21,
+    "z05": 94.0
+   },
+   {
+    "id": "U054",
+    "user_m": 127.7,
+    "z04": 129.8,
+    "z05": 131.8
+   },
+   {
+    "id": "U060",
+    "user_m": 126.1,
+    "z04": 126.26,
+    "z05": 127.2
+   },
+   {
+    "id": "U061",
+    "user_m": 122.6,
+    "z04": 122.12,
+    "z05": 124.91
+   },
+   {
+    "id": "U068",
+    "user_m": 124.8,
+    "z04": 124.6,
+    "z05": 126.09
+   },
+   {
+    "id": "U082",
+    "user_m": 142.9,
+    "z04": 135.3,
+    "z05": 135.3
+   }
+  ]
+ }
+}

@@ -60,9 +60,10 @@ S('upper-branch', 'HANLIM-WGAP-LOW', [(201096.5, 557283), (201104.0, 557283), (2
   '본관 동쪽 끝과 한림관 사이 틈의 바닥: 한림관 1층 앞 높이 그대로. 바깥 계단·비탈은 없다(사용자 2026-10-11). 북쪽 끝은 벽면(위는 한림관 북쪽 낮은 자리 135.3 m, 그 위로 본관 5층–한림관 3층 나무 데크)', '확정(계단·비탈 없음), 추정(바닥 높이·벽면 자리 북좌표 557301)')
 S('upper-branch', 'HANLIM-WGAP-UP', [(201097.0, 557301), (201104.5, 557301), (201104.5, 557313), (201099.0, 557313)], 135.3, CO, '본관·한림관 사이 틈의 윗부분: 한림관 북쪽 낮은 자리(135.3 m)와 같은 높이', 'S-MAP(135.3), 추정(범위)')
 S('upper-branch', 'HAIRPIN-ISLAND', [(201093, 557255.5), (201093, 557268), (201100, 557272), (201106, 557268), (201106, 557255.5)], 'med', PL, '위쪽 갈래 굽이 안쪽의 섬(화단으로 봄): 한 높이', 'S-MAP(높이), 추정(외곽·재질)')
-S('upper-branch', 'JUNCTION', [(201068, 557250), (201068, 557263), (201083, 557271), (201093, 557268), (201093, 557251), (201084, 557250)], 'fit', PV, '본관 앞 차도·위쪽 갈래·주 진입로가 만나는 갈림 포장', EST)
+S('upper-branch', 'JUNCTION', [(201068, 557250), (201068, 557263), (201074, 557278), (201090, 557280), (201093, 557268), (201093, 557251), (201084, 557250)], 'fit', PV, '본관 앞 차도·위쪽 갈래·주 진입로가 만나는 갈림 포장(굽이 북쪽 모퉁이까지)', EST, clip=(118.8, 123.2),
+  fitpoly=Polygon([(201070, 557252), (201070, 557263), (201083, 557270), (201092, 557267), (201092, 557253)]))
 S('upper-branch', 'MAIN-FRONT', [(201034, 557302), (201034, 557320), (201097, 557320), (201097, 557283), (201100.5, 557283), (201100.5, 557277), (201096, 557279.5), (201090, 557279), (201083, 557272.5)], 'fit', PV,
-  '본관 앞 포장(본관 벽에서 본관 앞 차도까지): 한 경사면', 'S-MAP(높이), 추정(외곽)')
+  '본관 앞 포장(본관 벽에서 본관 앞 차도까지): 한 경사면', 'S-MAP(높이), 추정(외곽)', clip=(121.8, 128.2))
 S('upper-branch', 'HANLIM-SOUTH', [(201111, 557276), (201111, 557284), (201123, 557284), (201123, 557271.5), (201113, 557272)], 'fit', PV, '한림관 남쪽(1층 문 앞 단의 동쪽)', EST)
 # --- 가운데 옹벽(주 진입로와 위쪽 갈래 사이): 벽 한 면, 위는 위쪽 갈래 높이를 따르는 띠 ---
 S('eunju', 'CENTRAL-WALLTOP', [(201099.5, 557256), (201110, 557256), (201110, 557205), (201099.5, 557205)], {'origin': [201104.0, 557256.0], 'direction': [0.0, -1.0], 'points': [[0, 127.3], [6, 127.8], [16, 129.3], [26, 130.2], [36, 130.4], [43, 130.8], [51, 131.0]]}, PL,
@@ -144,7 +145,7 @@ for q in PLATS:
         c = it.representative_point()
         if float(top_z(ot, c.x, c.y)) > float(top_z(q['top'], c.x, c.y)) + 0.3: add.append(it)
     newp.append(big(unary_union([q['poly']] + add).buffer(0).difference(UNDER)))
-for q, g in zip(PLATS, newp): q['poly'] = g
+for q, g in zip(PLATS, newp): q['poly0'] = q['poly']; q['poly'] = g   # poly0(겹치지 않는 외곽)은 지형 입력에, poly(이웃 밑으로 넣은 외곽)는 구조물 파일에
 
 # ---------- 기단 피처 ----------
 def low_around(poly):
@@ -153,7 +154,7 @@ def carries(poly): return (not poly.buffer(-1.4).is_empty) and poly.area >= 16
 feats = defaultdict(list); surf = []; summary = defaultdict(list)
 for q in PLATS:
     zone, top, poly = q['zone'], q['top'], q['poly']; pid = f"Z05-{ABBR[zone]}-{q['name']}"; lo = top if not isinstance(top, dict) else min(p[1] for p in top['points'])
-    terrain = carries(poly); bottom, note = q.get('bottom'), q.get('bottomNote')
+    terrain = carries(q['poly0']); bottom, note = q.get('bottom'), q.get('bottomNote')
     if bottom is None: bottom = round(min(lo, low_around(poly)) - 1.0, 1); note = '둘레 4 m 안 S-MAP 지면·지형의 가장 낮은 값보다 1 m 아래(옆 기단의 윗면보다 아래로 내려 틈이 없게)'
     ass = q['assumption'] if q['kind'] == 'hand' else q['what'] + ('. ' + q['fitinfo'] if q['fitinfo'] else '')
     src = q['source'] if q['kind'] == 'hand' else MESH + ', 구역 노트'
@@ -166,7 +167,7 @@ for q in PLATS:
         sp = {'name': pid, 'srid': 5186, 'reason': q['reason'] if q['kind'] == 'hand' else 'Z05 ' + q['what'].split(':')[0], 'grade': q['grade'], 'source': src}
         if isinstance(top, dict): sp['profile'] = top
         else: sp['heightM'] = top
-        surf.append((lo, {'type': 'Feature', 'properties': sp, 'geometry': gm}))
+        surf.append((lo, {'type': 'Feature', 'properties': sp, 'geometry': geom(q['poly0'])}))
     summary[zone].append({'id': pr['id'], 'what': ass.split(':')[0], 'top': top if not isinstance(top, dict) else [top['points'][0][1], top['points'][-1][1]], 'area': round(poly.area, 1), 'grade': q['grade'], 'material': q['material'], 'terrain': terrain, 'kind': q['kind']})
 def ground(x, y):
     """그 자리 기단 윗면 높이(없으면 None). 겹치면 높은 쪽."""
