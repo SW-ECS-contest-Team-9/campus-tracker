@@ -111,6 +111,17 @@ add(building='문예관·대일관 사이', op='create_road', chain='1a', roadId
     evidence=f"사용자 그림(사진 10): 대일관 서쪽 끝에서 온 길이 갈림 지점에서 남서쪽으로 짧게 내려간다. 그 끝이 문예관 옆 오르막 c52095ad 의 위 끝 노드 4f294196 에서 {a14['stubEndToNodeM']} m 다. S-MAP 지면 {a14['stub'][0][2]} → {a14['stub'][-1][2]} m. 사슬 1a 의 빠진 구간(A14 아래 끝)이 여기다. 2차 후보의 A14 아래 끝 (201118, 557312, 141.3)은 사용자 그림 위에 없어 거둔다")
 add(building='문예관·대일관 사이', op='shift_z', chain='1a·2b', roadIds=sorted(r['id'] for r in roads if r['id'][:8] in ('618385b9', 'a7a51d3c', 'fdb059c4', '9112314a', '3ab80c19')), deltaM=None, storedM=[143.8, 142.44], smapM=a14['eastBranchZ'] + [a14['forkZ']], grade='S-MAP(높이) / 평면 일치는 추정',
     evidence=f"사용자 그림의 동쪽 갈래와 문예관 쪽 갈래는 운영 길 618385b9 서쪽 절반 → a7a51d3c → fdb059c4 → 9112314a → 3ab80c19 와 {a14['lineToRoadsM']} m 안에서 겹친다(확정: 이 길이 실제 동선). 그 자리 S-MAP 지면은 {a14['eastBranchZ'][0]}~{a14['eastBranchZ'][1]} m, 갈림 지점 {a14['forkZ']} m 로 저장 높이(143.8, 142.44)보다 1.6~1.8 m 높다. G1 묶음이라 끝점별로 다시 정해야 한다(통째 이동 아님)")
+# ---- B07 (2026-10-10): 사용자 그림 14(본관·북악관 사이 지하 공간). 범례는 확정, 좌표는 그림에서 옮긴 추정(±2 m). 모두 제안만.
+D14 = json.loads((pathlib.Path(__file__).resolve().parent.parent / 'b07/drawing14.json').read_text(encoding='utf-8')); f14 = D14['features']
+z14 = lambda q: [*q['xy'], q['smap'][0] if q['smap'][1] == 'terrain' else None]
+add(building='본관·북악관 사이', op='create_road', chain='2d', roadIds=[], structure='ordinary(실외 보행: 계단 위 → 횡단보도 → 통로 → 북악관 벽 앞 계단)',
+    coordinates=[z14(f14['mainSideStairs']['centre']), z14(f14['crossing']['from']), z14(f14['crossing']['to']), z14(f14['bukakPassage']['centre']), z14(f14['bukakStairs']['centre'])],
+    grade='확정(계단·횡단보도·통로·계단이 이 순서로 있다: 사용자 그림 14) / 평면 추정(±2 m) / 높이 S-MAP 지상 면(계단 아래·통로 바닥 높이는 모름)',
+    evidence=f"사용자 그림 14: 본관 북서 모서리 앞 계단(본관 입구(2) 표지에서 {D14['compare']['markers']['본관 입구(2)']['toMainSideStairsM']} m) → 차도를 건너는 횡단보도 → 북악관 쪽 통로(상자) → 북악관 벽 앞 계단(북악관 입구(1) 표지에서 {D14['compare']['markers']['북악관 입구(1)']['toBukakStairsM']} m). 두 계단이 오르는지 내리는지, 통로가 지상인지 지하인지는 그림에 없다(모름). 마지막 점은 건물 칸이라 높이 없음")
+add(building='북악관', op='no_change', roadIds=sorted(r['id'] for r in roads if r['id'][:8] in ('f99540e3', '8fde6a04')), grade='추정',
+    evidence=f"운영 길 f99540e3('북악관 B1 진입 계단 (추정)')과 8fde6a04 의 북악관 쪽 끝은 사용자 그림 14 의 북악관 벽 앞 계단에서 {D14['compare']['markers']['8fde6a04 끝(북악관 B1 진입 계단 아래)']['toBukakStairsM']} m 다. 계단 자리는 그림과 맞는다. 다만 8fde6a04 는 951c157d 아래 끝에서 지하로 곧장 이어지는 차량 선으로 저장돼 있고, 그림은 그 사이를 지상의 횡단보도와 통로로 그렸다. 두 지하 공간이 지하로 이어지는지는 모름: 그대로 두고 사용자 확인 뒤 정한다")
+add(building='북악관', op='record_only', roadIds=[], coordinates=[f14['bukakWallStrip']['from']['xy'], f14['bukakWallStrip']['to']['xy']], grade='확정(북악관 남쪽 벽을 따라 지하 공간이 있다: 사용자 그림 14) / 평면 추정(±2 m) / 깊이 모름',
+    evidence=f"붉은 선 길이 {f14['bukakWallStrip']['lengthM']} m. B06 의 GS25 문 (201008.5, 557395.0)은 이 선의 서쪽 끝에서 {D14['compare']['markers']['B06 GS25 문(북악관 입구(4)를 서쪽 끝 벽 앞으로 옮긴 자리)']['toBukakWallStripM']} m 떨어진 서쪽 끝 벽에 있고 그림 범위 밖이다. 이 지하 공간이 B1(GS25) 층인지는 그림에 없다(모름). 실내 길을 만들지 않는다")
 count = collections.Counter((p['op'], p['grade']) for p in P)
 json.dump({'method': __doc__, 'snapshot': 'roads-live-2.json (128 roads)', 'applied': False, 'perBuilding': T, 'bukakLadderVsRoof': bukak,
            'proposals': P, 'proposalCounts': {f'{a} / {b}': c for (a, b), c in sorted(count.items())}}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

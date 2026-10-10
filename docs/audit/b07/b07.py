@@ -1,6 +1,6 @@
 """B07 — 한림관 층 높이 다시 추론, 나란한 두 내리막길(위 보행로 / 한 층 아래 지하 차도) 대조. 읽기 전용, DB 없음, 적용 없음.
 
-  python docs/audit/b07/b07.py <audit-dir> docs/audit/b07/results.json
+  python docs/audit/b07/b07.py <audit-dir> docs/audit/b07/results.json      (먼저 drawing14.py 를 돌려 drawing14.json 을 만든다)
 
 입력: <audit-dir>/e05/smap-mesh-*.txt (S-MAP 화면 판독 격자, 독립 측량 아님), <audit-dir>/claude-live/roads-live-2.json (운영 스냅숏 2).
 사용자 확정(2026-10-10, 근거: <audit-dir>/사용자-출입구·주차장-20261010/근거.md 와 허브 표):
@@ -18,6 +18,7 @@ sys.path.insert(0, str(HERE.parent / 'b03'))
 from common import TERRAIN, FIELD_M, load_cells
 
 audit, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+D14 = json.loads((HERE / 'drawing14.json').read_text(encoding='utf-8'))['features']
 C = load_cells(audit / 'e05')
 ROADS = {r['id'][:8]: r for r in json.loads((audit / 'claude-live/roads-live-2.json').read_text(encoding='utf-8'))['items']}
 r1 = lambda v: round(float(v), 1); r2 = lambda v: round(float(v), 2)
@@ -126,7 +127,7 @@ fit = {
     'busStopSide': {'bottom951ToP1SignEntranceM': r1(d(bot, P1)), 'p1ThresholdM': P1[2], 'bottom951ToBusStopsM': {k: r1(d(bot, v)) for k, v in BUS.items()}, 'busStopGroundM': {k: v[2] for k, v in BUS.items()},
                     'bottom951ToMainEntrance2M': r1(d(bot, MAIN_ENT2)), 'mainEntrance2GroundM': MAIN_ENT2[2], 'surfaceAbove951BottomM': prof['951c157d']['vertices'][-1]['smap'],
                     'p1ToBusStopsM': {k: r1(d(P1, v)) for k, v in BUS.items()},
-                    'reading': '아래 끝은 본관 입구(2)("지하주차장과 본관 2층 연결", 원천)에서 16 m, 표지판 P1 입구에서 53 m. 그 자리 지면 132.4 m 보다 5.6 m 아래. 표지판 P1 입구는 버스 정류장에서 10~15 m 이고 문턱 127.9 m: 사용자의 "버스 정류장 근처 제2 지하주차장 입구" 후보(추정, 확인 전)'},
+                    'reading': '아래 끝은 본관 입구(2)("지하주차장과 본관 2층 연결", 원천)에서 16 m, 사용자가 그린 계단(그림 14)에서 15 m, 표지판 P1 입구에서 53 m. 그 자리 지면 132.4 m 보다 5.6 m 아래. 표지판 P1 입구는 버스 정류장에서 10~15 m 이고 문턱 127.9 m: 사용자의 "버스 정류장 근처 제2 지하주차장 입구" 후보(추정, 확인 전)'},
 }
 nook = {'northOfHanlim': box(201104, 557309, 201114, 557314), 'gapMainHanlimWest': box(201099, 557296, 201104, 557308), 'eastStrip': box(201128, 557286, 201131, 557303),
         'terraceSE': box(201126, 557273, 201128, 557282),
@@ -138,9 +139,12 @@ under = {
         {'what': '서문 터널 입구 두 칸', 'xy': [200984.0, 557399.5], 'z': 117.0, 'grade': '확정(서문으로 드나드는 차가 이 차도를 쓴다) / 좌표·높이 S-MAP·사진(E09)'},
         {'what': '제2 지하주차장 입구', 'xy': None, 'z': None, 'grade': '확정(버스 정류장 근처, 유담관 9층으로 가는 보행 길 아래) / 위치 모름', 'candidate': {'what': '표지판 P1 입구', 'xy': list(P1[:2]), 'z': P1[2], 'grade': '추정'}},
         {'what': '본관 5층–한림관 3층 연결 데크(보행)', 'xy': list(DECK), 'z': F3, 'grade': '확정(이 길에서만 간다) / 좌표 = 학교 표지(원천) / 높이 추정'},
-        {'what': '북악관 B1(GS25 문)로 가는 길이 갈리는 곳', 'xy': None, 'z': None, 'grade': '확정(지하 차도가 시작하는 부근) / 위치 모름'},
+        {'what': '본관 북쪽 벽 옆의 지하 공간(사용자 그림 14 의 붉은 두 줄)', 'from': D14['mainSideStrip']['startsAt']['xy'], 'to': D14['mainSideStrip']['centreline'][-1]['xy'], 'continuesBeyondDrawing': True, 'widthM': D14['mainSideStrip']['widthM'], 'z': None,
+         'grade': '확정(지하 공간이 있다: 사용자 그림) / 평면 추정(±2 m) / 깊이 모름. 이것이 지하 차도 자체인지는 그림에 적혀 있지 않다(추정)'},
+        {'what': '그 띠의 회차 공간 쪽 끝의 계단(본관 북서 모서리 앞)', 'xy': D14['mainSideStairs']['centre']['xy'], 'surfaceZ': D14['mainSideStairs']['centre']['smap'][0], 'grade': '확정(계단이 있다) / 평면 추정(±2 m). 본관 입구(2) 표지에서 3.6 m'},
         {'what': '본관 입구(2): 지하주차장과 본관 2층 연결', 'xy': list(MAIN_ENT2[:2]), 'z': MAIN_ENT2[2], 'grade': '원천(학교 문구). 이 지하 차도와 이어지는지는 모름'}],
-    'onlyExistingGeometryHint': {'roads': ['951c157d', '8fde6a04', '66f166a8'], 'grade': '추정(운영 도로망의 "추정" 선. 이 지하 차도라는 확인은 없다)'},
+    'onlyExistingGeometryHint': {'roads': ['951c157d', '66f166a8'], 'grade': '추정(운영 도로망의 "추정" 선. 이 지하 차도라는 확인은 없다)',
+                                 'vsDrawing14': '951c157d 는 본관 벽에서 8.5~9.2 m, 사용자가 그린 띠의 가운데는 1.9~3.8 m: 나란하지만 5~7 m 북쪽에 저장돼 있다(옮긴 좌표 오차 2 m)'},
     'openToSky': 'S-MAP 에서 951c157d 의 선 위는 끊김 없는 포장면(위 보행로)이다: 그 구간은 덮여 있다. 열린 곳으로 보이는 것은 서문 입구, 표지판 P1 입구, 한림관 북쪽 모퉁이뿐(추정)'}
 res = {'method': __doc__, 'fieldM': FIELD_M, 'hanlim': hanlim, 'eunju1': eunju1,
        'corridor': {'roads': prof, 'upperPathCrossSections': cross, 'fit951': fit, 'nook': nook, 'undergroundRoad': under,

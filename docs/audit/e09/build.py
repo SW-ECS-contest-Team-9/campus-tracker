@@ -193,7 +193,7 @@ for r in roads:
 # 드나드는 차가 이 차도를 쓰고, 오르막 방향 오른쪽이 보행 구간이다. 본관 5층–한림관 3층 연결 데크는 이 길에서만 간다.
 # 운영 길 951c157d 가 이 지하 차도의 일부라는 것은 추정(선의 근거는 여전히 없음). 선을 새로 만들지 않는다. 보행 금지로 저장된 속성만 확정과 어긋난다.
 r = byid['951c157d']
-ops.append(dict(id='E09-FIX-951c157d', op='update_road', grade='확정(지하 차도에 보행 구간이 있다) / 추정(이 선이 그 지하 차도라는 것)', applyOnlyAfter='사용자가 지하 차도의 선을 그려 이 선이 맞다고 확인한 뒤',
+ops.append(dict(id='E09-FIX-951c157d', op='update_road', grade='확정(지하 차도에 보행 구간이 있다) / 추정(이 선이 그 지하 차도라는 것)', applyOnlyAfter='사용자가 지하 차도의 선을 확인한 뒤. 사용자 그림 14 의 지하 공간 띠는 본관 벽에서 1.9~3.8 m, 이 선은 8.5~9.2 m 라 평면도 5~7 m 본관 쪽으로 옮겨야 그림과 맞는다(옮기는 것은 제안하지 않음: 깊이·끝을 모름)',
                 why='B07: 지하 차도는 차량 길이고 오르막 방향 오른쪽에 보행 구간이 있다(사용자 확정). 저장된 pedestrianAccess=prohibited 는 어긋난다. 평면·높이는 그대로 둔다(위 보행로 c52095ad 와 층이 다른 별개 길)',
                 args=dict(id=r['id'], expectedRevision=r['revision'], attrs=dict(name='지하 차도 (선은 추정)', pedestrianAccess='allowed'))))
 c5 = byid['c52095ad']['coordinates']
@@ -220,9 +220,10 @@ B07 = json.loads((HERE.parent / 'b07/results.json').read_text(encoding='utf-8'))
 USER_B07 = dict(date='2026-10-10', grade='확정(사용자 말)', twoPaths='문예관·대일관 쪽과 본관·한림관 쪽 사이에 내리막길이 두 줄 나란히 있다. 위 = 문예관 3층 계단으로 이어지는 바깥 보행로, 한 층 아래 = "지하 경사로 통로"',
                 undergroundRoad='"지하 경사로 통로"는 지하 차도다. 서문과 제2 지하주차장(버스 정류장 근처) 입구로 드나드는 차가 쓴다. 오르막 방향 오른쪽은 보행 구간',
                 deck='본관 5층–한림관 3층 연결(실외 나무 데크)은 아래 길(지하 차도)에서만 갈 수 있다. B06 의 "한림관 1층 로비로 가는 둘째 길"은 이 연결을 가리킨 것(사용자: 10번이 5번이다)',
-                bukakB1='북악관 B1(GS25 문)로 가는 다른 길은 이 지하 차도가 시작하는 부근에서 들어간다(위치 모름)',
+                drawing14='사용자 그림(사진 14, 범례 확정): 본관 북쪽 벽 옆에 지하 공간(붉은 두 줄), 그 회차 공간 쪽 끝에 계단, 거기서 북악관 쪽으로 횡단보도, 건너편에 통로(상자)와 계단, 북악관 남쪽 벽을 따라 지하 공간(붉은 선). 좌표는 docs/audit/b07/drawing14.json (평면 ±2 m, 추정)',
+                withdrawn='"북악관 B1(GS25 문)로 가는 길은 지하 차도가 시작하는 부근"이라는 Claude 의 이해는 사용자가 틀렸다고 했다. 쓰지 않는다',
                 surface='회차 공간에서 서문으로 가는 지상 차도가 없다는 E09 판정은 지상에 한해 그대로다. 지하로는 이어진다')
-out = dict(created='2026-10-10', updated='2026-10-10 B07', userStatementsB06=USER_B06, userStatementsB07=USER_B07, undergroundRoadB07=dict(B07['undergroundRoad'], fit951=B07['fit951']), totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
+out = dict(created='2026-10-10', updated='2026-10-10 B07', userStatementsB06=USER_B06, userStatementsB07=USER_B07, undergroundRoadB07=dict(B07['undergroundRoad'], fit951=B07['fit951'], drawing14=json.loads((HERE.parent / 'b07/drawing14.json').read_text(encoding='utf-8'))['features']), totalLengthM=round(total, 1), mainLengthM=round(sum(r['lengthM'] for r in results_seg[:4]), 1), segments=results_seg, junctions=[dict(id=j['id'], xyz=[round(v, 2) for v in j['at']], joins=j['joins']) for j in junctions],
            entrances=ENT, existingVehicleRoads=existing, c951OnPedestrianPath=dict(planDistanceToC52095adM=[round(v, 2) for v in sep]),
            westGate=dict(wallFaceX=[round(p[0], 1) for p in wall], roadZ=API['westGate road']['dem_z'], plazaZ=[130.63, 131.26], markerToWallM=round(float(np.mean([p[0] for p in wall])) - 200967.8, 1)),
            inventory=dict(roads=len(roads), byClass={k: sum(r['roadClass'] == k for r in roads) for k in ('pedestrian', 'shared', 'vehicle')}, vehicleAllowed=sum(r['vehicleAccess'] == 'allowed' for r in roads),
