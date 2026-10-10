@@ -94,8 +94,8 @@ S('gate', 'ROAD-EAST-EDGE', [(201092, 557150), (201127, 557150), (201127, 557197
   {'origin': [201097.0, 557150.0], 'direction': [0.0, 1.0], 'points': [[r2(y - 557150), r2(np.interp(y, _v2[:, 1], _v2[:, 2]))] for y in _ys]}, PV,
   '주 진입로의 동쪽 가장자리(차도와 가운데 옹벽·수인관 벽 사이): 차도 종단과 같은 높이의 띠', 'S-MAP·사용자 핀(차도 종단, V02), 추정(외곽)')
 S('eunju', 'SUIN-SOUTH-EDGE', [(201150, 557108), (201196, 557108), (201196, 557146), (201150, 557146)], 132.1, CO, '수인관 남동 가장자리(건물 덩어리와 캠퍼스 외곽 사이의 좁은 띠): 옥상 높이로 봄', '추정(S-MAP 128~132 m, 무엇인지 모름)')
-S('gate', 'SEOGYEONG-RO', [(201120, 557080), (201166, 557080), (201172, 557100), (201160, 557112), (201150, 557112), (201140.67, 557099.92)], 'fit', PV, '정문 앞 서경로(캠퍼스 밖 공도): 한 경사면', 'S-MAP(높이), 추정(외곽)', outside=True,
-  fitpoly=Polygon([(201126, 557086), (201160, 557086), (201160, 557100), (201140, 557098)]), clip=(105.5, 111.0))
+S('gate', 'SEOGYEONG-RO', [(201120, 557080), (201152, 557080), (201157, 557100), (201150, 557110), (201140.67, 557099.92)], 'fit', PV, '정문 앞 서경로(캠퍼스 밖 공도): 한 경사면', 'S-MAP(높이), 추정(외곽)', outside=True,
+  fitpoly=Polygon([(201126, 557086), (201152, 557086), (201154, 557100), (201140, 557098)]), clip=(105.5, 109.8))
 # --- 혜인관·청운관 둘레: 운동장 높이의 평지 ---
 S('cheongun', 'CHEONGUN-GROUND', [(201200, 557256), (201246, 557304), (201275, 557304), (201275, 557256)], 'med', PV, '청운관 둘레(남·동쪽): 한 높이', EST)
 S('hyein', 'HYEIN-GROUND', [(201190, 557130), (201275, 557130), (201275, 557256), (201200, 557256), (201190, 557200)], 149.0, PV, '혜인관 둘레: 149.0 m 한 높이(메시 149.0~149.5). 남서쪽 끝은 수인관 옥상(132.1 m)과 벽면으로 만난다', EST)
@@ -130,6 +130,21 @@ for gp in parts(gapg, 6):
     if gp.area >= 60: continue
     best = max((q for q in PLATS if not q.get('road')), key=lambda q: gp.buffer(0.5).intersection(q['poly']).area)
     if gp.buffer(0.5).intersection(best['poly']).area > 0.5: best['poly'] = big(unary_union([best['poly'], gp.buffer(0.3)]).buffer(0).difference(unary_union([q['poly'] for q in PLATS if q is not best])).difference(UNDER))
+
+# 벽면에서 틈이 없게: 낮은 기단을 더 높은 이웃 밑으로 0.5 m 넣고, 0.5 m 안의 빈 틈은 메운다(틈이 있으면 그 사이로 중립 바닥이 벽을 타고 올라가 뾰족한 흰 조각으로 보인다)
+def _done_top(f): pr = f['properties']; return pr['topProfile'] if 'topProfile' in pr else pr['topM']
+OTH = [(q['poly'], q['top'], q) for q in PLATS] + [(Polygon(f['geometry']['coordinates'][0]).buffer(0), _done_top(f), None) for f in DONE_F] + [(FIELD, 148.9, None)]
+ALLU = unary_union([o[0] for o in OTH]).buffer(0); newp = []
+for q in PLATS:
+    ring = q['poly'].buffer(0.5); add = [ring.difference(ALLU)]
+    for op, ot, oq in OTH:
+        if oq is q or not ring.intersects(op): continue
+        it = ring.intersection(op)
+        if it.area < 0.05: continue
+        c = it.representative_point()
+        if float(top_z(ot, c.x, c.y)) > float(top_z(q['top'], c.x, c.y)) + 0.3: add.append(it)
+    newp.append(big(unary_union([q['poly']] + add).buffer(0).difference(UNDER)))
+for q, g in zip(PLATS, newp): q['poly'] = g
 
 # ---------- 기단 피처 ----------
 def low_around(poly):
