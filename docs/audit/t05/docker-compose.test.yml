@@ -1,0 +1,25 @@
+# T05 시험용 DB. 운영 DB·다른 프로젝트 컨테이너와 이름·볼륨·포트가 겹치지 않는다.
+#   docker compose -p campus-tracker-test -f docs/audit/t05/docker-compose.test.yml up -d --wait
+name: campus-tracker-test
+services:
+  db:
+    image: imresamu/postgis:16-3.5
+    container_name: campus-tracker-test-db
+    restart: "no"
+    environment:
+      POSTGRES_DB: campus
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: campus
+    ports:
+      - "127.0.0.1:5544:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus -d campus"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+volumes:
+  pgdata:
+    name: campus-tracker-test_pgdata
