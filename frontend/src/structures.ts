@@ -45,6 +45,13 @@ export const STRUCTURES = {
   /** Thin lines along the top edges of these types, so steps read as steps from straight above too (not platforms: two platforms at one height would show a line across one floor). */
   outlined: ['stair_step', 'landing', 'deck', 'canopy'],
   outlineShade: 0.55,
+  /**
+   * Z08: on the cut face of a cross-section these kinds are named with their height (a platform by its top, a box by
+   * bottom–top), so a deck, a corridor floor and its cover can be compared in numbers. One label per kind within
+   * `sectionLabelGapM` along the cut (a flight of landings is not labelled step by step).
+   */
+  sectionLabels: { platform: '기단', deck: '데크', landing: '바닥', canopy: '덮개' } as Record<string, string>,
+  sectionLabelGapM: 6,
 };
 
 /**

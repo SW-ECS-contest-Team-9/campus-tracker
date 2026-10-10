@@ -358,25 +358,41 @@ export class StructuresLayer {
       const positions = points.flatMap(([d, z]) => { const [x, y] = planePoint(plane, d, off); return [x, y, z]; });
       if (indices.length) parts.push({ mesh: { positions, indices }, stride: 3, rgb: () => rgb });
     };
+    const labels = new C.LabelCollection();
+    const text = (d: number, z: number, value: string, below = false) => {
+      const [x, y] = planePoint(plane, d, -0.05);
+      labels.add({
+        position: this.position(x, y, z), text: value, font: '12px system-ui, "Apple SD Gothic Neo", sans-serif',
+        fillColor: C.Color.fromCssColorString('#3b352d'), outlineColor: C.Color.WHITE, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+        horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: below ? C.VerticalOrigin.TOP : C.VerticalOrigin.BOTTOM, pixelOffset: new C.Cartesian2(0, below ? 2 : -2), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      });
+    };
+    const named = new Map<string, number[]>();
     for (const solid of this.solids) {
       if (solid.role === 'void') continue;
       const inside = voids.filter((v) => solid.role === 'platform' && (v.props.inside === undefined || v.props.inside === solid.id));
       const caps = sectionCaps(plane, solid, inside, this.platformPolygons.get(solid) ?? [solid.polygon]);
       face(caps, css(solidColors(solid).body).map((v) => v * 0.8), 0.03);
+      // the height of what is cut, in numbers (STRUCTURES.sectionLabels)
+      const name = STRUCTURES.sectionLabels[solid.role === 'platform' ? 'platform' : solid.type];
+      const points = caps.flat(2);
+      if (!name || !points.length) continue;
+      const from = Math.min(...points.map((p) => p[0])), to = Math.max(...points.map((p) => p[0])), mid = (from + to) / 2;
+      const seen = named.get(name) ?? [];
+      if (to - from < 0.3 || seen.some((d) => Math.abs(d - mid) < STRUCTURES.sectionLabelGapM)) continue;
+      named.set(name, [...seen, mid]);
+      const [x, y] = planePoint(plane, mid);
+      const top = topHeight(solid)(x, y);
+      if (solid.role === 'platform') text(mid, top, `${name} ${top.toFixed(1)} m`, true);
+      else text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`);
     }
-    const labels = new C.LabelCollection();
     let last = -Infinity;
     for (const v of voids) {
       for (const [from, to] of polygonIntervals(plane, v.polygon)) {
         face([[[[from, v.bottomM], [to, v.bottomM], [to, v.topM], [from, v.topM]]]], css(STRUCTURES.voidFace), 0.01);
         if (from - last < 15) continue;
         last = from;
-        const [x, y] = planePoint(plane, (from + to) / 2, -0.05);
-        labels.add({
-          position: this.position(x, y, (v.bottomM + v.topM) / 2), text: `빈 곳 ${v.bottomM.toFixed(1)}–${v.topM.toFixed(1)} m`, font: '12px system-ui, "Apple SD Gothic Neo", sans-serif',
-          fillColor: C.Color.fromCssColorString('#3b352d'), outlineColor: C.Color.WHITE, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
-          horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: C.VerticalOrigin.CENTER, disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        });
+        text((from + to) / 2, (v.bottomM + v.topM) / 2, `빈 곳 ${v.bottomM.toFixed(1)}–${v.topM.toFixed(1)} m`);
       }
     }
     // not cut again: the faces lie in the plane

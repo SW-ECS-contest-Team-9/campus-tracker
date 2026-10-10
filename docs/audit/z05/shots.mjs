@@ -1,6 +1,7 @@
 // Z05: 시험 지도(http://localhost:5273/)를 정해진 시점에서 찍어 파일로 저장한다. 읽기만 한다(DB·서버에 쓰지 않음).
 //   node shots.mjs <views.json> <저장 폴더> <머리말> [시점 이름 일부 ...]
 // --remote-debugging-port=9333 으로 띄운 Chrome 이 있어야 한다. views.json = {이름: {pos:[x,y,z], tgt:[x,y,z], fov}} (EPSG:5186, m)
+// Z08: section.frame: {lowM, highM, backdropM} = 정면 보기에서 보일 높이 범위와, 자른 면 뒤 backdropM 에 세우는 민무늬 벽(먼 건물을 가림). 단면도 도구의 lookAt(frame) 그대로.
 // Z07: 시점에 section: {a:[x,y], b:[x,y], flip?: true, ortho?: true(자른 면 정면 보기), zoom?: {widthM, centerM}(정면 보기에서 보이는 폭과 가운데 높이)} 가 있으면 그 선으로 단면을 켜고 찍은 뒤 끈다(프리뷰의 단면도 기능 그대로).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,7 +37,7 @@ for (const [name, w] of Object.entries(V)) {
   if (w.section) {   // 카메라를 먼저 놓는다(단면은 카메라가 있는 쪽 절반을 숨긴다). ortho: 자른 면을 정면에서 원근 없이
     await ev(`window.__shot(${view}, 2)`);
     // zoom: 폭은 카메라를 옮긴 뒤에 준다(옮기면 폭이 카메라 높이로 되돌아간다)
-    await ev(`(() => { window.__section.setLine(${JSON.stringify(w.section.a)}, ${JSON.stringify(w.section.b)}); if (${!!w.section.flip}) window.__section.flip(); if (${!!w.section.ortho}) window.__section.lookAt(); const z = ${JSON.stringify(w.section.zoom ?? null)}; if (z) { const c = window.__previewViewer.camera; c.moveUp(z.centerM - window.Cesium.Cartographic.fromCartesian(c.positionWC).height); c.frustum.width = z.widthM; } return 1; })()`);
+    await ev(`(() => { window.__section.setLine(${JSON.stringify(w.section.a)}, ${JSON.stringify(w.section.b)}); if (${!!w.section.flip}) window.__section.flip(); if (${!!w.section.ortho}) window.__section.lookAt(${JSON.stringify(w.section.frame ?? {})}); const z = ${JSON.stringify(w.section.zoom ?? null)}; if (z) { const c = window.__previewViewer.camera; c.moveUp(z.centerM - window.Cesium.Cartographic.fromCartesian(c.positionWC).height); c.frustum.width = z.widthM; } return 1; })()`);
     url = w.section.ortho
       ? await ev(`(async () => { const v = window.__previewViewer; for (let k = 0; k < 30; k++) { v.scene.requestRender(); v.render(); await new Promise((r) => setTimeout(r, 250)); } v.render(); return v.scene.canvas.toDataURL('image/jpeg', 0.9); })()`)
       : await ev(`window.__shot(${view}, 30)`);

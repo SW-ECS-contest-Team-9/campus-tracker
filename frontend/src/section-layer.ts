@@ -33,6 +33,8 @@ export const SECTION = {
   baseMarginM: 5,
   /** Lines and marks sit this far in front of the plane, the face this far behind it, so nothing flickers. */
   offsetM: 0.05,
+  /** Z08: the plain wall lookAt() may stand behind the cut, so that far buildings (as large as near ones without perspective) do not crowd the cut face. */
+  backdropColor: '#f4f2ec',
 };
 
 export type Cuttable = { setSection(plane: SectionPlane | null): void };
@@ -68,6 +70,8 @@ export class SectionTool {
   private marker: any = null;
   /** The perspective frustum of the view before lookAt() switched to the orthographic one. */
   private perspective: any = null;
+  /** Distance behind the cut of the plain backdrop wall, or null (lookAt sets it). */
+  private backdropM: number | null = null;
 
   constructor(private readonly viewer: Viewer, private readonly src: SectionSources, private readonly onStatus: (text: string) => void) {}
 
@@ -136,17 +140,26 @@ export class SectionTool {
     // back to the frustum the view had (switchToPerspectiveFrustum would make a default one: near 1 m instead of 0.1 m)
     if (this.perspective) this.viewer.camera.frustum = this.perspective;
     this.perspective = null;
+    this.backdropM = null;
     this.onStatus('');
   }
 
   /**
    * Camera square to the cut, on the hidden side, far enough to see the picked stretch A–B from the base of the face to
    * the highest roof on it. Orthographic (no perspective), so heights can be compared across the cut.
+   * Z08 `frame`: instead look at the heights `lowM`..`highM` only (the stretch A–B still fits), and with `backdropM`
+   * stand a plain wall that far behind the cut: what lies further back is not seen (a far tower no longer fills the
+   * view of a narrow gap).
    */
-  lookAt() {
+  lookAt(frame: { lowM?: number; highM?: number; backdropM?: number | null } = {}) {
     if (!this.plane) return;
     const C = (window as any).Cesium;
-    const { from, to, base, top } = this.frame;
+    if (frame.backdropM !== undefined && frame.backdropM !== this.backdropM) {
+      this.backdropM = frame.backdropM;
+      this.apply();
+    }
+    const { from, to } = this.frame;
+    const base = frame.lowM ?? this.frame.base, top = frame.highM ?? this.frame.top;
     const length = Math.abs(to - from);
     const camera = this.viewer.camera;
     const [x, y] = planePoint(this.plane, (from + to) / 2, -Math.max(300, length * 1.5));
@@ -310,6 +323,22 @@ export class SectionTool {
       appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
       asynchronous: false,
     })));
+
+    if (this.backdropM !== null) {
+      const d0 = Math.min(this.frame.from, this.frame.to) - 200, d1 = Math.max(this.frame.from, this.frame.to) + 200;
+      const corners = [at(d0, base, this.backdropM), at(d1, base, this.backdropM), at(d1, top + 200, this.backdropM), at(d0, top + 200, this.backdropM)];
+      const wall = new Float64Array(corners.flatMap((c) => [c.x, c.y, c.z]));
+      this.drawn.push(this.viewer.scene.primitives.add(new C.Primitive({
+        geometryInstances: new C.GeometryInstance({
+          geometry: new C.Geometry({
+            attributes: { position: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.DOUBLE, componentsPerAttribute: 3, values: wall }) } as any,
+            indices: new Uint32Array([0, 1, 2, 0, 2, 3]), primitiveType: C.PrimitiveType.TRIANGLES, boundingSphere: C.BoundingSphere.fromVertices(wall as unknown as number[]),
+          }),
+          attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString(SECTION.backdropColor)) },
+        }),
+        appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }), asynchronous: false, allowPicking: false,
+      })));
+    }
 
     const lines = new C.PolylineCollection();
     const labels = new C.LabelCollection();
