@@ -579,6 +579,8 @@ function stairChevrons(c: XYZ[]): XYZ[][] {
   }
   return out;
 }
+/** The light halo of a road line: [where it is seen, where something is in front of it]. Made on first use (Cesium is loaded by then). */
+let roadHalo: [any, any] | null = null;
 function drawRoad(r: Road) {
   const coords = r.geometry.coordinates;
   if (coords.length < 2) return;
@@ -597,6 +599,8 @@ function drawRoad(r: Road) {
   }
   // sidewalks get a light edge instead of the dark casing
   const casing = r.structure === 'sidewalk' ? new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(0.95)) : styleProperty(r.id, 'casing');
+  // Z08: a thin light halo outside the dark casing, so a line reads on the black asphalt and on the grey paving alike
+  if (r.structure !== 'sidewalk') addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 8 : 7), material: (roadHalo ??= [0.7, 0.2].map((alpha) => new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(alpha))) as [any, any])[0], depthFailMaterial: roadHalo[1] } });
   addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 5 : 4), material: casing, depthFailMaterial: casing } });
   addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: roadMaterial(r, 'line'), depthFailMaterial: roadMaterial(r, 'fail') } });
   if (r.structure === 'stairs') for (const chevron of stairChevrons(coords)) {
