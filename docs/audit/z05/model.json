@@ -1,12 +1,12 @@
 {
  "crs": "EPSG:5186",
  "counts": {
-  "platforms": 90,
+  "platforms": 91,
   "roadPieces": 37,
   "handOther": 5,
-  "planes": 48,
+  "planes": 49,
   "boxes": 230,
-  "terrainSurfaces": 90,
+  "terrainSurfaces": 91,
   "edgeSamples": 1855,
   "z04": {
    "platforms": 205,
@@ -23,8 +23,8 @@
   "coveredByPlatformsM2": 34241
  },
  "vsSmap1m": {
-  "points": 28783,
-  "p50abs": 0.43,
+  "points": 28779,
+  "p50abs": 0.42,
   "p90abs": 6.02
  },
  "zones": {
@@ -213,7 +213,7 @@
       125.08,
       125.25
      ],
-     "area": 25.4,
+     "area": 24.2,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
      "material": "paving",
      "terrain": true,
@@ -347,7 +347,7 @@
      "id": "Z05-PLATFORM-UPPER-HANLIM-1F",
      "what": "한림관 1층 로비 문 앞 단(계단 위)",
      "top": 127.2,
-     "area": 87.2,
+     "area": 57.7,
      "grade": "확정(한림관 1층은 앞 길에서 계단 몇 개 위), S-MAP(126.9~127.5)",
      "material": "paving",
      "terrain": true,
@@ -426,10 +426,10 @@
      "id": "Z05-PLATFORM-UPPER-MAIN-FRONT-LOW",
      "what": "본관 앞 포장의 아랫단(본관 앞 차도 가장자리 띠)",
      "top": [
-      122.36,
-      125.16
+      122.8,
+      126.0
      ],
-     "area": 142.7,
+     "area": 306.2,
      "grade": "S-MAP·사용자 핀 U068(높이), 추정(벽 선·외곽)",
      "material": "paving",
      "terrain": true,
@@ -439,11 +439,24 @@
      "id": "Z05-PLATFORM-UPPER-MAIN-FRONT",
      "what": "본관 앞 포장의 윗단(본관 벽 앞)",
      "top": [
-      125.83,
+      126.13,
       128.4
      ],
-     "area": 1000.5,
+     "area": 850.8,
      "grade": "S-MAP(높이), 추정(외곽)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-UPPER-HANLIM-FRONT",
+     "what": "한림관 1층 문 앞 단(127.2)과 차도 사이",
+     "top": [
+      125.23,
+      126.6
+     ],
+     "area": 36.9,
+     "grade": "S-MAP·사용자 핀 U060(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -688,7 +701,7 @@
       125.2,
       127.79
      ],
-     "area": 222.6,
+     "area": 217.8,
      "grade": "S-MAP·사용자 핀 U060(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -783,7 +796,7 @@
       121.82,
       122.6
      ],
-     "area": 76.5,
+     "area": 78.7,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
      "material": "paving",
      "terrain": true,
@@ -809,7 +822,7 @@
       123.71,
       126.84
      ],
-     "area": 223.5,
+     "area": 217.0,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
      "material": "paving",
      "terrain": true,
@@ -1392,9 +1405,9 @@
    157
   ],
   "Z05-PLATFORM-UPPER-HANLIM-1F": [
-   0.6,
-   1.04,
-   71
+   0.53,
+   1.02,
+   46
   ],
   "Z05-PLATFORM-YUDAM9-FORECOURT-9F": [
    0.3,
@@ -1497,14 +1510,19 @@
    52
   ],
   "Z05-PLATFORM-UPPER-MAIN-FRONT-LOW": [
-   -0.02,
-   0.38,
-   121
+   0.1,
+   1.11,
+   271
   ],
   "Z05-PLATFORM-UPPER-MAIN-FRONT": [
-   0.14,
-   0.87,
-   874
+   0.11,
+   0.51,
+   724
+  ],
+  "Z05-PLATFORM-UPPER-HANLIM-FRONT": [
+   -0.06,
+   0.38,
+   28
   ],
   "Z05-PLATFORM-UPPER-HANLIM-SOUTH": [
    -0.32,
@@ -1522,9 +1540,9 @@
    245
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-NW": [
-   -1.94,
-   5.59,
-   208
+   -2.03,
+   5.68,
+   201
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-WEST": [
    -0.51,

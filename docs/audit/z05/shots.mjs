@@ -18,6 +18,7 @@ await send('Page.navigate', { url: 'http://localhost:5273/' });
 for (let k = 0; k < 60; k++) { await sleep(1000); if (await ev('!!(window.__previewViewer && window.Cesium)')) break; }
 await sleep(6000);
 await ev(`(async () => { const tm = await import('/src/tm.ts'); const C = window.Cesium, v = window.__previewViewer;
+  v.scene.screenSpaceCameraController.enableCollisionDetection = false;   // Z06: 낮은 시점이 덜 불러온 지형 타일에 밀려 올라가지 않게
   window.__P = (x, y, z) => { const g = tm.tmInverse(x, y); return C.Cartesian3.fromDegrees(g.longitude, g.latitude, z); };
   window.__shot = async (w, n) => { const P = window.__P; const pos = P(...w.pos), tgt = P(...w.tgt), dir = C.Cartesian3.normalize(C.Cartesian3.subtract(tgt, pos, new C.Cartesian3()), new C.Cartesian3());
     let up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(pos, new C.Cartesian3());

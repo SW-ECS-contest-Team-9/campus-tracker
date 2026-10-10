@@ -21,9 +21,9 @@ ROWS = [
 feats = []
 def sq(c, h): return {'type': 'Polygon', 'coordinates': [[[r2(c[0] + a * h), r2(c[1] + b * h)] for a, b in ((-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1))]]}
 def tree(tid, c, z, what, src, base):
-    for part, typ, mat, h, z0, z1 in (('TRUNK', 'tree', 'trunk', 0.2, 0.0, 2.8), ('CROWN', 'tree', 'foliage', 1.6, 2.4, 4.4), ('TOP', 'tree', 'foliage', 0.9, 4.4, 5.4)):
+    for part, typ, mat, h, z0, z1 in (('TRUNK', 'tree', 'trunk', 0.18, 0.0, 3.0), ('CROWN', 'tree', 'foliage', 1.3, 2.8, 4.2), ('TOP', 'tree', 'foliage', 0.75, 4.2, 5.2)):
         feats.append({'type': 'Feature', 'properties': {'id': f'{tid}-{part}', 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': '확정(이 화단에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)', 'basePlane': base,
-            'fromM': r2(z + z0), 'toM': r2(z + z1), 'material': mat, 'assumption': f'{what}: 화단의 긴 축을 따라 고르게 둔 단순한 나무(줄기 0.4 m 각 2.8 m, 잎 덩어리 3.2 m 각 + 1.8 m 각, 전체 5.4 m). 실제 그루 수·자리·수종의 모양이 아니다', 'source': src}, 'geometry': sq(c, h)})
+            'fromM': r2(z + z0), 'toM': r2(z + z1), 'material': mat, 'assumption': f'{what}: 화단의 긴 축을 따라 고르게 둔 단순한 나무(줄기 0.36 m 각 3 m, 잎 덩어리 2.6 m 각 + 1.5 m 각, 전체 5.2 m). 실제 그루 수·자리·수종의 모양이 아니다', 'source': src}, 'geometry': sq(c, h)})
 n = 0
 for files, ids, per, src, what in ROWS:
     for pid in ids:
