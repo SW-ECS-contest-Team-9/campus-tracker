@@ -1,0 +1,49 @@
+{
+ "id": "B",
+ "title": "기존 길 속성 정정(오르막 보행로 2개, 지하 차도 이름·폭)",
+ "comment": "N01-B 문예관 옆 오르막을 보행로로, 지하 차도 951c157d 이름·폭 (근거: 실험 E09 차량 도로와 주차장 입구, B08 갱신)",
+ "evidence": "E09·B08",
+ "ops": [
+  {
+   "ref": "E09-FIX-c52095ad",
+   "op": "update_road",
+   "args": {
+    "id": "c52095ad-8e31-48ee-98b3-e3f925318fed",
+    "expectedRevision": 5,
+    "attrs": {
+     "roadClass": "pedestrian",
+     "vehicleAccess": "restricted",
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정"
+  },
+  {
+   "ref": "E09-FIX-8e71c240",
+   "op": "update_road",
+   "args": {
+    "id": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+    "expectedRevision": 6,
+    "attrs": {
+     "roadClass": "pedestrian",
+     "vehicleAccess": "restricted",
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "추정"
+  },
+  {
+   "ref": "E09-B08-6",
+   "op": "update_road",
+   "args": {
+    "id": "951c157d-5de4-44d0-84ea-931d45d3dfa1",
+    "expectedRevision": 4,
+    "attrs": {
+     "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+     "widthM": 7.2
+    }
+   },
+   "grade": "확정(양방향 지하 차도, 폭 = 횡단보도 길이) / 추정(이 선이 그 차도라는 것, 폭의 값)"
+  }
+ ]
+}

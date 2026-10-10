@@ -1,0 +1,135 @@
+{
+ "id": "F",
+ "title": "운동장 면 접근: 혜인관 문 앞에서 길 자르기, 계단 4개",
+ "comment": "N01-F 운동장 면 접근점과 계단 (근거: 실험 E10 운동장을 면으로, B09 갱신)",
+ "evidence": "E10·B09",
+ "ops": [
+  {
+   "ref": "E10-2",
+   "op": "split_road",
+   "grade": "원천(학교 표지) + 확정(운동장 높이 문 = B1)",
+   "args": {
+    "roadId": "3910b4a5-0b5f-4226-bdf5-8f2c8eca99fb",
+    "expectedRevision": 10,
+    "nearest": [
+     201213.72,
+     557213.9
+    ]
+   },
+   "deviation": "제안의 expectedRevision 1 대신 지금 값 10 (T05에서 확인된 문제)"
+  },
+  {
+   "ref": "E10-5 AP-DAEIL-FRONT",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "대일관 현관 앞 계단 (13단쯤, 위치·높이 추정)",
+    "structure": "stairs",
+    "path": [
+     {
+      "xy": [
+       201157.4,
+       557306.2
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201155.2,
+       557310
+      ],
+      "z": 151
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "아래 끝 = S-MAP 지면이 148.9에서 오르기 시작하는 면 경계(추정 ±2 m) / 위 끝 = 학교 표지 대일관 입구(1)(원천) / 1층 151.0 m = 148.9 + 13단 약 2.1 m(추정 ±0.3)"
+  },
+  {
+   "ref": "E10-5 AP-SANGSEUNG-STAIR-L",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "상승관 왼쪽 계단 (사용자 그림, 위치·높이 추정)",
+    "structure": "stairs",
+    "path": [
+     {
+      "xy": [
+       201204.98,
+       557287.4
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201205.4,
+       557294.5
+      ],
+      "z": 150.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "아래·위 끝 = 사용자 그림의 계단 뭉치 양 끝(추정 ±3 m) / 위 높이 150.9 m = 4.9 m 서쪽 학교 입구 표지 자리의 S-MAP 값(추정. 위 끝 옆 지면은 151.0~151.2 m)"
+  },
+  {
+   "ref": "E10-5 AP-SANGSEUNG-STAIR-R",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "상승관 오른쪽 계단 (사용자 그림, 위치·높이 추정)",
+    "structure": "stairs",
+    "path": [
+     {
+      "xy": [
+       201212.6,
+       557280.2
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201210.8,
+       557294.2
+      ],
+      "z": 152
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "아래 끝 = S-MAP 비탈의 아래 끝(추정 ±4 m) / 위 끝 = 사용자 그림의 뭉치 위 끝(추정 ±3 m) / 위 높이 = 그 자리 S-MAP 지면 152.0 m ~ 안쪽 마당 153.1 m(S-MAP 면이 뭉개져 단 높이는 추정)",
+   "deviation": "위 끝 높이가 범위(152~153.1 m)로만 있어 그 자리 S-MAP 지면 152 m를 썼다"
+  },
+  {
+   "ref": "E10-5 AP-HANLIM-6F",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "한림관 6층 ~ 운동장 높이 계단 (6칸쯤, 위치 추정)",
+    "structure": "stairs",
+    "path": [
+     {
+      "xy": [
+       201140,
+       557304
+      ],
+      "z": 147.9
+     },
+     {
+      "xy": [
+       201149,
+       557304
+      ],
+      "z": 148.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "높이차 약 1 m 확정(사용자) / 아래 끝 = S-MAP 147.6~148.1 m 칸의 가운데(추정 ±3 m). S-MAP은 1 m 계단을 9 m 비탈로 뭉갠다"
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "id": "A",
+ "title": "북악관 위층 계단 끝 노드 병합",
+ "comment": "N01-A 북악관 위층 계단 끝 병합 5건 (근거: 실험 E03 길 사슬 도로망 변경 목록, apply-plan)",
+ "evidence": "E03",
+ "ops": [
+  {
+   "ref": "E03-A1",
+   "op": "merge_nodes",
+   "args": {
+    "keepNodeId": "3d601a75-fd3d-44ad-82d0-65ed26be9204",
+    "removeNodeId": "27aa7e45-0453-4242-a2bf-e56abe03b5db"
+   },
+   "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+  },
+  {
+   "ref": "E03-A2",
+   "op": "merge_nodes",
+   "args": {
+    "keepNodeId": "2c228325-1083-4ac4-a46f-72cc1e073fdf",
+    "removeNodeId": "ce704289-d6f0-4e23-ab11-ac82621818c3"
+   },
+   "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+  },
+  {
+   "ref": "E03-A3",
+   "op": "merge_nodes",
+   "args": {
+    "keepNodeId": "457cc960-64d6-44bc-b13e-607ba3443ef9",
+    "removeNodeId": "7f7fb1a8-df9b-4170-b2e2-b82a435202d3"
+   },
+   "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+  },
+  {
+   "ref": "E03-A4",
+   "op": "merge_nodes",
+   "args": {
+    "keepNodeId": "961562f7-52aa-4b29-8c5a-d1052c019c32",
+    "removeNodeId": "ad3b4f4e-c3e0-4b3b-beed-738a517108d0"
+   },
+   "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+  },
+  {
+   "ref": "E03-A5",
+   "op": "merge_nodes",
+   "args": {
+    "keepNodeId": "e57f45e3-f457-4004-ae0b-91e33563b8b1",
+    "removeNodeId": "963167e1-3f3a-495b-8b67-bdf4b40c69f0"
+   },
+   "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+  }
+ ]
+}

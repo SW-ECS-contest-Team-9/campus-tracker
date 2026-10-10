@@ -1,0 +1,387 @@
+{
+ "title": "N01 시험용 DB 도로 적용 계획",
+ "database": "campus-tracker-test-db (127.0.0.1:5544) only",
+ "stateBefore": "01-state-before-nopairs.json",
+ "order": [
+  {
+   "group": "A",
+   "title": "북악관 위층 계단 끝 노드 병합",
+   "evidence": "E03",
+   "comment": "N01-A 북악관 위층 계단 끝 병합 5건 (근거: 실험 E03 길 사슬 도로망 변경 목록, apply-plan)",
+   "items": [
+    {
+     "ref": "E03-A1",
+     "op": "merge_nodes",
+     "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+    },
+    {
+     "ref": "E03-A2",
+     "op": "merge_nodes",
+     "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+    },
+    {
+     "ref": "E03-A3",
+     "op": "merge_nodes",
+     "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+    },
+    {
+     "ref": "E03-A4",
+     "op": "merge_nodes",
+     "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+    },
+    {
+     "ref": "E03-A5",
+     "op": "merge_nodes",
+     "grade": "A(검사 규칙 LEVEL_NODES_NOT_JOINED, 좌표 차 0)"
+    }
+   ]
+  },
+  {
+   "group": "B",
+   "title": "기존 길 속성 정정(오르막 보행로 2개, 지하 차도 이름·폭)",
+   "evidence": "E09·B08",
+   "comment": "N01-B 문예관 옆 오르막을 보행로로, 지하 차도 951c157d 이름·폭 (근거: 실험 E09 차량 도로와 주차장 입구, B08 갱신)",
+   "items": [
+    {
+     "ref": "E09-FIX-c52095ad",
+     "op": "update_road",
+     "grade": "확정"
+    },
+    {
+     "ref": "E09-FIX-8e71c240",
+     "op": "update_road",
+     "grade": "추정"
+    },
+    {
+     "ref": "E09-B08-6",
+     "op": "update_road",
+     "grade": "확정(양방향 지하 차도, 폭 = 횡단보도 길이) / 추정(이 선이 그 차도라는 것, 폭의 값)"
+    }
+   ]
+  },
+  {
+   "group": "C",
+   "title": "차량 도로 7구간과 장소 6곳",
+   "evidence": "E09",
+   "comment": "N01-C 정문~분수 광장 옆~S06~회차 공간 차도, 주차장 차로 2, 은주관 서쪽 윗길, 장소 6 (근거: 실험 E09 차량 도로와 주차장 입구)",
+   "items": [
+    {
+     "ref": "E09-V1",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-V2",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-V3",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-V4",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-P-LOW",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-P-UP",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-U1",
+     "op": "create_road",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-JOIN-N1",
+     "op": "connect_roads",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-JOIN-N2",
+     "op": "connect_roads",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-JOIN-N3",
+     "op": "connect_roads",
+     "grade": "S-MAP"
+    },
+    {
+     "ref": "E09-PLACE-G-MAIN",
+     "op": "create_place",
+     "grade": "원천(위치) / S-MAP(높이)"
+    },
+    {
+     "ref": "E09-PLACE-P-LOW",
+     "op": "create_place",
+     "grade": "S-MAP(차로·덮개 직전 높이) / 원천(학교 표지 201096.7, 557150.7: 5.5 m 거리, 지면 106.1 m)"
+    },
+    {
+     "ref": "E09-PLACE-P-UP",
+     "op": "create_place",
+     "grade": "S-MAP(문턱선 CT-M16 S07-C1, 높이 ±1.5 m)"
+    },
+    {
+     "ref": "E09-PLACE-E-MAIN2",
+     "op": "create_place",
+     "grade": "원천(위치·설명) / S-MAP(지면)"
+    },
+    {
+     "ref": "E09-PLACE-BUS-2115",
+     "op": "create_place",
+     "grade": "원천(위치) / S-MAP(높이)"
+    },
+    {
+     "ref": "E09-PLACE-BUS-1164",
+     "op": "create_place",
+     "grade": "원천(위치) / S-MAP(높이)"
+    }
+   ]
+  },
+  {
+   "group": "D",
+   "title": "본관·북악관 사이: 지상 횡단 길, 오르막 보행로 아래 끝 연결, 본관 쪽 계단, 지하 차도 보행 구간",
+   "evidence": "B08(b03/network.json)",
+   "comment": "N01-D 횡단보도 길·본관 쪽 계단·지하 차도 보행 구간 (근거: 실험 E08 B08 갱신, 사용자 그림 14)",
+   "items": [
+    {
+     "ref": "B08-2",
+     "op": "create_road",
+     "grade": "확정(계단·횡단보도·통로·계단이 이 순서로 있다) / 평면 추정(±2 m) / 높이 S-MAP 지상 면"
+    },
+    {
+     "ref": "B08-3",
+     "op": "create_road",
+     "grade": "확정(오르막 보행로는 북악관 앞 광장에서 시작한다) / 평면 추정"
+    },
+    {
+     "ref": "B08-4",
+     "op": "create_road",
+     "grade": "확정(지상에서 내려가는 계단이 있다) / 평면 추정(±2 m) / 위 높이 S-MAP, 아래 높이 추정"
+    },
+    {
+     "ref": "B08-5",
+     "op": "create_road",
+     "grade": "확정(지하 차도의 보행 구간이 본관 북쪽 벽을 따라 있다) / 평면 추정(±2 m) / 높이 추정(951c157d 저장 높이를 같은 거리에서 읽음)"
+    }
+   ]
+  },
+  {
+   "group": "E",
+   "title": "갈림 지점에서 오르막 위 끝으로 내려가는 길(사슬 1a)",
+   "evidence": "B06(b03/network.json chain 1a)",
+   "comment": "N01-E 갈림 지점~오르막 위 끝 (근거: 실험 E03 B06 갱신, 사용자 그림 사진 10)",
+   "items": [
+    {
+     "ref": "B06-A14",
+     "op": "create_road",
+     "grade": "확정(길이 있다는 사실·방향: 사용자 그림) / 평면 추정(±3 m) / 높이 S-MAP",
+     "deviation": "제안 높이(S-MAP 144.1→141.3 m) 대신 양 끝이 붙는 기존 길의 저장 높이(142.44→141.73 m)를 썼다. 위 끝은 제안 점에서 가장 가까운 fdb059c4 위의 점"
+    }
+   ]
+  },
+  {
+   "group": "F",
+   "title": "운동장 면 접근: 혜인관 문 앞에서 길 자르기, 계단 4개",
+   "evidence": "E10·B09",
+   "comment": "N01-F 운동장 면 접근점과 계단 (근거: 실험 E10 운동장을 면으로, B09 갱신)",
+   "items": [
+    {
+     "ref": "E10-2",
+     "op": "split_road",
+     "grade": "원천(학교 표지) + 확정(운동장 높이 문 = B1)",
+     "deviation": "제안의 expectedRevision 1 대신 지금 값 10 (T05에서 확인된 문제)"
+    },
+    {
+     "ref": "E10-5 AP-DAEIL-FRONT",
+     "op": "create_road",
+     "grade": "아래 끝 = S-MAP 지면이 148.9에서 오르기 시작하는 면 경계(추정 ±2 m) / 위 끝 = 학교 표지 대일관 입구(1)(원천) / 1층 151.0 m = 148.9 + 13단 약 2.1 m(추정 ±0.3)"
+    },
+    {
+     "ref": "E10-5 AP-SANGSEUNG-STAIR-L",
+     "op": "create_road",
+     "grade": "아래·위 끝 = 사용자 그림의 계단 뭉치 양 끝(추정 ±3 m) / 위 높이 150.9 m = 4.9 m 서쪽 학교 입구 표지 자리의 S-MAP 값(추정. 위 끝 옆 지면은 151.0~151.2 m)"
+    },
+    {
+     "ref": "E10-5 AP-SANGSEUNG-STAIR-R",
+     "op": "create_road",
+     "grade": "아래 끝 = S-MAP 비탈의 아래 끝(추정 ±4 m) / 위 끝 = 사용자 그림의 뭉치 위 끝(추정 ±3 m) / 위 높이 = 그 자리 S-MAP 지면 152.0 m ~ 안쪽 마당 153.1 m(S-MAP 면이 뭉개져 단 높이는 추정)",
+     "deviation": "위 끝 높이가 범위(152~153.1 m)로만 있어 그 자리 S-MAP 지면 152 m를 썼다"
+    },
+    {
+     "ref": "E10-5 AP-HANLIM-6F",
+     "op": "create_road",
+     "grade": "높이차 약 1 m 확정(사용자) / 아래 끝 = S-MAP 147.6~148.1 m 칸의 가운데(추정 ±3 m). S-MAP은 1 m 계단을 9 m 비탈로 뭉갠다"
+    }
+   ]
+  }
+ ],
+ "skipped": [
+  {
+   "ref": "E09-PLACE-G-WEST",
+   "source": "e09/editor-ops.json",
+   "reason": "위치 추정: 사용자 표시와 11.2 m 차(B08), 5 m 넘음"
+  },
+  {
+   "ref": "E09-B08-1",
+   "source": "e09/editor-ops.json",
+   "reason": "8fde6a04 없애기: 북악관 B1 관련이라 이번에 하지 않음(B10 뒤)"
+  },
+  {
+   "ref": "B08-7",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "B08-8",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "B08-9",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "B08-10",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "B08-11",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "B08-12",
+   "source": "b03/network.json",
+   "reason": "북악관 B1·GS25·옆길: 이번에 하지 않음(B10 뒤). B08-10~12는 제안에서도 막힘"
+  },
+  {
+   "ref": "E10-1",
+   "source": "e10/editor-ops.json",
+   "reason": "운동장 면은 T05에서 이미 만들어져 있음"
+  },
+  {
+   "ref": "E10-3",
+   "source": "e10/editor-ops.json",
+   "reason": "운동장 구간 보관 처리는 사용자 결정 필요(C02 수집 경로). 길찾기에는 필요 없음"
+  },
+  {
+   "ref": "E10-4",
+   "source": "e10/editor-ops.json",
+   "reason": "문 좌표가 학교 표지뿐이고 붙일 길이 없어 노드를 만들 수 없음"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 1층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 2층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 3층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 5층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 6층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 7층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 8층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 9층",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 북악관 '1층-2층', '2층-3층', '3층-…'",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 add_level 북악관 B1층 (새 층. 지금 저장된 길 중 이 층은 없다)",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 create_node 북악관 2c",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 create_road 북악관 2c",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 create_road 북악관 2a",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 no_change 북악관",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 record_only 북악관",
+   "source": "b03/network.json",
+   "reason": "북악관 층·B1: 이번에 하지 않음(B10 진행 중)"
+  },
+  {
+   "ref": "b03 relabel_level 유담관 9층 / 13층·15층, 대일관 1층, 문예관 3층 / 1층(추정)",
+   "source": "b03/network.json",
+   "reason": "제안에 층 이름만 있고 levelId 값·형식이 없다. levelId를 바꾸면 이웃 길과 노드를 함께 못 써 끊길 수 있다. 층 체계는 B10에서 다시 정하는 중"
+  },
+  {
+   "ref": "b03 shift_z 대일관 9a3cce3f +6.0",
+   "source": "b03/network.json",
+   "reason": "이 길만 올리면 양 끝의 이웃 길 1f32cde9·19800cee(145.80 m, 높이 미정)에 6 m 단이나 가짜 경사가 생긴다. 붙는 새 길도 없다"
+  },
+  {
+   "ref": "b03 shift_z 대일관 앞 실외 계단 5개 / 사슬 1a·2b 5개",
+   "source": "b03/network.json",
+   "reason": "제안에 옮길 값이 없음(끝점별로 다시 정해야 함)"
+  },
+  {
+   "ref": "b03 shift_z 혜인관 -1.1",
+   "source": "b03/network.json",
+   "reason": "제안이 옮기지 않는 쪽을 권함(추정)"
+  },
+  {
+   "ref": "b03 rename_building_id 혜인관",
+   "source": "b03/network.json",
+   "reason": "시험용 DB 건물 id가 아직 건물5(이름만 혜인관). 건물 id 정리가 먼저"
+  }
+ ],
+ "notes": [],
+ "changeSets": "apply_changes는 묶음 하나를 한 트랜잭션으로 저장하지만 변경 묶음(changeSet)은 작업마다 하나씩 생기고 설명 칸이 없다. 묶음별 설명과 id는 applied-*.json에 적는다"
+}
