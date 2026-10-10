@@ -1,0 +1,3686 @@
+{
+ "created": "2026-10-10",
+ "truthProxy": "dem-T01.f32 (세 구역 모두 보정한 격자, S-MAP 표본 기반. 독립 측량 아님)",
+ "candidates": [
+  {
+   "areas": "field",
+   "changedCells": 3213,
+   "maxDiffFromT01M": 8.84,
+   "outdoorVertices": 46,
+   "outdoorRoads": 14,
+   "indoorVertices": 21,
+   "relevel": {
+    "roads": 3,
+    "vertices": 15,
+    "keptNodes": 4
+   },
+   "shownBefore": {
+    "below05": 6,
+    "below2": 4,
+    "above05": 17,
+    "above2": 15,
+    "lowestM": -3.52,
+    "highestM": 9.32
+   },
+   "shownAfter": {
+    "below05": 18,
+    "below2": 11,
+    "above05": 11,
+    "above2": 3,
+    "lowestM": -7.19,
+    "highestM": 2.29
+   },
+   "trueErrorBefore": {
+    "below05": 33,
+    "below2": 26,
+    "above05": 12,
+    "above2": 3,
+    "lowestM": -8.37,
+    "highestM": 2.29
+   },
+   "trueErrorAfter": {
+    "below05": 22,
+    "below2": 17,
+    "above05": 9,
+    "above2": 3,
+    "lowestM": -7.19,
+    "highestM": 2.29
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 8,
+   "newlyOff05WhereCandidateDiffersFromT01": 0,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -0.69,
+      -0.69
+     ],
+     "shownAfterM": [
+      -0.69,
+      -0.69
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      -5.56
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "02d30f2b",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 4,
+     "shownBeforeM": [
+      0.07,
+      9.32
+     ],
+     "shownAfterM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorBeforeM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorAfterM": [
+      1.21,
+      2.29
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "4ee99835",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.77
+     ],
+     "shownAfterM": [
+      0,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      0.81,
+      1.52
+     ],
+     "trueErrorAfterM": [
+      0,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "a789c985",
+     "name": "지하주차장 통로 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 5,
+     "shownBeforeM": [
+      -3.52,
+      0.5
+     ],
+     "shownAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorBeforeM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.07
+    },
+    {
+     "id": "b17424ba",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.5
+     ],
+     "shownAfterM": [
+      -1.33,
+      1.21
+     ],
+     "trueErrorBeforeM": [
+      -1.67,
+      1.21
+     ],
+     "trueErrorAfterM": [
+      -1.33,
+      1.21
+     ],
+     "newlyOff05": 2,
+     "maxSampleDistanceM": 1.34
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 13,
+     "shownBeforeM": [
+      -0.24,
+      0.77
+     ],
+     "shownAfterM": [
+      -7.19,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      -8.37,
+      1.33
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -7.19,
+      -0.69
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.05,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      2.18
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.05
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -2.14,
+      -0.3
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -0.3,
+      1.8
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.03,
+      2.03
+     ],
+     "shownAfterM": [
+      1.8,
+      1.8
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.81
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.81
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.4
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      -2.5
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -2.5,
+      -2.14
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "혜인관",
+     "baseShiftM": 1.92,
+     "roofShiftM": -0.46
+    },
+    {
+     "building": "은주관",
+     "baseShiftM": 0,
+     "roofShiftM": 1.45
+    },
+    {
+     "building": "공연실습소",
+     "baseShiftM": 1.6,
+     "roofShiftM": -0.35
+    },
+    {
+     "building": "청운관",
+     "baseShiftM": 0,
+     "roofShiftM": 3.28
+    }
+   ]
+  },
+  {
+   "areas": "corridor",
+   "changedCells": 709,
+   "maxDiffFromT01M": 10.77,
+   "outdoorVertices": 41,
+   "outdoorRoads": 16,
+   "indoorVertices": 14,
+   "relevel": {
+    "roads": 0,
+    "vertices": 0,
+    "keptNodes": 1
+   },
+   "shownBefore": {
+    "below05": 10,
+    "below2": 2,
+    "above05": 26,
+    "above2": 16,
+    "lowestM": -4.16,
+    "highestM": 4.06
+   },
+   "shownAfter": {
+    "below05": 28,
+    "below2": 20,
+    "above05": 8,
+    "above2": 3,
+    "lowestM": -5.81,
+    "highestM": 3.17
+   },
+   "trueErrorBefore": {
+    "below05": 31,
+    "below2": 23,
+    "above05": 5,
+    "above2": 0,
+    "lowestM": -7.19,
+    "highestM": 1.4
+   },
+   "trueErrorAfter": {
+    "below05": 31,
+    "below2": 23,
+    "above05": 5,
+    "above2": 0,
+    "lowestM": -7.19,
+    "highestM": 1.4
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 4,
+   "newlyOff05WhereCandidateDiffersFromT01": 3,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "c52095ad",
+     "name": null,
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 12,
+     "shownBeforeM": [
+      -2.27,
+      1.76
+     ],
+     "shownAfterM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorBeforeM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorAfterM": [
+      -1.97,
+      1.4
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 11.83
+    },
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      -0.69,
+      1.76
+     ],
+     "shownAfterM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      0.67
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0.94
+    },
+    {
+     "id": "951c157d",
+     "name": "지하주차장 경사로 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -4.16,
+      -4.16
+     ],
+     "shownAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorBeforeM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.52
+    },
+    {
+     "id": "3ab80c19",
+     "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.64
+     ],
+     "shownAfterM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorBeforeM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorAfterM": [
+      -0.78,
+      0.35
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 8.79
+    },
+    {
+     "id": "9112314a",
+     "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.78
+     ],
+     "shownAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 7.53
+    },
+    {
+     "id": "a7a51d3c",
+     "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.34,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.9
+    },
+    {
+     "id": "fdb059c4",
+     "name": "문예관 하행계단 아래 평탄부 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.78,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.2
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -0.24,
+      -0.24
+     ],
+     "shownAfterM": [
+      -5.61,
+      -5.61
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -7.19
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -7.19
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -5.61,
+      -5.56
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      4.06,
+      4.06
+     ],
+     "shownAfterM": [
+      3.17,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.3
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -5.61,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.55,
+      -5.44
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      2.03,
+      2.34
+     ],
+     "shownAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.78
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.09,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -5.44,
+      -3.09
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "한림관",
+     "baseShiftM": 0,
+     "roofShiftM": -0.71
+    }
+   ]
+  },
+  {
+   "areas": "s06",
+   "changedCells": 856,
+   "maxDiffFromT01M": 10.77,
+   "outdoorVertices": 1,
+   "outdoorRoads": 1,
+   "indoorVertices": 26,
+   "relevel": {
+    "roads": 0,
+    "vertices": 0,
+    "keptNodes": 0
+   },
+   "shownBefore": {
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.01,
+    "highestM": 2.01
+   },
+   "shownAfter": {
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39
+   },
+   "trueErrorBefore": {
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39
+   },
+   "trueErrorAfter": {
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 0,
+   "newlyOff05WhereCandidateDiffersFromT01": 0,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "699d0cbc",
+     "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.01,
+      2.01
+     ],
+     "shownAfterM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorBeforeM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorAfterM": [
+      2.39,
+      2.39
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.82
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "유담관",
+     "baseShiftM": 0,
+     "roofShiftM": -1.05
+    },
+    {
+     "building": "본관",
+     "baseShiftM": -1.48,
+     "roofShiftM": 0
+    }
+   ]
+  },
+  {
+   "areas": "field+corridor",
+   "changedCells": 3746,
+   "maxDiffFromT01M": 6.2,
+   "outdoorVertices": 71,
+   "outdoorRoads": 20,
+   "indoorVertices": 35,
+   "relevel": {
+    "roads": 3,
+    "vertices": 15,
+    "keptNodes": 4
+   },
+   "shownBefore": {
+    "below05": 14,
+    "below2": 6,
+    "above05": 32,
+    "above2": 20,
+    "lowestM": -4.16,
+    "highestM": 9.32
+   },
+   "shownAfter": {
+    "below05": 37,
+    "below2": 24,
+    "above05": 14,
+    "above2": 3,
+    "lowestM": -7.19,
+    "highestM": 2.29
+   },
+   "trueErrorBefore": {
+    "below05": 48,
+    "below2": 33,
+    "above05": 17,
+    "above2": 3,
+    "lowestM": -8.37,
+    "highestM": 2.29
+   },
+   "trueErrorAfter": {
+    "below05": 37,
+    "below2": 24,
+    "above05": 14,
+    "above2": 3,
+    "lowestM": -7.19,
+    "highestM": 2.29
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 9,
+   "newlyOff05WhereCandidateDiffersFromT01": 0,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "c52095ad",
+     "name": null,
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 12,
+     "shownBeforeM": [
+      -2.27,
+      1.76
+     ],
+     "shownAfterM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorBeforeM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorAfterM": [
+      -1.97,
+      1.4
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 11.83
+    },
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      -0.69,
+      1.76
+     ],
+     "shownAfterM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      0.67
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0.94
+    },
+    {
+     "id": "02d30f2b",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 4,
+     "shownBeforeM": [
+      0.07,
+      9.32
+     ],
+     "shownAfterM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorBeforeM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorAfterM": [
+      1.21,
+      2.29
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "4ee99835",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.77
+     ],
+     "shownAfterM": [
+      0,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      0.81,
+      1.52
+     ],
+     "trueErrorAfterM": [
+      0,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "951c157d",
+     "name": "지하주차장 경사로 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -4.16,
+      -4.16
+     ],
+     "shownAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorBeforeM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.52
+    },
+    {
+     "id": "a789c985",
+     "name": "지하주차장 통로 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 5,
+     "shownBeforeM": [
+      -3.52,
+      0.5
+     ],
+     "shownAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorBeforeM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.07
+    },
+    {
+     "id": "b17424ba",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.5
+     ],
+     "shownAfterM": [
+      -1.33,
+      1.21
+     ],
+     "trueErrorBeforeM": [
+      -1.67,
+      1.21
+     ],
+     "trueErrorAfterM": [
+      -1.33,
+      1.21
+     ],
+     "newlyOff05": 2,
+     "maxSampleDistanceM": 1.34
+    },
+    {
+     "id": "3ab80c19",
+     "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.64
+     ],
+     "shownAfterM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorBeforeM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorAfterM": [
+      -0.78,
+      0.35
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 8.79
+    },
+    {
+     "id": "9112314a",
+     "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.78
+     ],
+     "shownAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 7.53
+    },
+    {
+     "id": "a7a51d3c",
+     "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.34,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.9
+    },
+    {
+     "id": "fdb059c4",
+     "name": "문예관 하행계단 아래 평탄부 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.78,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.2
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 13,
+     "shownBeforeM": [
+      -0.24,
+      0.77
+     ],
+     "shownAfterM": [
+      -7.19,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      -8.37,
+      1.33
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.05,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      2.18
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.05
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      2.03,
+      2.34
+     ],
+     "shownAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.78
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "한림관",
+     "baseShiftM": 0,
+     "roofShiftM": -0.71
+    },
+    {
+     "building": "혜인관",
+     "baseShiftM": 1.92,
+     "roofShiftM": -0.46
+    },
+    {
+     "building": "은주관",
+     "baseShiftM": 0,
+     "roofShiftM": 1.53
+    },
+    {
+     "building": "공연실습소",
+     "baseShiftM": 1.6,
+     "roofShiftM": -0.35
+    },
+    {
+     "building": "청운관",
+     "baseShiftM": 0,
+     "roofShiftM": 3.28
+    },
+    {
+     "building": "대일관",
+     "baseShiftM": 0,
+     "roofShiftM": 0.9
+    }
+   ]
+  },
+  {
+   "areas": "field+s06",
+   "changedCells": 4069,
+   "maxDiffFromT01M": 8.84,
+   "outdoorVertices": 47,
+   "outdoorRoads": 15,
+   "indoorVertices": 47,
+   "relevel": {
+    "roads": 3,
+    "vertices": 15,
+    "keptNodes": 4
+   },
+   "shownBefore": {
+    "below05": 6,
+    "below2": 4,
+    "above05": 18,
+    "above2": 16,
+    "lowestM": -3.52,
+    "highestM": 9.32
+   },
+   "shownAfter": {
+    "below05": 18,
+    "below2": 11,
+    "above05": 12,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorBefore": {
+    "below05": 33,
+    "below2": 26,
+    "above05": 13,
+    "above2": 4,
+    "lowestM": -8.37,
+    "highestM": 2.39
+   },
+   "trueErrorAfter": {
+    "below05": 22,
+    "below2": 17,
+    "above05": 10,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 8,
+   "newlyOff05WhereCandidateDiffersFromT01": 0,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -0.69,
+      -0.69
+     ],
+     "shownAfterM": [
+      -0.69,
+      -0.69
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      -5.56
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "02d30f2b",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 4,
+     "shownBeforeM": [
+      0.07,
+      9.32
+     ],
+     "shownAfterM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorBeforeM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorAfterM": [
+      1.21,
+      2.29
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "4ee99835",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.77
+     ],
+     "shownAfterM": [
+      0,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      0.81,
+      1.52
+     ],
+     "trueErrorAfterM": [
+      0,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "a789c985",
+     "name": "지하주차장 통로 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 5,
+     "shownBeforeM": [
+      -3.52,
+      0.5
+     ],
+     "shownAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorBeforeM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.07
+    },
+    {
+     "id": "b17424ba",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.5
+     ],
+     "shownAfterM": [
+      -1.33,
+      1.21
+     ],
+     "trueErrorBeforeM": [
+      -1.67,
+      1.21
+     ],
+     "trueErrorAfterM": [
+      -1.33,
+      1.21
+     ],
+     "newlyOff05": 2,
+     "maxSampleDistanceM": 1.34
+    },
+    {
+     "id": "699d0cbc",
+     "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.01,
+      2.01
+     ],
+     "shownAfterM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorBeforeM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorAfterM": [
+      2.39,
+      2.39
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.82
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 13,
+     "shownBeforeM": [
+      -0.24,
+      0.77
+     ],
+     "shownAfterM": [
+      -7.19,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      -8.37,
+      1.33
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -7.19,
+      -0.69
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.05,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      2.18
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.05
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -2.14,
+      -0.3
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -0.3,
+      1.8
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.03,
+      2.03
+     ],
+     "shownAfterM": [
+      1.8,
+      1.8
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.81
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.81
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.4
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      -2.5
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -2.5,
+      -2.14
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "혜인관",
+     "baseShiftM": 1.92,
+     "roofShiftM": -0.46
+    },
+    {
+     "building": "유담관",
+     "baseShiftM": 0,
+     "roofShiftM": -1.05
+    },
+    {
+     "building": "은주관",
+     "baseShiftM": 0,
+     "roofShiftM": 1.45
+    },
+    {
+     "building": "공연실습소",
+     "baseShiftM": 1.6,
+     "roofShiftM": -0.35
+    },
+    {
+     "building": "청운관",
+     "baseShiftM": 0,
+     "roofShiftM": 3.28
+    },
+    {
+     "building": "본관",
+     "baseShiftM": -1.48,
+     "roofShiftM": 0
+    }
+   ]
+  },
+  {
+   "areas": "corridor+s06",
+   "changedCells": 1565,
+   "maxDiffFromT01M": 10.77,
+   "outdoorVertices": 42,
+   "outdoorRoads": 17,
+   "indoorVertices": 40,
+   "relevel": {
+    "roads": 0,
+    "vertices": 0,
+    "keptNodes": 1
+   },
+   "shownBefore": {
+    "below05": 10,
+    "below2": 2,
+    "above05": 27,
+    "above2": 17,
+    "lowestM": -4.16,
+    "highestM": 4.06
+   },
+   "shownAfter": {
+    "below05": 28,
+    "below2": 20,
+    "above05": 9,
+    "above2": 4,
+    "lowestM": -5.81,
+    "highestM": 3.17
+   },
+   "trueErrorBefore": {
+    "below05": 31,
+    "below2": 23,
+    "above05": 6,
+    "above2": 1,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorAfter": {
+    "below05": 31,
+    "below2": 23,
+    "above05": 6,
+    "above2": 1,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 4,
+   "newlyOff05WhereCandidateDiffersFromT01": 3,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "c52095ad",
+     "name": null,
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 12,
+     "shownBeforeM": [
+      -2.27,
+      1.76
+     ],
+     "shownAfterM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorBeforeM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorAfterM": [
+      -1.97,
+      1.4
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 11.83
+    },
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      -0.69,
+      1.76
+     ],
+     "shownAfterM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      0.67
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0.94
+    },
+    {
+     "id": "951c157d",
+     "name": "지하주차장 경사로 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -4.16,
+      -4.16
+     ],
+     "shownAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorBeforeM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.52
+    },
+    {
+     "id": "699d0cbc",
+     "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.01,
+      2.01
+     ],
+     "shownAfterM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorBeforeM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorAfterM": [
+      2.39,
+      2.39
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.82
+    },
+    {
+     "id": "3ab80c19",
+     "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.64
+     ],
+     "shownAfterM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorBeforeM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorAfterM": [
+      -0.78,
+      0.35
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 8.79
+    },
+    {
+     "id": "9112314a",
+     "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.78
+     ],
+     "shownAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 7.53
+    },
+    {
+     "id": "a7a51d3c",
+     "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.34,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.9
+    },
+    {
+     "id": "fdb059c4",
+     "name": "문예관 하행계단 아래 평탄부 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.78,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.2
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -0.24,
+      -0.24
+     ],
+     "shownAfterM": [
+      -5.61,
+      -5.61
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -7.19
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -7.19
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -5.61,
+      -5.56
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      4.06,
+      4.06
+     ],
+     "shownAfterM": [
+      3.17,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.3
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -5.61,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.55,
+      -5.44
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      2.03,
+      2.34
+     ],
+     "shownAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.78
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.09,
+      3.17
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -5.44,
+      -3.09
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "한림관",
+     "baseShiftM": 0,
+     "roofShiftM": -0.71
+    },
+    {
+     "building": "유담관",
+     "baseShiftM": 0,
+     "roofShiftM": -1.05
+    },
+    {
+     "building": "본관",
+     "baseShiftM": -1.48,
+     "roofShiftM": 0
+    }
+   ]
+  },
+  {
+   "areas": "field+corridor+s06",
+   "changedCells": 4602,
+   "maxDiffFromT01M": 0,
+   "outdoorVertices": 72,
+   "outdoorRoads": 21,
+   "indoorVertices": 61,
+   "relevel": {
+    "roads": 3,
+    "vertices": 15,
+    "keptNodes": 4
+   },
+   "shownBefore": {
+    "below05": 14,
+    "below2": 6,
+    "above05": 33,
+    "above2": 21,
+    "lowestM": -4.16,
+    "highestM": 9.32
+   },
+   "shownAfter": {
+    "below05": 37,
+    "below2": 24,
+    "above05": 15,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorBefore": {
+    "below05": 48,
+    "below2": 33,
+    "above05": 18,
+    "above2": 4,
+    "lowestM": -8.37,
+    "highestM": 2.39
+   },
+   "trueErrorAfter": {
+    "below05": 37,
+    "below2": 24,
+    "above05": 15,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39
+   },
+   "trueErrorGrew": 0,
+   "newlyOff05": 9,
+   "newlyOff05WhereCandidateDiffersFromT01": 0,
+   "newlyOff05InFadeZone": 0,
+   "roads": [
+    {
+     "id": "c52095ad",
+     "name": null,
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 12,
+     "shownBeforeM": [
+      -2.27,
+      1.76
+     ],
+     "shownAfterM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorBeforeM": [
+      -1.97,
+      1.4
+     ],
+     "trueErrorAfterM": [
+      -1.97,
+      1.4
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 11.83
+    },
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      -0.69,
+      1.76
+     ],
+     "shownAfterM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorBeforeM": [
+      -5.56,
+      0.67
+     ],
+     "trueErrorAfterM": [
+      -5.56,
+      0.67
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0.94
+    },
+    {
+     "id": "02d30f2b",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 4,
+     "shownBeforeM": [
+      0.07,
+      9.32
+     ],
+     "shownAfterM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorBeforeM": [
+      1.21,
+      2.29
+     ],
+     "trueErrorAfterM": [
+      1.21,
+      2.29
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "4ee99835",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.77
+     ],
+     "shownAfterM": [
+      0,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      0.81,
+      1.52
+     ],
+     "trueErrorAfterM": [
+      0,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.16
+    },
+    {
+     "id": "951c157d",
+     "name": "지하주차장 경사로 (추정)",
+     "structure": "ramp",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      -4.16,
+      -4.16
+     ],
+     "shownAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorBeforeM": [
+      -3.59,
+      -3.59
+     ],
+     "trueErrorAfterM": [
+      -3.59,
+      -3.59
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.52
+    },
+    {
+     "id": "a789c985",
+     "name": "지하주차장 통로 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 5,
+     "shownBeforeM": [
+      -3.52,
+      0.5
+     ],
+     "shownAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorBeforeM": [
+      -2.01,
+      -1.33
+     ],
+     "trueErrorAfterM": [
+      -2.01,
+      -1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 1.07
+    },
+    {
+     "id": "b17424ba",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 4,
+     "shownBeforeM": [
+      0,
+      0.5
+     ],
+     "shownAfterM": [
+      -1.33,
+      1.21
+     ],
+     "trueErrorBeforeM": [
+      -1.67,
+      1.21
+     ],
+     "trueErrorAfterM": [
+      -1.33,
+      1.21
+     ],
+     "newlyOff05": 2,
+     "maxSampleDistanceM": 1.34
+    },
+    {
+     "id": "699d0cbc",
+     "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 1,
+     "shownBeforeM": [
+      2.01,
+      2.01
+     ],
+     "shownAfterM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorBeforeM": [
+      2.39,
+      2.39
+     ],
+     "trueErrorAfterM": [
+      2.39,
+      2.39
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.82
+    },
+    {
+     "id": "3ab80c19",
+     "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.64
+     ],
+     "shownAfterM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorBeforeM": [
+      -0.78,
+      0.35
+     ],
+     "trueErrorAfterM": [
+      -0.78,
+      0.35
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 8.79
+    },
+    {
+     "id": "9112314a",
+     "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.63,
+      1.78
+     ],
+     "shownAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -0.78
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -0.78
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 7.53
+    },
+    {
+     "id": "a7a51d3c",
+     "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.34,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.15,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.15,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.9
+    },
+    {
+     "id": "fdb059c4",
+     "name": "문예관 하행계단 아래 평탄부 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      1.78,
+      2.38
+     ],
+     "shownAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorBeforeM": [
+      -2.88,
+      -1.41
+     ],
+     "trueErrorAfterM": [
+      -2.88,
+      -1.41
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.2
+    },
+    {
+     "id": "3910b4a5",
+     "name": "C02 수집 경로 (2026-10-07)",
+     "structure": "ordinary",
+     "moved": true,
+     "vertices": 13,
+     "shownBeforeM": [
+      -0.24,
+      0.77
+     ],
+     "shownAfterM": [
+      -7.19,
+      1.33
+     ],
+     "trueErrorBeforeM": [
+      -8.37,
+      1.33
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      1.33
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.69,
+      -0.24
+     ],
+     "shownAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -5.56
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -5.56
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 0
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.05,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      2.18
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      2.18
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 10.05
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      -0.24,
+      4.06
+     ],
+     "shownAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorBeforeM": [
+      -7.19,
+      -3.3
+     ],
+     "trueErrorAfterM": [
+      -7.19,
+      -3.3
+     ],
+     "newlyOff05": 1,
+     "maxSampleDistanceM": 5.55
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorBeforeM": [
+      -5.55,
+      -5.42
+     ],
+     "trueErrorAfterM": [
+      -5.55,
+      -5.42
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 3.16
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      2.03,
+      3.02
+     ],
+     "shownAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -5.55
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -5.55
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 1.32
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 3,
+     "shownBeforeM": [
+      2.03,
+      2.34
+     ],
+     "shownAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorBeforeM": [
+      -5.81,
+      -2.15
+     ],
+     "trueErrorAfterM": [
+      -5.81,
+      -2.15
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 0.78
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      4.03,
+      4.06
+     ],
+     "shownAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorBeforeM": [
+      -3.3,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -3.3,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "moved": false,
+     "vertices": 2,
+     "shownBeforeM": [
+      3.02,
+      4.03
+     ],
+     "shownAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorBeforeM": [
+      -5.42,
+      -3.05
+     ],
+     "trueErrorAfterM": [
+      -5.42,
+      -3.05
+     ],
+     "newlyOff05": 0,
+     "maxSampleDistanceM": 5.92
+    }
+   ],
+   "buildingsOver03": [
+    {
+     "building": "한림관",
+     "baseShiftM": 0,
+     "roofShiftM": -0.71
+    },
+    {
+     "building": "혜인관",
+     "baseShiftM": 1.92,
+     "roofShiftM": -0.46
+    },
+    {
+     "building": "유담관",
+     "baseShiftM": 0,
+     "roofShiftM": -1.05
+    },
+    {
+     "building": "은주관",
+     "baseShiftM": 0,
+     "roofShiftM": 1.53
+    },
+    {
+     "building": "공연실습소",
+     "baseShiftM": 1.6,
+     "roofShiftM": -0.35
+    },
+    {
+     "building": "청운관",
+     "baseShiftM": 0,
+     "roofShiftM": 3.28
+    },
+    {
+     "building": "대일관",
+     "baseShiftM": 0,
+     "roofShiftM": 0.9
+    },
+    {
+     "building": "본관",
+     "baseShiftM": -1.48,
+     "roofShiftM": 0
+    }
+   ]
+  }
+ ],
+ "network": {
+  "components": [
+   {
+    "roads": 111,
+    "outdoor": 28,
+    "touchesChangedTerrain": true
+   },
+   {
+    "roads": 1,
+    "outdoor": 0,
+    "touchesChangedTerrain": false
+   },
+   {
+    "roads": 16,
+    "outdoor": 2,
+    "touchesChangedTerrain": true
+   }
+  ]
+ },
+ "ownHeightGroups": [
+  {
+   "group": "G1",
+   "roads": [
+    {
+     "id": "c52095ad",
+     "name": null,
+     "structure": "ramp",
+     "vertices": 30,
+     "z": [
+      129.78,
+      141.73
+     ],
+     "onChanged": 12
+    },
+    {
+     "id": "8e71c240",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "structure": "ramp",
+     "vertices": 3,
+     "z": [
+      141.73,
+      141.73
+     ],
+     "onChanged": 3
+    },
+    {
+     "id": "3ab80c19",
+     "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      142.44,
+      142.44
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "9112314a",
+     "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      142.44,
+      142.44
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "a7a51d3c",
+     "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "structure": "stairs",
+     "vertices": 2,
+     "z": [
+      142.44,
+      143.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "fdb059c4",
+     "name": "문예관 하행계단 아래 평탄부 (추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      142.44,
+      142.44
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "45682ee7",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      141.73,
+      141.73
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "19800cee",
+     "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      145.8,
+      145.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "88ba01e6",
+     "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+     "structure": "stairs",
+     "vertices": 2,
+     "z": [
+      141.73,
+      145.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "00cd9c0f",
+     "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      144.8,
+      144.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "2f206e6c",
+     "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+     "structure": "stairs",
+     "vertices": 2,
+     "z": [
+      143.8,
+      144.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "618385b9",
+     "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+     "structure": "ordinary",
+     "vertices": 3,
+     "z": [
+      143.8,
+      143.8
+     ],
+     "onChanged": 3
+    },
+    {
+     "id": "8e03aa9e",
+     "name": "대일관 전면 상단 평탄부 (고도 추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      145.8,
+      145.8
+     ],
+     "onChanged": 2
+    },
+    {
+     "id": "b14ac1da",
+     "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+     "structure": "stairs",
+     "vertices": 2,
+     "z": [
+      144.8,
+      145.8
+     ],
+     "onChanged": 2
+    }
+   ],
+   "flatLevelsM": [
+    141.73,
+    142.44,
+    143.8,
+    144.8,
+    145.8
+   ],
+   "vertices": 45,
+   "onChangedTerrain": {
+    "n": 27,
+    "terrainDeltaM": [
+     -1.03,
+     8.56
+    ],
+    "needM": {
+     "min": -2.18,
+     "p10": -0.67,
+     "median": 1.36,
+     "p90": 5.55,
+     "max": 7.19
+    },
+    "afterMedianShift": {
+     "within05": 3,
+     "worstM": 5.83
+    }
+   },
+   "onUnchangedTerrain": {
+    "n": 18,
+    "aboveTerrainM": [
+     -3.41,
+     1.24
+    ],
+    "within05Now": 5,
+    "within05AfterMedianShift": 2
+   },
+   "joins": [
+    {
+     "node": "0c198093",
+     "z": 142.44,
+     "terrainDeltaM": 1.29,
+     "aboveOldTerrainM": 1.64,
+     "needM": -0.35,
+     "with": [
+      "23de6a42 indoor_corridor 문예관"
+     ]
+    },
+    {
+     "node": "561a12b4",
+     "z": 141.73,
+     "terrainDeltaM": 6.96,
+     "aboveOldTerrainM": -0.24,
+     "needM": 7.19,
+     "with": [
+      "3910b4a5 ordinary (지형에 얹힌 길)"
+     ]
+    },
+    {
+     "node": "016416b6",
+     "z": 145.8,
+     "terrainDeltaM": 1.86,
+     "aboveOldTerrainM": 4.05,
+     "needM": -2.18,
+     "with": [
+      "9a3cce3f indoor_corridor 대일관"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "G2",
+   "roads": [
+    {
+     "id": "8fde6a04",
+     "name": "지하주차장-북악관 B1 연결 (추정)",
+     "structure": "ordinary",
+     "vertices": 2,
+     "z": [
+      126.82,
+      131.1
+     ],
+     "onChanged": 0
+    },
+    {
+     "id": "951c157d",
+     "name": "지하주차장 경사로 (추정)",
+     "structure": "ramp",
+     "vertices": 4,
+     "z": [
+      126.82,
+      136.39
+     ],
+     "onChanged": 1
+    }
+   ],
+   "flatLevelsM": [],
+   "vertices": 5,
+   "onChangedTerrain": {
+    "n": 1,
+    "terrainDeltaM": [
+     -0.56,
+     -0.56
+    ],
+    "needM": {
+     "min": 3.59,
+     "p10": 3.59,
+     "median": 3.59,
+     "p90": 3.59,
+     "max": 3.59
+    },
+    "afterMedianShift": {
+     "within05": 1,
+     "worstM": 0
+    }
+   },
+   "onUnchangedTerrain": {
+    "n": 4,
+    "aboveTerrainM": [
+     -6.38,
+     -1.66
+    ],
+    "within05Now": 0,
+    "within05AfterMedianShift": 0
+   },
+   "joins": [
+    {
+     "node": "18b2d87e",
+     "z": 131.1,
+     "terrainDeltaM": 0,
+     "aboveOldTerrainM": -1.66,
+     "needM": 1.66,
+     "with": [
+      "f99540e3 stairs 북악관"
+     ]
+    },
+    {
+     "node": "55a87aa0",
+     "z": 136.39,
+     "terrainDeltaM": -0.56,
+     "aboveOldTerrainM": -4.16,
+     "needM": 3.59,
+     "with": [
+      "66f166a8 indoor_corridor 문예관"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "G3",
+   "roads": [
+    {
+     "id": "02d30f2b",
+     "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "structure": "ordinary",
+     "vertices": 4,
+     "z": [
+      150.66,
+      150.8
+     ],
+     "onChanged": 4
+    }
+   ],
+   "flatLevelsM": [],
+   "vertices": 4,
+   "onChangedTerrain": {
+    "n": 4,
+    "terrainDeltaM": [
+     -1.14,
+     7.62
+    ],
+    "needM": {
+     "min": -2.29,
+     "p10": -2.29,
+     "median": -1.7,
+     "p90": -1.21,
+     "max": -1.21
+    },
+    "afterMedianShift": {
+     "within05": 3,
+     "worstM": 0.58
+    }
+   },
+   "onUnchangedTerrain": {
+    "n": 0,
+    "aboveTerrainM": null,
+    "within05Now": 0,
+    "within05AfterMedianShift": 0
+   },
+   "joins": [
+    {
+     "node": "9fb1fd71",
+     "z": 150.66,
+     "terrainDeltaM": -1.14,
+     "aboveOldTerrainM": 0.07,
+     "needM": -1.21,
+     "with": [
+      "4ee99835 ordinary (지형에 얹힌 길)",
+      "b17424ba ordinary (지형에 얹힌 길)"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "G4",
+   "roads": [
+    {
+     "id": "a789c985",
+     "name": "지하주차장 통로 (추정)",
+     "structure": "ordinary",
+     "vertices": 5,
+     "z": [
+      146.33,
+      146.94
+     ],
+     "onChanged": 5
+    }
+   ],
+   "flatLevelsM": [],
+   "vertices": 5,
+   "onChangedTerrain": {
+    "n": 5,
+    "terrainDeltaM": [
+     -1.51,
+     1.83
+    ],
+    "needM": {
+     "min": 1.33,
+     "p10": 1.33,
+     "median": 1.98,
+     "p90": 2.01,
+     "max": 2.01
+    },
+    "afterMedianShift": {
+     "within05": 4,
+     "worstM": 0.65
+    }
+   },
+   "onUnchangedTerrain": {
+    "n": 0,
+    "aboveTerrainM": null,
+    "within05Now": 0,
+    "within05AfterMedianShift": 0
+   },
+   "joins": [
+    {
+     "node": "79988154",
+     "z": 146.94,
+     "terrainDeltaM": -0.58,
+     "aboveOldTerrainM": -2.56,
+     "needM": 1.98,
+     "with": [
+      "5aea9b42 stairs 건물5"
+     ]
+    },
+    {
+     "node": "70261794",
+     "z": 146.33,
+     "terrainDeltaM": 1.83,
+     "aboveOldTerrainM": 0.5,
+     "needM": 1.33,
+     "with": [
+      "b17424ba ordinary (지형에 얹힌 길)"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "G5",
+   "roads": [
+    {
+     "id": "699d0cbc",
+     "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+     "structure": "stairs",
+     "vertices": 2,
+     "z": [
+      129.38,
+      130.97
+     ],
+     "onChanged": 1
+    }
+   ],
+   "flatLevelsM": [],
+   "vertices": 2,
+   "onChangedTerrain": {
+    "n": 1,
+    "terrainDeltaM": [
+     -0.38,
+     -0.38
+    ],
+    "needM": {
+     "min": -2.39,
+     "p10": -2.39,
+     "median": -2.39,
+     "p90": -2.39,
+     "max": -2.39
+    },
+    "afterMedianShift": {
+     "within05": 1,
+     "worstM": 0
+    }
+   },
+   "onUnchangedTerrain": {
+    "n": 1,
+    "aboveTerrainM": [
+     2.71,
+     2.71
+    ],
+    "within05Now": 0,
+    "within05AfterMedianShift": 1
+   },
+   "joins": [
+    {
+     "node": "6404f1ee",
+     "z": 130.97,
+     "terrainDeltaM": 0,
+     "aboveOldTerrainM": 2.71,
+     "needM": -2.71,
+     "with": [
+      "1d983e3a indoor_corridor"
+     ]
+    },
+    {
+     "node": "43a7f874",
+     "z": 129.38,
+     "terrainDeltaM": -0.38,
+     "aboveOldTerrainM": 2.01,
+     "needM": -2.39,
+     "with": [
+      "6b1caa1e indoor_corridor 유담관"
+     ]
+    }
+   ]
+  }
+ ],
+ "vaultHeights": [
+  {
+   "what": "141.73 m 연장 시작 (8e71c240 서쪽 끝)",
+   "roadZ": 141.73,
+   "smapZ": 140.9941,
+   "smapMinusRoadM": -0.74,
+   "oldDemM": 139.97,
+   "t01M": 141.06,
+   "terrainDeltaM": 1.09
+  },
+  {
+   "what": "141.73 m 연장 끝 (8e71c240 동쪽 끝)",
+   "roadZ": 141.73,
+   "smapZ": 147.2491,
+   "smapMinusRoadM": 5.52,
+   "oldDemM": 142.42,
+   "t01M": 147.29,
+   "terrainDeltaM": 4.88
+  },
+  {
+   "what": "대일 접근점 (건물 속성이 붙는 자리)",
+   "roadZ": 145.8,
+   "smapZ": 151.6358,
+   "smapMinusRoadM": 5.84,
+   "oldDemM": 141.57,
+   "t01M": 141.57,
+   "terrainDeltaM": 0
+  },
+  {
+   "what": "문예 입구점 (건물 속성이 붙는 자리)",
+   "roadZ": 142.44,
+   "smapZ": 142.7753,
+   "smapMinusRoadM": 0.34,
+   "oldDemM": 140.8,
+   "t01M": 142.09,
+   "terrainDeltaM": 1.29
+  },
+  {
+   "what": "C02-00 (561a12b4 노드)",
+   "roadZ": 141.73,
+   "smapZ": 148.8775,
+   "smapMinusRoadM": 7.15,
+   "oldDemM": 141.97,
+   "t01M": 148.92,
+   "terrainDeltaM": 6.96
+  }
+ ],
+ "fullPlanKeptNodes": 4
+}
