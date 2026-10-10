@@ -57,7 +57,7 @@ for c in G['chains']:
 used = set(road_chains)
 in_used = lambda rid: any(rid.startswith(u) or u.startswith(rid) for u in used)
 chains_of = lambda rid: [v for u, vs in road_chains.items() if rid.startswith(u) or u.startswith(rid) for v in vs]
-feats, skipped = [], []
+feats, skipped, omitted_paths = [], [], []
 LEG = {'path_graph_connected': '그래프상 연결', 'path_drawn_only': '그림만(그래프 미연결)', 'path_unverified': '미검증·보류·끊김',
        'path_candidate_node': '그래프 후보 노드(미검증)', 'surface_unverified': '표면 접속 미검증(후보 노드 포함)', 'surface_operational_only': '표면 접속: 운영 노드만(물리 접속 별도 검증)'}
 
@@ -103,6 +103,8 @@ for rid, o in cand.items():
     if len(xy) > 2 and zs[0] is not None and zs[-1] is not None:
         zs = [zs[0] + (zs[-1] - zs[0]) * k / (len(xy) - 1) for k in range(len(xy))]
     coords = [[*p, z] for p, z in zip(xy, zs)]
+    if any(z is None for z in zs):
+        omitted_paths.append({'id': rid, 'note': f'{o.get("why", rid)} · {st}. 끝점 고도 미확정으로 선 표시 생략; 실제 길 부재 판정 아님.'})
     add(f'PG-C-{rid}', typ, coords, st, f'path-graph-candidate-v2 ops add_road {rid}')
     if rid in used:
         surface_layer(f'PG-C-{rid}', coords, rid)
@@ -127,7 +129,7 @@ fc = {'type': 'FeatureCollection', 'name': 'path-graph-candidate', 'crs': {'type
                      'base_roads_sha_match': base_ok, 'generator': 'docs/audit/field/integrate_path_graph.py', 'status': G['status'], 'skipped': skipped, 'legend': LEG,
                      'chains': [{'chain': c['chain'], 'graph': c['graph_label'], 'surface': c['surface_connection']} for c in G['chains']],
                      'constraints_not_drawn': [c['id'] for c in G['constraints']],
-                     'constraint_notes': G['constraints']},
+                     'constraint_notes': G['constraints'], 'omitted_path_notes': omitted_paths},
       'features': feats}
 (ROOT / 'frontend/public/corrections/path-graph-candidate.geojson').write_text(json.dumps(fc, ensure_ascii=False), encoding='utf-8')
 ids = [f['properties']['id'] for f in feats]

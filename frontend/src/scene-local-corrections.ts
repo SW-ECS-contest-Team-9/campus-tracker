@@ -84,8 +84,8 @@ async function loadFile(base: string, file: string): Promise<any | null> {
 /** 보정 레이어 생성(그룹별, 기본 숨김). 없는 파일은 pending으로 보고. */
 export type FootprintOverride = { setFootprintOverride(buildingId: string, coordinates: number[][][][] | null): void };
 export function readPathConstraints(fc: any): { id: string; note: string }[] {
-  const notes = fc?.provenance?.constraint_notes;
-  return Array.isArray(notes) ? notes.filter((n) => typeof n?.id === 'string' && typeof n?.note === 'string').map(({ id, note }) => ({ id, note })) : [];
+  const notes = [fc?.provenance?.constraint_notes, fc?.provenance?.omitted_path_notes].flatMap((n) => Array.isArray(n) ? n : []);
+  return notes.filter((n) => typeof n?.id === 'string' && typeof n?.note === 'string').map(({ id, note }) => ({ id, note }));
 }
 export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: FootprintOverride | null = null, base = '/corrections/') {
   const loaded: string[] = [];

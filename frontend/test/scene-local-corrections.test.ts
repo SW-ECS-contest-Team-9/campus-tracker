@@ -18,10 +18,20 @@ const read = (f: string) => JSON.parse(fs.readFileSync(new URL(f, DIR), 'utf8'))
 test('좌표 없는 본관–한림 연결 근거가 표시 자료에 보존된다', () => {
   const fc = read('path-graph-candidate.geojson');
   const constraints = readPathConstraints(fc);
-  assert.deepEqual(constraints.map((c) => c.id), fc.provenance.constraints_not_drawn);
+  assert.deepEqual(constraints.map((c) => c.id), [...fc.provenance.constraints_not_drawn, ...fc.provenance.omitted_path_notes.map((c: any) => c.id)]);
   assert.ok(constraints.some((c) => c.id === '본관5F↔한림3F' && c.note.includes('바닥 z 미확정')));
   assert.deepEqual(readPathConstraints({}), []);
   assert.deepEqual(readPathConstraints({ provenance: { constraint_notes: [null, { id: 'x' }] } }), []);
+});
+
+test('고도 없는 청운관·GS25 후보는 선을 만들지 않고 생략 사유를 보존한다', () => {
+  const fc = read('path-graph-candidate.geojson');
+  const omitted = fc.provenance.omitted_path_notes;
+  assert.deepEqual(omitted.map((c: any) => c.id), ['C1-R-A3', 'C1-R-A5', 'C2-R-SIDE']);
+  for (const c of omitted) {
+    assert.ok(c.note.includes('고도 미확정') && c.note.includes('실제 길 부재 판정 아님'));
+    assert.ok(!fc.features.some((f: any) => f.properties.id === `PG-C-${c.id}`));
+  }
 });
 
 test('EPSG:5186 1 m = 1 m: 변환 왕복 오차 < 1 mm, 동서·남북 1 m 간격의 측지 거리 1 m ± 1 mm', () => {
