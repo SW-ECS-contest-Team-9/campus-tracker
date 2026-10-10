@@ -1,0 +1,77 @@
+{
+ "pairs": {
+  "before": 66,
+  "after": 66,
+  "missingAfter": []
+ },
+ "reachable": {
+  "walk": {
+   "before": 42,
+   "after": 42
+  },
+  "walkAssumeUnknown": {
+   "before": 66,
+   "after": 66
+  },
+  "vehicle": {
+   "before": 0,
+   "after": 0
+  }
+ },
+ "reachableFlips": [],
+ "lengthChanges": [],
+ "validation": {
+  "before": {
+   "total": 215,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 9,
+    "OVERLAPPING_ROADS": 5,
+    "OFF_TERRAIN": 48,
+    "ISOLATED_COMPONENT": 7,
+    "UNCONNECTED_CROSSING": 146
+   },
+   "bySeverity": {
+    "warning": 65,
+    "info": 135
+   }
+  },
+  "after": {
+   "total": 215,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 9,
+    "OVERLAPPING_ROADS": 5,
+    "OFF_TERRAIN": 48,
+    "ISOLATED_COMPONENT": 7,
+    "UNCONNECTED_CROSSING": 146
+   },
+   "bySeverity": {
+    "warning": 65,
+    "info": 135
+   }
+  }
+ },
+ "counts": {
+  "before": {
+   "roads": 217,
+   "nodes": 195,
+   "places": 33,
+   "totalLengthM": 3279.2
+  },
+  "after": {
+   "roads": 217,
+   "nodes": 195,
+   "places": 33,
+   "totalLengthM": 3279.2
+  }
+ },
+ "buildingId": {
+  "before": {
+   "건물5": 8,
+   "혜인관": 0
+  },
+  "after": {
+   "건물5": 0,
+   "혜인관": 8
+  }
+ }
+}

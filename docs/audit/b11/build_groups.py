@@ -16,7 +16,7 @@ EVID = '혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형
 
 ops = []
 for r in sorted((r for r in S['roads'] if live(r) and r.get('buildingId') == OLD), key=lambda r: r['name']):
-    ops.append({'ref': f"길 {r['id'][:8]} {r['name']}: 건물 표기 {OLD} → {NEW}", 'op': 'update_road', 'args': {'id': r['id'], 'expectedRevision': r['revision'], 'buildingId': NEW}, 'grade': '원천(건물 자료)', 'evidence': EVID})
+    ops.append({'ref': f"길 {r['id'][:8]} {r['name']}: 건물 표기 {OLD} → {NEW}", 'op': 'update_road', 'args': {'id': r['id'], 'expectedRevision': r['revision'], 'attrs': {'buildingId': NEW}}, 'grade': '원천(건물 자료)', 'evidence': EVID})
 for p in sorted((p for p in S['places'] if p.get('status') != 'RETIRED' and p.get('buildingId') == OLD), key=lambda p: p['name']):
     ops.append({'ref': f"장소 {p['id'][:8]} {p['name']}: 건물 표기 {OLD} → {NEW}", 'op': 'update_place', 'args': {'id': p['id'], 'expectedRevision': p['revision'], 'buildingId': NEW}, 'grade': '원천(건물 자료)', 'evidence': EVID})
 (HERE / 'groups').mkdir(exist_ok=True)

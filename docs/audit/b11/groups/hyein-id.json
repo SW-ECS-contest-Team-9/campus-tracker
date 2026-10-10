@@ -1,15 +1,17 @@
 {
  "id": "B11-hyein-id",
  "zone": "혜인관",
- "comment": "B11 혜인관 건물 표기 건물5 → 혜인관 (길 8, 장소 2)",
+ "comment": "B11 혜인관 건물 표기 건물5 → 혜인관 (길 8, 장소 0)",
  "ops": [
   {
    "ref": "길 0d88669d 혜인관 1층 통로 (추정): 건물 표기 건물5 → 혜인관",
    "op": "update_road",
    "args": {
     "id": "0d88669d-bd1a-4417-aaf4-8938b64073e4",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -19,8 +21,10 @@
    "op": "update_road",
    "args": {
     "id": "20277429-1d12-4a0d-9c23-dad4b3574de5",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -30,8 +34,10 @@
    "op": "update_road",
    "args": {
     "id": "96511fe1-a1f0-4326-8c04-7dc1b6746d7d",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -41,8 +47,10 @@
    "op": "update_road",
    "args": {
     "id": "5544cab2-86e9-4cf6-94b1-ea319606e83b",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -52,8 +60,10 @@
    "op": "update_road",
    "args": {
     "id": "89ce1806-d956-4d8e-93b0-9a52f517187d",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -63,8 +73,10 @@
    "op": "update_road",
    "args": {
     "id": "fa7d28d0-2aee-4d69-b872-eed9c1221284",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -74,8 +86,10 @@
    "op": "update_road",
    "args": {
     "id": "5aea9b42-15e8-4fa1-be44-50e22922d65a",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
@@ -85,30 +99,10 @@
    "op": "update_road",
    "args": {
     "id": "2e0d36ec-82bc-47ca-8870-30384eebdfee",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
-   },
-   "grade": "원천(건물 자료)",
-   "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
-  },
-  {
-   "ref": "장소 97652b58 혜인관 입구(1): 건물 표기 건물5 → 혜인관",
-   "op": "update_place",
-   "args": {
-    "id": "97652b58-f485-4dda-8ca8-f2d194e2870b",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
-   },
-   "grade": "원천(건물 자료)",
-   "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
-  },
-  {
-   "ref": "장소 ffc06312 혜인관 입구(2): 건물 표기 건물5 → 혜인관",
-   "op": "update_place",
-   "args": {
-    "id": "ffc06312-e805-44ad-941e-136e397ed54c",
-    "expectedRevision": 1,
-    "buildingId": "혜인관"
+    "expectedRevision": 2,
+    "attrs": {
+     "buildingId": "혜인관"
+    }
    },
    "grade": "원천(건물 자료)",
    "evidence": "혜인관 노트 B11: 캠퍼스 지도 파일이 실제 혜인관 도형에 이름을 주지 않아 서버 건물 id 가 건물5 였다. backend/data/campus-map/overrides/building-ids.json 이 혜인관으로 바로잡았다(H02)"
