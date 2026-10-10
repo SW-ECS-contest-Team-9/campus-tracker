@@ -2,12 +2,15 @@
  * Imports the rough campus 3D model (QGIS GeoPackage, layer buildings_3d) for the preview map and activates it.
  * docs/CAMPUS_3D_PREVIEW_PLAN.md
  *
- *   npm run scene:import -- --dir=/Users/hoshi/Desktop/skuniv_shp/campus_3d [--keep-absolute] [--dry-run]
+ *   npm run scene:import -- --dir=/Users/hoshi/Desktop/skuniv_shp/campus_3d [--keep-absolute] [--no-overrides] [--dry-run]
  *
  * - Building heights (height_m, register or estimate) come from the GeoPackage. Base and roof are RECOMPUTED on
  *   the active terrain DEM (the one fusion uses) with the model's rules; --keep-absolute takes roof_m/base_m as given.
  * - Gates (abort, nothing activated): EPSG:5186, valid geometries, every building matches a campus_buildings
  *   footprint of the active campus map (IoU >= 0.99), all under the DEM, roof above and base below the ground.
+ * - Roof overrides (data/scene/overrides/building-roofs.json): a listed building takes the given roof elevation and
+ *   height source instead of the GeoPackage height; the base is unchanged. They give the scene another version id.
+ *   --no-overrides (or no file) imports exactly the GeoPackage model, with the id it had before.
  * - The source files are copied to backend/data/scene/source with their SHA-256 (SOURCES.json).
  */
 import { createHash } from 'node:crypto';
@@ -18,9 +21,11 @@ import { pool, withTransaction } from '../src/config/database.js';
 import { readGpkgLayer, type Ring } from '../src/geo/gpkg.js';
 import { terrain } from '../src/geo/terrain.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
+import { overrideHeights, parseRoofOverrides, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
-const { values: args } = parseArgs({ options: { dir: { type: 'string' }, 'keep-absolute': { type: 'boolean', default: false }, 'dry-run': { type: 'boolean', default: false } } });
+const { values: args } = parseArgs({ options: { dir: { type: 'string' }, 'keep-absolute': { type: 'boolean', default: false }, 'no-overrides': { type: 'boolean', default: false }, 'dry-run': { type: 'boolean', default: false } } });
 const DEST = path.resolve(import.meta.dirname, '../data/scene/source');
+const OVERRIDES = path.resolve(import.meta.dirname, '../data/scene/overrides/building-roofs.json');
 const FILES = ['campus.gpkg', 'building_heights.csv', 'validation.json', 'README.md', 'build_campus.py', 'campus_3d.qgz'];
 const sha = (f: string) => createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 const r2 = (v: number) => Math.round(v * 100) / 100;
@@ -39,12 +44,14 @@ async function main() {
   if (!mv.length) throw new Error('No active campus map (npm run spatial:import)');
   const mapVersion = mv[0].id;
   const mode = args['keep-absolute'] ? 'ABSOLUTE' : 'RECOMPUTED';
+  const overrides = args['no-overrides'] || !fs.existsSync(OVERRIDES) ? [] : parseRoofOverrides(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
 
   const problems: string[] = [];
   const rows: Record<string, unknown>[] = [];
   const out: { buildingId: string; name: string | null; heightM: number; source: string; registerId: string | null; floors: number | null;
     baseM: number; roofM: number; tMin: number; tMax: number; srcBase: number | null; srcRoof: number | null; note: string | null; geojson: string }[] = [];
   const used = new Set<string>();
+  for (const o of overrides) if (!layer.features.some((f) => f.properties.name === o.name)) problems.push(`roof override ${o.name}: no such building in buildings_3d`);
   for (const f of layer.features) {
     const p = f.properties as { name: string | null; height_m: number | null; height_source: string | null; register_id: string | null; ground_floors: number | null; base_m: number | null; roof_m: number | null; note: string | null };
     const g = f.geometry;
@@ -79,14 +86,24 @@ async function main() {
     }
     const h = blockHeights(samples as number[], p.height_m ?? 0);
     const baseM = mode === 'ABSOLUTE' && p.base_m !== null ? p.base_m : h.baseM;
-    const roofM = mode === 'ABSOLUTE' && p.roof_m !== null ? p.roof_m : h.roofM;
+    let roofM = mode === 'ABSOLUTE' && p.roof_m !== null ? p.roof_m : h.roofM;
+    let heightM = p.height_m ?? 0;
+    const o = overrides.find((x) => x.name === p.name);
+    if (o) {
+      try {
+        ({ heightM, roofM } = overrideHeights(samples as number[], h, o.roofM));
+      } catch (err) {
+        problems.push(`${p.name}: ${(err as Error).message}`);
+      }
+    }
     if (!(baseM < h.terrainMinM)) problems.push(`${p.name}: base ${baseM} not below the ground ${h.terrainMinM}`);
     if (!(roofM > h.terrainMaxM)) problems.push(`${p.name}: roof ${roofM} not above the ground ${h.terrainMaxM}`);
     if (p.name && best.display && p.name !== best.display) problems.push(`${p.name}: building metadata calls ${best.building_id} "${best.display}"`);
-    const note = [p.note, h.roofRaised && mode === 'RECOMPUTED' ? 'roof raised to DEM max + 3 m on the server DEM' : null].filter(Boolean).join('; ') || null;
-    out.push({ buildingId: best.building_id, name: p.name, heightM: p.height_m ?? 0, source: p.height_source ?? 'ESTIMATE', registerId: p.register_id || null,
+    const note = [p.note, h.roofRaised && mode === 'RECOMPUTED' && !o ? 'roof raised to DEM max + 3 m on the server DEM' : null,
+      o ? `roof ${o.roofM} m from ${o.evidence.source} (${o.evidence.collectedOn}, ${o.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); GeoPackage height ${p.height_m} m ${p.height_source}` : null].filter(Boolean).join('; ') || null;
+    out.push({ buildingId: best.building_id, name: p.name, heightM, source: o?.heightSource ?? p.height_source ?? 'ESTIMATE', registerId: p.register_id || null,
       floors: p.ground_floors, baseM, roofM, tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, note, geojson });
-    rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), height: p.height_m, source: p.height_source, base: baseM, roof: roofM,
+    rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), height: heightM, source: o?.heightSource ?? p.height_source, base: baseM, roof: roofM,
       'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(roofM - p.roof_m), raised: h.roofRaised ? 'yes' : '' });
   }
   console.table(rows);
@@ -95,9 +112,9 @@ async function main() {
     throw new Error('Gates failed: nothing imported');
   }
   const gpkgSha = sha(gpkg);
-  const id = `campus3d-${createHash('sha256').update(`${gpkgSha}#${terrainVersion}#${mapVersion}#${mode}`).digest('hex').slice(0, 8)}`;
+  const id = sceneVersionId(gpkgSha, terrainVersion, mapVersion, mode, overrides.length ? sha(OVERRIDES) : undefined);
   if (args['dry-run']) {
-    console.log(`\ndry run: would activate ${id} (terrain ${terrainVersion}, map ${mapVersion}, ${mode})`);
+    console.log(`\ndry run: would activate ${id} (terrain ${terrainVersion}, map ${mapVersion}, ${mode}, roof overrides ${overrides.length})`);
     return;
   }
 
@@ -116,7 +133,7 @@ async function main() {
     await client.query('UPDATE scene_versions SET active = false WHERE active');
     await client.query(
       `INSERT INTO scene_versions (id, source_sha256, terrain_version_id, map_version_id, height_mode, active, metadata) VALUES ($1, $2, $3, $4, $5, true, $6)`,
-      [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows })],
+      [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows, ...(overrides.length ? { roofOverrides: overrides } : {}) })],
     );
     for (const b of out) {
       await client.query(
@@ -127,7 +144,7 @@ async function main() {
       );
     }
   });
-  console.log(`\nactivated ${id}: ${out.length} buildings on terrain ${terrainVersion} (${mode}). Reload the preview.`);
+  console.log(`\nactivated ${id}: ${out.length} buildings on terrain ${terrainVersion} (${mode}, roof overrides ${overrides.length}). Reload the preview.`);
 }
 
 main()

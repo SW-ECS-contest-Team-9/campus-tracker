@@ -5,6 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { decodeGpkgGeometry, readGpkgLayer } from '../src/geo/gpkg.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
+import { overrideHeights, parseRoofOverrides, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 /** GeoPackage blob: "GP", version 0, flags (little endian, no envelope), srs 5186, then WKB polygon. */
 function gpkgPolygon(ring: [number, number][]): Uint8Array {
@@ -41,4 +42,30 @@ test('block heights: base below the lowest ground, roof = median + height, never
   assert.equal(steep.roofM, 133);
   assert.equal(steep.roofRaised, true);
   assert.equal(outlineSamples([[[[0, 0], [10, 0], [10, 10], [0, 0]]]], 2).length, 5 + 5 + 8);
+});
+
+test('roof overrides: stored file carries provenance and names buildings of the model; heights stay consistent', () => {
+  const dir = path.resolve(import.meta.dirname, '../data/scene');
+  const overrides = parseRoofOverrides(JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8')));
+  const names = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features.map((f) => f.properties.name);
+  assert.ok(overrides.length > 0 && overrides.every((o) => names.includes(o.name) && o.heightSource.length <= 16));
+  assert.ok(overrides.every((o) => o.evidence.independentSurvey === false)); // nothing here is a field survey yet
+
+  const samples = [131, 139, 139.5, 140.8];
+  const h = blockHeights(samples, 14);
+  assert.deepEqual(overrideHeights(samples, h, 189.4), { heightM: 50.15, roofM: 189.4 }); // 189.4 - median 139.25
+  assert.throws(() => overrideHeights(samples, h, 140.8), /not above the ground/);
+
+  const entry = { name: 'A', roofM: 10, heightSource: 'SMAP_MESH', evidence: { source: 's', collectedOn: '2026-10-10', level: 'l', independentSurvey: false } };
+  assert.equal(parseRoofOverrides({ buildings: [entry] })[0].roofM, 10);
+  assert.throws(() => parseRoofOverrides({ buildings: [entry, entry] }), /twice/);
+  assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, evidence: { source: 's' } }] }), /evidence/);
+  assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, heightSource: 'REGISTER' }] }), /heightSource/);
+  assert.throws(() => parseRoofOverrides({ buildings: [{ ...entry, roofM: '189' }] }), /roofM/);
+});
+
+test('scene version id: unchanged without roof overrides (the live id), different with them', () => {
+  const live = ['26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13', 'seoul5000-2015-ba7fcb19', '28265795d5fb0966', 'RECOMPUTED'] as const;
+  assert.equal(sceneVersionId(...live), 'campus3d-ae7db7a7');
+  assert.notEqual(sceneVersionId(...live, 'abc'), 'campus3d-ae7db7a7');
 });

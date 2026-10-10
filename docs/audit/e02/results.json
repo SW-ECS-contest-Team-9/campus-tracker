@@ -1,0 +1,553 @@
+{
+ "a_highRoof": {
+  "insideCells": 216,
+  "insideHigh": 212,
+  "highShareOfOutlineCells": 0.98,
+  "insideNotHigh": [
+   {
+    "xy": [
+     201118,
+     557334
+    ],
+    "z": 144.9,
+    "model": ".",
+    "distToOutlineEdgeM": 0.04
+   },
+   {
+    "xy": [
+     201096,
+     557342
+    ],
+    "z": 139.1,
+    "model": ".",
+    "distToOutlineEdgeM": 0.01
+   },
+   {
+    "xy": [
+     201092,
+     557344
+    ],
+    "z": 145.4,
+    "model": "W",
+    "distToOutlineEdgeM": 0.17
+   },
+   {
+    "xy": [
+     201088,
+     557346
+    ],
+    "z": 169.8,
+    "model": "W",
+    "distToOutlineEdgeM": 0.34
+   }
+  ],
+  "flatHigh": {
+   "n": 147,
+   "min": 188.8,
+   "p10": 189.0,
+   "median": 189.4,
+   "p90": 191.3,
+   "max": 191.9
+  },
+  "slab(<=median+1)": {
+   "n": 96,
+   "min": 188.8,
+   "p10": 188.9,
+   "median": 189.3,
+   "p90": 189.5,
+   "max": 190.2
+  },
+  "aboveMedian+1(parapet/penthouse)": {
+   "n": 51,
+   "min": 190.5,
+   "p10": 190.8,
+   "median": 190.8,
+   "p90": 191.6,
+   "max": 191.9
+  },
+  "allHighInside": {
+   "n": 212,
+   "min": 186.6,
+   "p10": 189.0,
+   "median": 190.15,
+   "p90": 191.4,
+   "max": 193.5
+  }
+ },
+ "b_lowPart": {
+  "cells": [
+   {
+    "xy": [
+     201098,
+     557336
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 4.63
+   },
+   {
+    "xy": [
+     201098,
+     557338
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 2.81
+   },
+   {
+    "xy": [
+     201100,
+     557336
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 3.8
+   },
+   {
+    "xy": [
+     201100,
+     557338
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 1.98
+   },
+   {
+    "xy": [
+     201102,
+     557334
+    ],
+    "z": 149.7,
+    "insideOutline": false,
+    "distToOutlineM": 4.79
+   },
+   {
+    "xy": [
+     201102,
+     557336
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 2.97
+   },
+   {
+    "xy": [
+     201104,
+     557334
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 3.97
+   },
+   {
+    "xy": [
+     201104,
+     557336
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 2.14
+   },
+   {
+    "xy": [
+     201106,
+     557334
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 3.14
+   },
+   {
+    "xy": [
+     201108,
+     557332
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 4.13
+   },
+   {
+    "xy": [
+     201108,
+     557334
+    ],
+    "z": 148.8,
+    "insideOutline": false,
+    "distToOutlineM": 2.31
+   },
+   {
+    "xy": [
+     201120,
+     557358
+    ],
+    "z": 140.0,
+    "insideOutline": false,
+    "distToOutlineM": 1.76
+   }
+  ],
+  "z": {
+   "n": 12,
+   "min": 140.0,
+   "p10": 148.8,
+   "median": 148.8,
+   "p90": 148.8,
+   "max": 149.7
+  },
+  "insideOutline": 0,
+  "areaM2": 48
+ },
+ "c_planEdge": {
+  "convention": "offset = signed distance of a roof-edge bracket midpoint from the source outline, + outside. A bracket is 2 m wide, so the edge is known to +-1 m at best.",
+  "brackets": 79,
+  "outlinePassesBetweenTheTwoCells": 68,
+  "offsetMid": {
+   "n": 79,
+   "min": -1.25,
+   "p10": -0.73,
+   "median": -0.02,
+   "p90": 0.67,
+   "max": 1.04
+  },
+  "absOffsetMedian": 0.37,
+  "absOffsetP90": 0.85,
+  "highCellsOutsideOutline": {
+   "n": 2,
+   "of": 214,
+   "maxDistM": 0.13
+  },
+  "bySide": [
+   {
+    "from": [
+     201126.65,
+     557352.12
+    ],
+    "to": [
+     201118.17,
+     557333.89
+    ],
+    "lengthM": 20.11,
+    "brackets": 14,
+    "offsetMedianM": -0.13,
+    "offsetMinM": -0.86,
+    "offsetMaxM": 0.83
+   },
+   {
+    "from": [
+     201118.17,
+     557333.89
+    ],
+    "to": [
+     201110.51,
+     557337.24
+    ],
+    "lengthM": 8.36,
+    "brackets": 4,
+    "offsetMedianM": -0.01,
+    "offsetMinM": -0.38,
+    "offsetMaxM": 0.65
+   },
+   {
+    "from": [
+     201110.51,
+     557337.24
+    ],
+    "to": [
+     201109.92,
+     557335.66
+    ],
+    "lengthM": 1.68,
+    "brackets": 2,
+    "offsetMedianM": 0.78,
+    "offsetMinM": 0.67,
+    "offsetMaxM": 0.89
+   },
+   {
+    "from": [
+     201109.92,
+     557335.66
+    ],
+    "to": [
+     201082.34,
+     557348.2
+    ],
+    "lengthM": 30.29,
+    "brackets": 21,
+    "offsetMedianM": -0.26,
+    "offsetMinM": -1.25,
+    "offsetMaxM": 0.67
+   },
+   {
+    "from": [
+     201082.34,
+     557348.2
+    ],
+    "to": [
+     201092.17,
+     557368.91
+    ],
+    "lengthM": 22.92,
+    "brackets": 15,
+    "offsetMedianM": 0.38,
+    "offsetMinM": -0.19,
+    "offsetMaxM": 1.04
+   },
+   {
+    "from": [
+     201092.17,
+     557368.91
+    ],
+    "to": [
+     201119.44,
+     557356.32
+    ],
+    "lengthM": 30.04,
+    "brackets": 19,
+    "offsetMedianM": 0.02,
+    "offsetMinM": -0.82,
+    "offsetMaxM": 0.71
+   },
+   {
+    "from": [
+     201119.44,
+     557356.32
+    ],
+    "to": [
+     201119.07,
+     557355.71
+    ],
+    "lengthM": 0.71,
+    "brackets": 1,
+    "offsetMedianM": -0.22,
+    "offsetMinM": -0.22,
+    "offsetMaxM": -0.22
+   },
+   {
+    "from": [
+     201119.07,
+     557355.71
+    ],
+    "to": [
+     201126.65,
+     557352.12
+    ],
+    "lengthM": 8.39,
+    "brackets": 6,
+    "offsetMedianM": 0.25,
+    "offsetMinM": -0.34,
+    "offsetMaxM": 0.62
+   }
+  ],
+  "nearestHighCellToLowPatchM": 2.83,
+  "outlineAreaM2": 855.88
+ },
+ "crossCheck": {
+  "한림관": {
+   "gridCoversOutlineShare": 0.97,
+   "meshRoof": {
+    "n": 104,
+    "min": 188.1,
+    "p10": 188.1,
+    "median": 188.1,
+    "p90": 197.3,
+    "max": 197.3
+   },
+   "sceneRoofM": 196.398,
+   "heightSource": "REGISTER",
+   "heightM": 55.05,
+   "sceneMinusMeshMedian": 8.3,
+   "sceneMinusMeshMax": -0.9
+  },
+  "본관": {
+   "gridCoversOutlineShare": 0.47,
+   "meshRoof": {
+    "n": 207,
+    "min": 149.7,
+    "p10": 151.8,
+    "median": 153.8,
+    "p90": 155.8,
+    "max": 156.1
+   },
+   "sceneRoofM": 154.683,
+   "heightSource": "REGISTER",
+   "heightM": 21.35,
+   "sceneMinusMeshMedian": 0.88,
+   "sceneMinusMeshMax": -1.42
+  },
+  "북악관": {
+   "gridCoversOutlineShare": 0.23,
+   "meshRoof": {
+    "n": 126,
+    "min": 157.3,
+    "p10": 159.7,
+    "median": 160.7,
+    "p90": 160.7,
+    "max": 161.1
+   },
+   "sceneRoofM": 161.744,
+   "heightSource": "ESTIMATE",
+   "heightM": 30.51,
+   "sceneMinusMeshMedian": 1.04,
+   "sceneMinusMeshMax": 0.64
+  }
+ },
+ "smapElevationApi": [
+  {
+   "name": "문예관 외곽선 중앙(W 모델 고층 지붕)",
+   "x": 201104.0,
+   "y": 557352.0,
+   "dem_z": 140.06130981445312,
+   "buld_z": 59.1771850585938
+  },
+  {
+   "name": "문예관 외곽선 남서부(W 모델 148.8 저층면)",
+   "x": 201102.0,
+   "y": 557340.0,
+   "dem_z": 141.7864532470703,
+   "buld_z": 59.1771850585938
+  },
+  {
+   "name": "한림관 중앙(H 모델)",
+   "x": 201114.0,
+   "y": 557295.0,
+   "dem_z": 128.78562927246094,
+   "buld_z": 72.066
+  },
+  {
+   "name": "북악관 동부(B 모델)",
+   "x": 201080.0,
+   "y": 557370.0,
+   "dem_z": 132.28765869140625,
+   "buld_z": 30.3865203857422
+  }
+ ],
+ "serverRule": {
+  "current": {
+   "baseM": 130.013,
+   "roofM": 153.238,
+   "heightM": 14.0,
+   "terrainMedianM": 139.238,
+   "terrainMinM": 131.013,
+   "terrainMaxM": 140.848
+  },
+  "withOverride": {
+   "baseM": 130.013,
+   "roofM": 189.4,
+   "heightM": 50.162
+  },
+  "liveScene": {
+   "baseM": 130.013,
+   "roofM": 153.238,
+   "heightM": 14,
+   "heightSource": "ESTIMATE"
+  }
+ },
+ "roofError": {
+  "current": {
+   "vsSlabMedian": -36.16,
+   "vsHighCellsMin": -40.26,
+   "vsHighCellsMax": -33.36,
+   "cellsWithin1m": 0,
+   "cellsWithin2m": 0,
+   "cells": 212
+  },
+  "withOverride": {
+   "vsSlabMedian": 0.0,
+   "vsHighCellsMin": -4.1,
+   "vsHighCellsMax": 2.8,
+   "cellsWithin1m": 103,
+   "cellsWithin2m": 185,
+   "cells": 212
+  }
+ },
+ "roads": {
+  "maxZInside": 142.44,
+  "aboveCurrentRoof": 0,
+  "aboveOverrideRoof": 0,
+  "list": [
+   {
+    "id": "66f166a8",
+    "name": "문예관 지하–지하 통로 수평 직결 (고도 추정)",
+    "structure": "indoor_corridor",
+    "buildingId": "문예관",
+    "levelId": null,
+    "verticesInside": 1,
+    "zInside": [
+     136.39,
+     136.39
+    ]
+   },
+   {
+    "id": "23de6a42",
+    "name": "문예관 상부 진입 통로 (C02 seq 839–855·고도 추정)",
+    "structure": "indoor_corridor",
+    "buildingId": "문예관",
+    "levelId": null,
+    "verticesInside": 3,
+    "zInside": [
+     142.44,
+     142.44
+    ]
+   },
+   {
+    "id": "48061bd1",
+    "name": "문예관 내부 하행계단 (C02 seq 855–878·단차 약6m 추정)",
+    "structure": "stairs",
+    "buildingId": "문예관",
+    "levelId": null,
+    "verticesInside": 5,
+    "zInside": [
+     136.39,
+     142.44
+    ]
+   },
+   {
+    "id": "131616f9",
+    "name": "문예관 계단 아래 공간 동선 (C02 seq 878–893·고도 추정)",
+    "structure": "indoor_corridor",
+    "buildingId": "문예관",
+    "levelId": null,
+    "verticesInside": 5,
+    "zInside": [
+     136.39,
+     136.39
+    ]
+   },
+   {
+    "id": "3ab80c19",
+    "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+    "structure": "ordinary",
+    "buildingId": null,
+    "levelId": null,
+    "verticesInside": 2,
+    "zInside": [
+     142.44,
+     142.44
+    ]
+   },
+   {
+    "id": "9112314a",
+    "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+    "structure": "ordinary",
+    "buildingId": null,
+    "levelId": null,
+    "verticesInside": 2,
+    "zInside": [
+     142.44,
+     142.44
+    ]
+   },
+   {
+    "id": "fdb059c4",
+    "name": "문예관 하행계단 아래 평탄부 (추정)",
+    "structure": "ordinary",
+    "buildingId": null,
+    "levelId": null,
+    "verticesInside": 1,
+    "zInside": [
+     142.44,
+     142.44
+    ]
+   }
+  ]
+ }
+}

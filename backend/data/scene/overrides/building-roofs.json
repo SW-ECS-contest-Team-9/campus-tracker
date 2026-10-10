@@ -1,0 +1,22 @@
+{
+  "about": "Roof overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts). Remove an entry, or import with --no-overrides, to get the GeoPackage model back. S-MAP is not an independent survey: values here agree with S-MAP, not with a field measurement.",
+  "buildings": [
+    {
+      "name": "문예관",
+      "roofM": 189.4,
+      "heightSource": "SMAP_MESH",
+      "evidence": {
+        "source": "S-MAP 3D viewer mesh surface picks, 2 m grid",
+        "collectedOn": "2026-10-10",
+        "level": "source data (one provider), not field verified",
+        "independentSurvey": false,
+        "samples": "147 flat roof cells inside the source footprint: median 189.4 m, p10-p90 189.0-191.3 m; roof slab without the parapet band 96 cells 188.8-190.2 m",
+        "footprint": "212 of 216 grid cells inside the footprint are roof (>= 181.3 m); roof edge vs footprint: median offset 0.0 m, 90 % within 0.85 m, max 1.25 m (grid 2 m). The footprint is one high block, not two parts",
+        "crossCheck": "same grid, register-height buildings: 한림관 scene roof 196.4 vs mesh top 197.3 m, 본관 154.7 vs mesh median 153.8 m",
+        "replaces": "GeoPackage height 14 m ESTIMATE (4 floors x 3.5 m), roof 153.238 m on the server DEM",
+        "notCovered": "base, floor count, the low wing south of the footprint (S-MAP 148.8 m, 48 m2, outside the footprint), roof structures up to 193.5 m, vertical datum of S-MAP (one direct comparison, +0.03 m)",
+        "reproduce": "docs/audit/e02/munye_evidence.py -> docs/audit/e02/results.json"
+      }
+    }
+  ]
+}
