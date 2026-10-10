@@ -1,0 +1,159 @@
+{
+ "id": "F",
+ "zone": "안",
+ "comment": "운동장(면) 가장자리의 문 다섯 곳을 접속점으로",
+ "ops": [
+  {
+   "ref": "은주1관 입구(2) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "은주1관 입구(2) 5층 문 ~ 운동장 (148.9 m, 문 자리는 학교 표지)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "buildingId": null,
+    "path": [
+     {
+      "xy": [
+       201137.88,
+       557250.19
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201135.8,
+       557250.2
+      ],
+      "z": 148.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(문·층) + 확정(운동장 높이 문 = 5층) + 측정(148.9)",
+   "evidence": "사용자 확정 2026-10-10, 은주관 노트, F05 경계: 문 앞에서 화단이 끊김"
+  },
+  {
+   "ref": "은주2관 입구(2) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "은주2관 입구(2) 5층 문 ~ 운동장 남서 모서리 (148.9 m, 문 자리는 학교 표지. 사이 8 m 의 선은 추정)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "buildingId": null,
+    "path": [
+     {
+      "xy": [
+       201196.68,
+       557177.38
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201201.8,
+       557168.3
+      ],
+      "z": 148.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(문·층) + 측정(148.9), 선은 추정",
+   "evidence": "은주관 노트: 문 앞 S-MAP 지면 148.6~149.3 = 운동장 높이. E10 접근점은 표지에서 8.2 m(추정)"
+  },
+  {
+   "ref": "청운관 입구 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "청운관 1층 입구(학교 표지) ~ 운동장 (148.9 m. 열린 돌출부 아래로 들어감, 문 자리는 모름)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "buildingId": null,
+    "path": [
+     {
+      "xy": [
+       201214.68,
+       557276.77
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201216.5,
+       557279.8
+      ],
+      "z": 148.9
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(표지·층) + 측정(148.9), 문 자리는 모름",
+   "evidence": "청운관 노트 연결 관계 5: 운동장 바닥 ~ 청운관 1층 입구. 문 위치는 현장 확인 요청 F5 ①"
+  },
+  {
+   "ref": "혜인관 입구(2) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "혜인관 입구(2) B1층 문 ~ 운동장 동쪽 모서리 (문 149.6 m, 문 자리는 학교 표지. 선은 추정)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "buildingId": null,
+    "path": [
+     {
+      "xy": [
+       201242.28,
+       557257.99
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201247.7,
+       557255.8
+      ],
+      "z": 149.6
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(문·층) + S-MAP(149.1~149.8), 선은 추정",
+   "evidence": "혜인관 노트. E10 접근점은 표지에서 7.5 m(추정)"
+  },
+  {
+   "ref": "혜인관 입구(1) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "혜인관 입구(1) 문 앞 ~ 운동장 (운동장 높이 문 = B1층, 문 149.3 m. 문 자리는 학교 표지)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "path": [
+     {
+      "at": {
+       "nodeId": "ea9b5a91-9aa4-4445-89da-66aec151bc5a"
+      }
+     },
+     {
+      "xy": [
+       201218.7,
+       557213.7
+      ],
+      "z": 149.3
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "확정(운동장 높이 문 = B1) + 원천(위치) + S-MAP(148.9~149.4)",
+   "evidence": "사용자 확정 2026-10-10(사진 01), 혜인관 노트"
+  }
+ ]
+}

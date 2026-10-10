@@ -1,0 +1,442 @@
+{
+ "id": "P",
+ "zone": "안",
+ "comment": "출입구 장소 표지(길과 이어지지 않는 표지)",
+ "ops": [
+  {
+   "ref": "장소 대일관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "대일관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "대일관",
+    "description": "N03. 1층 로비. 높이 151.0 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201155.2,
+      557310.0
+     ],
+     "z": 151.0
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 대일관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "대일관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "대일관",
+    "description": "N03. 1층 복도. 높이 151.7 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201186.0,
+      557302.2
+     ],
+     "z": 151.7
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 대일관 입구(3) = 뒷문",
+   "op": "create_place",
+   "args": {
+    "name": "대일관 입구(3) = 뒷문",
+    "category": "building_entrance",
+    "buildingId": "대일관",
+    "description": "N03. 산책로에서 1층 복도로. 높이 152.0 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201182.5,
+      557321.4
+     ],
+     "z": 152.0
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 문예관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "문예관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "문예관",
+    "description": "N03. 3층 로비. 높이 144.2 m = 문 앞 지면(문 바닥은 모름). 근거 등급: 원천(위치·층), 확정(가는 길), S-MAP(평탄면), 추정(바닥)",
+    "position": {
+     "xy": [
+      201102.0,
+      557338.5
+     ],
+     "z": 144.2
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 문예관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "문예관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "문예관",
+    "description": "N03. 2층. 높이 138.9 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201093.0,
+      557342.5
+     ],
+     "z": 138.9
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 본관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "본관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "본관",
+    "description": "N03. 1층과 2층으로 갈 수 있음. 높이 127.8 m = 문 앞 지면(문 바닥은 모름). 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201060.8,
+      557304.0
+     ],
+     "z": 127.8
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 본관 입구(3)",
+   "op": "create_place",
+   "args": {
+    "name": "본관 입구(3)",
+    "category": "building_entrance",
+    "buildingId": "본관",
+    "description": "N03. 5층·6층 사이 계단으로 연결. 높이 139.9 m = 문 앞 지면(문 바닥은 모름). 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201097.8,
+      557317.0
+     ],
+     "z": 139.9
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 북악관 입구(1) = 정문",
+   "op": "create_place",
+   "args": {
+    "name": "북악관 입구(1) = 정문",
+    "category": "building_entrance",
+    "buildingId": "북악관",
+    "description": "N03. 1층 로비. 높이 134.1 m. 근거 등급: 확정(층·칸 수), 원천(위치), 바닥 높이는 추정(S-MAP 지면 + 확정 칸 수)",
+    "position": {
+     "xy": [
+      201043.7,
+      557368.7
+     ],
+     "z": 134.1
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 북악관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "북악관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "북악관",
+    "description": "N03. 1층 복도. 높이 134.1 m. 근거 등급: 원천(위치·층), S-MAP(지면), 바닥은 추정",
+    "position": {
+     "xy": [
+      201074.0,
+      557356.5
+     ],
+     "z": 134.1
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 북악관 입구(3)",
+   "op": "create_place",
+   "args": {
+    "name": "북악관 입구(3)",
+    "category": "building_entrance",
+    "buildingId": "북악관",
+    "description": "N03. 1층 복도. 높이 134.1 m. 근거 등급: 원천(위치·층), S-MAP(지면), 바닥은 추정",
+    "position": {
+     "xy": [
+      201013.8,
+      557382.7
+     ],
+     "z": 134.1
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 상승관 입구(마당 쪽, 추정)",
+   "op": "create_place",
+   "args": {
+    "name": "상승관 입구(마당 쪽, 추정)",
+    "category": "building_entrance",
+    "buildingId": "추가-상승관",
+    "description": "N03. 1층 로비. 높이 153.1 m. 근거 등급: 추정(위치: 어느 벽인지 확인 못 함), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201217.6,
+      557306.4
+     ],
+     "z": 153.1
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 유담관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "유담관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "유담관",
+    "description": "N03. 9층. 높이 129.2 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201038.5,
+      557283.0
+     ],
+     "z": 129.2
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 유담관 입구(3)",
+   "op": "create_place",
+   "args": {
+    "name": "유담관 입구(3)",
+    "category": "building_entrance",
+    "buildingId": "유담관",
+    "description": "N03. 3층. 높이 104.0 m. 근거 등급: 확정(위치), 원천(층), S-MAP(문 앞 지면), 추정(바닥)",
+    "position": {
+     "xy": [
+      200994.6,
+      557307.6
+     ],
+     "z": 104.0
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 은주1관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "은주1관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "은주관",
+    "description": "N03. 1층. 높이 131.3 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201120.8,
+      557252.7
+     ],
+     "z": 131.3
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 은주1관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "은주1관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "은주관",
+    "description": "N03. 5층. 높이 148.9 m. 근거 등급: 원천(위치·층), 측정(높이)",
+    "position": {
+     "xy": [
+      201135.8,
+      557250.2
+     ],
+     "z": 148.9
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 은주2관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "은주2관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "은주관#2관",
+    "description": "N03. 1층 로비. 높이 132.2 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201125.0,
+      557201.3
+     ],
+     "z": 132.2
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 은주2관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "은주2관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "은주관#2관",
+    "description": "N03. 5층. 높이 148.9 m. 근거 등급: 원천(위치·층), 측정(높이)",
+    "position": {
+     "xy": [
+      201201.8,
+      557168.3
+     ],
+     "z": 148.9
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 청운관 입구",
+   "op": "create_place",
+   "args": {
+    "name": "청운관 입구",
+    "category": "building_entrance",
+    "buildingId": "청운관",
+    "description": "N03. 1층. 높이 148.9 m. 근거 등급: 원천(위치·층), 측정(높이)",
+    "position": {
+     "xy": [
+      201216.5,
+      557279.8
+     ],
+     "z": 148.9
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 한림관 입구",
+   "op": "create_place",
+   "args": {
+    "name": "한림관 입구",
+    "category": "building_entrance",
+    "buildingId": "한림관",
+    "description": "N03. 1층 로비. 높이 127.2 m. 근거 등급: 원천(위치·층), 확정(앞 길에서 계단을 올라 1층으로 들어간다), 추정(바닥 높이)",
+    "position": {
+     "xy": [
+      201105.7,
+      557280.5
+     ],
+     "z": 127.2
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 혜인관 입구(1)",
+   "op": "create_place",
+   "args": {
+    "name": "혜인관 입구(1)",
+    "category": "building_entrance",
+    "buildingId": "건물5",
+    "description": "N03. 1층 로비와 B1층으로 갈 수 있음. 높이 149.3 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201218.7,
+      557213.7
+     ],
+     "z": 149.3
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 혜인관 입구(2)",
+   "op": "create_place",
+   "args": {
+    "name": "혜인관 입구(2)",
+    "category": "building_entrance",
+    "buildingId": "건물5",
+    "description": "N03. B1층. 높이 149.6 m. 근거 등급: 원천(위치·층), S-MAP(높이)",
+    "position": {
+     "xy": [
+      201247.7,
+      557255.8
+     ],
+     "z": 149.6
+    }
+   },
+   "grade": "원천(위치·층)",
+   "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리"
+  },
+  {
+   "ref": "장소 서문(후문) = 서문 주차장 출입구 (옹벽의 터널 입구)",
+   "op": "create_place",
+   "args": {
+    "name": "서문(후문) = 서문 주차장 출입구 (옹벽의 터널 입구)",
+    "category": "landmark",
+    "description": "N03. 차가 드나드는 서문(사용자 확정). 터널 입구는 북악관 북서쪽 옹벽 면(S-MAP·사진, B08). 학교 표지 (200967.8, 557401.5)·(200969.0, 557402.8)는 옹벽에서 서쪽 16 m 공도 위. 안쪽 지하 차도의 선은 모름이라 길과 잇지 않았다",
+    "position": {
+     "xy": [
+      200984.0,
+      557399.5
+     ],
+     "z": 117.0
+    }
+   },
+   "grade": "확정(있음), 자리·높이는 S-MAP 또는 추정",
+   "evidence": "학교 캠퍼스맵, 사용자 표시"
+  },
+  {
+   "ref": "장소 본관–한림관 연결통로 (본관 5층 = 한림관 3층, 실외 나무 데크)",
+   "op": "create_place",
+   "args": {
+    "name": "본관–한림관 연결통로 (본관 5층 = 한림관 3층, 실외 나무 데크)",
+    "category": "landmark",
+    "description": "N03. 자리 = 사용자 확정 2026-10-11(학교 표지). 높이 137.9 m 는 구조물 파일의 추정(본관 5층 138.1, 한림관 3층 137.8 계산값)",
+    "position": {
+     "xy": [
+      201098.0,
+      557302.7
+     ],
+     "z": 137.9
+    }
+   },
+   "grade": "확정(있음), 자리·높이는 S-MAP 또는 추정",
+   "evidence": "학교 캠퍼스맵, 사용자 표시"
+  }
+ ]
+}

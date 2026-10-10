@@ -1,0 +1,267 @@
+{
+ "id": "X",
+ "zone": "안",
+ "comment": "보행 출입 '모름' → '허용': 걸은 기록에서 나온 길과 사용자가 확정한 보행 길만",
+ "ops": [
+  {
+   "ref": "보행 허용 131616f9 문예관 계단 아래 공간 동선 (C02 seq 878–8",
+   "op": "update_road",
+   "args": {
+    "id": "131616f9-8371-4661-80d1-4e13fc0b5609",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 1d983e3a 유담관 9층 입구 통로 (두 C01 종합·추정)",
+   "op": "update_road",
+   "args": {
+    "id": "1d983e3a-7994-467c-8798-d6d20babff1e",
+    "expectedRevision": 6,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 23de6a42 문예관 상부 진입 통로 (C02 seq 839–855·",
+   "op": "update_road",
+   "args": {
+    "id": "23de6a42-cec7-4f92-b856-c1c043944a95",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 3ab80c19 문예관 입구 평탄 연결 (사진·고도 추정)",
+   "op": "update_road",
+   "args": {
+    "id": "3ab80c19-6983-43c8-a561-2542daf2d82d",
+    "expectedRevision": 6,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 48061bd1 문예관 내부 하행계단 (C02 seq 855–878·단",
+   "op": "update_road",
+   "args": {
+    "id": "48061bd1-f52a-4457-a604-0f58e82a9503",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 4ee99835 C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "args": {
+    "id": "4ee99835-2ccb-424c-9415-8370f290156d",
+    "expectedRevision": 9,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 699d0cbc 유담관 반층 하행계단 (단차1.59m 추정)",
+   "op": "update_road",
+   "args": {
+    "id": "699d0cbc-b66b-411d-898a-f02e32f74d9a",
+    "expectedRevision": 5,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 9112314a 문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+   "op": "update_road",
+   "args": {
+    "id": "9112314a-18aa-4821-821b-22528d8dcf91",
+    "expectedRevision": 8,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 9a3cce3f 대일관 1층 내부 통로 (고도 추정)",
+   "op": "update_road",
+   "args": {
+    "id": "9a3cce3f-8640-430e-9ab8-41806697359f",
+    "expectedRevision": 5,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 a03d33c3 대일관 측면 접근로 (기존 C02)",
+   "op": "update_road",
+   "args": {
+    "id": "a03d33c3-08b0-4bc6-ae9f-40b83c3296de",
+    "expectedRevision": 6,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 a7a51d3c 문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+   "op": "update_road",
+   "args": {
+    "id": "a7a51d3c-af49-4127-83ef-d4157247f27b",
+    "expectedRevision": 10,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 b17424ba C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "args": {
+    "id": "b17424ba-23eb-427f-b651-ba390b405e7f",
+    "expectedRevision": 9,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 fc50ca50 두 C01 종합 야외 접근 (위치·고도 근사)",
+   "op": "update_road",
+   "args": {
+    "id": "fc50ca50-2889-47b1-94a2-8dd8c66dc08a",
+    "expectedRevision": 5,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 3cb404de 문예관 하행계단 아래 평탄부 (추정)",
+   "op": "update_road",
+   "args": {
+    "id": "3cb404de-438e-45a4-87fe-e1064d2436e7",
+    "expectedRevision": 3,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 992af5b0 문예관 하행계단 아래 평탄부 (추정)",
+   "op": "update_road",
+   "args": {
+    "id": "992af5b0-0016-4499-adc0-c02c61122204",
+    "expectedRevision": 3,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 bf2acf00 C02 수집 경로 (2026-10-07)",
+   "op": "update_road",
+   "args": {
+    "id": "bf2acf00-c9eb-47d9-90d0-157496599d62",
+    "expectedRevision": 2,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 558c81e6 두 C01 종합 야외 접근 (위치·고도 근사)",
+   "op": "update_road",
+   "args": {
+    "id": "558c81e6-08c8-4af5-b928-e4865f18e287",
+    "expectedRevision": 4,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 dc64985c 두 C01 종합 야외 접근 (위치·고도 근사)",
+   "op": "update_road",
+   "args": {
+    "id": "dc64985c-3fea-41c0-a047-196bc29dc59d",
+    "expectedRevision": 5,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "측정(걸은 기록)",
+   "evidence": "수집 기록에서 나온 길은 사람이 걸은 길"
+  },
+  {
+   "ref": "보행 허용 0d09fd37 대일관 1층 높이 접근 통로 (추정)",
+   "op": "update_road",
+   "args": {
+    "id": "0d09fd37-61c8-4356-a7b5-0e5a9a31d68f",
+    "expectedRevision": 1,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  },
+  {
+   "ref": "보행 허용 f5e89f52 대일관 1층 높이 접근 통로 (추정)",
+   "op": "update_road",
+   "args": {
+    "id": "f5e89f52-d2c9-4532-89c7-fe3618999582",
+    "expectedRevision": 1,
+    "attrs": {
+     "pedestrianAccess": "allowed"
+    }
+   },
+   "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+   "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)"
+  }
+ ]
+}

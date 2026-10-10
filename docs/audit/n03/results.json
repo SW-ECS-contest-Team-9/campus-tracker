@@ -1,0 +1,1466 @@
+{
+ "note": "N03 시험용 DB 적용 결과(2026-10-11). 되돌리기: 아래 순서의 거꾸로, 변경 묶음을 하나씩 revert_changeset. 한 번에는 볼트 n03/00-backup-mobility-before.sql",
+ "groups": [
+  {
+   "id": "A",
+   "comment": "대일관 1층 실내 길을 층 높이로 올리고 로비 문·입구(2)와 잇기",
+   "batchId": "9ce7d749-31d3-4fc0-9f92-88c56450264d",
+   "ops": [
+    {
+     "ref": "대일관 1층 내부 통로 안쪽 꼭짓점 145.8 → 151.8",
+     "op": "update_road",
+     "grade": "S-MAP",
+     "evidence": "대일관 노트: 층 사다리 1층 151.8 m(S-MAP 기준, 입구(2) 151.7·입구(3) 152.0). 옛 145.8 m 는 옛 운동장 141.73 + 계단 4 m 라 틀림(풀림)",
+     "changeSetId": "f80aa09a-4839-41e8-a2b4-2192ffab240d",
+     "roads": [
+      "9a3cce3f-8640-430e-9ab8-41806697359f"
+     ]
+    },
+    {
+     "ref": "대일관 1층 내부 통로 현관 쪽 끝 145.8 → 151.8",
+     "op": "move_node",
+     "grade": "S-MAP",
+     "evidence": "대일관 노트: 층 사다리 1층 151.8 m(S-MAP 기준, 입구(2) 151.7·입구(3) 152.0). 옛 145.8 m 는 옛 운동장 141.73 + 계단 4 m 라 틀림(풀림)",
+     "changeSetId": "cbc06722-6a69-471b-a2d1-a05917f4533c",
+     "roads": [
+      "9a3cce3f-8640-430e-9ab8-41806697359f"
+     ]
+    },
+    {
+     "ref": "대일관 로비",
+     "op": "create_road",
+     "grade": "원천(입구(1) = 1층 로비), 선은 추정",
+     "evidence": "학교 출입구 목록 \"대일관 1층 로비 입구\". Z02 가 거둔 옛 연결선(19800cee) 자리. 문 151.0(현관 단, 추정 ±0.3), 실내 151.8(S-MAP)",
+     "changeSetId": "0e8d2129-66c2-4aba-befc-af4c59953ca5",
+     "roads": [
+      "c3575f67-bbd0-45fb-bd1e-0830be73bb4f"
+     ]
+    },
+    {
+     "ref": "대일관 입구(2) 문",
+     "op": "create_road",
+     "grade": "원천(문·층), S-MAP(문 앞 지면), 데크 높이는 추정",
+     "evidence": "학교 출입구 목록 \"1층 복도로 연결\", 구역 노트 B9: 데크가 문 앞을 지남, 벽 앞 단면 151.7/151.5/151.0",
+     "changeSetId": "93af0fee-e2e9-4d94-8963-ffe2bc35717b",
+     "roads": [
+      "53962aa5-68b5-4b6c-8a65-c03453119bf6",
+      "b94cdc87-aa91-41bb-9645-1eaaad26d54a",
+      "88537fed-540b-40a8-a9a1-a6ee597e9735"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "R",
+   "comment": "대일관 뒤 단과 뒷문, 옆 계단 사슬·뒤편 산책로 높이(S-MAP), 북악관 옆길과 잇기",
+   "batchId": "c795215e-3292-4d07-b291-441f791dbfe1",
+   "ops": [
+    {
+     "ref": "뒤편 산책로 높이를 S-MAP 으로 (가장 큰 차 0.5 m, 꼭짓점 19 → 31)",
+     "op": "update_road",
+     "grade": "S-MAP",
+     "evidence": "S-MAP 1 m 메시(2026-10-11 Z04 판독, 3x3 칸 가운데값). 옛 높이는 옛 지형(운동장 141.7 m 기준)에서 온 값이라 4~6 m 낮았다(E07·E08)",
+     "changeSetId": "dab48ac2-6b4f-4848-a4c1-7abdcb05e0b5",
+     "roads": [
+      "a03d33c3-08b0-4bc6-ae9f-40b83c3296de"
+     ]
+    },
+    {
+     "ref": "대일관 1층 내부 통로 뒤쪽 끝(실내 1층 151.8, 노트 층 사다리) 145.80 → 151.80",
+     "op": "move_node",
+     "grade": "S-MAP(노트 층 바닥)",
+     "evidence": "S-MAP 1 m 메시(2026-10-11 Z04 판독, 3x3 칸 가운데값). 옛 높이는 옛 지형(운동장 141.7 m 기준)에서 온 값이라 4~6 m 낮았다(E07·E08)",
+     "changeSetId": "a57ad355-3827-48ab-9100-f351795ca669",
+     "roads": [
+      "1f32cde9-0620-497f-b795-20371e9373c5",
+      "9a3cce3f-8640-430e-9ab8-41806697359f"
+     ]
+    },
+    {
+     "ref": "옆 계단 사슬: 짧은 계단 위 149.09 → 150.38",
+     "op": "move_node",
+     "grade": "S-MAP",
+     "evidence": "S-MAP 1 m 메시(2026-10-11 Z04 판독, 3x3 칸 가운데값). 옛 높이는 옛 지형(운동장 141.7 m 기준)에서 온 값이라 4~6 m 낮았다(E07·E08)",
+     "changeSetId": "c59858ad-3ae9-4842-9d4d-7feb630432ac",
+     "roads": [
+      "9c73ebe5-590c-455d-8c72-15a125e413af",
+      "a714275b-1647-4e6b-b5ba-067820204bd3"
+     ]
+    },
+    {
+     "ref": "옆 계단 사슬: 참 위쪽 148.98 → 149.42",
+     "op": "move_node",
+     "grade": "S-MAP",
+     "evidence": "S-MAP 1 m 메시(2026-10-11 Z04 판독, 3x3 칸 가운데값). 옛 높이는 옛 지형(운동장 141.7 m 기준)에서 온 값이라 4~6 m 낮았다(E07·E08)",
+     "changeSetId": "0ae477f7-e7b0-43e5-a218-3102cfc0ed46",
+     "roads": [
+      "64c08202-c303-4049-a633-a27797fcb287",
+      "a714275b-1647-4e6b-b5ba-067820204bd3"
+     ]
+    },
+    {
+     "ref": "뒤편 산책로 동쪽 끝 142.80 → 145.89",
+     "op": "move_node",
+     "grade": "S-MAP",
+     "evidence": "S-MAP 1 m 메시(2026-10-11 Z04 판독, 3x3 칸 가운데값). 옛 높이는 옛 지형(운동장 141.7 m 기준)에서 온 값이라 4~6 m 낮았다(E07·E08)",
+     "changeSetId": "38a821cd-6b5c-41c2-a6c8-18e3e3742103",
+     "roads": [
+      "d8ae25f8-0598-470e-9a61-020e473e1267",
+      "a03d33c3-08b0-4bc6-ae9f-40b83c3296de"
+     ]
+    },
+    {
+     "ref": "옆길~산책로",
+     "op": "create_road",
+     "grade": "확정(옆길과 산책로가 이어짐) + S-MAP(높이), 선은 추정",
+     "evidence": "사용자 2026-10-10(옆길과 뒤편 산책로는 이어진다), S-MAP 1 m 메시 132.4~132.6",
+     "changeSetId": "f20ae7d8-104a-4786-a546-059072475237",
+     "roads": [
+      "009dc3fe-d2ec-4c99-b12f-4e1710c73d8d"
+     ]
+    },
+    {
+     "ref": "대일관 뒷문",
+     "op": "create_road",
+     "grade": "원천(문·층) + S-MAP(문 앞 152.0, 뒤 단 151.9~152.1), 문 자리는 추정",
+     "evidence": "학교 출입구 목록 \"산책로에서 대일관 1층 복도로\", 사용자 그림 13(뒷문), 대일관 노트 출입구",
+     "changeSetId": "f250918f-fa98-42fc-9eef-94c70f76dc72",
+     "roads": [
+      "0d09fd37-61c8-4356-a7b5-0e5a9a31d68f",
+      "f5e89f52-d2c9-4532-89c7-fe3618999582",
+      "12b35f74-0269-4828-b299-962b897a5676"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F",
+   "comment": "운동장(면) 가장자리의 문 다섯 곳을 접속점으로",
+   "batchId": "3bb87cdc-5ee2-4fd9-a606-51cab8a58d31",
+   "ops": [
+    {
+     "ref": "은주1관 입구(2) 문",
+     "op": "create_road",
+     "grade": "원천(문·층) + 확정(운동장 높이 문 = 5층) + 측정(148.9)",
+     "evidence": "사용자 확정 2026-10-10, 은주관 노트, F05 경계: 문 앞에서 화단이 끊김",
+     "changeSetId": "31859f78-5b1c-4970-8690-79093f4c78d7",
+     "roads": [
+      "c8f392f2-b98a-4af7-9502-d3bff2d0df72"
+     ]
+    },
+    {
+     "ref": "은주2관 입구(2) 문",
+     "op": "create_road",
+     "grade": "원천(문·층) + 측정(148.9), 선은 추정",
+     "evidence": "은주관 노트: 문 앞 S-MAP 지면 148.6~149.3 = 운동장 높이. E10 접근점은 표지에서 8.2 m(추정)",
+     "changeSetId": "9c4f2571-0ab4-41d4-b6da-57171f7cc551",
+     "roads": [
+      "679961f1-7dcd-4fd9-9b23-af093453cbe7"
+     ]
+    },
+    {
+     "ref": "청운관 입구 문",
+     "op": "create_road",
+     "grade": "원천(표지·층) + 측정(148.9), 문 자리는 모름",
+     "evidence": "청운관 노트 연결 관계 5: 운동장 바닥 ~ 청운관 1층 입구. 문 위치는 현장 확인 요청 F5 ①",
+     "changeSetId": "34d2d6f7-85f3-4384-ba0c-baaa8701febe",
+     "roads": [
+      "a2a4de87-c19b-450f-8602-86be9595828f"
+     ]
+    },
+    {
+     "ref": "혜인관 입구(2) 문",
+     "op": "create_road",
+     "grade": "원천(문·층) + S-MAP(149.1~149.8), 선은 추정",
+     "evidence": "혜인관 노트. E10 접근점은 표지에서 7.5 m(추정)",
+     "changeSetId": "4cc05f9b-bd44-4f38-a041-4a0c1bc79559",
+     "roads": [
+      "7bd626dd-eed9-4673-950c-bb18d0cff17f"
+     ]
+    },
+    {
+     "ref": "혜인관 입구(1) 문",
+     "op": "create_road",
+     "grade": "확정(운동장 높이 문 = B1) + 원천(위치) + S-MAP(148.9~149.4)",
+     "evidence": "사용자 확정 2026-10-10(사진 01), 혜인관 노트",
+     "changeSetId": "4d415d98-26a3-4b14-be01-e6edf5c933fb",
+     "roads": [
+      "8a7b6361-efed-46c7-ba8f-3ae700552049"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "W",
+   "comment": "본관 입구(3), 본관 5층–한림관 3층 데크(문 두 곳). 지하 보행 구간에서 데크로 오르는 자리는 모름이라 잇지 않음",
+   "batchId": "061b86cc-ec6f-455b-b240-d45d3f604c60",
+   "ops": [
+    {
+     "ref": "본관 입구(3) 문",
+     "op": "create_road",
+     "grade": "원천(문) + S-MAP(문 앞 지면 139.4~140.5), 선은 추정",
+     "evidence": "본관 노트 B07: 위 보행로 쪽. 구역 노트 A30, G02: 남쪽 화단이 59~63 m 에서 끊김(문 앞)",
+     "changeSetId": "fe6b0c11-b70b-4092-b735-2f253cd22255",
+     "roads": [
+      "939d3e3a-5b88-457b-ac6e-3027c15938c0",
+      "aba83944-d7ad-4525-9e20-dd81d8a3bfef",
+      "29ba445f-238b-4802-9a18-bf59ccb52579"
+     ]
+    },
+    {
+     "ref": "데크 본관 쪽",
+     "op": "create_road",
+     "grade": "확정(자리·이어짐), 높이·문 자리는 추정",
+     "evidence": "사용자 확정 2026-10-11(자리, 다시 묻지 않음), 학교 캠퍼스맵 \"본관 5층과 한림관 3층을 연결\", 구조물 G02-DECK-MAIN-HANLIM(윗면 137.9: 본관 5층 138.1·한림관 3층 137.8 계산값, S-MAP 으로는 못 읽음)",
+     "changeSetId": "16873a22-4048-44f4-9b2f-182acc88f216",
+     "roads": [
+      "0399773c-4737-4573-a24e-c9e600c9b048"
+     ]
+    },
+    {
+     "ref": "데크 한림관 쪽",
+     "op": "create_road",
+     "grade": "확정(자리·이어짐), 높이·문 자리는 추정",
+     "evidence": "사용자 확정 2026-10-11(자리, 다시 묻지 않음), 학교 캠퍼스맵 \"본관 5층과 한림관 3층을 연결\", 구조물 G02-DECK-MAIN-HANLIM(윗면 137.9: 본관 5층 138.1·한림관 3층 137.8 계산값, S-MAP 으로는 못 읽음)",
+     "changeSetId": "e02567c0-c30a-4216-9758-b1594a941823",
+     "roads": [
+      "f8bb47f5-9ffd-4cd4-9650-1cf933aad31e"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U",
+   "comment": "한림관 1층 계단과 문, 은주2관 1층 로비 앞, 본관 입구(1) 앞 평탄부",
+   "batchId": "f1b34122-44ad-4a9e-a415-2e8703ad5a62",
+   "ops": [
+    {
+     "ref": "한림관 1층 계단",
+     "op": "create_road",
+     "grade": "확정(앞 길에서 계단을 올라 1층) + S-MAP(125.1 / 127.0~127.5), 단 수는 추정",
+     "evidence": "사용자 2026-10-10(사진 05·13), 한림관 노트: x 201107 단면에서 y 557270~557272 길 125.0~125.2 → 6 m 오름 → y 557277~557280 평탄 127.0~127.5",
+     "changeSetId": "39c765f7-6704-4cd6-903d-cf076b7a7856",
+     "roads": [
+      "ccf37081-22ad-480b-b8fc-90726b3f7bc2",
+      "6c877e98-dd45-4271-8365-0aa90e568d39",
+      "33523839-9534-4c39-98ea-27ce6e67c607"
+     ]
+    },
+    {
+     "ref": "한림관 1층 문",
+     "op": "create_road",
+     "grade": "원천(문·층) + S-MAP(평탄면)",
+     "evidence": "한림관 노트 출입구",
+     "changeSetId": "0a20e746-a9f4-4ab4-bffb-b82838b00538",
+     "roads": [
+      "c51fa3bc-8e9a-43e1-b369-9054299d32b6"
+     ]
+    },
+    {
+     "ref": "은주2관 1층 로비 앞",
+     "op": "create_road",
+     "grade": "원천(문·층) + S-MAP(사용자 핀 U034·U033·U031, 문 앞 131.8~132.2), 선은 핀을 이은 추정",
+     "evidence": "V02: 윗길 끝 너머 풋살장 쪽 핀 4개(U1-EXT). U031(132.2)이 문 표지에서 0.8 m",
+     "changeSetId": "76de9137-fd39-4620-939c-68d45e665ffb",
+     "roads": [
+      "7bc842f2-b460-4140-85cd-1ae78ce7bb01"
+     ]
+    },
+    {
+     "ref": "본관 입구(1) 앞",
+     "op": "create_road",
+     "grade": "원천(문) + S-MAP(문 앞 127.8, 평탄부 127.4~127.8), 선은 추정",
+     "evidence": "본관 노트 출입구(문 앞 지면 127.8). S-MAP 1 m 메시: 문 앞에서 남서 모서리 분기(127.8)까지 28 m 가 0.45 m 안에서 평평, 남쪽은 차도(125.3)로 떨어짐",
+     "changeSetId": "3de6f48f-1750-4096-9df0-a975c05879f8",
+     "roads": [
+      "344ccb61-ffda-4382-9838-e3d7b94debde"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "N",
+   "comment": "북악관 입구(3): 1층 복도와 서쪽 옆길을 계단으로",
+   "batchId": null,
+   "ops": [
+    {
+     "ref": "북악관 입구(3) 계단",
+     "op": "create_road",
+     "grade": "원천(입구(3) = 1층 복도) + 측정(보행 기록 두 번의 높이차) + S-MAP(옆길 지면 131.3~131.5), 자리는 추정",
+     "evidence": "북악관 노트 출입구 입구(3): 계단 있음. 1층 복도의 서쪽 끝(이름 없는 보행 기록 a648c084)이 표지에서 6.9 m",
+     "changeSetId": "4665678c-d40a-4f3a-88a0-cd2d03ffe0fe",
+     "roads": [
+      "5335ba4d-5166-4f70-8cd7-bf384ef3c3f5",
+      "eb66229b-98a2-436a-be33-28aba4158c6f",
+      "4e0e45f2-1770-43a3-8bb3-1650cdc69ef5"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "X",
+   "comment": "보행 출입 '모름' → '허용': 걸은 기록에서 나온 길과 사용자가 확정한 보행 길만",
+   "batchId": "47445dff-4c58-4bfa-8f68-9a46660ba693",
+   "ops": [
+    {
+     "ref": "보행 허용 131616f9 문예관 계단 아래 공간 동선 (C02 seq 878–8",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "51372351-875c-4024-b9b2-9e3bbed78e4a",
+     "roads": [
+      "131616f9-8371-4661-80d1-4e13fc0b5609"
+     ]
+    },
+    {
+     "ref": "보행 허용 1d983e3a 유담관 9층 입구 통로 (두 C01 종합·추정)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "b55cae18-1984-4175-a55c-e07091553d72",
+     "roads": [
+      "1d983e3a-7994-467c-8798-d6d20babff1e"
+     ]
+    },
+    {
+     "ref": "보행 허용 23de6a42 문예관 상부 진입 통로 (C02 seq 839–855·",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "b31fd48c-72c9-4c9f-bd4d-e316fa61baa7",
+     "roads": [
+      "23de6a42-cec7-4f92-b856-c1c043944a95"
+     ]
+    },
+    {
+     "ref": "보행 허용 3ab80c19 문예관 입구 평탄 연결 (사진·고도 추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "3b252059-8e06-427b-8f58-416a5e5bfe5c",
+     "roads": [
+      "3ab80c19-6983-43c8-a561-2542daf2d82d"
+     ]
+    },
+    {
+     "ref": "보행 허용 48061bd1 문예관 내부 하행계단 (C02 seq 855–878·단",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "35eb5add-cbeb-4132-bc29-1f033121048c",
+     "roads": [
+      "48061bd1-f52a-4457-a604-0f58e82a9503"
+     ]
+    },
+    {
+     "ref": "보행 허용 4ee99835 C02 수집 경로 (2026-10-07)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "03cdd2ec-a047-408a-a61a-51788781315d",
+     "roads": [
+      "4ee99835-2ccb-424c-9415-8370f290156d"
+     ]
+    },
+    {
+     "ref": "보행 허용 699d0cbc 유담관 반층 하행계단 (단차1.59m 추정)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "a45092c7-b48e-44f5-a321-3516f689d90d",
+     "roads": [
+      "699d0cbc-b66b-411d-898a-f02e32f74d9a"
+     ]
+    },
+    {
+     "ref": "보행 허용 9112314a 문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "f186754f-fe1e-457b-b5fd-85ac41788d27",
+     "roads": [
+      "9112314a-18aa-4821-821b-22528d8dcf91"
+     ]
+    },
+    {
+     "ref": "보행 허용 9a3cce3f 대일관 1층 내부 통로 (고도 추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "e4ebe520-9ba7-4a2c-af14-02e84de270f5",
+     "roads": [
+      "9a3cce3f-8640-430e-9ab8-41806697359f"
+     ]
+    },
+    {
+     "ref": "보행 허용 a03d33c3 대일관 측면 접근로 (기존 C02)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "60a4007d-8655-4b74-9ab0-6f3dd3bf71f3",
+     "roads": [
+      "a03d33c3-08b0-4bc6-ae9f-40b83c3296de"
+     ]
+    },
+    {
+     "ref": "보행 허용 a7a51d3c 문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "e04ecc38-8921-4f2e-8d9a-3face6720b6a",
+     "roads": [
+      "a7a51d3c-af49-4127-83ef-d4157247f27b"
+     ]
+    },
+    {
+     "ref": "보행 허용 b17424ba C02 수집 경로 (2026-10-07)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "8dc9d689-af39-4acb-b2c1-d0c357526a2c",
+     "roads": [
+      "b17424ba-23eb-427f-b651-ba390b405e7f"
+     ]
+    },
+    {
+     "ref": "보행 허용 fc50ca50 두 C01 종합 야외 접근 (위치·고도 근사)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "bcd6efa4-897b-40b3-98b0-8cf0d85502fd",
+     "roads": [
+      "fc50ca50-2889-47b1-94a2-8dd8c66dc08a"
+     ]
+    },
+    {
+     "ref": "보행 허용 3cb404de 문예관 하행계단 아래 평탄부 (추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "4c522f3f-dfda-4889-b1d9-ce284302df8f",
+     "roads": [
+      "3cb404de-438e-45a4-87fe-e1064d2436e7"
+     ]
+    },
+    {
+     "ref": "보행 허용 992af5b0 문예관 하행계단 아래 평탄부 (추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "2e9c18ca-93ff-4b68-a7c8-1f0862375872",
+     "roads": [
+      "992af5b0-0016-4499-adc0-c02c61122204"
+     ]
+    },
+    {
+     "ref": "보행 허용 bf2acf00 C02 수집 경로 (2026-10-07)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "53827c31-2c87-4bf0-95c8-1502c4b5d31d",
+     "roads": [
+      "bf2acf00-c9eb-47d9-90d0-157496599d62"
+     ]
+    },
+    {
+     "ref": "보행 허용 558c81e6 두 C01 종합 야외 접근 (위치·고도 근사)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "8f6bdac8-943f-44b5-9c54-6d152accf7f6",
+     "roads": [
+      "558c81e6-08c8-4af5-b928-e4865f18e287"
+     ]
+    },
+    {
+     "ref": "보행 허용 dc64985c 두 C01 종합 야외 접근 (위치·고도 근사)",
+     "op": "update_road",
+     "grade": "측정(걸은 기록)",
+     "evidence": "수집 기록에서 나온 길은 사람이 걸은 길",
+     "changeSetId": "f0a07181-777b-4aa2-997f-80a6fc8ec6f4",
+     "roads": [
+      "dc64985c-3fea-41c0-a047-196bc29dc59d"
+     ]
+    },
+    {
+     "ref": "보행 허용 0d09fd37 대일관 1층 높이 접근 통로 (추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "124a8317-7b90-44ee-bbf3-67ba8156a4c6",
+     "roads": [
+      "0d09fd37-61c8-4356-a7b5-0e5a9a31d68f"
+     ]
+    },
+    {
+     "ref": "보행 허용 f5e89f52 대일관 1층 높이 접근 통로 (추정)",
+     "op": "update_road",
+     "grade": "확정(사용자 그림·학교 출입구 목록의 길)",
+     "evidence": "사용자 그림 10(대일관 서쪽 끝 ~ 갈림 ~ 문예관 3층 로비), 학교 출입구 목록(대일관 1층 복도)",
+     "changeSetId": "8fe1040e-0815-46e8-90c0-b61c9c8b29cb",
+     "roads": [
+      "f5e89f52-d2c9-4532-89c7-fe3618999582"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "P",
+   "comment": "출입구 장소 표지(길과 이어지지 않는 표지)",
+   "batchId": "fd2bfa5c-10a4-4e9d-a7b3-d76a3f72eb42",
+   "ops": [
+    {
+     "ref": "장소 대일관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "b54d3790-fd23-4fe0-b271-beedd6447c88",
+     "roads": []
+    },
+    {
+     "ref": "장소 대일관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "507a2bd6-2cc0-411d-b2d8-a9201eb9c44e",
+     "roads": []
+    },
+    {
+     "ref": "장소 대일관 입구(3) = 뒷문",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "2f39e807-854a-45d7-a20a-33003029fee5",
+     "roads": []
+    },
+    {
+     "ref": "장소 문예관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "89d9e38e-da1c-4d47-a578-833f2a29cc11",
+     "roads": []
+    },
+    {
+     "ref": "장소 문예관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "795f19b6-d2ce-4c35-ad3d-754961386706",
+     "roads": []
+    },
+    {
+     "ref": "장소 본관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "7a356e21-ac5a-4614-9bd0-30a0da9ccb88",
+     "roads": []
+    },
+    {
+     "ref": "장소 본관 입구(3)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "a2b1cdce-6648-4d07-864e-8e17c77bff2b",
+     "roads": []
+    },
+    {
+     "ref": "장소 북악관 입구(1) = 정문",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "8b4e33a7-8fe8-4165-9fc6-dee9b1d71668",
+     "roads": []
+    },
+    {
+     "ref": "장소 북악관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "3f3bd7ea-097e-4197-b03c-43382bca3f1a",
+     "roads": []
+    },
+    {
+     "ref": "장소 북악관 입구(3)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "ebfbcbab-4282-4608-ab0b-48871b93c8bc",
+     "roads": []
+    },
+    {
+     "ref": "장소 상승관 입구(마당 쪽, 추정)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "2f31226e-17a5-44f1-a741-0c22efbcd0cb",
+     "roads": []
+    },
+    {
+     "ref": "장소 유담관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "09467286-12ce-480c-b705-5f0fd314aaf2",
+     "roads": []
+    },
+    {
+     "ref": "장소 유담관 입구(3)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "9a5d199a-06d1-4fb1-95bb-0ad8f79b9733",
+     "roads": []
+    },
+    {
+     "ref": "장소 은주1관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "d7caf2ca-573e-4d00-8308-2c4eb54b460c",
+     "roads": []
+    },
+    {
+     "ref": "장소 은주1관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "f434d73c-59b6-49a5-b24a-9ef7167daa62",
+     "roads": []
+    },
+    {
+     "ref": "장소 은주2관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "33b92220-3b77-47d0-88ba-0c59ab751d41",
+     "roads": []
+    },
+    {
+     "ref": "장소 은주2관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "92c14937-06d6-4fef-8812-ca1d5ecc8c12",
+     "roads": []
+    },
+    {
+     "ref": "장소 청운관 입구",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "8c77b57d-2175-4f8f-8522-a7d725be69dc",
+     "roads": []
+    },
+    {
+     "ref": "장소 한림관 입구",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "f0ba93dd-c79a-4e0e-9bb7-66d2a7a821e3",
+     "roads": []
+    },
+    {
+     "ref": "장소 혜인관 입구(1)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "9e9f0367-24c3-4335-8d79-3bb5ad4e7768",
+     "roads": []
+    },
+    {
+     "ref": "장소 혜인관 입구(2)",
+     "op": "create_place",
+     "grade": "원천(위치·층)",
+     "evidence": "학교 캠퍼스맵 출입구 목록, 동 노트 머리",
+     "changeSetId": "dce4ba8e-23b0-4356-b616-fe105b8575ba",
+     "roads": []
+    },
+    {
+     "ref": "장소 서문(후문) = 서문 주차장 출입구 (옹벽의 터널 입구)",
+     "op": "create_place",
+     "grade": "확정(있음), 자리·높이는 S-MAP 또는 추정",
+     "evidence": "학교 캠퍼스맵, 사용자 표시",
+     "changeSetId": "62ee0734-1c6a-4645-a5e2-a1fb40fd201d",
+     "roads": []
+    },
+    {
+     "ref": "장소 본관–한림관 연결통로 (본관 5층 = 한림관 3층, 실외 나무 데크)",
+     "op": "create_place",
+     "grade": "확정(있음), 자리·높이는 S-MAP 또는 추정",
+     "evidence": "학교 캠퍼스맵, 사용자 표시",
+     "changeSetId": "65b8262d-d4cd-476a-bdc4-d981f3aaae6a",
+     "roads": []
+    }
+   ]
+  }
+ ],
+ "before": {
+  "counts": {
+   "roads": 167,
+   "nodes": 156,
+   "places": 10,
+   "totalLengthM": 2539.8
+  },
+  "validation": {
+   "total": 181,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 2,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 32,
+    "ISOLATED_COMPONENT": 5,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 36,
+    "info": 145
+   }
+  },
+  "components": [
+   146,
+   9,
+   1
+  ],
+  "reachedFromGate": 9
+ },
+ "after": {
+  "counts": {
+   "roads": 189,
+   "nodes": 180,
+   "places": 33,
+   "totalLengthM": 2656.9
+  },
+  "validation": {
+   "total": 197,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 4,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 43,
+    "ISOLATED_COMPONENT": 8,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 53,
+    "info": 144
+   }
+  },
+  "components": [
+   176,
+   3,
+   1
+  ],
+  "reachedFromGate": 21
+ },
+ "matrixAfter": [
+  {
+   "target": "대일관 입구(1)",
+   "building": "대일관",
+   "floor": "1층 로비",
+   "doorZ": 151.0,
+   "pick": {
+    "node": "3bd52867",
+    "nodeId": "3bd52867-c0ab-4a66-96a2-6d77161a1359",
+    "planeM": 1.68,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 437.0,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 443.8,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 210.0,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "대일관 입구(2)",
+   "building": "대일관",
+   "floor": "1층 복도",
+   "doorZ": 151.7,
+   "pick": {
+    "node": "4ee52f0d",
+    "nodeId": "4ee52f0d-71dc-46b9-9ff7-14ea4d40b39a",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 472.9,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 479.7,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 245.9,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "대일관 입구(3) = 뒷문",
+   "building": "대일관",
+   "floor": "산책로에서 1층 복도로",
+   "doorZ": 152.0,
+   "pick": {
+    "node": "118a26b9",
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 480.6,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 487.4,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 253.6,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "문예관 입구(1)",
+   "building": "문예관",
+   "floor": "3층 로비",
+   "doorZ": null,
+   "pick": {
+    "node": "0c198093",
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3",
+    "planeM": 5.79,
+    "dz": 0.0,
+    "why": "사용자가 확정한 길의 문 앞 노드. 3층 바닥 높이는 두 읽기(142.4~142.8 / 144.7~144.9)가 미정이라 노트 값이 모름"
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 409.8,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 416.6,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 182.8,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "문예관 입구(2)",
+   "building": "문예관",
+   "floor": "2층",
+   "doorZ": 138.9,
+   "pick": null,
+   "status": "노드 없음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "본관 입구(1)",
+   "building": "본관",
+   "floor": "1층과 2층으로 갈 수 있음",
+   "doorZ": null,
+   "pick": {
+    "node": "59e77b01",
+    "nodeId": "59e77b01-41b4-4d20-b8a4-a01f6a74e4ac",
+    "planeM": 0.0,
+    "dz": null
+   },
+   "status": "노드 있음(높이 모름)",
+   "from": {
+    "정문": {
+     "m": 269.6,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 276.3,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 42.5,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "본관 입구(2)",
+   "building": "본관",
+   "floor": "지하주차장과 2층으로 연결",
+   "doorZ": 130.7,
+   "pick": {
+    "node": "438353e0",
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c",
+    "planeM": 0.14,
+    "dz": 0.12
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 309.4,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 316.1,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 82.3,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "본관 입구(3)",
+   "building": "본관",
+   "floor": "5층·6층 사이 계단으로 연결",
+   "doorZ": null,
+   "pick": {
+    "node": "2995173c",
+    "nodeId": "2995173c-585b-4a1b-9405-54b22ca26bc6",
+    "planeM": 1.21,
+    "dz": null
+   },
+   "status": "노드 있음(높이 모름)",
+   "from": {
+    "정문": {
+     "m": 380.4,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 387.1,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 153.3,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "북악관 입구(1) = 정문",
+   "building": "북악관",
+   "floor": "1층 로비",
+   "doorZ": 134.1,
+   "pick": {
+    "node": "a09e1033",
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142",
+    "planeM": 14.59,
+    "dz": 0.0,
+    "why": "문은 정문 계단 17칸의 중간(바깥 12칸 위 133.3 m)에 있다. 계단을 다 오른 1층 로비 노드로 본다"
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 338.2,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 345.0,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 111.2,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "북악관 입구(2)",
+   "building": "북악관",
+   "floor": "1층 복도",
+   "doorZ": 134.1,
+   "pick": null,
+   "status": "노드 없음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "북악관 입구(3)",
+   "building": "북악관",
+   "floor": "1층 복도",
+   "doorZ": 134.1,
+   "pick": {
+    "node": "e6480084",
+    "nodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8",
+    "planeM": 6.91,
+    "dz": 0.0,
+    "why": "보행 기록에서 나온 1층 복도의 서쪽 끝(표지에서 6.9 m)에서 계단이 옆길로 내려간다. 1층 바닥 134.1 m 와 0.46 m 차는 기록의 치우침"
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 331.5,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 338.3,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 104.5,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "북악관 입구(4) = GS25 문",
+   "building": "북악관",
+   "floor": "B1층",
+   "doorZ": 130.5,
+   "pick": {
+    "node": "190bf54c",
+    "nodeId": "190bf54c-556e-4872-b31b-c7f956bf6576",
+    "planeM": 1.12,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 340.7,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 347.4,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 113.6,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "B1 통로와 계단 (본관 쪽에서)",
+   "building": "북악관",
+   "floor": "B1층",
+   "doorZ": 130.5,
+   "pick": {
+    "node": "3c4d5560",
+    "nodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70",
+    "planeM": 0.72,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 336.8,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 343.5,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 109.7,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "상승관 입구(마당 쪽, 추정)",
+   "building": "상승관",
+   "floor": "1층 로비",
+   "doorZ": 153.1,
+   "pick": {
+    "node": "f953d0bb",
+    "nodeId": "f953d0bb-805f-425e-b4a4-bbd8796dbde8",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 515.2,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 522.0,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 288.2,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "유담관 입구(1)",
+   "building": "유담관",
+   "floor": "6층 로비",
+   "doorZ": 114.1,
+   "pick": {
+    "node": "b6cb5f28",
+    "nodeId": "b6cb5f28-aaf6-4978-986e-862c601b820c",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 167.0,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 173.7,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 158.8,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "유담관 입구(2)",
+   "building": "유담관",
+   "floor": "9층",
+   "doorZ": 129.2,
+   "pick": {
+    "node": "50b9ed6a",
+    "nodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c",
+    "planeM": 8.14,
+    "dz": 0.0,
+    "why": "9층 홀 노드(129.6 m). 노트의 9층 바닥 129.2 m 는 추정이고 범위가 128.4~129.6 m 다. 문 자리는 모름(표지가 문에서 어긋남)"
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 361.8,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 368.6,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 134.8,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "유담관 입구(3)",
+   "building": "유담관",
+   "floor": "3층",
+   "doorZ": 104.0,
+   "pick": null,
+   "status": "노드 없음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "은주1관 입구(1)",
+   "building": "은주관",
+   "floor": "1층",
+   "doorZ": 131.3,
+   "pick": null,
+   "status": "노드 없음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "은주1관 입구(2)",
+   "building": "은주관",
+   "floor": "5층",
+   "doorZ": 148.9,
+   "pick": {
+    "node": "81833de0",
+    "nodeId": "81833de0-8f28-4c86-b19c-8d106812482f",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 482.3,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 489.1,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 255.3,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "은주2관 입구(1)",
+   "building": "은주관",
+   "floor": "1층 로비",
+   "doorZ": 132.2,
+   "pick": {
+    "node": "e5ea7a83",
+    "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 288.3,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 295.1,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 182.6,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "은주2관 입구(2)",
+   "building": "은주관",
+   "floor": "5층",
+   "doorZ": 148.9,
+   "pick": {
+    "node": "b3db60cc",
+    "nodeId": "b3db60cc-949d-4690-bce7-b508a2adf8fa",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 572.7,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 579.4,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 345.6,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "청운관 입구",
+   "building": "청운관",
+   "floor": "1층",
+   "doorZ": 148.9,
+   "pick": {
+    "node": "56a1c8bd",
+    "nodeId": "56a1c8bd-98e1-4db3-8edb-25c9afb74035",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 501.5,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 508.2,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 274.4,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "한림관 입구",
+   "building": "한림관",
+   "floor": "1층 로비",
+   "doorZ": 127.2,
+   "pick": {
+    "node": "b2fd2d5e",
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 221.1,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 227.8,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 115.3,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "혜인관 입구(1)",
+   "building": "혜인관",
+   "floor": "1층 로비와 B1층으로 갈 수 있음",
+   "doorZ": 149.3,
+   "pick": {
+    "node": "07c38541",
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 541.0,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 547.8,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 314.0,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "혜인관 입구(2)",
+   "building": "혜인관",
+   "floor": "B1층",
+   "doorZ": 149.6,
+   "pick": {
+    "node": "0775ff68",
+    "nodeId": "0775ff68-da64-466d-bbd8-1b4deab44ca9",
+    "planeM": 0.0,
+    "dz": 0.0
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": {
+     "m": 536.8,
+     "strict": false
+    },
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": {
+     "m": 543.5,
+     "strict": false
+    },
+    "제2주차장 입구": {
+     "m": 309.7,
+     "strict": false
+    },
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "본관–한림관 연결통로(데크)",
+   "building": "본관·한림관",
+   "floor": "본관 5층 = 한림관 3층 (높이 추정 137.8~138.1)",
+   "doorZ": 137.8,
+   "pick": {
+    "node": "ebb31930",
+    "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24",
+    "planeM": 0.6,
+    "dz": 0.1
+   },
+   "status": "노드 있음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  },
+  {
+   "target": "한림관–은주관 연결통로",
+   "building": "한림관·은주관",
+   "floor": "한림관 3층 = 은주1관 2층, 한림관 6층 = 은주1관 5층",
+   "doorZ": null,
+   "pick": null,
+   "status": "노드 없음",
+   "from": {
+    "정문": null,
+    "서문(후문)": "출발 노드 없음",
+    "제1주차장 입구": null,
+    "제2주차장 입구": null,
+    "서문 주차장 입구": "출발 노드 없음"
+   }
+  }
+ ],
+ "changeSets": 67
+}
