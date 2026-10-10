@@ -6,6 +6,7 @@ import 'cesium/Build/Cesium/Widgets/widgets.css';
 import './elevation-colors.css';
 import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './api';
 import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
+import { clipLonLatPolygons, type SectionPlane } from './section';
 import { tmForward } from './tm';
 import type { Viewer } from './vworld';
 
@@ -24,7 +25,7 @@ const COLORS = {
 };
 
 /** Bilinear height at an EPSG:5186 point; outside the grid the nearest edge value (no cliff at the border). */
-function sampler(g: TerrainGrid) {
+export function sampler(g: TerrainGrid) {
   return (x: number, y: number): number => {
     let fx = (x - g.originX) / g.resolution - 0.5;
     let fy = (y - g.originY) / g.resolution - 0.5;
@@ -173,6 +174,7 @@ export class CampusSceneLayer {
   private elevation: { range: ElevationRange; image: string } | null = null;
   readonly picks = new Map<string, BuildingPick>();
   private readonly overrides = new Map<string, number[][][][]>(); // 표시용 평면 대체(scene-local-corrections, 끄면 원본)
+  private section: SectionPlane | null = null;
 
   constructor(private readonly C: CesiumNS, private readonly viewer: any, readonly scene: CampusScene) {
     this.edges = viewer.scene.primitives.add(new C.PolylineCollection());
@@ -193,6 +195,20 @@ export class CampusSceneLayer {
     this.labels.removeAll();
     this.drawEdgesAndLabels();
     this.rebuild();
+  }
+
+  /** Cross-section (section-layer.ts): only the part of every building on the kept side is drawn; null restores all. */
+  setSection(plane: SectionPlane | null) {
+    this.section = plane;
+    this.edges.removeAll();
+    this.labels.removeAll();
+    this.drawEdgesAndLabels();
+    this.rebuild();
+  }
+
+  private footprint(b: SceneBuilding): number[][][][] {
+    const polygons = this.overrides.get(b.buildingId) ?? b.geometry.coordinates;
+    return this.section ? clipLonLatPolygons(this.section, polygons) : polygons;
   }
 
   setOpacity(opacity: number) {
@@ -252,7 +268,7 @@ export class CampusSceneLayer {
     for (const b of this.scene.buildings) {
       const css = b.buildingId === this.selected ? COLORS.selected : this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall;
       const color = C.Color.fromCssColorString(css).withAlpha(this.opacity);
-      for (const poly of this.overrides.get(b.buildingId) ?? b.geometry.coordinates) {
+      for (const poly of this.footprint(b)) {
         const ring = (r: number[][]) => C.Cartesian3.fromDegreesArray(r.slice(0, -1).flat());
         const polygon = new C.PolygonGeometry({
           polygonHierarchy: new C.PolygonHierarchy(ring(poly[0]), poly.slice(1).map((h) => new C.PolygonHierarchy(ring(h)))),
@@ -294,7 +310,7 @@ export class CampusSceneLayer {
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(COLORS.edge) });
     for (const b of this.scene.buildings) {
       let best: number[][] = [];
-      for (const poly of this.overrides.get(b.buildingId) ?? b.geometry.coordinates) {
+      for (const poly of this.footprint(b)) {
         const r = poly[0];
         if (r.length > best.length) best = r;
         // roof outline, slightly above the roof so it is not z-fighting
@@ -337,7 +353,7 @@ export class CampusSceneLayer {
  * Creates the Cesium viewer with the campus terrain and 3D scene. Resolves like initVWorld (the viewer) plus the
  * building layer; without an imported scene the ground still works and `scene` is null.
  */
-export async function initCampusMap(containerId: string): Promise<{ viewer: Viewer; scene: CampusSceneLayer | null; warning: string | null }> {
+export async function initCampusMap(containerId: string): Promise<{ viewer: Viewer; scene: CampusSceneLayer | null; grid: TerrainGrid; warning: string | null }> {
   (window as any).CESIUM_BASE_URL = '/cesium/';
   const C: CesiumNS = await import('cesium');
   (window as any).Cesium = C; // trajectory.ts / lab.ts use the global namespace (as with VWorld)
@@ -398,8 +414,8 @@ export async function initCampusMap(containerId: string): Promise<{ viewer: View
   });
   if (sceneData instanceof Error) {
     viewer.camera.setView({ destination: C.Rectangle.fromDegrees(grid.bounds.west, grid.bounds.south, grid.bounds.east, grid.bounds.north) });
-    return { viewer, scene: null, warning: `Campus 3D buildings unavailable: ${sceneData.message} (npm run scene:import)` };
+    return { viewer, scene: null, grid, warning: `Campus 3D buildings unavailable: ${sceneData.message} (npm run scene:import)` };
   }
   layer!.home(0);
-  return { viewer, scene: layer, warning: null };
+  return { viewer, scene: layer, grid, warning: null };
 }

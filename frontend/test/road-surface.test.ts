@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { ROAD_SURFACE, buildRoadSurfaces, isUnderground, junctionDisc, ribbon, roadWidthM, smoothCentreline } = await import('../src/road-surface.ts');
+const { ROAD_SURFACE, buildRoadSurfaces: buildGroups, isUnderground, junctionDisc, ribbon, roadWidthM, smoothCentreline, surfaceKind, usesNameForUnderground } = await import('../src/road-surface.ts');
 
 type P = number[];
 const dist = (a: P, b: P) => Math.hypot(a[0] - b[0], a[1] - b[1], (a[2] ?? 0) - (b[2] ?? 0));
@@ -42,11 +42,19 @@ function triangleAreas(m: { positions: number[]; indices: number[] }) {
 }
 const road = (coordinates: P[], extra: object = {}) => ({ name: null, roadClass: 'vehicle', widthM: null, levelId: null, fromNodeId: 'a', toNodeId: 'b', geometry: { coordinates }, ...extra });
 const BEND = [[0, 0, 5], [30, 0, 5], [30, 30, 5]];
+/** 차도만 있는 입력: 지상 고리 목록과 지하 삼각형(종류별 묶음을 푼 것) */
+const buildRoadSurfaces = (roads: object[]) => {
+  const s = buildGroups(roads as never);
+  return { ground: s.ground.flatMap((g: { rings: P[][] }) => g.rings), underground: s.underground[0]?.mesh ?? { positions: [], indices: [] } };
+};
 
 test('폭: 도로에 적힌 값이 먼저, 없으면 유형별 표시 기본값', () => {
   assert.equal(roadWidthM({ widthM: 7.2, roadClass: 'vehicle' }), 7.2);
   assert.equal(roadWidthM({ widthM: null, roadClass: 'vehicle' }), ROAD_SURFACE.defaultWidthM.vehicle);
   assert.equal(roadWidthM({ widthM: null, roadClass: 'shared' }), ROAD_SURFACE.defaultWidthM.shared);
+  assert.equal(roadWidthM({ widthM: null, roadClass: 'pedestrian', structure: 'ordinary' }), ROAD_SURFACE.defaultWidthM.pedestrian);
+  assert.equal(roadWidthM({ widthM: null, roadClass: 'pedestrian', structure: 'stairs' }), ROAD_SURFACE.defaultWidthM.stairs);
+  assert.equal(roadWidthM({ widthM: 4, roadClass: 'pedestrian', structure: 'stairs' }), 4);
 });
 
 test('지하 판정: 층이 지하이면 지하, 층이 없으면 이름의 "지하"', () => {
@@ -55,6 +63,41 @@ test('지하 판정: 층이 지하이면 지하, 층이 없으면 이름의 "지
   assert.equal(isUnderground({ levelId: null, name: '지하 차도 (본관·문예관 사이)' }), true);
   assert.equal(isUnderground({ levelId: null, name: '정문 진입로' }), false);
   assert.equal(isUnderground({ levelId: null, name: null }), false);
+  // 층이 없을 때만 이름을 본다: 건물 안 길은 이름의 지하층(B1)도 지하. 층이 적혀 있으면 이름은 안 본다
+  assert.equal(isUnderground({ levelId: null, name: '북악관 B1 진입 통로 (추정)', buildingId: '북악관' }), true);
+  assert.equal(isUnderground({ levelId: null, name: '청운관 앞–혜인관 B1 지상 연결 (추정)', buildingId: null }), false, '실외 길 이름의 B1은 가는 곳');
+  assert.equal(isUnderground({ levelId: '북악관_Z146.18_추정', name: '지하 통로' }), false);
+  assert.equal(usesNameForUnderground({ levelId: null, name: '지하 차도' }), true);
+  assert.equal(usesNameForUnderground({ levelId: 'B1', name: '지하 차도' }), false);
+});
+
+test('면 종류: 차도·보행로·계단·횡단, 실내 지상 길과 승강기는 그리지 않는다', () => {
+  const k = (extra: object) => surfaceKind({ roadClass: 'pedestrian', structure: 'ordinary', buildingId: null, levelId: null, name: null, ...extra });
+  assert.equal(k({ roadClass: 'vehicle', structure: 'ramp' }), 'carriageway');
+  assert.equal(k({ roadClass: 'shared' }), 'carriageway');
+  assert.equal(k({}), 'pedestrian');
+  assert.equal(k({ structure: 'ramp' }), 'pedestrian');
+  assert.equal(k({ structure: 'stairs' }), 'stairs');
+  assert.equal(k({ structure: 'crossing' }), 'crossing');
+  assert.equal(k({ structure: 'elevator' }), null);
+  assert.equal(k({ structure: 'indoor_corridor', buildingId: '북악관' }), null);
+  assert.equal(k({ structure: 'stairs', buildingId: '북악관' }), null);
+  assert.equal(k({ structure: 'indoor_corridor', buildingId: '북악관', levelId: 'B1' }), 'pedestrian');
+  assert.equal(k({ structure: 'stairs', buildingId: '북악관', name: '북악관 B1 진입 계단' }), 'stairs');
+});
+
+test('종류별 묶음: 그리는 순서는 보행로·계단·차도·횡단, 지하 보행로는 5 cm 올린다', () => {
+  const line = (y: number, extra: object) => road([[0, y, 100], [10, y, 100]], { fromNodeId: `a${y}`, toNodeId: `b${y}`, ...extra });
+  const s = buildGroups([
+    line(0, { roadClass: 'pedestrian', structure: 'crossing' }), line(10, {}), line(20, { roadClass: 'pedestrian', structure: 'stairs' }), line(30, { roadClass: 'pedestrian', structure: 'ordinary' }),
+    line(40, { roadClass: 'pedestrian', structure: 'ordinary', levelId: 'B1' }), line(50, { levelId: 'B1' }), line(60, { roadClass: 'pedestrian', structure: 'indoor_corridor', buildingId: 'x' }),
+  ] as never);
+  assert.deepEqual(s.ground.map((g: { kind: string }) => g.kind), ['pedestrian', 'stairs', 'carriageway', 'crossing']);
+  assert.ok(s.ground.every((g: { rings: P[][] }) => g.rings.length === 1));
+  assert.deepEqual(s.underground.map((g: { kind: string }) => g.kind), ['pedestrian', 'carriageway']);
+  const zs = (m: { positions: number[] }) => [...new Set(m.positions.filter((_, i) => i % 3 === 2))];
+  assert.deepEqual(zs(s.underground[0].mesh), [100 + ROAD_SURFACE.undergroundPedestrianLiftM]);
+  assert.deepEqual(zs(s.underground[1].mesh), [100]);
 });
 
 test('곧은 길은 폭이 맞는 직사각형이 된다', () => {
@@ -121,6 +164,17 @@ test('만나는 점의 원은 길 기울기를 따른다', () => {
     assert.ok(Math.abs(Math.hypot(p[0], p[1]) - 3) < 1e-9);
     assert.ok(Math.abs(p[2] - (50 + 0.1 * p[0])) < 1e-3, '길 방향으로 10%, 길 가로 방향으로는 수평');
   }
+});
+
+test('만나는 점의 원: 거의 한 줄로 만나는 길의 기울기가 달라도 옆으로 치솟지 않는다', () => {
+  // 한쪽은 평평, 반대쪽은 급한 계단, 둘이 3도쯤 어긋나 있다(북악관 B1 진입 계단 꼴)
+  const rim = junctionDisc([0, 0, 130.5], 1, [[1, 0.05, 130.5], [-1.85, 0, 129.7]]);
+  for (const p of rim) assert.ok(Math.abs(p[2] - 130.5) <= 0.45, `원 가장자리 높이 ${p[2]}`);
+  // 길 방향 기울기는 남는다: 계단 쪽이 낮고 반대쪽이 높다
+  assert.ok(rim[0][2] > 130.5 && rim[ROAD_SURFACE.discSegments / 2][2] < 130.5);
+  // 직각으로 만나는 두 길은 그대로 두 방향 기울기를 다 따른다
+  const cross = junctionDisc([0, 0, 50], 3, [[3, 0, 50.3], [0, 3, 49.4]]);
+  for (const p of cross) assert.ok(Math.abs(p[2] - (50 + 0.1 * p[0] - 0.2 * p[1])) < 1e-3);
 });
 
 test('두 차도가 만나는 점에만 원을 채우고, 지상과 지하는 따로 센다', () => {

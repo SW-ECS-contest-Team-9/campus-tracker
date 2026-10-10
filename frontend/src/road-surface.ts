@@ -1,5 +1,7 @@
-// Carriageways (editor road segments, road_class vehicle / shared) on the preview map as dark asphalt surfaces:
-// a smoothed centreline widened to the road width. Read-only (GET /api/v1/mobility/roads).
+// Editor road segments on the preview map as surfaces: a smoothed centreline widened to the road width.
+// Carriageways (road_class vehicle / shared) are dark asphalt, outdoor pedestrian ways a paving tone, stairs a darker
+// one (a plain band: no steps are drawn, the step count is not known). Read-only (GET /api/v1/mobility/roads).
+// Indoor ways above ground are not drawn here (floors lie on top of each other in plan and most carry no level).
 // Surface roads are laid on the map's ground, not at their stored height: stored road heights and the terrain model
 // differ by several metres in places (2026-10-10 test data: -3 m ... +12 m), so a surface at the stored height would be
 // buried or float. Underground roads are drawn at their stored height and only with their own toggle.
@@ -11,34 +13,63 @@ import { floorFromLevelId } from './floor-colors';
 
 export type P3 = [number, number, number];
 
-/** Every display constant of the carriageway surface. Widths are display defaults, not measurements. */
+export type SurfaceKind = 'pedestrian' | 'stairs' | 'carriageway' | 'crossing';
+/** Draw order on the ground: a later kind lies on top where two overlap (a crossing shows on the carriageway). */
+export const SURFACE_KINDS: SurfaceKind[] = ['pedestrian', 'stairs', 'carriageway', 'crossing'];
+
+/** Every display constant of the road surfaces. Widths are display defaults, not measurements. */
 export const ROAD_SURFACE = {
-  /** Used when a road has no width_m. vehicle: two 3.0 m lanes; shared: one lane with a walking margin (assumptions). */
-  defaultWidthM: { vehicle: 6, shared: 4 } as Record<string, number>,
+  /**
+   * Used when a road has no width_m. vehicle: two 3.0 m lanes; shared: one lane with a walking margin;
+   * pedestrian: two people passing with room; stairs: a common outdoor flight (all assumptions).
+   */
+  defaultWidthM: { vehicle: 6, shared: 4, pedestrian: 2.5, stairs: 2 } as Record<string, number>,
   /** The smoothed centreline stays within this distance of every stored vertex (end nodes are kept exactly). */
   smoothMaxDeviationM: 0.3,
   /** Spacing of the resampled centreline. */
   sampleStepM: 1,
   /** Aimed-at largest turn between two samples inside a rounded corner (keeps the outer edge round). */
   maxTurnPerSampleRad: Math.PI / 18,
-  /** Near-black asphalt. Drawn unlit, so it reads as matte black from any direction. */
-  color: '#1b1d20',
-  /** Opacity of an underground road where the ground or a building is in front of it (underground toggle on). */
-  undergroundHiddenAlpha: 0.45,
+  /**
+   * Drawn unlit, so each reads the same from any direction. carriageway: near-black asphalt. pedestrian: warm mid
+   * grey paving, darker than the ivory campus ground and far from the black. stairs: a darker warm grey.
+   * A crossing has the pedestrian tone (no stripes are invented).
+   */
+  colors: { carriageway: '#1b1d20', pedestrian: '#9a9388', stairs: '#6b6257', crossing: '#9a9388' } as Record<SurfaceKind, string>,
+  /** Opacity of an underground way where the ground or a building is in front of it (underground toggle on). */
+  undergroundHiddenAlpha: 0.8,
+  /** Underground pedestrian ways are drawn this much above their stored height, so they do not flicker on a carriageway at the same height. */
+  undergroundPedestrianLiftM: 0.05,
   discSegments: 24,
 };
 
 /**
- * Underground = the road's level is a basement floor (levelId "B1", "지하1" ...). Roads without a level fall back to
- * the word "지하" in their name, because the underground roads of 2026-10-10 carry no level yet (stopgap, see work log).
+ * Underground = the road's level is a basement floor (levelId "B1", "지하1" ...); a road with any other level is not.
+ * Only a road without a level falls back to its name, because the underground roads of 2026-10-10 carry no level yet
+ * (stopgap, see work log): "지하" in the name, or for a road inside a building a basement floor such as "B1" in the
+ * name (outdoors "B1" names where a path leads to, not where it is). `structure` has no underground value.
  */
-export function isUnderground(road: { levelId: string | null; name: string | null }): boolean {
-  const floor = floorFromLevelId(road.levelId);
-  return floor != null ? floor < 0 : !road.levelId && /지하/.test(road.name ?? '');
+type LevelNamed = { levelId: string | null; name: string | null; buildingId?: string | null };
+export function isUnderground(road: LevelNamed): boolean {
+  if (road.levelId) return (floorFromLevelId(road.levelId) ?? 1) < 0;
+  return usesNameForUnderground(road);
+}
+/** True when the road is taken as underground only because of its name (no level written). */
+export function usesNameForUnderground(road: LevelNamed): boolean {
+  return !road.levelId && (/지하/.test(road.name ?? '') || (!!road.buildingId && (floorFromLevelId(road.name) ?? 1) < 0));
 }
 
-export function roadWidthM(road: { widthM: number | null; roadClass: string }): number {
-  return road.widthM ?? ROAD_SURFACE.defaultWidthM[road.roadClass] ?? ROAD_SURFACE.defaultWidthM.shared;
+/** Which surface a road is drawn as; null = not drawn (elevators, indoor ways above ground). */
+export function surfaceKind(road: { roadClass: string; structure?: string; buildingId?: string | null; levelId: string | null; name: string | null }): SurfaceKind | null {
+  if (road.structure === 'elevator') return null;
+  if ((road.buildingId || road.structure === 'indoor_corridor') && !isUnderground(road)) return null;
+  if (road.roadClass !== 'pedestrian') return 'carriageway';
+  return road.structure === 'stairs' ? 'stairs' : road.structure === 'crossing' ? 'crossing' : 'pedestrian';
+}
+
+export function roadWidthM(road: { widthM: number | null; roadClass: string; structure?: string }): number {
+  const key = road.roadClass === 'pedestrian' && road.structure === 'stairs' ? 'stairs' : road.roadClass;
+  return road.widthM ?? ROAD_SURFACE.defaultWidthM[key] ?? ROAD_SURFACE.defaultWidthM.shared;
 }
 
 const sub = (a: P3, b: P3): P3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -140,8 +171,20 @@ export function junctionDisc(center: P3, radiusM: number, arms: P3[], segments =
     sxx += dx * dx; sxy += dx * dy; syy += dy * dy; sxz += dx * dz; syz += dy * dz;
   }
   const det = sxx * syy - sxy * sxy;
-  const gx = (sxz * syy - syz * sxy) / det;
-  const gy = (syz * sxx - sxz * sxy) / det;
+  let gx = (sxz * syy - syz * sxy) / det;
+  let gy = (syz * sxx - sxz * sxy) / det;
+  // arms (nearly) along one line say nothing about the slope across it: slope along the line only, level across
+  // (otherwise two short roads meeting at a shallow angle with different slopes tilt the circle into a spike)
+  const mean = (sxx + syy) / 2;
+  const spread = Math.sqrt(Math.max(0, mean * mean - det));
+  if (mean - spread < 0.05 * (mean + spread)) {
+    let ex = mean + spread - syy, ey = sxy;
+    if (Math.hypot(ex, ey) < 1e-9) { ex = sxy; ey = mean + spread - sxx; }
+    const e = Math.hypot(ex, ey) || 1;
+    const g = (sxz * ex + syz * ey) / e / (mean + spread);
+    gx = (g * ex) / e;
+    gy = (g * ey) / e;
+  }
   return Array.from({ length: segments }, (_, k) => {
     const dx = radiusM * Math.cos((2 * Math.PI * k) / segments);
     const dy = radiusM * Math.sin((2 * Math.PI * k) / segments);
@@ -150,7 +193,7 @@ export function junctionDisc(center: P3, radiusM: number, arms: P3[], segments =
 }
 
 export type RoadMesh = { positions: number[]; indices: number[] };
-type SurfaceRoad = Pick<CarriagewayRoad, 'name' | 'roadClass' | 'widthM' | 'levelId' | 'fromNodeId' | 'toNodeId'> & { geometry: { coordinates: number[][] } };
+type SurfaceRoad = Pick<CarriagewayRoad, 'name' | 'widthM' | 'levelId' | 'fromNodeId' | 'toNodeId'> & { roadClass: string; structure?: string; buildingId?: string | null; geometry: { coordinates: number[][] } };
 
 /** Road bands, and a filled circle at every node where two or more of these roads meet (a dead end keeps its square end). */
 function shapes(roads: SurfaceRoad[]) {
@@ -175,30 +218,39 @@ function shapes(roads: SurfaceRoad[]) {
 }
 
 /**
- * All carriageway surfaces in EPSG:5186. `ground`: outlines (x, y rings, not closed) of the surface roads, to be laid
- * on the map's ground. `underground`: triangles (x, y, stored height) of the underground roads.
+ * All road surfaces in EPSG:5186, one group per kind in draw order (empty groups left out).
+ * `ground`: outlines (x, y rings, not closed) of the surface roads, to be laid on the map's ground.
+ * `underground`: triangles (x, y, stored height) of the underground roads. Circles are filled only between roads of one group.
  */
-export function buildRoadSurfaces(roads: SurfaceRoad[]): { ground: number[][][]; underground: RoadMesh } {
-  const above = shapes(roads.filter((r) => !isUnderground(r)));
-  const below = shapes(roads.filter(isUnderground));
+export function buildRoadSurfaces(roads: SurfaceRoad[]): { ground: { kind: SurfaceKind; rings: number[][][] }[]; underground: { kind: SurfaceKind; mesh: RoadMesh }[] } {
   const ring = (points: P3[]) => points.map(([x, y]) => [x, y]).filter((p, i, all) => {
     const q = all[(i + all.length - 1) % all.length];
     return Math.hypot(p[0] - q[0], p[1] - q[1]) > 1e-6;
   });
-  const ground = [...above.bands.map((b) => ring([...b.right, ...[...b.left].reverse()])), ...above.discs.map((d) => ring(d.rim))];
-  const underground: RoadMesh = { positions: [], indices: [] };
-  const triangle = (...corners: P3[]) => {
-    for (const p of corners) {
-      underground.indices.push(underground.positions.length / 3);
-      underground.positions.push(...p);
+  const ground: { kind: SurfaceKind; rings: number[][][] }[] = [];
+  const underground: { kind: SurfaceKind; mesh: RoadMesh }[] = [];
+  for (const kind of SURFACE_KINDS) {
+    const mine = roads.filter((r) => surfaceKind(r) === kind);
+    const above = shapes(mine.filter((r) => !isUnderground(r)));
+    const below = shapes(mine.filter(isUnderground));
+    const rings = [...above.bands.map((b) => ring([...b.right, ...[...b.left].reverse()])), ...above.discs.map((d) => ring(d.rim))];
+    if (rings.length) ground.push({ kind, rings });
+    const mesh: RoadMesh = { positions: [], indices: [] };
+    const lift = kind === 'carriageway' ? 0 : ROAD_SURFACE.undergroundPedestrianLiftM;
+    const triangle = (...corners: P3[]) => {
+      for (const p of corners) {
+        mesh.indices.push(mesh.positions.length / 3);
+        mesh.positions.push(p[0], p[1], p[2] + lift);
+      }
+    };
+    for (const { left, right } of below.bands) {
+      for (let i = 0; i + 1 < left.length; i++) {
+        triangle(left[i], right[i], left[i + 1]);
+        triangle(right[i], right[i + 1], left[i + 1]);
+      }
     }
-  };
-  for (const { left, right } of below.bands) {
-    for (let i = 0; i + 1 < left.length; i++) {
-      triangle(left[i], right[i], left[i + 1]);
-      triangle(right[i], right[i + 1], left[i + 1]);
-    }
+    for (const d of below.discs) d.rim.forEach((p, k) => triangle(d.center, p, d.rim[(k + 1) % d.rim.length]));
+    if (mesh.indices.length) underground.push({ kind, mesh });
   }
-  for (const d of below.discs) d.rim.forEach((p, k) => triangle(d.center, p, d.rim[(k + 1) % d.rim.length]));
   return { ground, underground };
 }

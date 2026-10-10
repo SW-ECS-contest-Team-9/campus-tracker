@@ -15,10 +15,11 @@ import {
 import { connectPreview } from './socket';
 import { Lab } from './lab';
 import { initVWorld, type Viewer } from './vworld';
-import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campus-map';
+import { initCampusMap, sampler, type BuildingPick, type CampusSceneLayer } from './campus-map';
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 import { RoadSurfaceLayer } from './road-surface-layer';
+import { SectionTool } from './section-layer';
 
 /** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
 const MAP_ENGINE: 'campus' | 'vworld' = import.meta.env.VITE_MAP_ENGINE === 'vworld' ? 'vworld' : 'campus';
@@ -61,6 +62,7 @@ let spatialMapOverlay: SpatialMapOverlay | null = null;
 let campusScene: CampusSceneLayer | null = null;
 let mobilityLayer: MobilityLayer | null = null;
 let roadSurfaces: RoadSurfaceLayer | null = null;
+let sectionTool: SectionTool | null = null;
 const tracks = new Map<string, SessionTrack>(); // sessionId -> track
 const trackLoads = new Map<string, Promise<void>>();
 const liveSessionIds = new Set<string>(); // sessions drawn in Live mode
@@ -904,6 +906,7 @@ function enablePicking(v: Viewer) {
   const C = (window as any).Cesium;
   const handler = new C.ScreenSpaceEventHandler(v.scene.canvas);
   handler.setInputAction((movement: { position: unknown }) => {
+    if (sectionTool?.placing) return; // the click places the section line
     // drillPick: dots usually sit on top of a polyline, which would win a plain pick().
     const hits: { id?: unknown }[] = v.scene.drillPick(movement.position, 10);
     const id = hits.map((h) => h.id as PickId | undefined).find((x) => x?.kind === 'raw' || x?.kind === 'fused');
@@ -973,11 +976,30 @@ async function boot() {
         campusScene = r.scene;
         if (r.warning) showMessage(r.warning);
         setupSceneControls();
-        // 차도 면(편집기 도로 중 차가 다니는 길, 읽기 전용): '차도' 기본 표시, '지하 차도'는 체크 시
+        // 길 면(편집기 도로, 읽기 전용): '차도'·'보행로' 기본 표시, '지하 길'은 체크 시
         roadSurfaces = new RoadSurfaceLayer(r.viewer);
-        void roadSurfaces.reload().catch((err) => console.error('carriageways unavailable', err));
+        void roadSurfaces.reload().catch((err) => console.error('road surfaces unavailable', err));
         $<HTMLInputElement>('scene-roads').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked));
+        $<HTMLInputElement>('scene-roads-pedestrian').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'pedestrian'));
         $<HTMLInputElement>('scene-roads-underground').addEventListener('change', (e) => roadSurfaces?.setVisible((e.target as HTMLInputElement).checked, 'underground'));
+        // 단면도: 체크 뒤 지도에서 두 점을 찍으면 그 선으로 자름. 끄면 원래대로
+        const g = r.grid;
+        const section = new SectionTool(r.viewer, {
+          height: sampler(g),
+          box: { minX: g.originX, minY: g.originY, maxX: g.originX + g.width * g.resolution, maxY: g.originY + g.height * g.resolution },
+          buildings: () => r.scene?.scene.buildings ?? [],
+          roads: () => roadSurfaces?.roads ?? [],
+          areas: () => mobilityLayer?.data.openAreas ?? [],
+          layers: () => [r.scene, roadSurfaces, mobilityLayer],
+        }, (text) => {
+          $('scene-section-status').textContent = text;
+          $('scene-section-tools').hidden = !section.active;
+        });
+        sectionTool = section;
+        $<HTMLInputElement>('scene-section').addEventListener('change', (e) => ((e.target as HTMLInputElement).checked ? section.start() : section.stop()));
+        $('scene-section-look').addEventListener('click', () => section.lookAt());
+        $('scene-section-flip').addEventListener('click', () => section.flip());
+        if (import.meta.env.DEV) (window as any).__section = section;
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {
           $<HTMLInputElement>('scene-corrected').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked));

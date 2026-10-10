@@ -341,9 +341,9 @@ export interface MobilityCorridor extends MobilityBase { widthM: number; oneWay:
 export interface MobilityOpenArea extends MobilityBase { areaM2: number; geometry: { type: 'Polygon'; coordinates: number[][][] } }
 export interface MobilityPortal extends MobilityBase { geometry: { type: 'Point'; coordinates: number[] } }
 export interface MobilitySpaces { corridors: MobilityCorridor[]; openAreas: MobilityOpenArea[]; portals: MobilityPortal[] }
-/** Editor road segment a vehicle drives on (road_class vehicle / shared), read-only for the preview. Coordinates: EPSG:5186 x, y, MSL height. */
+/** Editor road segment (carriageway or pedestrian way, no elevators), read-only for the preview. Coordinates: EPSG:5186 x, y, MSL height. */
 export interface CarriagewayRoad {
-  id: string; name: string | null; roadClass: 'vehicle' | 'shared'; structure: string; widthM: number | null; levelId: string | null;
+  id: string; name: string | null; roadClass: 'vehicle' | 'shared' | 'pedestrian'; structure: string; widthM: number | null; levelId: string | null; buildingId: string | null;
   fromNodeId: string; toNodeId: string; geometry: { type: 'LineString'; coordinates: number[][] };
 }
 

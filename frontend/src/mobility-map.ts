@@ -3,6 +3,7 @@
 // Features without elevation_m lie on the terrain; with it, at that absolute (MSL) height (indoor / elevated).
 import { api, type MobilityCorridor, type MobilityOpenArea, type MobilityPortal, type MobilitySpaces } from './api';
 import { ROAD_SURFACE } from './road-surface';
+import { clipLonLatPolygons, type SectionPlane } from './section';
 import type { Viewer } from './vworld';
 
 export type MobilityPick = { kind: 'mobility'; table: 'corridors' | 'openAreas' | 'portals'; id: number };
@@ -12,18 +13,35 @@ const CORRIDOR_COLORS: Record<string, string> = {
   crosswalk: '#f8fafc', road_shoulder: '#94a3b8', other: '#64748b',
 };
 const AREA_COLORS: Record<string, string> = { plaza: '#22c55e', courtyard: '#84cc16', lobby: '#a855f7', parking: '#94a3b8', other: '#64748b' };
-/** Open areas of this kind are paved road surface: drawn like the carriageways (road-surface.ts), so a road running into them reads as one surface. */
-const ASPHALT_AREA_KIND = 'parking';
+/**
+ * Open areas drawn as a filled surface (first match wins); every other area keeps the translucent look.
+ * asphalt: paved road surface in the colour of the carriageways (road-surface.ts), so a road running into it reads as
+ *   one surface. There is no paved-road kind: kind `parking` stands in, and so does any area with "포장면" in its name.
+ * field: the sports field, a muted tan. Kind `other`, told by its name: there is no field kind.
+ * Outdoors the fill is laid on the map's ground (never buried, no flicker). `flat` adds a level surface at the area's
+ * floor height in the same unlit colour: it covers the ground where that is lower, and where the ground is higher the
+ * ground shows instead, in the same colour. Inside a building (building or floor written) only the level surface is drawn.
+ */
+export const AREA_FILLS: { id: string; match: (a: { kind: string; name: string | null }) => boolean; color: string; flat: boolean }[] = [
+  { id: 'asphalt', match: (a) => a.kind === 'parking' || /포장면/.test(a.name ?? ''), color: ROAD_SURFACE.colors.carriageway, flat: false },
+  { id: 'field', match: (a) => a.kind === 'other' && /운동장/.test(a.name ?? ''), color: '#c9956b', flat: true },
+];
 const PORTAL_COLORS: Record<string, string> = {
   building_entrance: '#ef4444', plaza_entrance: '#22c55e', stair_start: '#f97316', stair_end: '#fb923c', elevator: '#a855f7', junction: '#0ea5e9', other: '#64748b',
 };
 
 export class MobilityLayer {
   private entities: any[] = [];
+  private readonly fills: any;
   private visible = true;
+  private section: SectionPlane | null = null;
   data: MobilitySpaces = { corridors: [], openAreas: [], portals: [] };
 
-  constructor(private readonly viewer: Viewer) {}
+  constructor(private readonly viewer: Viewer) {
+    // filled areas lie under the road surfaces (road-surface-layer.ts): lowest in the draw order
+    this.fills = viewer.scene.primitives.add(new (window as any).Cesium.PrimitiveCollection());
+    viewer.scene.primitives.lowerToBottom(this.fills);
+  }
 
   async reload() {
     this.data = await api.mobility();
@@ -34,6 +52,13 @@ export class MobilityLayer {
   setVisible(visible: boolean) {
     this.visible = visible;
     for (const e of this.entities) e.show = visible;
+    this.fills.show = visible;
+  }
+
+  /** Cross-section (section-layer.ts): the level surfaces of filled areas are cut at the plane; null restores them. */
+  setSection(plane: SectionPlane | null) {
+    this.section = plane;
+    this.draw();
   }
 
   feature(pick: MobilityPick): MobilityCorridor | MobilityOpenArea | MobilityPortal | undefined {
@@ -52,14 +77,24 @@ export class MobilityLayer {
     for (const e of this.entities) this.viewer.entities.remove(e);
     this.entities = [];
     const color = (css: string, a: number) => C.Color.fromCssColorString(css).withAlpha(a);
+    this.fills.removeAll();
+    this.fills.show = this.visible;
+    const onGround: any[] = [];
+    const level: any[] = [];
+    const polygon = (rings: number[][][]) => new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(rings[0].flat()), rings.slice(1).map((h) => new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(h.flat()))));
     for (const a of this.data.openAreas) {
-      const ring = a.geometry.coordinates[0].flat();
       const pick: MobilityPick = { kind: 'mobility', table: 'openAreas', id: a.id };
-      const hierarchy = new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring), a.geometry.coordinates.slice(1).map((h) => new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(h.flat()))));
-      if (a.kind === ASPHALT_AREA_KIND) {
-        // outdoors it lies on the map's ground like the carriageways (stored heights and terrain differ by metres); inside a building it stays at its floor height
+      const hierarchy = polygon(a.geometry.coordinates);
+      const fill = AREA_FILLS.find((f) => f.match(a));
+      if (fill) {
+        const attributes = () => ({ color: C.ColorGeometryInstanceAttribute.fromColor(color(fill.color, 1)) });
         const indoor = a.elevationM != null && (a.buildingId || a.floor);
-        this.add({ polygon: { hierarchy, material: color(ROAD_SURFACE.color, 1), ...(indoor ? { height: a.elevationM, perPositionHeight: false } : { classificationType: C.ClassificationType.TERRAIN }) } }, pick);
+        if (!indoor) onGround.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: hierarchy }), id: { mobilityPick: pick }, attributes: attributes() }));
+        if (a.elevationM != null && (indoor || fill.flat)) {
+          for (const rings of this.section ? clipLonLatPolygons(this.section, [a.geometry.coordinates]) : [a.geometry.coordinates]) {
+            level.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: polygon(rings), height: a.elevationM, vertexFormat: C.PerInstanceColorAppearance.FLAT_VERTEX_FORMAT }), id: { mobilityPick: pick }, attributes: attributes() }));
+          }
+        }
         continue;
       }
       this.add({
@@ -74,6 +109,8 @@ export class MobilityLayer {
           width: 2, clampToGround: a.elevationM == null, material: color(AREA_COLORS[a.kind] ?? AREA_COLORS.other, 0.9) },
       }, pick);
     }
+    if (onGround.length) this.fills.add(new C.GroundPrimitive({ geometryInstances: onGround, appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false }), classificationType: C.ClassificationType.TERRAIN }));
+    if (level.length) this.fills.add(new C.Primitive({ geometryInstances: level, appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }), asynchronous: false }));
     for (const c of this.data.corridors) {
       const css = CORRIDOR_COLORS[c.kind] ?? CORRIDOR_COLORS.other;
       const pick: MobilityPick = { kind: 'mobility', table: 'corridors', id: c.id };

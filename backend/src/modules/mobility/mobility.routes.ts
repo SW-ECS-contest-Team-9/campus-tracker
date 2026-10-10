@@ -29,13 +29,13 @@ mobilityRoutes.get('/mobility', async (req: Request, res: Response) => {
   res.json({ corridors: corridors.rows, openAreas: areas.rows, portals: portals.rows });
 });
 
-// GET /api/v1/mobility/roads — editor road segments a vehicle drives on (road_class vehicle / shared), read-only, for the
-// preview's carriageway surfaces. Coordinates stay in EPSG:5186 with the stored MSL height (the preview builds metre geometry).
+// GET /api/v1/mobility/roads — editor road segments (carriageways and pedestrian ways; no elevators), read-only, for the
+// preview's road surfaces. Coordinates stay in EPSG:5186 with the stored MSL height (the preview builds metre geometry).
 mobilityRoutes.get('/mobility/roads', async (_req, res) => {
   const { rows } = await pool.query(
-    `SELECT id, name, road_class "roadClass", structure, width_m "widthM", level_id "levelId",
+    `SELECT id, name, road_class "roadClass", structure, width_m "widthM", level_id "levelId", building_id "buildingId",
             from_node_id "fromNodeId", to_node_id "toNodeId", ST_AsGeoJSON(geom, 3)::json geometry
-       FROM mobility.road_segments WHERE status IN ('DRAFT', 'APPROVED') AND road_class IN ('vehicle', 'shared') ORDER BY created_at, id`,
+       FROM mobility.road_segments WHERE status IN ('DRAFT', 'APPROVED') AND structure <> 'elevator' ORDER BY created_at, id`,
   );
   res.setHeader('Cache-Control', 'no-cache');
   res.json({ roads: rows });
