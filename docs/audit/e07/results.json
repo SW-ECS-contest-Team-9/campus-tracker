@@ -1,0 +1,4481 @@
+{
+ "created": "2026-10-10",
+ "snapshot": {
+  "roads": 128,
+  "nodes": 118
+ },
+ "reference": {
+  "xy": [
+   201157.08,
+   557248.59
+  ],
+  "oldDemM": 141.73262095642093,
+  "t01M": 148.9606898956302,
+  "shiftT01M": 7.228068939209265
+ },
+ "provenance": {
+  "note": "draped = 실외 길 꼭짓점이 자기 자리 옛 지형 ±0.02 m. reference-copy = 얹히지 않았는데 높이가 기준 표본(옛 지형 141.7326 m)과 0.006 m 안. own = 그 밖의 실외. 길 끝은 길마다 따로 센다.",
+  "allVertices": {
+   "draped": 34,
+   "reference-copy": 8,
+   "own": 90,
+   "indoor": 255
+  },
+  "onChangedTerrain": {
+   "draped": 15,
+   "reference-copy": 8,
+   "own": 49,
+   "indoor": 61
+  },
+  "drapedOnChangedByRoad": [
+   {
+    "id": "4ee99835",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "vertices": 2,
+    "ends": 0
+   },
+   {
+    "id": "b17424ba",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "vertices": 2,
+    "ends": 0
+   },
+   {
+    "id": "3910b4a5",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "vertices": 11,
+    "ends": 0
+   }
+  ],
+  "indoorVerticesWithReferenceValue": 0,
+  "referenceCopies": [
+   {
+    "road": "c52095ad",
+    "name": null,
+    "structure": "ramp",
+    "index": 0,
+    "end": true,
+    "node": "4f294196",
+    "xy": [
+     201106.22,
+     557324.73
+    ],
+    "z": 141.73,
+    "oldDemHereM": 139.97,
+    "t01HereM": 141.06,
+    "needToGroundM": -0.67,
+    "afterRigidShiftAboveGroundM": 7.9
+   },
+   {
+    "road": "8e71c240",
+    "name": "혜인관 방향 지상 경사로 연장 (추정)",
+    "structure": "ramp",
+    "index": 0,
+    "end": true,
+    "node": "4f294196",
+    "xy": [
+     201106.22,
+     557324.73
+    ],
+    "z": 141.73,
+    "oldDemHereM": 139.97,
+    "t01HereM": 141.06,
+    "needToGroundM": -0.67,
+    "afterRigidShiftAboveGroundM": 7.9
+   },
+   {
+    "road": "8e71c240",
+    "name": "혜인관 방향 지상 경사로 연장 (추정)",
+    "structure": "ramp",
+    "index": 1,
+    "end": false,
+    "node": null,
+    "xy": [
+     201122.5,
+     557317.2
+    ],
+    "z": 141.73,
+    "oldDemHereM": 142.02,
+    "t01HereM": 144.04,
+    "needToGroundM": 2.31,
+    "afterRigidShiftAboveGroundM": 4.92
+   },
+   {
+    "road": "8e71c240",
+    "name": "혜인관 방향 지상 경사로 연장 (추정)",
+    "structure": "ramp",
+    "index": 2,
+    "end": true,
+    "node": "ef5a3c9c",
+    "xy": [
+     201139.1,
+     557309.5
+    ],
+    "z": 141.73,
+    "oldDemHereM": 142.42,
+    "t01HereM": 147.29,
+    "needToGroundM": 5.56,
+    "afterRigidShiftAboveGroundM": 1.66
+   },
+   {
+    "road": "3910b4a5",
+    "name": "C02 수집 경로 (2026-10-07)",
+    "structure": "ordinary",
+    "index": 0,
+    "end": true,
+    "node": "561a12b4",
+    "xy": [
+     201157.33,
+     557301.3
+    ],
+    "z": 141.73,
+    "oldDemHereM": 141.97,
+    "t01HereM": 148.92,
+    "needToGroundM": 7.19,
+    "afterRigidShiftAboveGroundM": 0.04
+   },
+   {
+    "road": "45682ee7",
+    "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+    "structure": "ordinary",
+    "index": 0,
+    "end": true,
+    "node": "ef5a3c9c",
+    "xy": [
+     201139.1,
+     557309.5
+    ],
+    "z": 141.73,
+    "oldDemHereM": 142.42,
+    "t01HereM": 147.29,
+    "needToGroundM": 5.56,
+    "afterRigidShiftAboveGroundM": 1.66
+   },
+   {
+    "road": "45682ee7",
+    "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+    "structure": "ordinary",
+    "index": 1,
+    "end": true,
+    "node": "561a12b4",
+    "xy": [
+     201157.33,
+     557301.3
+    ],
+    "z": 141.73,
+    "oldDemHereM": 141.97,
+    "t01HereM": 148.92,
+    "needToGroundM": 7.19,
+    "afterRigidShiftAboveGroundM": 0.04
+   },
+   {
+    "road": "88ba01e6",
+    "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+    "structure": "stairs",
+    "index": 1,
+    "end": true,
+    "node": "561a12b4",
+    "xy": [
+     201157.33,
+     557301.3
+    ],
+    "z": 141.73,
+    "oldDemHereM": 141.97,
+    "t01HereM": 148.92,
+    "needToGroundM": 7.19,
+    "afterRigidShiftAboveGroundM": 0.04
+   }
+  ],
+  "referenceNodes": [
+   {
+    "node": "4f294196",
+    "xy": [
+     201106.22,
+     557324.73
+    ],
+    "z": 141.73,
+    "aboveOldM": 1.76,
+    "needToGroundM": -0.67,
+    "afterRigidShiftAboveGroundM": 7.9,
+    "roads": [
+     "c52095ad ramp",
+     "8e71c240 ramp"
+    ]
+   },
+   {
+    "node": "561a12b4",
+    "xy": [
+     201157.33,
+     557301.3
+    ],
+    "z": 141.73,
+    "aboveOldM": -0.24,
+    "needToGroundM": 7.19,
+    "afterRigidShiftAboveGroundM": 0.04,
+    "roads": [
+     "3910b4a5 ordinary",
+     "45682ee7 ordinary",
+     "88ba01e6 stairs"
+    ]
+   },
+   {
+    "node": "ef5a3c9c",
+    "xy": [
+     201139.1,
+     557309.5
+    ],
+    "z": 141.73,
+    "aboveOldM": -0.69,
+    "needToGroundM": 5.56,
+    "afterRigidShiftAboveGroundM": 1.66,
+    "roads": [
+     "8e71c240 ramp",
+     "45682ee7 ordinary"
+    ]
+   }
+  ],
+  "ownLevelsOnChanged": [
+   {
+    "z": 129.38,
+    "minusReferenceM": -12.35,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "699d0cbc"
+    ]
+   },
+   {
+    "z": 136.39,
+    "minusReferenceM": -5.34,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "951c157d"
+    ]
+   },
+   {
+    "z": 137.45,
+    "minusReferenceM": -4.28,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 137.78,
+    "minusReferenceM": -3.95,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 138.11,
+    "minusReferenceM": -3.62,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 138.44,
+    "minusReferenceM": -3.29,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 138.77,
+    "minusReferenceM": -2.96,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 139.1,
+    "minusReferenceM": -2.63,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 139.43,
+    "minusReferenceM": -2.3,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 139.65,
+    "minusReferenceM": -2.08,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 139.98,
+    "minusReferenceM": -1.75,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 140.53,
+    "minusReferenceM": -1.2,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 141.07,
+    "minusReferenceM": -0.66,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "c52095ad"
+    ]
+   },
+   {
+    "z": 142.44,
+    "minusReferenceM": 0.71,
+    "equalsADrapedVertexValue": false,
+    "vertices": 7,
+    "roads": [
+     "3ab80c19",
+     "9112314a",
+     "a7a51d3c",
+     "fdb059c4"
+    ]
+   },
+   {
+    "z": 143.8,
+    "minusReferenceM": 2.07,
+    "equalsADrapedVertexValue": false,
+    "vertices": 5,
+    "roads": [
+     "a7a51d3c",
+     "2f206e6c",
+     "618385b9"
+    ]
+   },
+   {
+    "z": 144.8,
+    "minusReferenceM": 3.07,
+    "equalsADrapedVertexValue": false,
+    "vertices": 4,
+    "roads": [
+     "00cd9c0f",
+     "2f206e6c",
+     "b14ac1da"
+    ]
+   },
+   {
+    "z": 145.8,
+    "minusReferenceM": 4.07,
+    "equalsADrapedVertexValue": false,
+    "vertices": 6,
+    "roads": [
+     "19800cee",
+     "88ba01e6",
+     "8e03aa9e",
+     "b14ac1da"
+    ]
+   },
+   {
+    "z": 146.33,
+    "minusReferenceM": 4.6,
+    "equalsADrapedVertexValue": false,
+    "vertices": 2,
+    "roads": [
+     "a789c985",
+     "b17424ba"
+    ]
+   },
+   {
+    "z": 146.91,
+    "minusReferenceM": 5.18,
+    "equalsADrapedVertexValue": false,
+    "vertices": 1,
+    "roads": [
+     "a789c985"
+    ]
+   },
+   {
+    "z": 146.94,
+    "minusReferenceM": 5.21,
+    "equalsADrapedVertexValue": false,
+    "vertices": 3,
+    "roads": [
+     "a789c985"
+    ]
+   },
+   {
+    "z": 150.26,
+    "minusReferenceM": 8.53,
+    "equalsADrapedVertexValue": false,
+    "vertices": 2,
+    "roads": [
+     "4ee99835",
+     "3910b4a5"
+    ]
+   },
+   {
+    "z": 150.66,
+    "minusReferenceM": 8.93,
+    "equalsADrapedVertexValue": false,
+    "vertices": 3,
+    "roads": [
+     "02d30f2b",
+     "4ee99835",
+     "b17424ba"
+    ]
+   },
+   {
+    "z": 150.8,
+    "minusReferenceM": 9.07,
+    "equalsADrapedVertexValue": false,
+    "vertices": 3,
+    "roads": [
+     "02d30f2b"
+    ]
+   }
+  ],
+  "chanceMatchCells": {
+   "cellsRaised2mOrMore": 2580,
+   "141.73": 34,
+   "142.44": 2,
+   "143.8": 1,
+   "144.8": 0,
+   "145.8": 4,
+   "150.8": 0
+  }
+ },
+ "candidates": [
+  {
+   "areas": "field",
+   "changedCells": 3213,
+   "preview": {
+    "id": "local-samples-7e415b29668b2f62",
+    "samples": 2047,
+    "changedCells": 3213,
+    "minDelta": -1.8539886474609375,
+    "maxDelta": 10.772216796875,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 192,
+     "0.1-0.5m": 744,
+     "0.5-1m": 1164,
+     "1-2m": 1420,
+     "2-5m": 1364,
+     ">5m": 7968
+    },
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15368
+   },
+   "outdoorVertices": 46,
+   "outdoorRoads": 14,
+   "referenceShiftM": 7.228068939209265,
+   "before": {
+    "within05": 23,
+    "below05": 6,
+    "below2": 4,
+    "above05": 17,
+    "above2": 15,
+    "lowestM": -3.52,
+    "highestM": 9.32,
+    "truthWithin05": 1,
+    "truthBelow2": 26,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "terrainOnly": {
+    "within05": 3,
+    "below05": 29,
+    "below2": 20,
+    "above05": 14,
+    "above2": 3,
+    "lowestM": -8.37,
+    "highestM": 2.29,
+    "truthWithin05": 1,
+    "truthBelow2": 26,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "t03Rule": {
+    "within05": 17,
+    "below05": 18,
+    "below2": 11,
+    "above05": 11,
+    "above2": 3,
+    "lowestM": -7.19,
+    "highestM": 2.29,
+    "truthWithin05": 15,
+    "truthBelow2": 17,
+    "worstGrade": 6.02,
+    "roadsSteeper": 2,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 3,
+     "vertices": 15,
+     "nodes": [],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 11,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "561a12b4",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 6.96,
+      "aboveAfterM": -7.19
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -0.69
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.14,
+       -0.3
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.3,
+       1.8
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.8,
+       1.8
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -2.5
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.5,
+       -2.14
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 8,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 39.26,
+      "riseBeforeM": 0.02,
+      "riseAfterM": 7.18,
+      "gradeAfter": 0.18
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     }
+    ],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   },
+   "e07Rule": {
+    "within05": 20,
+    "below05": 15,
+    "below2": 8,
+    "above05": 11,
+    "above2": 3,
+    "lowestM": -3.3,
+    "highestM": 2.29,
+    "truthWithin05": 18,
+    "truthBelow2": 14,
+    "worstGrade": 6.02,
+    "roadsSteeper": 3,
+    "roadsOver30pct": 4,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 5,
+     "vertices": 18,
+     "nodes": [
+      {
+       "node": "561a12b4",
+       "rule": "reference",
+       "fromZ": 141.73,
+       "toZ": 148.958069,
+       "aboveCandidateM": 0.04,
+       "aboveT01M": 0.04,
+       "roads": [
+        "3910b4a5",
+        "45682ee7",
+        "88ba01e6"
+       ]
+      }
+     ],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 12,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      },
+      {
+       "road": "45682ee7",
+       "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      },
+      {
+       "road": "88ba01e6",
+       "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.14,
+       -0.3
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.3,
+       1.8
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.8,
+       1.8
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -2.5
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.5,
+       -2.14
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 8,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 19.99,
+      "riseBeforeM": 0,
+      "riseAfterM": 7.23,
+      "gradeAfter": 0.36
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "structure": "stairs",
+      "segment": 0,
+      "runM": 8.7,
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16,
+      "gradeAfter": 0.36
+     }
+    ],
+    "stairs": [
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16
+     }
+    ],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   }
+  },
+  {
+   "areas": "field+s06",
+   "changedCells": 4069,
+   "preview": {
+    "id": "local-samples-09eca6c203f338b0",
+    "samples": 2293,
+    "changedCells": 4069,
+    "minDelta": -6.2002105712890625,
+    "maxDelta": 10.772216796875,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 456,
+     "0.1-0.5m": 944,
+     "0.5-1m": 1628,
+     "1-2m": 2356,
+     "2-5m": 2820,
+     ">5m": 8072
+    },
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15358
+   },
+   "outdoorVertices": 47,
+   "outdoorRoads": 15,
+   "referenceShiftM": 7.228068939209265,
+   "before": {
+    "within05": 23,
+    "below05": 6,
+    "below2": 4,
+    "above05": 18,
+    "above2": 16,
+    "lowestM": -3.52,
+    "highestM": 9.32,
+    "truthWithin05": 1,
+    "truthBelow2": 26,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "terrainOnly": {
+    "within05": 3,
+    "below05": 29,
+    "below2": 20,
+    "above05": 15,
+    "above2": 4,
+    "lowestM": -8.37,
+    "highestM": 2.39,
+    "truthWithin05": 1,
+    "truthBelow2": 26,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "t03Rule": {
+    "within05": 17,
+    "below05": 18,
+    "below2": 11,
+    "above05": 12,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39,
+    "truthWithin05": 15,
+    "truthBelow2": 17,
+    "worstGrade": 6.02,
+    "roadsSteeper": 2,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 3,
+     "vertices": 15,
+     "nodes": [],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 11,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "561a12b4",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 6.96,
+      "aboveAfterM": -7.19
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -0.69
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.14,
+       -0.3
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.3,
+       1.8
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.8,
+       1.8
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -2.5
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.5,
+       -2.14
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 21,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 39.26,
+      "riseBeforeM": 0.02,
+      "riseAfterM": 7.18,
+      "gradeAfter": 0.18
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     }
+    ],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   },
+   "e07Rule": {
+    "within05": 20,
+    "below05": 15,
+    "below2": 8,
+    "above05": 12,
+    "above2": 4,
+    "lowestM": -3.3,
+    "highestM": 2.39,
+    "truthWithin05": 18,
+    "truthBelow2": 14,
+    "worstGrade": 6.02,
+    "roadsSteeper": 3,
+    "roadsOver30pct": 4,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 5,
+     "vertices": 18,
+     "nodes": [
+      {
+       "node": "561a12b4",
+       "rule": "reference",
+       "fromZ": 141.73,
+       "toZ": 148.958069,
+       "aboveCandidateM": 0.04,
+       "aboveT01M": 0.04,
+       "roads": [
+        "3910b4a5",
+        "45682ee7",
+        "88ba01e6"
+       ]
+      }
+     ],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 12,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      },
+      {
+       "road": "45682ee7",
+       "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      },
+      {
+       "road": "88ba01e6",
+       "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -0.69,
+       -0.69
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.14,
+       -0.3
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.3,
+       1.8
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.8,
+       1.8
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -2.5
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.5,
+       -2.14
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 21,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 19.99,
+      "riseBeforeM": 0,
+      "riseAfterM": 7.23,
+      "gradeAfter": 0.36
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "structure": "stairs",
+      "segment": 0,
+      "runM": 8.7,
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16,
+      "gradeAfter": 0.36
+     }
+    ],
+    "stairs": [
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16
+     }
+    ],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   }
+  },
+  {
+   "areas": "field+corridor+s06",
+   "changedCells": 4602,
+   "preview": {
+    "id": "local-samples-c83a01a93f760e3a",
+    "samples": 2508,
+    "changedCells": 4602,
+    "minDelta": -6.2002105712890625,
+    "maxDelta": 10.772216796875,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 748,
+     "0.1-0.5m": 1288,
+     "0.5-1m": 1872,
+     "1-2m": 2616,
+     "2-5m": 3580,
+     ">5m": 8304
+    },
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15355
+   },
+   "outdoorVertices": 72,
+   "outdoorRoads": 21,
+   "referenceShiftM": 7.228068939209265,
+   "before": {
+    "within05": 25,
+    "below05": 14,
+    "below2": 6,
+    "above05": 33,
+    "above2": 21,
+    "lowestM": -4.16,
+    "highestM": 9.32,
+    "truthWithin05": 6,
+    "truthBelow2": 33,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "terrainOnly": {
+    "within05": 6,
+    "below05": 48,
+    "below2": 33,
+    "above05": 18,
+    "above2": 4,
+    "lowestM": -8.37,
+    "highestM": 2.39,
+    "truthWithin05": 6,
+    "truthBelow2": 33,
+    "worstGrade": 1.38,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0
+   },
+   "t03Rule": {
+    "within05": 20,
+    "below05": 37,
+    "below2": 24,
+    "above05": 15,
+    "above2": 4,
+    "lowestM": -7.19,
+    "highestM": 2.39,
+    "truthWithin05": 20,
+    "truthBelow2": 24,
+    "worstGrade": 6.02,
+    "roadsSteeper": 2,
+    "roadsOver30pct": 3,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 3,
+     "vertices": 15,
+     "nodes": [],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 11,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "561a12b4",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 6.96,
+      "aboveAfterM": -7.19
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "c52095ad",
+      "name": null,
+      "vertices": 12,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -1.97,
+       1.4
+      ]
+     },
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.56,
+       0.67
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "951c157d",
+      "name": "지하주차장 경사로 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.59,
+       -3.59
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     },
+     {
+      "road": "3ab80c19",
+      "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.78,
+       0.35
+      ]
+     },
+     {
+      "road": "9112314a",
+      "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -0.78
+      ]
+     },
+     {
+      "road": "a7a51d3c",
+      "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.15,
+       -1.41
+      ]
+     },
+     {
+      "road": "fdb059c4",
+      "name": "문예관 하행계단 아래 평탄부 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -1.41
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -5.56
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -7.19,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.55,
+       -5.42
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -5.55
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -2.15
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -3.05
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.42,
+       -3.05
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 25,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 39.26,
+      "riseBeforeM": 0.02,
+      "riseAfterM": 7.18,
+      "gradeAfter": 0.18
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     }
+    ],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   },
+   "e07Rule": {
+    "within05": 23,
+    "below05": 34,
+    "below2": 21,
+    "above05": 15,
+    "above2": 4,
+    "lowestM": -5.81,
+    "highestM": 2.39,
+    "truthWithin05": 23,
+    "truthBelow2": 21,
+    "worstGrade": 6.02,
+    "roadsSteeper": 3,
+    "roadsOver30pct": 4,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 5,
+     "vertices": 18,
+     "nodes": [
+      {
+       "node": "561a12b4",
+       "rule": "reference",
+       "fromZ": 141.73,
+       "toZ": 148.958069,
+       "aboveCandidateM": 0.04,
+       "aboveT01M": 0.04,
+       "roads": [
+        "3910b4a5",
+        "45682ee7",
+        "88ba01e6"
+       ]
+      }
+     ],
+     "list": [
+      {
+       "road": "4ee99835",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.52,
+        -0.81
+       ]
+      },
+      {
+       "road": "b17424ba",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 2,
+       "shiftM": [
+        -1.03,
+        1.67
+       ]
+      },
+      {
+       "road": "3910b4a5",
+       "name": "C02 수집 경로 (2026-10-07)",
+       "vertices": 12,
+       "shiftM": [
+        -0.24,
+        8.37
+       ]
+      },
+      {
+       "road": "45682ee7",
+       "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      },
+      {
+       "road": "88ba01e6",
+       "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+       "vertices": 1,
+       "shiftM": [
+        7.23,
+        7.23
+       ]
+      }
+     ]
+    },
+    "keptNodes": [
+     {
+      "node": "435187c0",
+      "reason": "shared-with-indoor",
+      "terrainShiftM": -0.57,
+      "aboveAfterM": 1.33
+     },
+     {
+      "node": "70261794",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 1.83,
+      "aboveAfterM": -1.33
+     },
+     {
+      "node": "9fb1fd71",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": -1.14,
+      "aboveAfterM": 1.21
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "c52095ad",
+      "name": null,
+      "vertices": 12,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -1.97,
+       1.4
+      ]
+     },
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 3,
+      "aboveAfterM": [
+       -5.56,
+       0.67
+      ]
+     },
+     {
+      "road": "02d30f2b",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 4,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       1.21,
+       2.29
+      ]
+     },
+     {
+      "road": "951c157d",
+      "name": "지하주차장 경사로 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.59,
+       -3.59
+      ]
+     },
+     {
+      "road": "a789c985",
+      "name": "지하주차장 통로 (추정)",
+      "vertices": 5,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.01,
+       -1.33
+      ]
+     },
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     },
+     {
+      "road": "3ab80c19",
+      "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.78,
+       0.35
+      ]
+     },
+     {
+      "road": "9112314a",
+      "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -0.78
+      ]
+     },
+     {
+      "road": "a7a51d3c",
+      "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.15,
+       -1.41
+      ]
+     },
+     {
+      "road": "fdb059c4",
+      "name": "문예관 하행계단 아래 평탄부 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -1.41
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 1,
+      "aboveAfterM": [
+       -5.56,
+       -5.56
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       2.18
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -3.3
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.55,
+       -5.42
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -5.55
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -2.15
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.3,
+       -3.05
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.42,
+       -3.05
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 25,
+    "segmentsChangedOver05": [
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 11.01,
+      "riseBeforeM": -0.53,
+      "riseAfterM": -1.34,
+      "gradeAfter": 0.12
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 19.62,
+      "riseBeforeM": 0.71,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "4ee99835",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 21.93,
+      "riseBeforeM": 0.22,
+      "riseAfterM": 1.74,
+      "gradeAfter": 0.08
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 0.19,
+      "riseBeforeM": -0.13,
+      "riseAfterM": -1.16,
+      "gradeAfter": 6.02
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 1,
+      "runM": 4.03,
+      "riseBeforeM": -4.7,
+      "riseAfterM": -2,
+      "gradeAfter": 0.5
+     },
+     {
+      "road": "b17424ba",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 0.36,
+      "riseBeforeM": 0.5,
+      "riseAfterM": -1.17,
+      "gradeAfter": 3.23
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 2,
+      "runM": 18.19,
+      "riseBeforeM": -1.07,
+      "riseAfterM": -0.03,
+      "gradeAfter": 0
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 4,
+      "runM": 2.02,
+      "riseBeforeM": 1.13,
+      "riseAfterM": 0.13,
+      "gradeAfter": 0.07
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 5,
+      "runM": 2.02,
+      "riseBeforeM": 2.41,
+      "riseAfterM": 1.19,
+      "gradeAfter": 0.59
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 6,
+      "runM": 4.04,
+      "riseBeforeM": 1.5,
+      "riseAfterM": -0.09,
+      "gradeAfter": 0.02
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 7,
+      "runM": 14.15,
+      "riseBeforeM": 0.25,
+      "riseAfterM": -0.8,
+      "gradeAfter": 0.06
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 8,
+      "runM": 6.11,
+      "riseBeforeM": 0.15,
+      "riseAfterM": -0.6,
+      "gradeAfter": 0.1
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 9,
+      "runM": 2.03,
+      "riseBeforeM": 2.65,
+      "riseAfterM": 1.06,
+      "gradeAfter": 0.52
+     },
+     {
+      "road": "3910b4a5",
+      "name": "C02 수집 경로 (2026-10-07)",
+      "structure": "ordinary",
+      "segment": 10,
+      "runM": 2.03,
+      "riseBeforeM": 1.41,
+      "riseAfterM": 0,
+      "gradeAfter": 0
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "structure": "ordinary",
+      "segment": 0,
+      "runM": 19.99,
+      "riseBeforeM": 0,
+      "riseAfterM": 7.23,
+      "gradeAfter": 0.36
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "structure": "stairs",
+      "segment": 0,
+      "runM": 8.7,
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16,
+      "gradeAfter": 0.36
+     }
+    ],
+    "stairs": [
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "riseBeforeM": -4.07,
+      "riseAfterM": 3.16
+     }
+    ],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   }
+  },
+  {
+   "areas": "corridor",
+   "changedCells": 709,
+   "preview": {
+    "id": "local-samples-8d3ed04c10ae2228",
+    "samples": 215,
+    "changedCells": 709,
+    "minDelta": -2.182281494140625,
+    "maxDelta": 9.04052734375,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 292,
+     "0.1-0.5m": 488,
+     "0.5-1m": 260,
+     "1-2m": 296,
+     "2-5m": 920,
+     ">5m": 580
+    },
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15329
+   },
+   "outdoorVertices": 41,
+   "outdoorRoads": 16,
+   "referenceShiftM": 0,
+   "before": {
+    "within05": 5,
+    "below05": 10,
+    "below2": 2,
+    "above05": 26,
+    "above2": 16,
+    "lowestM": -4.16,
+    "highestM": 4.06,
+    "truthWithin05": 5,
+    "truthBelow2": 23,
+    "worstGrade": 1.31,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 2,
+    "maxEndNodeGapM": 0
+   },
+   "terrainOnly": {
+    "within05": 5,
+    "below05": 28,
+    "below2": 20,
+    "above05": 8,
+    "above2": 3,
+    "lowestM": -5.81,
+    "highestM": 3.17,
+    "truthWithin05": 5,
+    "truthBelow2": 23,
+    "worstGrade": 1.31,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 2,
+    "maxEndNodeGapM": 0
+   },
+   "t03Rule": {
+    "within05": 5,
+    "below05": 28,
+    "below2": 20,
+    "above05": 8,
+    "above2": 3,
+    "lowestM": -5.81,
+    "highestM": 3.17,
+    "truthWithin05": 5,
+    "truthBelow2": 23,
+    "worstGrade": 1.31,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 2,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 0,
+     "vertices": 0,
+     "nodes": [],
+     "list": []
+    },
+    "keptNodes": [
+     {
+      "node": "561a12b4",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 5.38,
+      "aboveAfterM": -5.61
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "c52095ad",
+      "name": null,
+      "vertices": 12,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -1.97,
+       1.4
+      ]
+     },
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.56,
+       0.67
+      ]
+     },
+     {
+      "road": "951c157d",
+      "name": "지하주차장 경사로 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.59,
+       -3.59
+      ]
+     },
+     {
+      "road": "3ab80c19",
+      "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.78,
+       0.35
+      ]
+     },
+     {
+      "road": "9112314a",
+      "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -0.78
+      ]
+     },
+     {
+      "road": "a7a51d3c",
+      "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.15,
+       -1.41
+      ]
+     },
+     {
+      "road": "fdb059c4",
+      "name": "문예관 하행계단 아래 평탄부 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -1.41
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.61,
+       -5.56
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       3.17,
+       3.17
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.61,
+       3.17
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.55,
+       -5.44
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -5.55
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -2.15
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.09,
+       3.17
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.44,
+       -3.09
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 4,
+    "segmentsChangedOver05": [],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   },
+   "e07Rule": {
+    "within05": 5,
+    "below05": 28,
+    "below2": 20,
+    "above05": 8,
+    "above2": 3,
+    "lowestM": -5.81,
+    "highestM": 3.17,
+    "truthWithin05": 5,
+    "truthBelow2": 23,
+    "worstGrade": 1.31,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 2,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 0,
+     "vertices": 0,
+     "nodes": [],
+     "list": []
+    },
+    "keptNodes": [
+     {
+      "node": "561a12b4",
+      "reason": "shared-with-own-heights",
+      "terrainShiftM": 5.38,
+      "aboveAfterM": -5.61
+     }
+    ],
+    "notMovedOwnHeights": [
+     {
+      "road": "c52095ad",
+      "name": null,
+      "vertices": 12,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -1.97,
+       1.4
+      ]
+     },
+     {
+      "road": "8e71c240",
+      "name": "혜인관 방향 지상 경사로 연장 (추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.56,
+       0.67
+      ]
+     },
+     {
+      "road": "951c157d",
+      "name": "지하주차장 경사로 (추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.59,
+       -3.59
+      ]
+     },
+     {
+      "road": "3ab80c19",
+      "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -0.78,
+       0.35
+      ]
+     },
+     {
+      "road": "9112314a",
+      "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -0.78
+      ]
+     },
+     {
+      "road": "a7a51d3c",
+      "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.15,
+       -1.41
+      ]
+     },
+     {
+      "road": "fdb059c4",
+      "name": "문예관 하행계단 아래 평탄부 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -2.88,
+       -1.41
+      ]
+     },
+     {
+      "road": "45682ee7",
+      "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.61,
+       -5.56
+      ]
+     },
+     {
+      "road": "19800cee",
+      "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       3.17,
+       3.17
+      ]
+     },
+     {
+      "road": "88ba01e6",
+      "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.61,
+       3.17
+      ]
+     },
+     {
+      "road": "00cd9c0f",
+      "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.55,
+       -5.44
+      ]
+     },
+     {
+      "road": "2f206e6c",
+      "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -5.55
+      ]
+     },
+     {
+      "road": "618385b9",
+      "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+      "vertices": 3,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.81,
+       -2.15
+      ]
+     },
+     {
+      "road": "8e03aa9e",
+      "name": "대일관 전면 상단 평탄부 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -3.09,
+       3.17
+      ]
+     },
+     {
+      "road": "b14ac1da",
+      "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+      "vertices": 2,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       -5.44,
+       -3.09
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 4,
+    "segmentsChangedOver05": [],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   }
+  },
+  {
+   "areas": "s06",
+   "changedCells": 856,
+   "preview": {
+    "id": "local-samples-ed8d94d3c8f1ab49",
+    "samples": 246,
+    "changedCells": 856,
+    "minDelta": -6.2002105712890625,
+    "maxDelta": 0,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 264,
+     "0.1-0.5m": 200,
+     "0.5-1m": 464,
+     "1-2m": 936,
+     "2-5m": 1456,
+     ">5m": 104
+    },
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15266
+   },
+   "outdoorVertices": 1,
+   "outdoorRoads": 1,
+   "referenceShiftM": 0,
+   "before": {
+    "within05": 0,
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.01,
+    "highestM": 2.01,
+    "truthWithin05": 0,
+    "truthBelow2": 0,
+    "worstGrade": 0.14,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 0,
+    "maxEndNodeGapM": 0
+   },
+   "terrainOnly": {
+    "within05": 0,
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39,
+    "truthWithin05": 0,
+    "truthBelow2": 0,
+    "worstGrade": 0.14,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 0,
+    "maxEndNodeGapM": 0
+   },
+   "t03Rule": {
+    "within05": 0,
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39,
+    "truthWithin05": 0,
+    "truthBelow2": 0,
+    "worstGrade": 0.14,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 0,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 0,
+     "vertices": 0,
+     "nodes": [],
+     "list": []
+    },
+    "keptNodes": [],
+    "notMovedOwnHeights": [
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 13,
+    "segmentsChangedOver05": [],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   },
+   "e07Rule": {
+    "within05": 0,
+    "below05": 0,
+    "below2": 0,
+    "above05": 1,
+    "above2": 1,
+    "lowestM": 2.39,
+    "highestM": 2.39,
+    "truthWithin05": 0,
+    "truthBelow2": 0,
+    "worstGrade": 0.14,
+    "roadsSteeper": 0,
+    "roadsOver30pct": 0,
+    "maxEndNodeGapM": 0,
+    "truthErrorGrew": 0,
+    "moved": {
+     "roads": 0,
+     "vertices": 0,
+     "nodes": [],
+     "list": []
+    },
+    "keptNodes": [],
+    "notMovedOwnHeights": [
+     {
+      "road": "699d0cbc",
+      "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+      "vertices": 1,
+      "copiedReferenceKept": 0,
+      "aboveAfterM": [
+       2.39,
+       2.39
+      ]
+     }
+    ],
+    "notMovedIndoorRoads": 13,
+    "segmentsChangedOver05": [],
+    "stairs": [],
+    "reverse": {
+     "verticesNotRestored": 0,
+     "nodesNotRestored": 0
+    }
+   }
+  }
+ ],
+ "g1": [
+  {
+   "road": "c52095ad",
+   "name": null,
+   "structure": "ramp",
+   "vertices": [
+    {
+     "xy": [
+      201106.22,
+      557324.73
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": 1.76,
+     "needToT01GroundM": -0.67,
+     "terrainShiftAllM": 1.09,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 141.73,
+     "aboveT01AfterM": 0.67
+    },
+    {
+     "xy": [
+      201103.5,
+      557325.99
+     ],
+     "z": 141.07,
+     "minusReferenceM": -0.66,
+     "aboveOldM": 0.72,
+     "needToT01GroundM": -0.51,
+     "terrainShiftAllM": 0.21,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 141.07,
+     "aboveT01AfterM": 0.51
+    },
+    {
+     "xy": [
+      201101.24,
+      557327.05
+     ],
+     "z": 140.53,
+     "minusReferenceM": -1.2,
+     "aboveOldM": 0.03,
+     "needToT01GroundM": -0.43,
+     "terrainShiftAllM": -0.39,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 140.53,
+     "aboveT01AfterM": 0.43
+    },
+    {
+     "xy": [
+      201098.97,
+      557328.11
+     ],
+     "z": 139.98,
+     "minusReferenceM": -1.75,
+     "aboveOldM": -0.62,
+     "needToT01GroundM": -0.21,
+     "terrainShiftAllM": -0.83,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 139.98,
+     "aboveT01AfterM": 0.21
+    },
+    {
+     "xy": [
+      201097.61,
+      557328.74
+     ],
+     "z": 139.65,
+     "minusReferenceM": -2.08,
+     "aboveOldM": -0.99,
+     "needToT01GroundM": 0,
+     "terrainShiftAllM": -0.99,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 139.65,
+     "aboveT01AfterM": 0
+    },
+    {
+     "xy": [
+      201096.71,
+      557329.16
+     ],
+     "z": 139.43,
+     "minusReferenceM": -2.3,
+     "aboveOldM": -1.23,
+     "needToT01GroundM": 0.21,
+     "terrainShiftAllM": -1.03,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 139.43,
+     "aboveT01AfterM": -0.21
+    },
+    {
+     "xy": [
+      201095.35,
+      557329.8
+     ],
+     "z": 139.1,
+     "minusReferenceM": -2.63,
+     "aboveOldM": -1.6,
+     "needToT01GroundM": 0.72,
+     "terrainShiftAllM": -0.88,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 139.1,
+     "aboveT01AfterM": -0.72
+    },
+    {
+     "xy": [
+      201093.99,
+      557330.43
+     ],
+     "z": 138.77,
+     "minusReferenceM": -2.96,
+     "aboveOldM": -1.95,
+     "needToT01GroundM": 1.36,
+     "terrainShiftAllM": -0.59,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 138.77,
+     "aboveT01AfterM": -1.36
+    },
+    {
+     "xy": [
+      201092.63,
+      557331.07
+     ],
+     "z": 138.44,
+     "minusReferenceM": -3.29,
+     "aboveOldM": -2.27,
+     "needToT01GroundM": 1.97,
+     "terrainShiftAllM": -0.3,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 138.44,
+     "aboveT01AfterM": -1.97
+    },
+    {
+     "xy": [
+      201091.27,
+      557331.7
+     ],
+     "z": 138.11,
+     "minusReferenceM": -3.62,
+     "aboveOldM": -1.3,
+     "needToT01GroundM": 1.18,
+     "terrainShiftAllM": -0.11,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 138.11,
+     "aboveT01AfterM": -1.18
+    },
+    {
+     "xy": [
+      201089.91,
+      557332.33
+     ],
+     "z": 137.78,
+     "minusReferenceM": -3.95,
+     "aboveOldM": 0.89,
+     "needToT01GroundM": -0.93,
+     "terrainShiftAllM": -0.04,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 137.78,
+     "aboveT01AfterM": 0.93
+    },
+    {
+     "xy": [
+      201088.55,
+      557332.97
+     ],
+     "z": 137.45,
+     "minusReferenceM": -4.28,
+     "aboveOldM": 1.39,
+     "needToT01GroundM": -1.4,
+     "terrainShiftAllM": -0.01,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 137.45,
+     "aboveT01AfterM": 1.4
+    },
+    {
+     "xy": [
+      201087.19,
+      557333.6
+     ],
+     "z": 137.13,
+     "minusReferenceM": -4.6,
+     "aboveOldM": 1.24,
+     "needToT01GroundM": -1.24,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 137.13,
+     "aboveT01AfterM": 1.24
+    },
+    {
+     "xy": [
+      201085.83,
+      557334.24
+     ],
+     "z": 136.8,
+     "minusReferenceM": -4.93,
+     "aboveOldM": 1.08,
+     "needToT01GroundM": -1.08,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 136.8,
+     "aboveT01AfterM": 1.08
+    },
+    {
+     "xy": [
+      201084.47,
+      557334.87
+     ],
+     "z": 136.47,
+     "minusReferenceM": -5.26,
+     "aboveOldM": 0.91,
+     "needToT01GroundM": -0.91,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 136.47,
+     "aboveT01AfterM": 0.91
+    },
+    {
+     "xy": [
+      201082.66,
+      557335.71
+     ],
+     "z": 136.03,
+     "minusReferenceM": -5.7,
+     "aboveOldM": 0.67,
+     "needToT01GroundM": -0.67,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 136.03,
+     "aboveT01AfterM": 0.67
+    },
+    {
+     "xy": [
+      201081.3,
+      557336.35
+     ],
+     "z": 135.7,
+     "minusReferenceM": -6.03,
+     "aboveOldM": 0.51,
+     "needToT01GroundM": -0.51,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 135.7,
+     "aboveT01AfterM": 0.51
+    },
+    {
+     "xy": [
+      201079.49,
+      557337.19
+     ],
+     "z": 135.26,
+     "minusReferenceM": -6.47,
+     "aboveOldM": 0.29,
+     "needToT01GroundM": -0.29,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 135.26,
+     "aboveT01AfterM": 0.29
+    },
+    {
+     "xy": [
+      201078.13,
+      557337.83
+     ],
+     "z": 134.93,
+     "minusReferenceM": -6.8,
+     "aboveOldM": 0.13,
+     "needToT01GroundM": -0.13,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 134.93,
+     "aboveT01AfterM": 0.13
+    },
+    {
+     "xy": [
+      201076.31,
+      557338.67
+     ],
+     "z": 134.49,
+     "minusReferenceM": -7.24,
+     "aboveOldM": -0.09,
+     "needToT01GroundM": 0.09,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 134.49,
+     "aboveT01AfterM": -0.09
+    },
+    {
+     "xy": [
+      201074.95,
+      557339.31
+     ],
+     "z": 134.16,
+     "minusReferenceM": -7.57,
+     "aboveOldM": -0.26,
+     "needToT01GroundM": 0.26,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 134.16,
+     "aboveT01AfterM": -0.26
+    },
+    {
+     "xy": [
+      201073.14,
+      557340.15
+     ],
+     "z": 133.73,
+     "minusReferenceM": -8,
+     "aboveOldM": -0.47,
+     "needToT01GroundM": 0.47,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 133.73,
+     "aboveT01AfterM": -0.47
+    },
+    {
+     "xy": [
+      201071.78,
+      557340.79
+     ],
+     "z": 133.4,
+     "minusReferenceM": -8.33,
+     "aboveOldM": -0.58,
+     "needToT01GroundM": 0.58,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 133.4,
+     "aboveT01AfterM": -0.58
+    },
+    {
+     "xy": [
+      201069.97,
+      557341.63
+     ],
+     "z": 132.96,
+     "minusReferenceM": -8.77,
+     "aboveOldM": -0.64,
+     "needToT01GroundM": 0.64,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 132.96,
+     "aboveT01AfterM": -0.64
+    },
+    {
+     "xy": [
+      201068.16,
+      557342.48
+     ],
+     "z": 132.52,
+     "minusReferenceM": -9.21,
+     "aboveOldM": -0.85,
+     "needToT01GroundM": 0.85,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 132.52,
+     "aboveT01AfterM": -0.85
+    },
+    {
+     "xy": [
+      201066.34,
+      557343.32
+     ],
+     "z": 132.08,
+     "minusReferenceM": -9.65,
+     "aboveOldM": -1.34,
+     "needToT01GroundM": 1.34,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 132.08,
+     "aboveT01AfterM": -1.34
+    },
+    {
+     "xy": [
+      201064.53,
+      557344.17
+     ],
+     "z": 131.64,
+     "minusReferenceM": -10.09,
+     "aboveOldM": -1.6,
+     "needToT01GroundM": 1.6,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 131.64,
+     "aboveT01AfterM": -1.6
+    },
+    {
+     "xy": [
+      201062.27,
+      557345.22
+     ],
+     "z": 131.1,
+     "minusReferenceM": -10.63,
+     "aboveOldM": -2.01,
+     "needToT01GroundM": 2.01,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 131.1,
+     "aboveT01AfterM": -2.01
+    },
+    {
+     "xy": [
+      201060,
+      557346.28
+     ],
+     "z": 130.55,
+     "minusReferenceM": -11.18,
+     "aboveOldM": -2.62,
+     "needToT01GroundM": 2.62,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 130.55,
+     "aboveT01AfterM": -2.62
+    },
+    {
+     "xy": [
+      201056.83,
+      557347.76
+     ],
+     "z": 129.78,
+     "minusReferenceM": -11.95,
+     "aboveOldM": -3.41,
+     "needToT01GroundM": 3.41,
+     "terrainShiftAllM": 0,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 129.78,
+     "aboveT01AfterM": -3.41
+    }
+   ]
+  },
+  {
+   "road": "8e71c240",
+   "name": "혜인관 방향 지상 경사로 연장 (추정)",
+   "structure": "ramp",
+   "vertices": [
+    {
+     "xy": [
+      201106.22,
+      557324.73
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": 1.76,
+     "needToT01GroundM": -0.67,
+     "terrainShiftAllM": 1.09,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 141.73,
+     "aboveT01AfterM": 0.67
+    },
+    {
+     "xy": [
+      201122.5,
+      557317.2
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": -0.29,
+     "needToT01GroundM": 2.31,
+     "terrainShiftAllM": 2.02,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 141.73,
+     "aboveT01AfterM": -2.31
+    },
+    {
+     "xy": [
+      201139.1,
+      557309.5
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": -0.69,
+     "needToT01GroundM": 5.56,
+     "terrainShiftAllM": 4.88,
+     "terrainShiftFieldOnlyM": 0.01,
+     "zAfterE07": 141.73,
+     "aboveT01AfterM": -5.56
+    }
+   ]
+  },
+  {
+   "road": "45682ee7",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201139.1,
+      557309.5
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": -0.69,
+     "needToT01GroundM": 5.56,
+     "terrainShiftAllM": 4.88,
+     "terrainShiftFieldOnlyM": 0.01,
+     "zAfterE07": 141.73,
+     "aboveT01AfterM": -5.56
+    },
+    {
+     "xy": [
+      201157.33,
+      557301.3
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": -0.24,
+     "needToT01GroundM": 7.19,
+     "terrainShiftAllM": 6.96,
+     "terrainShiftFieldOnlyM": 6.96,
+     "zAfterE07": 148.958069,
+     "aboveT01AfterM": 0.04
+    }
+   ]
+  },
+  {
+   "road": "88ba01e6",
+   "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+   "structure": "stairs",
+   "vertices": [
+    {
+     "xy": [
+      201160.58,
+      557309.37
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.06,
+     "needToT01GroundM": 3.3,
+     "terrainShiftAllM": 7.36,
+     "terrainShiftFieldOnlyM": 7.36,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": -3.3
+    },
+    {
+     "xy": [
+      201157.33,
+      557301.3
+     ],
+     "z": 141.73,
+     "minusReferenceM": 0,
+     "aboveOldM": -0.24,
+     "needToT01GroundM": 7.19,
+     "terrainShiftAllM": 6.96,
+     "terrainShiftFieldOnlyM": 6.96,
+     "zAfterE07": 148.958069,
+     "aboveT01AfterM": 0.04
+    }
+   ]
+  },
+  {
+   "road": "19800cee",
+   "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201162.8,
+      557316.6
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.05,
+     "needToT01GroundM": -2.18,
+     "terrainShiftAllM": 1.86,
+     "terrainShiftFieldOnlyM": 1.86,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": 2.18
+    },
+    {
+     "xy": [
+      201160.58,
+      557309.37
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.06,
+     "needToT01GroundM": 3.3,
+     "terrainShiftAllM": 7.36,
+     "terrainShiftFieldOnlyM": 7.36,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": -3.3
+    }
+   ]
+  },
+  {
+   "road": "8e03aa9e",
+   "name": "대일관 전면 상단 평탄부 (고도 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201160.58,
+      557309.37
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.06,
+     "needToT01GroundM": 3.3,
+     "terrainShiftAllM": 7.36,
+     "terrainShiftFieldOnlyM": 7.36,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": -3.3
+    },
+    {
+     "xy": [
+      201154.78,
+      557311.87
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.03,
+     "needToT01GroundM": 3.05,
+     "terrainShiftAllM": 7.08,
+     "terrainShiftFieldOnlyM": 6.53,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": -3.05
+    }
+   ]
+  },
+  {
+   "road": "b14ac1da",
+   "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+   "structure": "stairs",
+   "vertices": [
+    {
+     "xy": [
+      201154.78,
+      557311.87
+     ],
+     "z": 145.8,
+     "minusReferenceM": 4.07,
+     "aboveOldM": 4.03,
+     "needToT01GroundM": 3.05,
+     "terrainShiftAllM": 7.08,
+     "terrainShiftFieldOnlyM": 6.53,
+     "zAfterE07": 145.8,
+     "aboveT01AfterM": -3.05
+    },
+    {
+     "xy": [
+      201151.12,
+      557313.48
+     ],
+     "z": 144.8,
+     "minusReferenceM": 3.07,
+     "aboveOldM": 3.02,
+     "needToT01GroundM": 5.42,
+     "terrainShiftAllM": 8.44,
+     "terrainShiftFieldOnlyM": 5.15,
+     "zAfterE07": 144.8,
+     "aboveT01AfterM": -5.42
+    }
+   ]
+  },
+  {
+   "road": "00cd9c0f",
+   "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201151.12,
+      557313.48
+     ],
+     "z": 144.8,
+     "minusReferenceM": 3.07,
+     "aboveOldM": 3.02,
+     "needToT01GroundM": 5.42,
+     "terrainShiftAllM": 8.44,
+     "terrainShiftFieldOnlyM": 5.15,
+     "zAfterE07": 144.8,
+     "aboveT01AfterM": -5.42
+    },
+    {
+     "xy": [
+      201149.29,
+      557314.28
+     ],
+     "z": 144.8,
+     "minusReferenceM": 3.07,
+     "aboveOldM": 3.02,
+     "needToT01GroundM": 5.55,
+     "terrainShiftAllM": 8.56,
+     "terrainShiftFieldOnlyM": 3.32,
+     "zAfterE07": 144.8,
+     "aboveT01AfterM": -5.55
+    }
+   ]
+  },
+  {
+   "road": "2f206e6c",
+   "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+   "structure": "stairs",
+   "vertices": [
+    {
+     "xy": [
+      201149.29,
+      557314.28
+     ],
+     "z": 144.8,
+     "minusReferenceM": 3.07,
+     "aboveOldM": 3.02,
+     "needToT01GroundM": 5.55,
+     "terrainShiftAllM": 8.56,
+     "terrainShiftFieldOnlyM": 3.32,
+     "zAfterE07": 144.8,
+     "aboveT01AfterM": -5.55
+    },
+    {
+     "xy": [
+      201145.62,
+      557315.89
+     ],
+     "z": 143.8,
+     "minusReferenceM": 2.07,
+     "aboveOldM": 2.03,
+     "needToT01GroundM": 5.81,
+     "terrainShiftAllM": 7.83,
+     "terrainShiftFieldOnlyM": 0.22,
+     "zAfterE07": 143.8,
+     "aboveT01AfterM": -5.81
+    }
+   ]
+  },
+  {
+   "road": "618385b9",
+   "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201145.62,
+      557315.89
+     ],
+     "z": 143.8,
+     "minusReferenceM": 2.07,
+     "aboveOldM": 2.03,
+     "needToT01GroundM": 5.81,
+     "terrainShiftAllM": 7.83,
+     "terrainShiftFieldOnlyM": 0.22,
+     "zAfterE07": 143.8,
+     "aboveT01AfterM": -5.81
+    },
+    {
+     "xy": [
+      201140.78,
+      557318.02
+     ],
+     "z": 143.8,
+     "minusReferenceM": 2.07,
+     "aboveOldM": 2.11,
+     "needToT01GroundM": 3.86,
+     "terrainShiftAllM": 5.97,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 143.8,
+     "aboveT01AfterM": -3.86
+    },
+    {
+     "xy": [
+      201125.78,
+      557324.57
+     ],
+     "z": 143.8,
+     "minusReferenceM": 2.07,
+     "aboveOldM": 2.34,
+     "needToT01GroundM": 2.15,
+     "terrainShiftAllM": 4.49,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 143.8,
+     "aboveT01AfterM": -2.15
+    }
+   ]
+  },
+  {
+   "road": "a7a51d3c",
+   "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+   "structure": "stairs",
+   "vertices": [
+    {
+     "xy": [
+      201125.78,
+      557324.57
+     ],
+     "z": 143.8,
+     "minusReferenceM": 2.07,
+     "aboveOldM": 2.34,
+     "needToT01GroundM": 2.15,
+     "terrainShiftAllM": 4.49,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 143.8,
+     "aboveT01AfterM": -2.15
+    },
+    {
+     "xy": [
+      201115.65,
+      557329.17
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 2.38,
+     "needToT01GroundM": 1.41,
+     "terrainShiftAllM": 3.79,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -1.41
+    }
+   ]
+  },
+  {
+   "road": "fdb059c4",
+   "name": "문예관 하행계단 아래 평탄부 (추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201115.65,
+      557329.17
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 2.38,
+     "needToT01GroundM": 1.41,
+     "terrainShiftAllM": 3.79,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -1.41
+    },
+    {
+     "xy": [
+      201115.99,
+      557337.2
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 1.78,
+     "needToT01GroundM": 2.88,
+     "terrainShiftAllM": 4.66,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -2.88
+    }
+   ]
+  },
+  {
+   "road": "9112314a",
+   "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201115.99,
+      557337.2
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 1.78,
+     "needToT01GroundM": 2.88,
+     "terrainShiftAllM": 4.66,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -2.88
+    },
+    {
+     "xy": [
+      201109.5,
+      557339.1
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 1.63,
+     "needToT01GroundM": 0.78,
+     "terrainShiftAllM": 2.41,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -0.78
+    }
+   ]
+  },
+  {
+   "road": "3ab80c19",
+   "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+   "structure": "ordinary",
+   "vertices": [
+    {
+     "xy": [
+      201109.5,
+      557339.1
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 1.63,
+     "needToT01GroundM": 0.78,
+     "terrainShiftAllM": 2.41,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": -0.78
+    },
+    {
+     "xy": [
+      201107.67,
+      557339.65
+     ],
+     "z": 142.44,
+     "minusReferenceM": 0.71,
+     "aboveOldM": 1.64,
+     "needToT01GroundM": -0.35,
+     "terrainShiftAllM": 1.29,
+     "terrainShiftFieldOnlyM": 0,
+     "zAfterE07": 142.44,
+     "aboveT01AfterM": 0.35
+    }
+   ]
+  }
+ ]
+}

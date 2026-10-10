@@ -6,11 +6,12 @@
  * heights, buildings or roads; it prints relevel-roads as a follow-up when draped roads lie on changed terrain.
  * relevel-roads previews by default. --save needs TO_VERSION to be active and writes one editor change set (same statements
  * as the editor's move_node), so it shows in the editor history and can be reverted there. Swap the versions to undo.
+ * Besides draped roads it moves heights copied from the sports-field reference sample (RELEVEL_FIELD) by the change at that sample.
  */
 import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { pool, withTransaction } from '../src/config/database.js';
-import { planRelevel } from '../src/geo/terrain-relevel.js';
+import { planRelevel, RELEVEL_FIELD } from '../src/geo/terrain-relevel.js';
 import { gridDifferences, type TerrainVersionGrid } from '../src/geo/terrain-versions.js';
 import { assertNotLockedByOthers } from '../src/modules/editor/editor.ops.js';
 import { addChange, geoJSONLine, roadBefore, roadSelect, withEditorActor, type RoadRow } from '../src/modules/editor/editor.service.js';
@@ -46,7 +47,7 @@ async function relevelPlan(db: PoolClient, fromId: string, toId: string, lock = 
   const floats = (b: Buffer) => new Float32Array(b.buffer.slice(b.byteOffset, b.byteOffset + b.length));
   const plan = planRelevel({ originX: from.originX, originY: from.originY, resolution: from.resolutionM, width: from.width, height: from.height },
     floats(from.heights), floats(to.heights),
-    roads.map((r) => ({ id: r.id, structure: r.structure, buildingId: r.building_id, levelId: r.level_id, fromNodeId: r.from_node_id, toNodeId: r.to_node_id, coordinates: r.coordinates })), nodes);
+    roads.map((r) => ({ id: r.id, structure: r.structure, buildingId: r.building_id, levelId: r.level_id, fromNodeId: r.from_node_id, toNodeId: r.to_node_id, coordinates: r.coordinates })), nodes, RELEVEL_FIELD);
   return { plan, roads: new Map(roads.map((r) => [r.id, r])), toActive: to.active };
 }
 
@@ -79,10 +80,10 @@ async function relevelRoads(fromId: string, toId: string, owner: string | null) 
   console.log(JSON.stringify({
     from: fromId, to: toId, saved, changeSetId: saved ? changeSetId : null,
     roads: plan.roads.map((r) => ({ road: label(r.id), vertices: r.vertices.length, shiftM: range(r.vertices.map((v) => v.toZ - v.fromZ)) })),
-    nodes: plan.nodes.map((n) => ({ id: n.id, shiftM: range([n.coordinate[2] - n.fromZ])[0], roads: n.roadIds.map(label) })),
+    nodes: plan.nodes.map((n) => ({ id: n.id, rule: n.rule, shiftM: range([n.coordinate[2] - n.fromZ])[0], roads: n.roadIds.map(label) })),
     keptNodes: plan.refusedNodes.map((n) => ({ id: n.id, reason: n.reason, terrainShiftM: range([n.deltaM])[0], aboveTerrainAfterM: range([n.aboveAfterM])[0],
       drapedRoads: n.drapedRoadIds.map(label), otherRoads: n.otherRoadIds.map(label) })),
-    notMovedOwnHeights: plan.refusedRoads.filter((r) => r.reason === 'own-heights').map((r) => ({ road: label(r.id), vertices: r.vertices, terrainShiftM: range(r.deltaM), aboveTerrainAfterM: range(r.aboveAfterM) })),
+    notMovedOwnHeights: plan.refusedRoads.filter((r) => r.reason === 'own-heights').map((r) => ({ road: label(r.id), vertices: r.vertices, copiedReferenceKept: r.referenceCopies, terrainShiftM: range(r.deltaM), aboveTerrainAfterM: range(r.aboveAfterM) })),
     notMovedIndoorRoads: plan.refusedRoads.filter((r) => r.reason === 'indoor').length,
   }, null, 2));
   if (saved) console.log(`Undo: revert change set ${changeSetId} in the editor history, or activate ${fromId} and run relevel-roads ${toId} ${fromId} --save --as=${owner}`);
@@ -117,8 +118,8 @@ async function activate(id: string) {
       ? `- Buildings: active scene ${result.scene.id} still has base/roof computed on ${result.scene.terrainVersionId}. Recompute with: npm run scene:import -- --dir=<folder with campus.gpkg>`
       : '- Buildings: the active scene already uses this terrain version.',
     result.roads?.roads.length || result.roads?.nodes.length
-      ? `- Roads, REQUIRED: ${result.roads.roads.length} draped road(s) lie on changed terrain and still have the old heights. Preview: npm run terrain:relevel-roads -- ${result.previous} ${id}   then add --save --as=<collector code>`
-      : '- Roads: no draped road lies on changed terrain.',
+      ? `- Roads, REQUIRED: ${result.roads.roads.length} road(s) and ${result.roads.nodes.length} node(s) (draped on the old terrain or copied from the field reference) still have the old heights. Preview: npm run terrain:relevel-roads -- ${result.previous} ${id}   then add --save --as=<collector code>`
+      : '- Roads: no draped road or field-reference copy lies on changed terrain.',
     ...(ownHeights.length ? [`- Roads with their own heights on changed terrain: ${ownHeights.length}, lowest ${range(ownHeights.map((r) => r.aboveAfterM[0]))[0]} m relative to the new surface. relevel-roads lists them and does not move them.`] : []),
     '- Sessions already pinned to a terrain version keep it; new sessions use this one.',
     result.previous ? `Rollback: npm run terrain:activate -- ${result.previous}   (then relevel-roads ${id} ${result.previous} --save if you saved it, and scene:import again if you ran it)` : 'Rollback: none (no version was active before)',
