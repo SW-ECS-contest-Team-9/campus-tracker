@@ -1,0 +1,12 @@
+{
+  "crs": "EPSG:5186",
+  "reason": "T06 운동장 148.9 m 평탄, 회차 공간 포장면 130.6 m 평탄, 차도(V1~V4, 주차장 차로)와 오르막 보행로를 매끄러운 종단대로 지형에 새김. 표본 보정(운동장·차도 띠·정문 차도·S06·회차 공간) 위에 얹는다. 윗길 U1 은 넣지 않음.",
+  "protectBuildings": true,
+  "steps": [
+    { "type": "local-samples",
+      "files": ["../samples/smap_samples_5186.json", "../samples/smap_samples_roads_5186.json", "../samples/smap_samples_roadprofile_5186.json"],
+      "areas": ["field", "road_profile", "gate_road_rest", "s06_rest", "turnaround_rest"] },
+    { "type": "plateau", "file": "t06-plateaus.geojson", "noBlend": "t06-no-blend.geojson" },
+    { "type": "corridor", "file": "t06-road-corridors.json", "lines": ["V1", "V2", "V3", "V4a", "V4b", "P-LOW", "P-UP", "UPHILL"], "keep": "t06-plateaus.geojson" }
+  ]
+}

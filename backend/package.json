@@ -32,6 +32,7 @@
     "terrain:extract": "tsx scripts/terrain-extract.ts",
     "terrain:import": "tsx scripts/terrain-import.ts",
     "terrain:local-samples": "tsx scripts/terrain-local-samples.ts",
+    "terrain:recipe": "tsx scripts/terrain-recipe.ts",
     "terrain:list": "tsx scripts/terrain-versions.ts list",
     "terrain:activate": "tsx scripts/terrain-versions.ts activate",
     "terrain:relevel-roads": "tsx scripts/terrain-versions.ts relevel-roads",
