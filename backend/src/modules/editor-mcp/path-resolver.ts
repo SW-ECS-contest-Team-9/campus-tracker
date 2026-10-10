@@ -50,7 +50,7 @@ export interface ResolveOptions {
   runZ: 'terrain' | 'run_h';
   /** Level of the line being drawn; referenced roads must be on it */
   levelId: string | null;
-  /** Stairs/elevators join levels: they may reference roads of another level */
+  /** Stairs/elevators/ramps join levels: they may reference roads of another level */
   crossLevel: boolean;
 }
 export const DEFAULT_RESOLVE: ResolveOptions = { zMode: 'terrain', terrainOffsetM: 0, densify: true, runZ: 'terrain', levelId: null, crossLevel: false };

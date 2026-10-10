@@ -11,9 +11,10 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
     description: 'Draw a new DRAFT road centerline. path mixes free points {xy}, exact positions on existing objects {at}, and stretches of recorded '
       + 'tracks {run}/{canonical}. Reference roads with {at:{roadId,...}} wherever it must connect: coordinates typed by hand do not connect reliably. '
       + 'Access defaults follow roadClass (pedestrian: walking allowed, vehicles prohibited; vehicle: the reverse; shared: both). '
-      + 'Crossing an existing road on the same level and height splits both and joins them at a node. '
+      + 'Crossing an existing road on the same level and height (within 0.3 m) splits both and joins them at a node; an end reuses a node only within 0.15 m in plan and 0.3 m in height. '
+      + 'Heights further apart are kept as two surfaces and are not joined (warning HEIGHT_GAP_NOT_JOINED): join them with stairs or a ramp, or reference the node/road with {at} if it is one spot. '
       + 'An elevator is structure "elevator" with exactly two path points at the same x,y and different z (one road per pair of floors; zMode "explicit" or {at:{nodeId}} ends). '
-      + 'Stairs and elevators join levels: their ends reuse any node at the same place and height (within 0.3 m) whatever its levelId, they may reference roads of '
+      + 'Stairs, elevators and ramps join levels (e.g. a ramp down to an underground level): their ends reuse any node at the same place and height (within 0.3 m) whatever its levelId, they may reference roads of '
       + 'another level with {at:{roadId}}, and later roads of any level that end there reuse the node. Ordinary roads of different levels never share a node. '
       + 'Stacked flights / shaft pieces at other heights are not duplicates; only the same 3D line is. '
       + 'Returns the saved pieces, crossings, whether each reference connected, and nodeRefs (whether each {at:{nodeId}} end really landed on that node).' },
@@ -21,7 +22,8 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
     description: 'Change attributes and/or geometry of a DRAFT road. Needs expectedRevision from get_feature/list_features. Geometry: replace it all with path, '
       + 'or edit vertices with vertexOps (move/insert/delete/replaceRange), reverse, simplifyM, drapeToTerrain. If the new shape crosses other roads it is replaced by new pieces with new ids.' },
   connect_roads: { title: 'Connect roads at a point',
-    description: 'Make the roads that pass within 0.75 m of a point (same level, similar height) meet in one shared node: ends are snapped onto it, roads passing through are split. '
+    description: 'Make the roads that pass within 0.75 m of a point (same level, within 1.25 m in height) meet in one shared node at their mean height: ends are snapped onto it, roads passing through are split. '
+      + 'This is the explicit way to join roads more than 0.3 m apart in height; the result then carries a HEIGHT_GAP_JOINED warning with the gap. Do not use it for two real surfaces (join those with stairs or a ramp). '
       + 'Use it for findings from validate_network. Fails if fewer than two unconnected roads are there.' },
   create_place: { title: 'Create a place', description: 'Add a DRAFT place marker (entrance, facility, landmark, ...) at a position. Placing it near a road does not connect it to the network.' },
   update_place: { title: 'Change a place', description: 'Change the attributes and/or position of a DRAFT place. Needs expectedRevision.' },
@@ -30,8 +32,8 @@ const META: Record<OpName, { title: string; description: string; destructive?: b
   move_node: { title: 'Move a junction',
     description: 'Move a network node together with the end of every road attached to it, so they stay connected. Use this instead of moving one road end with update_road.' },
   merge_nodes: { title: 'Join two nodes at one spot',
-    description: 'Move every road on removeNodeId onto keepNodeId (within 0.15 m in plan and 0.3 m in height). Nodes of different levels may be joined only where stairs or '
-      + 'an elevator end: use it for LEVEL_NODES_NOT_JOINED / DUPLICATE_NODES findings of validate_network, e.g. corridors saved under another levelId at a stair top.' },
+    description: 'Move every road on removeNodeId onto keepNodeId (within 0.15 m in plan and 0.3 m in height). Nodes of different levels may be joined only where stairs, '
+      + 'an elevator or a ramp end. Nodes further apart in height are refused (the gap is kept; move_node first if it is one spot). Use it for LEVEL_NODES_NOT_JOINED / DUPLICATE_NODES findings of validate_network, e.g. corridors saved under another levelId at a stair top.' },
   split_road: { title: 'Split a road',
     description: 'Cut one DRAFT road in two at a distance from its start (or at the point nearest to a location). Both pieces keep its attributes; use it before giving part of a road different attributes.' },
   merge_roads: { title: 'Merge two roads',

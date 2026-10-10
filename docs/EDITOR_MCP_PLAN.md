@@ -144,7 +144,7 @@ P0~P2에서 만드는 도구는 22개다(읽기 14, 쓰기 6, 표시 2). P3 이�
 
 | 도구 | 하는 일 | 주요 입력 | 기반 |
 |---|---|---|---|
-| `get_editor_context` | 대화의 시작점. 좌표계, 수직 기준, 지형 범위, enum, 허용오차(1.25 m / 0.15 m / 0.75 m), 사용 중인 `levelId`, 현재 권한, 객체 수 (P0) | 없음 | 상수와 간단한 집계 |
+| `get_editor_context` | 대화의 시작점. 좌표계, 수직 기준, 지형 범위, enum, 허용오차(같은 노드 높이 0.3 m / 가까운 높이 1.25 m / 0.15 m / 0.75 m), 사용 중인 `levelId`, 현재 권한, 객체 수 (P0) | 없음 | 상수와 간단한 집계 |
 | `list_features` | 도로·장소·노드의 요약 목록: id, 이름, 유형, 상태, revision, 길이, Vertex 수, 양 끝 노드, 편집 중 여부 | `type`, `status`, `roadClass`, `levelId`, `nameContains`, `bbox`, `near`, `limit`, `geometry: none\|endpoints\|full` | snapshot 쿼리를 요약형으로 다시 작성 |
 | `get_feature` | 객체 하나의 상세: 속성, 인덱스가 붙은 좌표, revision, 편집 중인 작업자, 노드별 연결 도로, 계보(parent/replacedBy), 최근 변경 | `type`, `id`, `simplifyM?` | 신규 SQL |
 | `find_nearby` | 한 점 주변의 도로(최근접점, 거리, measure, 인접 Vertex, 보간 Z), 노드, 장소, 지면 Z, 건물. 연결 대상을 찾을 때 쓴다 | 점 또는 참조, `radiusM`, `levelId?` | `projectOnLine`, `terrain.buildingAt` |
@@ -240,10 +240,10 @@ type PathPoint =
 
 현재 서버가 도로를 연결하는 조건은 넷이다.
 
-- 같은 `level_id`(NULL 포함 완전 일치)에서 선분이 교차하고 보간 Z 차이가 1.25 m 이하
+- 같은 `level_id`(NULL 포함 완전 일치)에서 선분이 교차하고 보간 Z 차이가 0.3 m 이하 (2026-10-11 전에는 1.25 m, 아래 "높이 허용치" 참고)
 - Vertex가 XY 2 cm, Z 5 cm 안에서 일치
 - `branchFrom`(시작점만 가능)
-- 끝점이 같은 층에서 XY 0.15 m, Z 1.25 m 안의 기존 노드에 흡수
+- 끝점이 같은 층에서 XY 0.15 m, Z 0.3 m 안의 기존 노드에 흡수 (2026-10-11 전에는 1.25 m)
 
 모델이 cm로 반올림한 좌표로 "도로 중간에 닿는" 끝점을 보내면 몇 mm 차이로 연결되지 않고, 오류도 나지 않는다. 그래서 다음을 지킨다.
 
@@ -430,10 +430,16 @@ backend/test/editor-mcp.*.test.ts
 MCP 사용 중 보고된 "층별 경로 중복 판정 문제"를 반영한 변경이다.
 
 - **중복 판정은 3D로 한다.** 평면 Hausdorff 0.05 m 안의 후보 중, 높이 범위(±0.3 m)와 높이 단면까지 같은 경우만 `DUPLICATE_GEOMETRY`다(역방향 포함, levelId 무관). 같은 계단실의 위·아래 층 계단, 같은 샤프트의 다른 층 엘리베이터 구간은 별개 도로다(`corridor.ts`의 `sameRoad3D`).
-- **계단·엘리베이터(connector)가 층을 잇는다.** connector의 끝은 같은 위치(평면 0.15 m, 높이 0.3 m)의 노드를 levelId와 상관없이 재사용하고, 일반 도로도 connector 끝 노드는 다른 층이어도 재사용한다. 일반 도로끼리는 층이 다르면 여전히 연결되지 않는다. connector는 같은 층에서도 높이 허용치 0.3 m를 쓰므로 짧은 엘리베이터의 두 끝이 한 노드로 합쳐지지 않는다(`ensureNode`).
+- **계단·엘리베이터·경사로(connector)가 층을 잇는다.** (경사로는 지하 차도·주차장 진입로 때문에 2026-10-11 추가. 정의는 `topology.ts`의 `CONNECTOR_STRUCTURES` 한 곳) connector의 끝은 같은 위치(평면 0.15 m, 높이 0.3 m)의 노드를 levelId와 상관없이 재사용하고, 일반 도로도 connector 끝 노드는 다른 층이어도 재사용한다. 일반 도로끼리는 층이 다르면 여전히 연결되지 않는다. 한 층 위에 있는 야외 경사로(오르막 보행로 등)는 끝에서 같은 자리·같은 높이의 노드만 재사용하므로 겹친 층(층 사이 2.7 m 이상)을 잇지 않는다.
+- **높이 허용치 (2026-10-11, 규칙 "잰 고저차는 한 층으로 줄이지 않는다").** 값은 `topology.ts`의 `SAME_HEIGHT_M` 0.3 m, `NEAR_HEIGHT_M` 1.25 m 두 개뿐이다.
+  - 0.3 m 안: 같은 점. 끝점이 노드를 재사용하고, 교차하는 두 길을 나눠 잇는다(connector든 아니든 같다).
+  - 0.3 ~ 1.25 m: 가까운 두 면(계단 4~6단, 길 옆 1 m 낮은 데크). 자동으로 잇지 않고 노드를 따로 만든다. 끝점을 옛 노드 높이로 끌어가지 않는다. `validate_network`가 `NODES_HEIGHT_GAP`(같은 자리 두 노드), `UNCONNECTED_CROSSING` 경고(교차)로 알리고, MCP 저장 결과에 `HEIGHT_GAP_NOT_JOINED` 경고가 붙는다. 겹침·끊긴 끝 경고에는 높이 차를 적는다.
+  - 1.25 m 초과: 관계없음(다른 층, 고가).
+  - 직접 지시한 연결은 그대로 된다: `{at:{nodeId}}`·`{at:{roadId}}`(그 높이를 그대로 씀), `connect_roads`(1.25 m 안의 길을 평균 높이에서 이음, 0.3 m 넘으면 `HEIGHT_GAP_JOINED` 경고), `merge_nodes`(0.3 m 넘으면 `NODES_TOO_FAR`로 거절하고 차이를 알려 줌. 한 점이 맞으면 `move_node` 먼저). `move_node`는 다른 노드와 0.3 m 안으로 겹칠 때만 `NODE_COLLISION`.
+  - 0.3 m인 이유: 계단 두 단보다 작고, 지형 높이로 그은 선이 지형과 벌어질 수 있는 한도(densify 0.3 m)이며, "명확한 고저차" 최소값 0.9 m(`height-difference.ts`)의 1/3(걸음 한 번의 높이 오차)이다. 이미 connector·`merge_nodes`·3D 중복 판정이 쓰던 값이다.
 - connector는 `{at:{roadId}}`로 다른 층 도로를 참조할 수 있고(`LEVEL_MISMATCH` 면제), 참조 지점에서만 그 도로를 분할·연결한다. 기하 교차는 같은 층 도로와만 계산한다.
 - `create_road` 결과의 `nodeRefs`: `{at:{nodeId}}` 끝점이 실제로 그 노드에 붙었는지. 아니면 `NODE_NOT_REUSED` 경고.
-- `merge_nodes`: 같은 위치의 두 노드를 하나로 합친다. 층이 다르면 connector 끝에서만 허용. 이전 우회 저장분(층마다 다른 levelId로 따로 생긴 노드)을 잇는 데 쓴다. `validate_network`의 `LEVEL_NODES_NOT_JOINED`가 대상을 찾아 준다. 엘리베이터 양 끝은 `DUPLICATE_NODES`에서 제외했다.
+- `merge_nodes`: 같은 위치(평면 0.15 m, 높이 0.3 m)의 두 노드를 하나로 합친다. 층이 다르면 connector 끝에서만 허용. 이전 우회 저장분(층마다 다른 levelId로 따로 생긴 노드)을 잇는 데 쓴다. `validate_network`의 `LEVEL_NODES_NOT_JOINED`가 대상을 찾아 준다. 엘리베이터 양 끝은 `DUPLICATE_NODES`에서 제외했다.
 - `move_node`가 엘리베이터 끝을 움직일 때 평면 길이 대신 수직·높이차 조건으로 검사한다(전에는 항상 거부됐다).
 - **표시 색 공유**: `road_segments.display_color`(migration 026), `PUT /api/v1/editor/roads/:id/style`, MCP `set_road_style`. lease·revision 없이 바뀌고 changeset으로 기록되어 다른 편집기가 다시 읽으며 `revert_changeset`으로 되돌린다. 분할·병합·저장 때 유지된다. 진행 중인 다른 사람의 초안은 지우지 않는다.
 - **동선 → 통로**: `POST /api/v1/editor/corridor-preview`(저장 없음, 편집기가 초안으로 띄움), MCP `create_corridor`(저장). 가장 긴 실행을 기준으로 1 m 간격 단면에서 각 실행의 횡방향 위치 중앙값 = 중앙선, 실행 간 퍼짐의 80% 분위 + 0.8 m = 폭, 높이 = 실행 높이 중앙값 − 폰 높이(기본 1.1 m, 가정값) 또는 지형. 기본 구조는 `indoor_corridor`.

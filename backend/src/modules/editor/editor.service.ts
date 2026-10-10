@@ -5,23 +5,19 @@ import { pool, withTransaction, type DbClient } from '../../config/database.js';
 import { AppError } from '../../common/errors/app-error.js';
 import type { CollectorIdentity } from '../../common/auth/jwt.js';
 import type { Anchor, BranchFrom, JunctionSave, LeaseReleaseData, LeaseRequestData, PlaceSave, RoadSave, RoadStyleSave } from './editor.dto.js';
-import { coincidentVertices, crossings, projectOnLine, splitAt, type Hit, type XYZ } from './topology.js';
+import { CONNECTOR_STRUCTURES, NEAR_HEIGHT_M, SAME_HEIGHT_M, coincidentVertices, crossings, isConnector, projectOnLine, splitAt, type Hit, type XYZ } from './topology.js';
 
 const LEASE_MS = 30_000;
-export const LEVEL_TOLERANCE_M = 1.25;
+/** Heights this close at one place may be the same spot: only an explicit connect_roads joins them, and validate_network reports them. */
+export const LEVEL_TOLERANCE_M = NEAR_HEIGHT_M;
 export const JUNCTION_ENDPOINT_M = 0.15;
 export const JUNCTION_RADIUS_M = 0.75;
 /** An elevator is two vertices stacked in plan; endpoint snapping may pull each one up to a node 0.15 m away. */
 export const ELEVATOR_MAX_XY_M = 0.3;
 export const ELEVATOR_MIN_RISE_M = 0.5;
-/**
- * Stairs and elevators are the only roads that join different levels. Their ends reuse a node of any level that sits at
- * the same place and height (within CONNECTOR_Z_M), and an ordinary road reuses such a connector node too. Ordinary roads
- * of different levels still never share a node, so stacked corridors do not connect by accident.
- */
-export const CONNECTOR_STRUCTURES = ['stairs', 'elevator'] as const;
-export const CONNECTOR_Z_M = 0.3;
-export const isConnector = (structure: string | null | undefined) => (CONNECTOR_STRUCTURES as readonly string[]).includes(structure ?? '');
+/** Connectors (stairs/elevator/ramp, topology.ts) join levels with the same height tolerance every node reuse has. */
+export { CONNECTOR_STRUCTURES, isConnector };
+export const CONNECTOR_Z_M = SAME_HEIGHT_M;
 export type ObjectType = 'road' | 'place';
 
 /** Who made a change besides the collector account: the browser editor, or an AI agent through MCP. Recorded in editor_changes.payload.actor. */
@@ -132,7 +128,7 @@ function anchorHit(road: RoadRow, coordinates: XYZ[], anchor: Anchor, levelId: s
 
 /**
  * Geometric hits plus the caller's explicit connections (branch start, anchors) for one existing road. A road of another
- * level (only offered to stairs/elevators) contributes its explicit connections only, never geometric crossings.
+ * level (only offered to stairs/elevators/ramps) contributes its explicit connections only, never geometric crossings.
  */
 function hitsWithAnchors(coordinates: XYZ[], road: RoadRow, levelId: string | null, branchFrom?: BranchFrom, anchors: Anchor[] = []): Hit[] {
   const otherLevel = road.level_id !== levelId;
@@ -150,7 +146,7 @@ function hitsWithAnchors(coordinates: XYZ[], road: RoadRow, levelId: string | nu
 }
 
 function roadHits(coordinates: XYZ[], road: RoadRow): Hit[] {
-  const hits = crossings(coordinates, road.coordinates, LEVEL_TOLERANCE_M);
+  const hits = crossings(coordinates, road.coordinates, SAME_HEIGHT_M);
   for (const exact of coincidentVertices(coordinates, road.coordinates)) {
     const duplicate = hits.findIndex((hit) => Math.abs(hit.sourceMeasure - exact.sourceMeasure) < 0.01
       && Math.abs(hit.otherMeasure - exact.otherMeasure) < 0.01);
@@ -229,21 +225,22 @@ export async function requireLease(db: PoolClient, kind: ObjectType, id: string,
 }
 
 /**
- * The node at a point, created when missing. Same level within LEVEL_TOLERANCE_M as before; additionally a node of any level
- * within CONNECTOR_Z_M when the road being saved is a connector (stairs/elevator) or the node already ends one. A connector
- * uses the tight height tolerance on its own level too, so the two ends of a short elevator never collapse into one node.
+ * The node at a point, created when missing. A node is reused only within 0.15 m in plan and SAME_HEIGHT_M in height: on the
+ * same level, or on any level when the road being saved is a connector (stairs/elevator/ramp) or the node already ends one.
+ * A node further away in height is another surface (a few risers, a deck beside a path, the other end of a short elevator):
+ * a new node is made and nothing is pulled to the old height.
  */
 export async function ensureNode(db: PoolClient, p: XYZ, levelId: string | null, kind: 'endpoint' | 'junction', connector = false) {
   const { rows } = await db.query<{ id: string; x: number; y: number; z: number }>(
     `SELECT id, ST_X(geom)::float8 x, ST_Y(geom)::float8 y, ST_Z(geom)::float8 z
        FROM mobility.network_nodes n
       WHERE ST_DWithin(ST_Force2D(geom), ST_SetSRID(ST_MakePoint($2,$3),5186), 0.15)
-        AND ((level_id IS NOT DISTINCT FROM $1 AND abs(ST_Z(geom)-$4) <= CASE WHEN $7::boolean THEN $6::float8 ELSE $5::float8 END)
-          OR (abs(ST_Z(geom)-$4) <= $6::float8 AND ($7::boolean OR EXISTS (SELECT 1 FROM mobility.road_segments r
-                WHERE r.status IN ('DRAFT','APPROVED') AND r.structure IN ('stairs','elevator') AND (r.from_node_id=n.id OR r.to_node_id=n.id)))))
-      ORDER BY abs(ST_Z(geom)-$4) > $6::float8, CASE kind WHEN 'junction' THEN 0 ELSE 1 END,
+        AND abs(ST_Z(geom)-$4) <= $5::float8
+        AND (level_id IS NOT DISTINCT FROM $1 OR $6::boolean OR EXISTS (SELECT 1 FROM mobility.road_segments r
+              WHERE r.status IN ('DRAFT','APPROVED') AND r.structure = ANY($7::text[]) AND (r.from_node_id=n.id OR r.to_node_id=n.id)))
+      ORDER BY CASE kind WHEN 'junction' THEN 0 ELSE 1 END,
                ST_Distance(ST_Force2D(geom),ST_SetSRID(ST_MakePoint($2,$3),5186)) + abs(ST_Z(geom)-$4)
-      LIMIT 1 FOR UPDATE OF n`, [levelId, p[0], p[1], p[2], LEVEL_TOLERANCE_M, CONNECTOR_Z_M, connector],
+      LIMIT 1 FOR UPDATE OF n`, [levelId, p[0], p[1], p[2], SAME_HEIGHT_M, connector, CONNECTOR_STRUCTURES],
   );
   if (rows[0]) return { id: rows[0].id, point: [rows[0].x, rows[0].y, rows[0].z] as XYZ, created: false };
   const id = randomUUID();
@@ -394,7 +391,7 @@ export const editorService = {
           coordinate: [hit.x, hit.y, hit.z], zDeltaM: 0 });
       }
     }
-    const own = crossings(coordinates, coordinates, LEVEL_TOLERANCE_M)
+    const own = crossings(coordinates, coordinates, SAME_HEIGHT_M)
       .filter((h) => Math.abs(h.sourceMeasure - h.otherMeasure) > 0.02)
       .map((h) => ({ key: `${Math.min(h.sourceMeasure, h.otherMeasure).toFixed(2)}:${Math.max(h.sourceMeasure, h.otherMeasure).toFixed(2)}`, coordinate: [h.x, h.y, h.z] as XYZ }));
     const selfCrossings = [...new Map(own.map((h) => [h.key, h])).values()];
@@ -511,7 +508,7 @@ export const editorService = {
       }
       // A newly drawn line can cross itself. Add both route measures at each crossing so
       // the resulting edges share one junction instead of leaving a visual-only X.
-      const ownCrossings = crossings(body.coordinates, body.coordinates, LEVEL_TOLERANCE_M)
+      const ownCrossings = crossings(body.coordinates, body.coordinates, SAME_HEIGHT_M)
         .filter((h) => Math.abs(h.sourceMeasure - h.otherMeasure) > 0.02);
       for (const hit of ownCrossings) {
         allCuts.push({ x: hit.x, y: hit.y, z: hit.z, sourceMeasure: hit.sourceMeasure, roadId: 'self', otherMeasure: hit.otherMeasure });

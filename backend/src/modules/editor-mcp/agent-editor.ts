@@ -13,7 +13,7 @@ import { editorAgents, editorPresence, type OverlayItem } from '../../realtime/e
 import { PlaceSave, RoadSave } from '../editor/editor.dto.js';
 import { editorOps } from '../editor/editor.ops.js';
 import { JUNCTION_RADIUS_M, attrsFromRow, editorService, geoJSONLine, isConnector, roadSelect, withEditorActor, type RoadAttrs, type RoadRow } from '../editor/editor.service.js';
-import { projectOnLine, type XYZ } from '../editor/topology.js';
+import { NEAR_HEIGHT_M, SAME_HEIGHT_M, projectOnLine, type XYZ } from '../editor/topology.js';
 import { fusionRunsRepository } from '../fusion/fusion-runs.repository.js';
 import { pathfusionService } from '../pathfusion/pathfusion.service.js';
 import { SCOPE_APPROVED, type AgentContext } from './mcp.context.js';
@@ -186,6 +186,24 @@ async function summarize(run: Run, result: { changeSetId: string; events?: any[]
   };
 }
 
+/**
+ * Ends of the saved roads that sit at the place of another used node but more than SAME_HEIGHT_M (up to NEAR_HEIGHT_M) away in
+ * height. They are kept apart on purpose (a measured height difference is not flattened), so the caller is told.
+ */
+async function heightGapWarnings(db: PoolClient, roads: Awaited<ReturnType<typeof summarize>>['roads']) {
+  const { rows } = await db.query<{ node: string; other: string; gap: number }>(
+    `SELECT e.id node, n.id other, (ST_Z(e.geom)-ST_Z(n.geom))::float8 gap
+       FROM mobility.network_nodes e JOIN mobility.network_nodes n ON n.id<>e.id AND ST_DWithin(ST_Force2D(n.geom), ST_Force2D(e.geom), 0.15)
+        AND abs(ST_Z(e.geom)-ST_Z(n.geom)) > $2 AND abs(ST_Z(e.geom)-ST_Z(n.geom)) <= $3
+      WHERE e.id = ANY($1::uuid[])
+        AND EXISTS (SELECT 1 FROM mobility.road_segments r WHERE r.status IN ('DRAFT','APPROVED') AND (r.from_node_id=n.id OR r.to_node_id=n.id))
+        AND NOT EXISTS (SELECT 1 FROM mobility.road_segments r WHERE r.status IN ('DRAFT','APPROVED')
+              AND ((r.from_node_id=e.id AND r.to_node_id=n.id) OR (r.from_node_id=n.id AND r.to_node_id=e.id)))
+      ORDER BY e.id, n.id`, [[...new Set(roads.flatMap((r) => [r.start.nodeId, r.end.nodeId]))], SAME_HEIGHT_M, NEAR_HEIGHT_M]);
+  return rows.map((r) => `HEIGHT_GAP_NOT_JOINED: a road end (node ${r.node}) is ${round2(Math.abs(r.gap))} m ${r.gap > 0 ? 'above' : 'below'} node ${r.other} at the same place, so they were NOT joined `
+    + '(heights are kept). Two surfaces: join them with stairs or a ramp. One spot: redraw that end with {at:{nodeId}}, or connect_roads there');
+}
+
 /** Did each {at:{nodeId}} end vertex really land on that node? Interior node references are only positions. */
 function nodeRefStates(summary: Awaited<ReturnType<typeof summarize>>, refs: { vertexIndex: number; nodeId: string }[], vertexCount: number) {
   return refs.map((ref) => {
@@ -254,7 +272,8 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     return { ...summary, crossings: r.crossings, selfCrossings: r.selfCrossings, connections: r.connections, nodeRefs, sources: resolved.sources,
       warnings: [...resolved.warnings, ...(failed.length ? [`NOT CONNECTED at ${failed.length} referenced point(s): inspect with find_nearby, then use connect_roads there`] : []),
         ...nodeRefs.filter((n) => !n.connected).map((n) => `NODE_NOT_REUSED: path vertex ${n.vertexIndex} referenced node ${n.nodeId}, but the road ${n.vertexIndex === 0 ? 'starts' : 'ends'} on node ${n.usedNodeId ?? '(interior vertex)'}; it is NOT connected to the referenced node (different level or height?)`),
-        ...(summary.roads.length > 1 ? ['The line crosses itself or other roads, so it was saved as several road pieces'] : [])] };
+        ...(summary.roads.length > 1 ? ['The line crosses itself or other roads, so it was saved as several road pieces'] : []),
+        ...(await heightGapWarnings(run.db, summary.roads))] };
   },
 
   async create_corridor(run, a) {
@@ -280,7 +299,8 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     const { coordinates: _c, warnings: corridorWarnings, ...stats } = corridor;
     return { ...summary, corridor: { ...stats, widthM: attrs.widthM ?? null, estimatedWidthM: corridor.widthM, vertexCount: resolved.coordinates.length },
       crossings: r.crossings, connections: r.connections,
-      warnings: [...corridorWarnings, ...resolved.warnings, ...(corridor.coverage < 0.6 ? [`Only ${Math.round(corridor.coverage * 100)}% of the passage is covered by two or more tracks`] : [])] };
+      warnings: [...corridorWarnings, ...resolved.warnings, ...(corridor.coverage < 0.6 ? [`Only ${Math.round(corridor.coverage * 100)}% of the passage is covered by two or more tracks`] : []),
+        ...(await heightGapWarnings(run.db, summary.roads))] };
   },
 
   async set_road_style(run, a) {
@@ -340,7 +360,7 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     const coordinates = vertices.map((v) => v.p);
     // A moved end leaves the other roads on the old node: warn, because that silently disconnects them.
     for (const [end, node, before, after] of [['start', current.from_node_id, current.coordinates[0], coordinates[0]], ['end', current.to_node_id, current.coordinates.at(-1)!, coordinates.at(-1)!]] as const) {
-      if (Math.hypot(before[0] - after[0], before[1] - after[1]) <= 0.15 && Math.abs(before[2] - after[2]) <= 1.25) continue;
+      if (Math.hypot(before[0] - after[0], before[1] - after[1]) <= 0.15 && Math.abs(before[2] - after[2]) <= SAME_HEIGHT_M) continue;
       const { rows } = await run.db.query<{ n: number }>(`SELECT count(*)::int n FROM mobility.road_segments WHERE status IN ('DRAFT','APPROVED') AND id<>$1 AND (from_node_id=$2 OR to_node_id=$2)`, [a.id, node]);
       if (rows[0].n) warnings.push(`ENDPOINT_DETACHED: the ${end} moved away from a node that ${rows[0].n} other road(s) use; they are no longer connected to this road. Use move_node to move a junction with all its roads`);
     }
@@ -348,7 +368,7 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     const r = await saveRoadGeometry(run, a.id, a.expectedRevision, attrs, coordinates, anchors);
     const summary = await summarize(run, r.saved);
     if (!summary.roads.some((x) => x.id === a.id)) warnings.push('The road now crosses other geometry and was replaced by new road pieces with new ids (see roads)');
-    return { ...summary, crossings: r.crossings, selfCrossings: r.selfCrossings, connections: r.connections, warnings };
+    return { ...summary, crossings: r.crossings, selfCrossings: r.selfCrossings, connections: r.connections, warnings: [...warnings, ...(await heightGapWarnings(run.db, summary.roads))] };
   },
 
   async connect_roads(run, a) {
@@ -369,7 +389,10 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
     }
     const saved = await editorService.saveJunction({ coordinate: at, roads, sessionId: run.ctx.sessionId, mutationId: randomUUID() }, run.ctx.identity, run.db);
     run.overlay.push({ kind: 'point', coordinates: [saved.coordinate], style: 'proposal', label: 'junction' });
-    return { ...(await summarize(run, saved)), nodeId: saved.nodeId, at: roundXYZ(saved.coordinate), roadsConnected: saved.roadCount };
+    const heights = preview.roads.map((r) => r.heightM), spread = Math.max(...heights) - Math.min(...heights);
+    return { ...(await summarize(run, saved)), nodeId: saved.nodeId, at: roundXYZ(saved.coordinate), roadsConnected: saved.roadCount,
+      warnings: spread > SAME_HEIGHT_M ? [`HEIGHT_GAP_JOINED: the roads were ${round2(spread)} m apart in height here and now meet at ${round2(saved.coordinate[2])} m. `
+        + 'If they are two surfaces (a few steps apart), revert_changeset this and join them with stairs or a ramp instead'] : [] };
   },
 
   async create_place(run, a) {

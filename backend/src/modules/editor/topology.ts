@@ -1,6 +1,28 @@
 export type XYZ = [number, number, number];
 export type Hit = { x: number; y: number; z: number; sourceMeasure: number; otherMeasure: number; zDelta: number };
 
+/**
+ * Two heights at one plan position (the only place these two values are defined).
+ * - within SAME_HEIGHT_M they are one point: an end reuses the node, crossing roads are split and joined.
+ * - between SAME_HEIGHT_M and NEAR_HEIGHT_M they are two surfaces a few steps apart (a deck beside a path, a 4-6 riser
+ *   stair). They are never joined automatically, because that would pull one surface onto the other; validate_network
+ *   reports them and the user joins them with stairs/a ramp or explicitly (connect_roads, move_node + merge_nodes).
+ * - beyond NEAR_HEIGHT_M they are unrelated (another floor, an overpass).
+ * 0.3 m: under two risers, the height error a drawn line may have against the terrain (densify), and a third of the
+ * smallest height difference that counts as clear (trajectory/height-difference.ts, 0.9 m).
+ */
+export const SAME_HEIGHT_M = 0.3;
+export const NEAR_HEIGHT_M = 1.25;
+
+/**
+ * Stairs, elevators and ramps are the only roads that join different levels (a ramp e.g. down to an underground level).
+ * Their ends reuse a node of any level that sits at the same place and height (within SAME_HEIGHT_M), and an ordinary road
+ * reuses such a connector node too. Ordinary roads of different levels still never share a node, so stacked corridors do
+ * not connect by accident.
+ */
+export const CONNECTOR_STRUCTURES = ['stairs', 'elevator', 'ramp'] as const;
+export const isConnector = (structure: string | null | undefined) => (CONNECTOR_STRUCTURES as readonly string[]).includes(structure ?? '');
+
 /** Nearest point and distance along a road in the campus XY plane. */
 export function projectOnLine(points: XYZ[], target: XYZ) {
   let measure = 0;
@@ -75,7 +97,7 @@ function cumulativeMeasure(points: XYZ[], segment: number, fraction: number, len
 }
 
 /** 2D crossing candidates with each line's independently interpolated height. */
-export function crossings(a: XYZ[], b: XYZ[], zToleranceM = 1.25): Hit[] {
+export function crossings(a: XYZ[], b: XYZ[], zToleranceM = SAME_HEIGHT_M): Hit[] {
   const al = segmentLengths(a), bl = segmentLengths(b);
   const hits: Hit[] = [];
   for (let i = 0; i < a.length - 1; i++) for (let j = 0; j < b.length - 1; j++) {

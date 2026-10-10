@@ -1,5 +1,5 @@
 // Network QA over the active roads and nodes (docs/EDITOR_MCP_PLAN.md 6.3). Pure: callers load the data.
-import { crossings, projectOnLine, type XYZ } from '../editor/topology.js';
+import { NEAR_HEIGHT_M, SAME_HEIGHT_M, crossings, isConnector, projectOnLine, type XYZ } from '../editor/topology.js';
 import { round2, roundXYZ } from './geometry.js';
 
 export interface QaRoad {
@@ -19,16 +19,19 @@ export interface Finding {
 export interface QaOptions {
   /** A dangling end this close to another road was probably meant to connect. */
   danglingRadiusM: number;
+  /** Heights this close at one place are worth a look (topology.ts NEAR_HEIGHT_M) */
   levelToleranceM: number;
+  /** Heights this close at one place are the same point (topology.ts SAME_HEIGHT_M); between the two: reported, never called the same */
+  sameHeightM: number;
   duplicateNodeM: number;
   offTerrainM: number;
   /** Ground height at an XY point, or null outside the DEM. Omit to skip the terrain check. */
   ground?: (x: number, y: number) => number | null;
   smallComponentM: number;
 }
-export const DEFAULT_QA: QaOptions = { danglingRadiusM: 2, levelToleranceM: 1.25, duplicateNodeM: 0.15, offTerrainM: 1.5, smallComponentM: 10 };
+export const DEFAULT_QA: QaOptions = { danglingRadiusM: 2, levelToleranceM: NEAR_HEIGHT_M, sameHeightM: SAME_HEIGHT_M, duplicateNodeM: 0.15, offTerrainM: 1.5, smallComponentM: 10 };
 
-export const QA_CHECKS = ['DANGLING_END_NEAR_ROAD', 'UNCONNECTED_CROSSING', 'DUPLICATE_NODES', 'LEVEL_NODES_NOT_JOINED', 'OVERLAPPING_ROADS', 'OFF_TERRAIN', 'ATTRIBUTE_CONFLICT', 'ISOLATED_COMPONENT'] as const;
+export const QA_CHECKS = ['DANGLING_END_NEAR_ROAD', 'UNCONNECTED_CROSSING', 'DUPLICATE_NODES', 'LEVEL_NODES_NOT_JOINED', 'NODES_HEIGHT_GAP', 'OVERLAPPING_ROADS', 'OFF_TERRAIN', 'ATTRIBUTE_CONFLICT', 'ISOLATED_COMPONENT'] as const;
 export type QaCheck = (typeof QA_CHECKS)[number];
 
 const length = (c: XYZ[]) => c.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - c[i][0], p[1] - c[i][1]), 0);
@@ -40,6 +43,8 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
   const o = { ...DEFAULT_QA, ...options };
   const on = (c: QaCheck) => checks.includes(c);
   const findings: Finding[] = [];
+  /** ", 0.8 m apart in height" when the two are not at one height */
+  const gapNote = (dz: number) => (dz > o.sameHeightM ? `, ${round2(dz)} m apart in height` : '');
   const boxes = new Map(roads.map((r) => [r.id, bboxOf(r.coordinates)]));
   const degree = new Map<string, string[]>();
   for (const r of roads) for (const n of [r.fromNodeId, r.toNodeId]) degree.set(n, [...(degree.get(n) ?? []), r.id]);
@@ -56,7 +61,7 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
         const hit = projectOnLine(other.coordinates, node.coordinate);
         if (!hit || hit.distance > o.danglingRadiusM || Math.abs(hit.point[2] - node.coordinate[2]) > o.levelToleranceM) continue;
         findings.push({ code: 'DANGLING_END_NEAR_ROAD', severity: 'warning', roadIds: [own, other.id], nodeIds: [nodeId], location: roundXYZ(node.coordinate),
-          message: `An end of ${label(roads.find((r) => r.id === own)!)} stops ${round2(hit.distance)} m from ${label(other)} without connecting`,
+          message: `An end of ${label(roads.find((r) => r.id === own)!)} stops ${round2(hit.distance)} m from ${label(other)} without connecting${gapNote(Math.abs(hit.point[2] - node.coordinate[2]))}`,
           suggestion: hit.distance <= 0.75 ? 'connect_roads at this location' : 'extend the road to the other one (update_road with an "at" reference), or confirm it is a dead end' });
       }
     }
@@ -71,47 +76,60 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
       for (const hit of crossings(a.coordinates, b.coordinates, Number.POSITIVE_INFINITY)) {
         const atSharedNode = [...shared].some((n) => { const c = nodeById.get(n)?.coordinate; return c && Math.hypot(c[0] - hit.x, c[1] - hit.y) < 0.2; });
         if (atSharedNode) continue;
-        const connectable = hit.zDelta <= o.levelToleranceM;
-        findings.push({ code: 'UNCONNECTED_CROSSING', severity: connectable ? 'error' : 'info', roadIds: [a.id, b.id], location: [round2(hit.x), round2(hit.y), round2(hit.z)],
-          message: connectable ? `${label(a)} and ${label(b)} cross at the same height without a shared node`
-            : `${label(a)} and ${label(b)} cross in plan but are ${round2(hit.zDelta)} m apart in height (overpass, or a wrong Z)`,
-          suggestion: connectable ? 'connect_roads at this location' : undefined });
+        // same height: saving would have joined them. A little apart: two surfaces or a wrong height, never joined automatically.
+        const same = hit.zDelta <= o.sameHeightM, close = hit.zDelta <= o.levelToleranceM;
+        findings.push({ code: 'UNCONNECTED_CROSSING', severity: same ? 'error' : close ? 'warning' : 'info', roadIds: [a.id, b.id], location: [round2(hit.x), round2(hit.y), round2(hit.z)],
+          message: same ? `${label(a)} and ${label(b)} cross at the same height without a shared node`
+            : close ? `${label(a)} and ${label(b)} cross ${round2(hit.zDelta)} m apart in height and are not joined (two surfaces a few steps apart, or one height is off)`
+              : `${label(a)} and ${label(b)} cross in plan but are ${round2(hit.zDelta)} m apart in height (overpass, or a wrong Z)`,
+          suggestion: same ? 'connect_roads at this location'
+            : close ? 'two surfaces: leave them, or join them with stairs or a ramp. One spot: correct the height, or connect_roads here (joins both at their mean height)' : undefined });
       }
     }
     if (on('OVERLAPPING_ROADS')) {
       // Sample the shorter road; a long run that stays within 0.3 m of the other is a duplicate/overlap.
       const [s, l] = length(a.coordinates) <= length(b.coordinates) ? [a, b] : [b, a];
-      let run = 0, bestRun = 0, start: XYZ | null = null, bestStart: XYZ | null = null;
+      let run = 0, bestRun = 0, start: XYZ | null = null, bestStart: XYZ | null = null, gap = 0, bestGap = 0;
       for (let k = 1; k < s.coordinates.length; k++) {
         const p = s.coordinates[k - 1], q = s.coordinates[k];
         const seg = Math.hypot(q[0] - p[0], q[1] - p[1]);
         const mid: XYZ = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
         const hit = projectOnLine(l.coordinates, mid);
-        if (hit && hit.distance < 0.3 && Math.abs(hit.point[2] - mid[2]) <= o.levelToleranceM) { if (!run) start = p; run += seg; if (run > bestRun) { bestRun = run; bestStart = start; } }
-        else run = 0;
+        if (hit && hit.distance < 0.3 && Math.abs(hit.point[2] - mid[2]) <= o.levelToleranceM) {
+          if (!run) { start = p; gap = 0; }
+          run += seg; gap = Math.max(gap, Math.abs(hit.point[2] - mid[2]));
+          if (run > bestRun) { bestRun = run; bestStart = start; bestGap = gap; }
+        } else run = 0;
       }
       if (bestRun >= 1 && bestStart) findings.push({ code: 'OVERLAPPING_ROADS', severity: 'warning', roadIds: [a.id, b.id], location: roundXYZ(bestStart),
-        message: `${label(a)} and ${label(b)} run on top of each other for about ${round2(bestRun)} m`, suggestion: 'retire or reshape one of them; overlaps are not merged automatically' });
+        message: `${label(a)} and ${label(b)} run on top of each other for about ${round2(bestRun)} m${gapNote(bestGap)}`,
+        suggestion: bestGap > o.sameHeightM ? 'if they are two surfaces at different heights keep both; otherwise retire or reshape one of them. Overlaps are not merged automatically'
+          : 'retire or reshape one of them; overlaps are not merged automatically' });
     }
   }
 
-  if (on('DUPLICATE_NODES') || on('LEVEL_NODES_NOT_JOINED')) {
+  if (on('DUPLICATE_NODES') || on('LEVEL_NODES_NOT_JOINED') || on('NODES_HEIGHT_GAP')) {
     const used = nodes.filter((n) => degree.has(n.id));
     const byId = new Map(roads.map((r) => [r.id, r]));
     // the two ends of one elevator share x,y by design
     const elevatorEnds = (a: QaNode, b: QaNode) => roads.some((r) => r.structure === 'elevator' && ((r.fromNodeId === a.id && r.toNodeId === b.id) || (r.fromNodeId === b.id && r.toNodeId === a.id)));
-    const onConnector = (n: QaNode) => degree.get(n.id)!.some((id) => ['stairs', 'elevator'].includes(byId.get(id)?.structure ?? ''));
+    const onConnector = (n: QaNode) => degree.get(n.id)!.some((id) => isConnector(byId.get(id)?.structure));
     for (let i = 0; i < used.length; i++) for (let j = i + 1; j < used.length; j++) {
       const a = used[i], b = used[j];
       if (Math.hypot(a.coordinate[0] - b.coordinate[0], a.coordinate[1] - b.coordinate[1]) > o.duplicateNodeM) continue;
       const dz = Math.abs(a.coordinate[2] - b.coordinate[2]);
       const roadIds = [...new Set([...degree.get(a.id)!, ...degree.get(b.id)!])];
-      if (a.levelId === b.levelId) {
-        if (on('DUPLICATE_NODES') && dz <= o.levelToleranceM && !elevatorEnds(a, b)) findings.push({ code: 'DUPLICATE_NODES', severity: 'error', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
+      if (dz > o.sameHeightM) {
+        // Two heights at one place: never one node by accident. Said out loud so a missing stair/ramp or a wrong height is seen.
+        if (on('NODES_HEIGHT_GAP') && dz <= o.levelToleranceM && !elevatorEnds(a, b)) findings.push({ code: 'NODES_HEIGHT_GAP', severity: 'warning', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
+          message: `Two nodes at the same place are ${round2(dz)} m apart in height and are not joined${a.levelId === b.levelId ? '' : ` (levels ${JSON.stringify(a.levelId)} and ${JSON.stringify(b.levelId)})`}`,
+          suggestion: 'two surfaces: join them with stairs or a ramp. One spot: move_node one of them to the right height, then merge_nodes' });
+      } else if (a.levelId === b.levelId) {
+        if (on('DUPLICATE_NODES') && !elevatorEnds(a, b)) findings.push({ code: 'DUPLICATE_NODES', severity: 'error', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
           message: 'Two separate nodes sit at the same place, so their roads are not connected', suggestion: 'connect_roads at this location, or merge_nodes' });
-      } else if (on('LEVEL_NODES_NOT_JOINED') && dz <= 0.3 && (onConnector(a) || onConnector(b))) {
+      } else if (on('LEVEL_NODES_NOT_JOINED') && (onConnector(a) || onConnector(b))) {
         findings.push({ code: 'LEVEL_NODES_NOT_JOINED', severity: 'warning', roadIds, nodeIds: [a.id, b.id], location: roundXYZ(a.coordinate),
-          message: `Stairs/elevator end and a road of level ${JSON.stringify(a.levelId === b.levelId ? a.levelId : (onConnector(a) ? b.levelId : a.levelId))} meet here on separate nodes, so the floors are not connected`,
+          message: `Stairs/elevator/ramp end and a road of level ${JSON.stringify(a.levelId === b.levelId ? a.levelId : (onConnector(a) ? b.levelId : a.levelId))} meet here on separate nodes, so the floors are not connected`,
           suggestion: 'merge_nodes with these two nodes' });
       }
     }

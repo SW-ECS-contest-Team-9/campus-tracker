@@ -10,7 +10,7 @@ import {
   CONNECTOR_Z_M, ELEVATOR_MAX_XY_M, ELEVATOR_MIN_RISE_M, addChange, assertPointInsideTerrain, attrsFromRow, ensureNode, geoJSONLine, insertRoad, isConnector, pointAtMeasure, roadBefore, roadSelect, snapPieceEndpoints,
   type RoadAttrs, type RoadRow,
 } from './editor.service.js';
-import { splitAt, type XYZ } from './topology.js';
+import { SAME_HEIGHT_M, splitAt, type XYZ } from './topology.js';
 
 interface OpBase { sessionId: string; mutationId: string }
 const inTx = <T>(outer: PoolClient | undefined, fn: (db: PoolClient) => Promise<T>): Promise<T> => (outer ? fn(outer) : withTransaction(fn));
@@ -70,9 +70,9 @@ export const editorOps = {
       await assertNotLockedByOthers(db, roads.map((r) => r.id), owner, body.sessionId);
       const { rows: clash } = await db.query(
         `SELECT n.id FROM mobility.network_nodes n WHERE n.id<>$1 AND n.level_id IS NOT DISTINCT FROM $2
-            AND ST_DWithin(ST_Force2D(n.geom), ST_SetSRID(ST_MakePoint($3,$4),5186), 0.15) AND abs(ST_Z(n.geom)-$5) <= 1.25
+            AND ST_DWithin(ST_Force2D(n.geom), ST_SetSRID(ST_MakePoint($3,$4),5186), 0.15) AND abs(ST_Z(n.geom)-$5) <= $6
             AND EXISTS (SELECT 1 FROM mobility.road_segments r WHERE r.status IN ('DRAFT','APPROVED') AND (r.from_node_id=n.id OR r.to_node_id=n.id)) LIMIT 1`,
-        [node.id, node.level_id, ...body.coordinate]);
+        [node.id, node.level_id, ...body.coordinate, SAME_HEIGHT_M]);
       if (clash.length) throw AppError.conflict('NODE_COLLISION', 'Another node already sits at the target position; connect the roads there instead of moving onto it', { nodeId: clash[0].id });
 
       const events: unknown[] = [];
@@ -101,8 +101,9 @@ export const editorOps = {
 
   /**
    * Joins two nodes at the same place (within 0.15 m in plan, CONNECTOR_Z_M in height): every road on `removeNodeId` is moved onto
-   * `keepNodeId`. Nodes of different levels may only be joined when one of them ends a stairs/elevator road, so stacked
-   * corridors are never fused. Repairs networks saved before connectors could join levels.
+   * `keepNodeId`. Nodes of different levels may only be joined when one of them ends a stairs/elevator/ramp road, so stacked
+   * corridors are never fused. Repairs networks saved before connectors could join levels. Nodes further apart in height are
+   * refused: that gap is kept on purpose, and closing it takes an explicit move_node first.
    */
   async mergeNodes(body: OpBase & { keepNodeId: string; removeNodeId: string }, identity: CollectorIdentity, outer?: PoolClient) {
     return inTx(outer, async (db) => {
@@ -114,13 +115,15 @@ export const editorOps = {
         `SELECT id, level_id, (ST_AsGeoJSON(geom)::json->'coordinates') c FROM mobility.network_nodes WHERE id = ANY($1::uuid[]) FOR UPDATE`, [[body.keepNodeId, body.removeNodeId]]);
       const keep = nodes.find((n) => n.id === body.keepNodeId), remove = nodes.find((n) => n.id === body.removeNodeId);
       if (!keep || !remove) throw AppError.notFound('NODE_NOT_FOUND', 'Both nodes must exist');
-      if (Math.hypot(keep.c[0] - remove.c[0], keep.c[1] - remove.c[1]) > 0.15 || Math.abs(keep.c[2] - remove.c[2]) > CONNECTOR_Z_M) {
-        throw AppError.conflict('NODES_TOO_FAR', `Nodes must be within 0.15 m in plan and ${CONNECTOR_Z_M} m in height; use move_node first`);
+      const planGap = Math.hypot(keep.c[0] - remove.c[0], keep.c[1] - remove.c[1]), heightGap = Math.abs(keep.c[2] - remove.c[2]);
+      if (planGap > 0.15 || heightGap > CONNECTOR_Z_M) {
+        throw AppError.conflict('NODES_TOO_FAR', `Nodes must be within 0.15 m in plan and ${CONNECTOR_Z_M} m in height; these are ${planGap.toFixed(2)} m and ${heightGap.toFixed(2)} m apart. `
+          + 'A height difference is kept, not merged away: join two surfaces with stairs or a ramp, or use move_node first if it really is one spot', { planGapM: planGap, heightGapM: heightGap });
       }
       const { rows: roads } = await db.query<RoadRow>(`${roadSelect} WHERE status IN ('DRAFT','APPROVED') AND (from_node_id = ANY($1::uuid[]) OR to_node_id = ANY($1::uuid[])) ORDER BY id FOR UPDATE`,
         [[keep.id, remove.id]]);
       if (keep.level_id !== remove.level_id && !roads.some((r) => isConnector(r.structure))) {
-        throw AppError.conflict('LEVEL_MISMATCH', 'Nodes of different levels can only be joined where stairs or an elevator end');
+        throw AppError.conflict('LEVEL_MISMATCH', 'Nodes of different levels can only be joined where stairs, an elevator or a ramp end');
       }
       const moving = roads.filter((r) => r.from_node_id === remove.id || r.to_node_id === remove.id);
       if (moving.some((r) => r.from_node_id === keep.id || r.to_node_id === keep.id)) throw AppError.conflict('MERGE_COLLAPSES_ROAD', 'A road runs between the two nodes; it would collapse');
