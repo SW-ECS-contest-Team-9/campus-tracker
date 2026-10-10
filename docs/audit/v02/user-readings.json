@@ -1,0 +1,3943 @@
+{
+ "title": "V02 사용자 S-MAP 높이 핀(차도와 그 옆)",
+ "crs": "EPSG:5186",
+ "created": "2026-10-11",
+ "note": "값은 사용자가 S-MAP 화면에서 찍은 풍선의 숫자를 Claude 가 캡처에서 다시 읽은 것. 자리는 캡처마다 카메라(눈 위치·방향·시야각)를 되찾아 핀 바닥점을 옮긴 것(georef.py). 측량 아님.",
+ "cameras": {
+  "SM07": {
+   "camera": {
+    "eye_x": 201134.37597289658,
+    "eye_y": 557303.6674988988,
+    "eye_z": 340,
+    "heading_deg": 282.6056980230653,
+    "tilt_deg": 57.10216056714537,
+    "fov_deg": 43.487509581776735,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.06623447777502633,
+    "rms_dz": 0.81769987078726,
+    "n_used": 29
+   }
+  },
+  "SM09": {
+   "camera": {
+    "eye_x": 201124.34997927494,
+    "eye_y": 557324.2498142556,
+    "eye_z": 288,
+    "heading_deg": 221.44309902333316,
+    "tilt_deg": 70.86785946319249,
+    "fov_deg": 41.05027315900285,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.20951943426815944,
+    "rms_dz": 0.9511047408338646,
+    "n_used": 43
+   }
+  },
+  "SM11": {
+   "camera": {
+    "eye_x": 201078.36545599872,
+    "eye_y": 557187.2699274042,
+    "eye_z": 386,
+    "heading_deg": 127.01176601356595,
+    "tilt_deg": 76.82164525982627,
+    "fov_deg": 43.87486791388557,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.08302959560533196,
+    "rms_dz": 0.16200758539226812,
+    "n_used": 42
+   }
+  },
+  "SM15": {
+   "camera": {
+    "eye_x": 200991.74953626472,
+    "eye_y": 557138.3321584923,
+    "eye_z": 374,
+    "heading_deg": 102.59411857494156,
+    "tilt_deg": 71.95121614052748,
+    "fov_deg": 44.784090947171585,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.0999999999999801,
+    "rms_dz": 1.2648417544627357,
+    "n_used": 57
+   }
+  },
+  "P13": {
+   "camera": {
+    "eye_x": 201147.11591049374,
+    "eye_y": 557264.219457045,
+    "eye_z": 285.20039341746303,
+    "heading_deg": 315.39722978863466,
+    "tilt_deg": 78.34644496340809,
+    "cx_off": 14.650193434045056,
+    "cy_off": 72.45970723328598,
+    "fov_deg": 43.7
+   },
+   "fit": {
+    "median_abs_dz": 0.19077053116559028,
+    "rms_dz": 0.32722498276735174,
+    "n_used": 6,
+    "controls": 2
+   }
+  }
+ },
+ "summary": {
+  "total_campus_points": 105,
+  "public_road_points_not_listed": 20,
+  "carriageway_points": 43,
+  "other_surface_points": 62,
+  "by_segment": {
+   "P-LOW": 3,
+   "U1": 9,
+   "U1-EXT": 4,
+   "V1": 1,
+   "V2": 9,
+   "V3": 5,
+   "V4": 12
+  },
+  "by_surface": {
+   "공도 갈림(정문 밖)": 4,
+   "기타(차도 아님)": 4,
+   "본관 쪽 보도·계단식 보도(차도 아님)": 7,
+   "분수 광장": 7,
+   "차도": 15,
+   "차도(윗길)": 9,
+   "차도(윗길에서 풋살장 쪽으로 이어지는 열)": 4,
+   "차도(주차장 차로)": 3,
+   "풋살장·운동장·통로 등(차도 아님)": 31,
+   "하단 주차장 덮개 아래·광장 가장자리(차도 아님)": 4,
+   "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)": 5,
+   "회차 공간 포장면": 12
+  },
+  "xy_err_m": {
+   "n": 105,
+   "median_abs": 2.5,
+   "p90_abs": 3.0,
+   "max_abs": 5.3
+  },
+  "points_seen_in_two_or_more_images": 42,
+  "agreement_carriageway": {
+   "user_minus_e09_proposal_at_nearest_point": {
+    "n": 39,
+    "median_abs": 0.11,
+    "p90_abs": 0.34,
+    "max_abs": 0.69
+   },
+   "user_minus_e09_pick_within_4m": {
+    "n": 31,
+    "median_abs": 0.11,
+    "p90_abs": 0.39,
+    "max_abs": 0.71
+   },
+   "user_minus_smap_query": {
+    "n": 43,
+    "median_abs": 0.07,
+    "p90_abs": 0.19,
+    "max_abs": 0.59
+   },
+   "user_minus_mesh": {
+    "n": 43,
+    "median_abs": 0.07,
+    "p90_abs": 0.16,
+    "max_abs": 0.54
+   },
+   "user_minus_t04_or_s06_sample_within_2m": {
+    "n": 31,
+    "median_abs": 0.1,
+    "p90_abs": 0.1,
+    "max_abs": 0.5
+   },
+   "user_minus_terrain_old": {
+    "n": 43,
+    "median_abs": 2.43,
+    "p90_abs": 10.32,
+    "max_abs": 11.77
+   },
+   "user_minus_terrain_t04_all": {
+    "n": 43,
+    "median_abs": 0.28,
+    "p90_abs": 10.32,
+    "max_abs": 11.77
+   }
+  },
+  "agreement_all": {
+   "user_minus_smap_query": {
+    "n": 105,
+    "median_abs": 0.07,
+    "p90_abs": 0.57,
+    "max_abs": 8.48
+   },
+   "user_minus_mesh": {
+    "n": 96,
+    "median_abs": 0.09,
+    "p90_abs": 0.48,
+    "max_abs": 12.29
+   }
+  },
+  "disagree_over_0p5_vs_query": [
+   {
+    "id": "U013",
+    "value": 105.9,
+    "query": 106.93,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201097.54,
+     557151.61
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U016",
+    "value": 106.4,
+    "query": 107.97,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201095.53,
+     557157.94
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U019",
+    "value": 111.3,
+    "query": 109.79,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201086.57,
+     557168.8
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U028",
+    "value": 148.3,
+    "query": 148.96,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201195.35,
+     557186.34
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U037",
+    "value": 114.1,
+    "query": 105.62,
+    "surface": "분수 광장",
+    "segment": null,
+    "xy": [
+     201048.38,
+     557216.44
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U054",
+    "value": 127.7,
+    "query": 126.75,
+    "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+    "segment": null,
+    "xy": [
+     201113.95,
+     557258.73
+    ],
+    "xy_err_m": 2.2
+   },
+   {
+    "id": "U061",
+    "value": 122.6,
+    "query": 122.01,
+    "surface": "차도(윗길)",
+    "segment": "U1",
+    "xy": [
+     201081.62,
+     557274.15
+    ],
+    "xy_err_m": 5.0
+   },
+   {
+    "id": "U066",
+    "value": 148.9,
+    "query": 144.24,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201142.02,
+     557282.46
+    ],
+    "xy_err_m": 3.0
+   },
+   {
+    "id": "U068",
+    "value": 124.8,
+    "query": 125.33,
+    "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+    "segment": null,
+    "xy": [
+     201068.96,
+     557289.5
+    ],
+    "xy_err_m": 1.5
+   },
+   {
+    "id": "U071",
+    "value": 126.3,
+    "query": 127.3,
+    "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+    "segment": null,
+    "xy": [
+     201050.46,
+     557297.25
+    ],
+    "xy_err_m": 2.2
+   },
+   {
+    "id": "U075",
+    "value": 125.9,
+    "query": 128.49,
+    "surface": "기타(차도 아님)",
+    "segment": null,
+    "xy": [
+     201013.87,
+     557300.01
+    ],
+    "xy_err_m": 3.2
+   },
+   {
+    "id": "U078",
+    "value": 148.5,
+    "query": 147.86,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201141.63,
+     557304.66
+    ],
+    "xy_err_m": 3.0
+   },
+   {
+    "id": "U095",
+    "value": 133.7,
+    "query": 134.21,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201065.88,
+     557342.61
+    ],
+    "xy_err_m": 1.5
+   }
+  ]
+ },
+ "notGeoreferenced": [
+  {
+   "image": "사용자-SMAP높이-20261010/사진-7-전체시점.png",
+   "value_m": 130.6,
+   "surface": "회차 공간 포장면(버스 옆)",
+   "why": "이 화면의 땅 핀이 2개뿐이라 카메라를 못 맞춤. SM-07 의 130.6 핀과 같은 값. 근거.md 의 사진7 전사에는 이 핀이 빠져 있다"
+  },
+  {
+   "image": "사용자-SMAP높이-20261010/사진-2~4.png",
+   "value_m": [
+    131.3,
+    148.8
+   ],
+   "surface": "문예관 옆 오르막(사용자 확정: 보행로)",
+   "why": "경사도 측정선의 시작·끝(평균 13.591 %). 차도가 아니라 이번 종단에 쓰지 않음"
+  },
+  {
+   "image": "사용자-SMAP높이-20261010/사진-6.png, 사진-8-*.png",
+   "value_m": "151.3 151.6 148.9 / 141.4~150.2",
+   "surface": "대일관 앞 띠·운동장·사잇길(차도 아님)",
+   "why": "차도 밖. 이전 작업(user-smap-samples-5186.geojson)의 대응을 그대로 둔다"
+  },
+  {
+   "image": "사용자-SMAP높이-20261010/사진-9-은주2관-상하부.png",
+   "value_m": [
+    111.3,
+    109.8,
+    109.8
+   ],
+   "surface": "풋살장 아래 길(화면 아래쪽)",
+   "why": "핀 8개 중 5개가 풋살장 평탄면(132 m)이라 카메라가 정해지지 않음. SM-11·SM-15 의 차도 열(107.0~110.9)과 같은 길로 보임(추정)"
+  }
+ ],
+ "transcriptionDifferences": [
+  {
+   "card": "SM-07-G02",
+   "earlier": "본관 가까운 열 126.3, 128.1, 128.8",
+   "now": "126.3, 127.7, 128.1, 128.8",
+   "note": "127.7 풍선이 126.3·128.1 뒤에 가려 있다. SM-09 전사에는 127.7 이 있다"
+  },
+  {
+   "card": "SM-15-G03",
+   "earlier": "가운데 열 106.8, 107.6, 107.0, 106.4, 105.9, 106.4, 107.8, 111.3, 114.1 (한 줄)",
+   "now": "값은 같다. 자리로 보면 한 줄이 아니다: 106.8 은 정문 밖 공도 갈림, 107.6·107.0·106.4 는 하단 주차장 차로, 105.9·106.4·107.8·111.3 은 주차장 덮개 아래 땅(메시는 덮개 위 110 m), 114.1 은 광장 가장자리"
+  },
+  {
+   "card": "사진 13",
+   "earlier": "121.4 / 122.6 / 124.4 / 125.1 / 126.1 / …5.1 을 한림관 가는 길(윗길)의 한 줄로 봄",
+   "now": "값은 같다(마지막은 앞자리가 가려 125.1 로 추정). 121.4 는 윗길이 아니라 갈림 바로 앞 본선 차로, 126.1·(1)25.1 은 한림관 입구 앞"
+  },
+  {
+   "card": "사진 7",
+   "earlier": "근거.md 전사에 회차 공간 130.6 m 핀 없음",
+   "now": "화면 왼쪽 아래 버스 옆에 130.6m 핀이 있다"
+  },
+  {
+   "card": "SM-11 고도 글자",
+   "earlier": "-",
+   "now": "화면 글자가 겹쳐 386 m 로 읽음(385 일 수 있음). 카메라 맞춤 결과에는 영향이 작다"
+  }
+ ],
+ "points": [
+  {
+   "id": "U000",
+   "value_m": 106.6,
+   "x": 201146.82,
+   "y": 557076.04,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     1158.8,
+     357.9
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "공도 갈림(정문 밖)",
+   "segment": null,
+   "surface_note": "정문 남쪽 공도. 학교 차도 아님",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 103.83,
+   "terrain_t04_all": 103.83,
+   "smap_query_z": 106.6,
+   "user_minus_query": 0.0
+  },
+  {
+   "id": "U001",
+   "value_m": 106.6,
+   "x": 201138.82,
+   "y": 557081.96,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     1132.4,
+     413.4
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "공도 갈림(정문 밖)",
+   "segment": null,
+   "surface_note": "정문 남쪽 공도. 학교 차도 아님",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 102.11,
+   "terrain_t04_all": 102.1,
+   "smap_query_z": 106.62,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U002",
+   "value_m": 106.8,
+   "x": 201142.55,
+   "y": 557090.89,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     1065.9,
+     402.3
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "공도 갈림(정문 밖)",
+   "segment": null,
+   "surface_note": "정문 남쪽 공도. 학교 차도 아님",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 111.67,
+   "terrain_t04_all": 108.97,
+   "smap_query_z": 106.87,
+   "user_minus_query": -0.07
+  },
+  {
+   "id": "U003",
+   "value_m": 106.0,
+   "x": 201129.02,
+   "y": 557095.61,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     1055.4,
+     493.7
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "공도 갈림(정문 밖)",
+   "segment": null,
+   "surface_note": "정문 남쪽 공도. 학교 차도 아님",
+   "reading_note": null,
+   "mesh_z": 106.35,
+   "terrain_old": 102.37,
+   "terrain_t04_all": 106.7,
+   "smap_query_z": 106.34,
+   "user_minus_query": -0.34
+  },
+  {
+   "id": "U004",
+   "value_m": 107.0,
+   "x": 201129.49,
+   "y": 557118.55,
+   "xy_err_m": 2.0,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     1136.5,
+     734.5
+    ],
+    "SM15": [
+     903.5,
+     530.3
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.1 m)",
+   "surface": "차도",
+   "segment": "V1",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 2.2 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 2.18,
+    "s_m": 21.5,
+    "proposal_z": 107.09,
+    "user_minus_proposal": -0.09
+   },
+   "e09_pick": {
+    "dist_m": 2.97,
+    "z": 107.08,
+    "user_minus_pick": -0.08
+   },
+   "mesh_z": 107.12,
+   "t04_sample": {
+    "dist_m": 0.75,
+    "z": 107.1,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 112.08,
+   "terrain_t04_all": 107.62,
+   "smap_query_z": 107.16,
+   "user_minus_query": -0.16
+  },
+  {
+   "id": "U005",
+   "value_m": 132.1,
+   "x": 201157.9,
+   "y": 557129.27,
+   "xy_err_m": 1.7,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     945.0,
+     560.0
+    ],
+    "SM15": [
+     777.5,
+     266.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.5 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.1,
+   "terrain_old": 132.23,
+   "terrain_t04_all": 132.23,
+   "smap_query_z": 132.13,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U006",
+   "value_m": 107.3,
+   "x": 201123.76,
+   "y": 557131.48,
+   "xy_err_m": 2.0,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     1085.0,
+     830.0
+    ],
+    "SM15": [
+     826.3,
+     578.4
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.9 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 2.6 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 2.57,
+    "s_m": 8.1,
+    "proposal_z": 107.21,
+    "user_minus_proposal": 0.09
+   },
+   "e09_pick": {
+    "dist_m": 2.57,
+    "z": 107.21,
+    "user_minus_pick": 0.09
+   },
+   "mesh_z": 107.27,
+   "t04_sample": {
+    "dist_m": 0.57,
+    "z": 107.3,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 111.86,
+   "terrain_t04_all": 106.98,
+   "smap_query_z": 107.26,
+   "user_minus_query": 0.04
+  },
+  {
+   "id": "U007",
+   "value_m": 107.6,
+   "x": 201109.91,
+   "y": 557134.42,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     812.6,
+     665.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(주차장 차로)",
+   "segment": "P-LOW",
+   "surface_note": "하단 주차장 차로. 제안 중심선에서 0.6 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.61,
+    "s_m": 18.8,
+    "proposal_z": 107.61,
+    "user_minus_proposal": -0.01
+   },
+   "e09_pick": {
+    "dist_m": 0.61,
+    "z": 107.61,
+    "user_minus_pick": -0.01
+   },
+   "mesh_z": 107.6,
+   "t04_sample": {
+    "dist_m": 0.43,
+    "z": 107.6,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 105.66,
+   "terrain_t04_all": 107.76,
+   "smap_query_z": 107.65,
+   "user_minus_query": -0.05
+  },
+  {
+   "id": "U008",
+   "value_m": 132.2,
+   "x": 201171.38,
+   "y": 557137.65,
+   "xy_err_m": 1.6,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     829.0,
+     516.0
+    ],
+    "SM15": [
+     695.9,
+     193.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.2 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.17,
+   "terrain_old": 131.92,
+   "terrain_t04_all": 131.92,
+   "smap_query_z": 132.19,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U009",
+   "value_m": 132.1,
+   "x": 201188.77,
+   "y": 557139.31,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     750.4,
+     424.9
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.1,
+   "terrain_old": 137.18,
+   "terrain_t04_all": 137.18,
+   "smap_query_z": 132.13,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U010",
+   "value_m": 107.0,
+   "x": 201103.41,
+   "y": 557140.29,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     780.0,
+     718.3
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(주차장 차로)",
+   "segment": "P-LOW",
+   "surface_note": "하단 주차장 차로. 제안 중심선에서 1.0 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.04,
+    "s_m": 27.6,
+    "proposal_z": 107.15,
+    "user_minus_proposal": -0.15
+   },
+   "e09_pick": {
+    "dist_m": 1.96,
+    "z": 107.39,
+    "user_minus_pick": -0.39
+   },
+   "mesh_z": 107.08,
+   "t04_sample": {
+    "dist_m": 0.66,
+    "z": 107.1,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 103.2,
+   "terrain_t04_all": 106.51,
+   "smap_query_z": 107.03,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U011",
+   "value_m": 106.4,
+   "x": 201101.46,
+   "y": 557143.87,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     757.3,
+     738.3
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(주차장 차로)",
+   "segment": "P-LOW",
+   "surface_note": "하단 주차장 차로. 제안 중심선에서 0.1 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.08,
+    "s_m": 31.5,
+    "proposal_z": 106.54,
+    "user_minus_proposal": -0.14
+   },
+   "e09_pick": {
+    "dist_m": 1.4,
+    "z": 106.78,
+    "user_minus_pick": -0.38
+   },
+   "mesh_z": 106.47,
+   "t04_sample": {
+    "dist_m": 0.56,
+    "z": 106.5,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 104.43,
+   "terrain_t04_all": 106.68,
+   "smap_query_z": 106.37,
+   "user_minus_query": 0.03
+  },
+  {
+   "id": "U012",
+   "value_m": 108.1,
+   "x": 201112.42,
+   "y": 557149.44,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     1027.5,
+     967.3
+    ],
+    "SM15": [
+     712.3,
+     682.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 5.1 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 0.7 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.72,
+    "s_m": 29.2,
+    "proposal_z": 108.07,
+    "user_minus_proposal": 0.03
+   },
+   "e09_pick": {
+    "dist_m": 2.82,
+    "z": 108.17,
+    "user_minus_pick": -0.07
+   },
+   "mesh_z": 108.13,
+   "t04_sample": {
+    "dist_m": 0.7,
+    "z": 108.2,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 111.53,
+   "terrain_t04_all": 108.05,
+   "smap_query_z": 108.18,
+   "user_minus_query": -0.08
+  },
+  {
+   "id": "U013",
+   "value_m": 105.9,
+   "x": 201097.54,
+   "y": 557151.61,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     707.0,
+     777.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+   "segment": null,
+   "surface_note": "S-MAP 표고는 덮개 아래 땅 높이, 메시는 덮개 위",
+   "reading_note": null,
+   "e09_pick": {
+    "dist_m": 1.8,
+    "z": 110.62,
+    "user_minus_pick": -4.72
+   },
+   "mesh_z": 110.28,
+   "terrain_old": 103.2,
+   "terrain_t04_all": 103.99,
+   "smap_query_z": 106.93,
+   "user_minus_query": -1.03
+  },
+  {
+   "id": "U014",
+   "value_m": 132.1,
+   "x": 201148.43,
+   "y": 557152.06,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     844.5,
+     725.0
+    ],
+    "SM15": [
+     620.5,
+     357.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.1 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.1,
+   "terrain_old": 132.09,
+   "terrain_t04_all": 132.09,
+   "smap_query_z": 132.13,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U015",
+   "value_m": 132.2,
+   "x": 201159.22,
+   "y": 557155.68,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     782.0,
+     674.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.11,
+   "terrain_old": 131.59,
+   "terrain_t04_all": 131.59,
+   "smap_query_z": 132.14,
+   "user_minus_query": 0.06
+  },
+  {
+   "id": "U016",
+   "value_m": 106.4,
+   "x": 201095.53,
+   "y": 557157.94,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     663.0,
+     799.4
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+   "segment": null,
+   "surface_note": "S-MAP 표고는 덮개 아래 땅 높이, 메시는 덮개 위",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 102.83,
+   "terrain_t04_all": 100.82,
+   "smap_query_z": 107.97,
+   "user_minus_query": -1.57
+  },
+  {
+   "id": "U017",
+   "value_m": 107.8,
+   "x": 201091.87,
+   "y": 557162.47,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     632.9,
+     827.9
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+   "segment": null,
+   "surface_note": "S-MAP 표고는 덮개 아래 땅 높이, 메시는 덮개 위",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 101.3,
+   "terrain_t04_all": 99.84,
+   "smap_query_z": 107.91,
+   "user_minus_query": -0.11
+  },
+  {
+   "id": "U018",
+   "value_m": 108.6,
+   "x": 201106.1,
+   "y": 557163.15,
+   "xy_err_m": 1.7,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     977.5,
+     1075.1
+    ],
+    "SM15": [
+     620.2,
+     735.9
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.5 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 1.4 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.45,
+    "s_m": 44.3,
+    "proposal_z": 108.63,
+    "user_minus_proposal": -0.03
+   },
+   "e09_pick": {
+    "dist_m": 2.73,
+    "z": 108.73,
+    "user_minus_pick": -0.13
+   },
+   "mesh_z": 108.72,
+   "t04_sample": {
+    "dist_m": 0.86,
+    "z": 108.8,
+    "user_minus_sample": -0.2
+   },
+   "terrain_old": 111.32,
+   "terrain_t04_all": 108.69,
+   "smap_query_z": 108.74,
+   "user_minus_query": -0.14
+  },
+  {
+   "id": "U019",
+   "value_m": 111.3,
+   "x": 201086.57,
+   "y": 557168.8,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     588.0,
+     866.4
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+   "segment": null,
+   "surface_note": "S-MAP 표고는 덮개 아래 땅 높이, 메시는 덮개 위",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 104.54,
+   "terrain_t04_all": 104.39,
+   "smap_query_z": 109.79,
+   "user_minus_query": 1.51
+  },
+  {
+   "id": "U020",
+   "value_m": 109.1,
+   "x": 201102.57,
+   "y": 557170.15,
+   "xy_err_m": 2.2,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     947.7,
+     1126.0
+    ],
+    "SM15": [
+     573.7,
+     772.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.3 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 1.2 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.19,
+    "s_m": 52.2,
+    "proposal_z": 109.05,
+    "user_minus_proposal": 0.05
+   },
+   "e09_pick": {
+    "dist_m": 1.85,
+    "z": 109.13,
+    "user_minus_pick": -0.03
+   },
+   "mesh_z": 109.11,
+   "t04_sample": {
+    "dist_m": 0.59,
+    "z": 109.1,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 110.89,
+   "terrain_t04_all": 109.07,
+   "smap_query_z": 109.13,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U021",
+   "value_m": 132.0,
+   "x": 201124.85,
+   "y": 557170.35,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     838.5,
+     966.5
+    ],
+    "SM15": [
+     510.6,
+     540.4
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.1 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.0,
+   "terrain_old": 111.92,
+   "terrain_t04_all": 111.92,
+   "smap_query_z": 132.02,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U022",
+   "value_m": 132.0,
+   "x": 201140.64,
+   "y": 557170.56,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     772.5,
+     861.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.0,
+   "terrain_old": 131.59,
+   "terrain_t04_all": 131.59,
+   "smap_query_z": 132.02,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U023",
+   "value_m": 114.1,
+   "x": 201081.31,
+   "y": 557172.55,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     562.2,
+     903.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.27,
+   "terrain_old": 101.29,
+   "terrain_t04_all": 101.29,
+   "smap_query_z": 113.92,
+   "user_minus_query": 0.18
+  },
+  {
+   "id": "U024",
+   "value_m": 132.0,
+   "x": 201139.13,
+   "y": 557176.34,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     741.1,
+     899.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.0,
+   "terrain_old": 131.34,
+   "terrain_t04_all": 131.34,
+   "smap_query_z": 132.04,
+   "user_minus_query": -0.04
+  },
+  {
+   "id": "U025",
+   "value_m": 109.7,
+   "x": 201093.06,
+   "y": 557180.12,
+   "xy_err_m": 1.9,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     931.7,
+     1235.0
+    ],
+    "SM15": [
+     509.3,
+     849.3
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.7 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 4.3 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 4.31,
+    "s_m": 64.9,
+    "proposal_z": 109.94,
+    "user_minus_proposal": -0.24
+   },
+   "mesh_z": 109.76,
+   "t04_sample": {
+    "dist_m": 0.95,
+    "z": 109.8,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 109.58,
+   "terrain_t04_all": 109.9,
+   "smap_query_z": 109.8,
+   "user_minus_query": -0.1
+  },
+  {
+   "id": "U026",
+   "value_m": 132.1,
+   "x": 201147.84,
+   "y": 557180.43,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     671.9,
+     862.9
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 132.09,
+   "terrain_old": 144.0,
+   "terrain_t04_all": 144.0,
+   "smap_query_z": 132.07,
+   "user_minus_query": 0.03
+  },
+  {
+   "id": "U027",
+   "value_m": 114.1,
+   "x": 201079.06,
+   "y": 557185.97,
+   "xy_err_m": 1.9,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     961.0,
+     1356.0
+    ],
+    "SM15": [
+     474.5,
+     946.8
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.7 m)",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.1,
+   "terrain_old": 106.73,
+   "terrain_t04_all": 106.71,
+   "smap_query_z": 114.09,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U028",
+   "value_m": 148.3,
+   "x": 201195.35,
+   "y": 557186.34,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     379.9,
+     547.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 141.18,
+   "terrain_t04_all": 148.96,
+   "smap_query_z": 148.96,
+   "user_minus_query": -0.66
+  },
+  {
+   "id": "U029",
+   "value_m": 110.9,
+   "x": 201090.23,
+   "y": 557191.71,
+   "xy_err_m": 1.9,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     871.1,
+     1309.1
+    ],
+    "SM15": [
+     423.0,
+     884.6
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.7 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 3.5 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 3.47,
+    "s_m": 76.6,
+    "proposal_z": 111.14,
+    "user_minus_proposal": -0.24
+   },
+   "mesh_z": 110.88,
+   "t04_sample": {
+    "dist_m": 0.37,
+    "z": 110.9,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 114.4,
+   "terrain_t04_all": 110.41,
+   "smap_query_z": 111.05,
+   "user_minus_query": -0.15
+  },
+  {
+   "id": "U030",
+   "value_m": 132.1,
+   "x": 201128.3,
+   "y": 557195.63,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     652.7,
+     1069.3
+    ],
+    "SM15": [
+     306.4,
+     554.4
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.4 m)",
+   "surface": "차도(윗길에서 풋살장 쪽으로 이어지는 열)",
+   "segment": "U1-EXT",
+   "surface_note": "E09 제안 U1 끝(130.8 m) 너머. 제안에 없는 구간",
+   "reading_note": null,
+   "mesh_z": 132.1,
+   "terrain_old": 142.18,
+   "terrain_t04_all": 142.18,
+   "smap_query_z": 132.14,
+   "user_minus_query": -0.04
+  },
+  {
+   "id": "U031",
+   "value_m": 132.2,
+   "x": 201124.53,
+   "y": 557200.64,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     636.0,
+     1116.7
+    ],
+    "SM15": [
+     269.0,
+     591.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "차도(윗길에서 풋살장 쪽으로 이어지는 열)",
+   "segment": "U1-EXT",
+   "surface_note": "E09 제안 U1 끝(130.8 m) 너머. 제안에 없는 구간",
+   "reading_note": null,
+   "mesh_z": 132.18,
+   "terrain_old": 142.17,
+   "terrain_t04_all": 142.17,
+   "smap_query_z": 132.2,
+   "user_minus_query": 0.0
+  },
+  {
+   "id": "U032",
+   "value_m": 148.9,
+   "x": 201209.98,
+   "y": 557201.27,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     204.1,
+     524.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 149.14,
+   "terrain_old": 145.52,
+   "terrain_t04_all": 149.06,
+   "smap_query_z": 148.95,
+   "user_minus_query": -0.05
+  },
+  {
+   "id": "U033",
+   "value_m": 131.7,
+   "x": 201120.14,
+   "y": 557204.47,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     631.7,
+     1170.0
+    ],
+    "SM15": [
+     245.0,
+     627.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.4 m)",
+   "surface": "차도(윗길에서 풋살장 쪽으로 이어지는 열)",
+   "segment": "U1-EXT",
+   "surface_note": "E09 제안 U1 끝(130.8 m) 너머. 제안에 없는 구간",
+   "reading_note": null,
+   "mesh_z": 131.77,
+   "terrain_old": 142.08,
+   "terrain_t04_all": 142.08,
+   "smap_query_z": 131.87,
+   "user_minus_query": -0.17
+  },
+  {
+   "id": "U034",
+   "value_m": 131.2,
+   "x": 201116.32,
+   "y": 557208.17,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     625.7,
+     1215.7
+    ],
+    "SM15": [
+     220.0,
+     661.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "차도(윗길에서 풋살장 쪽으로 이어지는 열)",
+   "segment": "U1-EXT",
+   "surface_note": "E09 제안 U1 끝(130.8 m) 너머. 제안에 없는 구간",
+   "reading_note": null,
+   "mesh_z": 131.33,
+   "terrain_old": 141.97,
+   "terrain_t04_all": 141.97,
+   "smap_query_z": 131.3,
+   "user_minus_query": -0.1
+  },
+  {
+   "id": "U035",
+   "value_m": 148.9,
+   "x": 201183.56,
+   "y": 557211.36,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     246.5,
+     750.0
+    ],
+    "SM15": [
+     87.0,
+     132.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 1.8 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 140.29,
+   "terrain_t04_all": 148.92,
+   "smap_query_z": 148.93,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U036",
+   "value_m": 130.8,
+   "x": 201112.89,
+   "y": 557213.92,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     603.0,
+     1270.1
+    ],
+    "SM15": [
+     178.0,
+     696.1
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 0.3 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.31,
+    "s_m": 91.7,
+    "proposal_z": 130.78,
+    "user_minus_proposal": 0.02
+   },
+   "e09_pick": {
+    "dist_m": 1.94,
+    "z": 130.74,
+    "user_minus_pick": 0.06
+   },
+   "mesh_z": 130.8,
+   "terrain_old": 141.47,
+   "terrain_t04_all": 141.47,
+   "smap_query_z": 130.84,
+   "user_minus_query": -0.04
+  },
+  {
+   "id": "U037",
+   "value_m": 114.1,
+   "x": 201048.38,
+   "y": 557216.44,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     251.5,
+     1228.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 106.24,
+   "terrain_old": 99.1,
+   "terrain_t04_all": 99.1,
+   "smap_query_z": 105.62,
+   "user_minus_query": 8.48
+  },
+  {
+   "id": "U038",
+   "value_m": 113.9,
+   "x": 201085.84,
+   "y": 557217.73,
+   "xy_err_m": 2.1,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM09": [
+     503.5,
+     361.1
+    ],
+    "SM11": [
+     722.0,
+     1463.0
+    ],
+    "SM15": [
+     220.2,
+     940.0
+    ]
+   },
+   "position_method": "캡처 3장의 카메라 맞춤 평균(장별 자리 차 최대 4.1 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 3.4 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 3.38,
+    "s_m": 102.3,
+    "proposal_z": 113.97,
+    "user_minus_proposal": -0.07
+   },
+   "e09_pick": {
+    "dist_m": 3.58,
+    "z": 114.12,
+    "user_minus_pick": -0.22
+   },
+   "mesh_z": 113.88,
+   "t04_sample": {
+    "dist_m": 0.31,
+    "z": 113.9,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 115.36,
+   "terrain_t04_all": 113.83,
+   "smap_query_z": 114.03,
+   "user_minus_query": -0.13
+  },
+  {
+   "id": "U039",
+   "value_m": 114.1,
+   "x": 201051.12,
+   "y": 557218.4,
+   "xy_err_m": 5.3,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM09": [
+     831.5,
+     176.9
+    ],
+    "SM11": [
+     899.5,
+     1721.2
+    ],
+    "SM15": [
+     273.4,
+     1190.4
+    ]
+   },
+   "position_method": "캡처 3장의 카메라 맞춤 평균(장별 자리 차 최대 10.6 m)",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.01,
+   "terrain_old": 106.6,
+   "terrain_t04_all": 106.6,
+   "smap_query_z": 114.1,
+   "user_minus_query": 0.0
+  },
+  {
+   "id": "U040",
+   "value_m": 114.1,
+   "x": 201054.21,
+   "y": 557219.63,
+   "xy_err_m": 3.2,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM09": [
+     778.0,
+     175.3
+    ],
+    "SM11": [
+     899.2,
+     1684.8
+    ],
+    "SM15": [
+     195.0,
+     1187.3
+    ]
+   },
+   "position_method": "캡처 3장의 카메라 맞춤 평균(장별 자리 차 최대 6.4 m)",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.1,
+   "terrain_old": 109.82,
+   "terrain_t04_all": 109.82,
+   "smap_query_z": 114.1,
+   "user_minus_query": -0.0
+  },
+  {
+   "id": "U041",
+   "value_m": 114.1,
+   "x": 201069.16,
+   "y": 557221.08,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     792.9,
+     1602.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.0,
+   "terrain_old": 116.0,
+   "terrain_t04_all": 116.0,
+   "smap_query_z": 114.06,
+   "user_minus_query": 0.04
+  },
+  {
+   "id": "U042",
+   "value_m": 130.4,
+   "x": 201112.65,
+   "y": 557221.55,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     551.0,
+     1312.0
+    ],
+    "SM15": [
+     118.0,
+     711.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 0.8 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.82,
+    "s_m": 84.1,
+    "proposal_z": 130.63,
+    "user_minus_proposal": -0.23
+   },
+   "e09_pick": {
+    "dist_m": 2.37,
+    "z": 130.59,
+    "user_minus_pick": -0.19
+   },
+   "mesh_z": 130.53,
+   "terrain_old": 141.35,
+   "terrain_t04_all": 141.35,
+   "smap_query_z": 130.36,
+   "user_minus_query": 0.04
+  },
+  {
+   "id": "U043",
+   "value_m": 130.2,
+   "x": 201111.18,
+   "y": 557226.18,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM11": [
+     526.0,
+     1346.4
+    ],
+    "SM15": [
+     82.0,
+     730.4
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.2 m)",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 2.8 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 2.83,
+    "s_m": 79.8,
+    "proposal_z": 130.53,
+    "user_minus_proposal": -0.33
+   },
+   "e09_pick": {
+    "dist_m": 3.54,
+    "z": 130.59,
+    "user_minus_pick": -0.39
+   },
+   "mesh_z": 130.03,
+   "terrain_old": 141.97,
+   "terrain_t04_all": 141.97,
+   "smap_query_z": 130.15,
+   "user_minus_query": 0.05
+  },
+  {
+   "id": "U044",
+   "value_m": 148.9,
+   "x": 201139.25,
+   "y": 557229.34,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     332.9,
+     1149.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 141.93,
+   "terrain_t04_all": 148.93,
+   "smap_query_z": 148.89,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U045",
+   "value_m": 114.2,
+   "x": 201073.65,
+   "y": 557230.87,
+   "xy_err_m": 2.9,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     25.1,
+     1729.4
+    ],
+    "SM09": [
+     688.5,
+     398.5
+    ],
+    "SM11": [
+     691.0,
+     1613.6
+    ],
+    "SM15": [
+     125.9,
+     1051.0
+    ]
+   },
+   "position_method": "캡처 4장의 카메라 맞춤 평균(장별 자리 차 최대 5.8 m)",
+   "surface": "분수 광장",
+   "segment": null,
+   "surface_note": "광장 포장면",
+   "reading_note": null,
+   "mesh_z": 114.11,
+   "terrain_old": 118.5,
+   "terrain_t04_all": 118.49,
+   "smap_query_z": 114.16,
+   "user_minus_query": 0.04
+  },
+  {
+   "id": "U046",
+   "value_m": 149.0,
+   "x": 201188.04,
+   "y": 557233.08,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     70.6,
+     825.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 142.66,
+   "terrain_t04_all": 149.45,
+   "smap_query_z": 148.97,
+   "user_minus_query": 0.03
+  },
+  {
+   "id": "U047",
+   "value_m": 148.9,
+   "x": 201146.41,
+   "y": 557237.65,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     234.0,
+     1142.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 141.71,
+   "terrain_t04_all": 148.92,
+   "smap_query_z": 148.93,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U048",
+   "value_m": 116.9,
+   "x": 201088.27,
+   "y": 557237.95,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)",
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM09": [
+     610.1,
+     521.0
+    ],
+    "SM11": [
+     573.0,
+     1557.0
+    ],
+    "SM15": [
+     47.4,
+     952.0
+    ]
+   },
+   "position_method": "캡처 3장의 카메라 맞춤 평균(장별 자리 차 최대 2.6 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 0.2 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.24,
+    "s_m": 122.3,
+    "proposal_z": 116.92,
+    "user_minus_proposal": -0.02
+   },
+   "e09_pick": {
+    "dist_m": 3.07,
+    "z": 116.43,
+    "user_minus_pick": 0.47
+   },
+   "mesh_z": 116.91,
+   "t04_sample": {
+    "dist_m": 0.27,
+    "z": 116.9,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 117.15,
+   "terrain_t04_all": 116.11,
+   "smap_query_z": 117.04,
+   "user_minus_query": -0.14
+  },
+  {
+   "id": "U049",
+   "value_m": 116.8,
+   "x": 201040.77,
+   "y": 557240.1,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-court-parallel-roads.png (SM-15; SM-05·SM-16 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM15": [
+     54.1,
+     1330.2
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "기타(차도 아님)",
+   "segment": null,
+   "surface_note": "가장 가까운 제안 구간 V3 에서 46.2 m",
+   "reading_note": null,
+   "mesh_z": 129.09,
+   "terrain_old": 122.11,
+   "terrain_t04_all": 122.11,
+   "smap_query_z": 116.87,
+   "user_minus_query": -0.07
+  },
+  {
+   "id": "U050",
+   "value_m": 129.3,
+   "x": 201109.84,
+   "y": 557240.39,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     441.0,
+     1427.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 0.6 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.58,
+    "s_m": 63.2,
+    "proposal_z": 128.9,
+    "user_minus_proposal": 0.4
+   },
+   "e09_pick": {
+    "dist_m": 2.85,
+    "z": 129.22,
+    "user_minus_pick": 0.08
+   },
+   "mesh_z": 129.09,
+   "terrain_old": 137.83,
+   "terrain_t04_all": 137.83,
+   "smap_query_z": 129.19,
+   "user_minus_query": 0.11
+  },
+  {
+   "id": "U051",
+   "value_m": 128.4,
+   "x": 201108.92,
+   "y": 557248.49,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     389.0,
+     1477.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 0.4 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.42,
+    "s_m": 55.0,
+    "proposal_z": 127.87,
+    "user_minus_proposal": 0.53
+   },
+   "e09_pick": {
+    "dist_m": 1.43,
+    "z": 127.69,
+    "user_minus_pick": 0.71
+   },
+   "mesh_z": 127.94,
+   "terrain_old": 130.41,
+   "terrain_t04_all": 130.41,
+   "smap_query_z": 128.2,
+   "user_minus_query": 0.2
+  },
+  {
+   "id": "U052",
+   "value_m": 149.0,
+   "x": 201162.12,
+   "y": 557254.22,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     30.0,
+     1119.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.98,
+   "terrain_old": 141.5,
+   "terrain_t04_all": 148.91,
+   "smap_query_z": 148.99,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U053",
+   "value_m": 126.7,
+   "x": 201108.04,
+   "y": 557257.64,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM11": [
+     331.0,
+     1532.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "제안 중심선에서 0.2 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.15,
+    "s_m": 45.9,
+    "proposal_z": 126.55,
+    "user_minus_proposal": 0.15
+   },
+   "e09_pick": {
+    "dist_m": 1.46,
+    "z": 126.79,
+    "user_minus_pick": -0.09
+   },
+   "mesh_z": 126.54,
+   "terrain_old": 131.14,
+   "terrain_t04_all": 131.14,
+   "smap_query_z": 126.39,
+   "user_minus_query": 0.31
+  },
+  {
+   "id": "U054",
+   "value_m": 127.7,
+   "x": 201113.95,
+   "y": 557258.73,
+   "xy_err_m": 2.2,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM09": [
+     487.4,
+     824.0
+    ],
+    "SM11": [
+     274.7,
+     1490.9
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.4 m)",
+   "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+   "segment": null,
+   "surface_note": "U1 중심선에서 5.7 m",
+   "reading_note": null,
+   "mesh_z": 128.86,
+   "terrain_old": 131.46,
+   "terrain_t04_all": 131.46,
+   "smap_query_z": 126.75,
+   "user_minus_query": 0.95
+  },
+  {
+   "id": "U055",
+   "value_m": 120.5,
+   "x": 201080.63,
+   "y": 557262.34,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     341.8,
+     1732.7
+    ],
+    "SM09": [
+     849.1,
+     665.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.5 m)",
+   "surface": "차도",
+   "segment": "V2",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 1.6 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.65,
+    "s_m": 148.8,
+    "proposal_z": 120.69,
+    "user_minus_proposal": -0.19
+   },
+   "e09_pick": {
+    "dist_m": 3.18,
+    "z": 120.34,
+    "user_minus_pick": 0.16
+   },
+   "mesh_z": 120.64,
+   "t04_sample": {
+    "dist_m": 0.72,
+    "z": 120.7,
+    "user_minus_sample": -0.2
+   },
+   "s06_sample": {
+    "dist_m": 1.41,
+    "z": 120.5,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 122.71,
+   "terrain_t04_all": 120.69,
+   "smap_query_z": 120.72,
+   "user_minus_query": -0.22
+  },
+  {
+   "id": "U056",
+   "value_m": 125.1,
+   "x": 201105.52,
+   "y": 557266.27,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     226.3,
+     367.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "윗길 들머리. 제안 중심선에서 2.9 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 2.94,
+    "s_m": 37.2,
+    "proposal_z": 125.33,
+    "user_minus_proposal": -0.23
+   },
+   "e09_pick": {
+    "dist_m": 3.12,
+    "z": 125.21,
+    "user_minus_pick": -0.11
+   },
+   "mesh_z": 125.14,
+   "terrain_old": 131.34,
+   "terrain_t04_all": 131.34,
+   "smap_query_z": 125.14,
+   "user_minus_query": -0.04
+  },
+  {
+   "id": "U057",
+   "value_m": 121.4,
+   "x": 201073.76,
+   "y": 557266.31,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     138.3,
+     279.3
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도",
+   "segment": "V3",
+   "surface_note": "윗길 갈림 바로 앞 본선 차로(횡단보도와 과속방지턱 사이)",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 4.39,
+    "s_m": 4.8,
+    "proposal_z": 121.47,
+    "user_minus_proposal": -0.07
+   },
+   "mesh_z": 121.53,
+   "s06_sample": {
+    "dist_m": 1.71,
+    "z": 121.5,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 123.65,
+   "terrain_t04_all": 122.09,
+   "smap_query_z": 121.65,
+   "user_minus_query": -0.25
+  },
+  {
+   "id": "U058",
+   "value_m": 121.6,
+   "x": 201079.71,
+   "y": 557272.1,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     441.0,
+     1698.1
+    ],
+    "SM09": [
+     939.7,
+     737.6
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.4 m)",
+   "surface": "차도",
+   "segment": "V3",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 3.9 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 3.91,
+    "s_m": 5.1,
+    "proposal_z": 121.49,
+    "user_minus_proposal": 0.11
+   },
+   "e09_pick": {
+    "dist_m": 3.91,
+    "z": 121.49,
+    "user_minus_pick": 0.11
+   },
+   "mesh_z": 121.61,
+   "s06_sample": {
+    "dist_m": 0.31,
+    "z": 121.6,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 126.05,
+   "terrain_t04_all": 122.08,
+   "smap_query_z": 121.67,
+   "user_minus_query": -0.07
+  },
+  {
+   "id": "U059",
+   "value_m": 124.4,
+   "x": 201093.62,
+   "y": 557272.69,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     211.8,
+     313.8
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "윗길 들머리. 제안 중심선에서 2.9 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 2.88,
+    "s_m": 19.3,
+    "proposal_z": 124.42,
+    "user_minus_proposal": -0.02
+   },
+   "e09_pick": {
+    "dist_m": 3.63,
+    "z": 124.14,
+    "user_minus_pick": 0.26
+   },
+   "mesh_z": 124.34,
+   "terrain_old": 125.26,
+   "terrain_t04_all": 124.21,
+   "smap_query_z": 124.27,
+   "user_minus_query": 0.13
+  },
+  {
+   "id": "U060",
+   "value_m": 126.1,
+   "x": 201110.23,
+   "y": 557273.27,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     262.0,
+     359.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+   "segment": null,
+   "surface_note": "한림관 입구 앞",
+   "reading_note": null,
+   "mesh_z": 126.35,
+   "terrain_old": 132.76,
+   "terrain_t04_all": 132.76,
+   "smap_query_z": 126.26,
+   "user_minus_query": -0.16
+  },
+  {
+   "id": "U061",
+   "value_m": 122.6,
+   "x": 201081.62,
+   "y": 557274.15,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     183.3,
+     277.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "차도(윗길)",
+   "segment": "U1",
+   "surface_note": "윗길 들머리. 제안 중심선에서 4.7 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 4.7,
+    "s_m": 7.9,
+    "proposal_z": 122.34,
+    "user_minus_proposal": 0.26
+   },
+   "mesh_z": 122.06,
+   "s06_sample": {
+    "dist_m": 0.41,
+    "z": 122.1,
+    "user_minus_sample": 0.5
+   },
+   "terrain_old": 126.19,
+   "terrain_t04_all": 121.84,
+   "smap_query_z": 122.01,
+   "user_minus_query": 0.59
+  },
+  {
+   "id": "U062",
+   "value_m": 126.8,
+   "x": 201106.57,
+   "y": 557275.58,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)",
+    "smap-user-eunju-court-pins.png (SM-11)"
+   ],
+   "pixel": {
+    "SM09": [
+     700.0,
+     944.3
+    ],
+    "SM11": [
+     199.0,
+     1642.7
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 1.6 m)",
+   "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+   "segment": null,
+   "surface_note": "U1 중심선에서 4.2 m",
+   "reading_note": null,
+   "mesh_z": 126.58,
+   "terrain_old": 130.46,
+   "terrain_t04_all": 130.46,
+   "smap_query_z": 126.82,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U063",
+   "value_m": 125.1,
+   "x": 201115.29,
+   "y": 557278.54,
+   "xy_err_m": 5.0,
+   "images": [
+    "사용자-출입구·주차장-20261010/13-SMAP-한림관-가는길-높이표시.webp"
+   ],
+   "pixel": {
+    "P13": [
+     294.3,
+     359.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+   "segment": null,
+   "surface_note": "한림관 입구 앞",
+   "reading_note": "앞자리 가림, 125.1 추정",
+   "mesh_z": 125.62,
+   "terrain_old": 136.73,
+   "terrain_t04_all": 136.73,
+   "smap_query_z": 125.39,
+   "user_minus_query": -0.29
+  },
+  {
+   "id": "U064",
+   "value_m": 123.4,
+   "x": 201063.76,
+   "y": 557280.09,
+   "xy_err_m": 1.6,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     499.0,
+     1508.0
+    ],
+    "SM09": [
+     1157.4,
+     679.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.2 m)",
+   "surface": "차도",
+   "segment": "V3",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 0.1 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.1,
+    "s_m": 22.1,
+    "proposal_z": 123.35,
+    "user_minus_proposal": 0.05
+   },
+   "e09_pick": {
+    "dist_m": 2.25,
+    "z": 123.64,
+    "user_minus_pick": -0.24
+   },
+   "mesh_z": 123.33,
+   "s06_sample": {
+    "dist_m": 0.26,
+    "z": 123.3,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 125.27,
+   "terrain_t04_all": 123.62,
+   "smap_query_z": 123.5,
+   "user_minus_query": -0.1
+  },
+  {
+   "id": "U065",
+   "value_m": 126.2,
+   "x": 201097.1,
+   "y": 557281.97,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     856.8,
+     937.7
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+   "segment": null,
+   "surface_note": "U1 중심선에서 7.0 m",
+   "reading_note": null,
+   "mesh_z": 126.45,
+   "terrain_old": 131.54,
+   "terrain_t04_all": 131.54,
+   "smap_query_z": 126.27,
+   "user_minus_query": -0.07
+  },
+  {
+   "id": "U066",
+   "value_m": 148.9,
+   "x": 201142.02,
+   "y": 557282.46,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     280.5,
+     1304.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 149.8,
+   "terrain_old": 142.22,
+   "terrain_t04_all": 149.01,
+   "smap_query_z": 144.24,
+   "user_minus_query": 4.66
+  },
+  {
+   "id": "U067",
+   "value_m": 125.5,
+   "x": 201050.53,
+   "y": 557288.15,
+   "xy_err_m": 2.1,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     552.7,
+     1357.5
+    ],
+    "SM09": [
+     1357.6,
+     643.6
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.3 m)",
+   "surface": "차도",
+   "segment": "V3",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 0.3 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.31,
+    "s_m": 37.6,
+    "proposal_z": 125.51,
+    "user_minus_proposal": -0.01
+   },
+   "e09_pick": {
+    "dist_m": 2.32,
+    "z": 125.25,
+    "user_minus_pick": 0.25
+   },
+   "mesh_z": 125.39,
+   "s06_sample": {
+    "dist_m": 0.55,
+    "z": 125.4,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 129.43,
+   "terrain_t04_all": 125.78,
+   "smap_query_z": 125.55,
+   "user_minus_query": -0.05
+  },
+  {
+   "id": "U068",
+   "value_m": 124.8,
+   "x": 201068.96,
+   "y": 557289.5,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     599.5,
+     1538.1
+    ],
+    "SM09": [
+     1197.0,
+     796.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.6 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 10.6 m",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 130.32,
+   "terrain_t04_all": 128.96,
+   "smap_query_z": 125.33,
+   "user_minus_query": -0.53
+  },
+  {
+   "id": "U069",
+   "value_m": 148.9,
+   "x": 201153.82,
+   "y": 557293.15,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     223.5,
+     1579.8
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.9,
+   "terrain_old": 141.98,
+   "terrain_t04_all": 148.92,
+   "smap_query_z": 148.89,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U070",
+   "value_m": 126.5,
+   "x": 201069.65,
+   "y": 557294.43,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     650.0,
+     1530.0
+    ],
+    "SM09": [
+     1237.9,
+     837.9
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 15.2 m",
+   "reading_note": null,
+   "mesh_z": 126.8,
+   "terrain_old": 131.88,
+   "terrain_t04_all": 130.34,
+   "smap_query_z": 126.86,
+   "user_minus_query": -0.36
+  },
+  {
+   "id": "U071",
+   "value_m": 126.3,
+   "x": 201050.46,
+   "y": 557297.25,
+   "xy_err_m": 2.2,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     641.5,
+     1333.5
+    ],
+    "SM09": [
+     1440.6,
+     720.3
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.4 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 7.4 m",
+   "reading_note": null,
+   "mesh_z": 126.55,
+   "s06_sample": {
+    "dist_m": 0.88,
+    "z": 126.6,
+    "user_minus_sample": -0.3
+   },
+   "terrain_old": 130.94,
+   "terrain_t04_all": 126.36,
+   "smap_query_z": 127.3,
+   "user_minus_query": -1.0
+  },
+  {
+   "id": "U072",
+   "value_m": 127.3,
+   "x": 201069.4,
+   "y": 557297.34,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     678.0,
+     1519.0
+    ],
+    "SM09": [
+     1269.6,
+     860.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 2.3 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 17.6 m",
+   "reading_note": null,
+   "mesh_z": 127.21,
+   "terrain_old": 131.69,
+   "terrain_t04_all": 131.06,
+   "smap_query_z": 127.29,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U073",
+   "value_m": 127.3,
+   "x": 201040.08,
+   "y": 557297.45,
+   "xy_err_m": 2.2,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     623.7,
+     1240.5
+    ],
+    "SM09": [
+     1546.2,
+     635.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.3 m)",
+   "surface": "차도",
+   "segment": "V3",
+   "surface_note": "아스팔트 차로 위. 제안 중심선에서 1.1 m",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.14,
+    "s_m": 51.6,
+    "proposal_z": 127.16,
+    "user_minus_proposal": 0.14
+   },
+   "e09_pick": {
+    "dist_m": 3.35,
+    "z": 127.38,
+    "user_minus_pick": -0.08
+   },
+   "mesh_z": 127.19,
+   "s06_sample": {
+    "dist_m": 0.56,
+    "z": 127.2,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 131.42,
+   "terrain_t04_all": 127.16,
+   "smap_query_z": 127.23,
+   "user_minus_query": 0.07
+  },
+  {
+   "id": "U074",
+   "value_m": 127.7,
+   "x": 201052.64,
+   "y": 557299.99,
+   "xy_err_m": 2.0,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     670.0,
+     1345.0
+    ],
+    "SM09": [
+     1452.8,
+     754.8
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.0 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 10.9 m",
+   "reading_note": "풍선이 126.3·128.1 뒤에 가려 흐림. 127.7 로 읽음(SM-09 전사와 같음)",
+   "mesh_z": 127.23,
+   "terrain_old": 131.06,
+   "terrain_t04_all": 126.88,
+   "smap_query_z": 128.14,
+   "user_minus_query": -0.44
+  },
+  {
+   "id": "U075",
+   "value_m": 125.9,
+   "x": 201013.87,
+   "y": 557300.01,
+   "xy_err_m": 3.2,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     606.1,
+     1021.4
+    ],
+    "SM09": [
+     1791.0,
+     477.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 6.3 m)",
+   "surface": "기타(차도 아님)",
+   "segment": null,
+   "surface_note": "가장 가까운 제안 구간 P-UP 에서 10.7 m",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 119.29,
+   "terrain_t04_all": 116.86,
+   "smap_query_z": 128.49,
+   "user_minus_query": -2.59
+  },
+  {
+   "id": "U076",
+   "value_m": 127.9,
+   "x": 201031.28,
+   "y": 557303.3,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     681.0,
+     1162.6
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 0.27,
+    "s_m": 1.6,
+    "proposal_z": 127.82,
+    "user_minus_proposal": 0.08
+   },
+   "e09_pick": {
+    "dist_m": 1.63,
+    "z": 127.79,
+    "user_minus_pick": 0.11
+   },
+   "mesh_z": 127.84,
+   "t04_sample": {
+    "dist_m": 1.0,
+    "z": 127.8,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 131.09,
+   "terrain_t04_all": 127.85,
+   "smap_query_z": 127.91,
+   "user_minus_query": -0.01
+  },
+  {
+   "id": "U077",
+   "value_m": 128.1,
+   "x": 201053.75,
+   "y": 557304.3,
+   "xy_err_m": 1.9,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     714.2,
+     1346.5
+    ],
+    "SM09": [
+     1486.0,
+     800.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 3.7 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 15.0 m",
+   "reading_note": null,
+   "mesh_z": 127.71,
+   "terrain_old": 131.94,
+   "terrain_t04_all": 128.49,
+   "smap_query_z": 127.83,
+   "user_minus_query": 0.27
+  },
+  {
+   "id": "U078",
+   "value_m": 148.5,
+   "x": 201141.63,
+   "y": 557304.66,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     513.0,
+     1590.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 148.05,
+   "terrain_old": 142.47,
+   "terrain_t04_all": 148.01,
+   "smap_query_z": 147.86,
+   "user_minus_query": 0.64
+  },
+  {
+   "id": "U079",
+   "value_m": 147.0,
+   "x": 201134.31,
+   "y": 557308.48,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     655.6,
+     1555.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 146.58,
+   "terrain_old": 142.82,
+   "terrain_t04_all": 146.42,
+   "smap_query_z": 146.52,
+   "user_minus_query": 0.48
+  },
+  {
+   "id": "U080",
+   "value_m": 128.8,
+   "x": 201045.38,
+   "y": 557311.43,
+   "xy_err_m": 2.1,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     766.6,
+     1252.0
+    ],
+    "SM09": [
+     1634.0,
+     797.1
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 4.2 m)",
+   "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+   "segment": null,
+   "surface_note": "V3 중심선에서 15.2 m",
+   "reading_note": null,
+   "mesh_z": 128.48,
+   "t04_sample": {
+    "dist_m": 1.56,
+    "z": 128.2,
+    "user_minus_sample": 0.6
+   },
+   "terrain_old": 133.67,
+   "terrain_t04_all": 129.47,
+   "smap_query_z": 128.75,
+   "user_minus_query": 0.05
+  },
+  {
+   "id": "U081",
+   "value_m": 145.6,
+   "x": 201128.65,
+   "y": 557311.51,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     764.0,
+     1530.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 145.35,
+   "terrain_old": 142.82,
+   "terrain_t04_all": 145.34,
+   "smap_query_z": 145.32,
+   "user_minus_query": 0.28
+  },
+  {
+   "id": "U082",
+   "value_m": 142.9,
+   "x": 201111.25,
+   "y": 557311.59,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     982.0,
+     1342.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": null,
+   "terrain_old": 142.33,
+   "terrain_t04_all": 140.72,
+   "smap_query_z": 142.87,
+   "user_minus_query": 0.03
+  },
+  {
+   "id": "U083",
+   "value_m": 128.6,
+   "x": 201027.46,
+   "y": 557313.09,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     764.5,
+     1110.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.06,
+    "s_m": 12.5,
+    "proposal_z": 128.57,
+    "user_minus_proposal": 0.03
+   },
+   "e09_pick": {
+    "dist_m": 1.97,
+    "z": 128.49,
+    "user_minus_pick": 0.11
+   },
+   "mesh_z": 128.53,
+   "t04_sample": {
+    "dist_m": 1.06,
+    "z": 128.6,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 130.38,
+   "terrain_t04_all": 128.74,
+   "smap_query_z": 128.63,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U084",
+   "value_m": 146.8,
+   "x": 201136.52,
+   "y": 557317.65,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     726.0,
+     1706.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 146.04,
+   "terrain_old": 141.79,
+   "terrain_t04_all": 146.09,
+   "smap_query_z": 146.6,
+   "user_minus_query": 0.2
+  },
+  {
+   "id": "U085",
+   "value_m": 145.6,
+   "x": 201132.47,
+   "y": 557319.1,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     797.0,
+     1676.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 145.53,
+   "terrain_old": 141.65,
+   "terrain_t04_all": 145.6,
+   "smap_query_z": 145.48,
+   "user_minus_query": 0.12
+  },
+  {
+   "id": "U086",
+   "value_m": 141.0,
+   "x": 201105.91,
+   "y": 557323.36,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1170.5,
+     1431.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 141.05,
+   "terrain_old": 139.97,
+   "terrain_t04_all": 141.12,
+   "smap_query_z": 141.05,
+   "user_minus_query": -0.05
+  },
+  {
+   "id": "U087",
+   "value_m": 129.4,
+   "x": 201021.77,
+   "y": 557324.82,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     860.0,
+     1040.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.59,
+    "s_m": 25.3,
+    "proposal_z": 129.3,
+    "user_minus_proposal": 0.1
+   },
+   "e09_pick": {
+    "dist_m": 1.8,
+    "z": 129.35,
+    "user_minus_pick": 0.05
+   },
+   "mesh_z": 129.35,
+   "t04_sample": {
+    "dist_m": 0.85,
+    "z": 129.3,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 130.72,
+   "terrain_t04_all": 129.45,
+   "smap_query_z": 129.42,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U088",
+   "value_m": 145.4,
+   "x": 201122.54,
+   "y": 557325.54,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     996.5,
+     1645.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 145.6,
+   "terrain_old": 141.67,
+   "terrain_t04_all": 145.61,
+   "smap_query_z": 145.74,
+   "user_minus_query": -0.34
+  },
+  {
+   "id": "U089",
+   "value_m": 143.7,
+   "x": 201110.41,
+   "y": 557331.12,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1208.0,
+     1577.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 143.38,
+   "terrain_old": 140.18,
+   "terrain_t04_all": 143.61,
+   "smap_query_z": 143.44,
+   "user_minus_query": 0.26
+  },
+  {
+   "id": "U090",
+   "value_m": 130.2,
+   "x": 201015.51,
+   "y": 557333.48,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     924.4,
+     973.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 5.16,
+    "s_m": 35.2,
+    "proposal_z": 130.03,
+    "user_minus_proposal": 0.17
+   },
+   "mesh_z": 130.1,
+   "t04_sample": {
+    "dist_m": 0.71,
+    "z": 130.1,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 128.62,
+   "terrain_t04_all": 129.83,
+   "smap_query_z": 130.11,
+   "user_minus_query": 0.09
+  },
+  {
+   "id": "U091",
+   "value_m": 136.8,
+   "x": 201084.12,
+   "y": 557335.57,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     1117.6,
+     1564.5
+    ],
+    "SM09": [
+     1538.2,
+     1350.5
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 0.5 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 137.12,
+   "terrain_old": 135.5,
+   "terrain_t04_all": 135.5,
+   "smap_query_z": 137.27,
+   "user_minus_query": -0.47
+  },
+  {
+   "id": "U092",
+   "value_m": 130.1,
+   "x": 201024.43,
+   "y": 557335.84,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     964.0,
+     1038.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 4.06,
+    "s_m": 35.3,
+    "proposal_z": 130.04,
+    "user_minus_proposal": 0.06
+   },
+   "mesh_z": 130.09,
+   "t04_sample": {
+    "dist_m": 0.46,
+    "z": 130.1,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 129.91,
+   "terrain_t04_all": 130.06,
+   "smap_query_z": 130.13,
+   "user_minus_query": -0.03
+  },
+  {
+   "id": "U093",
+   "value_m": 130.4,
+   "x": 201020.79,
+   "y": 557340.22,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     995.0,
+     1001.1
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 1.6,
+    "s_m": 40.4,
+    "proposal_z": 130.3,
+    "user_minus_proposal": 0.1
+   },
+   "e09_pick": {
+    "dist_m": 1.95,
+    "z": 130.35,
+    "user_minus_pick": 0.05
+   },
+   "mesh_z": 130.3,
+   "t04_sample": {
+    "dist_m": 0.82,
+    "z": 130.3,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 129.94,
+   "terrain_t04_all": 130.35,
+   "smap_query_z": 130.35,
+   "user_minus_query": 0.05
+  },
+  {
+   "id": "U094",
+   "value_m": 138.8,
+   "x": 201089.6,
+   "y": 557342.0,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1558.6,
+     1486.4
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 138.7,
+   "terrain_old": 135.77,
+   "terrain_t04_all": 135.77,
+   "smap_query_z": 138.76,
+   "user_minus_query": 0.04
+  },
+  {
+   "id": "U095",
+   "value_m": 133.7,
+   "x": 201065.88,
+   "y": 557342.61,
+   "xy_err_m": 1.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)",
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM07": [
+     1124.0,
+     1367.0
+    ],
+    "SM09": [
+     1791.0,
+     1270.0
+    ]
+   },
+   "position_method": "캡처 2장의 카메라 맞춤 평균(장별 자리 차 최대 1.7 m)",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 134.19,
+   "terrain_old": 133.4,
+   "terrain_t04_all": 133.4,
+   "smap_query_z": 134.21,
+   "user_minus_query": -0.51
+  },
+  {
+   "id": "U096",
+   "value_m": 138.8,
+   "x": 201085.91,
+   "y": 557345.15,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1635.4,
+     1485.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "풋살장·운동장·통로 등(차도 아님)",
+   "segment": null,
+   "surface_note": "",
+   "reading_note": null,
+   "mesh_z": 138.43,
+   "terrain_old": 135.32,
+   "terrain_t04_all": 135.32,
+   "smap_query_z": 138.65,
+   "user_minus_query": 0.15
+  },
+  {
+   "id": "U097",
+   "value_m": 130.6,
+   "x": 201011.53,
+   "y": 557345.59,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1021.5,
+     921.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 5.2,
+    "s_m": 49.4,
+    "proposal_z": 130.56,
+    "user_minus_proposal": 0.04
+   },
+   "e09_pick": {
+    "dist_m": 2.32,
+    "z": 130.5,
+    "user_minus_pick": 0.1
+   },
+   "mesh_z": 130.58,
+   "t04_sample": {
+    "dist_m": 0.62,
+    "z": 130.6,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 128.47,
+   "terrain_t04_all": 130.65,
+   "smap_query_z": 130.59,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U098",
+   "value_m": 130.7,
+   "x": 201030.37,
+   "y": 557346.03,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1069.0,
+     1065.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 12.42,
+    "s_m": 42.9,
+    "proposal_z": 130.4,
+    "user_minus_proposal": 0.3
+   },
+   "e09_pick": {
+    "dist_m": 3.86,
+    "z": 130.63,
+    "user_minus_pick": 0.07
+   },
+   "mesh_z": 130.7,
+   "t04_sample": {
+    "dist_m": 0.37,
+    "z": 130.7,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 131.43,
+   "terrain_t04_all": 130.71,
+   "smap_query_z": 130.75,
+   "user_minus_query": -0.05
+  },
+  {
+   "id": "U099",
+   "value_m": 130.7,
+   "x": 201032.67,
+   "y": 557346.08,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1075.0,
+     1083.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 14.63,
+    "s_m": 42.2,
+    "proposal_z": 130.38,
+    "user_minus_proposal": 0.32
+   },
+   "e09_pick": {
+    "dist_m": 2.76,
+    "z": 130.63,
+    "user_minus_pick": 0.07
+   },
+   "mesh_z": 130.8,
+   "t04_sample": {
+    "dist_m": 0.67,
+    "z": 130.8,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 131.72,
+   "terrain_t04_all": 130.77,
+   "smap_query_z": 130.8,
+   "user_minus_query": -0.1
+  },
+  {
+   "id": "U100",
+   "value_m": 132.3,
+   "x": 201077.42,
+   "y": 557352.07,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1773.5,
+     1485.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "기타(차도 아님)",
+   "segment": null,
+   "surface_note": "가장 가까운 제안 구간 V4 에서 59.4 m",
+   "reading_note": null,
+   "mesh_z": 132.37,
+   "terrain_old": 133.57,
+   "terrain_t04_all": 133.57,
+   "smap_query_z": 132.32,
+   "user_minus_query": -0.02
+  },
+  {
+   "id": "U101",
+   "value_m": 131.2,
+   "x": 201043.09,
+   "y": 557352.99,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1165.0,
+     1155.0
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 26.67,
+    "s_m": 45.6,
+    "proposal_z": 130.51,
+    "user_minus_proposal": 0.69
+   },
+   "mesh_z": 131.3,
+   "t04_sample": {
+    "dist_m": 1.34,
+    "z": 131.3,
+    "user_minus_sample": -0.1
+   },
+   "terrain_old": 132.99,
+   "terrain_t04_all": 131.25,
+   "smap_query_z": 131.3,
+   "user_minus_query": -0.1
+  },
+  {
+   "id": "U102",
+   "value_m": 132.5,
+   "x": 201072.66,
+   "y": 557354.13,
+   "xy_err_m": 3.0,
+   "images": [
+    "smap-user-main-building-both-sides.png (SM-09)"
+   ],
+   "pixel": {
+    "SM09": [
+     1846.4,
+     1459.6
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "기타(차도 아님)",
+   "segment": null,
+   "surface_note": "가장 가까운 제안 구간 V4 에서 55.3 m",
+   "reading_note": null,
+   "mesh_z": 132.4,
+   "terrain_old": 132.48,
+   "terrain_t04_all": 132.48,
+   "smap_query_z": 132.61,
+   "user_minus_query": -0.11
+  },
+  {
+   "id": "U103",
+   "value_m": 130.7,
+   "x": 201010.68,
+   "y": 557358.89,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1133.5,
+     892.5
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 10.42,
+    "s_m": 51.0,
+    "proposal_z": 130.56,
+    "user_minus_proposal": 0.14
+   },
+   "mesh_z": 130.62,
+   "t04_sample": {
+    "dist_m": 1.12,
+    "z": 130.6,
+    "user_minus_sample": 0.1
+   },
+   "terrain_old": 128.27,
+   "terrain_t04_all": 130.52,
+   "smap_query_z": 130.69,
+   "user_minus_query": 0.01
+  },
+  {
+   "id": "U104",
+   "value_m": 131.0,
+   "x": 201008.89,
+   "y": 557373.32,
+   "xy_err_m": 2.5,
+   "images": [
+    "smap-user-main-west-detail.png (SM-07; SM-06 과 같은 핀)"
+   ],
+   "pixel": {
+    "SM07": [
+     1251.0,
+     854.9
+    ]
+   },
+   "position_method": "캡처 1장의 카메라 맞춤",
+   "surface": "회차 공간 포장면",
+   "segment": "V4",
+   "surface_note": "버스·노면 표시가 보이는 포장면",
+   "reading_note": null,
+   "e09": {
+    "dist_m": 24.62,
+    "s_m": 51.0,
+    "proposal_z": 130.56,
+    "user_minus_proposal": 0.44
+   },
+   "e09_pick": {
+    "dist_m": 3.83,
+    "z": 130.89,
+    "user_minus_pick": 0.11
+   },
+   "mesh_z": 131.0,
+   "t04_sample": {
+    "dist_m": 1.12,
+    "z": 131.0,
+    "user_minus_sample": 0.0
+   },
+   "terrain_old": 130.8,
+   "terrain_t04_all": 130.95,
+   "smap_query_z": 131.04,
+   "user_minus_query": -0.04
+  }
+ ]
+}

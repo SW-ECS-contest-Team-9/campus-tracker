@@ -1,0 +1,1052 @@
+{
+ "planTolM": 0.8,
+ "vertexStepM": 2.5,
+ "segments": {
+  "V1": {
+   "id": "V1",
+   "roadId": "729bd2ad-9e46-4554-a584-8356ebdbda26",
+   "fromNodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec",
+   "toNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+   "lengthM": 27.53,
+   "vertices": 12,
+   "zStart": 106.94,
+   "zEnd": 107.08,
+   "grade": {
+    "max1mPct": 1.7,
+    "max1mAtS": 26.0,
+    "max15mPct": 0.4,
+    "max15mFromS": 0.0,
+    "avgPct": 0.5,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.29
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 6,
+    "median": 13.0,
+    "p25": 12.6,
+    "p75": 13.4
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.5,
+    "maxDeviationOfNewVertexM": 0.5,
+    "maxTurnAtOldVertexDeg": 8.9,
+    "maxTurnAtNewVertexDeg": 1.2
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.07,
+    "max": 0.04,
+    "medianAbs": 0.03
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "main",
+   "mainStationStartM": 0.0
+  },
+  "V2": {
+   "id": "V2",
+   "roadId": "e934fcd3-f453-44bf-829f-9c77322aa212",
+   "fromNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+   "toNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+   "lengthM": 151.61,
+   "vertices": 62,
+   "zStart": 107.08,
+   "zEnd": 120.93,
+   "grade": {
+    "max1mPct": 16.1,
+    "max1mAtS": 125.0,
+    "max15mPct": 15.7,
+    "max15mFromS": 116.0,
+    "avgPct": 9.1,
+    "over15pct_stations": [
+     [
+      110.0,
+      132.0
+     ]
+    ],
+    "maxGradeChangePctPerM": 0.84
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 37,
+    "median": 10.5,
+    "p25": 9.5,
+    "p75": 12.0
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.42,
+    "maxDeviationOfNewVertexM": 0.44,
+    "maxTurnAtOldVertexDeg": 16.7,
+    "maxTurnAtNewVertexDeg": 3.9
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.15,
+    "max": 0.08,
+    "medianAbs": 0.02
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "main",
+   "mainStationStartM": 27.5
+  },
+  "V3": {
+   "id": "V3",
+   "roadId": "499ab1ab-cc02-4ea6-9bd3-e5fe5e5c2a62",
+   "fromNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+   "toNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+   "lengthM": 60.64,
+   "vertices": 25,
+   "zStart": 120.93,
+   "zEnd": 127.8,
+   "grade": {
+    "max1mPct": 14.1,
+    "max1mAtS": 34.0,
+    "max15mPct": 13.9,
+    "max15mFromS": 30.0,
+    "avgPct": 11.4,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.99
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 15,
+    "median": 11.5,
+    "p25": 10.5,
+    "p75": 13.8
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.66,
+    "maxDeviationOfNewVertexM": 0.75,
+    "maxTurnAtOldVertexDeg": 7.7,
+    "maxTurnAtNewVertexDeg": 3.5
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.13,
+    "max": 0.12,
+    "medianAbs": 0.06
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "main",
+   "mainStationStartM": 179.1
+  },
+  "V4a": {
+   "id": "V4a",
+   "roadId": "07615440-e6c0-4f7b-9a01-982ea7a4af68",
+   "fromNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+   "toNodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+   "lengthM": 36.0,
+   "vertices": 15,
+   "zStart": 127.8,
+   "zEnd": 130.19,
+   "grade": {
+    "max1mPct": 7.9,
+    "max1mAtS": 29.0,
+    "max15mPct": 7.3,
+    "max15mFromS": 20.0,
+    "avgPct": 6.7,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.5
+   },
+   "widthM_stored": 14,
+   "flatBandWidthM": {
+    "n": 8,
+    "median": 15.5,
+    "p25": 12.9,
+    "p75": 18.9
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.78,
+    "maxDeviationOfNewVertexM": 0.78,
+    "maxTurnAtOldVertexDeg": 20.1,
+    "maxTurnAtNewVertexDeg": 3.7
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.01,
+    "max": 0.2,
+    "medianAbs": 0.07
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "main",
+   "mainStationStartM": 239.8
+  },
+  "V4b": {
+   "id": "V4b",
+   "roadId": "67e234b5-f38c-4400-b046-975d0125ebc6",
+   "fromNodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+   "toNodeId": "a12b5e30-31e6-46d0-9c11-97c751f81266",
+   "lengthM": 9.07,
+   "vertices": 5,
+   "zStart": 130.19,
+   "zEnd": 130.53,
+   "grade": {
+    "max1mPct": 5.4,
+    "max1mAtS": 0.0,
+    "avgPct": 3.7,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.52
+   },
+   "widthM_stored": 14,
+   "flatBandWidthM": {
+    "n": 2,
+    "median": 25.5,
+    "p25": 25.0,
+    "p75": 26.0
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.07,
+    "maxDeviationOfNewVertexM": 0.04,
+    "maxTurnAtOldVertexDeg": 3.8,
+    "maxTurnAtNewVertexDeg": 1.4
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.33,
+    "max": 0.09,
+    "medianAbs": 0.09
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "main",
+   "mainStationStartM": 275.8
+  },
+  "P-LOW": {
+   "id": "P-LOW",
+   "roadId": "1b2219e1-b8e0-4495-a037-6712f1639c1b",
+   "fromNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+   "toNodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba",
+   "lengthM": 34.28,
+   "vertices": 15,
+   "zStart": 107.08,
+   "zEnd": 106.02,
+   "grade": {
+    "max1mPct": -17.2,
+    "max1mAtS": 33.0,
+    "max15mPct": -10.2,
+    "max15mFromS": 19.0,
+    "avgPct": -3.0,
+    "over15pct_stations": [
+     [
+      30.0,
+      34.0
+     ]
+    ],
+    "maxGradeChangePctPerM": 1.72
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 8,
+    "median": 16.5,
+    "p25": 12.8,
+    "p75": 18.1
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.35,
+    "maxDeviationOfNewVertexM": 0.32,
+    "maxTurnAtOldVertexDeg": 12.9,
+    "maxTurnAtNewVertexDeg": 2.4
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.13,
+    "max": 0.02,
+    "medianAbs": 0.03
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "P-LOW",
+   "startsAtMainJunctionOf": "V1"
+  },
+  "P-UP": {
+   "id": "P-UP",
+   "roadId": "192703b3-1c53-4602-8435-bba8533e93e8",
+   "fromNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+   "toNodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b",
+   "lengthM": 12.73,
+   "vertices": 3,
+   "zStart": 127.8,
+   "zEnd": 127.94,
+   "grade": {
+    "max1mPct": 1.1,
+    "max1mAtS": 10.0,
+    "avgPct": 1.1,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.0
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 3,
+    "median": 8.0,
+    "p25": 6.5,
+    "p75": 10.8
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 0.01,
+    "maxDeviationOfNewVertexM": 0.01,
+    "maxTurnAtOldVertexDeg": 47.9,
+    "maxTurnAtNewVertexDeg": 47.7
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.0,
+    "max": 0.22,
+    "medianAbs": 0.01
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "P-UP",
+   "startsAtMainJunctionOf": "V3"
+  },
+  "U1": {
+   "id": "U1",
+   "roadId": "9713befb-0f85-419e-8246-b8f6665c3e3b",
+   "fromNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+   "toNodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+   "lengthM": 92.9,
+   "vertices": 38,
+   "zStart": 120.93,
+   "zEnd": 130.92,
+   "grade": {
+    "max1mPct": 21.7,
+    "max1mAtS": 9.0,
+    "max15mPct": 19.7,
+    "max15mFromS": 2.0,
+    "avgPct": 10.8,
+    "over15pct_stations": [
+     [
+      0.0,
+      17.0
+     ],
+     [
+      40.0,
+      54.0
+     ]
+    ],
+    "maxGradeChangePctPerM": 1.88
+   },
+   "widthM_stored": null,
+   "flatBandWidthM": {
+    "n": 23,
+    "median": 6.5,
+    "p25": 2.2,
+    "p75": 9.8
+   },
+   "plan": {
+    "maxDeviationOfOldVertexM": 1.07,
+    "maxDeviationOfNewVertexM": 0.86,
+    "maxTurnAtOldVertexDeg": 49.3,
+    "maxTurnAtNewVertexDeg": 18.2
+   },
+   "zChangeAtOldVertices": {
+    "min": -0.4,
+    "max": 0.37,
+    "medianAbs": 0.05
+   },
+   "kind": "vehicle-road",
+   "accuracyVerified": false,
+   "line": "U1",
+   "startsAtMainJunctionOf": "V2"
+  },
+  "U1-EXT": {
+   "id": "U1-EXT",
+   "roadId": null,
+   "optional": true,
+   "lengthM": 22.6,
+   "note": "사용자 핀 4개(두 캡처에서 자리 차 3 m 이내)를 그대로 이은 선. E09 제안·시험용 DB 에 없는 구간. 폭·포장 경계 미확인. 만들지는 사용자 확인 뒤",
+   "kind": "vehicle-road",
+   "accuracyVerified": false
+  }
+ },
+ "lines": {
+  "main": {
+   "lengthM": 284.9,
+   "junctionStationsM": [
+    0.0,
+    27.5,
+    179.1,
+    239.8,
+    275.8,
+    284.9
+   ],
+   "junctionHeightsM": [
+    106.94,
+    107.08,
+    120.93,
+    127.8,
+    130.19,
+    130.53
+   ],
+   "grade": {
+    "max1mPct": 16.1,
+    "max1mAtS": 151.9,
+    "max15mPct": 15.7,
+    "max15mFromS": 143.9,
+    "avgPct": 8.3,
+    "over15pct_stations": [
+     [
+      137.9,
+      159.9
+     ]
+    ],
+    "maxGradeChangePctPerM": 0.99
+   },
+   "minRadiusM": 36.1,
+   "maxHeadingChangeDegPerM": 1.6,
+   "userPoints": [
+    {
+     "id": "U004",
+     "value_m": 107.0,
+     "x": 201129.49,
+     "y": 557118.55,
+     "xy_err_m": 2.0,
+     "surface": "차도",
+     "dist_m": 2.34,
+     "s": 21.609344900254357,
+     "use": true,
+     "sigma": 0.08,
+     "profile_z": 107.01,
+     "profile_minus_user": 0.01
+    },
+    {
+     "id": "U006",
+     "value_m": 107.3,
+     "x": 201123.76,
+     "y": 557131.48,
+     "xy_err_m": 2.0,
+     "surface": "차도",
+     "dist_m": 2.71,
+     "s": 35.625154499072174,
+     "use": true,
+     "sigma": 0.09,
+     "profile_z": 107.29,
+     "profile_minus_user": -0.01
+    },
+    {
+     "id": "U012",
+     "value_m": 108.1,
+     "x": 201112.42,
+     "y": 557149.44,
+     "xy_err_m": 2.5,
+     "surface": "차도",
+     "dist_m": 0.89,
+     "s": 56.75425801654471,
+     "use": true,
+     "sigma": 0.104,
+     "profile_z": 108.1,
+     "profile_minus_user": -0.0
+    },
+    {
+     "id": "U018",
+     "value_m": 108.6,
+     "x": 201106.1,
+     "y": 557163.15,
+     "xy_err_m": 1.7,
+     "surface": "차도",
+     "dist_m": 1.37,
+     "s": 71.88467676464624,
+     "use": true,
+     "sigma": 0.095,
+     "profile_z": 108.61,
+     "profile_minus_user": 0.01
+    },
+    {
+     "id": "U020",
+     "value_m": 109.1,
+     "x": 201102.57,
+     "y": 557170.15,
+     "xy_err_m": 2.2,
+     "surface": "차도",
+     "dist_m": 1.06,
+     "s": 79.75906466385695,
+     "use": true,
+     "sigma": 0.118,
+     "profile_z": 109.08,
+     "profile_minus_user": -0.02
+    },
+    {
+     "id": "U025",
+     "value_m": 109.7,
+     "x": 201093.06,
+     "y": 557180.12,
+     "xy_err_m": 1.9,
+     "surface": "차도",
+     "dist_m": 4.13,
+     "s": 92.41314198680335,
+     "use": true,
+     "sigma": 0.145,
+     "profile_z": 109.76,
+     "profile_minus_user": 0.06
+    },
+    {
+     "id": "U029",
+     "value_m": 110.9,
+     "x": 201090.23,
+     "y": 557191.71,
+     "xy_err_m": 1.9,
+     "surface": "차도",
+     "dist_m": 3.38,
+     "s": 104.04007990442759,
+     "use": true,
+     "sigma": 0.164,
+     "profile_z": 110.97,
+     "profile_minus_user": 0.07
+    },
+    {
+     "id": "U038",
+     "value_m": 113.9,
+     "x": 201085.84,
+     "y": 557217.73,
+     "xy_err_m": 2.1,
+     "surface": "차도",
+     "dist_m": 3.29,
+     "s": 129.82126093934062,
+     "use": true,
+     "sigma": 0.215,
+     "profile_z": 113.92,
+     "profile_minus_user": 0.02
+    },
+    {
+     "id": "U048",
+     "value_m": 116.9,
+     "x": 201088.27,
+     "y": 557237.95,
+     "xy_err_m": 1.5,
+     "surface": "차도",
+     "dist_m": 0.21,
+     "s": 149.83475719167973,
+     "use": true,
+     "sigma": 0.187,
+     "profile_z": 116.92,
+     "profile_minus_user": 0.02
+    },
+    {
+     "id": "U055",
+     "value_m": 120.5,
+     "x": 201080.63,
+     "y": 557262.34,
+     "xy_err_m": 1.5,
+     "surface": "차도",
+     "dist_m": 1.53,
+     "s": 176.17093355020646,
+     "use": true,
+     "sigma": 0.148,
+     "profile_z": 120.55,
+     "profile_minus_user": 0.05
+    },
+    {
+     "id": "U057",
+     "value_m": 121.4,
+     "x": 201073.76,
+     "y": 557266.31,
+     "xy_err_m": 5.0,
+     "surface": "차도",
+     "dist_m": 4.61,
+     "s": 184.0149229396101,
+     "use": true,
+     "sigma": 0.344,
+     "profile_z": 121.52,
+     "profile_minus_user": 0.12
+    },
+    {
+     "id": "U058",
+     "value_m": 121.6,
+     "x": 201079.71,
+     "y": 557272.1,
+     "xy_err_m": 1.5,
+     "surface": "차도",
+     "dist_m": 3.69,
+     "s": 184.31903918978702,
+     "use": true,
+     "sigma": 0.128,
+     "profile_z": 121.56,
+     "profile_minus_user": -0.04
+    },
+    {
+     "id": "U064",
+     "value_m": 123.4,
+     "x": 201063.76,
+     "y": 557280.09,
+     "xy_err_m": 1.6,
+     "surface": "차도",
+     "dist_m": 0.4,
+     "s": 201.27529899560506,
+     "use": true,
+     "sigma": 0.164,
+     "profile_z": 123.38,
+     "profile_minus_user": -0.02
+    },
+    {
+     "id": "U067",
+     "value_m": 125.5,
+     "x": 201050.53,
+     "y": 557288.15,
+     "xy_err_m": 2.1,
+     "surface": "차도",
+     "dist_m": 0.11,
+     "s": 216.78955504514562,
+     "use": true,
+     "sigma": 0.221,
+     "profile_z": 125.46,
+     "profile_minus_user": -0.04
+    },
+    {
+     "id": "U073",
+     "value_m": 127.3,
+     "x": 201040.08,
+     "y": 557297.45,
+     "xy_err_m": 2.2,
+     "surface": "차도",
+     "dist_m": 1.9,
+     "s": 230.8393583542585,
+     "use": true,
+     "sigma": 0.156,
+     "profile_z": 127.26,
+     "profile_minus_user": -0.04
+    },
+    {
+     "id": "U076",
+     "value_m": 127.9,
+     "x": 201031.28,
+     "y": 557303.3,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 0.43,
+     "s": 241.35341885649925,
+     "use": true,
+     "sigma": 0.124,
+     "profile_z": 127.88,
+     "profile_minus_user": -0.02
+    },
+    {
+     "id": "U083",
+     "value_m": 128.6,
+     "x": 201027.46,
+     "y": 557313.09,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 1.05,
+     "s": 251.85804369869163,
+     "use": true,
+     "sigma": 0.144,
+     "profile_z": 128.57,
+     "profile_minus_user": -0.03
+    },
+    {
+     "id": "U087",
+     "value_m": 129.4,
+     "x": 201021.77,
+     "y": 557324.82,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 1.0,
+     "s": 264.7891448373122,
+     "use": true,
+     "sigma": 0.146,
+     "profile_z": 129.38,
+     "profile_minus_user": -0.02
+    },
+    {
+     "id": "U090",
+     "value_m": 130.2,
+     "x": 201015.51,
+     "y": 557333.48,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 5.15,
+     "s": 274.66574081294266,
+     "use": true,
+     "sigma": 0.134,
+     "profile_z": 130.13,
+     "profile_minus_user": -0.07
+    },
+    {
+     "id": "U092",
+     "value_m": 130.1,
+     "x": 201024.43,
+     "y": 557335.84,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 4.07,
+     "s": 274.88916833212824,
+     "use": true,
+     "sigma": 0.133,
+     "profile_z": 130.14,
+     "profile_minus_user": 0.04
+    },
+    {
+     "id": "U093",
+     "value_m": 130.4,
+     "x": 201020.79,
+     "y": 557340.22,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 1.62,
+     "s": 279.9440206331306,
+     "use": true,
+     "sigma": 0.119,
+     "profile_z": 130.39,
+     "profile_minus_user": -0.01
+    },
+    {
+     "id": "U097",
+     "value_m": 130.6,
+     "x": 201011.53,
+     "y": 557345.59,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 6.38,
+     "s": 284.85176992958515,
+     "use": false,
+     "profile_z": 130.53,
+     "profile_minus_user": -0.07
+    },
+    {
+     "id": "U098",
+     "value_m": 130.7,
+     "x": 201030.37,
+     "y": 557346.03,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 12.44,
+     "s": 282.6708131115088,
+     "use": false,
+     "profile_z": 130.48,
+     "profile_minus_user": -0.22
+    },
+    {
+     "id": "U099",
+     "value_m": 130.7,
+     "x": 201032.67,
+     "y": 557346.08,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 14.66,
+     "s": 282.14540266011505,
+     "use": false,
+     "profile_z": 130.46,
+     "profile_minus_user": -0.24
+    },
+    {
+     "id": "U101",
+     "value_m": 131.2,
+     "x": 201043.09,
+     "y": 557352.99,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 26.67,
+     "s": 284.85176992958515,
+     "use": false,
+     "profile_z": 130.53,
+     "profile_minus_user": -0.67
+    },
+    {
+     "id": "U103",
+     "value_m": 130.7,
+     "x": 201010.68,
+     "y": 557358.89,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 16.07,
+     "s": 284.85176992958515,
+     "use": false,
+     "profile_z": 130.53,
+     "profile_minus_user": -0.17
+    },
+    {
+     "id": "U104",
+     "value_m": 131.0,
+     "x": 201008.89,
+     "y": 557373.32,
+     "xy_err_m": 2.5,
+     "surface": "회차 공간 포장면",
+     "dist_m": 30.18,
+     "s": 284.85176992958515,
+     "use": false,
+     "profile_z": 130.53,
+     "profile_minus_user": -0.47
+    }
+   ],
+   "data": {
+    "e09_picks": 44,
+    "mesh_samples": 143,
+    "user_points_used": 21
+   },
+   "residualAtAutomated": {
+    "e09_pick_medianAbs": 0.04,
+    "e09_pick_maxAbs": 0.2,
+    "mesh_medianAbs": 0.04,
+    "mesh_p90Abs": 0.11,
+    "mesh_maxAbs": 0.19
+   }
+  },
+  "P-LOW": {
+   "lengthM": 34.3,
+   "zStart": 107.08,
+   "zEnd": 106.02,
+   "grade": {
+    "max1mPct": -17.3,
+    "max1mAtS": 33.3,
+    "max15mPct": -10.8,
+    "max15mFromS": 19.6,
+    "avgPct": -3.1,
+    "over15pct_stations": [
+     [
+      29.4,
+      34.3
+     ]
+    ],
+    "maxGradeChangePctPerM": 1.69
+   },
+   "minRadiusM": 55.1,
+   "userPoints": [
+    {
+     "id": "U007",
+     "value_m": 107.6,
+     "x": 201109.91,
+     "y": 557134.42,
+     "xy_err_m": 2.5,
+     "surface": "차도(주차장 차로)",
+     "dist_m": 0.49,
+     "s": 18.834701504942153,
+     "use": true,
+     "sigma": 0.083,
+     "profile_z": 107.6,
+     "profile_minus_user": -0.0
+    },
+    {
+     "id": "U010",
+     "value_m": 107.0,
+     "x": 201103.41,
+     "y": 557140.29,
+     "xy_err_m": 2.5,
+     "surface": "차도(주차장 차로)",
+     "dist_m": 1.22,
+     "s": 27.523507930222152,
+     "use": true,
+     "sigma": 0.225,
+     "profile_z": 107.07,
+     "profile_minus_user": 0.07
+    },
+    {
+     "id": "U011",
+     "value_m": 106.4,
+     "x": 201101.46,
+     "y": 557143.87,
+     "xy_err_m": 2.5,
+     "surface": "차도(주차장 차로)",
+     "dist_m": 0.3,
+     "s": 31.488091460920547,
+     "use": true,
+     "sigma": 0.311,
+     "profile_z": 106.49,
+     "profile_minus_user": 0.09
+    }
+   ],
+   "residualAtAutomated": {
+    "e09_pick_maxAbs": 0.13,
+    "mesh_p90Abs": 0.13,
+    "mesh_maxAbs": 0.18
+   }
+  },
+  "P-UP": {
+   "lengthM": 12.7,
+   "zStart": 127.8,
+   "zEnd": 127.94,
+   "grade": {
+    "max1mPct": 1.1,
+    "max1mAtS": 10.8,
+    "avgPct": 1.1,
+    "over15pct_stations": [],
+    "maxGradeChangePctPerM": 0.0
+   },
+   "minRadiusM": 1.4,
+   "userPoints": [],
+   "residualAtAutomated": {
+    "e09_pick_maxAbs": 0.54,
+    "mesh_p90Abs": 0.51,
+    "mesh_maxAbs": 0.57
+   }
+  },
+  "U1": {
+   "lengthM": 93.0,
+   "zStart": 120.93,
+   "zEnd": 130.92,
+   "grade": {
+    "max1mPct": 21.7,
+    "max1mAtS": 9.0,
+    "max15mPct": 19.7,
+    "max15mFromS": 2.0,
+    "avgPct": 10.7,
+    "over15pct_stations": [
+     [
+      0.0,
+      17.0
+     ],
+     [
+      40.0,
+      54.0
+     ]
+    ],
+    "maxGradeChangePctPerM": 1.88
+   },
+   "minRadiusM": 7.3,
+   "userPoints": [
+    {
+     "id": "U036",
+     "value_m": 130.8,
+     "x": 201112.89,
+     "y": 557213.92,
+     "xy_err_m": 1.5,
+     "surface": "차도(윗길)",
+     "dist_m": 0.52,
+     "s": 90.14747932011667,
+     "use": true,
+     "sigma": 0.081,
+     "profile_z": 130.8,
+     "profile_minus_user": -0.0
+    },
+    {
+     "id": "U042",
+     "value_m": 130.4,
+     "x": 201112.65,
+     "y": 557221.55,
+     "xy_err_m": 1.5,
+     "surface": "차도(윗길)",
+     "dist_m": 1.28,
+     "s": 82.69113036513325,
+     "use": true,
+     "sigma": 0.087,
+     "profile_z": 130.41,
+     "profile_minus_user": 0.01
+    },
+    {
+     "id": "U043",
+     "value_m": 130.2,
+     "x": 201111.18,
+     "y": 557226.18,
+     "xy_err_m": 1.5,
+     "surface": "차도(윗길)",
+     "dist_m": 3.35,
+     "s": 77.84709389741579,
+     "use": true,
+     "sigma": 0.101,
+     "profile_z": 130.21,
+     "profile_minus_user": 0.01
+    },
+    {
+     "id": "U050",
+     "value_m": 129.3,
+     "x": 201109.84,
+     "y": 557240.39,
+     "xy_err_m": 2.5,
+     "surface": "차도(윗길)",
+     "dist_m": 0.48,
+     "s": 62.561194939502144,
+     "use": true,
+     "sigma": 0.229,
+     "profile_z": 129.23,
+     "profile_minus_user": -0.07
+    },
+    {
+     "id": "U051",
+     "value_m": 128.4,
+     "x": 201108.92,
+     "y": 557248.49,
+     "xy_err_m": 2.5,
+     "surface": "차도(윗길)",
+     "dist_m": 0.62,
+     "s": 54.235253872423115,
+     "use": true,
+     "sigma": 0.26,
+     "profile_z": 128.27,
+     "profile_minus_user": -0.13
+    },
+    {
+     "id": "U053",
+     "value_m": 126.7,
+     "x": 201108.04,
+     "y": 557257.64,
+     "xy_err_m": 2.5,
+     "surface": "차도(윗길)",
+     "dist_m": 0.5,
+     "s": 45.08783213629927,
+     "use": true,
+     "sigma": 0.294,
+     "profile_z": 126.61,
+     "profile_minus_user": -0.09
+    },
+    {
+     "id": "U056",
+     "value_m": 125.1,
+     "x": 201105.52,
+     "y": 557266.27,
+     "xy_err_m": 5.0,
+     "surface": "차도(윗길)",
+     "dist_m": 2.55,
+     "s": 35.728885540249166,
+     "use": true,
+     "sigma": 0.278,
+     "profile_z": 125.23,
+     "profile_minus_user": 0.13
+    },
+    {
+     "id": "U059",
+     "value_m": 124.4,
+     "x": 201093.62,
+     "y": 557272.69,
+     "xy_err_m": 5.0,
+     "surface": "차도(윗길)",
+     "dist_m": 3.1,
+     "s": 17.999696883976426,
+     "use": true,
+     "sigma": 0.51,
+     "profile_z": 124.36,
+     "profile_minus_user": -0.04
+    },
+    {
+     "id": "U061",
+     "value_m": 122.6,
+     "x": 201081.62,
+     "y": 557274.15,
+     "xy_err_m": 5.0,
+     "surface": "차도(윗길)",
+     "dist_m": 4.13,
+     "s": 7.512885178970599,
+     "use": true,
+     "sigma": 0.753,
+     "profile_z": 122.31,
+     "profile_minus_user": -0.29
+    }
+   ],
+   "residualAtAutomated": {
+    "e09_pick_maxAbs": 0.4,
+    "mesh_p90Abs": 0.12,
+    "mesh_maxAbs": 0.26
+   }
+  }
+ },
+ "nodeMoves": [
+  {
+   "nodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+   "dz": -0.13,
+   "zNew": 120.93,
+   "others": 0
+  },
+  {
+   "nodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+   "dz": 0.08,
+   "zNew": 130.19,
+   "others": 0
+  },
+  {
+   "nodeId": "a12b5e30-31e6-46d0-9c11-97c751f81266",
+   "dz": -0.33,
+   "zNew": 130.53,
+   "others": 2
+  },
+  {
+   "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+   "dz": 0.09,
+   "zNew": 130.92,
+   "others": 0
+  }
+ ]
+}

@@ -1,0 +1,119 @@
+[
+ {
+  "extraPasses": 0,
+  "kernelM": 2,
+  "radiusM": 6,
+  "mainP90": 0.73,
+  "mainMax": 2.23,
+  "u1P90": 0.93,
+  "u1Max": 3.02
+ },
+ {
+  "extraPasses": 2,
+  "kernelM": 2,
+  "radiusM": 6,
+  "mainP90": 0.61,
+  "mainMax": 2.14,
+  "u1P90": 0.82,
+  "u1Max": 2.8
+ },
+ {
+  "extraPasses": 6,
+  "kernelM": 2,
+  "radiusM": 6,
+  "mainP90": 0.52,
+  "mainMax": 1.91,
+  "u1P90": 0.68,
+  "u1Max": 2.58
+ },
+ {
+  "extraPasses": 12,
+  "kernelM": 2,
+  "radiusM": 6,
+  "mainP90": 0.47,
+  "mainMax": 1.67,
+  "u1P90": 0.63,
+  "u1Max": 2.45
+ },
+ {
+  "extraPasses": 24,
+  "kernelM": 2,
+  "radiusM": 6,
+  "mainP90": 0.42,
+  "mainMax": 1.41,
+  "u1P90": 0.53,
+  "u1Max": 2.34
+ },
+ {
+  "extraPasses": 2,
+  "kernelM": 1.5,
+  "radiusM": 4,
+  "mainP90": 0.53,
+  "mainMax": 1.91,
+  "u1P90": 0.69,
+  "u1Max": 2.62
+ },
+ {
+  "extraPasses": 6,
+  "kernelM": 1.5,
+  "radiusM": 4,
+  "mainP90": 0.42,
+  "mainMax": 1.46,
+  "u1P90": 0.52,
+  "u1Max": 2.37
+ },
+ {
+  "extraPasses": 12,
+  "kernelM": 1.5,
+  "radiusM": 4,
+  "mainP90": 0.36,
+  "mainMax": 1.2,
+  "u1P90": 0.46,
+  "u1Max": 2.23
+ },
+ {
+  "extraPasses": 24,
+  "kernelM": 1.5,
+  "radiusM": 4,
+  "mainP90": 0.32,
+  "mainMax": 1.13,
+  "u1P90": 0.39,
+  "u1Max": 2.08
+ },
+ {
+  "extraPasses": 2,
+  "kernelM": 1,
+  "radiusM": 3,
+  "mainP90": 0.42,
+  "mainMax": 1.4,
+  "u1P90": 0.53,
+  "u1Max": 2.41
+ },
+ {
+  "extraPasses": 6,
+  "kernelM": 1,
+  "radiusM": 3,
+  "mainP90": 0.32,
+  "mainMax": 1.13,
+  "u1P90": 0.38,
+  "u1Max": 2.09
+ },
+ {
+  "extraPasses": 12,
+  "kernelM": 1,
+  "radiusM": 3,
+  "mainP90": 0.31,
+  "mainMax": 1.08,
+  "u1P90": 0.36,
+  "u1Max": 1.97
+ },
+ {
+  "extraPasses": 24,
+  "kernelM": 1,
+  "radiusM": 3,
+  "mainP90": 0.3,
+  "mainMax": 1.07,
+  "u1P90": 0.36,
+  "u1Max": 1.91
+ }
+]

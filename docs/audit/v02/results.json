@@ -1,0 +1,3311 @@
+{
+ "title": "V02 사용자 고도점으로 차도 매끄럽게",
+ "created": "2026-10-11",
+ "applied": false,
+ "userReadings": {
+  "total_campus_points": 105,
+  "public_road_points_not_listed": 20,
+  "carriageway_points": 43,
+  "other_surface_points": 62,
+  "by_segment": {
+   "P-LOW": 3,
+   "U1": 9,
+   "U1-EXT": 4,
+   "V1": 1,
+   "V2": 9,
+   "V3": 5,
+   "V4": 12
+  },
+  "by_surface": {
+   "공도 갈림(정문 밖)": 4,
+   "기타(차도 아님)": 4,
+   "본관 쪽 보도·계단식 보도(차도 아님)": 7,
+   "분수 광장": 7,
+   "차도": 15,
+   "차도(윗길)": 9,
+   "차도(윗길에서 풋살장 쪽으로 이어지는 열)": 4,
+   "차도(주차장 차로)": 3,
+   "풋살장·운동장·통로 등(차도 아님)": 31,
+   "하단 주차장 덮개 아래·광장 가장자리(차도 아님)": 4,
+   "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)": 5,
+   "회차 공간 포장면": 12
+  },
+  "xy_err_m": {
+   "n": 105,
+   "median_abs": 2.5,
+   "p90_abs": 3.0,
+   "max_abs": 5.3
+  },
+  "points_seen_in_two_or_more_images": 42,
+  "agreement_carriageway": {
+   "user_minus_e09_proposal_at_nearest_point": {
+    "n": 39,
+    "median_abs": 0.11,
+    "p90_abs": 0.34,
+    "max_abs": 0.69
+   },
+   "user_minus_e09_pick_within_4m": {
+    "n": 31,
+    "median_abs": 0.11,
+    "p90_abs": 0.39,
+    "max_abs": 0.71
+   },
+   "user_minus_smap_query": {
+    "n": 43,
+    "median_abs": 0.07,
+    "p90_abs": 0.19,
+    "max_abs": 0.59
+   },
+   "user_minus_mesh": {
+    "n": 43,
+    "median_abs": 0.07,
+    "p90_abs": 0.16,
+    "max_abs": 0.54
+   },
+   "user_minus_t04_or_s06_sample_within_2m": {
+    "n": 31,
+    "median_abs": 0.1,
+    "p90_abs": 0.1,
+    "max_abs": 0.5
+   },
+   "user_minus_terrain_old": {
+    "n": 43,
+    "median_abs": 2.43,
+    "p90_abs": 10.32,
+    "max_abs": 11.77
+   },
+   "user_minus_terrain_t04_all": {
+    "n": 43,
+    "median_abs": 0.28,
+    "p90_abs": 10.32,
+    "max_abs": 11.77
+   }
+  },
+  "agreement_all": {
+   "user_minus_smap_query": {
+    "n": 105,
+    "median_abs": 0.07,
+    "p90_abs": 0.57,
+    "max_abs": 8.48
+   },
+   "user_minus_mesh": {
+    "n": 96,
+    "median_abs": 0.09,
+    "p90_abs": 0.48,
+    "max_abs": 12.29
+   }
+  },
+  "disagree_over_0p5_vs_query": [
+   {
+    "id": "U013",
+    "value": 105.9,
+    "query": 106.93,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201097.54,
+     557151.61
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U016",
+    "value": 106.4,
+    "query": 107.97,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201095.53,
+     557157.94
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U019",
+    "value": 111.3,
+    "query": 109.79,
+    "surface": "하단 주차장 덮개 아래·광장 가장자리(차도 아님)",
+    "segment": null,
+    "xy": [
+     201086.57,
+     557168.8
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U028",
+    "value": 148.3,
+    "query": 148.96,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201195.35,
+     557186.34
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U037",
+    "value": 114.1,
+    "query": 105.62,
+    "surface": "분수 광장",
+    "segment": null,
+    "xy": [
+     201048.38,
+     557216.44
+    ],
+    "xy_err_m": 2.5
+   },
+   {
+    "id": "U054",
+    "value": 127.7,
+    "query": 126.75,
+    "surface": "한림관·은주1관 앞(윗길 가장자리·입구 앞, 차도 아님)",
+    "segment": null,
+    "xy": [
+     201113.95,
+     557258.73
+    ],
+    "xy_err_m": 2.2
+   },
+   {
+    "id": "U061",
+    "value": 122.6,
+    "query": 122.01,
+    "surface": "차도(윗길)",
+    "segment": "U1",
+    "xy": [
+     201081.62,
+     557274.15
+    ],
+    "xy_err_m": 5.0
+   },
+   {
+    "id": "U066",
+    "value": 148.9,
+    "query": 144.24,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201142.02,
+     557282.46
+    ],
+    "xy_err_m": 3.0
+   },
+   {
+    "id": "U068",
+    "value": 124.8,
+    "query": 125.33,
+    "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+    "segment": null,
+    "xy": [
+     201068.96,
+     557289.5
+    ],
+    "xy_err_m": 1.5
+   },
+   {
+    "id": "U071",
+    "value": 126.3,
+    "query": 127.3,
+    "surface": "본관 쪽 보도·계단식 보도(차도 아님)",
+    "segment": null,
+    "xy": [
+     201050.46,
+     557297.25
+    ],
+    "xy_err_m": 2.2
+   },
+   {
+    "id": "U075",
+    "value": 125.9,
+    "query": 128.49,
+    "surface": "기타(차도 아님)",
+    "segment": null,
+    "xy": [
+     201013.87,
+     557300.01
+    ],
+    "xy_err_m": 3.2
+   },
+   {
+    "id": "U078",
+    "value": 148.5,
+    "query": 147.86,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201141.63,
+     557304.66
+    ],
+    "xy_err_m": 3.0
+   },
+   {
+    "id": "U095",
+    "value": 133.7,
+    "query": 134.21,
+    "surface": "풋살장·운동장·통로 등(차도 아님)",
+    "segment": null,
+    "xy": [
+     201065.88,
+     557342.61
+    ],
+    "xy_err_m": 1.5
+   }
+  ]
+ },
+ "cameras": {
+  "SM07": {
+   "camera": {
+    "eye_x": 201134.37597289658,
+    "eye_y": 557303.6674988988,
+    "eye_z": 340,
+    "heading_deg": 282.6056980230653,
+    "tilt_deg": 57.10216056714537,
+    "fov_deg": 43.487509581776735,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.06623447777502633,
+    "rms_dz": 0.81769987078726,
+    "n_used": 29
+   }
+  },
+  "SM09": {
+   "camera": {
+    "eye_x": 201124.34997927494,
+    "eye_y": 557324.2498142556,
+    "eye_z": 288,
+    "heading_deg": 221.44309902333316,
+    "tilt_deg": 70.86785946319249,
+    "fov_deg": 41.05027315900285,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.20951943426815944,
+    "rms_dz": 0.9511047408338646,
+    "n_used": 43
+   }
+  },
+  "SM11": {
+   "camera": {
+    "eye_x": 201078.36545599872,
+    "eye_y": 557187.2699274042,
+    "eye_z": 386,
+    "heading_deg": 127.01176601356595,
+    "tilt_deg": 76.82164525982627,
+    "fov_deg": 43.87486791388557,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.08302959560533196,
+    "rms_dz": 0.16200758539226812,
+    "n_used": 42
+   }
+  },
+  "SM15": {
+   "camera": {
+    "eye_x": 200991.74953626472,
+    "eye_y": 557138.3321584923,
+    "eye_z": 374,
+    "heading_deg": 102.59411857494156,
+    "tilt_deg": 71.95121614052748,
+    "fov_deg": 44.784090947171585,
+    "cx_off": 0,
+    "cy_off": 0
+   },
+   "fit": {
+    "median_abs_dz": 0.0999999999999801,
+    "rms_dz": 1.2648417544627357,
+    "n_used": 57
+   }
+  },
+  "P13": {
+   "camera": {
+    "eye_x": 201147.11591049374,
+    "eye_y": 557264.219457045,
+    "eye_z": 285.20039341746303,
+    "heading_deg": 315.39722978863466,
+    "tilt_deg": 78.34644496340809,
+    "cx_off": 14.650193434045056,
+    "cy_off": 72.45970723328598,
+    "fov_deg": 43.7
+   },
+   "fit": {
+    "median_abs_dz": 0.19077053116559028,
+    "rms_dz": 0.32722498276735174,
+    "n_used": 6,
+    "controls": 2
+   }
+  }
+ },
+ "road": {
+  "planTolM": 0.8,
+  "vertexStepM": 2.5,
+  "segments": {
+   "V1": {
+    "id": "V1",
+    "roadId": "729bd2ad-9e46-4554-a584-8356ebdbda26",
+    "fromNodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec",
+    "toNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+    "lengthM": 27.53,
+    "vertices": 12,
+    "zStart": 106.94,
+    "zEnd": 107.08,
+    "grade": {
+     "max1mPct": 1.7,
+     "max1mAtS": 26.0,
+     "max15mPct": 0.4,
+     "max15mFromS": 0.0,
+     "avgPct": 0.5,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.29
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 6,
+     "median": 13.0,
+     "p25": 12.6,
+     "p75": 13.4
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.5,
+     "maxDeviationOfNewVertexM": 0.5,
+     "maxTurnAtOldVertexDeg": 8.9,
+     "maxTurnAtNewVertexDeg": 1.2
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.07,
+     "max": 0.04,
+     "medianAbs": 0.03
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "main",
+    "mainStationStartM": 0.0
+   },
+   "V2": {
+    "id": "V2",
+    "roadId": "e934fcd3-f453-44bf-829f-9c77322aa212",
+    "fromNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+    "toNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+    "lengthM": 151.61,
+    "vertices": 62,
+    "zStart": 107.08,
+    "zEnd": 120.93,
+    "grade": {
+     "max1mPct": 16.1,
+     "max1mAtS": 125.0,
+     "max15mPct": 15.7,
+     "max15mFromS": 116.0,
+     "avgPct": 9.1,
+     "over15pct_stations": [
+      [
+       110.0,
+       132.0
+      ]
+     ],
+     "maxGradeChangePctPerM": 0.84
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 37,
+     "median": 10.5,
+     "p25": 9.5,
+     "p75": 12.0
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.42,
+     "maxDeviationOfNewVertexM": 0.44,
+     "maxTurnAtOldVertexDeg": 16.7,
+     "maxTurnAtNewVertexDeg": 3.9
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.15,
+     "max": 0.08,
+     "medianAbs": 0.02
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "main",
+    "mainStationStartM": 27.5
+   },
+   "V3": {
+    "id": "V3",
+    "roadId": "499ab1ab-cc02-4ea6-9bd3-e5fe5e5c2a62",
+    "fromNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+    "toNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+    "lengthM": 60.64,
+    "vertices": 25,
+    "zStart": 120.93,
+    "zEnd": 127.8,
+    "grade": {
+     "max1mPct": 14.1,
+     "max1mAtS": 34.0,
+     "max15mPct": 13.9,
+     "max15mFromS": 30.0,
+     "avgPct": 11.4,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.99
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 15,
+     "median": 11.5,
+     "p25": 10.5,
+     "p75": 13.8
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.66,
+     "maxDeviationOfNewVertexM": 0.75,
+     "maxTurnAtOldVertexDeg": 7.7,
+     "maxTurnAtNewVertexDeg": 3.5
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.13,
+     "max": 0.12,
+     "medianAbs": 0.06
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "main",
+    "mainStationStartM": 179.1
+   },
+   "V4a": {
+    "id": "V4a",
+    "roadId": "07615440-e6c0-4f7b-9a01-982ea7a4af68",
+    "fromNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+    "toNodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+    "lengthM": 36.0,
+    "vertices": 15,
+    "zStart": 127.8,
+    "zEnd": 130.19,
+    "grade": {
+     "max1mPct": 7.9,
+     "max1mAtS": 29.0,
+     "max15mPct": 7.3,
+     "max15mFromS": 20.0,
+     "avgPct": 6.7,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.5
+    },
+    "widthM_stored": 14,
+    "flatBandWidthM": {
+     "n": 8,
+     "median": 15.5,
+     "p25": 12.9,
+     "p75": 18.9
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.78,
+     "maxDeviationOfNewVertexM": 0.78,
+     "maxTurnAtOldVertexDeg": 20.1,
+     "maxTurnAtNewVertexDeg": 3.7
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.01,
+     "max": 0.2,
+     "medianAbs": 0.07
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "main",
+    "mainStationStartM": 239.8
+   },
+   "V4b": {
+    "id": "V4b",
+    "roadId": "67e234b5-f38c-4400-b046-975d0125ebc6",
+    "fromNodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+    "toNodeId": "a12b5e30-31e6-46d0-9c11-97c751f81266",
+    "lengthM": 9.07,
+    "vertices": 5,
+    "zStart": 130.19,
+    "zEnd": 130.53,
+    "grade": {
+     "max1mPct": 5.4,
+     "max1mAtS": 0.0,
+     "avgPct": 3.7,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.52
+    },
+    "widthM_stored": 14,
+    "flatBandWidthM": {
+     "n": 2,
+     "median": 25.5,
+     "p25": 25.0,
+     "p75": 26.0
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.07,
+     "maxDeviationOfNewVertexM": 0.04,
+     "maxTurnAtOldVertexDeg": 3.8,
+     "maxTurnAtNewVertexDeg": 1.4
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.33,
+     "max": 0.09,
+     "medianAbs": 0.09
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "main",
+    "mainStationStartM": 275.8
+   },
+   "P-LOW": {
+    "id": "P-LOW",
+    "roadId": "1b2219e1-b8e0-4495-a037-6712f1639c1b",
+    "fromNodeId": "3660818d-16ec-4f6f-bec2-1abb00c1415d",
+    "toNodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba",
+    "lengthM": 34.28,
+    "vertices": 15,
+    "zStart": 107.08,
+    "zEnd": 106.02,
+    "grade": {
+     "max1mPct": -17.2,
+     "max1mAtS": 33.0,
+     "max15mPct": -10.2,
+     "max15mFromS": 19.0,
+     "avgPct": -3.0,
+     "over15pct_stations": [
+      [
+       30.0,
+       34.0
+      ]
+     ],
+     "maxGradeChangePctPerM": 1.72
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 8,
+     "median": 16.5,
+     "p25": 12.8,
+     "p75": 18.1
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.35,
+     "maxDeviationOfNewVertexM": 0.32,
+     "maxTurnAtOldVertexDeg": 12.9,
+     "maxTurnAtNewVertexDeg": 2.4
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.13,
+     "max": 0.02,
+     "medianAbs": 0.03
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "P-LOW",
+    "startsAtMainJunctionOf": "V1"
+   },
+   "P-UP": {
+    "id": "P-UP",
+    "roadId": "192703b3-1c53-4602-8435-bba8533e93e8",
+    "fromNodeId": "422719fb-61e4-44a4-9eb9-fdf2b0544eb2",
+    "toNodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b",
+    "lengthM": 12.73,
+    "vertices": 3,
+    "zStart": 127.8,
+    "zEnd": 127.94,
+    "grade": {
+     "max1mPct": 1.1,
+     "max1mAtS": 10.0,
+     "avgPct": 1.1,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.0
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 3,
+     "median": 8.0,
+     "p25": 6.5,
+     "p75": 10.8
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 0.01,
+     "maxDeviationOfNewVertexM": 0.01,
+     "maxTurnAtOldVertexDeg": 47.9,
+     "maxTurnAtNewVertexDeg": 47.7
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.0,
+     "max": 0.22,
+     "medianAbs": 0.01
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "P-UP",
+    "startsAtMainJunctionOf": "V3"
+   },
+   "U1": {
+    "id": "U1",
+    "roadId": "9713befb-0f85-419e-8246-b8f6665c3e3b",
+    "fromNodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+    "toNodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+    "lengthM": 92.9,
+    "vertices": 38,
+    "zStart": 120.93,
+    "zEnd": 130.92,
+    "grade": {
+     "max1mPct": 21.7,
+     "max1mAtS": 9.0,
+     "max15mPct": 19.7,
+     "max15mFromS": 2.0,
+     "avgPct": 10.8,
+     "over15pct_stations": [
+      [
+       0.0,
+       17.0
+      ],
+      [
+       40.0,
+       54.0
+      ]
+     ],
+     "maxGradeChangePctPerM": 1.88
+    },
+    "widthM_stored": null,
+    "flatBandWidthM": {
+     "n": 23,
+     "median": 6.5,
+     "p25": 2.2,
+     "p75": 9.8
+    },
+    "plan": {
+     "maxDeviationOfOldVertexM": 1.07,
+     "maxDeviationOfNewVertexM": 0.86,
+     "maxTurnAtOldVertexDeg": 49.3,
+     "maxTurnAtNewVertexDeg": 18.2
+    },
+    "zChangeAtOldVertices": {
+     "min": -0.4,
+     "max": 0.37,
+     "medianAbs": 0.05
+    },
+    "kind": "vehicle-road",
+    "accuracyVerified": false,
+    "line": "U1",
+    "startsAtMainJunctionOf": "V2"
+   },
+   "U1-EXT": {
+    "id": "U1-EXT",
+    "roadId": null,
+    "optional": true,
+    "lengthM": 22.6,
+    "note": "사용자 핀 4개(두 캡처에서 자리 차 3 m 이내)를 그대로 이은 선. E09 제안·시험용 DB 에 없는 구간. 폭·포장 경계 미확인. 만들지는 사용자 확인 뒤",
+    "kind": "vehicle-road",
+    "accuracyVerified": false
+   }
+  },
+  "lines": {
+   "main": {
+    "lengthM": 284.9,
+    "junctionStationsM": [
+     0.0,
+     27.5,
+     179.1,
+     239.8,
+     275.8,
+     284.9
+    ],
+    "junctionHeightsM": [
+     106.94,
+     107.08,
+     120.93,
+     127.8,
+     130.19,
+     130.53
+    ],
+    "grade": {
+     "max1mPct": 16.1,
+     "max1mAtS": 151.9,
+     "max15mPct": 15.7,
+     "max15mFromS": 143.9,
+     "avgPct": 8.3,
+     "over15pct_stations": [
+      [
+       137.9,
+       159.9
+      ]
+     ],
+     "maxGradeChangePctPerM": 0.99
+    },
+    "minRadiusM": 36.1,
+    "maxHeadingChangeDegPerM": 1.6,
+    "userPoints": [
+     {
+      "id": "U004",
+      "value_m": 107.0,
+      "x": 201129.49,
+      "y": 557118.55,
+      "xy_err_m": 2.0,
+      "surface": "차도",
+      "dist_m": 2.34,
+      "s": 21.609344900254357,
+      "use": true,
+      "sigma": 0.08,
+      "profile_z": 107.01,
+      "profile_minus_user": 0.01
+     },
+     {
+      "id": "U006",
+      "value_m": 107.3,
+      "x": 201123.76,
+      "y": 557131.48,
+      "xy_err_m": 2.0,
+      "surface": "차도",
+      "dist_m": 2.71,
+      "s": 35.625154499072174,
+      "use": true,
+      "sigma": 0.09,
+      "profile_z": 107.29,
+      "profile_minus_user": -0.01
+     },
+     {
+      "id": "U012",
+      "value_m": 108.1,
+      "x": 201112.42,
+      "y": 557149.44,
+      "xy_err_m": 2.5,
+      "surface": "차도",
+      "dist_m": 0.89,
+      "s": 56.75425801654471,
+      "use": true,
+      "sigma": 0.104,
+      "profile_z": 108.1,
+      "profile_minus_user": -0.0
+     },
+     {
+      "id": "U018",
+      "value_m": 108.6,
+      "x": 201106.1,
+      "y": 557163.15,
+      "xy_err_m": 1.7,
+      "surface": "차도",
+      "dist_m": 1.37,
+      "s": 71.88467676464624,
+      "use": true,
+      "sigma": 0.095,
+      "profile_z": 108.61,
+      "profile_minus_user": 0.01
+     },
+     {
+      "id": "U020",
+      "value_m": 109.1,
+      "x": 201102.57,
+      "y": 557170.15,
+      "xy_err_m": 2.2,
+      "surface": "차도",
+      "dist_m": 1.06,
+      "s": 79.75906466385695,
+      "use": true,
+      "sigma": 0.118,
+      "profile_z": 109.08,
+      "profile_minus_user": -0.02
+     },
+     {
+      "id": "U025",
+      "value_m": 109.7,
+      "x": 201093.06,
+      "y": 557180.12,
+      "xy_err_m": 1.9,
+      "surface": "차도",
+      "dist_m": 4.13,
+      "s": 92.41314198680335,
+      "use": true,
+      "sigma": 0.145,
+      "profile_z": 109.76,
+      "profile_minus_user": 0.06
+     },
+     {
+      "id": "U029",
+      "value_m": 110.9,
+      "x": 201090.23,
+      "y": 557191.71,
+      "xy_err_m": 1.9,
+      "surface": "차도",
+      "dist_m": 3.38,
+      "s": 104.04007990442759,
+      "use": true,
+      "sigma": 0.164,
+      "profile_z": 110.97,
+      "profile_minus_user": 0.07
+     },
+     {
+      "id": "U038",
+      "value_m": 113.9,
+      "x": 201085.84,
+      "y": 557217.73,
+      "xy_err_m": 2.1,
+      "surface": "차도",
+      "dist_m": 3.29,
+      "s": 129.82126093934062,
+      "use": true,
+      "sigma": 0.215,
+      "profile_z": 113.92,
+      "profile_minus_user": 0.02
+     },
+     {
+      "id": "U048",
+      "value_m": 116.9,
+      "x": 201088.27,
+      "y": 557237.95,
+      "xy_err_m": 1.5,
+      "surface": "차도",
+      "dist_m": 0.21,
+      "s": 149.83475719167973,
+      "use": true,
+      "sigma": 0.187,
+      "profile_z": 116.92,
+      "profile_minus_user": 0.02
+     },
+     {
+      "id": "U055",
+      "value_m": 120.5,
+      "x": 201080.63,
+      "y": 557262.34,
+      "xy_err_m": 1.5,
+      "surface": "차도",
+      "dist_m": 1.53,
+      "s": 176.17093355020646,
+      "use": true,
+      "sigma": 0.148,
+      "profile_z": 120.55,
+      "profile_minus_user": 0.05
+     },
+     {
+      "id": "U057",
+      "value_m": 121.4,
+      "x": 201073.76,
+      "y": 557266.31,
+      "xy_err_m": 5.0,
+      "surface": "차도",
+      "dist_m": 4.61,
+      "s": 184.0149229396101,
+      "use": true,
+      "sigma": 0.344,
+      "profile_z": 121.52,
+      "profile_minus_user": 0.12
+     },
+     {
+      "id": "U058",
+      "value_m": 121.6,
+      "x": 201079.71,
+      "y": 557272.1,
+      "xy_err_m": 1.5,
+      "surface": "차도",
+      "dist_m": 3.69,
+      "s": 184.31903918978702,
+      "use": true,
+      "sigma": 0.128,
+      "profile_z": 121.56,
+      "profile_minus_user": -0.04
+     },
+     {
+      "id": "U064",
+      "value_m": 123.4,
+      "x": 201063.76,
+      "y": 557280.09,
+      "xy_err_m": 1.6,
+      "surface": "차도",
+      "dist_m": 0.4,
+      "s": 201.27529899560506,
+      "use": true,
+      "sigma": 0.164,
+      "profile_z": 123.38,
+      "profile_minus_user": -0.02
+     },
+     {
+      "id": "U067",
+      "value_m": 125.5,
+      "x": 201050.53,
+      "y": 557288.15,
+      "xy_err_m": 2.1,
+      "surface": "차도",
+      "dist_m": 0.11,
+      "s": 216.78955504514562,
+      "use": true,
+      "sigma": 0.221,
+      "profile_z": 125.46,
+      "profile_minus_user": -0.04
+     },
+     {
+      "id": "U073",
+      "value_m": 127.3,
+      "x": 201040.08,
+      "y": 557297.45,
+      "xy_err_m": 2.2,
+      "surface": "차도",
+      "dist_m": 1.9,
+      "s": 230.8393583542585,
+      "use": true,
+      "sigma": 0.156,
+      "profile_z": 127.26,
+      "profile_minus_user": -0.04
+     },
+     {
+      "id": "U076",
+      "value_m": 127.9,
+      "x": 201031.28,
+      "y": 557303.3,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 0.43,
+      "s": 241.35341885649925,
+      "use": true,
+      "sigma": 0.124,
+      "profile_z": 127.88,
+      "profile_minus_user": -0.02
+     },
+     {
+      "id": "U083",
+      "value_m": 128.6,
+      "x": 201027.46,
+      "y": 557313.09,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 1.05,
+      "s": 251.85804369869163,
+      "use": true,
+      "sigma": 0.144,
+      "profile_z": 128.57,
+      "profile_minus_user": -0.03
+     },
+     {
+      "id": "U087",
+      "value_m": 129.4,
+      "x": 201021.77,
+      "y": 557324.82,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 1.0,
+      "s": 264.7891448373122,
+      "use": true,
+      "sigma": 0.146,
+      "profile_z": 129.38,
+      "profile_minus_user": -0.02
+     },
+     {
+      "id": "U090",
+      "value_m": 130.2,
+      "x": 201015.51,
+      "y": 557333.48,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 5.15,
+      "s": 274.66574081294266,
+      "use": true,
+      "sigma": 0.134,
+      "profile_z": 130.13,
+      "profile_minus_user": -0.07
+     },
+     {
+      "id": "U092",
+      "value_m": 130.1,
+      "x": 201024.43,
+      "y": 557335.84,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 4.07,
+      "s": 274.88916833212824,
+      "use": true,
+      "sigma": 0.133,
+      "profile_z": 130.14,
+      "profile_minus_user": 0.04
+     },
+     {
+      "id": "U093",
+      "value_m": 130.4,
+      "x": 201020.79,
+      "y": 557340.22,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 1.62,
+      "s": 279.9440206331306,
+      "use": true,
+      "sigma": 0.119,
+      "profile_z": 130.39,
+      "profile_minus_user": -0.01
+     },
+     {
+      "id": "U097",
+      "value_m": 130.6,
+      "x": 201011.53,
+      "y": 557345.59,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 6.38,
+      "s": 284.85176992958515,
+      "use": false,
+      "profile_z": 130.53,
+      "profile_minus_user": -0.07
+     },
+     {
+      "id": "U098",
+      "value_m": 130.7,
+      "x": 201030.37,
+      "y": 557346.03,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 12.44,
+      "s": 282.6708131115088,
+      "use": false,
+      "profile_z": 130.48,
+      "profile_minus_user": -0.22
+     },
+     {
+      "id": "U099",
+      "value_m": 130.7,
+      "x": 201032.67,
+      "y": 557346.08,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 14.66,
+      "s": 282.14540266011505,
+      "use": false,
+      "profile_z": 130.46,
+      "profile_minus_user": -0.24
+     },
+     {
+      "id": "U101",
+      "value_m": 131.2,
+      "x": 201043.09,
+      "y": 557352.99,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 26.67,
+      "s": 284.85176992958515,
+      "use": false,
+      "profile_z": 130.53,
+      "profile_minus_user": -0.67
+     },
+     {
+      "id": "U103",
+      "value_m": 130.7,
+      "x": 201010.68,
+      "y": 557358.89,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 16.07,
+      "s": 284.85176992958515,
+      "use": false,
+      "profile_z": 130.53,
+      "profile_minus_user": -0.17
+     },
+     {
+      "id": "U104",
+      "value_m": 131.0,
+      "x": 201008.89,
+      "y": 557373.32,
+      "xy_err_m": 2.5,
+      "surface": "회차 공간 포장면",
+      "dist_m": 30.18,
+      "s": 284.85176992958515,
+      "use": false,
+      "profile_z": 130.53,
+      "profile_minus_user": -0.47
+     }
+    ],
+    "data": {
+     "e09_picks": 44,
+     "mesh_samples": 143,
+     "user_points_used": 21
+    },
+    "residualAtAutomated": {
+     "e09_pick_medianAbs": 0.04,
+     "e09_pick_maxAbs": 0.2,
+     "mesh_medianAbs": 0.04,
+     "mesh_p90Abs": 0.11,
+     "mesh_maxAbs": 0.19
+    }
+   },
+   "P-LOW": {
+    "lengthM": 34.3,
+    "zStart": 107.08,
+    "zEnd": 106.02,
+    "grade": {
+     "max1mPct": -17.3,
+     "max1mAtS": 33.3,
+     "max15mPct": -10.8,
+     "max15mFromS": 19.6,
+     "avgPct": -3.1,
+     "over15pct_stations": [
+      [
+       29.4,
+       34.3
+      ]
+     ],
+     "maxGradeChangePctPerM": 1.69
+    },
+    "minRadiusM": 55.1,
+    "userPoints": [
+     {
+      "id": "U007",
+      "value_m": 107.6,
+      "x": 201109.91,
+      "y": 557134.42,
+      "xy_err_m": 2.5,
+      "surface": "차도(주차장 차로)",
+      "dist_m": 0.49,
+      "s": 18.834701504942153,
+      "use": true,
+      "sigma": 0.083,
+      "profile_z": 107.6,
+      "profile_minus_user": -0.0
+     },
+     {
+      "id": "U010",
+      "value_m": 107.0,
+      "x": 201103.41,
+      "y": 557140.29,
+      "xy_err_m": 2.5,
+      "surface": "차도(주차장 차로)",
+      "dist_m": 1.22,
+      "s": 27.523507930222152,
+      "use": true,
+      "sigma": 0.225,
+      "profile_z": 107.07,
+      "profile_minus_user": 0.07
+     },
+     {
+      "id": "U011",
+      "value_m": 106.4,
+      "x": 201101.46,
+      "y": 557143.87,
+      "xy_err_m": 2.5,
+      "surface": "차도(주차장 차로)",
+      "dist_m": 0.3,
+      "s": 31.488091460920547,
+      "use": true,
+      "sigma": 0.311,
+      "profile_z": 106.49,
+      "profile_minus_user": 0.09
+     }
+    ],
+    "residualAtAutomated": {
+     "e09_pick_maxAbs": 0.13,
+     "mesh_p90Abs": 0.13,
+     "mesh_maxAbs": 0.18
+    }
+   },
+   "P-UP": {
+    "lengthM": 12.7,
+    "zStart": 127.8,
+    "zEnd": 127.94,
+    "grade": {
+     "max1mPct": 1.1,
+     "max1mAtS": 10.8,
+     "avgPct": 1.1,
+     "over15pct_stations": [],
+     "maxGradeChangePctPerM": 0.0
+    },
+    "minRadiusM": 1.4,
+    "userPoints": [],
+    "residualAtAutomated": {
+     "e09_pick_maxAbs": 0.54,
+     "mesh_p90Abs": 0.51,
+     "mesh_maxAbs": 0.57
+    }
+   },
+   "U1": {
+    "lengthM": 93.0,
+    "zStart": 120.93,
+    "zEnd": 130.92,
+    "grade": {
+     "max1mPct": 21.7,
+     "max1mAtS": 9.0,
+     "max15mPct": 19.7,
+     "max15mFromS": 2.0,
+     "avgPct": 10.7,
+     "over15pct_stations": [
+      [
+       0.0,
+       17.0
+      ],
+      [
+       40.0,
+       54.0
+      ]
+     ],
+     "maxGradeChangePctPerM": 1.88
+    },
+    "minRadiusM": 7.3,
+    "userPoints": [
+     {
+      "id": "U036",
+      "value_m": 130.8,
+      "x": 201112.89,
+      "y": 557213.92,
+      "xy_err_m": 1.5,
+      "surface": "차도(윗길)",
+      "dist_m": 0.52,
+      "s": 90.14747932011667,
+      "use": true,
+      "sigma": 0.081,
+      "profile_z": 130.8,
+      "profile_minus_user": -0.0
+     },
+     {
+      "id": "U042",
+      "value_m": 130.4,
+      "x": 201112.65,
+      "y": 557221.55,
+      "xy_err_m": 1.5,
+      "surface": "차도(윗길)",
+      "dist_m": 1.28,
+      "s": 82.69113036513325,
+      "use": true,
+      "sigma": 0.087,
+      "profile_z": 130.41,
+      "profile_minus_user": 0.01
+     },
+     {
+      "id": "U043",
+      "value_m": 130.2,
+      "x": 201111.18,
+      "y": 557226.18,
+      "xy_err_m": 1.5,
+      "surface": "차도(윗길)",
+      "dist_m": 3.35,
+      "s": 77.84709389741579,
+      "use": true,
+      "sigma": 0.101,
+      "profile_z": 130.21,
+      "profile_minus_user": 0.01
+     },
+     {
+      "id": "U050",
+      "value_m": 129.3,
+      "x": 201109.84,
+      "y": 557240.39,
+      "xy_err_m": 2.5,
+      "surface": "차도(윗길)",
+      "dist_m": 0.48,
+      "s": 62.561194939502144,
+      "use": true,
+      "sigma": 0.229,
+      "profile_z": 129.23,
+      "profile_minus_user": -0.07
+     },
+     {
+      "id": "U051",
+      "value_m": 128.4,
+      "x": 201108.92,
+      "y": 557248.49,
+      "xy_err_m": 2.5,
+      "surface": "차도(윗길)",
+      "dist_m": 0.62,
+      "s": 54.235253872423115,
+      "use": true,
+      "sigma": 0.26,
+      "profile_z": 128.27,
+      "profile_minus_user": -0.13
+     },
+     {
+      "id": "U053",
+      "value_m": 126.7,
+      "x": 201108.04,
+      "y": 557257.64,
+      "xy_err_m": 2.5,
+      "surface": "차도(윗길)",
+      "dist_m": 0.5,
+      "s": 45.08783213629927,
+      "use": true,
+      "sigma": 0.294,
+      "profile_z": 126.61,
+      "profile_minus_user": -0.09
+     },
+     {
+      "id": "U056",
+      "value_m": 125.1,
+      "x": 201105.52,
+      "y": 557266.27,
+      "xy_err_m": 5.0,
+      "surface": "차도(윗길)",
+      "dist_m": 2.55,
+      "s": 35.728885540249166,
+      "use": true,
+      "sigma": 0.278,
+      "profile_z": 125.23,
+      "profile_minus_user": 0.13
+     },
+     {
+      "id": "U059",
+      "value_m": 124.4,
+      "x": 201093.62,
+      "y": 557272.69,
+      "xy_err_m": 5.0,
+      "surface": "차도(윗길)",
+      "dist_m": 3.1,
+      "s": 17.999696883976426,
+      "use": true,
+      "sigma": 0.51,
+      "profile_z": 124.36,
+      "profile_minus_user": -0.04
+     },
+     {
+      "id": "U061",
+      "value_m": 122.6,
+      "x": 201081.62,
+      "y": 557274.15,
+      "xy_err_m": 5.0,
+      "surface": "차도(윗길)",
+      "dist_m": 4.13,
+      "s": 7.512885178970599,
+      "use": true,
+      "sigma": 0.753,
+      "profile_z": 122.31,
+      "profile_minus_user": -0.29
+     }
+    ],
+    "residualAtAutomated": {
+     "e09_pick_maxAbs": 0.4,
+     "mesh_p90Abs": 0.12,
+     "mesh_maxAbs": 0.26
+    }
+   }
+  },
+  "nodeMoves": [
+   {
+    "nodeId": "7e93e170-1d28-4ea4-9d91-799146a8a92d",
+    "dz": -0.13,
+    "zNew": 120.93,
+    "others": 0
+   },
+   {
+    "nodeId": "0a815157-05e4-48fd-bc2c-7817a03c0aef",
+    "dz": 0.08,
+    "zNew": 130.19,
+    "others": 0
+   },
+   {
+    "nodeId": "a12b5e30-31e6-46d0-9c11-97c751f81266",
+    "dz": -0.33,
+    "zNew": 130.53,
+    "others": 2
+   },
+   {
+    "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+    "dz": 0.09,
+    "zNew": 130.92,
+    "others": 0
+   }
+  ]
+ },
+ "terrain": {
+  "tool": {
+   "passes": [
+    [
+     6,
+     15
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     2,
+     6
+    ]
+   ],
+   "supportM": 6,
+   "fadeM": 6,
+   "minNeighbours": 3,
+   "neighbourRadiusM": 6
+  },
+  "checkPoints": 1189,
+  "oldTerrainMinusRoad": {
+   "bySegment": {
+    "V1": {
+     "n": 84,
+     "median": 0.69,
+     "p90Abs": 5.08,
+     "maxAbs": 5.13,
+     "over0_2": 81
+    },
+    "V2": {
+     "n": 456,
+     "median": 2.43,
+     "p90Abs": 4.43,
+     "maxAbs": 5.68,
+     "over0_2": 431
+    },
+    "V3": {
+     "n": 183,
+     "median": 3.33,
+     "p90Abs": 5.09,
+     "maxAbs": 6.34,
+     "over0_2": 183
+    },
+    "V4a": {
+     "n": 111,
+     "median": 1.73,
+     "p90Abs": 3.15,
+     "maxAbs": 4.06,
+     "over0_2": 98
+    },
+    "V4b": {
+     "n": 30,
+     "median": -0.81,
+     "p90Abs": 1.75,
+     "maxAbs": 1.84,
+     "over0_2": 21
+    },
+    "P-LOW": {
+     "n": 63,
+     "median": -1.49,
+     "p90Abs": 4.15,
+     "maxAbs": 4.51,
+     "over0_2": 62
+    },
+    "P-UP": {
+     "n": 0
+    },
+    "U1": {
+     "n": 262,
+     "median": 5.33,
+     "p90Abs": 11.62,
+     "maxAbs": 13.65,
+     "over0_2": 259
+    }
+   },
+   "allButU1": {
+    "n": 927,
+    "median": 2.14,
+    "p90Abs": 4.53,
+    "maxAbs": 6.34,
+    "over0_2": 876
+   },
+   "worst": [
+    [
+     "U1",
+     75,
+     2.4,
+     13.65
+    ],
+    [
+     "U1",
+     75,
+     0,
+     13.6
+    ],
+    [
+     "U1",
+     74,
+     2.4,
+     13.54
+    ],
+    [
+     "U1",
+     74,
+     -2.4,
+     13.37
+    ],
+    [
+     "U1",
+     73,
+     2.4,
+     13.35
+    ],
+    [
+     "U1",
+     75,
+     -2.4,
+     13.27
+    ],
+    [
+     "U1",
+     76,
+     2.4,
+     13.26
+    ],
+    [
+     "U1",
+     74,
+     0,
+     13.18
+    ]
+   ]
+  },
+  "combos": {
+   "active-f5f1dbc4": {
+    "areas": [
+     "field",
+     "s06",
+     "gate_road",
+     "turnaround"
+    ],
+    "samples": 3326,
+    "guardSkipped": 0,
+    "passes": "default",
+    "previewIdIfTheseThreeFiles": "local-samples-f5f1dbc499a3263c",
+    "changedCells": 6643,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15291,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1204,
+     "0.1-0.5m": 2420,
+     "0.5-1m": 2992,
+     "1-2m": 4764,
+     "2-5m": 6468,
+     ">5m": 8724
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": -0.02,
+       "p90Abs": 1.27,
+       "maxAbs": 2.26,
+       "over0_2": 68
+      },
+      "V2": {
+       "n": 456,
+       "median": 0.03,
+       "p90Abs": 0.7,
+       "maxAbs": 1.74,
+       "over0_2": 184
+      },
+      "V3": {
+       "n": 183,
+       "median": -0.02,
+       "p90Abs": 0.55,
+       "maxAbs": 2.16,
+       "over0_2": 64
+      },
+      "V4a": {
+       "n": 111,
+       "median": -0.01,
+       "p90Abs": 0.7,
+       "maxAbs": 1.42,
+       "over0_2": 46
+      },
+      "V4b": {
+       "n": 30,
+       "median": -0.03,
+       "p90Abs": 0.15,
+       "maxAbs": 0.29,
+       "over0_2": 1
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": 0.07,
+       "p90Abs": 0.76,
+       "maxAbs": 1.04,
+       "over0_2": 49
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 5.33,
+       "p90Abs": 11.62,
+       "maxAbs": 13.65,
+       "over0_2": 253
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0.01,
+      "p90Abs": 0.79,
+      "maxAbs": 2.26,
+      "over0_2": 412
+     },
+     "worst": [
+      [
+       "U1",
+       75,
+       2.4,
+       13.65
+      ],
+      [
+       "U1",
+       75,
+       0,
+       13.6
+      ],
+      [
+       "U1",
+       74,
+       2.4,
+       13.54
+      ],
+      [
+       "U1",
+       74,
+       -2.4,
+       13.37
+      ],
+      [
+       "U1",
+       73,
+       2.4,
+       13.35
+      ],
+      [
+       "U1",
+       75,
+       -2.4,
+       13.27
+      ],
+      [
+       "U1",
+       76,
+       2.4,
+       13.26
+      ],
+      [
+       "U1",
+       74,
+       0,
+       13.18
+      ]
+     ]
+    }
+   },
+   "add": {
+    "areas": [
+     "field",
+     "s06",
+     "gate_road",
+     "turnaround",
+     "road_profile"
+    ],
+    "samples": 4538,
+    "guardSkipped": 0,
+    "passes": "default",
+    "previewIdIfTheseThreeFiles": "local-samples-88377b4a54694a0a",
+    "changedCells": 6761,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15311,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1136,
+     "0.1-0.5m": 2512,
+     "0.5-1m": 3064,
+     "1-2m": 4680,
+     "2-5m": 6708,
+     ">5m": 8944
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0.04,
+       "p90Abs": 1.1,
+       "maxAbs": 1.94,
+       "over0_2": 69
+      },
+      "V2": {
+       "n": 456,
+       "median": 0.01,
+       "p90Abs": 0.71,
+       "maxAbs": 1.89,
+       "over0_2": 151
+      },
+      "V3": {
+       "n": 183,
+       "median": -0.01,
+       "p90Abs": 0.55,
+       "maxAbs": 1.88,
+       "over0_2": 47
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.42,
+       "maxAbs": 1.06,
+       "over0_2": 34
+      },
+      "V4b": {
+       "n": 30,
+       "median": -0.01,
+       "p90Abs": 0.14,
+       "maxAbs": 0.21,
+       "over0_2": 1
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": 0.03,
+       "p90Abs": 0.75,
+       "maxAbs": 1.16,
+       "over0_2": 43
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 5.33,
+       "p90Abs": 11.62,
+       "maxAbs": 13.65,
+       "over0_2": 254
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0.01,
+      "p90Abs": 0.72,
+      "maxAbs": 1.94,
+      "over0_2": 345
+     },
+     "worst": [
+      [
+       "U1",
+       75,
+       2.4,
+       13.65
+      ],
+      [
+       "U1",
+       75,
+       0,
+       13.6
+      ],
+      [
+       "U1",
+       74,
+       2.4,
+       13.54
+      ],
+      [
+       "U1",
+       74,
+       -2.4,
+       13.37
+      ],
+      [
+       "U1",
+       73,
+       2.4,
+       13.35
+      ],
+      [
+       "U1",
+       75,
+       -2.4,
+       13.27
+      ],
+      [
+       "U1",
+       76,
+       2.4,
+       13.26
+      ],
+      [
+       "U1",
+       74,
+       0,
+       13.18
+      ]
+     ]
+    }
+   },
+   "replace": {
+    "areas": [
+     "field",
+     "road_profile",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "samples": 3694,
+    "guardSkipped": 0,
+    "passes": "default",
+    "previewIdIfTheseThreeFiles": "local-samples-047fda5955630b41",
+    "changedCells": 6747,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15295,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1152,
+     "0.1-0.5m": 2504,
+     "0.5-1m": 3072,
+     "1-2m": 4676,
+     "2-5m": 6688,
+     ">5m": 8896
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0.04,
+       "p90Abs": 1.09,
+       "maxAbs": 1.83,
+       "over0_2": 71
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.74,
+       "maxAbs": 2.23,
+       "over0_2": 141
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.51,
+       "maxAbs": 1.75,
+       "over0_2": 44
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.39,
+       "maxAbs": 0.98,
+       "over0_2": 28
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0.02,
+       "p90Abs": 0.16,
+       "maxAbs": 0.21,
+       "over0_2": 2
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": -0.06,
+       "p90Abs": 0.72,
+       "maxAbs": 1.24,
+       "over0_2": 44
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 5.33,
+       "p90Abs": 11.62,
+       "maxAbs": 13.65,
+       "over0_2": 252
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.73,
+      "maxAbs": 2.23,
+      "over0_2": 330
+     },
+     "worst": [
+      [
+       "U1",
+       75,
+       2.4,
+       13.65
+      ],
+      [
+       "U1",
+       75,
+       0,
+       13.6
+      ],
+      [
+       "U1",
+       74,
+       2.4,
+       13.54
+      ],
+      [
+       "U1",
+       74,
+       -2.4,
+       13.37
+      ],
+      [
+       "U1",
+       73,
+       2.4,
+       13.35
+      ],
+      [
+       "U1",
+       75,
+       -2.4,
+       13.27
+      ],
+      [
+       "U1",
+       76,
+       2.4,
+       13.26
+      ],
+      [
+       "U1",
+       74,
+       0,
+       13.18
+      ]
+     ]
+    }
+   },
+   "replace>ribbon": {
+    "areas": [
+     "field",
+     "road_profile",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "then": "applyPlateau per 1 m slice (338 slices)",
+    "ribbonCells": 859,
+    "restoredInBuildings": 0,
+    "changedCells": 6747,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15288,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1172,
+     "0.1-0.5m": 2580,
+     "0.5-1m": 3052,
+     "1-2m": 4644,
+     "2-5m": 6512,
+     ">5m": 9028
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0,
+       "p90Abs": 0,
+       "maxAbs": 0.01,
+       "over0_2": 0
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.03,
+       "maxAbs": 0.07,
+       "over0_2": 0
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.04,
+       "maxAbs": 0.06,
+       "over0_2": 0
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.02,
+       "maxAbs": 0.03,
+       "over0_2": 0
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0,
+       "p90Abs": 0.06,
+       "maxAbs": 0.13,
+       "over0_2": 0
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": 0,
+       "p90Abs": 0.03,
+       "maxAbs": 0.08,
+       "over0_2": 0
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 5.33,
+       "p90Abs": 11.62,
+       "maxAbs": 13.65,
+       "over0_2": 252
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.13,
+      "over0_2": 0
+     },
+     "worst": [
+      [
+       "U1",
+       75,
+       2.4,
+       13.65
+      ],
+      [
+       "U1",
+       75,
+       0,
+       13.6
+      ],
+      [
+       "U1",
+       74,
+       2.4,
+       13.54
+      ],
+      [
+       "U1",
+       74,
+       -2.4,
+       13.37
+      ],
+      [
+       "U1",
+       73,
+       2.4,
+       13.35
+      ],
+      [
+       "U1",
+       75,
+       -2.4,
+       13.27
+      ],
+      [
+       "U1",
+       76,
+       2.4,
+       13.26
+      ],
+      [
+       "U1",
+       74,
+       0,
+       13.18
+      ]
+     ]
+    }
+   },
+   "replace+u1": {
+    "areas": [
+     "field",
+     "road_profile",
+     "road_profile_u1",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "samples": 4005,
+    "guardSkipped": 0,
+    "passes": "default",
+    "previewIdIfTheseThreeFiles": "local-samples-71bfdaabe27b643d",
+    "changedCells": 7256,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15330,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1096,
+     "0.1-0.5m": 2424,
+     "0.5-1m": 3196,
+     "1-2m": 4892,
+     "2-5m": 7472,
+     ">5m": 9944
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0.04,
+       "p90Abs": 1.09,
+       "maxAbs": 1.83,
+       "over0_2": 71
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.74,
+       "maxAbs": 2.23,
+       "over0_2": 141
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.51,
+       "maxAbs": 1.75,
+       "over0_2": 44
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.39,
+       "maxAbs": 0.98,
+       "over0_2": 28
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0.02,
+       "p90Abs": 0.16,
+       "maxAbs": 0.21,
+       "over0_2": 2
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": -0.06,
+       "p90Abs": 0.72,
+       "maxAbs": 1.24,
+       "over0_2": 44
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 0.03,
+       "p90Abs": 0.93,
+       "maxAbs": 3.02,
+       "over0_2": 144
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.73,
+      "maxAbs": 2.23,
+      "over0_2": 330
+     },
+     "worst": [
+      [
+       "U1",
+       63,
+       -2.4,
+       3.02
+      ],
+      [
+       "V2",
+       81,
+       -2.8,
+       -2.23
+      ],
+      [
+       "U1",
+       56,
+       0,
+       2.2
+      ],
+      [
+       "V2",
+       82,
+       -2.8,
+       -2.11
+      ],
+      [
+       "U1",
+       64,
+       -2.4,
+       2.05
+      ],
+      [
+       "U1",
+       58,
+       2.4,
+       -1.9
+      ],
+      [
+       "V1",
+       0,
+       0,
+       1.83
+      ],
+      [
+       "V3",
+       40,
+       2.8,
+       -1.75
+      ]
+     ]
+    }
+   },
+   "replace+u1>ribbon": {
+    "areas": [
+     "field",
+     "road_profile",
+     "road_profile_u1",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "then": "applyPlateau per 1 m slice (432 slices)",
+    "ribbonCells": 1061,
+    "restoredInBuildings": 0,
+    "changedCells": 7256,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15311,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1120,
+     "0.1-0.5m": 2520,
+     "0.5-1m": 3184,
+     "1-2m": 4848,
+     "2-5m": 7276,
+     ">5m": 10076
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0,
+       "p90Abs": 0,
+       "maxAbs": 0.01,
+       "over0_2": 0
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.03,
+       "maxAbs": 0.07,
+       "over0_2": 0
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.04,
+       "maxAbs": 0.06,
+       "over0_2": 0
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.02,
+       "maxAbs": 0.03,
+       "over0_2": 0
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0,
+       "p90Abs": 0.06,
+       "maxAbs": 0.13,
+       "over0_2": 0
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": 0,
+       "p90Abs": 0.03,
+       "maxAbs": 0.08,
+       "over0_2": 0
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 0,
+       "p90Abs": 0.04,
+       "maxAbs": 0.1,
+       "over0_2": 0
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.13,
+      "over0_2": 0
+     },
+     "worst": [
+      [
+       "V4b",
+       9,
+       5.6,
+       0.13
+      ],
+      [
+       "V4b",
+       9,
+       0,
+       0.11
+      ],
+      [
+       "U1",
+       13,
+       0,
+       -0.1
+      ],
+      [
+       "U1",
+       10,
+       2.4,
+       -0.09
+      ],
+      [
+       "P-LOW",
+       34,
+       2.4,
+       0.08
+      ],
+      [
+       "V2",
+       129,
+       -2.8,
+       0.07
+      ],
+      [
+       "V4b",
+       8,
+       5.6,
+       0.07
+      ],
+      [
+       "P-LOW",
+       29,
+       -2.4,
+       -0.07
+      ]
+     ]
+    }
+   },
+   "replace+2passes": {
+    "areas": [
+     "field",
+     "road_profile",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "samples": 3694,
+    "guardSkipped": 0,
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      1.5,
+      4
+     ],
+     [
+      1.5,
+      4
+     ]
+    ],
+    "previewIdIfTheseThreeFiles": null,
+    "changedCells": 6747,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15287,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1156,
+     "0.1-0.5m": 2460,
+     "0.5-1m": 3084,
+     "1-2m": 4680,
+     "2-5m": 6736,
+     ">5m": 8872
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0.01,
+       "p90Abs": 0.82,
+       "maxAbs": 1.43,
+       "over0_2": 62
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.52,
+       "maxAbs": 1.91,
+       "over0_2": 126
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.37,
+       "maxAbs": 1.27,
+       "over0_2": 33
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.27,
+       "maxAbs": 0.68,
+       "over0_2": 20
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0.01,
+       "p90Abs": 0.14,
+       "maxAbs": 0.17,
+       "over0_2": 0
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": -0.05,
+       "p90Abs": 0.59,
+       "maxAbs": 1,
+       "over0_2": 32
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 5.33,
+       "p90Abs": 11.62,
+       "maxAbs": 13.65,
+       "over0_2": 252
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.53,
+      "maxAbs": 1.91,
+      "over0_2": 273
+     },
+     "worst": [
+      [
+       "U1",
+       75,
+       2.4,
+       13.65
+      ],
+      [
+       "U1",
+       75,
+       0,
+       13.6
+      ],
+      [
+       "U1",
+       74,
+       2.4,
+       13.54
+      ],
+      [
+       "U1",
+       74,
+       -2.4,
+       13.37
+      ],
+      [
+       "U1",
+       73,
+       2.4,
+       13.35
+      ],
+      [
+       "U1",
+       75,
+       -2.4,
+       13.27
+      ],
+      [
+       "U1",
+       76,
+       2.4,
+       13.26
+      ],
+      [
+       "U1",
+       74,
+       0,
+       13.18
+      ]
+     ]
+    }
+   },
+   "replace+u1+2passes": {
+    "areas": [
+     "field",
+     "road_profile",
+     "road_profile_u1",
+     "gate_road_rest",
+     "s06_rest",
+     "turnaround_rest"
+    ],
+    "samples": 4005,
+    "guardSkipped": 0,
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      1.5,
+      4
+     ],
+     [
+      1.5,
+      4
+     ]
+    ],
+    "previewIdIfTheseThreeFiles": null,
+    "changedCells": 7256,
+    "steepCellsBefore": 15276,
+    "steepCellsAfter": 15316,
+    "areaM2ByAbsDelta": {
+     "0-0.1m": 1104,
+     "0.1-0.5m": 2392,
+     "0.5-1m": 3192,
+     "1-2m": 4860,
+     "2-5m": 7568,
+     ">5m": 9908
+    },
+    "terrainMinusRoad": {
+     "bySegment": {
+      "V1": {
+       "n": 84,
+       "median": 0.01,
+       "p90Abs": 0.82,
+       "maxAbs": 1.43,
+       "over0_2": 62
+      },
+      "V2": {
+       "n": 456,
+       "median": 0,
+       "p90Abs": 0.52,
+       "maxAbs": 1.91,
+       "over0_2": 124
+      },
+      "V3": {
+       "n": 183,
+       "median": 0,
+       "p90Abs": 0.37,
+       "maxAbs": 1.27,
+       "over0_2": 33
+      },
+      "V4a": {
+       "n": 111,
+       "median": 0,
+       "p90Abs": 0.27,
+       "maxAbs": 0.68,
+       "over0_2": 20
+      },
+      "V4b": {
+       "n": 30,
+       "median": 0.01,
+       "p90Abs": 0.14,
+       "maxAbs": 0.17,
+       "over0_2": 0
+      },
+      "P-LOW": {
+       "n": 63,
+       "median": -0.05,
+       "p90Abs": 0.59,
+       "maxAbs": 1,
+       "over0_2": 32
+      },
+      "P-UP": {
+       "n": 0
+      },
+      "U1": {
+       "n": 262,
+       "median": 0.01,
+       "p90Abs": 0.69,
+       "maxAbs": 2.62,
+       "over0_2": 130
+      }
+     },
+     "allButU1": {
+      "n": 927,
+      "median": 0,
+      "p90Abs": 0.53,
+      "maxAbs": 1.91,
+      "over0_2": 271
+     },
+     "worst": [
+      [
+       "U1",
+       63,
+       -2.4,
+       2.62
+      ],
+      [
+       "V2",
+       81,
+       -2.8,
+       -1.91
+      ],
+      [
+       "U1",
+       64,
+       -2.4,
+       1.6
+      ],
+      [
+       "U1",
+       56,
+       0,
+       1.58
+      ],
+      [
+       "V2",
+       82,
+       -2.8,
+       -1.55
+      ],
+      [
+       "U1",
+       58,
+       2.4,
+       -1.52
+      ],
+      [
+       "V2",
+       80,
+       -2.8,
+       -1.47
+      ],
+      [
+       "V1",
+       23,
+       0,
+       1.43
+      ]
+     ]
+    }
+   }
+  },
+  "passesScan": [
+   {
+    "extraPasses": 0,
+    "kernelM": 2,
+    "radiusM": 6,
+    "mainP90": 0.73,
+    "mainMax": 2.23,
+    "u1P90": 0.93,
+    "u1Max": 3.02
+   },
+   {
+    "extraPasses": 2,
+    "kernelM": 2,
+    "radiusM": 6,
+    "mainP90": 0.61,
+    "mainMax": 2.14,
+    "u1P90": 0.82,
+    "u1Max": 2.8
+   },
+   {
+    "extraPasses": 6,
+    "kernelM": 2,
+    "radiusM": 6,
+    "mainP90": 0.52,
+    "mainMax": 1.91,
+    "u1P90": 0.68,
+    "u1Max": 2.58
+   },
+   {
+    "extraPasses": 12,
+    "kernelM": 2,
+    "radiusM": 6,
+    "mainP90": 0.47,
+    "mainMax": 1.67,
+    "u1P90": 0.63,
+    "u1Max": 2.45
+   },
+   {
+    "extraPasses": 24,
+    "kernelM": 2,
+    "radiusM": 6,
+    "mainP90": 0.42,
+    "mainMax": 1.41,
+    "u1P90": 0.53,
+    "u1Max": 2.34
+   },
+   {
+    "extraPasses": 2,
+    "kernelM": 1.5,
+    "radiusM": 4,
+    "mainP90": 0.53,
+    "mainMax": 1.91,
+    "u1P90": 0.69,
+    "u1Max": 2.62
+   },
+   {
+    "extraPasses": 6,
+    "kernelM": 1.5,
+    "radiusM": 4,
+    "mainP90": 0.42,
+    "mainMax": 1.46,
+    "u1P90": 0.52,
+    "u1Max": 2.37
+   },
+   {
+    "extraPasses": 12,
+    "kernelM": 1.5,
+    "radiusM": 4,
+    "mainP90": 0.36,
+    "mainMax": 1.2,
+    "u1P90": 0.46,
+    "u1Max": 2.23
+   },
+   {
+    "extraPasses": 24,
+    "kernelM": 1.5,
+    "radiusM": 4,
+    "mainP90": 0.32,
+    "mainMax": 1.13,
+    "u1P90": 0.39,
+    "u1Max": 2.08
+   },
+   {
+    "extraPasses": 2,
+    "kernelM": 1,
+    "radiusM": 3,
+    "mainP90": 0.42,
+    "mainMax": 1.4,
+    "u1P90": 0.53,
+    "u1Max": 2.41
+   },
+   {
+    "extraPasses": 6,
+    "kernelM": 1,
+    "radiusM": 3,
+    "mainP90": 0.32,
+    "mainMax": 1.13,
+    "u1P90": 0.38,
+    "u1Max": 2.09
+   },
+   {
+    "extraPasses": 12,
+    "kernelM": 1,
+    "radiusM": 3,
+    "mainP90": 0.31,
+    "mainMax": 1.08,
+    "u1P90": 0.36,
+    "u1Max": 1.97
+   },
+   {
+    "extraPasses": 24,
+    "kernelM": 1,
+    "radiusM": 3,
+    "mainP90": 0.3,
+    "mainMax": 1.07,
+    "u1P90": 0.36,
+    "u1Max": 1.91
+   }
+  ],
+  "impact": {
+   "ribbon_vs_active": {
+    "new": "ribbon",
+    "comparedWith": "active",
+    "changedCells": 3084,
+    "maxDistOfChangeFromCarriagewayM": 30.3,
+    "changeBeyond12m": 462,
+    "changeBeyond30m": 2,
+    "band2to30m": {
+     "cellsChanged": 2101,
+     "areaOver0_5m2": 2148,
+     "areaOver2m2": 212,
+     "maxAbs": 5.2
+    },
+    "insideCarriageway": {
+     "cells": 655,
+     "medianAbsChange": 0.16,
+     "maxAbsChange": 3.38
+    },
+    "steep45": {
+     "new": 47,
+     "gone": 50,
+     "newWhereSmapAlsoStepped": 40,
+     "newWhereSmapGentle": 7,
+     "newOutsideMesh": 0,
+     "bySegment": {
+      "V1": {
+       "real": 10,
+       "gentleInSmap": 0,
+       "outsideMesh": 0
+      },
+      "P-LOW": {
+       "real": 5,
+       "gentleInSmap": 1,
+       "outsideMesh": 0
+      },
+      "V2": {
+       "real": 25,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      },
+      "V3": {
+       "real": 0,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      },
+      "V4a": {
+       "real": 0,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      }
+     },
+     "bboxBySegment": {
+      "V1": [
+       201119.0,
+       557097.0,
+       201151.0,
+       557125.0
+      ],
+      "P-LOW": [
+       201085.0,
+       557121.0,
+       201109.0,
+       557151.0
+      ],
+      "V2": [
+       201079.0,
+       557129.0,
+       201137.0,
+       557267.0
+      ],
+      "V3": [
+       201031.0,
+       557283.0,
+       201061.0,
+       557297.0
+      ],
+      "V4a": [
+       201017.0,
+       557291.0,
+       201023.0,
+       557311.0
+      ]
+     }
+    },
+    "buildings": [
+     {
+      "name": "유담관",
+      "outlinePoints": 383,
+      "changedPoints": 125,
+      "over0_3": 58,
+      "min": -1.8,
+      "median": 0.0,
+      "max": 1.06,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "본관",
+      "outlinePoints": 193,
+      "changedPoints": 27,
+      "over0_3": 10,
+      "min": -1.86,
+      "median": 0.0,
+      "max": 0.2,
+      "lowestPointChange": 0.01
+     },
+     {
+      "name": "수인관",
+      "outlinePoints": 261,
+      "changedPoints": 99,
+      "over0_3": 83,
+      "min": -1.75,
+      "median": 0.0,
+      "max": 0.65,
+      "lowestPointChange": -0.57
+     }
+    ]
+   },
+   "ribbon_vs_old": {
+    "new": "ribbon",
+    "comparedWith": "old",
+    "changedCells": 6747,
+    "maxDistOfChangeFromCarriagewayM": 160.6,
+    "changeBeyond12m": 4126,
+    "changeBeyond30m": 3461,
+    "band2to30m": {
+     "cellsChanged": 2305,
+     "areaOver0_5m2": 7356,
+     "areaOver2m2": 3952,
+     "maxAbs": 11.1
+    },
+    "insideCarriageway": {
+     "cells": 655,
+     "medianAbsChange": 2.07,
+     "maxAbsChange": 6.45
+    },
+    "steep45": {
+     "new": 389,
+     "gone": 377,
+     "newWhereSmapAlsoStepped": 319,
+     "newWhereSmapGentle": 70,
+     "newOutsideMesh": 0,
+     "bySegment": {
+      "V1": {
+       "real": 23,
+       "gentleInSmap": 0,
+       "outsideMesh": 0
+      },
+      "P-LOW": {
+       "real": 22,
+       "gentleInSmap": 0,
+       "outsideMesh": 0
+      },
+      "V2": {
+       "real": 246,
+       "gentleInSmap": 62,
+       "outsideMesh": 0
+      },
+      "V3": {
+       "real": 6,
+       "gentleInSmap": 6,
+       "outsideMesh": 0
+      },
+      "V4a": {
+       "real": 5,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      },
+      "V4b": {
+       "real": 17,
+       "gentleInSmap": 0,
+       "outsideMesh": 0
+      }
+     },
+     "bboxBySegment": {
+      "V1": [
+       201117.0,
+       557095.0,
+       201151.0,
+       557125.0
+      ],
+      "P-LOW": [
+       201085.0,
+       557121.0,
+       201109.0,
+       557151.0
+      ],
+      "V2": [
+       201077.0,
+       557129.0,
+       201217.0,
+       557317.0
+      ],
+      "V3": [
+       201049.0,
+       557285.0,
+       201083.0,
+       557303.0
+      ],
+      "V4a": [
+       200999.0,
+       557309.0,
+       201047.0,
+       557325.0
+      ],
+      "V4b": [
+       200987.0,
+       557355.0,
+       200997.0,
+       557389.0
+      ]
+     }
+    },
+    "buildings": [
+     {
+      "name": "혜인관",
+      "outlinePoints": 217,
+      "changedPoints": 105,
+      "over0_3": 100,
+      "min": -1.54,
+      "median": 0.0,
+      "max": 7.89,
+      "lowestPointChange": 1.81
+     },
+     {
+      "name": "유담관",
+      "outlinePoints": 383,
+      "changedPoints": 213,
+      "over0_3": 194,
+      "min": -4.8,
+      "median": 0.0,
+      "max": 10.73,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "은주관",
+      "outlinePoints": 397,
+      "changedPoints": 180,
+      "over0_3": 177,
+      "min": 0.0,
+      "median": 0.0,
+      "max": 7.75,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "공연실습소",
+      "outlinePoints": 201,
+      "changedPoints": 94,
+      "over0_3": 88,
+      "min": -1.24,
+      "median": 0.0,
+      "max": 7.06,
+      "lowestPointChange": 1.62
+     },
+     {
+      "name": "청운관",
+      "outlinePoints": 144,
+      "changedPoints": 53,
+      "over0_3": 50,
+      "min": -1.83,
+      "median": 0.0,
+      "max": 7.23,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "북악관",
+      "outlinePoints": 226,
+      "changedPoints": 68,
+      "over0_3": 58,
+      "min": -1.1,
+      "median": 0.0,
+      "max": 2.22,
+      "lowestPointChange": 0.49
+     },
+     {
+      "name": "대일관",
+      "outlinePoints": 264,
+      "changedPoints": 76,
+      "over0_3": 74,
+      "min": 0.0,
+      "median": 0.0,
+      "max": 10.24,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "본관",
+      "outlinePoints": 193,
+      "changedPoints": 88,
+      "over0_3": 82,
+      "min": -5.29,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": -4.33
+     },
+     {
+      "name": "수인관",
+      "outlinePoints": 261,
+      "changedPoints": 98,
+      "over0_3": 87,
+      "min": -3.94,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": -1.48
+     }
+    ]
+   },
+   "samplesOnly_vs_active": {
+    "new": "samples",
+    "comparedWith": "active",
+    "changedCells": 3084,
+    "maxDistOfChangeFromCarriagewayM": 30.3,
+    "changeBeyond12m": 462,
+    "changeBeyond30m": 2,
+    "band2to30m": {
+     "cellsChanged": 2101,
+     "areaOver0_5m2": 2148,
+     "areaOver2m2": 212,
+     "maxAbs": 5.2
+    },
+    "insideCarriageway": {
+     "cells": 655,
+     "medianAbsChange": 0.08,
+     "maxAbsChange": 1.5
+    },
+    "steep45": {
+     "new": 46,
+     "gone": 42,
+     "newWhereSmapAlsoStepped": 37,
+     "newWhereSmapGentle": 9,
+     "newOutsideMesh": 0,
+     "bySegment": {
+      "V1": {
+       "real": 10,
+       "gentleInSmap": 1,
+       "outsideMesh": 0
+      },
+      "P-LOW": {
+       "real": 4,
+       "gentleInSmap": 1,
+       "outsideMesh": 0
+      },
+      "V2": {
+       "real": 23,
+       "gentleInSmap": 3,
+       "outsideMesh": 0
+      },
+      "V3": {
+       "real": 0,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      },
+      "V4a": {
+       "real": 0,
+       "gentleInSmap": 2,
+       "outsideMesh": 0
+      }
+     },
+     "bboxBySegment": {
+      "V1": [
+       201119.0,
+       557095.0,
+       201151.0,
+       557125.0
+      ],
+      "P-LOW": [
+       201085.0,
+       557121.0,
+       201109.0,
+       557147.0
+      ],
+      "V2": [
+       201079.0,
+       557129.0,
+       201137.0,
+       557267.0
+      ],
+      "V3": [
+       201031.0,
+       557283.0,
+       201061.0,
+       557297.0
+      ],
+      "V4a": [
+       201017.0,
+       557291.0,
+       201023.0,
+       557311.0
+      ]
+     }
+    },
+    "buildings": [
+     {
+      "name": "유담관",
+      "outlinePoints": 383,
+      "changedPoints": 125,
+      "over0_3": 58,
+      "min": -1.8,
+      "median": 0.0,
+      "max": 1.06,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "본관",
+      "outlinePoints": 193,
+      "changedPoints": 27,
+      "over0_3": 10,
+      "min": -1.76,
+      "median": 0.0,
+      "max": 0.2,
+      "lowestPointChange": 0.01
+     },
+     {
+      "name": "수인관",
+      "outlinePoints": 261,
+      "changedPoints": 99,
+      "over0_3": 83,
+      "min": -1.75,
+      "median": 0.0,
+      "max": 0.65,
+      "lowestPointChange": -0.57
+     }
+    ]
+   },
+   "u1_added_vs_ribbon": {
+    "new": "ribbon_u1",
+    "comparedWith": "ribbon",
+    "changedCells": 1017,
+    "maxDistOfChangeFromCarriagewayM": 31.5,
+    "changeBeyond12m": 240,
+    "changeBeyond30m": 4,
+    "band2to30m": {
+     "cellsChanged": 786,
+     "areaOver0_5m2": 1784,
+     "areaOver2m2": 1260,
+     "maxAbs": 13.9
+    },
+    "insideCarriageway": {
+     "cells": 148,
+     "medianAbsChange": 5.56,
+     "maxAbsChange": 13.65
+    },
+    "steep45": {
+     "new": 116,
+     "gone": 93,
+     "newWhereSmapAlsoStepped": 107,
+     "newWhereSmapGentle": 9,
+     "newOutsideMesh": 0,
+     "bySegment": {
+      "U1": {
+       "real": 107,
+       "gentleInSmap": 9,
+       "outsideMesh": 0
+      }
+     },
+     "bboxBySegment": {
+      "U1": [
+       201085.0,
+       557201.0,
+       201133.0,
+       557289.0
+      ]
+     }
+    },
+    "buildings": [
+     {
+      "name": "한림관",
+      "outlinePoints": 85,
+      "changedPoints": 21,
+      "over0_3": 20,
+      "min": -5.52,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": -5.05
+     },
+     {
+      "name": "은주관",
+      "outlinePoints": 397,
+      "changedPoints": 74,
+      "over0_3": 67,
+      "min": -13.79,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": -12.01
+     },
+     {
+      "name": "본관",
+      "outlinePoints": 193,
+      "changedPoints": 2,
+      "over0_3": 0,
+      "min": -0.19,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": 0.0
+     },
+     {
+      "name": "수인관",
+      "outlinePoints": 261,
+      "changedPoints": 11,
+      "over0_3": 10,
+      "min": -1.43,
+      "median": 0.0,
+      "max": 0.0,
+      "lowestPointChange": 0.0
+     }
+    ]
+   }
+  }
+ }
+}

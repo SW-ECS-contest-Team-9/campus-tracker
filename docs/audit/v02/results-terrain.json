@@ -1,0 +1,1289 @@
+{
+ "created": "2026-10-11",
+ "settings": {
+  "passes": [
+   [
+    6,
+    15
+   ],
+   [
+    3,
+    8
+   ],
+   [
+    2,
+    6
+   ],
+   [
+    2,
+    6
+   ]
+  ],
+  "supportM": 6,
+  "fadeM": 6,
+  "minNeighbours": 3,
+  "neighbourRadiusM": 6
+ },
+ "checkPoints": 1189,
+ "oldTerrain": {
+  "bySegment": {
+   "V1": {
+    "n": 84,
+    "median": 0.69,
+    "p90Abs": 5.08,
+    "maxAbs": 5.13,
+    "over0_2": 81
+   },
+   "V2": {
+    "n": 456,
+    "median": 2.43,
+    "p90Abs": 4.43,
+    "maxAbs": 5.68,
+    "over0_2": 431
+   },
+   "V3": {
+    "n": 183,
+    "median": 3.33,
+    "p90Abs": 5.09,
+    "maxAbs": 6.34,
+    "over0_2": 183
+   },
+   "V4a": {
+    "n": 111,
+    "median": 1.73,
+    "p90Abs": 3.15,
+    "maxAbs": 4.06,
+    "over0_2": 98
+   },
+   "V4b": {
+    "n": 30,
+    "median": -0.81,
+    "p90Abs": 1.75,
+    "maxAbs": 1.84,
+    "over0_2": 21
+   },
+   "P-LOW": {
+    "n": 63,
+    "median": -1.49,
+    "p90Abs": 4.15,
+    "maxAbs": 4.51,
+    "over0_2": 62
+   },
+   "P-UP": {
+    "n": 0
+   },
+   "U1": {
+    "n": 262,
+    "median": 5.33,
+    "p90Abs": 11.62,
+    "maxAbs": 13.65,
+    "over0_2": 259
+   }
+  },
+  "allButU1": {
+   "n": 927,
+   "median": 2.14,
+   "p90Abs": 4.53,
+   "maxAbs": 6.34,
+   "over0_2": 876
+  },
+  "worst": [
+   [
+    "U1",
+    75,
+    2.4,
+    13.65
+   ],
+   [
+    "U1",
+    75,
+    0,
+    13.6
+   ],
+   [
+    "U1",
+    74,
+    2.4,
+    13.54
+   ],
+   [
+    "U1",
+    74,
+    -2.4,
+    13.37
+   ],
+   [
+    "U1",
+    73,
+    2.4,
+    13.35
+   ],
+   [
+    "U1",
+    75,
+    -2.4,
+    13.27
+   ],
+   [
+    "U1",
+    76,
+    2.4,
+    13.26
+   ],
+   [
+    "U1",
+    74,
+    0,
+    13.18
+   ]
+  ]
+ },
+ "combos": {
+  "active-f5f1dbc4": {
+   "areas": [
+    "field",
+    "s06",
+    "gate_road",
+    "turnaround"
+   ],
+   "samples": 3326,
+   "guardSkipped": 0,
+   "passes": "default",
+   "previewIdIfTheseThreeFiles": "local-samples-f5f1dbc499a3263c",
+   "changedCells": 6643,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15291,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1204,
+    "0.1-0.5m": 2420,
+    "0.5-1m": 2992,
+    "1-2m": 4764,
+    "2-5m": 6468,
+    ">5m": 8724
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": -0.02,
+      "p90Abs": 1.27,
+      "maxAbs": 2.26,
+      "over0_2": 68
+     },
+     "V2": {
+      "n": 456,
+      "median": 0.03,
+      "p90Abs": 0.7,
+      "maxAbs": 1.74,
+      "over0_2": 184
+     },
+     "V3": {
+      "n": 183,
+      "median": -0.02,
+      "p90Abs": 0.55,
+      "maxAbs": 2.16,
+      "over0_2": 64
+     },
+     "V4a": {
+      "n": 111,
+      "median": -0.01,
+      "p90Abs": 0.7,
+      "maxAbs": 1.42,
+      "over0_2": 46
+     },
+     "V4b": {
+      "n": 30,
+      "median": -0.03,
+      "p90Abs": 0.15,
+      "maxAbs": 0.29,
+      "over0_2": 1
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": 0.07,
+      "p90Abs": 0.76,
+      "maxAbs": 1.04,
+      "over0_2": 49
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 5.33,
+      "p90Abs": 11.62,
+      "maxAbs": 13.65,
+      "over0_2": 253
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0.01,
+     "p90Abs": 0.79,
+     "maxAbs": 2.26,
+     "over0_2": 412
+    },
+    "worst": [
+     [
+      "U1",
+      75,
+      2.4,
+      13.65
+     ],
+     [
+      "U1",
+      75,
+      0,
+      13.6
+     ],
+     [
+      "U1",
+      74,
+      2.4,
+      13.54
+     ],
+     [
+      "U1",
+      74,
+      -2.4,
+      13.37
+     ],
+     [
+      "U1",
+      73,
+      2.4,
+      13.35
+     ],
+     [
+      "U1",
+      75,
+      -2.4,
+      13.27
+     ],
+     [
+      "U1",
+      76,
+      2.4,
+      13.26
+     ],
+     [
+      "U1",
+      74,
+      0,
+      13.18
+     ]
+    ]
+   }
+  },
+  "add": {
+   "areas": [
+    "field",
+    "s06",
+    "gate_road",
+    "turnaround",
+    "road_profile"
+   ],
+   "samples": 4538,
+   "guardSkipped": 0,
+   "passes": "default",
+   "previewIdIfTheseThreeFiles": "local-samples-88377b4a54694a0a",
+   "changedCells": 6761,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15311,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1136,
+    "0.1-0.5m": 2512,
+    "0.5-1m": 3064,
+    "1-2m": 4680,
+    "2-5m": 6708,
+    ">5m": 8944
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0.04,
+      "p90Abs": 1.1,
+      "maxAbs": 1.94,
+      "over0_2": 69
+     },
+     "V2": {
+      "n": 456,
+      "median": 0.01,
+      "p90Abs": 0.71,
+      "maxAbs": 1.89,
+      "over0_2": 151
+     },
+     "V3": {
+      "n": 183,
+      "median": -0.01,
+      "p90Abs": 0.55,
+      "maxAbs": 1.88,
+      "over0_2": 47
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.42,
+      "maxAbs": 1.06,
+      "over0_2": 34
+     },
+     "V4b": {
+      "n": 30,
+      "median": -0.01,
+      "p90Abs": 0.14,
+      "maxAbs": 0.21,
+      "over0_2": 1
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": 0.03,
+      "p90Abs": 0.75,
+      "maxAbs": 1.16,
+      "over0_2": 43
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 5.33,
+      "p90Abs": 11.62,
+      "maxAbs": 13.65,
+      "over0_2": 254
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0.01,
+     "p90Abs": 0.72,
+     "maxAbs": 1.94,
+     "over0_2": 345
+    },
+    "worst": [
+     [
+      "U1",
+      75,
+      2.4,
+      13.65
+     ],
+     [
+      "U1",
+      75,
+      0,
+      13.6
+     ],
+     [
+      "U1",
+      74,
+      2.4,
+      13.54
+     ],
+     [
+      "U1",
+      74,
+      -2.4,
+      13.37
+     ],
+     [
+      "U1",
+      73,
+      2.4,
+      13.35
+     ],
+     [
+      "U1",
+      75,
+      -2.4,
+      13.27
+     ],
+     [
+      "U1",
+      76,
+      2.4,
+      13.26
+     ],
+     [
+      "U1",
+      74,
+      0,
+      13.18
+     ]
+    ]
+   }
+  },
+  "replace": {
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "samples": 3694,
+   "guardSkipped": 0,
+   "passes": "default",
+   "previewIdIfTheseThreeFiles": "local-samples-047fda5955630b41",
+   "changedCells": 6747,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15295,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1152,
+    "0.1-0.5m": 2504,
+    "0.5-1m": 3072,
+    "1-2m": 4676,
+    "2-5m": 6688,
+    ">5m": 8896
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0.04,
+      "p90Abs": 1.09,
+      "maxAbs": 1.83,
+      "over0_2": 71
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.74,
+      "maxAbs": 2.23,
+      "over0_2": 141
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.51,
+      "maxAbs": 1.75,
+      "over0_2": 44
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.39,
+      "maxAbs": 0.98,
+      "over0_2": 28
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0.02,
+      "p90Abs": 0.16,
+      "maxAbs": 0.21,
+      "over0_2": 2
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": -0.06,
+      "p90Abs": 0.72,
+      "maxAbs": 1.24,
+      "over0_2": 44
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 5.33,
+      "p90Abs": 11.62,
+      "maxAbs": 13.65,
+      "over0_2": 252
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.73,
+     "maxAbs": 2.23,
+     "over0_2": 330
+    },
+    "worst": [
+     [
+      "U1",
+      75,
+      2.4,
+      13.65
+     ],
+     [
+      "U1",
+      75,
+      0,
+      13.6
+     ],
+     [
+      "U1",
+      74,
+      2.4,
+      13.54
+     ],
+     [
+      "U1",
+      74,
+      -2.4,
+      13.37
+     ],
+     [
+      "U1",
+      73,
+      2.4,
+      13.35
+     ],
+     [
+      "U1",
+      75,
+      -2.4,
+      13.27
+     ],
+     [
+      "U1",
+      76,
+      2.4,
+      13.26
+     ],
+     [
+      "U1",
+      74,
+      0,
+      13.18
+     ]
+    ]
+   }
+  },
+  "replace>ribbon": {
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "then": "applyPlateau per 1 m slice (338 slices)",
+   "ribbonCells": 859,
+   "restoredInBuildings": 0,
+   "changedCells": 6747,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15288,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1172,
+    "0.1-0.5m": 2580,
+    "0.5-1m": 3052,
+    "1-2m": 4644,
+    "2-5m": 6512,
+    ">5m": 9028
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0,
+      "p90Abs": 0,
+      "maxAbs": 0.01,
+      "over0_2": 0
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.07,
+      "over0_2": 0
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.04,
+      "maxAbs": 0.06,
+      "over0_2": 0
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.02,
+      "maxAbs": 0.03,
+      "over0_2": 0
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0,
+      "p90Abs": 0.06,
+      "maxAbs": 0.13,
+      "over0_2": 0
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.08,
+      "over0_2": 0
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 5.33,
+      "p90Abs": 11.62,
+      "maxAbs": 13.65,
+      "over0_2": 252
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.03,
+     "maxAbs": 0.13,
+     "over0_2": 0
+    },
+    "worst": [
+     [
+      "U1",
+      75,
+      2.4,
+      13.65
+     ],
+     [
+      "U1",
+      75,
+      0,
+      13.6
+     ],
+     [
+      "U1",
+      74,
+      2.4,
+      13.54
+     ],
+     [
+      "U1",
+      74,
+      -2.4,
+      13.37
+     ],
+     [
+      "U1",
+      73,
+      2.4,
+      13.35
+     ],
+     [
+      "U1",
+      75,
+      -2.4,
+      13.27
+     ],
+     [
+      "U1",
+      76,
+      2.4,
+      13.26
+     ],
+     [
+      "U1",
+      74,
+      0,
+      13.18
+     ]
+    ]
+   }
+  },
+  "replace+u1": {
+   "areas": [
+    "field",
+    "road_profile",
+    "road_profile_u1",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "samples": 4005,
+   "guardSkipped": 0,
+   "passes": "default",
+   "previewIdIfTheseThreeFiles": "local-samples-71bfdaabe27b643d",
+   "changedCells": 7256,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15330,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1096,
+    "0.1-0.5m": 2424,
+    "0.5-1m": 3196,
+    "1-2m": 4892,
+    "2-5m": 7472,
+    ">5m": 9944
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0.04,
+      "p90Abs": 1.09,
+      "maxAbs": 1.83,
+      "over0_2": 71
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.74,
+      "maxAbs": 2.23,
+      "over0_2": 141
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.51,
+      "maxAbs": 1.75,
+      "over0_2": 44
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.39,
+      "maxAbs": 0.98,
+      "over0_2": 28
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0.02,
+      "p90Abs": 0.16,
+      "maxAbs": 0.21,
+      "over0_2": 2
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": -0.06,
+      "p90Abs": 0.72,
+      "maxAbs": 1.24,
+      "over0_2": 44
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 0.03,
+      "p90Abs": 0.93,
+      "maxAbs": 3.02,
+      "over0_2": 144
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.73,
+     "maxAbs": 2.23,
+     "over0_2": 330
+    },
+    "worst": [
+     [
+      "U1",
+      63,
+      -2.4,
+      3.02
+     ],
+     [
+      "V2",
+      81,
+      -2.8,
+      -2.23
+     ],
+     [
+      "U1",
+      56,
+      0,
+      2.2
+     ],
+     [
+      "V2",
+      82,
+      -2.8,
+      -2.11
+     ],
+     [
+      "U1",
+      64,
+      -2.4,
+      2.05
+     ],
+     [
+      "U1",
+      58,
+      2.4,
+      -1.9
+     ],
+     [
+      "V1",
+      0,
+      0,
+      1.83
+     ],
+     [
+      "V3",
+      40,
+      2.8,
+      -1.75
+     ]
+    ]
+   }
+  },
+  "replace+u1>ribbon": {
+   "areas": [
+    "field",
+    "road_profile",
+    "road_profile_u1",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "then": "applyPlateau per 1 m slice (432 slices)",
+   "ribbonCells": 1061,
+   "restoredInBuildings": 0,
+   "changedCells": 7256,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15311,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1120,
+    "0.1-0.5m": 2520,
+    "0.5-1m": 3184,
+    "1-2m": 4848,
+    "2-5m": 7276,
+    ">5m": 10076
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0,
+      "p90Abs": 0,
+      "maxAbs": 0.01,
+      "over0_2": 0
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.07,
+      "over0_2": 0
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.04,
+      "maxAbs": 0.06,
+      "over0_2": 0
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.02,
+      "maxAbs": 0.03,
+      "over0_2": 0
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0,
+      "p90Abs": 0.06,
+      "maxAbs": 0.13,
+      "over0_2": 0
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": 0,
+      "p90Abs": 0.03,
+      "maxAbs": 0.08,
+      "over0_2": 0
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 0,
+      "p90Abs": 0.04,
+      "maxAbs": 0.1,
+      "over0_2": 0
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.03,
+     "maxAbs": 0.13,
+     "over0_2": 0
+    },
+    "worst": [
+     [
+      "V4b",
+      9,
+      5.6,
+      0.13
+     ],
+     [
+      "V4b",
+      9,
+      0,
+      0.11
+     ],
+     [
+      "U1",
+      13,
+      0,
+      -0.1
+     ],
+     [
+      "U1",
+      10,
+      2.4,
+      -0.09
+     ],
+     [
+      "P-LOW",
+      34,
+      2.4,
+      0.08
+     ],
+     [
+      "V2",
+      129,
+      -2.8,
+      0.07
+     ],
+     [
+      "V4b",
+      8,
+      5.6,
+      0.07
+     ],
+     [
+      "P-LOW",
+      29,
+      -2.4,
+      -0.07
+     ]
+    ]
+   }
+  },
+  "replace+2passes": {
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "samples": 3694,
+   "guardSkipped": 0,
+   "passes": [
+    [
+     6,
+     15
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     1.5,
+     4
+    ],
+    [
+     1.5,
+     4
+    ]
+   ],
+   "previewIdIfTheseThreeFiles": null,
+   "changedCells": 6747,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15287,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1156,
+    "0.1-0.5m": 2460,
+    "0.5-1m": 3084,
+    "1-2m": 4680,
+    "2-5m": 6736,
+    ">5m": 8872
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0.01,
+      "p90Abs": 0.82,
+      "maxAbs": 1.43,
+      "over0_2": 62
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.52,
+      "maxAbs": 1.91,
+      "over0_2": 126
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.37,
+      "maxAbs": 1.27,
+      "over0_2": 33
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.27,
+      "maxAbs": 0.68,
+      "over0_2": 20
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0.01,
+      "p90Abs": 0.14,
+      "maxAbs": 0.17,
+      "over0_2": 0
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": -0.05,
+      "p90Abs": 0.59,
+      "maxAbs": 1,
+      "over0_2": 32
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 5.33,
+      "p90Abs": 11.62,
+      "maxAbs": 13.65,
+      "over0_2": 252
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.53,
+     "maxAbs": 1.91,
+     "over0_2": 273
+    },
+    "worst": [
+     [
+      "U1",
+      75,
+      2.4,
+      13.65
+     ],
+     [
+      "U1",
+      75,
+      0,
+      13.6
+     ],
+     [
+      "U1",
+      74,
+      2.4,
+      13.54
+     ],
+     [
+      "U1",
+      74,
+      -2.4,
+      13.37
+     ],
+     [
+      "U1",
+      73,
+      2.4,
+      13.35
+     ],
+     [
+      "U1",
+      75,
+      -2.4,
+      13.27
+     ],
+     [
+      "U1",
+      76,
+      2.4,
+      13.26
+     ],
+     [
+      "U1",
+      74,
+      0,
+      13.18
+     ]
+    ]
+   }
+  },
+  "replace+u1+2passes": {
+   "areas": [
+    "field",
+    "road_profile",
+    "road_profile_u1",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ],
+   "samples": 4005,
+   "guardSkipped": 0,
+   "passes": [
+    [
+     6,
+     15
+    ],
+    [
+     3,
+     8
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     1.5,
+     4
+    ],
+    [
+     1.5,
+     4
+    ]
+   ],
+   "previewIdIfTheseThreeFiles": null,
+   "changedCells": 7256,
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15316,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1104,
+    "0.1-0.5m": 2392,
+    "0.5-1m": 3192,
+    "1-2m": 4860,
+    "2-5m": 7568,
+    ">5m": 9908
+   },
+   "terrainMinusRoad": {
+    "bySegment": {
+     "V1": {
+      "n": 84,
+      "median": 0.01,
+      "p90Abs": 0.82,
+      "maxAbs": 1.43,
+      "over0_2": 62
+     },
+     "V2": {
+      "n": 456,
+      "median": 0,
+      "p90Abs": 0.52,
+      "maxAbs": 1.91,
+      "over0_2": 124
+     },
+     "V3": {
+      "n": 183,
+      "median": 0,
+      "p90Abs": 0.37,
+      "maxAbs": 1.27,
+      "over0_2": 33
+     },
+     "V4a": {
+      "n": 111,
+      "median": 0,
+      "p90Abs": 0.27,
+      "maxAbs": 0.68,
+      "over0_2": 20
+     },
+     "V4b": {
+      "n": 30,
+      "median": 0.01,
+      "p90Abs": 0.14,
+      "maxAbs": 0.17,
+      "over0_2": 0
+     },
+     "P-LOW": {
+      "n": 63,
+      "median": -0.05,
+      "p90Abs": 0.59,
+      "maxAbs": 1,
+      "over0_2": 32
+     },
+     "P-UP": {
+      "n": 0
+     },
+     "U1": {
+      "n": 262,
+      "median": 0.01,
+      "p90Abs": 0.69,
+      "maxAbs": 2.62,
+      "over0_2": 130
+     }
+    },
+    "allButU1": {
+     "n": 927,
+     "median": 0,
+     "p90Abs": 0.53,
+     "maxAbs": 1.91,
+     "over0_2": 271
+    },
+    "worst": [
+     [
+      "U1",
+      63,
+      -2.4,
+      2.62
+     ],
+     [
+      "V2",
+      81,
+      -2.8,
+      -1.91
+     ],
+     [
+      "U1",
+      64,
+      -2.4,
+      1.6
+     ],
+     [
+      "U1",
+      56,
+      0,
+      1.58
+     ],
+     [
+      "V2",
+      82,
+      -2.8,
+      -1.55
+     ],
+     [
+      "U1",
+      58,
+      2.4,
+      -1.52
+     ],
+     [
+      "V2",
+      80,
+      -2.8,
+      -1.47
+     ],
+     [
+      "V1",
+      23,
+      0,
+      1.43
+     ]
+    ]
+   }
+  }
+ }
+}
