@@ -25,7 +25,7 @@ T_S, T_N = -5.5, 17.5   # 본관 북벽(t=-4.9)과 북쪽 건물 벽 안쪽까�
 planes = [
   dict(name='WAY', st=[(3, T_S), (69.3, T_S), (69.3, -2.5), (101, -2.5), (101, -3), (113.2, -3), (112.6, -1), (108.3, 10), (107.5, T_N), (0, T_N), (0, 8.5), (-2, 8.5), (-2, 7), (0, 3), (3, -3)],
        profile=True, grade='S-MAP',
-       reason='G02 내리막길 기본 경사면: 가운데 경사로의 S-MAP 높이에 맞춘 평면 조각 4개(폭 방향 평평). 본관 북벽에서 북쪽 건물 벽까지 한 평면. 아래 끝은 회차 공간 포장면 130.6 m(T06), 위 끝은 운동장 148.9 m(F05 경계)에 벽 없이 닿는다.'),
+       reason='G02 내리막길 기본 경사면: 가운데 경사로의 S-MAP 높이에 맞춘 평면 조각 4개(폭 방향 평평). 본관 북벽에서 북쪽 건물 벽까지 한 평면. 아래 끝은 회차 공간 포장면(Z04 경사면, 이 자리 131.16 m), 위 끝은 운동장 148.9 m(F05 경계)에 벽 없이 닿는다.'),
   dict(name='LANE', st=rect(0, 31.5, 8.5, T_N), heightM=132.5, grade='S-MAP',
        reason='G02 북악관 동쪽 낮은 마당: S-MAP 132.4~132.9 m, 사용자 핀 U100 132.3·U102 132.5. 길 경사면과는 화단 상자와 벽면으로 만난다.'),
   dict(name='PODIUM', st=rect(31.5, 50, 6.5, T_N), heightM=138.8, grade='S-MAP',
@@ -80,7 +80,7 @@ for a in np.arange(5.0, 30.4, 5.1):
     b = min(a + 5.1, 30.5)
     box(f'G02-NPLANT-A{int(round(a)):02d}', 'planter', ring(rect(a, b, STRIP_N, 8.5)), min(132.5, way_z(a)), way_z(b) + 0.45,
         '북쪽 화단 섬(북악관 동쪽 마당과 길 사이): 화강석 벽이 약 5 m 마디로 층층이 오름, 윗면 = 마디 위쪽 끝의 경사면 + 0.45 m(추정). 평면은 S-MAP 정사 그림의 나무 자리(±1 m)', PH + ', g02/smap-ortho-rectified-01m.png')
-box('G02-NPLANT-DRUM', 'planter', ring([(0.2, 6.2), (2.8, 6.2), (3.4, 7.6), (2.8, 9.0), (0.2, 9.0), (-0.4, 7.6)]), 130.6, 131.5, '입구 왼쪽 둥근 화강석 화단: 높이 0.9 m, 지름 약 3 m(거리뷰 09 눈대중)', '거리뷰 09')
+box('G02-NPLANT-DRUM', 'planter', ring([(0.2, 6.2), (2.8, 6.2), (3.4, 7.6), (2.8, 9.0), (0.2, 9.0), (-0.4, 7.6)]), 130.6, 132.1, '입구 왼쪽 둥근 화강석 화단: 높이 0.9 m, 지름 약 3 m(거리뷰 09 눈대중)', '거리뷰 09')
 # 문예관 기단으로 오르는 옆 계단(s 31.5~34): 띠(t 5.5)에서 기단(138.8)까지
 z0 = float(way_z(32.5)); nr = int(round((138.8 - z0) / 0.157)); run = 0.30
 for k in range(nr):
@@ -111,18 +111,19 @@ dk = np.array([201098.0, 557302.7]); dv = np.array([201112.0, 557295.0]) - dk; d
 box('G02-DECK-MAIN-HANLIM', 'deck', ring_xy([dk - 1.8 * dv + dw, dk + 3.0 * dv + dw, dk + 3.0 * dv - dw, dk - 1.8 * dv - dw]), 137.6, 137.9,
     '본관 5층–한림관 3층 나무 데크: 윗면 137.9 m(한림관 3층 137.8, B07), 두께 0.3 m, 길이 4.8 m(본관 동벽~한림관 원통), 폭 3 m. 크기는 추정. 위 길에서는 갈 수 없고 지하 차도 보행 띠에서만 간다(사용자 확정)', '사용자 확정(그림 01-카카오위성-본관한림관-나무데크-위치, 학교 표지), B07', grade='확정(위치), 추정(크기·높이)', basePlane='없음(지하 차도 쪽 아래 공간 위에 뜬 판)')
 # 북악관 정문: 광장 평면(130.6) 위. 바깥 계단 12단(확정) → 현관 바닥 132.9 → (안쪽 5단) 1층 134.1. 평면은 S-MAP 메시의 132~133 m 단과 시험용 DB 길 8f8c716f
+BUKAK_FOOT = 131.39   # Z04: 회차 공간 경사면이 정문 계단 발치 (201041.7, 557360.5) 에서 갖는 높이(docs/audit/z04/model.json plaza.atBukakStairFoot)
 PB = '거리뷰 10(북악관 정문 계단 2025-02), 사용자 확정(바깥 12단 + 안쪽 5단), ' + SRC_MESH + ', 시험용 DB 길 8f8c716f'
 for k in range(12):
-    box(f'G02-BUKAK-STAIR-S{k + 1:02d}', 'stair_step', ring(rect(-13.3, -4.3, 7.4 + k * 0.4, 7.4 + (k + 1) * 0.4)), 130.6, 130.6 + (k + 1) * (132.9 - 130.6) / 12,
-        '북악관 정문 바깥 계단: 12단(확정), 폭 9 m·디딤 0.4 m(거리뷰 눈대중). 맨 위 132.9 m(S-MAP). 광장을 130.6 m 평면으로 둔 탓에 한 단이 0.19 m 로 계산됨(실제 발치는 S-MAP 131.4 m 라 한 단 약 0.125 m)', PB, basePlane='plaza 130.6', stair='G02-BUKAK-MAIN-STAIR', riseM=r2((132.9 - 130.6) / 12), runM=0.4, widthM=9.0)
-box('G02-BUKAK-PORCH-FLOOR', 'landing', ring(rect(-14.3, -3.3, 12.2, 17.0)), 130.6, 132.9, '북악관 현관 바닥(돌출부): 132.9 m, 앞뒤 4.8 m·폭 11 m(추정)', PB, basePlane='plaza 130.6')
+    box(f'G02-BUKAK-STAIR-S{k + 1:02d}', 'stair_step', ring(rect(-13.3, -4.3, 7.4 + k * 0.4, 7.4 + (k + 1) * 0.4)), 130.0, BUKAK_FOOT + (k + 1) * (132.9 - BUKAK_FOOT) / 12,
+        '북악관 정문 바깥 계단: 12단(확정), 폭 9 m·디딤 0.4 m(거리뷰 눈대중). 맨 위 132.9 m(S-MAP). 발치 131.39 m = 회차 공간 경사면(Z04)이 이 자리에서 갖는 높이(S-MAP 131.4), 한 단 약 0.126 m', PB, basePlane='Z04-TURN-PLAZA', stair='G02-BUKAK-MAIN-STAIR', riseM=r2((132.9 - BUKAK_FOOT) / 12), runM=0.4, widthM=9.0)
+box('G02-BUKAK-PORCH-FLOOR', 'landing', ring(rect(-14.3, -3.3, 12.2, 17.0)), 130.6, 132.9, '북악관 현관 바닥(돌출부): 132.9 m, 앞뒤 4.8 m·폭 11 m(추정)', PB, basePlane='Z04-TURN-PLAZA')
 for k, sc in enumerate((-13.8, -8.8, -3.8)):
     box(f'G02-BUKAK-PORCH-PIER{k + 1}', 'wall', ring(rect(sc - 0.5, sc + 0.5, 12.3, 13.3)), 132.9, 137.6, '현관 아치 기둥(아치 둘 = 기둥 셋), 1 m 각, 높이 4.7 m(추정)', PB, basePlane='G02-BUKAK-PORCH-FLOOR')
 box('G02-BUKAK-PORCH-CANOPY', 'canopy', ring(rect(-15.3, -2.3, 11.3, 17.0)), 137.6, 139.6, '현관 기와 차양: 기둥 위 2 m 덩어리(지붕 기울기는 표현 안 함), 추정', PB, basePlane='G02-BUKAK-PORCH-FLOOR')
 for nm, (sa, sb) in {'W': (-13.9, -13.3), 'E': (-4.3, -3.7)}.items():
-    box(f'G02-BUKAK-STAIR-CHEEK-{nm}1', 'wall', ring(rect(sa, sb, 7.4, 9.8)), 130.6, 132.3, '계단 옆 벽(아래 반), 추정', PB, basePlane='plaza 130.6')
-    box(f'G02-BUKAK-STAIR-CHEEK-{nm}2', 'wall', ring(rect(sa, sb, 9.8, 12.2)), 130.6, 133.4, '계단 옆 벽(위 반), 추정', PB, basePlane='plaza 130.6')
-box('G02-BUKAK-PLANTER-E', 'planter', ring(rect(-3.7, 0.0, 9.0, 17.0)), 130.6, 132.5, '정문 동쪽 화단(화강석 벽 + 소나무): 윗면 132.5 m = 동쪽 마당 높이(S-MAP 132.2~132.9)', PB, basePlane='plaza 130.6')
+    box(f'G02-BUKAK-STAIR-CHEEK-{nm}1', 'wall', ring(rect(sa, sb, 7.4, 9.8)), 130.6, 132.3, '계단 옆 벽(아래 반), 추정', PB, basePlane='Z04-TURN-PLAZA')
+    box(f'G02-BUKAK-STAIR-CHEEK-{nm}2', 'wall', ring(rect(sa, sb, 9.8, 12.2)), 130.6, 133.4, '계단 옆 벽(위 반), 추정', PB, basePlane='Z04-TURN-PLAZA')
+box('G02-BUKAK-PLANTER-E', 'planter', ring(rect(-3.7, 0.0, 9.0, 17.0)), 130.6, 132.5, '정문 동쪽 화단(화강석 벽 + 소나무): 윗면 132.5 m = 동쪽 마당 높이(S-MAP 132.2~132.9)', PB, basePlane='Z04-TURN-PLAZA')
 box('G02-BARRIER-POST', 'barrier', ring(rect(4.3, 4.8, RAMP_N - 0.5, RAMP_N)), way_z(4.3), way_z(4.5) + 1.1, '차단기 기둥(노란 상자), 자리 s 4.5 ±2 m', '거리뷰 09, SKU 0:52')
 box('G02-BARRIER-ARM', 'barrier', ring(rect(4.45, 4.6, S_PAVE + 0.6, RAMP_N - 0.5)), way_z(4.5) + 0.9, way_z(4.5) + 1.0, '차단기 막대: 경사로 폭을 가로막음', '거리뷰 09, SKU 0:52')
 # ---------- 2b. 기단(땅 덩어리): 기본 평면을 구조물로. 지형 조리법의 surface 입력(g02-surface.geojson)은 이 정의에서 나온 것과 같다 ----------
@@ -148,7 +149,7 @@ for k in range(len(ug) - 1):
         voids.append({'type': 'Feature', 'properties': {'id': f'G02-VOID-UNDERGROUND-ROAD-{k}{q}', 'type': 'void', 'kind': 'void', 'estimated': True, 'grade': '확정(위 길보다 한 층 아래 지하 차도가 나란히 있음), 추정(선·폭·높이)',
             'fromM': r2(min(pa[2], pb[2])), 'toM': r2(zc), 'inside': 'G02-PLATFORM-WAY', 'assumption': '바닥 = 시험용 DB 길 951c157d 높이(추정), 폭 7.2 m(그림에서 4.1 m 로도 읽힘), 천장 = 길 경사면 − 0.6 m(슬래브 두께 가정). 남는 높이 %.1f m' % (zc - max(pa[2], pb[2])),
             'source': '사용자 확정(지하 차도), 그림 14, 시험용 DB 길 951c157d'}, 'geometry': {'type': 'Polygon', 'coordinates': [ring_xy([pa[:2] + w, pb[:2] + w, pb[:2] - w, pa[:2] - w])]}})
-boxes = platforms + voids + boxes
+boxes = [f for f in platforms if f['properties']['id'] != 'G02-PLATFORM-PLAZA'] + voids + boxes   # Z04: 포장면 기단은 z04-turnaround.geojson 의 한 경사면(Z04-PLATFORM-TURN-PLAZA)으로 옮김
 STRUCT = REPO / 'frontend' / 'public' / 'structures' / 'g02-way.geojson'; STRUCT.parent.mkdir(exist_ok=True)
 dump(STRUCT, {'type': 'FeatureCollection', 'name': 'g02-way', 'crs': CRS,
   'provenance': {'builder': 'docs/audit/g02/build_inputs.py', 'basePlanes': 'backend/data/terrain/recipes/g02-surface.geojson', 'schema': 'docs/audit/g02/STRUCTURES.md', 'note': '모든 상자는 기본 평면 위에 얹힌다. 치수는 사진 눈대중이라 전부 estimated.'},

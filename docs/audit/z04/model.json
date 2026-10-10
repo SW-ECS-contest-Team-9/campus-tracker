@@ -1,0 +1,2104 @@
+{
+ "crs": "EPSG:5186",
+ "plaza": {
+  "profile": {
+   "origin": [
+    201020.7,
+    557357.53
+   ],
+   "direction": [
+    0.6077,
+    0.7942
+   ],
+   "points": [
+    [
+     -22.74,
+     130.15
+    ],
+    [
+     16.78,
+     131.44
+    ]
+   ]
+  },
+  "slopePct": 3.27,
+  "fitResidualP90M": 0.18,
+  "atWayFoot": 131.16,
+  "atBukakStairFoot": 131.39
+ },
+ "coverage": {
+  "campusOutsideBuildingsM2": 34388,
+  "coveredByPlatformsM2": 33145,
+  "groundCellsWithoutPlatform": 14
+ },
+ "counts": {
+  "turnaround": {
+   "platform": 16,
+   "extrude": 0,
+   "terrain": 15
+  },
+  "upper-branch": {
+   "platform": 41,
+   "extrude": 65,
+   "terrain": 38
+  },
+  "back-paths": {
+   "platform": 36,
+   "extrude": 4,
+   "terrain": 34
+  },
+  "cheongun": {
+   "platform": 5,
+   "extrude": 0,
+   "terrain": 4
+  },
+  "hyein": {
+   "platform": 10,
+   "extrude": 2,
+   "terrain": 10
+  },
+  "eunju": {
+   "platform": 22,
+   "extrude": 24,
+   "terrain": 20
+  },
+  "yudam9": {
+   "platform": 37,
+   "extrude": 0,
+   "terrain": 36
+  },
+  "west": {
+   "platform": 7,
+   "extrude": 4,
+   "terrain": 7
+  },
+  "gate": {
+   "platform": 31,
+   "extrude": 5,
+   "terrain": 31
+  }
+ },
+ "zones": {
+  "turnaround": {
+   "title": "북악관 앞 회차 공간과 본관 앞 포장면",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-TURN-PLAZA",
+     "label": null,
+     "top": [
+      130.15,
+      131.44
+     ],
+     "area": 1324.3,
+     "grade": "확정(회차 공간·북악관 현관 앞·본관 앞·오르막길이 끊김 없는 한 포장면: 사용자 그림 11), S-MAP(높이)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-01",
+     "label": null,
+     "top": [
+      127.76,
+      128.07
+     ],
+     "area": 78.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-02",
+     "label": null,
+     "top": [
+      128.07,
+      128.47
+     ],
+     "area": 80.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-03",
+     "label": null,
+     "top": [
+      128.47,
+      128.83
+     ],
+     "area": 80.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-04",
+     "label": null,
+     "top": [
+      128.83,
+      129.17
+     ],
+     "area": 80.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-05",
+     "label": null,
+     "top": [
+      129.17,
+      129.62
+     ],
+     "area": 80.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-06",
+     "label": null,
+     "top": [
+      129.62,
+      130.17
+     ],
+     "area": 80.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-07",
+     "label": null,
+     "top": [
+      130.17,
+      130.57
+     ],
+     "area": 79.6,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-V4-08",
+     "label": null,
+     "top": [
+      130.57,
+      130.6
+     ],
+     "area": 12.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-R01",
+     "label": null,
+     "top": [
+      126.89,
+      130.49
+     ],
+     "area": 479.1,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-R02",
+     "label": null,
+     "top": [
+      129.66,
+      132.02
+     ],
+     "area": 254.4,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-R03",
+     "label": null,
+     "top": [
+      131.59,
+      133.48
+     ],
+     "area": 193.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-R04",
+     "label": null,
+     "top": [
+      131.81,
+      132.88
+     ],
+     "area": 161.2,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.43 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-S05",
+     "label": null,
+     "top": 134.7,
+     "area": 62.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-S06",
+     "label": null,
+     "top": 131.7,
+     "area": 60.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-TURN-T07",
+     "label": null,
+     "top": 130.3,
+     "area": 55.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    }
+   ]
+  },
+  "upper-branch": {
+   "title": "위쪽 갈래(본관·한림관 사이 차도, 한림관 1층 가는 길, 한림관 옆 낮은 곳)",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-01",
+     "label": null,
+     "top": [
+      120.94,
+      122.04
+     ],
+     "area": 20.7,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-02",
+     "label": null,
+     "top": [
+      122.04,
+      123.36
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-03",
+     "label": null,
+     "top": [
+      123.36,
+      124.45
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-04",
+     "label": null,
+     "top": [
+      124.45,
+      124.96
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-05",
+     "label": null,
+     "top": [
+      124.96,
+      125.04
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-06",
+     "label": null,
+     "top": [
+      125.04,
+      125.36
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-07",
+     "label": null,
+     "top": [
+      125.36,
+      126.29
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-08",
+     "label": null,
+     "top": [
+      126.29,
+      127.47
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-09",
+     "label": null,
+     "top": [
+      127.47,
+      128.49
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-10",
+     "label": null,
+     "top": [
+      128.49,
+      129.18
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-11",
+     "label": null,
+     "top": [
+      129.18,
+      129.69
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-12",
+     "label": null,
+     "top": [
+      129.69,
+      130.06
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-13",
+     "label": null,
+     "top": [
+      130.06,
+      130.32
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-14",
+     "label": null,
+     "top": [
+      130.32,
+      130.63
+     ],
+     "area": 40.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-U1-15",
+     "label": null,
+     "top": [
+      130.63,
+      130.92
+     ],
+     "area": 39.7,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-HANLIM-WGAP",
+     "label": null,
+     "top": [
+      127.2,
+      135.3
+     ],
+     "area": 100.5,
+     "grade": "S-MAP(양 끝 높이 127.2·135.3), 추정(한 경사면으로 봄. 계단인지 경사인지 모름)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-HANLIM-NARC",
+     "label": null,
+     "top": 135.3,
+     "area": 120.0,
+     "grade": "S-MAP(한림관 벽 옆 낮은 값 134.2~135.9), 추정(한 높이로 봄, 범위)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-HANLIM-ESLOT",
+     "label": null,
+     "top": 136.3,
+     "area": 202.3,
+     "grade": "S-MAP(평탄면 136.3~136.4), 추정(범위)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-HANLIM-1F",
+     "label": null,
+     "top": 127.2,
+     "area": 55.8,
+     "grade": "확정(한림관 1층은 앞 길에서 계단 몇 개 위), S-MAP(126.9~127.5)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R01",
+     "label": null,
+     "top": [
+      125.58,
+      127.85
+     ],
+     "area": 356.4,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.36 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R02",
+     "label": null,
+     "top": [
+      118.79,
+      121.16
+     ],
+     "area": 323.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R03",
+     "label": null,
+     "top": [
+      125.41,
+      127.34
+     ],
+     "area": 205.9,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.66 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R04",
+     "label": null,
+     "top": [
+      124.52,
+      126.23
+     ],
+     "area": 204.4,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.44 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S05",
+     "label": null,
+     "top": 129.8,
+     "area": 153.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S06",
+     "label": "은주1관 1층 입구 앞",
+     "top": 131.4,
+     "area": 116.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S07",
+     "label": null,
+     "top": 126.2,
+     "area": 115.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S08",
+     "label": null,
+     "top": 124.5,
+     "area": 109.3,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S09",
+     "label": null,
+     "top": 120.2,
+     "area": 102.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R10",
+     "label": null,
+     "top": [
+      121.68,
+      124.35
+     ],
+     "area": 101.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S11",
+     "label": null,
+     "top": 132.7,
+     "area": 101.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S12",
+     "label": null,
+     "top": 128.5,
+     "area": 96.3,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S13",
+     "label": null,
+     "top": 122.7,
+     "area": 91.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-R14",
+     "label": null,
+     "top": [
+      148.28,
+      150.37
+     ],
+     "area": 78.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S15",
+     "label": null,
+     "top": 118.1,
+     "area": 72.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S16",
+     "label": null,
+     "top": 118.4,
+     "area": 65.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S17",
+     "label": null,
+     "top": 145.5,
+     "area": 59.3,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S18",
+     "label": null,
+     "top": 133.7,
+     "area": 52.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S19",
+     "label": null,
+     "top": 116.7,
+     "area": 52.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S20",
+     "label": null,
+     "top": 131.2,
+     "area": 39.9,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S21",
+     "label": null,
+     "top": 131.5,
+     "area": 39.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-UPPER-S22",
+     "label": null,
+     "top": 128.4,
+     "area": 19.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    }
+   ]
+  },
+  "back-paths": {
+   "title": "문예관–대일관 사잇길, 북악관 옆길, 뒤편 산책로",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-BACK-R01",
+     "label": null,
+     "top": [
+      132.82,
+      136.08
+     ],
+     "area": 652.2,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.39 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R02",
+     "label": null,
+     "top": [
+      131.44,
+      133.48
+     ],
+     "area": 552.5,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.39 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R03",
+     "label": null,
+     "top": [
+      138.45,
+      140.99
+     ],
+     "area": 547.4,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R04",
+     "label": null,
+     "top": [
+      147.57,
+      149.28
+     ],
+     "area": 541.3,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.35 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R05",
+     "label": null,
+     "top": [
+      148.43,
+      149.32
+     ],
+     "area": 515.9,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R06",
+     "label": null,
+     "top": [
+      141.14,
+      147.87
+     ],
+     "area": 477.2,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.37 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R07",
+     "label": null,
+     "top": [
+      133.14,
+      134.17
+     ],
+     "area": 298.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R08",
+     "label": null,
+     "top": [
+      145.78,
+      149.44
+     ],
+     "area": 249.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R09",
+     "label": null,
+     "top": [
+      135.92,
+      138.24
+     ],
+     "area": 245.9,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R10",
+     "label": null,
+     "top": [
+      127.06,
+      129.83
+     ],
+     "area": 231.9,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R11",
+     "label": "대일관 뒷문 앞",
+     "top": [
+      151.73,
+      152.37
+     ],
+     "area": 218.6,
+     "grade": "확정(뒷문 위치: 사용자 그림 13), S-MAP(높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R12",
+     "label": null,
+     "top": [
+      126.43,
+      130.59
+     ],
+     "area": 201.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R13",
+     "label": null,
+     "top": [
+      138.23,
+      139.73
+     ],
+     "area": 135.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S14",
+     "label": null,
+     "top": 147.9,
+     "area": 118.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S15",
+     "label": null,
+     "top": 139.0,
+     "area": 108.9,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R16",
+     "label": null,
+     "top": [
+      137.93,
+      139.33
+     ],
+     "area": 107.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S17",
+     "label": null,
+     "top": 146.3,
+     "area": 104.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S18",
+     "label": null,
+     "top": 122.5,
+     "area": 101.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S19",
+     "label": null,
+     "top": 140.8,
+     "area": 101.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S20",
+     "label": null,
+     "top": 151.5,
+     "area": 99.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-T21",
+     "label": null,
+     "top": 149.1,
+     "area": 89.1,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S22",
+     "label": null,
+     "top": 135.7,
+     "area": 89.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S23",
+     "label": null,
+     "top": 131.3,
+     "area": 85.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-T24",
+     "label": null,
+     "top": 148.2,
+     "area": 76.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S25",
+     "label": null,
+     "top": 149.7,
+     "area": 76.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-T26",
+     "label": null,
+     "top": 139.5,
+     "area": 75.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S27",
+     "label": null,
+     "top": 134.1,
+     "area": 66.3,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S28",
+     "label": null,
+     "top": 137.5,
+     "area": 60.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S29",
+     "label": null,
+     "top": 149.3,
+     "area": 56.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-T30",
+     "label": "북악관 서쪽 옆길(GS25 문 앞)",
+     "top": 131.5,
+     "area": 55.1,
+     "grade": "확정(GS25 문 = 북악관 지하 1층 입구), S-MAP(높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S31",
+     "label": null,
+     "top": 120.9,
+     "area": 53.2,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-R32",
+     "label": null,
+     "top": [
+      138.29,
+      139.7
+     ],
+     "area": 48.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S33",
+     "label": null,
+     "top": 132.1,
+     "area": 45.9,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S34",
+     "label": null,
+     "top": 114.8,
+     "area": 33.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S35",
+     "label": null,
+     "top": 120.9,
+     "area": 19.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-BACK-S36",
+     "label": null,
+     "top": 119.1,
+     "area": 16.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    }
+   ]
+  },
+  "cheongun": {
+   "title": "청운관 앞",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-CHEONGUN-R01",
+     "label": null,
+     "top": [
+      149.4,
+      149.88
+     ],
+     "area": 476.6,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.35 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-CHEONGUN-T02",
+     "label": null,
+     "top": 149.4,
+     "area": 228.5,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-CHEONGUN-T03",
+     "label": null,
+     "top": 149.8,
+     "area": 180.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-CHEONGUN-T04",
+     "label": null,
+     "top": 149.2,
+     "area": 41.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-CHEONGUN-S05",
+     "label": null,
+     "top": 149.2,
+     "area": 18.9,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    }
+   ]
+  },
+  "hyein": {
+   "title": "혜인관 둘레",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-HYEIN-T01",
+     "label": null,
+     "top": 149.0,
+     "area": 375.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-R02",
+     "label": null,
+     "top": [
+      148.99,
+      149.4
+     ],
+     "area": 297.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-R03",
+     "label": null,
+     "top": [
+      148.35,
+      149.44
+     ],
+     "area": 177.8,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-R04",
+     "label": null,
+     "top": [
+      148.85,
+      149.68
+     ],
+     "area": 148.9,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-S05",
+     "label": null,
+     "top": 149.9,
+     "area": 99.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-S06",
+     "label": null,
+     "top": 149.9,
+     "area": 87.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-R07",
+     "label": null,
+     "top": [
+      149.06,
+      149.26
+     ],
+     "area": 76.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-S08",
+     "label": null,
+     "top": 141.0,
+     "area": 69.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-T09",
+     "label": null,
+     "top": 149.1,
+     "area": 68.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-HYEIN-S10",
+     "label": null,
+     "top": 139.2,
+     "area": 48.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    }
+   ]
+  },
+  "eunju": {
+   "title": "은주관 둘레(풋살장·수인관)",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-EUNJU-U1X-01",
+     "label": null,
+     "top": [
+      130.92,
+      131.24
+     ],
+     "area": 28.6,
+     "grade": "S-MAP·사용자 핀 U030·U031·U033·U034(높이), 추정(선·폭. 차도인지 모름)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-U1X-02",
+     "label": null,
+     "top": [
+      131.24,
+      131.77
+     ],
+     "area": 33.9,
+     "grade": "S-MAP·사용자 핀 U030·U031·U033·U034(높이), 추정(선·폭. 차도인지 모름)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-U1X-03",
+     "label": null,
+     "top": [
+      131.77,
+      132.2
+     ],
+     "area": 33.9,
+     "grade": "S-MAP·사용자 핀 U030·U031·U033·U034(높이), 추정(선·폭. 차도인지 모름)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-U1X-04",
+     "label": null,
+     "top": [
+      132.2,
+      132.2
+     ],
+     "area": 33.9,
+     "grade": "S-MAP·사용자 핀 U030·U031·U033·U034(높이), 추정(선·폭. 차도인지 모름)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-T01",
+     "label": null,
+     "top": 132.1,
+     "area": 256.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S02",
+     "label": null,
+     "top": 108.7,
+     "area": 197.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S03",
+     "label": null,
+     "top": 110.7,
+     "area": 195.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-R04",
+     "label": null,
+     "top": [
+      126.62,
+      129.69
+     ],
+     "area": 166.1,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-R05",
+     "label": null,
+     "top": [
+      149.56,
+      149.62
+     ],
+     "area": 164.4,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S06",
+     "label": null,
+     "top": 146.0,
+     "area": 161.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-R07",
+     "label": null,
+     "top": [
+      132.1,
+      132.91
+     ],
+     "area": 155.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S08",
+     "label": null,
+     "top": 147.6,
+     "area": 153.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-R09",
+     "label": null,
+     "top": [
+      131.96,
+      132.66
+     ],
+     "area": 153.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S10",
+     "label": null,
+     "top": 112.9,
+     "area": 117.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S11",
+     "label": null,
+     "top": 110.8,
+     "area": 81.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S12",
+     "label": null,
+     "top": 137.4,
+     "area": 75.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S13",
+     "label": null,
+     "top": 110.7,
+     "area": 62.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-R14",
+     "label": null,
+     "top": [
+      131.86,
+      132.59
+     ],
+     "area": 62.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S15",
+     "label": null,
+     "top": 125.6,
+     "area": 58.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S16",
+     "label": null,
+     "top": 144.1,
+     "area": 58.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S17",
+     "label": null,
+     "top": 114.7,
+     "area": 56.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-EUNJU-S18",
+     "label": null,
+     "top": 144.2,
+     "area": 25.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": false
+    }
+   ]
+  },
+  "yudam9": {
+   "title": "유담관 둘레(9층 쪽 앞마당, 본관 앞 차도 S06, 분수 광장 서쪽 아래)",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-01",
+     "label": null,
+     "top": [
+      120.9,
+      121.63
+     ],
+     "area": 54.3,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-02",
+     "label": null,
+     "top": [
+      121.63,
+      122.21
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-03",
+     "label": null,
+     "top": [
+      122.21,
+      122.87
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-04",
+     "label": null,
+     "top": [
+      122.87,
+      123.63
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-05",
+     "label": null,
+     "top": [
+      123.63,
+      124.43
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-06",
+     "label": null,
+     "top": [
+      124.43,
+      125.28
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-07",
+     "label": null,
+     "top": [
+      125.28,
+      126.13
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-08",
+     "label": null,
+     "top": [
+      126.13,
+      126.94
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-09",
+     "label": null,
+     "top": [
+      126.94,
+      127.48
+     ],
+     "area": 54.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-V3-10",
+     "label": null,
+     "top": [
+      127.48,
+      127.81
+     ],
+     "area": 46.5,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-PUP-02",
+     "label": null,
+     "top": [
+      127.87,
+      127.94
+     ],
+     "area": 12.4,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": false
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-FORECOURT-9F",
+     "label": null,
+     "top": 129.2,
+     "area": 56.0,
+     "grade": "확정(버스 정류장 쪽에서 들어간 자리가 유담관 9층), S-MAP(128.4~129.6)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R01",
+     "label": null,
+     "top": [
+      91.66,
+      96.25
+     ],
+     "area": 754.8,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R02",
+     "label": null,
+     "top": [
+      128.73,
+      131.69
+     ],
+     "area": 282.8,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R03",
+     "label": null,
+     "top": [
+      125.74,
+      128.1
+     ],
+     "area": 195.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S04",
+     "label": null,
+     "top": 114.2,
+     "area": 173.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-T05",
+     "label": null,
+     "top": 114.1,
+     "area": 162.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R06",
+     "label": null,
+     "top": [
+      91.96,
+      94.9
+     ],
+     "area": 153.8,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R07",
+     "label": null,
+     "top": [
+      126.04,
+      128.42
+     ],
+     "area": 141.2,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R08",
+     "label": null,
+     "top": [
+      130.67,
+      131.41
+     ],
+     "area": 114.5,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-T09",
+     "label": null,
+     "top": 92.0,
+     "area": 112.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S10",
+     "label": null,
+     "top": 115.6,
+     "area": 104.2,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R11",
+     "label": null,
+     "top": [
+      129.21,
+      129.79
+     ],
+     "area": 101.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R12",
+     "label": null,
+     "top": [
+      126.03,
+      128.62
+     ],
+     "area": 93.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S13",
+     "label": null,
+     "top": 123.8,
+     "area": 89.1,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-T14",
+     "label": null,
+     "top": 129.1,
+     "area": 84.4,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R15",
+     "label": null,
+     "top": [
+      121.2,
+      123.1
+     ],
+     "area": 82.9,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S16",
+     "label": null,
+     "top": 92.1,
+     "area": 77.2,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S17",
+     "label": null,
+     "top": 124.8,
+     "area": 73.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S18",
+     "label": null,
+     "top": 124.6,
+     "area": 68.2,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S19",
+     "label": null,
+     "top": 124.5,
+     "area": 67.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S20",
+     "label": null,
+     "top": 90.6,
+     "area": 64.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-R21",
+     "label": null,
+     "top": [
+      127.71,
+      129.68
+     ],
+     "area": 62.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S22",
+     "label": null,
+     "top": 114.2,
+     "area": 61.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-T23",
+     "label": null,
+     "top": 127.8,
+     "area": 57.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-S24",
+     "label": null,
+     "top": 115.6,
+     "area": 41.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-YUDAM9-T25",
+     "label": null,
+     "top": 131.1,
+     "area": 38.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    }
+   ]
+  },
+  "west": {
+   "title": "서문과 서쪽 옹벽",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-WEST-R01",
+     "label": null,
+     "top": [
+      97.06,
+      110.99
+     ],
+     "area": 1209.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-R02",
+     "label": null,
+     "top": [
+      130.62,
+      132.49
+     ],
+     "area": 257.6,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-R03",
+     "label": null,
+     "top": [
+      134.03,
+      136.28
+     ],
+     "area": 229.0,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-R04",
+     "label": null,
+     "top": [
+      134.32,
+      134.85
+     ],
+     "area": 150.8,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-S05",
+     "label": null,
+     "top": 133.6,
+     "area": 123.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-S06",
+     "label": null,
+     "top": 130.7,
+     "area": 95.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-WEST-S07",
+     "label": null,
+     "top": 117.1,
+     "area": 54.7,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    }
+   ]
+  },
+  "gate": {
+   "title": "정문",
+   "platforms": [
+    {
+     "id": "Z04-PLATFORM-GATE-V1-01",
+     "label": null,
+     "top": [
+      106.94,
+      107.0
+     ],
+     "area": 83.6,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V1-02",
+     "label": null,
+     "top": [
+      107.0,
+      107.01
+     ],
+     "area": 83.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V1-03",
+     "label": null,
+     "top": [
+      107.01,
+      107.01
+     ],
+     "area": 83.9,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V1-04",
+     "label": null,
+     "top": [
+      107.01,
+      107.09
+     ],
+     "area": 83.8,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-01",
+     "label": null,
+     "top": [
+      107.07,
+      107.21
+     ],
+     "area": 49.2,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-02",
+     "label": null,
+     "top": [
+      107.21,
+      107.39
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-03",
+     "label": null,
+     "top": [
+      107.39,
+      107.59
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-04",
+     "label": null,
+     "top": [
+      107.59,
+      107.84
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-05",
+     "label": null,
+     "top": [
+      107.84,
+      108.09
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-06",
+     "label": null,
+     "top": [
+      108.09,
+      108.28
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-07",
+     "label": null,
+     "top": [
+      108.28,
+      108.46
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-08",
+     "label": null,
+     "top": [
+      108.46,
+      108.74
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-09",
+     "label": null,
+     "top": [
+      108.74,
+      109.1
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-10",
+     "label": null,
+     "top": [
+      109.1,
+      109.39
+     ],
+     "area": 59.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-V2S-11",
+     "label": null,
+     "top": [
+      109.39,
+      109.72
+     ],
+     "area": 47.0,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-PLOW-02",
+     "label": null,
+     "top": [
+      107.17,
+      107.44
+     ],
+     "area": 19.8,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-PLOW-03",
+     "label": null,
+     "top": [
+      107.44,
+      107.59
+     ],
+     "area": 36.8,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-PLOW-04",
+     "label": null,
+     "top": [
+      107.59,
+      107.08
+     ],
+     "area": 41.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-PLOW-05",
+     "label": null,
+     "top": [
+      107.08,
+      106.02
+     ],
+     "area": 41.1,
+     "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-R01",
+     "label": null,
+     "top": [
+      95.02,
+      101.43
+     ],
+     "area": 897.3,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.40 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-R02",
+     "label": null,
+     "top": [
+      107.22,
+      109.84
+     ],
+     "area": 274.7,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-R03",
+     "label": null,
+     "top": [
+      106.31,
+      107.95
+     ],
+     "area": 252.7,
+     "grade": "S-MAP(윗면 높이), 추정(평면 하나로 줄임: 맞춤 잔차 90 % 0.56 m), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-R04",
+     "label": null,
+     "top": [
+      106.84,
+      108.01
+     ],
+     "area": 223.3,
+     "grade": "S-MAP(윗면 높이), 추정(외곽 ±1.5 m)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S05",
+     "label": null,
+     "top": 109.7,
+     "area": 165.8,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S06",
+     "label": null,
+     "top": 112.8,
+     "area": 97.2,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S07",
+     "label": null,
+     "top": 102.6,
+     "area": 88.3,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S08",
+     "label": null,
+     "top": 111.0,
+     "area": 83.5,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S09",
+     "label": null,
+     "top": 112.7,
+     "area": 74.4,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S10",
+     "label": null,
+     "top": 113.0,
+     "area": 67.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S11",
+     "label": null,
+     "top": 115.1,
+     "area": 51.0,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    },
+    {
+     "id": "Z04-PLATFORM-GATE-S12",
+     "label": null,
+     "top": 116.5,
+     "area": 36.6,
+     "grade": "S-MAP(높이 범위), 추정(가파른 곳을 높이 2 m 띠마다 한 단으로 나눔: 실제 단의 수·자리 모름), 추정(외곽)",
+     "terrain": true
+    }
+   ]
+  }
+ }
+}

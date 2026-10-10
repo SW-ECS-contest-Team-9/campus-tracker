@@ -1,0 +1,57 @@
+{
+ "crs": "EPSG:5186",
+ "protectBuildings": true,
+ "reason": "Z04: Z03 조리법에 캠퍼스 안 나머지 구역의 기단을 더함(회차 공간 포장면을 한 경사면으로, 차도 띠, 본관·한림관 사이, 뒤편, 청운관·혜인관·은주관 둘레, 유담관 9층 앞마당, 서쪽 옹벽 위, 정문). 지형 칸은 구조물 파일(frontend/public/structures/z04-*.geojson)의 기단 윗면에서 나온다. 기단끼리는 벽면으로 만난다.",
+ "steps": [
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_5186.json",
+    "../samples/smap_samples_roads_5186.json",
+    "../samples/smap_samples_roadprofile_5186.json"
+   ],
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ]
+  },
+  {
+   "type": "plateau",
+   "file": "f05-plateaus.geojson",
+   "noBlend": "f05-no-blend.geojson"
+  },
+  {
+   "type": "corridor",
+   "file": "t06-road-corridors.json",
+   "lines": [
+    "V1",
+    "V2",
+    "V3",
+    "V4a",
+    "V4b",
+    "P-LOW",
+    "P-UP"
+   ],
+   "keep": "f05-plateaus.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "g02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z02-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z03-surface.geojson"
+  },
+  {
+   "type": "surface",
+   "file": "z04-surface.geojson"
+  }
+ ]
+}
