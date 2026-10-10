@@ -25,7 +25,7 @@ export const STRUCTURES = {
   /** A `planting` platform (a planted bank or a planter band on a wall): its top is the planted green, its sides are this wall colour. */
   plantingSide: '#a9a59b',
   /** A box whose `material` is one of these is drawn in this colour instead of the colour of its `type` (a concrete slab is not a timber deck; `opening` = a dark panel marking a portal in a wall; brick, glass, stone, roof tiles, railings and the trunk and foliage of a simple tree are what the zone files name). */
-  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551' } as Record<string, string>,
+  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551', water: '#7fb9cf', fence: '#5f6a5c' } as Record<string, string>,
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
   /** A material or type this table does not know. */

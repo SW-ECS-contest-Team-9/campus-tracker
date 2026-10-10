@@ -45,5 +45,25 @@
  },
  "pairs": 66,
  "reachableFlips": [],
- "lengthChanges": []
+ "lengthChanges": [],
+ "terrain": {
+  "old": "recipe-48104b3cbe948e93",
+  "new": "recipe-ad5312f23efc3e86",
+  "changedCells": 868,
+  "changedBuildingCells": 0,
+  "min": -2.19,
+  "max": 2.49,
+  "pins": {
+   "U060": {
+    "user": 126.1,
+    "z05": 127.6,
+    "z06": 126.16
+   },
+   "U068": {
+    "user": 124.8,
+    "z05": 126.27,
+    "z06": 125.25
+   }
+  }
+ }
 }

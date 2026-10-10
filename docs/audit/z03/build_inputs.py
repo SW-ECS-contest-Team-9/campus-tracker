@@ -121,7 +121,7 @@ for k in range(N):
         '분수 물받이 테두리(어두운 돌): 바깥 반지름 6.3 m(정사 그림), 높이 0.45 m·두께 0.45 m(사진 눈대중). 둥근 테두리를 24조각으로', FSRC, grade='S-MAP(자리·지름 ±1 m), 추정(높이)')
 box('Z03-FOUNTAIN-WATER', 'landing', circle(FX, FY, R_IN, 32), Z_PLAZA - 0.3, Z_PLAZA + 0.25, '물 면: 광장 + 0.25 m(테두리보다 0.2 m 아래, 추정). S-MAP 메시는 이 자리를 113.6~113.9 m 로 읽는다(물이라 믿기 어려움)', FSRC, material='water')
 for nm, r, h in (('TIER1', 3.8, 0.75), ('TIER2', 2.2, 1.45), ('TIER3', 1.0, 2.2)):
-    box(f'Z03-FOUNTAIN-{nm}', 'planter', circle(FX, FY, r, 24), Z_PLAZA, Z_PLAZA + h, f'분수 단({nm}): 반지름 {r} m(정사 그림의 고리), 윗면 광장 + {h} m(사진에서 물줄기 받침이 세 단으로 높아짐, 눈대중)', FSRC)
+    box(f'Z03-FOUNTAIN-{nm}', 'landing', circle(FX, FY, r, 24), Z_PLAZA, Z_PLAZA + h, f'분수 단({nm}): 반지름 {r} m(정사 그림의 고리), 윗면 광장 + {h} m(사진에서 물줄기 받침이 세 단으로 높아짐, 눈대중)', FSRC, material='white_stone')   # Z06: 화단(초록 윗면)이 아니라 흰 돌 단
 # 굽은 열주: 분수 가운데에서 반지름 12 m 원호(북서~북북동), 기둥 7개(사진에서 셈), 윗보
 R_COL, A0, A1, NCOL, H_COL, H_LINTEL = 12.0, 66.0, 155.0, 7, 4.3, 0.6
 CSRC = P_UP + '(기둥 7개가 보임), ' + ORTHO + '(원호 자리), ' + SV(8)
