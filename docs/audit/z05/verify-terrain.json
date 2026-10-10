@@ -1,5 +1,5 @@
 {
- "new": "terrain-recipe-dbb97463bfc0a8ab.f32",
+ "new": "terrain-recipe-34970164095a56dd.f32",
  "old": "terrain-recipe-a334b116df79c91e.f32",
  "finished_zones": {
   "g02": {
@@ -34,7 +34,7 @@
   "max": 17.0
  },
  "z05_platform_cells": 7141,
- "z05_max_abs_off_plane_m": 8.8461,
+ "z05_max_abs_off_plane_m": 8.7,
  "vs_smap_1m_in_campus": {
   "points": 32137,
   "z04": {
@@ -45,7 +45,7 @@
   "z05": {
    "median": -0.02,
    "p50_abs": 0.14,
-   "p90_abs": 2.22
+   "p90_abs": 2.2
   }
  },
  "vs_smap_1m_outside_sw": {
@@ -62,7 +62,7 @@
  "user_pins": {
   "n": 84,
   "z04_p90_abs": 1.73,
-  "z05_p90_abs": 0.83,
+  "z05_p90_abs": 0.66,
   "z05_over_1m": [
    {
     "id": "U013",
@@ -89,16 +89,10 @@
     "z05": 94.0
    },
    {
-    "id": "U054",
-    "user_m": 127.7,
-    "z04": 129.8,
-    "z05": 131.8
-   },
-   {
     "id": "U060",
     "user_m": 126.1,
     "z04": 126.26,
-    "z05": 127.2
+    "z05": 127.6
    },
    {
     "id": "U068",

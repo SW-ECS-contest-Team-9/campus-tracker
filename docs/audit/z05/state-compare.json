@@ -1,0 +1,49 @@
+{
+ "validation": {
+  "before": {
+   "total": 197,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 4,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 43,
+    "ISOLATED_COMPONENT": 8,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 53,
+    "info": 144
+   }
+  },
+  "after": {
+   "total": 198,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 4,
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 44,
+    "ISOLATED_COMPONENT": 8,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 54,
+    "info": 144
+   }
+  }
+ },
+ "counts": {
+  "before": {
+   "roads": 189,
+   "nodes": 180,
+   "places": 33,
+   "totalLengthM": 2656.9
+  },
+  "after": {
+   "roads": 189,
+   "nodes": 180,
+   "places": 33,
+   "totalLengthM": 2656.9
+  }
+ },
+ "pairs": 64,
+ "reachableFlips": [],
+ "lengthChanges": []
+}
