@@ -141,11 +141,15 @@ export function applyRecipe(
 
 const sha = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).digest('hex');
 
-/** Content hashes of the recipe inputs (parsed JSON, so line endings and spacing of the files do not matter). */
+/**
+ * Content hashes of the recipe inputs (parsed JSON, so line endings and spacing of the files do not matter).
+ * The protected footprints are hashed as a set (sorted by their own text): the order the buildings are read in is the
+ * order of their ids, and renaming a building id (B11: 건물5 -> 혜인관) must not give the same terrain a new id (Z08).
+ */
 export function recipeInputHashes(recipe: Recipe, inputs: Record<string, unknown>, buildings: Polygons = []) {
   return {
     files: Object.fromEntries(recipeFiles(recipe).map((f) => [f, sha(inputs[f])])),
-    buildings: recipe.protectBuildings ? sha(buildings) : null,
+    buildings: recipe.protectBuildings ? sha(buildings.map((polygon) => JSON.stringify(polygon)).sort()) : null,
   };
 }
 

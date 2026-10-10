@@ -11,7 +11,7 @@ export const PAVING = {
   slab: 0.9,
   /** Joint width (m) and how much darker a joint is than the face (0..1). */
   jointM: 0.035,
-  jointShade: 0.2,
+  jointShade: 0.13,
 };
 
 const VS = `in vec3 position3DHigh;

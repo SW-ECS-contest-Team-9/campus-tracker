@@ -57,6 +57,10 @@ test('recipe id depends on base, recipe, input contents and protected footprints
   const other = recipe(); (other.steps[2] as any).blendM = 2;
   assert.notEqual(recipeId('base-1', other, inputs(), buildings), id);
   assert.notEqual(recipeId('base-1', recipe(), inputs(), []), id);
+  // Z08: the footprints count as a set: a renamed building id only changes the order they are read in
+  const second = [[[[50, 50], [60, 50], [60, 60], [50, 60], [50, 50]]]];
+  assert.equal(recipeId('base-1', recipe(), inputs(), [...buildings, second]), recipeId('base-1', recipe(), inputs(), [second, ...buildings]));
+  assert.notEqual(recipeId('base-1', recipe(), inputs(), [...buildings, second]), id);
   const open = { ...recipe(), protectBuildings: false };
   assert.equal(recipeId('base-1', open, inputs(), buildings), recipeId('base-1', open, inputs(), [])); // footprints not used, not hashed
 });
