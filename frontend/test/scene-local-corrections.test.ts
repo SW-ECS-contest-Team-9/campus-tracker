@@ -7,13 +7,22 @@ import * as C from 'cesium';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { parseCorrections, CORRECTION_FILES } = await import('../src/scene-local-corrections.ts');
+const { parseCorrections, CORRECTION_FILES, readPathConstraints } = await import('../src/scene-local-corrections.ts');
 const { tmForward, tmInverse } = await import('../src/tm.ts');
 
 const DIR = new URL('../public/corrections/', import.meta.url);
 const groupOf = new Map(CORRECTION_FILES.map((c: any) => [c.file, c.group]));
 const present = CORRECTION_FILES.map((c: any) => c.file).filter((f: string) => fs.existsSync(new URL(f, DIR)));
 const read = (f: string) => JSON.parse(fs.readFileSync(new URL(f, DIR), 'utf8'));
+
+test('좌표 없는 본관–한림 연결 근거가 표시 자료에 보존된다', () => {
+  const fc = read('path-graph-candidate.geojson');
+  const constraints = readPathConstraints(fc);
+  assert.deepEqual(constraints.map((c) => c.id), fc.provenance.constraints_not_drawn);
+  assert.ok(constraints.some((c) => c.id === '본관5F↔한림3F' && c.note.includes('바닥 z 미확정')));
+  assert.deepEqual(readPathConstraints({}), []);
+  assert.deepEqual(readPathConstraints({ provenance: { constraint_notes: [null, { id: 'x' }] } }), []);
+});
 
 test('EPSG:5186 1 m = 1 m: 변환 왕복 오차 < 1 mm, 동서·남북 1 m 간격의 측지 거리 1 m ± 1 mm', () => {
   for (const f of present) {

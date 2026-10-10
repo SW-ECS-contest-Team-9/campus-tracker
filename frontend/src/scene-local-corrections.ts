@@ -83,10 +83,15 @@ async function loadFile(base: string, file: string): Promise<any | null> {
 
 /** 보정 레이어 생성(그룹별, 기본 숨김). 없는 파일은 pending으로 보고. */
 export type FootprintOverride = { setFootprintOverride(buildingId: string, coordinates: number[][][][] | null): void };
+export function readPathConstraints(fc: any): { id: string; note: string }[] {
+  const notes = fc?.provenance?.constraint_notes;
+  return Array.isArray(notes) ? notes.filter((n) => typeof n?.id === 'string' && typeof n?.note === 'string').map(({ id, note }) => ({ id, note })) : [];
+}
 export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: FootprintOverride | null = null, base = '/corrections/') {
   const loaded: string[] = [];
   const pending: string[] = [];
   const errors: string[] = [];
+  const pathConstraints: { id: string; note: string }[] = [];
   const byGroup: Record<CorrectionGroup, CorrectionFeature[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [], pathGraph: [] };
   const hidesByGroup: Record<CorrectionGroup, string[]> = { corrected: [], estimated: [], stairCandidate: [], stairV6: [], pathGraph: [] };
   for (const { file, group } of CORRECTION_FILES) {
@@ -94,6 +99,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
     if (!fc) { pending.push(file); continue; }
     const r = parseCorrections(file, fc, group);
     loaded.push(file);
+    if (group === 'pathGraph') pathConstraints.push(...readPathConstraints(fc));
     byGroup[group].push(...r.features);
     hidesByGroup[group].push(...(fc.provenance?.hides ?? [])); // 이 그룹이 켜지면 숨길 기존 객체 id 접두어
     errors.push(...r.errors);
@@ -130,7 +136,7 @@ export async function addLocalCorrections(C: CesiumNS, viewer: any, sceneLayer: 
   };
   if (errors.length) console.warn('local corrections rejected', errors);
   return {
-    loaded, pending, errors, ids: Object.values(byGroup).flat().map((f) => f.id),
+    loaded, pending, errors, pathConstraints, ids: Object.values(byGroup).flat().map((f) => f.id),
     setVisible(show: boolean, group: CorrectionGroup = 'corrected') {
       state[group] = show;
       apply();

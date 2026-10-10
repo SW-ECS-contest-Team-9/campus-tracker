@@ -126,7 +126,8 @@ fc = {'type': 'FeatureCollection', 'name': 'path-graph-candidate', 'crs': {'type
       'provenance': {'source': f'Obsidian 데이터/보완자료/3d-map-audit-20261009/claude-user-20261010/길사슬/{SRC.name}', 'sha256': hashlib.sha256(raw).hexdigest(),
                      'base_roads_sha_match': base_ok, 'generator': 'docs/audit/field/integrate_path_graph.py', 'status': G['status'], 'skipped': skipped, 'legend': LEG,
                      'chains': [{'chain': c['chain'], 'graph': c['graph_label'], 'surface': c['surface_connection']} for c in G['chains']],
-                     'constraints_not_drawn': [c['id'] for c in G['constraints']]},
+                     'constraints_not_drawn': [c['id'] for c in G['constraints']],
+                     'constraint_notes': G['constraints']},
       'features': feats}
 (ROOT / 'frontend/public/corrections/path-graph-candidate.geojson').write_text(json.dumps(fc, ensure_ascii=False), encoding='utf-8')
 ids = [f['properties']['id'] for f in feats]

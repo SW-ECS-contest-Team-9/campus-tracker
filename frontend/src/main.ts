@@ -976,7 +976,16 @@ async function boot() {
           $<HTMLInputElement>('scene-estimated').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'estimated'));
           $<HTMLInputElement>('scene-stair-candidate').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'stairCandidate'));
           $<HTMLInputElement>('scene-stair-v6').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'stairV6'));
-          $<HTMLInputElement>('scene-path-graph').addEventListener('change', (e) => c.setVisible((e.target as HTMLInputElement).checked, 'pathGraph'));
+          for (const constraint of c.pathConstraints) {
+            const item = document.createElement('li');
+            item.textContent = `${constraint.id}: ${constraint.note}`;
+            $('scene-path-constraint-list').append(item);
+          }
+          $<HTMLInputElement>('scene-path-graph').addEventListener('change', (e) => {
+            const show = (e.target as HTMLInputElement).checked;
+            c.setVisible(show, 'pathGraph');
+            $('scene-path-constraints').hidden = !show || c.pathConstraints.length === 0;
+          });
           if (import.meta.env.DEV) (window as any).__localCorrections = c;
         });
         return r.viewer;
