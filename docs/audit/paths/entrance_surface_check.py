@@ -36,7 +36,10 @@ def surface_at(xy):
         else:
             hits.append({'file':name,'id':f['properties']['id'],'zM':None,'note':'비평면 다각형: 단일평면 높이 미계산'})
             continue
-        hits.append({'file':name,'id':f['properties']['id'],'zM':z})
+        hits.append({'file':name,'id':f['properties']['id'],'zM':z,
+                     'walkable':f['properties'].get('walkable'),
+                     'label':f['properties'].get('label'),
+                     'usableAsGround':False if f['properties'].get('walkable') is False else None})
     return hits
 result=[]
 for label,e in graph['entrances'].items():
