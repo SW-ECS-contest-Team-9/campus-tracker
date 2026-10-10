@@ -1,0 +1,768 @@
+{
+ "type": "FeatureCollection",
+ "name": "e09-vehicle-roads-proposal",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "provenance": {
+  "created": "2026-10-10",
+  "by": "Claude",
+  "applied": false,
+  "note": "제안. 운영 DB에 쓰지 않음. 평면은 S-MAP 화면 판독(오차 가정 1.5 m), 높이는 S-MAP 메시(독립 측량 아님). 지하·터널 안은 없음(모름)."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "V1",
+    "name": "정문 진입로 (공도 분기 ~ 하단 주차장 차로 분기)",
+    "lengthM": 27.6,
+    "avgGradePct": 0.7,
+    "maxGradePct15m": 0.9,
+    "widthM": null,
+    "widthNote": "차로 2개 + 서쪽 정차 띠, 화면 판독 약 9~11 m(추정)",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + 학교 표지 정문(중심선 위 0.2 m) + 거리뷰 Y01(정문 가로 보, 정지선, 차단기)",
+    "grade": "S-MAP",
+    "photo": "streetview-yudam-approach-202602-01 (Y01), streetview-seogyeongro-202512 (S01)",
+    "note": null,
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ordinary",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201134.83,
+      557097.35,
+      106.9
+     ],
+     [
+      201131.14,
+      557106.97,
+      107.01
+     ],
+     [
+      201128.42,
+      557115.78,
+      107.08
+     ],
+     [
+      201124.89,
+      557122.99,
+      107.1
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "V2",
+    "name": "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이)",
+    "lengthM": 151.7,
+    "avgGradePct": 9.2,
+    "maxGradePct15m": 15.6,
+    "widthM": 7,
+    "widthNote": "화면 판독 약 7~8 m(추정), 황색 중앙선",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + 사용자 분수 광장 항공 사진 2장(광장 가장자리 암석 화단 위로 차도, 황색 중앙선) + 거리뷰 Y01~Y03",
+    "grade": "S-MAP",
+    "photo": "사용자-유담관분수-북악관앞-20261010 항공 2장, streetview-yudam-approach-202602-01~03",
+    "note": null,
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201124.89,
+      557122.99,
+      107.1
+     ],
+     [
+      201121.53,
+      557130.2,
+      107.21
+     ],
+     [
+      201117.84,
+      557137.4,
+      107.54
+     ],
+     [
+      201114,
+      557145.08,
+      107.91
+     ],
+     [
+      201110.48,
+      557151.48,
+      108.17
+     ],
+     [
+      201106.96,
+      557158.19,
+      108.42
+     ],
+     [
+      201103.77,
+      557164.57,
+      108.73
+     ],
+     [
+      201100.9,
+      557170.95,
+      109.13
+     ],
+     [
+      201100.05,
+      557172.67,
+      109.24
+     ],
+     [
+      201097.96,
+      557179.11,
+      109.7
+     ],
+     [
+      201095.22,
+      557187.16,
+      110.5
+     ],
+     [
+      201092.81,
+      557195.19,
+      111.42
+     ],
+     [
+      201091.04,
+      557203.2,
+      112.22
+     ],
+     [
+      201089.75,
+      557211.2,
+      113.08
+     ],
+     [
+      201089.11,
+      557219.18,
+      114.12
+     ],
+     [
+      201089.1,
+      557227.13,
+      115.24
+     ],
+     [
+      201088.22,
+      557234.88,
+      116.43
+     ],
+     [
+      201087.71,
+      557243.32,
+      117.78
+     ],
+     [
+      201086.99,
+      557249.63,
+      118.76
+     ],
+     [
+      201085.44,
+      557255.91,
+      119.63
+     ],
+     [
+      201083.57,
+      557261.13,
+      120.34
+     ],
+     [
+      201080.26,
+      557265.61,
+      121.06
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "V3",
+    "name": "주 경사로 상부 = S06 (굽이 ~ 본관 남서 모서리 P1 분기)",
+    "lengthM": 60.5,
+    "avgGradePct": 11.1,
+    "maxGradePct15m": 14.1,
+    "widthM": 7,
+    "widthNote": "화면 판독 약 7 m(추정). 본관 쪽 계단식 보도는 따로",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + CT-M16 S06-C1(같은 선, 최대 1.6 m 차) + 거리뷰 Y04~Y09·M01·M04·M05·M07",
+    "grade": "S-MAP",
+    "photo": "streetview-yudam-approach-202602-04~09, streetview-main-p1-202602-01·04·05·07",
+    "note": null,
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201080.26,
+      557265.61,
+      121.06
+     ],
+     [
+      201076.84,
+      557269.45,
+      121.49
+     ],
+     [
+      201072.18,
+      557274.12,
+      122.12
+     ],
+     [
+      201067.02,
+      557278.25,
+      122.86
+     ],
+     [
+      201061.88,
+      557281.33,
+      123.64
+     ],
+     [
+      201057.27,
+      557283.89,
+      124.31
+     ],
+     [
+      201052.66,
+      557287.23,
+      125.25
+     ],
+     [
+      201046.89,
+      557290.69,
+      126.0
+     ],
+     [
+      201041.9,
+      557294.46,
+      126.92
+     ],
+     [
+      201036.93,
+      557298.58,
+      127.38
+     ],
+     [
+      201032.58,
+      557302.31,
+      127.79
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "V4",
+    "name": "본관 서쪽 회차 공간 (P1 분기 ~ 북악관 앞 버스 공간 남쪽 끝)",
+    "lengthM": 51.0,
+    "avgGradePct": 5.4,
+    "maxGradePct15m": 7.2,
+    "widthM": null,
+    "widthNote": "넓은 포장면(면으로 다룰 곳). 선은 진입 축만",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + 거리뷰 M06(노면 글자 \"회차\"·화살표, 멀리 버스) + B01(버스 공간) + 학교 표지 버스정류장 2곳",
+    "grade": "S-MAP",
+    "photo": "streetview-main-p1-202602-06 (M06), streetview-bukak-front-202512-01 (B01), 사용자 북악관 앞 사진",
+    "note": null,
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ordinary",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201032.58,
+      557302.31,
+      127.79
+     ],
+     [
+      201028.86,
+      557306.28,
+      127.9
+     ],
+     [
+      201026.75,
+      557311.25,
+      128.49
+     ],
+     [
+      201025.76,
+      557316.2,
+      128.72
+     ],
+     [
+      201024.53,
+      557321.15,
+      129.02
+     ],
+     [
+      201023.04,
+      557326.1,
+      129.35
+     ],
+     [
+      201021.44,
+      557331.04,
+      129.78
+     ],
+     [
+      201020.21,
+      557335.98,
+      130.12
+     ],
+     [
+      201018.97,
+      557340.91,
+      130.35
+     ],
+     [
+      201017.37,
+      557345.84,
+      130.56
+     ],
+     [
+      201015.27,
+      557349.54,
+      130.56
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P-LOW",
+    "name": "하단 주차장 차로 (정문 안쪽 서편, 표지판 \"P2\")",
+    "lengthM": 34.3,
+    "avgGradePct": -3.1,
+    "maxGradePct15m": 10.1,
+    "widthM": null,
+    "widthNote": "모름",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + 거리뷰 Y01(\"P2\" 표지 아래 낮은 입구, 앞 횡단보도·STOP) + 학교 표지 \"제1주차장 출입구\"(끝점에서 5.5 m)",
+    "grade": "S-MAP",
+    "photo": "streetview-yudam-approach-202602-01 (Y01)",
+    "note": "첫 구간(분기점~차로 첫 점 12.6 m)의 이음 모양은 추정. 끝점은 덮개 직전의 가장 낮은 메시 점이고 그 안쪽은 모름",
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201124.89,
+      557122.99,
+      107.1
+     ],
+     [
+      201112.88,
+      557131.89,
+      107.48
+     ],
+     [
+      201110.36,
+      557134.83,
+      107.61
+     ],
+     [
+      201107.84,
+      557137.77,
+      107.62
+     ],
+     [
+      201105.32,
+      557139.86,
+      107.39
+     ],
+     [
+      201102.37,
+      557142.8,
+      106.78
+     ],
+     [
+      201099.84,
+      557146.16,
+      106.05
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P-UP",
+    "name": "P1 주차장 차로 (본관 남서 모서리, 표지판 \"P1\")",
+    "lengthM": 12.7,
+    "avgGradePct": 1.2,
+    "maxGradePct15m": 0.0,
+    "widthM": null,
+    "widthNote": "모름",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + CT-M16 S07-C1 문턱선 + 거리뷰 M06(\"P1\" 표지, 노면 글자 \"주차장\")·M01",
+    "grade": "S-MAP",
+    "photo": "streetview-main-p1-202602-06 (M06), -01 (M01)",
+    "note": "문턱 높이 오차 ±1.5 m(메시가 화단 아래 내리막을 그리지 못함). 문턱 안쪽은 모름",
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201032.58,
+      557302.31,
+      127.79
+     ],
+     [
+      201025.76,
+      557302.55,
+      127.66
+     ],
+     [
+      201021.95,
+      557307.07,
+      127.94
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U1",
+    "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길",
+    "lengthM": 94.5,
+    "avgGradePct": 10.3,
+    "maxGradePct15m": 18.0,
+    "widthM": null,
+    "widthNote": "화면 판독 약 5~8 m(추정), 남쪽에 빗금 주차 칸",
+    "source": "S-MAP 3D 화면 판독(2026-10-10, 차선·경계석을 눈으로 보고 찍음, 메시 표면 높이) + 거리뷰 M02(갈라져 오르는 아스팔트, 노면 20)·M03(유리 건물 앞 계단으로 끝나는 가지)",
+    "grade": "S-MAP",
+    "photo": "streetview-main-p1-202602-02·03 (M02, M03)",
+    "note": "upperBranch 끝(201109.6, 557237.6)과 upperBranchSouth 첫 점 사이 8 m는 넓은 포장면 안에서 이은 것(추정). 그 남쪽 25 m(수인관 북서 모서리까지)는 판독 높이와 조회 높이가 2 m 어긋나고 8 m 에 2.1 m 떨어져 제안에서 뺌. 끝이 어디로 들어가는지 모름. M03의 한림관 앞 가지는 넣지 않음",
+    "kind": "vehicle-road",
+    "roadClass": "vehicle",
+    "structure": "ramp",
+    "accuracyVerified": false,
+    "errXyM": 1.5,
+    "errZM": 0.5
+   },
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      201080.26,
+      557265.61,
+      121.06
+     ],
+     [
+      201085.17,
+      557271.0,
+      122.21
+     ],
+     [
+      201088.3,
+      557275.64,
+      123.41
+     ],
+     [
+      201092.45,
+      557276.13,
+      124.14
+     ],
+     [
+      201097.1,
+      557274.56,
+      124.77
+     ],
+     [
+      201102.27,
+      557273.01,
+      125.02
+     ],
+     [
+      201106.4,
+      557270.94,
+      125.09
+     ],
+     [
+      201108.46,
+      557267.32,
+      125.21
+     ],
+     [
+      201108.44,
+      557262.16,
+      125.8
+     ],
+     [
+      201108.11,
+      557256.18,
+      126.79
+     ],
+     [
+      201108.39,
+      557249.82,
+      127.69
+     ],
+     [
+      201108.88,
+      557243.68,
+      128.52
+     ],
+     [
+      201109.58,
+      557237.55,
+      129.22
+     ],
+     [
+      201114.79,
+      557231.5,
+      130.38
+     ],
+     [
+      201113.69,
+      557223.68,
+      130.59
+     ],
+     [
+      201112.9,
+      557215.86,
+      130.74
+     ],
+     [
+      201112.12,
+      557211.18,
+      130.83
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "G-MAIN",
+    "name": "정문",
+    "category": "landmark",
+    "grade": "원천(위치) / S-MAP(높이)",
+    "leadsTo": "차도 위. 차단기는 북쪽 약 55 m(거리뷰 Y01, 위치 추정)",
+    "unknown": "차단기 정확한 자리, 일반 차량 통과 조건",
+    "oldTerrain": 107.33,
+    "t01": 107.33,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201129.2,
+     557112.8,
+     107.09
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "G-WEST",
+    "name": "서문(후문) = 서문 주차장 출입구(추정)",
+    "category": "parking",
+    "grade": "S-MAP(옹벽 면 x·앞 도로 높이) / 추정(벽을 따른 남북 위치, 두 표지가 같은 문이라는 것)",
+    "leadsTo": "옹벽 밑 터널형 차량 출입구 두 칸(사용자 사진 서문.jpg). 옹벽 위는 식재 비탈 126~129 m, 그 뒤 북악관 앞 포장면 130.6~131.3 m(S-MAP) → 문 바닥이 약 14 m 아래",
+    "unknown": "터널 안 배치·층·경사로, P1 주차장과 이어지는지, 일반 차량 개방 여부. 학교 표지 2개(서문 200967.8, 557401.5 / 서문 주차장 출입구 200969.0, 557402.8)는 옹벽 면에서 서쪽 약 13~15 m 공도 위",
+    "oldTerrain": 117.55,
+    "t01": 117.55,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     200983.7,
+     557399.5,
+     116.96
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P-LOW",
+    "name": "하단 주차장 입구 (표지판 P2, 학교 표지 \"제1주차장 출입구\")",
+    "category": "parking",
+    "grade": "S-MAP(차로·덮개 직전 높이) / 원천(학교 표지 201096.7, 557150.7: 5.5 m 거리, 지면 106.1 m)",
+    "leadsTo": "모름(어느 건물 몇 층인지 원천 없음)",
+    "unknown": "표지판은 P2인데 학교 목록은 제1주차장: 같은 곳인지. 안쪽 층·배치. 실제 문턱은 덮개 아래라 S-MAP에 안 보임",
+    "oldTerrain": 103.85,
+    "t01": 103.85,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201099.8,
+     557146.2,
+     106.05
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P-UP",
+    "name": "P1 주차장 입구 (표지판 P1, 본관 남서 화단 아래)",
+    "category": "parking",
+    "grade": "S-MAP(문턱선 CT-M16 S07-C1, 높이 ±1.5 m)",
+    "leadsTo": "화단 아래로 내려감(거리뷰 M06). 본관 입구(2)가 \"지하주차장과 본관 2층 연결\"(원천)이고 그 표지 지면이 130.5 m → 북악관·본관 앞 포장면 아래 주차장으로 보임(추정)",
+    "unknown": "지하 바닥 높이·배치, 서문 터널과 이어지는지. 학교 표지 \"제2주차장 출입구\"(201057.8, 557267.2)는 유담관 외곽 안(문턱에서 53 m)이라 이 문을 가리키는지 모름",
+    "oldTerrain": 131.22,
+    "t01": 131.22,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201021.95,
+     557307.07,
+     127.94
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "P-M2",
+    "name": "학교 표지 \"제2주차장 출입구\"",
+    "category": "parking",
+    "grade": "원천(표지 위치만)",
+    "leadsTo": "모름. 표지가 유담관 지붕 아래(S-MAP 건물 높이 값이 있는 칸)이고 S-MAP·거리뷰 Y02~Y08에서 차량 문이 확인되지 않음",
+    "unknown": "실제 문 위치, P1 표지판 문과 같은지",
+    "propose": false,
+    "oldTerrain": 125.35,
+    "t01": 125.12,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201057.8,
+     557267.2,
+     122.58
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "E-MAIN2",
+    "name": "본관 입구(2)",
+    "category": "building_entrance",
+    "grade": "원천(위치·설명) / S-MAP(지면)",
+    "leadsTo": "지하주차장과 본관 2층(원천 문구). 보행 입구",
+    "unknown": "문 바닥 높이, 주차장으로 내려가는 계단·승강기",
+    "buildingId": "본관",
+    "oldTerrain": 133.57,
+    "t01": 133.57,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201041.5,
+     557338.5,
+     130.5
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "BUS-2115",
+    "name": "서경대본관 2115번 버스정류장",
+    "category": "bus_stop",
+    "grade": "원천(위치) / S-MAP(높이)",
+    "leadsTo": "회차 공간 남쪽",
+    "unknown": "승하차 자리",
+    "oldTerrain": 133.95,
+    "t01": 133.95,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201031.0,
+     557319.0,
+     128.85
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "BUS-1164",
+    "name": "서경대본관 1164번 버스정류장",
+    "category": "bus_stop",
+    "grade": "원천(위치) / S-MAP(높이)",
+    "leadsTo": "회차 공간 남쪽",
+    "unknown": "승하차 자리",
+    "oldTerrain": 130.59,
+    "t01": 130.59,
+    "kind": "entrance-or-stop",
+    "accuracyVerified": false
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     201023.3,
+     557317.0,
+     129.01
+    ]
+   }
+  }
+ ]
+}
