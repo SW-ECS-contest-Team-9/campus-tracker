@@ -174,3 +174,14 @@ export function sceneVersionId(gpkgSha: string, terrainVersion: string, mapVersi
   const key = `${gpkgSha}#${terrainVersion}#${mapVersion}#${mode}${overridesSha ? `#roofs:${overridesSha}` : ''}`;
   return `campus3d-${createHash('sha256').update(key).digest('hex').slice(0, 8)}`;
 }
+
+/**
+ * qgis:sync matches scene rows to GeoPackage rows by name. Rows of added buildings (not in the GeoPackage) and every row of a
+ * hidden or split building are left out: the first part of a split keeps the building's name but carries only that part's heights.
+ */
+export function gpkgSyncRows<T extends { building_id: string; name: string | null }>(scene: T[],
+  metadata: { hiddenBuildings?: { name: string }[]; buildingParts?: { name: string }[]; addedBuildings?: { id: string }[] } | null | undefined): { rows: T[]; kept: Set<string> } {
+  const added = new Set((metadata?.addedBuildings ?? []).map((o) => o.id));
+  const kept = new Set([...(metadata?.hiddenBuildings ?? []), ...(metadata?.buildingParts ?? [])].map((o) => o.name));
+  return { rows: scene.filter((b) => !added.has(b.building_id) && !(b.name !== null && kept.has(b.name))), kept };
+}

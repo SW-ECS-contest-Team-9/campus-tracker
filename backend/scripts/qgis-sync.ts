@@ -16,6 +16,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { pool } from '../src/config/database.js';
 import { terrain } from '../src/geo/terrain.js';
 import { registerGpkgFunctions } from '../src/geo/gpkg.js';
+import { gpkgSyncRows } from '../src/modules/scene/scene-overrides.js';
 
 const { values: args } = parseArgs({ options: { dir: { type: 'string' }, 'dry-run': { type: 'boolean', default: false } } });
 
@@ -41,9 +42,8 @@ async function main() {
   // Buildings the scene overrides hide or split into parts have no row of their own name in the scene: their GeoPackage rows are left as they are.
   const { rows: [sv] } = await pool.query<{ metadata: { hiddenBuildings?: { name: string }[]; buildingParts?: { name: string }[]; addedBuildings?: { id: string }[] } | null }>('SELECT metadata FROM scene_versions WHERE active');
   // Buildings the overrides add are not in the GeoPackage; one may carry the name of a hidden GeoPackage row, which must not take its heights.
-  const added = new Set((sv?.metadata?.addedBuildings ?? []).map((o) => o.id));
-  const buildings = scene.filter((b) => !added.has(b.building_id));
-  const overridden = new Set([...(sv?.metadata?.hiddenBuildings ?? []), ...(sv?.metadata?.buildingParts ?? [])].map((o) => o.name));
+  // The first part of a split building keeps the building's name: it must not write one part's heights into the whole building's row.
+  const { rows: buildings, kept: overridden } = gpkgSyncRows(scene, sv?.metadata);
 
   // 1. server DEM -> GeoTIFF (rows north to south; the stored grid's row 0 is the south edge)
   const g = ctx.grid;

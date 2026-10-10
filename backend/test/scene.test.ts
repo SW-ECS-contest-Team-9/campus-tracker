@@ -5,7 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { decodeGpkgGeometry, readGpkgLayer } from '../src/geo/gpkg.js';
 import { blockHeights, outlineSamples } from '../src/modules/scene/scene-heights.js';
-import { overrideHeights, parseRoofOverrides, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, ringArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
+import { gpkgSyncRows, overrideHeights, parseRoofOverrides, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, ringArea, sceneVersionId } from '../src/modules/scene/scene-overrides.js';
 
 /** GeoPackage blob: "GP", version 0, flags (little endian, no envelope), srs 5186, then WKB polygon. */
 function gpkgPolygon(ring: [number, number][]): Uint8Array {
@@ -179,4 +179,16 @@ test('scene overrides: added buildings (not in the GeoPackage) carry their own o
   assert.throws(() => parseSceneOverrides({ buildings: [], added: {} }), /"added" must be an array/);
   // without overrides the version id is the old one; anything applied (an added building too) gives another id
   assert.notEqual(sceneVersionId('g', 't', 'm', 'RECOMPUTED', 'x'), sceneVersionId('g', 't', 'm', 'RECOMPUTED'));
+});
+
+test('qgis:sync rows: added buildings and every row of a hidden or split building are left out, also the part that keeps the name', () => {
+  const scene = [
+    { building_id: '본관', name: '본관' }, { building_id: '대일관', name: '대일관' }, { building_id: '대일관#동쪽부속부', name: null },
+    { building_id: '은주관', name: '은주1관' }, { building_id: '추가-공연실습소', name: '공연실습소' }, { building_id: '수인관', name: '수인관' },
+  ];
+  const metadata = { hiddenBuildings: [{ name: '공연실습소' }], buildingParts: [{ name: '대일관' }, { name: '은주관' }], addedBuildings: [{ id: '추가-공연실습소' }] };
+  const { rows, kept } = gpkgSyncRows(scene, metadata);
+  assert.deepEqual(rows.map((b) => b.building_id), ['본관', '대일관#동쪽부속부', '은주관', '수인관']); // nameless parts and 은주1관 match no GeoPackage name later
+  assert.deepEqual([...kept].sort(), ['공연실습소', '대일관', '은주관']);
+  assert.deepEqual(gpkgSyncRows(scene, null).rows, scene); // a scene imported without overrides syncs every row
 });
