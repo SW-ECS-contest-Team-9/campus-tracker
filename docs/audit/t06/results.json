@@ -1,0 +1,2628 @@
+{
+ "title": "T06 운동장·포장면 평탄화와 차도 띠 새김 (시험용 DB)",
+ "created": "2026-10-11",
+ "appliedTo": "local test DB only (campus-tracker-test-db, 127.0.0.1:5544)",
+ "terrain": {
+  "base": "seoul5000-2015-ba7fcb19",
+  "recipe": "backend/data/terrain/recipes/t06-smooth-ground.json",
+  "id": "recipe-ee7396b9671416c8",
+  "gridSha256": "56c8217da108ca821a990b61605a38e17cb5d9b8936adbeeba373e8d0317739b",
+  "previousActive": "local-samples-f5f1dbc499a3263c",
+  "inputSha256": {
+   "files": {
+    "../samples/smap_samples_5186.json": "233b848a4ef0d75efc300e743f32361e0067d642f0fbbefea1bdabdfd3fddc2c",
+    "../samples/smap_samples_roads_5186.json": "325c6add0c866f2bc557c55eea4b71a92f9d0244455c505eedae16fe5bb08fec",
+    "../samples/smap_samples_roadprofile_5186.json": "a989387ba16d2b85d1050cc3821c85dc32f62124890a2825d4e11e8a176b581b",
+    "t06-plateaus.geojson": "db0c7bb6550a3be5f70f72b5f858ad73bf7c25b9a15140feda584fa782d1420d",
+    "t06-no-blend.geojson": "fd07479ee83d90e778a5b9d56c4cc71aae891757a1ad417070c7dcd3e7ff5302",
+    "t06-road-corridors.json": "aadc2356c0df3eb7c6489c3b68a99f635f54f6883c38844f6c4970172c5e307d"
+   },
+   "buildings": "c549185f5b95832df42dac1da526019cf5fe5d92a1feca10d0dea96e9d328897"
+  },
+  "options": {
+   "localSamples": {
+    "passes": [
+     [
+      6,
+      15
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      6
+     ]
+    ],
+    "supportM": 6,
+    "fadeM": 6,
+    "minNeighbours": 3,
+    "neighbourRadiusM": 6
+   },
+   "plateauEdge": {
+    "marginM": 3,
+    "blendM": 4
+   },
+   "corridor": {
+    "shoulderM": 2,
+    "blendM": 4
+   }
+  },
+  "steps": [
+   {
+    "type": "local-samples",
+    "detail": {
+     "areas": [
+      "field",
+      "road_profile",
+      "gate_road_rest",
+      "s06_rest",
+      "turnaround_rest"
+     ],
+     "samples": 3694,
+     "skippedSamples": 0,
+     "groups": 14
+    },
+    "changedCells": 6747,
+    "minDelta": -9.235549926757812,
+    "maxDelta": 11.109451293945312
+   },
+   {
+    "type": "plateau",
+    "detail": {
+     "marginM": 3,
+     "blendM": 4
+    },
+    "changedCells": 2856,
+    "minDelta": -3.3732147216796875,
+    "maxDelta": 2.4028778076171875
+   },
+   {
+    "type": "corridor",
+    "detail": {
+     "shoulderM": 2,
+     "blendM": 4
+    },
+    "changedCells": 1864,
+    "minDelta": -11.733444213867188,
+    "maxDelta": 3.829833984375
+   }
+  ],
+  "vsBase": {
+   "changedCells": 7052,
+   "minDelta": -11.9525146484375,
+   "maxDelta": 11.109451293945312,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 1240,
+    "0.1-0.5m": 2724,
+    "0.5-1m": 3404,
+    "1-2m": 4796,
+    "2-5m": 7136,
+    ">5m": 8908
+   },
+   "steepCellsBefore": 15276,
+   "steepCellsAfter": 15228
+  },
+  "vsPreviousActive": {
+   "version": "local-samples-f5f1dbc499a3263c",
+   "changedCells": 5903,
+   "minDelta": -10.969276428222656,
+   "maxDelta": 4.5580291748046875,
+   "areaM2ByAbsDelta": {
+    "0-0.1m": 10732,
+    "0.1-0.5m": 6664,
+    "0.5-1m": 2900,
+    "1-2m": 2584,
+    "2-5m": 712,
+    ">5m": 20
+   },
+   "steepCellsBefore": 15291,
+   "steepCellsAfter": 15228
+  },
+  "storedEqualsRerun": {
+   "id": "recipe-ee7396b9671416c8",
+   "idMatchesRecipe": true,
+   "cellsDifferentFromRerun": 0
+  }
+ },
+ "plazaHeight": {
+  "chosenM": 130.6,
+  "was": 131.0,
+  "why": "사용자 S-MAP 핀: 포장면 12개 130.4~131.2(중앙 130.7), 차도 끝 130.4·130.6. V02 종단 끝 130.53. 131.0 이면 차도 끝을 0.6 m 올려야 함.",
+  "cost": "북쪽 가장자리 노드(북악관 정문 계단 아래 131.4, 서쪽 옆길 131.3, 오르막 보행로 아래 131.4)를 0.7~0.8 m 낮춤"
+ },
+ "editorOps": [
+  {
+   "group": "T06-A",
+   "comment": "V02 만나는 점 높이 4건(a12b5e30 은 포장면 높이 130.6, 0a815157 은 그에 맞춘 종단)",
+   "batchId": "a96d1bfe-f0cb-4672-aa00-90f8da6feec1",
+   "changeSets": [
+    {
+     "ref": "T06-V02-node-7e93e170",
+     "op": "move_node",
+     "changeSetId": "d737df9e-9889-4ff0-b3e5-dc144a62bc92"
+    },
+    {
+     "ref": "T06-V02-node-0a815157",
+     "op": "move_node",
+     "changeSetId": "2cd99a10-259c-475e-bc94-c78bd827e3c7"
+    },
+    {
+     "ref": "T06-V02-node-a12b5e30",
+     "op": "move_node",
+     "changeSetId": "3b875150-53fe-4e36-9f22-62225296a272"
+    },
+    {
+     "ref": "T06-V02-node-98909b6c",
+     "op": "move_node",
+     "changeSetId": "3761aa97-2a50-4afb-b9d7-d1f94cbf449e"
+    }
+   ]
+  },
+  {
+   "group": "T06-B",
+   "comment": "V02 차도 8개: 매끄러운 가운데 선과 종단(V4a·V4b 끝은 포장면 130.6 m 에 맞춤)",
+   "batchId": "2b313f6f-b0e0-4962-846c-07f9677cc840",
+   "changeSets": [
+    {
+     "ref": "T06-V02-V1",
+     "op": "update_road",
+     "changeSetId": "2a1ebd78-87c3-472e-974f-1cc0b032b92b"
+    },
+    {
+     "ref": "T06-V02-V2",
+     "op": "update_road",
+     "changeSetId": "9f0b145c-0296-4919-9be7-2a937f04f8e4"
+    },
+    {
+     "ref": "T06-V02-V3",
+     "op": "update_road",
+     "changeSetId": "1456b0bd-17f7-42f1-bf22-1cb2a63cd9f1"
+    },
+    {
+     "ref": "T06-V02-V4a",
+     "op": "update_road",
+     "changeSetId": "a513db08-e3db-45d7-a584-0744330abd51"
+    },
+    {
+     "ref": "T06-V02-V4b",
+     "op": "update_road",
+     "changeSetId": "1c28cf18-8087-4190-a9a7-854ec9c612c9"
+    },
+    {
+     "ref": "T06-V02-P-LOW",
+     "op": "update_road",
+     "changeSetId": "21eb2ab5-ca28-4c00-ac5f-7c9d8835301e"
+    },
+    {
+     "ref": "T06-V02-P-UP",
+     "op": "update_road",
+     "changeSetId": "90b18760-cbbe-48de-a029-3f7fd3a82b4b"
+    },
+    {
+     "ref": "T06-V02-U1",
+     "op": "update_road",
+     "changeSetId": "b2621b7f-9307-4eaa-8dd0-cac0978b9239"
+    }
+   ]
+  },
+  {
+   "group": "T06-C",
+   "comment": "포장면에 닿는 노드를 포장면 높이 130.6 m 로",
+   "batchId": "9cd7cb72-d4de-4dc9-8709-13b0a9f4e531",
+   "changeSets": [
+    {
+     "ref": "T06-plaza-node-e13a5ce2 (130.90 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "adf5e080-f561-472d-9b04-2aabdcd3d907"
+    },
+    {
+     "ref": "T06-plaza-node-438353e0 (130.80 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "61b76425-58f2-4b5a-8995-0d6dfe9483ae"
+    },
+    {
+     "ref": "T06-plaza-node-bd52b7a9 (131.40 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "63125615-abd0-439f-96fb-7e3ca1b9adaa"
+    },
+    {
+     "ref": "T06-plaza-node-1c589868 (131.40 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "7299197d-19ee-45f1-9504-85ba1fdc8ccb"
+    },
+    {
+     "ref": "T06-plaza-node-be0dbc5c (131.30 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "18f04b14-3df7-4c09-8d3e-ec4143f38a09"
+    },
+    {
+     "ref": "T06-plaza-node-4c8924d4 (131.32 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "e005ee49-c64f-4548-a2f9-2e2204b7f545"
+    },
+    {
+     "ref": "T06-plaza-node-fa8ea5b3 (131.00 -> 130.60)",
+     "op": "move_node",
+     "changeSetId": "650a7800-d917-489f-83ac-11e21e266370"
+    }
+   ]
+  },
+  {
+   "group": "T06-D",
+   "comment": "오르막 보행로 c52095ad 아래 세 꼭짓점을 포장면 높이에 맞춰 낮춤",
+   "batchId": null,
+   "changeSets": [
+    {
+     "ref": "T06-uphill-c52095ad",
+     "op": "update_road",
+     "changeSetId": "a2fdbbcf-0976-4b64-b17d-8f0daa7416ee"
+    }
+   ]
+  }
+ ],
+ "area": {
+  "id": 2,
+  "elevationM": [
+   131.0,
+   130.6
+  ]
+ },
+ "relevel": {
+  "changeSetId": "fb175416-e958-44c1-8b7f-15ed04b6763e",
+  "roads": [
+   {
+    "road": "45682ee7 청운관 앞–혜인관 B1 지상 연결 (추정)",
+    "vertices": 1,
+    "shiftM": [
+     -0.06,
+     -0.06
+    ]
+   },
+   {
+    "road": "4ee99835 C02 수집 경로 (2026-10-07)",
+    "vertices": 2,
+    "shiftM": [
+     -0.02,
+     -0.02
+    ]
+   },
+   {
+    "road": "79fbc430 C02 수집 경로 (2026-10-07)",
+    "vertices": 11,
+    "shiftM": [
+     -0.79,
+     0.7
+    ]
+   },
+   {
+    "road": "88ba01e6 대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+    "vertices": 1,
+    "shiftM": [
+     -0.06,
+     -0.06
+    ]
+   },
+   {
+    "road": "b17424ba C02 수집 경로 (2026-10-07)",
+    "vertices": 2,
+    "shiftM": [
+     -0.6,
+     1.4
+    ]
+   },
+   {
+    "road": "b6ea9f96 회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+    "vertices": 1,
+    "shiftM": [
+     0,
+     0
+    ]
+   },
+   {
+    "road": "bf2acf00 C02 수집 경로 (2026-10-07)",
+    "vertices": 2,
+    "shiftM": [
+     -0.36,
+     -0.35
+    ]
+   }
+  ],
+  "nodes": [
+   {
+    "id": "561a12b4-2022-431c-ad95-b979b396be16",
+    "rule": "reference",
+    "shiftM": -0.06,
+    "roads": [
+     "45682ee7 청운관 앞–혜인관 B1 지상 연결 (추정)",
+     "79fbc430 C02 수집 경로 (2026-10-07)",
+     "88ba01e6 대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)"
+    ]
+   },
+   {
+    "id": "ea9b5a91-9aa4-4445-89da-66aec151bc5a",
+    "rule": "draped",
+    "shiftM": -0.35,
+    "roads": [
+     "79fbc430 C02 수집 경로 (2026-10-07)",
+     "bf2acf00 C02 수집 경로 (2026-10-07)"
+    ]
+   }
+  ],
+  "keptNodes": 5,
+  "notMovedOwnHeights": 38,
+  "notMovedIndoorRoads": 23
+ },
+ "scene": {
+  "before": "campus3d-83d5f401",
+  "after": "campus3d-ee89d971",
+  "gates": "passed",
+  "changedOver0_3m": [
+   {
+    "building": "수인관",
+    "name": "수인관",
+    "base": [
+     109.13,
+     108.59
+    ],
+    "roof": [
+     132.1,
+     132.1
+    ],
+    "groundMin": [
+     110.13,
+     109.59
+    ],
+    "groundMax": [
+     144.8,
+     144.8
+    ],
+    "dBase": -0.54,
+    "dRoof": 0.0,
+    "dHeight": 0.0
+   },
+   {
+    "building": "유담관#탑남동",
+    "name": "",
+    "base": [
+     118.57,
+     118.1
+    ],
+    "roof": [
+     169.2,
+     169.2
+    ],
+    "groundMin": [
+     119.57,
+     119.1
+    ],
+    "groundMax": [
+     123.04,
+     122.77
+    ],
+    "dBase": -0.47,
+    "dRoof": 0.0,
+    "dHeight": 0.1
+   }
+  ],
+  "changedAny": [
+   {
+    "building": "건물5",
+    "name": "혜인관",
+    "base": [
+     141.87,
+     141.87
+    ],
+    "roof": [
+     178.05,
+     178.03
+    ],
+    "groundMin": [
+     142.87,
+     142.87
+    ],
+    "groundMax": [
+     151.35,
+     151.35
+    ],
+    "dBase": 0.0,
+    "dRoof": -0.02,
+    "dHeight": 0.0
+   },
+   {
+    "building": "본관",
+    "name": "본관",
+    "base": [
+     126.11,
+     126.12
+    ],
+    "roof": [
+     153.01,
+     152.98
+    ],
+    "groundMin": [
+     127.11,
+     127.12
+    ],
+    "groundMax": [
+     140.73,
+     140.45
+    ],
+    "dBase": 0.01,
+    "dRoof": -0.03,
+    "dHeight": 0.0
+   },
+   {
+    "building": "북악관",
+    "name": "북악관",
+    "base": [
+     128.94,
+     128.94
+    ],
+    "roof": [
+     161.78,
+     161.77
+    ],
+    "groundMin": [
+     129.94,
+     129.94
+    ],
+    "groundMax": [
+     134.92,
+     134.92
+    ],
+    "dBase": 0.0,
+    "dRoof": -0.01,
+    "dHeight": 0.0
+   },
+   {
+    "building": "수인관",
+    "name": "수인관",
+    "base": [
+     109.13,
+     108.59
+    ],
+    "roof": [
+     132.1,
+     132.1
+    ],
+    "groundMin": [
+     110.13,
+     109.59
+    ],
+    "groundMax": [
+     144.8,
+     144.8
+    ],
+    "dBase": -0.54,
+    "dRoof": 0.0,
+    "dHeight": 0.0
+   },
+   {
+    "building": "유담관#탑남동",
+    "name": "",
+    "base": [
+     118.57,
+     118.1
+    ],
+    "roof": [
+     169.2,
+     169.2
+    ],
+    "groundMin": [
+     119.57,
+     119.1
+    ],
+    "groundMax": [
+     123.04,
+     122.77
+    ],
+    "dBase": -0.47,
+    "dRoof": 0.0,
+    "dHeight": 0.1
+   }
+  ]
+ },
+ "flatAreas": [
+  {
+   "name": "plaza",
+   "heightM": 130.6,
+   "cells": 335,
+   "cellsInBuildingFootprint": 3,
+   "maxAbsAtCellCentresM": 0,
+   "bilinearInside": {
+    "n": 5306,
+    "min": -0.29,
+    "max": 0.48,
+    "p95Abs": 0,
+    "over5cm": 89,
+    "over5cmShare": 0.02
+   },
+   "bilinearInsideBefore": {
+    "n": 5306,
+    "min": -0.54,
+    "max": 2.03,
+    "p95Abs": 0.95,
+    "over5cm": 4733,
+    "over5cmShare": 0.89
+   },
+   "edge": {
+    "samples": 320,
+    "terrainAboveFloorBy5cm": 37,
+    "share": 0.12,
+    "ofWhichWithin3mOfBuilding": 37,
+    "maxAboveM": 0.47,
+    "before": {
+     "terrainAboveFloorBy5cm": 217,
+     "share": 0.68
+    }
+   }
+  },
+  {
+   "name": "field",
+   "heightM": 148.9,
+   "cells": 2052,
+   "cellsInBuildingFootprint": 9,
+   "maxAbsAtCellCentresM": 0,
+   "bilinearInside": {
+    "n": 32092,
+    "min": -2.64,
+    "max": 0.75,
+    "p95Abs": 0,
+    "over5cm": 76,
+    "over5cmShare": 0
+   },
+   "bilinearInsideBefore": {
+    "n": 32092,
+    "min": -2.87,
+    "max": 2.26,
+    "p95Abs": 0.76,
+    "over5cm": 8803,
+    "over5cmShare": 0.27
+   },
+   "edge": {
+    "samples": 820,
+    "terrainAboveFloorBy5cm": 12,
+    "share": 0.01,
+    "ofWhichWithin3mOfBuilding": 12,
+    "maxAboveM": 0.94,
+    "before": {
+     "terrainAboveFloorBy5cm": 199,
+     "share": 0.24
+    }
+   }
+  }
+ ],
+ "roadVsTerrain": {
+  "profileLines": [
+   {
+    "name": "V1",
+    "halfWidthM": 3.5,
+    "centre": {
+     "n": 28,
+     "maxAbs": 0,
+     "p95Abs": 0,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 140,
+     "maxAbs": 0.01,
+     "p95Abs": 0,
+     "median": 0
+    },
+    "worst": [
+     0,
+     -0.8,
+     [
+      201137.52,
+      557098.13
+     ],
+     0.01
+    ],
+    "before": {
+     "centre": {
+      "n": 28,
+      "maxAbs": 2.26,
+      "p95Abs": 1.73,
+      "median": -0.46
+     },
+     "fullWidth": {
+      "n": 140,
+      "maxAbs": 2.26,
+      "p95Abs": 1.41,
+      "median": -0.02
+     }
+    }
+   },
+   {
+    "name": "V2",
+    "halfWidthM": 3.5,
+    "centre": {
+     "n": 153,
+     "maxAbs": 0.01,
+     "p95Abs": 0,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 765,
+     "maxAbs": 0.07,
+     "p95Abs": 0.01,
+     "median": 0
+    },
+    "worst": [
+     6,
+     0.8,
+     [
+      201120.01,
+      557126.65
+     ],
+     -0.07
+    ],
+    "before": {
+     "centre": {
+      "n": 153,
+      "maxAbs": 1.66,
+      "p95Abs": 0.94,
+      "median": 0.04
+     },
+     "fullWidth": {
+      "n": 765,
+      "maxAbs": 3.39,
+      "p95Abs": 1.12,
+      "median": 0.02
+     }
+    }
+   },
+   {
+    "name": "V3",
+    "halfWidthM": 3.5,
+    "centre": {
+     "n": 61,
+     "maxAbs": 0.14,
+     "p95Abs": 0.05,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 305,
+     "maxAbs": 0.21,
+     "p95Abs": 0.1,
+     "median": 0
+    },
+    "worst": [
+     56,
+     -1,
+     [
+      201038.32,
+      557301.17
+     ],
+     0.21
+    ],
+    "before": {
+     "centre": {
+      "n": 61,
+      "maxAbs": 1.12,
+      "p95Abs": 0.88,
+      "median": -0.04
+     },
+     "fullWidth": {
+      "n": 305,
+      "maxAbs": 2.03,
+      "p95Abs": 0.81,
+      "median": -0.01
+     }
+    }
+   },
+   {
+    "name": "V4a",
+    "halfWidthM": 7,
+    "centre": {
+     "n": 37,
+     "maxAbs": 0.02,
+     "p95Abs": 0,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 185,
+     "maxAbs": 0.55,
+     "p95Abs": 0.25,
+     "median": 0
+    },
+    "worst": [
+     12,
+     1,
+     [
+      201020.43,
+      557309.05
+     ],
+     -0.55
+    ],
+    "before": {
+     "centre": {
+      "n": 37,
+      "maxAbs": 0.49,
+      "p95Abs": 0.31,
+      "median": -0.03
+     },
+     "fullWidth": {
+      "n": 185,
+      "maxAbs": 1.87,
+      "p95Abs": 1.06,
+      "median": 0.02
+     }
+    }
+   },
+   {
+    "name": "V4b",
+    "halfWidthM": 7,
+    "centre": {
+     "n": 10,
+     "maxAbs": 0.02,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 50,
+     "maxAbs": 0.02,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "worst": [
+     5,
+     1,
+     [
+      201012.5,
+      557337.83
+     ],
+     -0.02
+    ],
+    "before": {
+     "centre": {
+      "n": 10,
+      "maxAbs": 0.29,
+      "p95Abs": 0.29,
+      "median": -0.23
+     },
+     "fullWidth": {
+      "n": 50,
+      "maxAbs": 0.56,
+      "p95Abs": 0.41,
+      "median": -0.22
+     }
+    }
+   },
+   {
+    "name": "P-LOW",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 35,
+     "maxAbs": 0.05,
+     "p95Abs": 0.03,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 175,
+     "maxAbs": 0.1,
+     "p95Abs": 0.07,
+     "median": 0
+    },
+    "worst": [
+     7,
+     -1,
+     [
+      201120.92,
+      557129.28
+     ],
+     0.1
+    ],
+    "before": {
+     "centre": {
+      "n": 35,
+      "maxAbs": 1.59,
+      "p95Abs": 0.91,
+      "median": 0.21
+     },
+     "fullWidth": {
+      "n": 175,
+      "maxAbs": 1.59,
+      "p95Abs": 1.02,
+      "median": 0.03
+     }
+    }
+   },
+   {
+    "name": "P-UP",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 13,
+     "maxAbs": 0.1,
+     "p95Abs": 0.1,
+     "median": 0.06
+    },
+    "fullWidth": {
+     "n": 65,
+     "maxAbs": 0.41,
+     "p95Abs": 0.35,
+     "median": 0.06
+    },
+    "worst": [
+     12,
+     -1,
+     [
+      201024.71,
+      557308.45
+     ],
+     0.41
+    ],
+    "before": {
+     "centre": {
+      "n": 13,
+      "maxAbs": 0.46,
+      "p95Abs": 0.42,
+      "median": -0.16
+     },
+     "fullWidth": {
+      "n": 65,
+      "maxAbs": 0.46,
+      "p95Abs": 0.38,
+      "median": -0.08
+     }
+    }
+   },
+   {
+    "name": "UPHILL",
+    "halfWidthM": 4.5,
+    "centre": {
+     "n": 68,
+     "maxAbs": 0.09,
+     "p95Abs": 0.03,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 340,
+     "maxAbs": 0.17,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "worst": [
+     54,
+     1,
+     [
+      201055.36,
+      557343.5
+     ],
+     -0.17
+    ],
+    "before": {
+     "centre": {
+      "n": 68,
+      "maxAbs": 2.14,
+      "p95Abs": 1.86,
+      "median": -0.33
+     },
+     "fullWidth": {
+      "n": 340,
+      "maxAbs": 2.3,
+      "p95Abs": 1.9,
+      "median": -0.31
+     }
+    }
+   }
+  ],
+  "storedRoads": [
+   {
+    "id": "07615440",
+    "line": "V4a",
+    "widthM": 14,
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "halfWidthM": 7,
+    "centre": {
+     "n": 36,
+     "maxAbs": 0.02,
+     "p95Abs": 0.01,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 180,
+     "maxAbs": 0.56,
+     "p95Abs": 0.25,
+     "median": 0
+    },
+    "worst": [
+     11,
+     1,
+     [
+      201020.48,
+      557308.97
+     ],
+     -0.56
+    ]
+   },
+   {
+    "id": "192703b3",
+    "line": "P-UP",
+    "widthM": null,
+    "name": "P1 주차장 차로 (본관 남서 모서리, 표지판 \"P1\") (S-MAP 판독)",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 13,
+     "maxAbs": 0.1,
+     "p95Abs": 0.1,
+     "median": 0.06
+    },
+    "fullWidth": {
+     "n": 65,
+     "maxAbs": 0.41,
+     "p95Abs": 0.35,
+     "median": 0.06
+    },
+    "worst": [
+     12,
+     -1,
+     [
+      201024.71,
+      557308.45
+     ],
+     0.41
+    ]
+   },
+   {
+    "id": "1b2219e1",
+    "line": "P-LOW",
+    "widthM": null,
+    "name": "하단 주차장 차로 (정문 안쪽 서편, 표지판 \"P2\") (S-MAP 판독)",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 35,
+     "maxAbs": 0.02,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 175,
+     "maxAbs": 0.1,
+     "p95Abs": 0.07,
+     "median": 0
+    },
+    "worst": [
+     7,
+     -1,
+     [
+      201120.88,
+      557129.32
+     ],
+     0.1
+    ]
+   },
+   {
+    "id": "499ab1ab",
+    "line": "V3",
+    "widthM": null,
+    "name": "주 경사로 상부 = S06 (굽이 ~ 본관 남서 모서리 P1 분기) (S-MAP 판독)",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 61,
+     "maxAbs": 0.14,
+     "p95Abs": 0.06,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 305,
+     "maxAbs": 0.2,
+     "p95Abs": 0.09,
+     "median": 0
+    },
+    "worst": [
+     56,
+     0.8,
+     [
+      201033.95,
+      557297.2
+     ],
+     0.2
+    ]
+   },
+   {
+    "id": "67e234b5",
+    "line": "V4b",
+    "widthM": 14,
+    "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+    "halfWidthM": 7,
+    "centre": {
+     "n": 10,
+     "maxAbs": 0.01,
+     "p95Abs": 0.01,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 50,
+     "maxAbs": 0.03,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "worst": [
+     3,
+     -1,
+     [
+      201026.28,
+      557340.49
+     ],
+     0.03
+    ]
+   },
+   {
+    "id": "729bd2ad",
+    "line": "V1",
+    "widthM": null,
+    "name": "정문 진입로 (공도 분기 ~ 하단 주차장 차로 분기) (S-MAP 판독)",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 28,
+     "maxAbs": 0.05,
+     "p95Abs": 0.03,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 140,
+     "maxAbs": 0.05,
+     "p95Abs": 0.03,
+     "median": 0
+    },
+    "worst": [
+     0,
+     -1,
+     [
+      201137.71,
+      557098.2
+     ],
+     0.05
+    ]
+   },
+   {
+    "id": "c52095ad",
+    "line": "UPHILL",
+    "widthM": 9,
+    "name": "문예관 옆 오르막 보행로 (보행. 공사 차량만 제한 통행, 입구 차단기. 높이 S-MAP)",
+    "halfWidthM": 4.5,
+    "centre": {
+     "n": 68,
+     "maxAbs": 0.09,
+     "p95Abs": 0.03,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 340,
+     "maxAbs": 0.17,
+     "p95Abs": 0.02,
+     "median": 0
+    },
+    "worst": [
+     54,
+     1,
+     [
+      201055.36,
+      557343.5
+     ],
+     -0.17
+    ]
+   },
+   {
+    "id": "e934fcd3",
+    "line": "V2",
+    "widthM": null,
+    "name": "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)",
+    "halfWidthM": 3,
+    "centre": {
+     "n": 152,
+     "maxAbs": 0.02,
+     "p95Abs": 0,
+     "median": 0
+    },
+    "fullWidth": {
+     "n": 760,
+     "maxAbs": 0.07,
+     "p95Abs": 0.01,
+     "median": 0
+    },
+    "worst": [
+     8,
+     1,
+     [
+      201118.7,
+      557128.83
+     ],
+     -0.07
+    ]
+   }
+  ]
+ },
+ "spill": {
+  "cellsChangedByPlateauAndCorridorSteps": 4648,
+  "beyondBlendDistance": 0,
+  "farthestBeyondM": 0,
+  "changedInsideBuildingFootprints": 0
+ },
+ "steep": {
+  "before": 15291,
+  "after": 15228,
+  "created": 60,
+  "removed": 123,
+  "createdByKind": {
+   "bank already steep within 4 m": 42,
+   "building wall within 3 m": 18
+  },
+  "createdByFeature": {
+   "V1 / bank already steep within 4 m": 8,
+   "P-LOW / bank already steep within 4 m": 6,
+   "V1 / building wall within 3 m": 4,
+   "V2 / building wall within 3 m": 3,
+   "V2 / bank already steep within 4 m": 23,
+   "field / building wall within 3 m": 9,
+   "V3 / building wall within 3 m": 1,
+   "V3 / bank already steep within 4 m": 2,
+   "P-UP / building wall within 3 m": 1,
+   "P-UP / bank already steep within 4 m": 2,
+   "plaza / bank already steep within 4 m": 1
+  },
+  "createdNew": []
+ },
+ "groundUnderBuildingOutlines": [
+  {
+   "id": "본관",
+   "name": "본관",
+   "outlinePoints": 105,
+   "minBefore": 127.11,
+   "minAfter": 127.12,
+   "minChange": 0.01,
+   "maxBefore": 140.73,
+   "maxAfter": 140.45,
+   "medianChange": -0.02,
+   "pointsChangedOver0_3": 24,
+   "changeRange": [
+    -2.1,
+    0.84
+   ]
+  },
+  {
+   "id": "대일관",
+   "name": "대일관",
+   "outlinePoints": 147,
+   "minBefore": 139.99,
+   "minAfter": 139.99,
+   "minChange": 0,
+   "maxBefore": 151.81,
+   "maxAfter": 151.79,
+   "medianChange": 0,
+   "pointsChangedOver0_3": 5,
+   "changeRange": [
+    -0.71,
+    0.5
+   ]
+  },
+  {
+   "id": "북악관",
+   "name": "북악관",
+   "outlinePoints": 116,
+   "minBefore": 129.94,
+   "minAfter": 129.94,
+   "minChange": 0,
+   "maxBefore": 134.92,
+   "maxAfter": 134.92,
+   "medianChange": -0.02,
+   "pointsChangedOver0_3": 2,
+   "changeRange": [
+    -0.69,
+    0.18
+   ]
+  },
+  {
+   "id": "수인관",
+   "name": "수인관",
+   "outlinePoints": 134,
+   "minBefore": 110.13,
+   "minAfter": 109.58,
+   "minChange": -0.55,
+   "maxBefore": 144.8,
+   "maxAfter": 144.8,
+   "medianChange": 0,
+   "pointsChangedOver0_3": 41,
+   "changeRange": [
+    -1.74,
+    0.55
+   ]
+  },
+  {
+   "id": "유담관",
+   "name": "유담관",
+   "outlinePoints": 218,
+   "minBefore": 96.05,
+   "minAfter": 96.05,
+   "minChange": 0,
+   "maxBefore": 132.35,
+   "maxAfter": 132.36,
+   "medianChange": -0.16,
+   "pointsChangedOver0_3": 43,
+   "changeRange": [
+    -1.84,
+    1.72
+   ]
+  },
+  {
+   "id": "청운관",
+   "name": "청운관",
+   "outlinePoints": 85,
+   "minBefore": 141.5,
+   "minAfter": 141.5,
+   "minChange": 0,
+   "maxBefore": 151.38,
+   "maxAfter": 151.38,
+   "medianChange": 0.75,
+   "pointsChangedOver0_3": 3,
+   "changeRange": [
+    -0.72,
+    1.49
+   ]
+  },
+  {
+   "id": "건물5",
+   "name": "혜인관",
+   "outlinePoints": 111,
+   "minBefore": 142.87,
+   "minAfter": 142.87,
+   "minChange": 0,
+   "maxBefore": 151.35,
+   "maxAfter": 151.35,
+   "medianChange": -0.03,
+   "pointsChangedOver0_3": 3,
+   "changeRange": [
+    -0.99,
+    0.34
+   ]
+  }
+ ],
+ "outdoorRoadsStoredMinusTerrain": [
+  {
+   "id": "00cd9c0f",
+   "name": "대일관 전면 두 계단 사이 계단참 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 2,
+   "roadMinusTerrain": [
+    -2.81,
+    -2.04,
+    -2.04
+   ]
+  },
+  {
+   "id": "02d30f2b",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 18,
+   "roadMinusTerrain": [
+    1.76,
+    1.9,
+    1.9
+   ]
+  },
+  {
+   "id": "040d4571",
+   "name": "갈림 지점 ~ 문예관 옆 오르막 위 끝 내려가는 길 (사용자 그림, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 15,
+   "roadMinusTerrain": [
+    0.2,
+    2.33,
+    4.16
+   ]
+  },
+  {
+   "id": "07615440",
+   "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+   "cls": "vehicle",
+   "structure": "ordinary",
+   "n": 36,
+   "roadMinusTerrain": [
+    -0.02,
+    0,
+    0.01
+   ]
+  },
+  {
+   "id": "192703b3",
+   "name": "P1 주차장 차로 (본관 남서 모서리, 표지판 \"P1\") (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 13,
+   "roadMinusTerrain": [
+    -0.1,
+    -0.06,
+    0
+   ]
+  },
+  {
+   "id": "19800cee",
+   "name": "대일관 정문 앞 돌출 평탄 공간–외측 계단 연결 (사진 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 3,
+   "roadMinusTerrain": [
+    -3.07,
+    -2.93,
+    -2.15
+   ]
+  },
+  {
+   "id": "1b2219e1",
+   "name": "하단 주차장 차로 (정문 안쪽 서편, 표지판 \"P2\") (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 35,
+   "roadMinusTerrain": [
+    -0.02,
+    0,
+    0.02
+   ]
+  },
+  {
+   "id": "1d10b963",
+   "name": "대일관 측면 주 상행계단 (스케치·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 3,
+   "roadMinusTerrain": [
+    0.94,
+    1.93,
+    2.93
+   ]
+  },
+  {
+   "id": "1d983e3a",
+   "name": "유담관 9층 입구 통로 (두 C01 종합·추정)",
+   "cls": "pedestrian",
+   "structure": "indoor_corridor",
+   "n": 13,
+   "roadMinusTerrain": [
+    2.17,
+    3.03,
+    3.32
+   ]
+  },
+  {
+   "id": "1f32cde9",
+   "name": "대일관 1층 높이 접근 통로 (추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 21,
+   "roadMinusTerrain": [
+    4.14,
+    4.26,
+    4.29
+   ]
+  },
+  {
+   "id": "2f206e6c",
+   "name": "대일관 전면 연속 하행계단 2 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 5,
+   "roadMinusTerrain": [
+    -1.28,
+    0.78,
+    1.72
+   ]
+  },
+  {
+   "id": "38fd4580",
+   "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 4,
+   "roadMinusTerrain": [
+    -2.13,
+    -2.1,
+    -2.1
+   ]
+  },
+  {
+   "id": "3a5e6480",
+   "name": "본관 입구(2) 문 앞 ~ 본관 모서리 앞 계단 위 (포장면 가장자리, 문 자리는 학교 표지)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 4,
+   "roadMinusTerrain": [
+    -0.05,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "3ab80c19",
+   "name": "문예관 입구 평탄 연결 (사진·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 0,
+   "roadMinusTerrain": null
+  },
+  {
+   "id": "3cb404de",
+   "name": "문예관 하행계단 아래 평탄부 (추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 4,
+   "roadMinusTerrain": [
+    3.91,
+    4.82,
+    5.49
+   ]
+  },
+  {
+   "id": "45682ee7",
+   "name": "청운관 앞–혜인관 B1 지상 연결 (추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 20,
+   "roadMinusTerrain": [
+    -4.58,
+    -2.15,
+    -0.36
+   ]
+  },
+  {
+   "id": "499ab1ab",
+   "name": "주 경사로 상부 = S06 (굽이 ~ 본관 남서 모서리 P1 분기) (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 61,
+   "roadMinusTerrain": [
+    -0.14,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "4ee99835",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 53,
+   "roadMinusTerrain": [
+    0,
+    0.35,
+    1.71
+   ]
+  },
+  {
+   "id": "558c81e6",
+   "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 27,
+   "roadMinusTerrain": [
+    0.04,
+    1.92,
+    3.8
+   ]
+  },
+  {
+   "id": "568ba2aa",
+   "name": "상승관 오른쪽 계단 (사용자 그림, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 11,
+   "roadMinusTerrain": [
+    0.61,
+    2.28,
+    7.65
+   ]
+  },
+  {
+   "id": "5dcbde43",
+   "name": "한림관 6층 ~ 운동장 높이 계단 (6칸쯤, 위치 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 10,
+   "roadMinusTerrain": [
+    -0.42,
+    -0.25,
+    0.18
+   ]
+  },
+  {
+   "id": "618385b9",
+   "name": "대일관 전면 하단 평탄 연결부 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 22,
+   "roadMinusTerrain": [
+    1.73,
+    2.91,
+    4.09
+   ]
+  },
+  {
+   "id": "64c08202",
+   "name": "대일관 측면 중간 계단참 (스케치·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 7,
+   "roadMinusTerrain": [
+    3.57,
+    3.65,
+    3.71
+   ]
+  },
+  {
+   "id": "67e234b5",
+   "name": "본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값)",
+   "cls": "vehicle",
+   "structure": "ordinary",
+   "n": 10,
+   "roadMinusTerrain": [
+    -0.01,
+    0,
+    0.01
+   ]
+  },
+  {
+   "id": "699d0cbc",
+   "name": "유담관 반층 하행계단 (단차1.59m 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 8,
+   "roadMinusTerrain": [
+    3.35,
+    3.87,
+    5.55
+   ]
+  },
+  {
+   "id": "6e30f94e",
+   "name": "상승관 왼쪽 계단 (사용자 그림, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 4,
+   "roadMinusTerrain": [
+    0,
+    0.48,
+    0.55
+   ]
+  },
+  {
+   "id": "729bd2ad",
+   "name": "정문 진입로 (공도 분기 ~ 하단 주차장 차로 분기) (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ordinary",
+   "n": 28,
+   "roadMinusTerrain": [
+    -0.05,
+    0,
+    0.02
+   ]
+  },
+  {
+   "id": "79fbc430",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 130,
+   "roadMinusTerrain": [
+    -0.01,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "7ca95923",
+   "name": "북악관 입구(4) GS25 문 앞 (옆길 ~ 문)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 2,
+   "roadMinusTerrain": [
+    0.97,
+    1.21,
+    1.21
+   ]
+  },
+  {
+   "id": "7e1b63d6",
+   "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 12,
+   "roadMinusTerrain": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "88ba01e6",
+   "name": "대일관 돌출 평탄부–지상 경로 시작 연결계단 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 9,
+   "roadMinusTerrain": [
+    -3.14,
+    -1.68,
+    -0.25
+   ]
+  },
+  {
+   "id": "8e03aa9e",
+   "name": "대일관 전면 상단 평탄부 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 7,
+   "roadMinusTerrain": [
+    -3.14,
+    -3.09,
+    -2.85
+   ]
+  },
+  {
+   "id": "8e71c240",
+   "name": "혜인관 방향 지상 경사로 연장 (추정)",
+   "cls": "pedestrian",
+   "structure": "ramp",
+   "n": 37,
+   "roadMinusTerrain": [
+    -1.82,
+    -0.6,
+    0.21
+   ]
+  },
+  {
+   "id": "8fde6a04",
+   "name": "북악관 B1 가는 지하 횡단보도·통로 (본관 쪽 보행 구간 ~ 지하 차도 건넘 ~ 통로 ~ 계단 아래. 사용자 그림 14, 위치 ±2 m·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 19,
+   "roadMinusTerrain": [
+    -2.6,
+    -2.08,
+    -1.38
+   ]
+  },
+  {
+   "id": "9112314a",
+   "name": "문예관 입구 앞 평탄 접근로 (사진·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 0,
+   "roadMinusTerrain": null
+  },
+  {
+   "id": "951c157d",
+   "name": "지하 차도 (본관·문예관 사이, 선·높이 추정)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 52,
+   "roadMinusTerrain": [
+    -4.46,
+    -4.09,
+    -3.46
+   ]
+  },
+  {
+   "id": "9713befb",
+   "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 93,
+   "roadMinusTerrain": [
+    -13.54,
+    -5.43,
+    0.68
+   ]
+  },
+  {
+   "id": "992af5b0",
+   "name": "문예관 하행계단 아래 평탄부 (추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 3,
+   "roadMinusTerrain": [
+    3.56,
+    3.66,
+    3.96
+   ]
+  },
+  {
+   "id": "9c73ebe5",
+   "name": "대일관 측면 상부 평탄 연결부 (스케치·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 4,
+   "roadMinusTerrain": [
+    4.2,
+    4.22,
+    4.23
+   ]
+  },
+  {
+   "id": "a03d33c3",
+   "name": "대일관 측면 접근로 (기존 C02)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 170,
+   "roadMinusTerrain": [
+    -2.35,
+    0.03,
+    0.62
+   ]
+  },
+  {
+   "id": "a1a9b9dd",
+   "name": "유담관 입구(1) 6층 로비 문 앞 ~ 분수 광장 (114.1 m, 문 자리는 학교 표지. 차도와 안 이음)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 0,
+   "roadMinusTerrain": null
+  },
+  {
+   "id": "a714275b",
+   "name": "대일관 측면 짧은 상행계단 (스케치·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 2,
+   "roadMinusTerrain": [
+    3.73,
+    4.06,
+    4.06
+   ]
+  },
+  {
+   "id": "a789c985",
+   "name": "지하주차장 통로 (추정)",
+   "cls": "vehicle",
+   "structure": "ordinary",
+   "n": 53,
+   "roadMinusTerrain": [
+    -2.57,
+    -1.99,
+    -1.96
+   ]
+  },
+  {
+   "id": "a7a51d3c",
+   "name": "문예관 입구 방향 하행계단 2 (사진·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 12,
+   "roadMinusTerrain": [
+    0.97,
+    3.32,
+    4.14
+   ]
+  },
+  {
+   "id": "b14ac1da",
+   "name": "대일관 전면 연속 하행계단 1 (고도 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 4,
+   "roadMinusTerrain": [
+    -3.28,
+    -2.98,
+    -2.82
+   ]
+  },
+  {
+   "id": "b17424ba",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 5,
+   "roadMinusTerrain": [
+    0,
+    0,
+    1.76
+   ]
+  },
+  {
+   "id": "b1758181",
+   "name": "지하 차도 보행 구간 (본관 북쪽 벽 옆, 그림 안 구간만, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 44,
+   "roadMinusTerrain": [
+    -4.99,
+    -4.48,
+    -2.13
+   ]
+  },
+  {
+   "id": "b6ea9f96",
+   "name": "회차 공간 서쪽 가장자리 ~ 횡단보도 (북쪽 버스 정류장 표지에서, 사용자 그림 11 의 흰 띠, 위치 ±3 m)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 26,
+   "roadMinusTerrain": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": "b7c0792f",
+   "name": "대일관 현관 앞 계단 (13단쯤, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 5,
+   "roadMinusTerrain": [
+    0,
+    0.96,
+    1.92
+   ]
+  },
+  {
+   "id": "bf2acf00",
+   "name": "C02 수집 경로 (2026-10-07)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 20,
+   "roadMinusTerrain": [
+    0,
+    0.62,
+    1.32
+   ]
+  },
+  {
+   "id": "c52095ad",
+   "name": "문예관 옆 오르막 보행로 (보행. 공사 차량만 제한 통행, 입구 차단기. 높이 S-MAP)",
+   "cls": "pedestrian",
+   "structure": "ramp",
+   "n": 68,
+   "roadMinusTerrain": [
+    -0.02,
+    0,
+    0.09
+   ]
+  },
+  {
+   "id": "d8ae25f8",
+   "name": "대일관 측면 하부 평탄 접근부 (스케치·고도 추정)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 11,
+   "roadMinusTerrain": [
+    0,
+    0.67,
+    0.92
+   ]
+  },
+  {
+   "id": "db3fe999",
+   "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 뒤편 산책로와는 아직 안 이음, 높이 S-MAP)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 17,
+   "roadMinusTerrain": [
+    0.97,
+    1.88,
+    1.98
+   ]
+  },
+  {
+   "id": "dc64985c",
+   "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 7,
+   "roadMinusTerrain": [
+    0,
+    0.31,
+    0.63
+   ]
+  },
+  {
+   "id": "ddb8a8f8",
+   "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 포장 폭 약 6 m, 높이 S-MAP)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 10,
+   "roadMinusTerrain": [
+    0,
+    0.77,
+    0.88
+   ]
+  },
+  {
+   "id": "e934fcd3",
+   "name": "주 진입로 하부 (차단기 ~ 분수 광장 옆 ~ 유담관·한림관 굽이) (S-MAP 판독)",
+   "cls": "vehicle",
+   "structure": "ramp",
+   "n": 152,
+   "roadMinusTerrain": [
+    0,
+    0,
+    0.02
+   ]
+  },
+  {
+   "id": "e996a8f7",
+   "name": "본관 모서리 앞 계단 (지상 ~ 지하 차도 보행 구간, 위치·높이 추정)",
+   "cls": "pedestrian",
+   "structure": "stairs",
+   "n": 6,
+   "roadMinusTerrain": [
+    -1.84,
+    -0.74,
+    0
+   ]
+  },
+  {
+   "id": "fc50ca50",
+   "name": "두 C01 종합 야외 접근 (위치·고도 근사)",
+   "cls": "pedestrian",
+   "structure": "ordinary",
+   "n": 31,
+   "roadMinusTerrain": [
+    -0.06,
+    0.56,
+    2.1
+   ]
+  }
+ ],
+ "validator": {
+  "before": {
+   "total": 194,
+   "byCode": {
+    "OFF_TERRAIN": 46,
+    "ISOLATED_COMPONENT": 7,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 50,
+    "info": 144
+   }
+  },
+  "after": {
+   "total": 194,
+   "byCode": {
+    "OVERLAPPING_ROADS": 1,
+    "OFF_TERRAIN": 45,
+    "ISOLATED_COMPONENT": 7,
+    "UNCONNECTED_CROSSING": 141
+   },
+   "bySeverity": {
+    "warning": 50,
+    "info": 144
+   }
+  },
+  "new": [
+   {
+    "code": "OVERLAPPING_ROADS",
+    "severity": "warning",
+    "roadIds": [
+     "fc50ca50-2889-47b1-94a2-8dd8c66dc08a",
+     "67e234b5-f38c-4400-b046-975d0125ebc6"
+    ],
+    "location": [
+     201018.49,
+     557342.33,
+     130.6
+    ],
+    "message": "두 C01 종합 야외 접근 (위치·고도 근사) and 본관 서쪽 회차 공간 내리막 (P1 분기 ~ 회차 공간 평탄부 남쪽 끝) (S-MAP 판독. 포장 폭 13~28 m 가운데 좁은 곳 값) run on top of each other for about 2.26 m",
+    "suggestion": "retire or reshape one of them; overlaps are not merged automatically"
+   }
+  ]
+ },
+ "components": {
+  "before": [
+   [
+    82,
+    994.7
+   ],
+   [
+    43,
+    926.2
+   ],
+   [
+    28,
+    645
+   ],
+   [
+    1,
+    14.1
+   ],
+   [
+    1,
+    9
+   ],
+   [
+    1,
+    7.1
+   ],
+   [
+    1,
+    4.5
+   ],
+   [
+    1,
+    4.4
+   ]
+  ],
+  "after": [
+   [
+    82,
+    994.7
+   ],
+   [
+    43,
+    926.2
+   ],
+   [
+    28,
+    643.2
+   ],
+   [
+    1,
+    14.1
+   ],
+   [
+    1,
+    9
+   ],
+   [
+    1,
+    7.1
+   ],
+   [
+    1,
+    4.5
+   ],
+   [
+    1,
+    4.4
+   ]
+  ]
+ },
+ "reachability": [
+  {
+   "id": "gate>turn",
+   "label": "정문(공도 분기) → 회차 공간(차도가 포장면에 닿는 곳)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    284.98,
+    284.84
+   ],
+   "vehicle": [
+    284.98,
+    284.84
+   ]
+  },
+  {
+   "id": "gate>main2",
+   "label": "정문 → 본관 모서리 앞(본관 쪽 계단 위)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    308.1,
+    307.97
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>uphillTop",
+   "label": "정문 → 회차 공간 → 오르막 보행로 위 끝",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    379.27,
+    379.13
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>munye3",
+   "label": "정문 → 문예관 3층 입구 통로",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    407.14,
+    407
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>daeilW",
+   "label": "정문 → 대일관 서쪽 끝(전면 하단)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    430.48,
+    430.34
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>daeil1",
+   "label": "정문 → 대일관 입구(1) 1층 로비(현관 계단 위)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    444.79,
+    444.65
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>hyeinB1",
+   "label": "정문 → 혜인관 B1 문 안(운동장 건넘)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    559.03,
+    558.89
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "gate>yudam6",
+   "label": "정문 → 유담관 입구(1) 6층 로비(분수 광장)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    false,
+    false
+   ],
+   "vehicle": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "turn>bukak1F",
+   "label": "회차 공간 → 정문 계단 → 북악관 1층 로비 복도",
+   "allowedOnly": [
+    53.38,
+    53.38
+   ],
+   "assumeUnknown": [
+    53.38,
+    53.38
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>bukakB1",
+   "label": "회차 공간 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "allowedOnly": [
+    67.51,
+    67.51
+   ],
+   "assumeUnknown": [
+    67.51,
+    67.51
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "main2>bukakB1",
+   "label": "본관 모서리 앞 → 본관 쪽 계단 → 보행 구간 → 지하 횡단보도 → 통로 → 계단 → 북악관 B1 복도(편의점 앞)",
+   "allowedOnly": [
+    44.38,
+    44.38
+   ],
+   "assumeUnknown": [
+    44.38,
+    44.38
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "bukakB1>gs25out",
+   "label": "북악관 B1 복도(편의점 앞) → GS25 문 안 계단 → 문 밖(131.7 m)",
+   "allowedOnly": [
+    43.15,
+    43.15
+   ],
+   "assumeUnknown": [
+    43.15,
+    43.15
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "bukakB1>bukak1F",
+   "label": "북악관 B1 복도 → 1층 로비 복도(건물 안)",
+   "allowedOnly": [
+    15.63,
+    15.63
+   ],
+   "assumeUnknown": [
+    15.63,
+    15.63
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>gs25out",
+   "label": "회차 공간 → 북악관 서쪽 옆길 → GS25 문 밖",
+   "allowedOnly": [
+    54.86,
+    54.86
+   ],
+   "assumeUnknown": [
+    54.86,
+    54.86
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>busN",
+   "label": "회차 공간 → 북쪽 버스 정류장 표지",
+   "allowedOnly": [
+    22.45,
+    22.45
+   ],
+   "assumeUnknown": [
+    22.45,
+    22.45
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>busS",
+   "label": "회차 공간 → 남쪽 버스 정류장 표지 앞(차도 위)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    9.07,
+    9.07
+   ],
+   "vehicle": [
+    9.07,
+    9.07
+   ]
+  },
+  {
+   "id": "turn>main2door",
+   "label": "회차 공간 → 본관 입구(2) 문 앞",
+   "allowedOnly": [
+    24.51,
+    24.51
+   ],
+   "assumeUnknown": [
+    24.51,
+    24.51
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>daeil1",
+   "label": "회차 공간 → 대일관 입구(1) 1층 로비",
+   "allowedOnly": [
+    159.81,
+    159.81
+   ],
+   "assumeUnknown": [
+    159.81,
+    159.81
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "main2>daeil1",
+   "label": "본관 모서리 앞 → 대일관 입구(1) 1층 로비",
+   "allowedOnly": [
+    141.54,
+    141.54
+   ],
+   "assumeUnknown": [
+    141.54,
+    141.54
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "main2>munye3",
+   "label": "본관 모서리 앞 → 문예관 3층 입구 통로",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    103.9,
+    103.9
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "munye3>daeilW",
+   "label": "문예관 3층 입구 통로 → 대일관 서쪽 끝(전면 하단)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    49.49,
+    49.49
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "daeilW>daeil1",
+   "label": "대일관 서쪽 끝(전면 하단) → 대일관 입구(1) 1층 로비",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    34.31,
+    34.31
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "daeil1>hyeinB1",
+   "label": "대일관 입구(1) 1층 로비 → 혜인관 B1 문 안",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    132.05,
+    132.05
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "hanlim6>hyeinB1",
+   "label": "한림관 6층 계단 아래 → 혜인관 B1 문 안(운동장)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    139.45,
+    139.45
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "hanlim6>daeil1",
+   "label": "한림관 6층 계단 아래 → 대일관 입구(1) 1층 로비",
+   "allowedOnly": [
+    22.07,
+    22.07
+   ],
+   "assumeUnknown": [
+    22.07,
+    22.07
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "sangseung>hyeinB1",
+   "label": "상승관 왼쪽 계단 위 → 혜인관 B1 문 안",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    100.65,
+    100.65
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "bukakB1>hyeinB1",
+   "label": "북악관 B1 복도(편의점 앞) → 혜인관 B1 문 안",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    300.16,
+    300.16
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "yudam9>turn",
+   "label": "유담관 9층 입구 통로 → 회차 공간",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    30.83,
+    30.83
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "yudam9>main2",
+   "label": "유담관 9층 입구 통로 → 본관 모서리 앞",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    53.95,
+    53.96
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>p1",
+   "label": "회차 공간 → 표지판 P1 입구",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    58.02,
+    57.8
+   ],
+   "vehicle": [
+    58.02,
+    57.8
+   ]
+  },
+  {
+   "id": "gate>u1end",
+   "label": "정문 → 은주관 서쪽 윗길 끝",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    273.71,
+    272.04
+   ],
+   "vehicle": [
+    273.71,
+    272.04
+   ]
+  },
+  {
+   "id": "strip>main2",
+   "label": "지하 차도 보행 구간 동쪽 끝(그림 끝) → 본관 모서리 앞",
+   "allowedOnly": [
+    51.84,
+    51.84
+   ],
+   "assumeUnknown": [
+    51.84,
+    51.84
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  },
+  {
+   "id": "turn>backpath",
+   "label": "회차 공간 → 뒤편 산책로 서쪽 끝(7895ac0d)",
+   "allowedOnly": [
+    false,
+    false
+   ],
+   "assumeUnknown": [
+    421.53,
+    421.53
+   ],
+   "vehicle": [
+    null,
+    null
+   ]
+  }
+ ],
+ "notApplied": [
+  "U1(9713befb) 지형 띠: 한림관·은주관 외곽 아래 지면이 5~12 m 내려감(V02). 길의 선·높이는 V02 대로 고쳤다.",
+  "차도 띠의 번지지 않는 구역: 차도 옆 옹벽의 선을 모른다."
+ ],
+ "rollback": [
+  "terrain:activate local-samples-f5f1dbc499a3263c",
+  "terrain:relevel-roads recipe-ee7396b9671416c8 local-samples-f5f1dbc499a3263c --save --as=T05 (또는 변경 묶음 fb175416-e958-44c1-8b7f-15ed04b6763e 되돌리기)",
+  "scene:import 다시",
+  "편집 묶음 D → C → B → A 순으로 변경 묶음 되돌리기, 영역 2 바닥 131.0 으로",
+  "한 번에: 00-backup-mobility-before.sql, 00-backup-terrain-scene-before.sql"
+ ]
+}
