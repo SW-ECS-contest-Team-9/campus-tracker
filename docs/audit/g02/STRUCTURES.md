@@ -16,7 +16,7 @@
 | `topM` | 윗면이 평평할 때의 높이(m) |
 | `topProfile` | 윗면이 한 방향으로 기울 때: `{origin:[x,y], direction:[dx,dy], points:[[거리, 높이], …]}`. 높이 = 그 점을 `direction` 축에 내린 거리에서의 값(사이는 직선, 폭 방향으로 평평, 양 끝 밖은 끝 값). `topM` 과 둘 중 하나만 |
 | `bottomM`, `bottomNote` | 옆면을 내릴 바닥 높이와 그 까닭(아래 기단의 윗면, 지하층 천장, 옛 지형보다 아래의 안전 깊이) |
-| `material` | `paving` / `concrete` / `rock` / `timber` |
+| `material` | `paving` / `concrete` / `rock` / `timber` / `planting`(화단 띠·나무 덮인 비탈: 윗면만 초록, 옆면은 벽 색. Z05) |
 | `surfaceName` | 지형 조리법 surface 입력에서 같은 평면의 `name` (지형 칸은 여기서 나온다) |
 | `grade`, `estimated`, `assumption`, `source` | 상자와 같다 |
 
@@ -48,3 +48,8 @@
 2. 합친 길 면(`road-surface-layer.ts`)이 계단 상자 위를 덮지 않게, `stair_step`·`landing` 평면 안에서는 길 면을 상자 윗면 높이로 올리거나 그리지 않는다.
 3. 단면도(`section-layer.ts`)에 `addLayer()` 로 넣어 같이 잘리게 한다.
 4. 지형 격자는 2 m 라 평면 사이 벽면이 2 m 폭 비탈로 그려진다. 벽면을 세로로 세우려면 조리법 surface 피처의 외곽선에서 양쪽 평면 높이를 읽어 세로 면을 그린다(`g02-surface.geojson` 의 다각형과 `heightM`/`profile` 로 계산 가능).
+
+## Z05 에서 더한 것
+- 기단은 손으로 정한 곧은 변의 큰 평면으로 적는다(`docs/audit/z05/build_inputs.py`). 가파른 곳을 높이 띠로 나눈 단을 만들지 않는다: 두 평면은 벽면 하나로 만난다.
+- 구조물 파일의 기단 외곽은 더 높은 이웃 밑으로 0.5 m 들어가 있다(벽면에 틈이 없게). 지형 조리법 입력(`z05-surface.geojson`)은 겹치지 않는 외곽이다.
+- 상자의 `material` 이 `concrete`·`opening` 이면 종류 색 대신 그 색으로 그린다(`opening` = 벽면의 뚫린 곳을 나타내는 어두운 판. 안쪽 빈 곳은 아니다).

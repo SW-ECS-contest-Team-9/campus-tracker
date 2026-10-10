@@ -1,5 +1,5 @@
 {
- "new": "terrain-recipe-34970164095a56dd.f32",
+ "new": "terrain-recipe-48104b3cbe948e93.f32",
  "old": "terrain-recipe-a334b116df79c91e.f32",
  "finished_zones": {
   "g02": {
@@ -25,15 +25,15 @@
   }
  },
  "changed": {
-  "cells": 11596,
+  "cells": 11682,
   "building_cells": 0,
-  "in_z05_platforms": 6936,
+  "in_z05_platforms": 7018,
   "in_finished_zone_platforms": 0,
-  "elsewhere": 4660,
+  "elsewhere": 4664,
   "min": -34.68,
   "max": 17.0
  },
- "z05_platform_cells": 7141,
+ "z05_platform_cells": 7223,
  "z05_max_abs_off_plane_m": 8.7,
  "vs_smap_1m_in_campus": {
   "points": 32137,
@@ -56,13 +56,13 @@
   },
   "z05": {
    "median": 0.09,
-   "p90_abs": 1.45
+   "p90_abs": 1.46
   }
  },
  "user_pins": {
-  "n": 84,
-  "z04_p90_abs": 1.73,
-  "z05_p90_abs": 0.66,
+  "n": 85,
+  "z04_p90_abs": 1.72,
+  "z05_p90_abs": 0.65,
   "z05_over_1m": [
    {
     "id": "U013",
