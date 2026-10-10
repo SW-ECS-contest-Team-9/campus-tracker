@@ -6,8 +6,10 @@
 // the height the median track height minus the phone height (or the terrain), the width a high percentile of the spread
 // between tracks plus a margin. The centre line is smoothed and simplified in 3D.
 import type { XYZ } from '../editor/topology.js';
+import { clearHeightDifference, comparisonNoiseM, type HeightSource } from '../trajectory/height-difference.js';
 
-export interface TrackPoint { x: number; y: number; h: number | null }
+/** run / t (ms) / sigmaZ (sigma of the run's height zero) are optional: with them, tracks on clearly different levels are refused. */
+export interface TrackPoint { x: number; y: number; h: number | null; run?: string | null; t?: number | null; sigmaZ?: number | null }
 export interface CorridorOptions {
   stepM: number;
   searchRadiusM: number;
@@ -38,6 +40,10 @@ export interface CorridorResult {
 
 const median = (v: number[]) => { const s = [...v].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 const percentile = (v: number[], q: number) => { const s = [...v].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.max(0, Math.round(q * (s.length - 1))))]; };
+const heightSource = (t: TrackPoint[]): HeightSource => {
+  const mid = (v: (number | null | undefined)[]) => { const f = v.filter((x): x is number => x != null && Number.isFinite(x)); return f.length ? median(f) : null; };
+  return { run: t[0].run, t: mid(t.map((p) => p.t)), sigmaZ: mid(t.map((p) => p.sigmaZ)) };
+};
 const xyLength = (t: TrackPoint[]) => t.slice(1).reduce((sum, p, i) => sum + Math.hypot(p.x - t[i].x, p.y - t[i].y), 0);
 
 /** Douglas-Peucker on 3D points; always keeps both ends. */
@@ -107,6 +113,7 @@ export function corridorCenterline(input: TrackPoint[][], options: Partial<Corri
   const spreads: number[] = [];
   let covered = 0;
   const need = Math.min(2, tracks.length);
+  const aboveRef: number[][] = tracks.map(() => []); // height of each track minus the reference, station by station
   for (let k = 0; k < count; k++) {
     const m = (total * k) / (count - 1);
     const p = at(m), p0 = at(Math.max(0, m - o.stepM)), p1 = at(Math.min(total, m + o.stepM));
@@ -114,13 +121,18 @@ export function corridorCenterline(input: TrackPoint[][], options: Partial<Corri
     const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
     const nx = -ty, ny = tx;
     const offsets: number[] = [], heights: number[] = [];
-    for (const t of tracks) {
+    let refH: number | null = null;
+    for (const [j, t] of tracks.entries()) {
       const q = nearestOnTrack(t, p.x, p.y);
       if (!q || q.d > o.searchRadiusM) continue;
       // only what lies across the passage; a point far along it belongs to another station
       if (Math.abs((q.x - p.x) * tx + (q.y - p.y) * ty) > Math.max(o.stepM, 1.5)) continue;
       offsets.push((q.x - p.x) * nx + (q.y - p.y) * ny);
-      if (q.h !== null && Number.isFinite(q.h)) heights.push(q.h);
+      if (q.h !== null && Number.isFinite(q.h)) {
+        heights.push(q.h);
+        if (j === 0) refH = q.h;
+        else if (refH !== null) aboveRef[j].push(q.h - refH);
+      }
     }
     if (!offsets.length) continue;
     if (offsets.length >= need) covered++;
@@ -131,6 +143,17 @@ export function corridorCenterline(input: TrackPoint[][], options: Partial<Corri
     else if (ground) z = ground(cx, cy);
     if (z === null || !Number.isFinite(z)) continue;
     centres.push([cx, cy, z]);
+  }
+  if (o.zSource === 'run') {
+    // A clear, consistent height difference between walks is another level (stacked corridors share the plan): never blended into one height.
+    const refSource = heightSource(ref);
+    const other = tracks.flatMap((t, j) => {
+      if (j === 0) return [];
+      const d = clearHeightDifference(aboveRef[j], comparisonNoiseM(heightSource(t), refSource));
+      return d.clear ? [`${d.medianM! > 0 ? '+' : ''}${d.medianM!.toFixed(1)} m`] : [];
+    });
+    if (other.length) throw new Error(`${other.length} of ${tracks.length} tracks run at a clearly different height than the longest one (${other.join(', ')} along the shared stretch): `
+      + 'they are different levels and are not merged into one. Make one corridor per level; if they are the same floor, the runs disagree in height, so pick the tracks of one run or use zSource "terrain"');
   }
   if (centres.length < 2) throw new Error(o.zSource === 'run' ? 'Not enough stations with a height; the tracks may have no absolute height (try zSource "terrain")' : 'Not enough stations inside the terrain');
   if (centres.length < count) warnings.push(`${count - centres.length} of ${count} stations had no usable track point or height and were skipped`);

@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import type { Station } from '../trajectory/resample.js';
 import { resamplePolyline, reverseStations } from '../trajectory/resample.js';
 import { dtwMeanDistance, median, normals, projectMonotone, quantile, robustSigma } from '../trajectory/geometry.js';
+import { clearHeightDifference, comparisonNoiseM, type HeightSource } from '../trajectory/height-difference.js';
 
 export const PATHFUSION_VERSION = 'pathfusion-v1';
 
@@ -48,10 +49,13 @@ export interface PassInput {
   weight?: number;
   /** h of this pass is only relative (no absolute datum): aligned by its median offset */
   hRelative?: boolean;
+  /** fusion run and sigma of its height zero: with them a pass on a clearly different level is excluded (DIFFERENT_LEVEL) */
+  run?: string | null;
+  sigmaZ?: number | null;
 }
 
 export type PassStatus = 'ACCEPTED' | 'PARTIAL' | 'REJECTED';
-export type PassReason = 'DIFFERENT_PATH' | 'LENGTH_MISMATCH' | 'TOO_SHORT' | 'RUN_OUTLIER' | 'TOO_FEW_STATIONS';
+export type PassReason = 'DIFFERENT_PATH' | 'LENGTH_MISMATCH' | 'TOO_SHORT' | 'RUN_OUTLIER' | 'TOO_FEW_STATIONS' | 'DIFFERENT_LEVEL';
 
 export interface PassResult {
   id: string;
@@ -194,6 +198,24 @@ export function buildCanonical(inputs: PassInput[], params: Partial<PathfusionPa
     const status: PassStatus = reasons.length ? 'REJECTED' : sim.range < p.fullRange ? 'PARTIAL' : 'ACCEPTED';
     results.set(x.id, { id: x.id, status, reasons, flipped, coverage: sim.coverage, lengthRatio: sim.lengthRatio, dtwMeanM: sim.dtwMeanM, range: sim.range, outlierVoteFraction: null, zOffsetM: null });
     oriented.set(x.id, st);
+  }
+
+  // A pass at a clearly, consistently different absolute height than the medoid walked another level (stacked corridors
+  // share the plan). It is excluded, never averaged into one height. Unclear differences are left to the median as before.
+  if (!medoid.hRelative) {
+    const source = (x: PassInput): HeightSource => ({ run: x.run, t: median(x.stations.map((st) => st.t)), sigmaZ: x.sigmaZ });
+    for (const x of usable) {
+      const r = results.get(x.id)!;
+      if (x === medoid || x.hRelative || r.status === 'REJECTED') continue;
+      const st = oriented.get(x.id)!;
+      const diffs = projectMonotone(st, medoid.stations).flatMap((q, k) => {
+        const a = st[k].h, b = medoid.stations[q.segment].h;
+        return q.d <= p.widthM && a !== null && b !== null ? [a - b] : [];
+      });
+      if (!clearHeightDifference(diffs, comparisonNoiseM(source(x), source(medoid))).clear) continue;
+      r.status = 'REJECTED';
+      r.reasons.push('DIFFERENT_LEVEL');
+    }
   }
 
   const active = () => usable.filter((x) => results.get(x.id)!.status !== 'REJECTED');

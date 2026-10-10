@@ -138,7 +138,7 @@ function deps(run: Run): ResolveDeps {
     runTrack: async (runId) => {
       const rows = await fusionRunsRepository.positions(runId, 'FINAL');
       if (!rows.length) throw AppError.notFound('RUN_HAS_NO_TRACK', `Run ${runId} has no FINAL track`);
-      return rows.map((p) => ({ seq: p.seq, x: p.x + ox, y: p.y + oy, h: p.h }));
+      return rows.map((p) => ({ seq: p.seq, x: p.x + ox, y: p.y + oy, h: p.h, t: p.t, sigmaZ: p.zDatumSigma }));
     },
     canonical: async (pathId) => ((await pathfusionService.canonicalPath(pathId)) as any).points.map((p: any) => ({ idx: p.idx, x: p.x + ox, y: p.y + oy })),
     ground: (x, y) => terrain.sampleXY(run.terrain, x, y)?.height ?? null,
@@ -264,7 +264,7 @@ const OPS: { [K in OpName]: (run: Run, args: z.infer<(typeof OP_SCHEMAS)[K]>) =>
       const lo = Math.min(t.fromSeq ?? -Infinity, t.toSeq ?? Infinity), hi = Math.max(t.fromSeq ?? -Infinity, t.toSeq ?? Infinity);
       const points = (await deps(run).runTrack(t.runId)).filter((q) => q.seq >= lo && q.seq <= hi);
       if (points.length < 2) throw AppError.badRequest('TRACK_RANGE_EMPTY', `Run ${t.runId}: fewer than two track points in that range`);
-      loaded.push(points.map((q) => ({ x: q.x, y: q.y, h: q.h })));
+      loaded.push(points.map((q) => ({ x: q.x, y: q.y, h: q.h, run: t.runId, t: q.t, sigmaZ: q.sigmaZ })));
     }
     let corridor;
     try {

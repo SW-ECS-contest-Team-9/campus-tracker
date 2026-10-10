@@ -89,10 +89,13 @@ async function finalPositions(runId: string): Promise<RunPosition[]> {
 }
 
 /** Stations of one pass (oriented A→B). */
-export async function passStations(p: { runId: string; tStart: number; tEnd: number; direction: 'AB' | 'BA' }, ds = pathfusionParamsV1.ds): Promise<{ stations: Station[]; hRelative: boolean }> {
-  const { points, hRelative } = trackPoints((await finalPositions(p.runId)).filter((x) => x.t >= p.tStart && x.t <= p.tEnd));
+export async function passStations(p: { runId: string; tStart: number; tEnd: number; direction: 'AB' | 'BA' }, ds = pathfusionParamsV1.ds): Promise<{ stations: Station[]; hRelative: boolean; sigmaZ: number | null }> {
+  const positions = (await finalPositions(p.runId)).filter((x) => x.t >= p.tStart && x.t <= p.tEnd);
+  const { points, hRelative } = trackPoints(positions);
   const st = resampleTrack(points, { ds }).stations;
-  return { stations: p.direction === 'BA' ? reverseStations(st) : st, hRelative };
+  // sigma of the run's height zero over this pass: decides whether a height difference to another pass is clear
+  const sigmaZ = median(positions.flatMap((x) => (x.zDatumSigma !== null ? [x.zDatumSigma] : [])));
+  return { stations: p.direction === 'BA' ? reverseStations(st) : st, hRelative, sigmaZ };
 }
 
 export const pathfusionService = {
@@ -205,8 +208,8 @@ export const pathfusionService = {
     const passes = (await this.passes(routeId)).filter((p) => !p.excluded);
     const out: PassInput[] = [];
     for (const p of passes) {
-      const { stations, hRelative } = await passStations(p);
-      out.push({ id: p.id, stations, hRelative });
+      const { stations, hRelative, sigmaZ } = await passStations(p);
+      out.push({ id: p.id, stations, hRelative, run: p.runId, sigmaZ });
     }
     return out;
   },
@@ -426,8 +429,8 @@ export async function benchRoute(route: RouteRow, c: BenchCandidate) {
   }
   const inputs: PassInput[] = [];
   for (const p of passes) {
-    const { stations, hRelative } = await passStations(p);
-    inputs.push({ id: p.id, stations, hRelative });
+    const { stations, hRelative, sigmaZ } = await passStations(p);
+    inputs.push({ id: p.id, stations, hRelative, run: p.runId, sigmaZ });
   }
   const canonical = inputs.length ? summarizeCanonical(buildCanonical(inputs)) : null;
   const validation = validationMetrics(leaveOneOut(inputs), await windowStats(passes));

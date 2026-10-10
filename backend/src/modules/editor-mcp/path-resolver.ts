@@ -6,6 +6,10 @@ import { AppError } from '../../common/errors/app-error.js';
 import { Uuid } from '../../common/dto.js';
 import { projectOnLine, type XYZ } from '../editor/topology.js';
 import type { Anchor } from '../editor/editor.dto.js';
+import { fusionConfigV4 } from '../fusion/fusion.config.js';
+import { median } from '../trajectory/geometry.js';
+import { clearHeightDifference } from '../trajectory/height-difference.js';
+import { simplify3D } from './corridor.js';
 import { simplifyIndices } from './geometry.js';
 
 export const PathItem = z.object({
@@ -33,7 +37,7 @@ export interface ResolveDeps {
   place(id: string): Promise<{ coordinate: XYZ }>;
   cursorOf(collectorId: string): XYZ | null;
   /** FINAL track in EPSG:5186; h = absolute height or null */
-  runTrack(runId: string): Promise<{ seq: number; x: number; y: number; h: number | null }[]>;
+  runTrack(runId: string): Promise<{ seq: number; x: number; y: number; h: number | null; t?: number; sigmaZ?: number | null }[]>;
   canonical(pathId: string): Promise<{ idx: number; x: number; y: number }[]>;
   /** Terrain height or null outside the DEM */
   ground(x: number, y: number): number | null;
@@ -125,12 +129,12 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
       } else throw AppError.badRequest('INVALID_PATH_ITEM', `path[${i}].at needs roadId, nodeId, placeId or cursorOf`);
     } else {
       // A stretch of a recorded track: simplified in XY, heights from the terrain unless run heights are requested.
-      let points: { key: number; x: number; y: number; h: number | null }[];
+      let points: { key: number; x: number; y: number; h: number | null; sigmaZ?: number | null }[];
       let simplifyM: number;
       if (item.run) {
         const { runId, fromSeq, toSeq } = item.run;
         const lo = Math.min(fromSeq, toSeq), hi = Math.max(fromSeq, toSeq);
-        points = (await deps.runTrack(runId)).filter((q) => q.seq >= lo && q.seq <= hi).map((q) => ({ key: q.seq, x: q.x, y: q.y, h: q.h }));
+        points = (await deps.runTrack(runId)).filter((q) => q.seq >= lo && q.seq <= hi).map((q) => ({ key: q.seq, x: q.x, y: q.y, h: q.h, sigmaZ: q.sigmaZ }));
         if (fromSeq > toSeq) points.reverse();
         simplifyM = item.run.simplifyM;
         if (o.runZ === 'run_h') {
@@ -138,6 +142,12 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
           if (withH.length < points.length) warnings.push(`path[${i}]: ${points.length - withH.length} run points without an absolute height were skipped`);
           points = withH;
           warnings.push(`path[${i}]: run heights are phone heights, not the road surface`);
+        } else {
+          // Terrain heights drop what the walk measured. Say so when the walk is clearly and consistently off the ground (a floor, a bridge, an underground passage).
+          const above = points.flatMap((q) => { const g = q.h === null ? null : deps.ground(q.x, q.y); return g === null ? [] : [q.h! - fusionConfigV4.phoneHeightM - g]; });
+          const sigmas = points.flatMap((q) => (q.sigmaZ != null && Number.isFinite(q.sigmaZ) ? [q.sigmaZ] : []));
+          const d = clearHeightDifference(above, median(sigmas) ?? Infinity);
+          if (d.clear) warnings.push(`path[${i}]: MEASURED_HEIGHT_DROPPED: this walk is ${Math.abs(d.medianM!).toFixed(1)} m ${d.medianM! > 0 ? 'above' : 'below'} the ground along the whole stretch, and terrain heights drop that. If it is a floor, a bridge or an underground passage use runZ "run_h" or create_corridor`);
         }
       } else {
         const c = item.canonical!;
@@ -146,7 +156,11 @@ export async function resolvePath(items: PathItem[], deps: ResolveDeps, options:
         simplifyM = c.simplifyM;
       }
       if (points.length < 2) throw AppError.badRequest('TRACK_RANGE_EMPTY', `path[${i}]: fewer than two track points in that range`);
-      const kept = simplifyIndices(points.map((q) => [q.x, q.y] as [number, number]), simplifyM).map((k) => points[k]);
+      // Measured heights are simplified in 3D: where a level stretch turns into stairs on a straight plan line, that vertex stays.
+      const xyz = item.run && o.runZ === 'run_h' ? points.map((q) => [q.x, q.y, q.h!] as XYZ) : null;
+      const keptXyz = xyz && new Set(simplify3D(xyz, simplifyM));
+      const kept = keptXyz ? points.filter((_, k) => keptXyz.has(xyz![k]))
+        : simplifyIndices(points.map((q) => [q.x, q.y] as [number, number]), simplifyM).map((k) => points[k]);
       for (const q of kept) {
         vertices.push(item.run && o.runZ === 'run_h' ? { p: [q.x, q.y, q.h!], draped: false } : drape(q.x, q.y, `path[${i}] track point ${q.key}`));
       }

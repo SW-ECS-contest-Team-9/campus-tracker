@@ -1,7 +1,7 @@
 /**
  * Calibrates building levels from a field session recorded with markers (fusion-v4 with a TERRAIN datum required):
  *  - "entrance" markers: the phone height at the building's entrance floor (orthometric, Incheon MSL)
- *  - barometric plateaus inside the building: its floor levels -> floor height
+ *  - barometric plateaus inside the building: its floor levels, each with its measured height (storeys are uneven here)
  * Stored in building_metadata.metadata.calibration; the preview shows "entrance floor +N" from it.
  *
  *   npm run buildings:calibrate -- --session=<uuid> [--session=<uuid> ...]
@@ -9,6 +9,7 @@
 import { parseArgs } from 'node:util';
 import { pool } from '../src/config/database.js';
 import { terrain } from '../src/geo/terrain.js';
+import { calibrateLevels, heightPlateaus } from '../src/modules/trajectory/height-difference.js';
 
 const { values: args } = parseArgs({ options: { session: { type: 'string', multiple: true } } });
 const median = (v: number[]) => {
@@ -48,23 +49,9 @@ async function main() {
         ORDER BY 1`,
       [sessions, name, N],
     );
-    // plateaus = peaks of the height histogram (stairs only pass through; levels are where time is spent)
-    const values = pts.map((p) => p.ortho);
-    const bin = (v: number) => Math.floor(v / 0.5);
-    const counts = new Map<number, number>();
-    for (const v of values) counts.set(bin(v), (counts.get(bin(v)) ?? 0) + 1);
-    const peaks = [...counts.entries()]
-      .filter(([b, n]) => n >= 8 && n >= (counts.get(b - 1) ?? 0) && n >= (counts.get(b + 1) ?? 0))
-      .sort((x, y) => y[1] - x[1]);
-    const chosen: number[] = [];
-    for (const [b] of peaks) if (chosen.every((c) => Math.abs(c - b) * 0.5 >= 2)) chosen.push(b);
-    const levels = chosen
-      .map((b) => {
-        const near = values.filter((v) => Math.abs(v - (b + 0.5) * 0.5) <= 0.75);
-        return { orthometricM: median(near)!, samples: near.length };
-      })
-      .sort((x, y) => x.orthometricM - y.orthometricM);
-    const diffs = levels.slice(1).map((l, i) => l.orthometricM - levels[i].orthometricM).filter((d) => d >= 2.5 && d <= 5);
+    // plateaus = peaks of the height histogram (stairs only pass through; levels are where time is spent).
+    // Clearly separate plateaus stay separate levels, however close or far apart (trajectory/height-difference.ts).
+    const plateaus = heightPlateaus(pts.map((p) => p.ortho));
     const { rows: meta } = await pool.query<{ buildingId: string; mapVersionId: string; heightM: number | null; floors: number | null; metadata: Record<string, unknown> }>(
       `SELECT m.building_id "buildingId", m.map_version_id "mapVersionId", m.register_height_m "heightM", m.register_ground_floors floors, m.metadata
          FROM building_metadata m JOIN spatial_map_versions v ON v.id = m.map_version_id AND v.active WHERE m.display_name = $1`,
@@ -75,13 +62,16 @@ async function main() {
       continue;
     }
     const registerFloorHeight = meta[0].heightM && meta[0].floors ? meta[0].heightM / meta[0].floors : null;
-    const floorHeight = median(diffs) ?? registerFloorHeight ?? DEFAULT_FLOOR_HEIGHT_M;
+    const measured = calibrateLevels(plateaus, entrance, registerFloorHeight, DEFAULT_FLOOR_HEIGHT_M);
     const calibration = {
       entrancePhoneOrthometricM: r2(entrance),
       entranceFloorOrthometricM: r2(entrance - PHONE_HEIGHT_M),
-      floorHeightM: r2(floorHeight),
-      floorHeightSource: diffs.length ? 'BAROMETER_LEVELS' : registerFloorHeight ? 'BUILDING_REGISTER' : 'DEFAULT',
-      levels: levels.map((l) => ({ orthometricM: r2(l.orthometricM), relativeFloor: Math.round((l.orthometricM - entrance) / floorHeight), samples: l.samples })),
+      // one number for the "entrance floor +N" label of the preview only; the measured levels below are what counts
+      floorHeightM: r2(measured.floorHeightM),
+      floorHeightSource: measured.floorHeightSource,
+      levelGapsM: measured.levelGapsM.map(r2),
+      // relativeFloor = order of the measured plateaus from the entrance level (a floor nobody walked is not counted)
+      levels: measured.levels.map((l) => ({ orthometricM: r2(l.orthometricM), aboveEntranceM: r2(l.aboveEntranceM), relativeFloor: l.relativeFloor, samples: l.samples })),
       entranceMarkers: usable.filter((e) => e.building === name).map((e) => r2(e.ortho!)),
       sessions,
       calibratedAt: new Date().toISOString(),
@@ -91,7 +81,7 @@ async function main() {
       [meta[0].mapVersionId, meta[0].buildingId, JSON.stringify(calibration)],
     );
     console.log(`  ${name}: entrance floor ${calibration.entranceFloorOrthometricM} m (phone ${calibration.entrancePhoneOrthometricM} m, markers ${calibration.entranceMarkers.join(', ')}), floor height ${calibration.floorHeightM} m (${calibration.floorHeightSource})`);
-    for (const l of calibration.levels) console.log(`     level ${l.orthometricM} m -> entrance floor ${l.relativeFloor >= 0 ? '+' : ''}${l.relativeFloor} (${l.samples} samples)`);
+    for (const l of calibration.levels) console.log(`     level ${l.orthometricM} m (${l.aboveEntranceM >= 0 ? '+' : ''}${l.aboveEntranceM} m) -> measured level ${l.relativeFloor >= 0 ? '+' : ''}${l.relativeFloor} from the entrance (${l.samples} samples)`);
   }
 }
 
