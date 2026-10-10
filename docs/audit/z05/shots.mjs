@@ -35,7 +35,8 @@ for (const [name, w] of Object.entries(V)) {
   let url;
   if (w.section) {   // 카메라를 먼저 놓는다(단면은 카메라가 있는 쪽 절반을 숨긴다). ortho: 자른 면을 정면에서 원근 없이
     await ev(`window.__shot(${view}, 2)`);
-    await ev(`(() => { window.__section.setLine(${JSON.stringify(w.section.a)}, ${JSON.stringify(w.section.b)}); if (${!!w.section.flip}) window.__section.flip(); if (${!!w.section.ortho}) window.__section.lookAt(); const z = ${JSON.stringify(w.section.zoom ?? null)}; if (z) { const c = window.__previewViewer.camera; c.moveUp(z.centerM - window.Cesium.Cartographic.fromCartesian(c.positionWC).height); c.frustum.width = z.widthM;   // 폭은 옮긴 뒤에(옮기면 폭이 카메라 높이로 되돌아간다) } return 1; })()`);
+    // zoom: 폭은 카메라를 옮긴 뒤에 준다(옮기면 폭이 카메라 높이로 되돌아간다)
+    await ev(`(() => { window.__section.setLine(${JSON.stringify(w.section.a)}, ${JSON.stringify(w.section.b)}); if (${!!w.section.flip}) window.__section.flip(); if (${!!w.section.ortho}) window.__section.lookAt(); const z = ${JSON.stringify(w.section.zoom ?? null)}; if (z) { const c = window.__previewViewer.camera; c.moveUp(z.centerM - window.Cesium.Cartographic.fromCartesian(c.positionWC).height); c.frustum.width = z.widthM; } return 1; })()`);
     url = w.section.ortho
       ? await ev(`(async () => { const v = window.__previewViewer; for (let k = 0; k < 30; k++) { v.scene.requestRender(); v.render(); await new Promise((r) => setTimeout(r, 250)); } v.render(); return v.scene.canvas.toDataURL('image/jpeg', 0.9); })()`)
       : await ev(`window.__shot(${view}, 30)`);

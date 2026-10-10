@@ -60,3 +60,9 @@
 - `type: tree` = 단순한 나무(줄기 상자 + 잎 상자 둘). `frontend/public/structures/z06-trees.geojson`, 만드는 스크립트 `docs/audit/z06/trees.py`. 사진에 나무 줄이 있는 화단에만 두고, 자리는 화단 상자의 긴 축을 고르게 나눈 것이다(추정).
 - 캠퍼스 밖으로 나간 기단도 지형을 숨기는 구역에 넣는다: 기단 바깥 가장자리가 지형 칸을 따라 톱니로 보이지 않고 곧은 선이 된다(`structures-layer.ts`).
 - 청운관·혜인관·서문 상자는 `docs/audit/z05/boxes_z06.py` 가 Z05 상자를 걷고 다시 만든다(id 머리말 `Z06-`, 파일 이름은 그대로 `z05-*.geojson`).
+
+## Z07 에서 더한 것
+- 상자는 제 색을 가질 수 있다: `color`(옆면·윗면), `topColor`(윗면만), 둘 다 `#rrggbb` 소문자. 있으면 `material`·종류 색보다 먼저다. 기단에는 쓰지 않는다.
+- `frontend/public/structures/z07-building-parts.geojson`(만드는 스크립트 `docs/audit/z07/build_parts.py`): 건물에 붙는 덩어리 가운데 높이·외곽이 추정이라 건물 보정 파일에 못 넣는 것(유담관 둥근 기단부의 창 띠·옥상 정원, 굽은 낮은 날개의 바깥벽과 창, 문예관 저층부의 나머지·열린 기둥 층·옥상 테두리).
+- 본관–한림관 틈(`docs/audit/z05/boxes_z07.py`, 파일은 `z05-upper-branch.geojson`): 덮인 보행 복도 = 마디마다 밑단·바닥(`landing`) + 옆벽 둘(`wall`) + 덮개(`canopy`). 내리막길 기단 밑 구간은 `void`(inside = `G02-PLATFORM-WAY`). 틈 바닥 기단은 그대로 둔다.
+- 갈무리 스크립트 `docs/audit/z05/shots.mjs`: 시점에 `section: {a, b, flip?, ortho?, zoom?: {widthM, centerM}}` 을 주면 그 선으로 단면을 켜고 찍는다. `SHOT_URL` 로 다른 포트의 화면을 찍을 수 있다.
