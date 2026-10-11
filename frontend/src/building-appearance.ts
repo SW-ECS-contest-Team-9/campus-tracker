@@ -302,7 +302,8 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
   let ridge = offset((e) => (e.open ? -run : 0));
   for (let k = 0; k < 3 && !(area2(ridge) > 0.02 * area2(outer)); k++) { run /= 2; ridge = offset((e) => (e.open ? -run : 0)); }
   if (!(area2(ridge) > 0)) { out.cap(rings, top + 0.1, color); return; }
-  const cornice = hex(WINDOW.cornice), wall = hex(wallColor(a)), dormer = hex(WINDOW.dormer);
+  // Z10: a pitched roof with a rim colour has its eave in that colour (a dark metal mansard has no light cornice)
+  const cornice = hex(a.roof.rim ?? WINDOW.cornice), wall = hex(wallColor(a)), dormer = hex(WINDOW.dormer);
   const z = (p: XY, zz: number) => [p[0], p[1], zz];
   if (a.roof.tiers === 2) { // Z09 a double eave: the lower roof up to a low wall band, the smaller upper roof with its own eave above it
     const h1 = h * 0.4, low = offset((e) => (e.open ? -run * 0.45 : 0)), upper = offset((e) => (e.open ? -run * 0.45 + TIERS.eaveM : 0)), z2 = top + h1 + TIERS.bandM;

@@ -5998,7 +5998,7 @@
     "estimated": true,
     "grade": "확정(있음: 사용자 사진), 추정(자리·치수)",
     "basePlane": "추가-외국인생활관 북쪽 벽",
-    "fromM": 94.65,
+    "fromM": 94.54,
     "toM": 104.0,
     "assumption": "외국인 생활관 회전교차로 쪽 가운데의 세로 유리 띠(계단실 창: 폭 2.2 m, 2층 ~ 벽돌 벽 끝)",
     "source": "사용자-서문-공연실습소-생활관-20261010/외국인생활관.jpg",
@@ -6041,8 +6041,8 @@
     "estimated": true,
     "grade": "확정(있음: 사용자 사진), 추정(자리·치수)",
     "basePlane": "추가-외국인생활관 북쪽 벽",
-    "fromM": 92.05,
-    "toM": 94.55,
+    "fromM": 91.94,
+    "toM": 94.44,
     "assumption": "회전교차로 쪽 가운데의 문(폭 2.4 m). 벽면의 문 자리를 나타내는 어두운 판. 출입구 자료는 없다(길에 잇지 않음)",
     "source": "사용자-서문-공연실습소-생활관-20261010/외국인생활관.jpg",
     "material": "opening"
@@ -6715,6 +6715,694 @@
       [
        201017.4,
        557206.3
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-1-TRUNK",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 125.4,
+    "toM": 128.4,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "trunk"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201095.82,
+       557258.32
+      ],
+      [
+       201096.18,
+       557258.32
+      ],
+      [
+       201096.18,
+       557258.68
+      ],
+      [
+       201095.82,
+       557258.68
+      ],
+      [
+       201095.82,
+       557258.32
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-1-CROWN",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 128.2,
+    "toM": 129.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.7,
+       557257.2
+      ],
+      [
+       201097.3,
+       557257.2
+      ],
+      [
+       201097.3,
+       557259.8
+      ],
+      [
+       201094.7,
+       557259.8
+      ],
+      [
+       201094.7,
+       557257.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-1-TOP",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 129.6,
+    "toM": 130.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201095.25,
+       557257.75
+      ],
+      [
+       201096.75,
+       557257.75
+      ],
+      [
+       201096.75,
+       557259.25
+      ],
+      [
+       201095.25,
+       557259.25
+      ],
+      [
+       201095.25,
+       557257.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-2-TRUNK",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 125.4,
+    "toM": 128.4,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "trunk"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201102.32,
+       557258.32
+      ],
+      [
+       201102.68,
+       557258.32
+      ],
+      [
+       201102.68,
+       557258.68
+      ],
+      [
+       201102.32,
+       557258.68
+      ],
+      [
+       201102.32,
+       557258.32
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-2-CROWN",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 128.2,
+    "toM": 129.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201101.2,
+       557257.2
+      ],
+      [
+       201103.8,
+       557257.2
+      ],
+      [
+       201103.8,
+       557259.8
+      ],
+      [
+       201101.2,
+       557259.8
+      ],
+      [
+       201101.2,
+       557257.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-2-TOP",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 129.6,
+    "toM": 130.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201101.75,
+       557257.75
+      ],
+      [
+       201103.25,
+       557257.75
+      ],
+      [
+       201103.25,
+       557259.25
+      ],
+      [
+       201101.75,
+       557259.25
+      ],
+      [
+       201101.75,
+       557257.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-3-TRUNK",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 125.4,
+    "toM": 128.4,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "trunk"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201095.82,
+       557264.32
+      ],
+      [
+       201096.18,
+       557264.32
+      ],
+      [
+       201096.18,
+       557264.68
+      ],
+      [
+       201095.82,
+       557264.68
+      ],
+      [
+       201095.82,
+       557264.32
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-3-CROWN",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 128.2,
+    "toM": 129.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.7,
+       557263.2
+      ],
+      [
+       201097.3,
+       557263.2
+      ],
+      [
+       201097.3,
+       557265.8
+      ],
+      [
+       201094.7,
+       557265.8
+      ],
+      [
+       201094.7,
+       557263.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-3-TOP",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 129.6,
+    "toM": 130.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201095.25,
+       557263.75
+      ],
+      [
+       201096.75,
+       557263.75
+      ],
+      [
+       201096.75,
+       557265.25
+      ],
+      [
+       201095.25,
+       557265.25
+      ],
+      [
+       201095.25,
+       557263.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-4-TRUNK",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 125.4,
+    "toM": 128.4,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "trunk"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201102.32,
+       557264.32
+      ],
+      [
+       201102.68,
+       557264.32
+      ],
+      [
+       201102.68,
+       557264.68
+      ],
+      [
+       201102.32,
+       557264.68
+      ],
+      [
+       201102.32,
+       557264.32
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-4-CROWN",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 128.2,
+    "toM": 129.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201101.2,
+       557263.2
+      ],
+      [
+       201103.8,
+       557263.2
+      ],
+      [
+       201103.8,
+       557265.8
+      ],
+      [
+       201101.2,
+       557265.8
+      ],
+      [
+       201101.2,
+       557263.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-4-TOP",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 129.6,
+    "toM": 130.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201101.75,
+       557263.75
+      ],
+      [
+       201103.25,
+       557263.75
+      ],
+      [
+       201103.25,
+       557265.25
+      ],
+      [
+       201101.75,
+       557265.25
+      ],
+      [
+       201101.75,
+       557263.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-5-TRUNK",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 125.4,
+    "toM": 128.4,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "trunk"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201099.32,
+       557268.82
+      ],
+      [
+       201099.68,
+       557268.82
+      ],
+      [
+       201099.68,
+       557269.18
+      ],
+      [
+       201099.32,
+       557269.18
+      ],
+      [
+       201099.32,
+       557268.82
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-5-CROWN",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 128.2,
+    "toM": 129.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201098.2,
+       557267.7
+      ],
+      [
+       201100.8,
+       557267.7
+      ],
+      [
+       201100.8,
+       557270.3
+      ],
+      [
+       201098.2,
+       557270.3
+      ],
+      [
+       201098.2,
+       557267.7
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HAIRPIN-TREE-5-TOP",
+    "type": "tree",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(이 자리에 나무가 줄지어 있음: 사진), 추정(그루 수·자리·크기)",
+    "basePlane": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
+    "fromM": 129.6,
+    "toM": 130.6,
+    "assumption": "위쪽 갈래 굽이 안쪽 섬의 소나무: 단순한 나무(실제 그루 수·자리·수종의 모양이 아니다)",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "material": "foliage"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201098.75,
+       557268.25
+      ],
+      [
+       201100.25,
+       557268.25
+      ],
+      [
+       201100.25,
+       557269.75
+      ],
+      [
+       201098.75,
+       557269.75
+      ],
+      [
+       201098.75,
+       557268.25
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z10-HANLIM-1F-CANOPY",
+    "type": "canopy",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 사용자 사진), 추정(자리·치수)",
+    "basePlane": "없음(건물 벽에 붙음)",
+    "fromM": 130.6,
+    "toM": 130.9,
+    "assumption": "한림관 1층 문 위의 차양(짙은 틀의 유리 차양: 폭 7.5 m, 내민 길이 3 m, 문 앞 단 127.2 m 위 3.4 m). 문 자리는 문 앞 단의 건물 쪽으로 봄",
+    "source": "사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이버거리뷰-202506.webp",
+    "color": "#3a4046"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201102.0,
+       557280.2
+      ],
+      [
+       201109.5,
+       557280.2
+      ],
+      [
+       201109.5,
+       557283.4
+      ],
+      [
+       201102.0,
+       557283.4
+      ],
+      [
+       201102.0,
+       557280.2
       ]
      ]
     ]

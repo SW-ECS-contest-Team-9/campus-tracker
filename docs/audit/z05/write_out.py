@@ -6,7 +6,8 @@ def box(zone, id, typ, poly, fromM, toM, assumption, source, grade='추정', bas
 if (HERE5 / 'boxes.py').exists(): exec((HERE5 / 'boxes.py').read_text(encoding='utf-8'))
 # ---------- 캠퍼스 밖 남서·남쪽: S-MAP 지면 표본(2 m 간격). 캠퍼스 지도 건물에서 16 m 안은 뺀다(표본 단계는 건물 칸을 지키지 않는다) ----------
 ALLP = unary_union([q['poly'] for q in PLATS]).buffer(0)
-far = ~contains_xy(BLD_ALL.buffer(16.0), XS, YS) & ~contains_xy(CAMPUS.buffer(1.0), XS, YS) & ~contains_xy(ALLP.buffer(1.0), XS, YS)
+_ALLP_S = unary_union([q['poly'] for q in PLATS if q.get('terrainCut') is None]).buffer(0)   # Z10: 건물 옆에 붙인 기단(회전교차로) 안의 표본은 그대로 둔다. 빼면 그 건물(외국인 생활관) 밑의 지형 칸이 달라진다
+far = ~contains_xy(BLD_ALL.buffer(16.0), XS, YS) & ~contains_xy(CAMPUS.buffer(1.0), XS, YS) & ~contains_xy(_ALLP_S.buffer(1.0), XS, YS)
 sel = M.g & np.isfinite(Z) & far & (YS < 557246) & (XS < 201182) & (XS % 2 == 0) & (YS % 2 == 0)
 pts = [[float(x), float(y), r2(z)] for x, y, z in zip(XS[sel], YS[sel], Z[sel])]
 dump(REPO / 'backend/data/terrain/samples/smap_samples_z05_edge_5186.json', {'crs': 'EPSG:5186', 'reason': 'Z05: 캠퍼스 남서·남쪽 바깥(공연실습소·외국인 생활관·정문 앞 둘레)의 지형을 S-MAP 지면으로 국소 보정. 옛 지형이 2~10 m 높아 건물 밑동과 정문 앞을 가렸다',

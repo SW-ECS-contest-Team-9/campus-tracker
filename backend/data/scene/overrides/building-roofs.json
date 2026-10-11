@@ -1372,6 +1372,7 @@
       "roof": {
         "type": "hipped",
         "material": "metal",
+        "rim": "#4d5258",
         "riseM": 1.5,
         "runM": 2.0,
         "dormers": true
