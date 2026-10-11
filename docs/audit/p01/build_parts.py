@@ -232,10 +232,10 @@ def munye_end():
     box('P01-MUNYE-END-LOUVRE-2', 'wall', R(11.8, min(L, 14.4), 0, 0.1), 150.0, 188.6, '흰 판 오른쪽의 가로 살 띠', SRC, G, '문예관 동쪽 끝 벽', color='#6f7377')
     OR = '#e8873a'; c = 9.0
     for k in range(7):   # 아래 굽은 획: 반원 아래쪽을 조각으로
-        t0, t1 = math.radians(200 + 20 * k), math.radians(200 + 20 * (k + 1)); xs = sorted((c + 1.9 * math.cos(t0), c + 1.9 * math.cos(t1))); zm = 170.5 + 1.9 * (math.sin(t0) + math.sin(t1)) / 2
+        t0, t1 = math.radians(200 + 20 * k), math.radians(200 + 20 * (k + 1)); xs = sorted((c + 1.9 * math.cos(t0), c + 1.9 * math.cos(t1))); zm = 176.5 + 1.9 * (math.sin(t0) + math.sin(t1)) / 2
         box(f'P01-MUNYE-LOGO-ARC{k + 1}', 'wall', R(xs[0], xs[1] + 0.05, 0.14, 0.2), zm - 0.45, zm + 0.45, '주황 로고의 아래 굽은 획(조각)', SRC, G, 'P01-MUNYE-END-PANEL', color=OR)
-    box('P01-MUNYE-LOGO-DIAMOND', 'wall', R(c - 0.2, c + 1.3, 0.14, 0.2), 173.6, 175.1, '주황 로고의 가운데 마름모(네모로 줄임)', SRC, G, 'P01-MUNYE-END-PANEL', color=OR)
-    for k in range(3): box(f'P01-MUNYE-LOGO-TOP{k + 1}', 'wall', R(c - 1.6 + 0.6 * k, c - 0.9 + 0.6 * k, 0.14, 0.2), 176.0 + 0.8 * k, 177.1 + 0.8 * k, '주황 로고의 위 비낀 획(조각)', SRC, G, 'P01-MUNYE-END-PANEL', color=OR)
+    box('P01-MUNYE-LOGO-DIAMOND', 'wall', R(c - 0.2, c + 1.3, 0.14, 0.2), 179.6, 181.1, '주황 로고의 가운데 마름모(네모로 줄임)', SRC, G, 'P01-MUNYE-END-PANEL', color=OR)
+    for k in range(3): box(f'P01-MUNYE-LOGO-TOP{k + 1}', 'wall', R(c - 1.6 + 0.6 * k, c - 0.9 + 0.6 * k, 0.14, 0.2), 182.0 + 0.8 * k, 183.1 + 0.8 * k, '주황 로고의 위 비낀 획(조각)', SRC, G, 'P01-MUNYE-END-PANEL', color=OR)
     drum = [P(0.2, 0.3) + 2.3 * np.array([math.cos(math.radians(a)), math.sin(math.radians(a))]) for a in range(0, 360, 30)]
     box('P01-MUNYE-DRUM', 'wall', drum, 178.0, 186.0, '꼭대기 근처 모서리의 둥근 유리 돌출(반지름 2.3 m, 높이 8 m)', SRC, G, '없음(벽에 붙음)', color='#8fbcb6')
     for k, z in enumerate((178.0, 181.9, 185.6)): box(f'P01-MUNYE-DRUM-BAND{k + 1}', 'wall', [P(0.2, 0.3) + 2.42 * np.array([math.cos(math.radians(a)), math.sin(math.radians(a))]) for a in range(0, 360, 30)], z, z + 0.45, '둥근 돌출의 흰 띠', SRC, G, 'P01-MUNYE-DRUM', color='#e7e6e1')
