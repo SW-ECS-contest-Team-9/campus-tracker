@@ -23,7 +23,7 @@
   "coveredByPlatformsM2": 34241
  },
  "vsSmap1m": {
-  "points": 29380,
+  "points": 29369,
   "p50abs": 0.42,
   "p90abs": 6.07
  },
@@ -1180,7 +1180,7 @@
       91.79,
       95.6
      ],
-     "area": 733.6,
+     "area": 659.7,
      "grade": "S-MAP(높이), 확정(건물 앞이 회전교차로: 사용자 사진 외국인생활관.jpg), 추정(외곽, 메시 밖 5 m)",
      "material": "asphalt",
      "terrain": true,
@@ -1661,9 +1661,9 @@
    2939
   ],
   "Z05-PLATFORM-GATE-ROUNDABOUT": [
-   -0.01,
-   0.67,
-   549
+   -0.02,
+   0.62,
+   538
   ],
   "Z05-PLATFORM-GATE-ROAD-EAST-EDGE": [
    -4.2,
