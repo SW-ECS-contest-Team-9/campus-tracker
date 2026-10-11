@@ -109,7 +109,7 @@ const checkReachabilityTool = defineTool({
   description: 'Network check, not a route planner: can you get from one place to another along the drawn roads on foot, by vehicle or by wheelchair? '
     + 'Returns the connecting roads and length, or how far the search got and which roads block it. Access "unknown"/"restricted" counts as not passable '
     + 'unless assumeUnknownAllowed is set. Start and end snap to the nearest network node. Open areas count as walkable space: nodes standing on an '
-    + 'area at its floor height are joined across it (roadId "area:<areaId>:<node>:<node>", pedestrians only).',
+    + 'area at its floor height are joined across it (roadId "area:<areaId>:<node>:<node>"): pedestrians, and vehicles too where the area is of kind parking.',
   input: z.object({
     from: Where, to: Where,
     mode: z.enum(['pedestrian', 'vehicle', 'wheelchair']).default('pedestrian'),

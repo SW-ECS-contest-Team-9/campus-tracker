@@ -1,12 +1,14 @@
 // Open areas (mobility.open_areas) as walkable space for the network check: an area is one flat floor, so every network
 // node standing on it at its height is an access point, and two access points are joined by the shortest walk that stays
 // inside the polygon (straight when they see each other, around corners and holes otherwise). The links are built on
-// demand and never stored as roads.
+// demand and never stored as roads. An area of kind 'parking' is shared: vehicles may cross it too (U04).
 import type { ReachNode, ReachRoad } from './reachability.js';
 
 type XY = readonly [number, number];
 export interface WalkArea {
   id: number | string; name: string | null; elevationM: number | null; floor: string | null;
+  /** 'parking': a floor vehicles drive on as well (the aisles of a car park): its links allow vehicles in both directions. Any other kind is walked only. */
+  kind?: string | null;
   /** rings[0] is the boundary, the rest are holes; closed or open rings, EPSG:5186 */
   rings: (readonly number[])[][];
 }
@@ -92,6 +94,7 @@ export function areaLinks(areas: WalkArea[], nodes: (ReachNode & { levelId?: str
       if (edge.d <= o.edgeToleranceM) access.push({ id: n.id, at: edge.point });
     }
     if (access.length < 2) continue;
+    const shared = area.kind === 'parking';
     // visibility graph over the access points and the polygon corners, then the shortest walk from each access point
     const points = [...access.map((a) => a.at), ...polygon.corners];
     const seen: number[][] = points.map(() => []);
@@ -118,7 +121,7 @@ export function areaLinks(areas: WalkArea[], nodes: (ReachNode & { levelId?: str
         links.push({
           id: `area:${area.id}:${access[from].id}:${access[to].id}`, areaId: area.id, name: area.name, structure: 'area',
           fromNodeId: access[from].id, toNodeId: access[to].id, lengthM: best[to], coordinates,
-          pedestrianAccess: 'allowed', vehicleAccess: 'unknown', wheelchairAccess: 'unknown', pedestrianDirection: 'both', vehicleDirection: 'unknown',
+          pedestrianAccess: 'allowed', vehicleAccess: shared ? 'allowed' : 'unknown', wheelchairAccess: 'unknown', pedestrianDirection: 'both', vehicleDirection: shared ? 'both' : 'unknown',
         });
       }
     }

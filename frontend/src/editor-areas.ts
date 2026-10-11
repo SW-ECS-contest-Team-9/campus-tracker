@@ -8,7 +8,9 @@ type Context = { viewer: any; C: any; point: (p: XYZ) => any; cursor: () => XYZ;
   /** Called when the saved areas were read again. */
   changed?: () => void;
   /** True when something else already fills this area on the map: only its outline is drawn then (two fills at one height flicker). */
-  filled?: (area: Area) => boolean };
+  filled?: (area: Area) => boolean;
+  /** True when the area is not shown at all now (U04: an underground area while the underground ways are off); the selected one always shows. */
+  hidden?: (area: Area) => boolean };
 const escape = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 
 /** Area boundaries are independent of routing centerlines. Existing paths are never removed automatically. */
@@ -140,7 +142,7 @@ export class AreaEditor {
       if (positions.length) this.entities.push(viewer.entities.add({position:positions[0],label:{text:name,font:'12px system-ui',fillColor:color,showBackground:true,disableDepthTestDistance:Number.POSITIVE_INFINITY}}));
       if (draft) for (const position of positions) this.entities.push(viewer.entities.add({position,point:{pixelSize:8,color,disableDepthTestDistance:Number.POSITIVE_INFINITY}}));
     };
-    for (const area of this.areas) if (area.id !== this.selected?.id) draw(area.geometry.coordinates[0].slice(0,-1),area.elevationM,false,area.name,area.geometry.coordinates.slice(1).map(r=>r.slice(0,-1)),!this.ctx.filled?.(area));
+    for (const area of this.areas) if (area.id !== this.selected?.id && !this.ctx.hidden?.(area)) draw(area.geometry.coordinates[0].slice(0,-1),area.elevationM,false,area.name,area.geometry.coordinates.slice(1).map(r=>r.slice(0,-1)),!this.ctx.filled?.(area));
     const height = Number(this.field('elevationM').value);
     if (this.vertices && Number.isFinite(height)) draw(this.vertices,height,true,this.field('name').value || '공간 초안',this.holes);
     this.root.querySelector('[data-info]')!.textContent = this.active ? `경계점 ${this.vertices!.length}개 · 같은 바닥 고도의 닫힌 면 · Space 추가 / Enter 저장` : '공간은 경로와 별개인 면입니다. 기존 도로는 자동 정리·연결되지 않습니다.';

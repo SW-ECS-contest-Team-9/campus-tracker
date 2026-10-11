@@ -2,7 +2,7 @@
 // Corridors are drawn with their real width, open areas as filled polygons, portals as labelled points.
 // Features without elevation_m lie on the terrain; with it, at that absolute (MSL) height (indoor / elevated).
 import { api, type MobilityCorridor, type MobilityOpenArea, type MobilityPortal, type MobilitySpaces } from './api';
-import { ROAD_SURFACE } from './road-surface';
+import { ROAD_SURFACE, isUndergroundArea } from './road-surface';
 import { clipLonLatPolygons, type SectionPlane } from './section';
 import type { Viewer } from './vworld';
 
@@ -102,8 +102,9 @@ export class MobilityLayer {
         const attributes = () => ({ color: C.ColorGeometryInstanceAttribute.fromColor(color(fill.color, 1)) });
         const indoor = a.elevationM != null && (a.buildingId || a.floor);
         if (this.surfacesElsewhere && !indoor) continue;
-        if (!indoor) onGround.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: hierarchy }), id: { mobilityPick: pick }, attributes: attributes() }));
-        if (a.elevationM != null && (indoor || fill.flat)) {
+        const below = isUndergroundArea(a); // U04: never laid on the ground
+        if (!indoor && !below) onGround.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: hierarchy }), id: { mobilityPick: pick }, attributes: attributes() }));
+        if (a.elevationM != null && (indoor || fill.flat || below)) {
           for (const rings of this.section ? clipLonLatPolygons(this.section, [a.geometry.coordinates]) : [a.geometry.coordinates]) {
             level.push(new C.GeometryInstance({ geometry: new C.PolygonGeometry({ polygonHierarchy: polygon(rings), height: a.elevationM, vertexFormat: C.PerInstanceColorAppearance.FLAT_VERTEX_FORMAT }), id: { mobilityPick: pick }, attributes: attributes() }));
           }

@@ -35,6 +35,8 @@ export const STRUCTURES = {
   /** Voids (shown with the underground ways, and as a hole on the cut face). */
   void: '#5c6470',
   voidFace: '#eef0ec',
+  /** Opacity of a box marked `underground: true` (floor markings of an underground storey) where the ground or a platform is in front of it (underground toggle on). */
+  undergroundMarkAlpha: 0.9,
   /**
    * Faces are shaded by where they face, without scene lighting (the surfaces around them are unlit too): the top
    * face has the colour itself, a side face is darker, a little less so when it faces the light (from the south-west,

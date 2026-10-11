@@ -1732,7 +1732,8 @@ function installSocket() {
 function installControls() {
   areaEditor = new AreaEditor({ viewer, C, point: drawPoint, cursor: () => ownCursor, terrain: terrainAt,
     request, say: (text) => say(text), changed: scheduleLayers,
-    filled: (area) => { const part = areaSurfacePart(area); return part !== null && !!sceneLayers?.surfaces.isVisible(part); }, start: () => {
+    filled: (area) => { const part = areaSurfacePart(area); return part !== null && !!sceneLayers?.surfaces.isVisible(part); },
+    hidden: (area) => areaSurfacePart(area) === 'underground' && !sceneLayers?.surfaces.isVisible('underground'), start: () => {
       if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 공간을 그릴까요?')) return false;
       clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); return true;
     } });

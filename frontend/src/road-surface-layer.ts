@@ -5,7 +5,7 @@ import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS, type MobilityPick } from './mobility-map';
 import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { PAVED, buildPavedSurfaces, type Material, type PavedSurfaces, type SurfaceArea } from './paved-surface';
-import { ROAD_SURFACE, buildRoadSurfaces, isUnderground } from './road-surface';
+import { ROAD_SURFACE, buildRoadSurfaces, flatAreaMesh, isUnderground, isUndergroundArea, type RoadMesh } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import { clipMesh, type Mesh, type SectionPlane } from './section';
 import { setTerrainClip } from './terrain-clip';
@@ -15,7 +15,7 @@ import type { Viewer } from './vworld';
 /**
  * ground: the wide paved surfaces: the asphalt of the vehicle roads and vehicle areas, and the block paving of the
  * pedestrian-priority ways and plazas; pedestrian: the other pedestrian ways, sidewalks, stairs and crossings;
- * area: the sports field; underground: every underground way.
+ * area: the sports field; underground: every underground way and underground open area (U04: car park aisles).
  */
 export type RoadSurfacePart = 'ground' | 'pedestrian' | 'area' | 'underground';
 const PART: Record<Material, RoadSurfacePart> = { carriageway: 'ground', block: 'ground', crossing: 'pedestrian', stairs: 'pedestrian', sidewalk: 'pedestrian', pedestrian: 'pedestrian', field: 'area' };
@@ -45,7 +45,8 @@ export function surfaceAreas(areas: LayerArea[], roads: Pick<CarriagewayRoad, 'r
   };
   const ends = roads.filter((r) => r.roadClass !== 'pedestrian' && !isUnderground(r)).flatMap((r) => [r.geometry.coordinates[0], r.geometry.coordinates[r.geometry.coordinates.length - 1]]);
   return areas.flatMap((a) => {
-    if (areaSurfacePart(a) === null) return [];
+    const part = areaSurfacePart(a);
+    if (part === null || part === 'underground') return []; // an underground area is drawn with the underground ways (undergroundAreas)
     const rings = a.geometry.coordinates.map(metres);
     const fill = AREA_FILLS.find((f) => f.match(a))?.id === 'field' ? 'field' as const : a.kind === 'parking' || ends.some((p) => inside(p, rings[0])) ? 'asphalt' as const : 'block' as const;
     return [{ id: a.id, fill, elevationM: a.elevationM, rings }];
@@ -55,8 +56,18 @@ export function surfaceAreas(areas: LayerArea[], roads: Pick<CarriagewayRoad, 'r
 /** The part an open area is drawn in as a filled surface, or null (an indoor area, or a kind that is not filled: only plazas, parking areas and the field are). */
 export function areaSurfacePart(area: { kind: string; name: string | null; elevationM: number | null; buildingId: string | null; floor: string | null }): RoadSurfacePart | null {
   if (area.elevationM != null && (area.buildingId || area.floor)) return null;
+  if (isUndergroundArea(area)) return 'underground';
   if (AREA_FILLS.find((f) => f.match(area))?.id === 'field') return 'area';
   return area.kind === 'parking' || area.kind === 'plaza' ? 'ground' : null;
+}
+
+/**
+ * U04: the underground open areas (the aisles of an underground car park: the floor minus the stall blocks) as flat
+ * surfaces at their floor height, holes kept. They are road: drawn in the carriageway colour with the underground ways.
+ */
+export function undergroundAreas(areas: LayerArea[]): { id: LayerArea['id']; mesh: RoadMesh }[] {
+  const metres = (ring: number[][]) => ring.slice(0, -1).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
+  return areas.filter((a) => areaSurfacePart(a) === 'underground').map((a) => ({ id: a.id, mesh: flatAreaMesh(a.geometry.coordinates.map(metres), a.elevationM!) }));
 }
 
 /** What the structures layer tells the surfaces (scene-layers.ts passes it on): `key` changes when anything in it does. */
@@ -79,6 +90,7 @@ export class RoadSurfaceLayer {
   /** Built once per data change, not per frame and not per toggle. */
   private paved: PavedSurfaces = { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
   private underground: ReturnType<typeof buildRoadSurfaces>['underground'] = [];
+  private undergroundFloors: ReturnType<typeof undergroundAreas> = [];
   roads: CarriagewayRoad[] = [];
   /** How long the last build of the merged surfaces took. */
   buildMs = 0;
@@ -103,6 +115,7 @@ export class RoadSurfaceLayer {
       // nothing shown: drop what was drawn from the old data, build when a part is turned on
       this.paved = { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
       this.underground = [];
+      this.undergroundFloors = [];
       this.draw();
       return;
     }
@@ -115,6 +128,7 @@ export class RoadSurfaceLayer {
       exclude: this.context.exclude, flush: this.context.flush,
     });
     this.underground = buildRoadSurfaces(this.roads).underground;
+    this.undergroundFloors = undergroundAreas(this.areas);
     this.buildMs = performance.now() - started;
     this.draw();
   }
@@ -232,10 +246,15 @@ export class RoadSurfaceLayer {
       const skirt = cut(s.skirt, 3);
       if (skirt.indices.length) add(PART[s.material], this.primitive(skirt, 3, () => skirtColor));
     }
-    for (const group of this.underground) {
+    // the floors (aisles of an underground car park) first, the ways on top of them
+    const below: { mesh: RoadMesh; css: string; id?: object }[] = [
+      ...this.undergroundFloors.map((f) => ({ mesh: f.mesh, css: ROAD_SURFACE.colors.carriageway, id: { mobilityPick: { kind: 'mobility', table: 'openAreas', id: f.id } satisfies MobilityPick } })),
+      ...this.underground.map((g) => ({ mesh: g.mesh, css: ROAD_SURFACE.colors[g.kind] })),
+    ];
+    for (const group of below) {
       const mesh = cut(group.mesh, 3);
       if (!mesh.indices.length) continue;
-      const color = C.Color.fromCssColorString(ROAD_SURFACE.colors[group.kind]);
+      const color = C.Color.fromCssColorString(group.css);
       const values = new Float64Array(mesh.positions.length);
       for (let i = 0; i < values.length; i += 3) {
         const c = this.position(mesh.positions[i], mesh.positions[i + 1], mesh.positions[i + 2]);
@@ -250,6 +269,7 @@ export class RoadSurfaceLayer {
             primitiveType: C.PrimitiveType.TRIANGLES,
             boundingSphere: C.BoundingSphere.fromVertices(values as unknown as number[]),
           }),
+          id: group.id,
           attributes: {
             color: C.ColorGeometryInstanceAttribute.fromColor(color),
             depthFailColor: C.ColorGeometryInstanceAttribute.fromColor(color.withAlpha(ROAD_SURFACE.undergroundHiddenAlpha)),

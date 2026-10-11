@@ -331,11 +331,18 @@ export class StructuresLayer {
     this.viewer.scene.requestRender?.();
   }
 
-  /** The voids as boxes that show through the ground and the platforms, like the underground ways. */
+  /**
+   * The voids as boxes that show through the ground and the platforms, like the underground ways. After them (drawn on
+   * top) the boxes marked `underground: true` in their own colour: floor markings of an underground storey (U04: the
+   * stall blocks and bay lines of the car park under the field), in file order, so a lower storey lies under an upper one.
+   */
   private drawVoids() {
     const C = (window as any).Cesium;
-    const color = C.Color.fromCssColorString(STRUCTURES.void);
-    const instances = this.solids.filter((s) => s.role === 'void').map((s) => {
+    const tone = C.Color.fromCssColorString(STRUCTURES.void);
+    const marks = this.solids.filter((s) => s.role === 'box' && s.props.underground === true);
+    const instances = [...this.solids.filter((s) => s.role === 'void'), ...marks].map((s) => {
+      const mark = s.role !== 'void';
+      const color = mark ? C.Color.fromCssColorString(solidColors(s).body) : tone;
       const { mesh } = solidMesh(s);
       const n = mesh.positions.length / SOLID_STRIDE;
       const values = new Float64Array(n * 3);
@@ -346,7 +353,7 @@ export class StructuresLayer {
           indices: new Uint32Array(mesh.indices), primitiveType: C.PrimitiveType.TRIANGLES, boundingSphere: C.BoundingSphere.fromVertices(values as unknown as number[]),
         }),
         id: { kind: 'structure', id: s.id } satisfies StructurePick,
-        attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color), depthFailColor: C.ColorGeometryInstanceAttribute.fromColor(color.withAlpha(0.45)) },
+        attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color), depthFailColor: C.ColorGeometryInstanceAttribute.fromColor(color.withAlpha(mark ? STRUCTURES.undergroundMarkAlpha : 0.45)) },
       });
     });
     if (!instances.length) return;

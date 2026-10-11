@@ -11,12 +11,13 @@
 // building with its base and roof height, and a mark where a road or a level area meets the plane.
 import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS } from './mobility-map';
-import { ROAD_SURFACE, isUnderground, roadWidthM, surfaceKind } from './road-surface';
+import { ROAD_SURFACE, isUnderground, isUndergroundArea, roadWidthM, surfaceKind } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import {
   clipPolyline, clipRing, extendToBox, heightTicks, lineCrossings, meshCrossings, planeAlong, planePoint, planeSide, profileHeight, ringIntervals, sectionPlane, terrainProfile,
   type Mesh, type SectionPlane, type XY,
 } from './section';
+import { polygonIntervals } from './structures';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
 
@@ -285,7 +286,11 @@ export class SectionTool {
       return { road, kind, onGround, d: hit.d, z: onGround ? profileHeight(profile, hit.d) : hit.z ?? profileHeight(profile, hit.d), half: roadWidthM(road) / 2 };
     })).filter((r) => !r.onGround); // roads on the ground are part of the merged surfaces below
     const surfaces = this.src.surfaces().map((s) => ({ color: s.color, cuts: meshCrossings(plane, s.mesh, 4) }));
-    const areas = this.src.areas().filter((a) => a.elevationM != null).flatMap((a) => ringIntervals(plane, metres(a.geometry.coordinates[0])).map(([from, to]) => ({ a, from, to })));
+    // an underground area (U04: car park aisles) is cut with its holes: the stall blocks are gaps in its line
+    const areas = this.src.areas().filter((a) => a.elevationM != null).flatMap((a) => {
+      const below = isUndergroundArea(a);
+      return (below ? polygonIntervals(plane, a.geometry.coordinates.map(metres)) : ringIntervals(plane, metres(a.geometry.coordinates[0]))).map(([from, to], k) => ({ a, from, to, below, first: k === 0 }));
+    });
 
     // heights on the face: along the whole line for the face itself, between A and B for the camera
     const lo = Math.min(this.frame.from, this.frame.to), hi = Math.max(this.frame.from, this.frame.to);
@@ -363,10 +368,11 @@ export class SectionTool {
     }
     // the merged ground surfaces where the plane cuts them, at the height they are drawn at
     for (const s of surfaces) for (const [p, q] of s.cuts) line([front(p[0], p[1] + 0.05), front(q[0], q[1] + 0.05)], s.color, 6);
-    for (const { a, from, to } of areas) {
+    for (const { a, from, to, below, first } of areas) {
       const css = AREA_FILLS.find((f) => f.match(a))?.color ?? SECTION.areaColor;
-      if (!AREA_FILLS.some((f) => f.match(a))) line([front(from, a.elevationM!), front(to, a.elevationM!)], css, 4);
-      label((from + to) / 2, a.elevationM!, `${a.name ?? '영역'} ${a.elevationM!.toFixed(1)} m`);
+      if (below) line([front(from, a.elevationM! + 0.05), front(to, a.elevationM! + 0.05)], ROAD_SURFACE.colors.carriageway, 6);
+      else if (!AREA_FILLS.some((f) => f.match(a))) line([front(from, a.elevationM!), front(to, a.elevationM!)], css, 4);
+      if (!below || first) label((from + to) / 2, a.elevationM!, `${a.name ?? '영역'} ${a.elevationM!.toFixed(1)} m`);
     }
     const labelled = new Set<string>();
     for (const r of roads) {

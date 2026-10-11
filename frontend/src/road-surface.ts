@@ -8,6 +8,7 @@
 // The editor page keeps its own scheme (colour = floor, line shape = road type); this is only the preview.
 // This file is the geometry in EPSG:5186 metres (pure functions, tested in test/road-surface.test.ts);
 // road-surface-layer.ts draws it with Cesium.
+import earcut from 'earcut';
 import type { CarriagewayRoad } from './api';
 import { floorFromLevelId } from './floor-colors';
 
@@ -69,6 +70,24 @@ export function isUnderground(road: LevelNamed): boolean {
 /** True when the road is taken as underground only because of its name (no level written). */
 export function usesNameForUnderground(road: LevelNamed): boolean {
   return !road.levelId && (/지하/.test(road.name ?? '') || (!!road.buildingId && (floorFromLevelId(road.name) ?? 1) < 0));
+}
+
+/**
+ * U04: an open area that lies under the ground (the aisles of an underground car park): it has a floor height, belongs to
+ * no building and no floor, and is named as underground ("지하" in the name: the same stopgap as for the roads, an area
+ * has no level of its own). It is drawn with the underground ways, never on the ground.
+ */
+export function isUndergroundArea(area: { name: string | null; elevationM: number | null; buildingId?: string | null; floor?: string | null }): boolean {
+  return area.elevationM != null && !area.buildingId && !area.floor && /지하/.test(area.name ?? '');
+}
+
+/** Flat triangles of a polygon with holes (rings in metres, not closed) at one height: x, y, z per vertex. */
+export function flatAreaMesh(rings: number[][][], z: number): RoadMesh {
+  const flat: number[] = [], holes: number[] = [];
+  rings.forEach((ring, k) => { if (k > 0) holes.push(flat.length / 2); for (const p of ring) flat.push(p[0], p[1]); });
+  const positions: number[] = [];
+  for (let i = 0; i < flat.length; i += 2) positions.push(flat[i], flat[i + 1], z);
+  return { positions, indices: earcut(flat, holes) };
 }
 
 /** Which surface a road is drawn as; null = not drawn (elevators, indoor ways above ground). */

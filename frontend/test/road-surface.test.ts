@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { ROAD_SURFACE, buildRoadSurfaces: buildGroups, isUnderground, junctionDisc, ribbon, roadWidthM, smoothCentreline, surfaceKind, usesNameForUnderground } = await import('../src/road-surface.ts');
+const { ROAD_SURFACE, buildRoadSurfaces: buildGroups, flatAreaMesh, isUnderground, isUndergroundArea, junctionDisc, ribbon, roadWidthM, smoothCentreline, surfaceKind, usesNameForUnderground } = await import('../src/road-surface.ts');
 
 type P = number[];
 const dist = (a: P, b: P) => Math.hypot(a[0] - b[0], a[1] - b[1], (a[2] ?? 0) - (b[2] ?? 0));
@@ -195,4 +195,20 @@ test('두 차도가 만나는 점에만 원을 채우고, 지상과 지하는 �
   // 지하 삼각형은 저장된 높이 그대로
   const deep = buildRoadSurfaces([road([[0, 0, 126.8], [10, 0, 126.8]], { levelId: 'B1' })]).underground;
   assert.ok(deep.positions.filter((_, i) => i % 3 === 2).every((z) => z === 126.8));
+});
+
+test('U04: an underground open area (car park aisles) is told by its name, floor height and no building; it is a flat surface with its holes kept', () => {
+  assert.equal(isUndergroundArea({ name: '운동장 지하 1층 주차장 통로 면', elevationM: 141.4, buildingId: null, floor: null }), true);
+  assert.equal(isUndergroundArea({ name: '운동장', elevationM: 148.9, buildingId: null, floor: null }), false);
+  assert.equal(isUndergroundArea({ name: '지하 로비', elevationM: 120, buildingId: '본관', floor: 'B1' }), false, 'an indoor area keeps its own drawing');
+  assert.equal(isUndergroundArea({ name: '지하 주차장', elevationM: null, buildingId: null, floor: null }), false, 'no floor height: nothing to draw it at');
+  // a 20 x 10 floor with a 4 x 2 stall block in it
+  const mesh = flatAreaMesh([[[0, 0], [20, 0], [20, 10], [0, 10]], [[8, 4], [12, 4], [12, 6], [8, 6]]], 141.4);
+  let area = 0;
+  for (let i = 0; i < mesh.indices.length; i += 3) {
+    const [a, b, c] = [0, 1, 2].map((k) => mesh.indices[i + k] * 3);
+    area += Math.abs((mesh.positions[b] - mesh.positions[a]) * (mesh.positions[c + 1] - mesh.positions[a + 1]) - (mesh.positions[c] - mesh.positions[a]) * (mesh.positions[b + 1] - mesh.positions[a + 1])) / 2;
+  }
+  assert.ok(Math.abs(area - (200 - 8)) < 1e-9, `area ${area}`);
+  assert.ok(mesh.positions.every((v, i) => i % 3 !== 2 || v === 141.4));
 });

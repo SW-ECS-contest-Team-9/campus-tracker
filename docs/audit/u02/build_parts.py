@@ -142,16 +142,21 @@ U, V = ht, np.array([-ht[1], ht[0]]); c = np.array(INNER.centroid.coords[0]); GR
 ramp_zone = unary_union([half(0.0, R_LANE + LANE_W / 2 + 0.6), LineString([W0, RB]).buffer(LANE_W / 2 + 0.8, cap_style=2)])
 lanes = unary_union([ramp_zone, LineString([E0, W1, J0, E1, S0]).buffer(4.0), LineString([S0, C1]).buffer(3.6), LineString([RB, K2, C2]).buffer(3.6), LineString([H_BOT, H_OUT, PV1, PV2, J0]).buffer(1.6), LineString([J0, SBN, DOOR]).buffer(1.6), LineString([SBN, ST]).buffer(1.6)])
 BANDS = ['#2f6fb5', '#e0b400', '#3f9a4a', '#c8402f']
+# U04: 주차 칸 묶음(docs/audit/u04/stalls.json)이 있으면 기둥은 두 층 모두 주차 칸 묶음 안에 드는 격자점에만 세우고(통로에는 세우지 않는다), 줄 가운데 선은 그리지 않는다(칸 선은 u04-parking.geojson)
+U04 = HERE.parent / 'u04' / 'stalls.json'
+STALLS = None
+if U04.exists():
+    u4 = json.loads(U04.read_text(encoding='utf-8')); STALLS = unary_union([Polygon(b['polygon']) for b in u4['B1']['blocks']]).intersection(unary_union([Polygon(b['polygon']) for b in u4['B2']['blocks']]))
 sq_at = lambda p, h: Polygon([p + U * a + V * b for a, b in ((-h, -h), (h, -h), (h, h), (-h, h))])
 for i in range(-14, 15):
     for j in range(-14, 15):
         p = c + U * (i * GRID + 4.0) + V * (j * GRID); sq = sq_at(p, 0.3)
-        if not INNER.buffer(-1.5).contains(sq) or lanes.intersects(sq): continue
+        if not INNER.buffer(-1.5).contains(sq) or (lanes.intersects(sq) if STALLS is None else not STALLS.contains(sq)): continue
         cols += 1
         box(f'U02-COLUMN-{cols:03d}', 'wall', sq, Z_B2, C_B1, '#b9b6ad', f'네모 콘크리트 기둥 0.6 m, {GRID:.0f} m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지', grade='확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)', basePlane='U02-VOID-B2 바닥')
         for lv, z in (('B1', Z_B1), ('B2', Z_B2)): box(f'U02-COLUMN-{cols:03d}-BAND-{lv}', 'wall', sq_at(p, 0.33), z + 1.0, z + 1.8, BANDS[j % 4], '기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)')
 rows = 0
-for j in range(-14, 15):
+for j in (range(-14, 15) if STALLS is None else ()):
     o = c + V * (j * GRID + 4.0); strip = LineString([o - U * 200, o + U * 200]).buffer(0.08, cap_style=2).intersection(INNER.buffer(-3.0)).difference(lanes.buffer(1.0))
     for g in (strip.geoms if hasattr(strip, 'geoms') else [strip]):
         if g.is_empty or g.area < 1.0: continue

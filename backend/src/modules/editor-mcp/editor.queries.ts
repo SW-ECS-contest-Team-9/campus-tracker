@@ -81,7 +81,7 @@ export const editorQueries = {
   /** Open areas (editor "공간 영역", mobility.open_areas) for the network check: rings in EPSG:5186. */
   async areas(): Promise<WalkArea[]> {
     const { rows } = await pool.query<WalkArea>(
-      `SELECT id, name, elevation_m "elevationM", floor, (ST_AsGeoJSON(geom)::json->'coordinates') rings FROM mobility.open_areas ORDER BY id`);
+      `SELECT id, name, kind, elevation_m "elevationM", floor, (ST_AsGeoJSON(geom)::json->'coordinates') rings FROM mobility.open_areas ORDER BY id`);
     return rows;
   },
 

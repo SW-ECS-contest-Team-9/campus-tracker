@@ -62,3 +62,15 @@ test('area links: the network check crosses the area instead of walking the stor
   assert.deepEqual(withArea.roads.map((r) => r.roadId), ['area:1:a:c', 'stairs']);
   assert.equal(checkReachability(areaLinks([area([square])], nodes), nodes, 'a', 'c', 'vehicle').reachable, false, 'vehicles are not assumed on an area');
 });
+
+test('area links: a parking area is shared, vehicles drive across it around the stall blocks', () => {
+  const stalls = [[40, 10], [60, 10], [60, 50], [40, 50]];
+  const nodes = [node('entry', 0, 30), node('ramp', 100, 30)];
+  const links = areaLinks([area([square, stalls], { kind: 'parking' })], nodes);
+  assert.equal(links[0].vehicleAccess, 'allowed');
+  assert.equal(links[0].vehicleDirection, 'both');
+  const drive = checkReachability(links, nodes, 'entry', 'ramp', 'vehicle');
+  assert.ok(drive.reachable);
+  near(drive.lengthM, 2 * Math.hypot(40, 20) + 20);
+  assert.equal(areaLinks([area([square], { kind: 'plaza' })], nodes)[0].vehicleAccess, 'unknown');
+});
