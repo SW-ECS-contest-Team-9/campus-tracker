@@ -37,7 +37,7 @@ await ev(`(async () => { const tm = await import('/src/tm.ts'); const C = window
     for (let k = 0; k < n; k++) { v.scene.requestRender(); v.render(); await new Promise((r) => setTimeout(r, 250)); }
     v.render(); return v.scene.canvas.toDataURL('image/jpeg', 0.9); }; return 1; })()`);
 const check = (on) => ev(`(() => { const b = document.getElementById('${BOX}'); if (b.checked !== ${on}) b.click(); return b.checked; })()`);
-const save = (name, url) => { const f = path.join(outDir, `${editor ? '편집기' : '지도'}-u11-${name}.jpg`); fs.writeFileSync(f, Buffer.from(url.split(',')[1], 'base64')); console.log('saved', f); };
+const save = (name, url) => { const f = path.join(outDir, `${editor ? '편집기' : '지도'}-u11-${tag === 'x' ? '' : tag + '-'}${name}.jpg`); fs.writeFileSync(f, Buffer.from(url.split(',')[1], 'base64')); console.log('saved', f); };
 const want = (name) => !only.length || only.some((o) => name.includes(o));
 let first = true;
 for (const [name, w] of Object.entries(V)) {
@@ -56,7 +56,7 @@ for (const [name, w] of Object.entries(V)) {
     await ev(`(document.getElementById('${LEVEL}').click(), 1)`); await sleep(1200);
   } else if (w.walk) {
     // 1인칭(first-person.ts): 정한 자리에 서서 정한 쪽을 본다. 화각만 사진에 맞춰 넓힌다
-    await check(true);
+    await check(w.walk.underground !== false);
     const res = await ev(`(() => { const W = ${SV}.walk; const a = ${JSON.stringify(w.walk)}; W.start(a.at[0], a.at[1], a.at[2], a.heading); W.state.pitch = a.pitch; return W.where ? W.where() : 1; })()`);
     console.log(name, '->', JSON.stringify(res));
     await sleep(6000);
