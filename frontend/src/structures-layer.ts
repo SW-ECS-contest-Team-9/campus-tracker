@@ -183,8 +183,8 @@ export class StructuresLayer {
   }
 
   private build() {
-    const buildings: GroundBuilding[] = this.src.buildings().flatMap((b) => b.geometry.coordinates.map((poly) => ({
-      polygon: polygonOps('union', [poly.map(metres)])[0] ?? [], groundM: b.terrainMinM ?? b.baseM + 1, baseM: b.baseM,
+    const buildings: (GroundBuilding & { plinth?: string })[] = this.src.buildings().flatMap((b) => b.geometry.coordinates.map((poly) => ({
+      polygon: polygonOps('union', [poly.map(metres)])[0] ?? [], groundM: b.terrainMinM ?? b.baseM + 1, baseM: b.baseM, plinth: b.appearance?.plinth?.color,
     }))).filter((b) => b.polygon.length > 0);
     this.buildings = buildings;
     const shown = this.visible.structures ? this.solids.filter((s) => s.role !== 'void') : [];
@@ -208,13 +208,25 @@ export class StructuresLayer {
       this.ground = ground;
       const floor = css(GROUND.color);
       const outside = css(GROUND.outsideColor);
-      this.groundParts.push({ mesh: ground.mesh, stride: 3, rgb: () => floor }, { mesh: ground.apron, stride: 3, rgb: () => outside }, { mesh: ground.skirt, stride: 3, rgb: () => outside });
+      // Z09: where the neutral surface has to climb steeply between two heights (a sliver between a wall and a platform, a
+      // gap between two platforms) it is a wall face, not floor: those triangles are drawn in the retaining-wall tone
       const tone = css(GROUND.foundationColor);
+      const flat: number[] = [], steep: number[] = [];
+      const gp = ground.mesh.positions, gi = ground.mesh.indices;
+      for (let k = 0; k < gi.length; k += 3) {
+        const [a, b, c] = [gi[k] * 3, gi[k + 1] * 3, gi[k + 2] * 3];
+        const ux = gp[b] - gp[a], uy = gp[b + 1] - gp[a + 1], uz = gp[b + 2] - gp[a + 2], vx = gp[c] - gp[a], vy = gp[c + 1] - gp[a + 1], vz = gp[c + 2] - gp[a + 2];
+        const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        (Math.abs(nz) < GROUND.steepNormalZ * Math.hypot(nx, ny, nz) ? steep : flat).push(gi[k], gi[k + 1], gi[k + 2]);
+      }
+      this.groundParts.push({ mesh: { positions: gp, indices: flat }, stride: 3, rgb: () => floor }, { mesh: { positions: gp, indices: steep }, stride: 3, rgb: () => tone.map((v) => v * STRUCTURES.sideShade) },
+        { mesh: ground.apron, stride: 3, rgb: () => outside }, { mesh: ground.skirt, stride: 3, rgb: () => outside });
       ground.foundations.forEach((fromM, k) => {
         if (fromM === null) return;
         const b = buildings[k];
         const { mesh } = solidMesh({ id: '', file: '', role: 'box', type: 'foundation', polygon: b.polygon, bottomM: fromM, topM: b.baseM, estimated: true, props: {} });
-        this.groundParts.push({ mesh, stride: SOLID_STRIDE, rgb: (i) => tone.map((v) => v * mesh.positions[i * SOLID_STRIDE + 3]) });
+        const own = b.plinth ? css(b.plinth) : tone; // Z09: the base of a building that names its plinth colour
+        this.groundParts.push({ mesh, stride: SOLID_STRIDE, rgb: (i) => own.map((v) => v * mesh.positions[i * SOLID_STRIDE + 3]) });
       });
     }
 
@@ -240,7 +252,9 @@ export class StructuresLayer {
       const same = covered.find((c) => c.share >= PRECEDENCE.sameSurfaceShare);
       if (same) covered = covered.filter((c) => c !== same && c.share < same.share);
       const plain = covered.length ? polygonOps('minus', polygons, covered.flatMap((c) => c.polygons)) : polygons;
-      for (const part of [{ rgb: same?.rgb ?? top, pattern: same?.pattern ?? 0, polygons: plain }, ...covered]) {
+      // Z09: a plain paving platform (a forecourt, a terrace) is block paving like the pedestrian-priority ways
+      const own = solid.material === 'paving' ? STRUCTURES.pavingPattern : 0;
+      for (const part of [{ rgb: same?.rgb ?? top, pattern: same?.pattern ?? own, polygons: plain }, ...covered]) {
         const piece = topMesh(solid, part.polygons);
         if (piece.indices.length) this.structureParts.push({ mesh: piece, stride: 3, pick, rgb: () => part.rgb, pattern: part.pattern });
       }

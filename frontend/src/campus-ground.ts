@@ -25,6 +25,8 @@ export const GROUND = {
   sinkM: 0.03,
   /** A point this close to a building wall is at the wall (rule 1). */
   wallReachM: 0.05,
+  /** A known surface this close to an outline point (a platform ends 5 cm before a building wall; an older outline may leave up to a metre) gives the point its height. */
+  wallGapM: 1.2,
   /**
    * Outside the campus edge a band of this width is drawn here too, at the terrain height and in the colour of the
    * outside ground, and the terrain is hidden to half this width beyond the edge. Why: the map engine hides terrain
@@ -43,6 +45,8 @@ export const GROUND = {
   outsideColor: '#d6e4be',
   /** The concrete of a retaining wall (STRUCTURES.plantingSide): a foundation is a base, not a lit building wall. */
   foundationColor: '#a9a59b',
+  /** A triangle of the neutral surface whose unit normal has less than this vertical part (steeper than about 55 degrees) is drawn as a wall face (Z09). */
+  steepNormalZ: 0.57,
   maxSweeps: 4000,
   toleranceM: 0.0005,
 };
@@ -233,7 +237,19 @@ export function buildCampusGround(input: {
     for (const s of near) lowest[s.building] = Math.min(lowest[s.building], z);
     return z;
   };
-  const outlineHeight = (x: number, y: number): number => (onEdge(x, y) ? input.terrain(x, y) : atWalls(x, y, known(x, y, 0.02) ?? height(x, y)));
+  /** The lowest known surface within GROUND.wallGapM of a point at a building wall (rings of 8 directions, the nearest ring that finds one), else null. */
+  const besideWall = (x: number, y: number): number | null => {
+    if (!walls.at(x, y).some((s) => segmentDistance(x, y, s.a, s.b) < GROUND.wallReachM)) return null;
+    for (const r of [GROUND.wallGapM / 8, GROUND.wallGapM / 3, GROUND.wallGapM]) {
+      let best: number | null = null;
+      for (let k = 0; k < 8; k++) { const z = known(x + r * Math.cos((k * Math.PI) / 4), y + r * Math.sin((k * Math.PI) / 4)); if (z !== null && (best === null || z < best)) best = z; }
+      if (best !== null) return best;
+    }
+    return null;
+  };
+  // Z09: a wall point takes the height of a known surface that ends just short of the wall (a platform stops 5 cm before it): the sliver between the two is
+  // then level with that surface, not a near-vertical strip of floor up to the building's own ground level
+  const outlineHeight = (x: number, y: number): number => (onEdge(x, y) ? input.terrain(x, y) : atWalls(x, y, known(x, y, 0.02) ?? besideWall(x, y) ?? height(x, y)));
 
   // ----- triangles: ear cutting, then every long edge halved until none is longer than GROUND.edgeM -----
   // an outline edge stays straight between its ends (flush with what it runs along), except along the campus edge (the terrain)

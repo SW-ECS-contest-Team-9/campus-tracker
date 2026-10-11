@@ -23,9 +23,9 @@
   "coveredByPlatformsM2": 34241
  },
  "vsSmap1m": {
-  "points": 28779,
-  "p50abs": 0.42,
-  "p90abs": 6.02
+  "points": 28852,
+  "p50abs": 0.43,
+  "p90abs": 6.19
  },
  "zones": {
   "turnaround": {
@@ -985,8 +985,8 @@
       94.0,
       121.0
      ],
-     "area": 3343.6,
-     "grade": "S-MAP(종단), 추정(폭 11~23 m: 캠퍼스 외곽까지, 북쪽 끝)",
+     "area": 3446.2,
+     "grade": "S-MAP(종단), 추정(폭 11~23 m: 캠퍼스 외곽까지, 북쪽 끝, 유담관 벽 앞 틈)",
      "material": "asphalt",
      "terrain": true,
      "kind": "spec"
@@ -995,7 +995,7 @@
      "id": "Z05-PLATFORM-WEST-WALLTOP-PLANTER",
      "what": "서쪽 옹벽 위 화단 띠(소나무)",
      "top": 131.2,
-     "area": 743.5,
+     "area": 732.1,
      "grade": "확정(옹벽 위에 소나무 화단이 있음: 서문 사진), 추정(높이·폭)",
      "material": "planting",
      "terrain": true,
@@ -1415,14 +1415,14 @@
    54
   ],
   "Z05-PLATFORM-WEST-STREET": [
-   -0.41,
-   14.06,
-   1815
+   -0.72,
+   17.29,
+   1902
   ],
   "Z05-PLATFORM-WEST-WALLTOP-PLANTER": [
-   -1.77,
+   -1.8,
    4.12,
-   734
+   720
   ],
   "Z05-PLATFORM-WEST-WALLTOP-NORTH": [
    0.2,

@@ -579,7 +579,7 @@
       "id": "본관",
       "wall": "stone",
       "windows": {
-        "style": "rows",
+        "style": "archrows",
         "floorsM": [
           127.1,
           130.7,
@@ -611,11 +611,12 @@
         "material": "tile",
         "color": "#6b7280",
         "riseM": 3.0,
-        "eaveBandM": 1.2
+        "eaveBandM": 1.2,
+        "tiers": 2
       },
       "grades": {
         "wall": "원천(학교 사진)",
-        "windows": "추정",
+        "windows": "확정(머리가 둥근 작은 창), 추정(크기·간격·줄 높이)",
         "roof": "확정(경사), 오름은 추정"
       },
       "features": [
@@ -632,8 +633,14 @@
           "drawn": true
         },
         {
-          "what": "처마 밑 공포(흰 받침 줄)와 두 겹 처마",
-          "evidence": "사용자-SMAP높이-20261010/사진-21-사잇길-상행.png, 사용자-유담관분수-북악관앞-20261010/유담관-분수광장-넓게.jpg. 밝은 띠 하나로만 그림",
+          "what": "두 겹 처마(아래 지붕 위에 낮은 벽 띠, 그 위에 작은 윗지붕)",
+          "evidence": "사용자-유담관분수-북악관앞-20261010/유담관-분수광장-넓게.jpg, 사용자-SMAP높이-20261010/사진-21-사잇길-상행.png. 윗지붕의 크기·벽 띠 높이는 추정",
+          "grade": "확정(두 겹), 추정(치수)",
+          "drawn": true
+        },
+        {
+          "what": "처마 밑 공포(흰 받침 줄)",
+          "evidence": "사용자-SMAP높이-20261010/사진-21-사잇길-상행.png. 밝은 띠 하나로만 그림",
           "grade": "확정",
           "drawn": false
         },
@@ -688,7 +695,7 @@
       "id": "수인관",
       "wall": "white",
       "windows": {
-        "style": "bays",
+        "style": "piers",
         "floorsM": [
           108.0,
           112.02,
@@ -704,7 +711,7 @@
       },
       "grades": {
         "wall": "확정(사용자 거리뷰·사진)",
-        "windows": "추정",
+        "windows": "확정(곧은 기둥과 발코니: 거리뷰), 추정(층수·칸 폭·난간 높이)",
         "roof": "확정"
       },
       "features": [
@@ -758,13 +765,50 @@
       "id": "유담관#기단데크",
       "wall": "glass",
       "wallColor": "#5b8fb0",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          83.8,
+          88.9,
+          93.9,
+          99.0,
+          104.0,
+          109.0,
+          114.1,
+          121.6,
+          125.4,
+          129.2,
+          133.0,
+          136.8,
+          140.5,
+          144.3,
+          148.1,
+          151.8,
+          155.6
+        ]
+      },
+      "faces": [
+        {
+          "azimuth": 250,
+          "grade": "확정(공도 쪽은 짙은 회색 벽과 창 줄), 추정(창 줄 높이 = 층 표, 어디까지가 이 벽인지)",
+          "spread": 60,
+          "wall": "concrete",
+          "wallColor": "#5a5b5e",
+          "style": "bands"
+        }
+      ],
       "roof": {
         "type": "flat",
         "material": "concrete"
       },
+      "plinth": {
+        "color": "#5a5b5e"
+      },
       "grades": {
         "wall": "확정(사용자 사진)",
-        "roof": "S-MAP"
+        "windows": "추정(높이는 층 표)",
+        "roof": "S-MAP",
+        "plinth": "확정(벽이 길까지), 추정(색)"
       },
       "features": [
         {

@@ -304,3 +304,22 @@ test('Z07: 상자는 제 색(color, topColor)을 가질 수 있다. 기단은 �
   assert.equal(solidColors(solid('box', 'wall', { color: 'green' }, 'brick')).body, STRUCTURES.boxMaterials.brick);
   assert.equal(solidColors(solid('platform', 'platform', { color: '#5f9a86' }, 'paving')).body, STRUCTURES.materials.paving);
 });
+
+test('Z09 기운 판(thicknessM): 밑면이 윗면과 나란하다, 닫힌 덩어리, 단면도 평행사변형', () => {
+  const profile = { origin: [X0, Y0], direction: [1, 0], points: [[0, 140], [10, 141]] };
+  const { solids, skipped } = parseStructures('t.geojson', collection([feature({ id: 'COVER', kind: 'extrude', type: 'canopy', fromM: 139, toM: 141, topProfile: profile, thicknessM: 0.25 }, rect(0, 0, 10, 3))]));
+  assert.equal(skipped.length, 0);
+  const s = solids[0];
+  assert.equal(s.thicknessM, 0.25);
+  assert.equal(s.bottomM, 139.75);
+  const { mesh } = solidMesh(s);
+  assert.equal(openEdges(mesh, SOLID_STRIDE), 0);
+  const top = topHeight(s);
+  for (let i = 0; i < mesh.positions.length; i += SOLID_STRIDE) {
+    const [x, y, z] = mesh.positions.slice(i, i + 3);
+    assert.ok(Math.abs(z - top(x, y)) < 1e-9 || Math.abs(z - (top(x, y) - 0.25)) < 1e-9);
+  }
+  const caps = sectionCaps(sectionPlane([X0 - 1, Y0 + 1.5], [X0 + 11, Y0 + 1.5]), s);
+  const heights = caps.flat(2).map((p) => p[1]).sort((a, b) => a - b);
+  assert.ok(Math.abs(heights[0] - 139.75) < 1e-6 && Math.abs(heights[heights.length - 1] - 141) < 1e-6);
+});

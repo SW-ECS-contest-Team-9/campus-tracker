@@ -15,6 +15,10 @@ Z07 에서 더한 것:
       벽면: [{방향: 북|북동|동|남동|남|남서|서|북서 또는 방위각(도, 북 0·동 90), 폭: 도(기본 45), 값: 벽 재질, 색, 창: 창 모양 또는 "없음", 기둥: 개수(그 방향의 가장 긴 벽 가운데에 큰 기둥 열과 보), 기둥_아래_층: 층 표의 층(기둥이 서는 바닥. 없으면 맨 아래 층), 출처, 등급}]
             # 그 방향을 보는 벽면만 다른 재질·창 모양으로 그린다(한 면의 담쟁이, 정면의 기둥 열)
       지붕.처마띠: m     # 처마 밑 벽의 밝은 띠 높이
+Z09 에서 더한 것:
+      창.모양 "작은 아치": 층마다 머리가 둥근 작은 창.   "기둥 발코니": 층을 꿰뚫는 곧은 기둥 사이에 깊은 발코니(어두운 안쪽, 층마다 난간 띠와 창 띠, 맨 위에 보)
+      지붕.겹: 2          # 두 겹 처마(아래 지붕 위에 낮은 벽 띠, 그 위에 작은 윗지붕)
+      밑동: {색: "#rrggbb", 위_높이: m(없으면 기초만), 출처, 등급}   # 건물이 올라선 기단·옹벽: 기초와 위_높이 아래 벽을 이 색으로, 창 없이
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정).
 """
@@ -22,11 +26,11 @@ import re
 
 GRADES = ('확정', '원천', 'S-MAP', '추정')
 WALLS = {'붉은 벽돌': 'brick', '유리': 'glass', '밝은 돌': 'stone', '흰 돌': 'white', '콘크리트': 'concrete', '담쟁이': 'ivy', '판': 'panel', '금속판': 'metal'}
-STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches', '긴 아치': 'bays'}
+STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches', '긴 아치': 'bays', '작은 아치': 'archrows', '기둥 발코니': 'piers'}
 DIRECTIONS = {'북': 0, '북동': 45, '동': 90, '남동': 135, '남': 180, '남서': 225, '서': 270, '북서': 315}
 ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped'}
 ROOF_MATERIALS = {'기와': 'tile', '콘크리트': 'concrete', '유리': 'glass', '옥상 정원': 'green', '금속판': 'metal', '코트': 'court'}
-KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof'}
+KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof', '밑동': 'plinth'}
 COLOR = re.compile(r'^#[0-9a-f]{6}$')
 
 
@@ -140,7 +144,15 @@ def from_note(head):
                     if not isinstance(r['처마띠'], (int, float)) or not 0 < r['처마띠'] <= 4: bad.append(f'{at}.지붕.처마띠 는 0~4 m')
                     else: roof['eaveBandM'] = r['처마띠']
                 if r.get('지붕창') is True: roof['dormers'] = True
+                if r.get('겹') is not None:
+                    if r['겹'] != 2: bad.append(f'{at}.지붕.겹 은 2')
+                    else: roof['tiers'] = 2
                 rec['roof'] = roof
+        pl = item('밑동')
+        if pl:
+            c, t = pl.get('색'), pl.get('위_높이')
+            if not isinstance(c, str) or not COLOR.match(c) or (t is not None and (not isinstance(t, (int, float)) or isinstance(t, bool))): bad.append(f'{at}.밑동: 색("#rrggbb")과, 있으면 위_높이(m)')
+            else: rec['plinth'] = {'color': c, **({'topM': t} if t is not None else {})}
         feats = []
         for k, f in enumerate(e.get('특징') or []):
             if not isinstance(f, dict) or not f.get('무엇') or not f.get('출처') or _grade(f) is None or f.get('그림') not in ('예', '아니오'):

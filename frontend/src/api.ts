@@ -316,7 +316,7 @@ export interface SceneBuilding {
   /** How the block looks (walls, window rows, roof), from the building notes; absent or null = a plain block. */
   appearance?: BuildingAppearance | null;
 }
-export type WindowStyle = 'rows' | 'bands' | 'curtain' | 'arches' | 'bays';
+export type WindowStyle = 'rows' | 'bands' | 'curtain' | 'arches' | 'bays' | 'archrows' | 'piers';
 /** Display only (building-appearance.ts draws it). Every item carries the note's evidence grade in `grades`. */
 export interface BuildingAppearance {
   /** Wall material word: brick, glass, stone, concrete, ivy, panel, metal, white. */
@@ -332,7 +332,9 @@ export interface BuildingAppearance {
   faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; /** the columns stand on this height (default: the lowest storey shown) */ columnsFromM?: number; grade?: string }[];
   /** A band of another colour on the walls above a height (upper storeys clad differently). */
   upper?: { fromM: number; color: string };
-  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string };
+  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string; /** 2: a second, smaller roof above a low wall band on the first (a double eave, Z09) */ tiers?: number };
+  /** The base of the building (Z09): the foundation below the block, and the walls up to `topM` when given, in this colour without windows (a tower that stands on a podium or a retaining wall). */
+  plinth?: { color: string; topM?: number };
   grades?: Record<string, string>;
   features?: { what: string; evidence: string; grade: string; drawn: boolean }[];
 }

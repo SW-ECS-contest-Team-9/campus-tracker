@@ -28,6 +28,8 @@ export const STRUCTURES = {
   boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551', water: '#7fb9cf', fence: '#5f6a5c' } as Record<string, string>,
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
+  /** The joint pattern (paving-pattern.ts: 1 = blocks) of the top of a platform whose material is `paving` and that no road or area colours (Z09). */
+  pavingPattern: 1,
   /** A material or type this table does not know. */
   unknown: '#b9b4a8',
   /** Voids (shown with the underground ways, and as a hole on the cut face). */
@@ -91,6 +93,8 @@ export type Solid = {
   /** The top height (with a profile: its highest point). */
   topM: number;
   profile?: TopProfile;
+  /** With a profile: the underside is parallel to the top, this far below it (an inclined slab, Z09). `bottomM` is then its lowest point. */
+  thicknessM?: number;
   material?: string;
   /** The stair a step belongs to. */
   stair?: string;
@@ -201,6 +205,7 @@ export function stairSteps(stair: {
 /**
  * The solids of one structures file. Read defensively, because the files grow and get new kinds:
  *  - `platform` (or anything with a top (`topM` or `topProfile`) and a `bottomM`): a prism with that top and bottom;
+ *  - a box with a `topProfile` and a `thicknessM`: an inclined slab (top and underside parallel, Z09);
  *  - `void`, `extrude` and any other kind with `fromM` < `toM`: a box between the two heights;
  *  - a `stair` with `risers`, `direction`, `fromM` < `toM`: steps made by stairSteps (not in the files yet);
  *  - everything else is skipped and named in `skipped` (never an exception).
@@ -230,6 +235,9 @@ export function parseStructures(file: string, fc: any): { solids: Solid[]; skipp
       const made = stairSteps({ ring: polygons[0][0], direction: p.direction, fromM: p.fromM as number, toM: p.toM as number, risers: p.risers, baseM: num(p.baseM) ? p.baseM : undefined, sideWallM: num(p.sideWallM) ? p.sideWallM : undefined, sideWallThicknessM: num(p.sideWallThicknessM) ? p.sideWallThicknessM : undefined });
       made.steps.forEach((s, k) => solids.push({ ...base, id, type: 'stair_step', stair: id, role: 'box', polygon: [s.ring], bottomM: s.fromM, topM: s.toM, props: { ...p, step: k + 1 } }));
       for (const w of made.walls) solids.push({ ...base, id, type: 'wall', role: 'box', polygon: [w.ring], bottomM: w.fromM, topM: w.toM });
+    } else if (profile && kind !== 'platform' && num(p.thicknessM) && p.thicknessM > 0) {
+      // an inclined slab: the underside follows the top
+      for (const polygon of polygons) solids.push({ ...base, id, role: 'box', polygon, bottomM: (lowestTop as number) - p.thicknessM, topM: top as number, profile, thicknessM: p.thicknessM });
     } else if (top !== null && num(p.bottomM) && p.bottomM < (lowestTop as number)) {
       // a platform, or an unknown kind written like one: it is ground only when it says so
       for (const polygon of polygons) solids.push({ ...base, id, role: kind === 'platform' ? 'platform' : 'box', polygon, bottomM: p.bottomM, topM: top, profile: profile ?? undefined });
@@ -310,7 +318,7 @@ export function solidMesh(solid: Solid, options: {
   const { xy, tris, outline } = triangles(options.polygons ?? [solid.polygon], solid.profile);
   const top = topHeight(solid);
   const bottomAt = options.bottomAt;
-  const bottom = (x: number, y: number) => (bottomAt ? Math.min(solid.bottomM, bottomAt(x, y)) : solid.bottomM);
+  const bottom = (x: number, y: number) => (solid.thicknessM ? top(x, y) - solid.thicknessM : bottomAt ? Math.min(solid.bottomM, bottomAt(x, y)) : solid.bottomM);
   const positions: number[] = [];
   const indices: number[] = [];
   for (const [x, y] of xy) positions.push(x, y, top(x, y), 1, 1);
@@ -381,7 +389,9 @@ export function sectionCaps(plane: SectionPlane, solid: Solid, voids: Solid[] = 
         if (Math.abs(rate) > 1e-9) for (const [s] of p.points) { const d = (s - start) / rate; if (d > from && d < to) ds.push(d); }
       }
       ds.sort((a, b) => b - a);
-      caps.push([[[from, solid.bottomM], [to, solid.bottomM], ...ds.map((d) => { const [x, y] = planePoint(plane, d); return [d, top(x, y)]; })]]);
+      const tops = ds.map((d) => { const [x, y] = planePoint(plane, d); return [d, top(x, y)]; });
+      // an inclined slab: the underside is the top moved down
+      caps.push([solid.thicknessM ? [...[...tops].reverse().map(([d, z]) => [d, z - solid.thicknessM!]), ...tops] : [[from, solid.bottomM], [to, solid.bottomM], ...tops]]);
     }
   }
   const holes = voids.flatMap((v) => polygonIntervals(plane, v.polygon).map(([from, to]): Polygon => [[[from, v.bottomM], [to, v.bottomM], [to, v.topM], [from, v.topM]]]));

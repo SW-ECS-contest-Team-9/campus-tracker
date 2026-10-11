@@ -12,6 +12,7 @@ pts = [[float(x), float(y), r2(z)] for x, y, z in zip(XS[sel], YS[sel], Z[sel])]
 dump(REPO / 'backend/data/terrain/samples/smap_samples_z05_edge_5186.json', {'crs': 'EPSG:5186', 'reason': 'Z05: 캠퍼스 남서·남쪽 바깥(공연실습소·외국인 생활관·정문 앞 둘레)의 지형을 S-MAP 지면으로 국소 보정. 옛 지형이 2~10 m 높아 건물 밑동과 정문 앞을 가렸다',
   'note': 'S-MAP(서울시 3D 지도)은 독립 측량이 아니다. 건물 모델 칸은 뺐다. 캠퍼스 지도 건물에서 16 m 안, 캠퍼스 안, 기단 안은 뺐다. 원자료는 작업 볼트 데이터/보완자료/3d-map-audit-20261009/z04 (smap-mesh-z04-1m-*.txt)',
   'groups': [{'area': 'z05_edge_sw', 'source': 'smap-3d-mesh-pick', 'collected': '2026-10-11', 'originalFile': 'z04/smap-mesh-z04-1m-w0~e3.txt (2 m 간격으로 솎음)', 'points': pts}]})
+if (HERE5.parent / 'z09' / 'blend.py').exists(): exec((HERE5.parent / 'z09' / 'blend.py').read_text(encoding='utf-8'))
 # ---------- 파일 ----------
 for old in list(STR.glob('z04-*.geojson')) + list(STR.glob('z05-*.geojson')): old.unlink()
 for zone in ZONES:
@@ -23,7 +24,7 @@ z03 = json.loads((REC / 'z03-smooth-ground.json').read_text(encoding='utf-8'))
 first = [s for s in z03['steps'] if s['type'] != 'surface']; rest = [s for s in z03['steps'] if s['type'] == 'surface']
 dump(REC / 'z05-smooth-ground.json', {'crs': 'EPSG:5186', 'protectBuildings': True,
   'reason': 'Z05: Z03 조리법에 캠퍼스 안 나머지 구역의 기단을 더함(Z04 의 자동 기단·2 m 띠의 단을 손으로 정한 큰 평면과 옹벽 한 면으로 바꿈: 서쪽 옹벽과 아래 공도, 가운데 옹벽, 남서쪽 공도, 뒤편 단과 숲 비탈, 정문 안 포장). 캠퍼스 밖 남서·남쪽 지형은 S-MAP 지면 표본으로 낮춤. 지형 칸은 구조물 파일(frontend/public/structures/z05-*.geojson)의 기단 윗면에서 나온다.',
-  'steps': first + [{'type': 'local-samples', 'files': ['../samples/smap_samples_z05_edge_5186.json'], 'areas': ['z05_edge_sw']}] + rest + [{'type': 'surface', 'file': 'z05-surface.geojson'}]})
+  'steps': first + [{'type': 'local-samples', 'files': ['../samples/smap_samples_z05_edge_5186.json'], 'areas': ['z05_edge_sw']}] + ([{'type': 'local-samples', 'files': ['../samples/z09_edge_blend_5186.json'], 'areas': ['z09_edge_blend']}] if BLEND_PTS else []) + rest + [{'type': 'surface', 'file': 'z05-surface.geojson'}]})
 cov = unary_union([ALLP, DONE, FIELD]); inside = CAMPUS.difference(BLD_ALL)
 e = RES[okc]; kinds = Counter(q['kind'] for q in PLATS)
 dump(HERE5 / 'model.json', {'crs': 'EPSG:5186',

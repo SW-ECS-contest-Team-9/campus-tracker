@@ -66,3 +66,11 @@
 - `frontend/public/structures/z07-building-parts.geojson`(만드는 스크립트 `docs/audit/z07/build_parts.py`): 건물에 붙는 덩어리 가운데 높이·외곽이 추정이라 건물 보정 파일에 못 넣는 것(유담관 둥근 기단부의 창 띠·옥상 정원, 굽은 낮은 날개의 바깥벽과 창, 문예관 저층부의 나머지·열린 기둥 층·옥상 테두리).
 - 본관–한림관 틈(`docs/audit/z05/boxes_z07.py`, 파일은 `z05-upper-branch.geojson`): 덮인 보행 복도 = 마디마다 밑단·바닥(`landing`) + 옆벽 둘(`wall`) + 덮개(`canopy`). 내리막길 기단 밑 구간은 `void`(inside = `G02-PLATFORM-WAY`). 틈 바닥 기단은 그대로 둔다.
 - 갈무리 스크립트 `docs/audit/z05/shots.mjs`: 시점에 `section: {a, b, flip?, ortho?, zoom?: {widthM, centerM}}` 을 주면 그 선으로 단면을 켜고 찍는다. `SHOT_URL` 로 다른 포트의 화면을 찍을 수 있다.
+
+## Z09 에서 더한 것
+- 기운 판: 상자에 `topProfile` 과 `thicknessM` 을 함께 주면 밑면이 윗면과 나란한 판이 된다(덮인 복도의 덮개: 바닥과 나란한 한 경사 판). 옆벽은 `topProfile` + `bottomM`.
+- 포장 무늬: `material: paving` 인 기단의 윗면은 길·영역이 칠하지 않는 곳도 블록 줄눈 무늬로 그린다(보행 우선 길과 같은 무늬).
+- 중립 바닥이 두 높이 사이를 가파르게(약 55도 넘게) 잇는 조각은 바닥 색이 아니라 옹벽 색으로 그린다(벽과 기단 사이의 얇은 틈이 흰 조각으로 보이지 않게).
+- 이음 표본 `backend/data/terrain/samples/z09_edge_blend_5186.json`(만드는 스크립트 `docs/audit/z09/blend.py`, `z05/write_out.py` 가 부른다): 캠퍼스 밖으로 나간 기단의 바깥 변에서 지형이 기단 윗면과 턱 없이 만나게 하는 추정 표본. 잰 값이 아니다.
+- `frontend/public/structures/z09-parts.geojson`(만드는 스크립트 `docs/audit/z09/build_parts.py`): 뒤편 숲 비탈의 듬성듬성한 나무, 문예관 3층 로비 입구의 차양과 문 면.
+- 건물 겉모습(동 노트 `겉모습`, 양식은 `docs/audit/registry/appearance.py`): 창 모양 `작은 아치`·`기둥 발코니`, 지붕 `겹: 2`, `밑동`.

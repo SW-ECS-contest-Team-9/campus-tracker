@@ -18,11 +18,13 @@ for k, (p, q) in enumerate(_pieces):
     last = k == len(_pieces) - 1; zf = max(p[2], q[2]); nm = f'Z07-CORRIDOR-{k + 1:02d}'
     # Z08: 바닥은 마디마다 길 높이를 따라 기운 면(경사 10.8 %). Z07 은 마디마다 평평하게 두어 0.21~0.24 m 단 여섯이 생겼다: 계단·높이 차 없이 이어진다는 확정 사실에 어긋남
     _len = float(np.hypot(q[0] - p[0], q[1] - p[1]))
+    _prof = lambda dz: {'origin': [r2(p[0]), r2(p[1])], 'direction': [r2(q[0] - p[0]), r2(q[1] - p[1])], 'points': [[0, r2(p[2] + dz)], [r2(_len), r2(q[2] + dz)]]}
     box('upper-branch', nm + '-FLOOR', 'landing', _strip_box(p, q, CW + CT, -CW - CT), 135.3, zf, f'덮인 보행 복도의 밑단과 바닥(마디 {k + 1}/{len(_pieces)}): 윗면 {p[2]:.2f} → {q[2]:.2f} m = 길 높이를 따라 기운 면(단 없음), 아래는 틈 윗부분 기단(135.3 m)까지 막힌 덩어리. 기단을 올리지 않고 복도를 얹었다', ZSRC, grade=ZG, basePlane='Z05-PLATFORM-UPPER-HANLIM-WGAP-UP / NARC 135.3', material='concrete',
         bottomM=135.3, topProfile={'origin': [r2(p[0]), r2(p[1])], 'direction': [r2(q[0] - p[0]), r2(q[1] - p[1])], 'points': [[0, r2(p[2])], [r2(_len), r2(q[2])]]})
     if last: continue   # 마지막 마디(데크로 나가는 2.2 m)는 덮개 없는 바닥만: 데크는 실외(확정)
-    for tag, (l, r) in (('L', (CW + CT, CW)), ('R', (-CW, -CW - CT))): box('upper-branch', f'{nm}-WALL-{tag}', 'wall', _strip_box(p, q, l, r), zf, zf + CH, '복도 옆벽(두께 0.2 m, 안 높이 2.5 m: 추정)', ZSRC, grade=ZG, basePlane=nm + '-FLOOR', material='concrete')
-    box('upper-branch', nm + '-COVER', 'canopy', _strip_box(p, q, CW + CT + 0.15, -CW - CT - 0.15), zf + CH, zf + CH + 0.25, '복도 덮개 판(두께 0.25 m). 내리막길 밑에서 나온 뒤에도 덮여 있다고 본 것은 추정(지하 보행 구간의 연장이라는 것만 확정)', ZSRC, grade=ZG, basePlane='없음(옆벽 위)', material='concrete')
+    # Z09: 옆벽 윗선과 덮개도 바닥과 나란히 기운다(전에는 마디마다 평평해 덮개가 계단처럼 단이 졌다). 덮개 = 바닥 + 2.5 m 에 두께 0.25 m 인 기운 판
+    for tag, (l, r) in (('L', (CW + CT, CW)), ('R', (-CW, -CW - CT))): box('upper-branch', f'{nm}-WALL-{tag}', 'wall', _strip_box(p, q, l, r), min(p[2], q[2]), zf + CH, '복도 옆벽(두께 0.2 m, 안 높이 2.5 m: 추정). 윗선은 바닥과 나란히 기운다', ZSRC, grade=ZG, basePlane=nm + '-FLOOR', material='concrete', bottomM=r2(min(p[2], q[2])), topProfile=_prof(CH))
+    box('upper-branch', nm + '-COVER', 'canopy', _strip_box(p, q, CW + CT + 0.15, -CW - CT - 0.15), min(p[2], q[2]) + CH, zf + CH + 0.25, '복도 덮개 판(두께 0.25 m): 바닥과 나란히 기운 한 판(마디마다 단을 두지 않는다). 내리막길 밑에서 나온 뒤에도 덮여 있다고 본 것은 추정(지하 보행 구간의 연장이라는 것만 확정)', ZSRC, grade=ZG, basePlane='없음(옆벽 위)', material='concrete', thicknessM=0.25, topProfile=_prof(CH + 0.25))
 # 내리막길 기단 밑 구간: 기단 안의 빈 곳(단면도에서 길 밑의 덮인 통로로 보인다). 덮개 = 내리막길 포장면(위로 3.0~5.4 m)
 _under = [(_STRIP[0], _STRIP[1]), (_STRIP[1], _STRIP[2]), tuple(_cut(_STRIP[2], _STRIP[3], 0.0, _OUT))]
 for k, (p, q) in enumerate(_under):

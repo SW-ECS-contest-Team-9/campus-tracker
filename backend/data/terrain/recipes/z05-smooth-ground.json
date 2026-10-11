@@ -47,6 +47,15 @@
    ]
   },
   {
+   "type": "local-samples",
+   "files": [
+    "../samples/z09_edge_blend_5186.json"
+   ],
+   "areas": [
+    "z09_edge_blend"
+   ]
+  },
+  {
    "type": "surface",
    "file": "g02-surface.geojson"
   },

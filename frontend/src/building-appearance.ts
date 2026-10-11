@@ -40,8 +40,16 @@ const STYLES = {
   arches: { pitch: 4.2, width: 3.0, sill: 1.0, head: 2.6, gap: 0.5 },
   // one tall arched bay through all the storeys (Z07): glass from the lowest sill to a round head under the eave, a band at every floor
   bays: { pitch: 4.6, width: 3.2, sill: 0.6, head: 99, gap: 0.5 },
+  // Z09: a small window with a round head on every storey
+  archrows: { pitch: 3.2, width: 1.3, sill: 0.95, head: 2.0, gap: 0.45 },
+  // Z09: straight piers through all the storeys with deep balconies between them (a dark recess, a railing band and a window strip per floor, a beam on top)
+  piers: { pitch: 4.6, width: 3.7, sill: 0, head: 99, gap: 0 },
 } as const;
+/** The bays between straight piers (style `piers`): how far the piers stand out, the balcony railing band, the window strip above it. */
+const PIERS = { depth: 0.9, railM: 1.15, railDepth: 0.45, rail: '#6d6f73', recess: '#3a3d40', glassFrom: 1.35, glassTo: 2.5, beam: 1.0 };
 /** A row of tall columns in front of a wall face (Z07): column width and spacing, how far they stand out, the beam on top. */
+/** A double eave (roof.tiers 2): the wall band between the two roofs and how far the upper eave stands out of it. */
+const TIERS = { bandM: 0.9, eaveM: 0.7, band: '#cfc9ba' };
 const COLONNADE = { pitch: 4.4, width: 0.9, depth: 0.6, beam: 1.3, recess: '#3b3f42', color: '#e6e3da' };
 
 /** Compass direction (degrees, north 0, east 90) an outward wall normal faces. */
@@ -136,7 +144,8 @@ export function storeys(a: BuildingAppearance, groundM: number, topM: number): [
 export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number }, a: BuildingAppearance, opts: DecorOptions = {}): Mesh {
   const out = new Builder();
   const top = wallTopM(b.roofM, a);
-  const levels = storeys(a, b.groundM, top);
+  // Z09: below the top of a plinth there are no windows (the walls there are the podium or the retaining wall the building stands on)
+  const levels = storeys(a, b.groundM, top).filter(([z0]) => a.plinth?.topM === undefined || z0 >= a.plinth.topM - 0.5);
   const baseStyle = a.windows ? STYLES[a.windows.style] : null;
   const glass = hex(a.windows?.color ?? (a.windows?.style === 'rows' ? WINDOW.frame : WINDOW.glass)); // punched windows read as their light frames
   const wall = hex(wallColor(a));
@@ -174,6 +183,7 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         const face = faceOf(a, n);
         // this face in another material: one panel over the whole wall, under the windows
         if (face && (face.wall || face.wallColor) && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), top, 0.03, hex(face.wallColor ?? WALL_COLORS[face.wall ?? ''] ?? WALL_COLORS.panel));
+        if (a.plinth?.topM !== undefined && hidden < a.plinth.topM - 0.5) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), Math.min(a.plinth.topM, top), 0.05, hex(a.plinth.color));
         if (a.upper && top > a.upper.fromM && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(a.upper.fromM, hidden), top, 0.04, hex(a.upper.color));
         if (a.roof?.rim && hidden < top - 1) out.panel(p, u, n, 0, len, top - 1.2, top, 0.1, hex(a.roof.rim));
         if (a.roof?.eaveBandM && hidden < top - 1) out.panel(p, u, n, 0, len, top - a.roof.eaveBandM, top, 0.12, hex(WINDOW.cornice));
@@ -195,6 +205,26 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         if (count < 1) { count = 1; width = Math.min(width, len - 0.3); pitch = len - 0.6; }
         const start = (len - count * pitch) / 2 + (pitch - width) / 2;
         const behind = (s: number, z = Infinity) => clear !== null && s + width > clear[0] && s < clear[1] && z >= clear[2];
+        if (kind === 'piers') { // straight piers with deep balconies between them, through the storeys that show
+          const seen = levels.filter(([z0]) => z0 >= hidden - 0.5);
+          if (!seen.length) continue;
+          const z0 = seen[0][0], z1 = top - (a.roof?.eaveBandM ?? 0) - 0.1, pierW = pitch - width;
+          if (z1 - z0 < 3 || pierW < 0.3) continue;
+          const first = (len - count * pitch - pierW) / 2; // piers at both ends
+          const rail = accent ?? hex(PIERS.rail);
+          for (let c = 0; c <= count; c++) out.pier(p, u, n, first + c * pitch, first + c * pitch + pierW, z0, z1, PIERS.depth, wall);
+          out.pier(p, u, n, first, first + count * pitch + pierW, z1 - PIERS.beam, z1, PIERS.depth + 0.05, wall);
+          for (let c = 0; c < count; c++) {
+            const s = first + c * pitch + pierW;
+            out.panel(p, u, n, s, s + width, z0, z1 - PIERS.beam, 0.06, hex(PIERS.recess));
+            for (const [f0, f1] of seen) {
+              if (f0 + PIERS.railM > z1 - PIERS.beam) continue;
+              out.pier(p, u, n, s, s + width, f0 - 0.25, f0 + PIERS.railM, PIERS.railDepth, rail);
+              out.panel(p, u, n, s + 0.3, s + width - 0.3, f0 + PIERS.glassFrom, Math.min(f0 + PIERS.glassTo, f1 - 0.4, z1 - PIERS.beam - 0.1), 0.08, glass);
+            }
+          }
+          continue;
+        }
         if (kind === 'bays') { // one bay through the storeys that show above a neighbour: glass, a round head, a wall band at each floor
           const seen = levels.filter(([z0]) => z0 >= hidden - 0.5);
           if (!seen.length) continue;
@@ -222,8 +252,8 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
             out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
             // the panel under the window: the accent colour and grey in a checker (the real pattern is irregular)
             if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);
-            if (kind === 'arches' && k === levels.length - 1) { // the bay ends in a round head (drawn flatter when the wall above is short)
-              const r = width / 2, ry = Math.min(r, top - head - 0.4);
+            if ((kind === 'arches' && k === levels.length - 1) || kind === 'archrows') { // the bay ends in a round head (drawn flatter when the wall above is short)
+              const r = width / 2, ry = kind === 'archrows' ? Math.min(r, z1 - style.gap - head + 0.3) : Math.min(r, top - head - 0.4);
               if (ry > 0.3) {
                 const at = (t: number) => { const s1 = s + r - r * Math.cos(t); return [p[0] + u[0] * s1 + n[0] * 0.08, p[1] + u[1] * s1 + n[1] * 0.08, head + ry * Math.sin(t)]; };
                 const centre = [p[0] + u[0] * (s + r) + n[0] * 0.08, p[1] + u[1] * (s + r) + n[1] * 0.08, head];
@@ -274,6 +304,24 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
   if (!(area2(ridge) > 0)) { out.cap(rings, top + 0.1, color); return; }
   const cornice = hex(WINDOW.cornice), wall = hex(wallColor(a)), dormer = hex(WINDOW.dormer);
   const z = (p: XY, zz: number) => [p[0], p[1], zz];
+  if (a.roof.tiers === 2) { // Z09 a double eave: the lower roof up to a low wall band, the smaller upper roof with its own eave above it
+    const h1 = h * 0.4, low = offset((e) => (e.open ? -run * 0.45 : 0)), upper = offset((e) => (e.open ? -run * 0.45 + TIERS.eaveM : 0)), z2 = top + h1 + TIERS.bandM;
+    if (area2(low) > 0 && area2(upper) > 0) {
+      edges.forEach((e, i) => {
+        const j = (i + 1) % N;
+        if (e.open) {
+          out.quad(z(outer[i], top - 0.45), z(outer[j], top - 0.45), z(eave[j], top - 0.45), z(eave[i], top - 0.45), cornice);
+          out.quad(z(eave[i], top - 0.45), z(eave[j], top - 0.45), z(eave[j], top), z(eave[i], top), cornice);
+        }
+        out.quad(z(eave[i], top), z(eave[j], top), z(low[j], top + h1), z(low[i], top + h1), e.open ? color : wall);
+        out.quad(z(low[i], top + h1), z(low[j], top + h1), z(low[j], z2), z(low[i], z2), e.open ? hex(TIERS.band) : wall);
+        if (e.open) out.quad(z(low[i], z2 - 0.05), z(low[j], z2 - 0.05), z(upper[j], z2 - 0.05), z(upper[i], z2 - 0.05), cornice);
+        out.quad(z(upper[i], z2), z(upper[j], z2), z(ridge[j], z2 + h * 0.6), z(ridge[i], z2 + h * 0.6), e.open ? color : wall);
+      });
+      out.cap([ridge], z2 + h * 0.6, color);
+      return;
+    }
+  }
   edges.forEach((e, i) => {
     const j = (i + 1) % N;
     if (e.open) { // the eave: its underside and a light band along its edge

@@ -108,3 +108,35 @@ test('기둥 열: 그 방향의 가장 긴 벽 가운데에 기둥과 보, 그 �
   assert.equal(tris(withColumns), tris(plain) + 2 + 5 * 8 - hiddenPerLevel * 3 * 2);
   assert.ok(hiddenPerLevel >= 4);
 });
+
+test('Z09 기둥 발코니: 곧은 기둥이 맨 아래 층에서 처마 밑까지, 칸마다 층 수만큼 난간 띠와 창 띠', () => {
+  const a = { wall: 'white', windows: { style: 'piers' as const, floorsM: [100, 104, 108, 112] } };
+  const wall = [[[X0, Y0], [X0 + 10, Y0], [X0 + 10, Y0 + 0.5], [X0, Y0 + 0.5], [X0, Y0]]];
+  const mesh = decorate([wall], { roofM: 117, groundM: 100 }, a);
+  // 10 m 벽 둘(짧은 벽은 건너뜀)에 칸 둘씩: 기둥 3 + 보 1(면 넷씩 = 삼각형 8), 칸마다 안쪽 판 2 + 층 넷 x (난간 8 + 창 2)
+  assert.equal(tris(mesh), 2 * (4 * 8 + 2 * (2 + 4 * 10)));
+  assert.ok(Math.min(...zs(mesh)) >= 99.75 - 1e-6 && Math.max(...zs(mesh)) <= 117 + 1e-6);
+});
+
+test('Z09 작은 아치: 층마다 창 위에 둥근 머리', () => {
+  const rows = decorate([block], { roofM: 113, groundM: 100 }, { wall: 'stone', windows: { style: 'rows' as const, floorsM: [100, 104, 108] } });
+  const arch = decorate([block], { roofM: 113, groundM: 100 }, { wall: 'stone', windows: { style: 'archrows' as const, floorsM: [100, 104, 108] } });
+  assert.equal(tris(arch), (tris(rows) / 2) * (2 + 8)); // 창 하나 = 네모 2 + 머리 8
+});
+
+test('Z09 밑동: 위 높이 아래에는 창이 없고 벽마다 밑동 색 판 하나', () => {
+  const a = { wall: 'glass', windows: { style: 'rows' as const, floorsM: [100, 104, 108, 112] } };
+  const plain = decorate([block], { roofM: 117, groundM: 100 }, a);
+  const based = decorate([block], { roofM: 117, groundM: 100 }, { ...a, plinth: { color: '#5a5b5e', topM: 108 } });
+  assert.equal(tris(based), tris(plain) / 2 + 4 * 2); // 창 줄 넷 가운데 둘이 빠지고 벽 넷에 판 하나씩
+  assert.ok(storeysOf(based) >= 108);
+});
+const storeysOf = (m: { positions: number[]; colors: number[] }) => { let low = Infinity; for (let i = 0; i < m.positions.length; i += 3) if (m.colors[i] !== 0x5a) low = Math.min(low, m.positions[i + 2]); return low; };
+
+test('Z09 두 겹 지붕: 아래 지붕 위에 벽 띠와 작은 윗지붕(한 겹보다 벽 띠만큼 높다)', () => {
+  const roof = { type: 'hipped' as const, material: 'tile', riseM: 3 };
+  const one = decorate([block], { roofM: 113, groundM: 100 }, { wall: 'stone', roof });
+  const two = decorate([block], { roofM: 113, groundM: 100 }, { wall: 'stone', roof: { ...roof, tiers: 2 } });
+  assert.ok(Math.abs(Math.max(...zs(two)) - Math.max(...zs(one)) - 0.9) < 1e-6);
+  assert.ok(tris(two) > tris(one));
+});
