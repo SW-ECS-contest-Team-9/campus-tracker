@@ -78,6 +78,8 @@ for k, s in enumerate((4.0, 10.0, 15.5)): tree(f'Z07-MUNYE-PODIUM-TREE-{k + 1}',
 # 기단 테라스(G02-PLATFORM-PODIUM 138.8)의 서쪽 벽면: 북악관 옆 낮은 마당(132.5) 위 6.3 m. 사진에서 북악관 끝 옆의 초록 유리가 마당 높이까지 내려온다
 TER = shape(G02['G02-PLATFORM-PODIUM']['geometry']).buffer(0); minx = TER.bounds[0]
 WEST = TER.intersection(Polygon([(minx - 1, 557300), (minx + 1.2, 557300), (minx + 1.2, 557400), (minx - 1, 557400)])).buffer(0.25, join_style=2).difference(TER.buffer(-0.05))
+WEST = WEST.difference(Polygon([[201074.21, 557340.16], [201076.54, 557339.01], [201079.59, 557345.21], [201077.25, 557346.35]]))   # Q01: 기단 옆 계단(G02-PODIUM-STAIR, s 31.5~34)이 기단을 파고 오르는 자리는 비운다(유리 면이 계단을 가로막지 않게)
+WEST = max(getattr(WEST, 'geoms', [WEST]), key=lambda g: g.area)
 box('Z07-MUNYE-PODIUM-WESTFACE', 'wall', WEST, 132.5, 138.8, '기단 테라스 서쪽 벽면의 초록 유리 면(두께 0.25 m, 낮은 마당 132.5 m 에서 테라스 138.8 m 까지). 북악관 앞에서 보면 북악관 끝 옆의 초록 유리가 마당까지 내려온다. 폭은 테라스 서쪽 끝 그대로(추정)', MSRC, MG, 'G02-PLATFORM-LANE 132.5', color='#5f9a86')
 # 탑 아래 열린 기둥 층: 저층부 옥상(148.8)에서 층 표 7층 바닥(156.2)까지, 남서면
 box('Z07-MUNYE-OPEN-RECESS', 'wall', mR([(0.3, 0.0), (30.0, 0.0), (30.0, 0.14), (0.3, 0.14)]), 148.8, 156.2, '탑 아래 열린 기둥 층의 들임 면(어두운 판, 벽 앞 0.14 m): 저층부 옥상 148.8 m 에서 층 표 7층 바닥 156.2 m 까지 두 층 높이. 실제로 비어 있는 깊이는 모른다', MSRC, MG, '문예관 남서면', material='opening')
