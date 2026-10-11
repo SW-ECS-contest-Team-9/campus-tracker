@@ -30,6 +30,8 @@ export const STRUCTURES = {
   planterTop: '#7f9a6b',
   /** The joint pattern (paving-pattern.ts: 1 = blocks) of the top of a platform whose material is `paving` and that no road or area colours (Z09). */
   pavingPattern: 1,
+  /** A box may name the pattern of its faces with `pattern` (G03: `rings` = the ring paving of the sloping way, paving-pattern.ts kind 3). */
+  boxPatterns: { rings: 3 } as Record<string, number>,
   /** A material or type this table does not know. */
   unknown: '#b9b4a8',
   /** Voids (shown with the underground ways, and as a hole on the cut face). */

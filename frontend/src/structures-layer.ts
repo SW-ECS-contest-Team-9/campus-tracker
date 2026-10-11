@@ -255,7 +255,7 @@ export class StructuresLayer {
       // No side face where a neighbouring platform stands at least as high: the face is inside that neighbour.
       const inNeighbour = (x: number, y: number, z: number) => platforms.some((o) => o !== solid && o.bottomM < z && topHeight(o)(x, y) >= z - 0.01 && this.platformPolygons.get(o)!.some((p) => polygonContains(x, y, p)));
       const { mesh, edges } = solidMesh(solid, polygons ? { polygons, bottomAt: below, top: false, hiddenSide: inNeighbour } : {});
-      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])) });
+      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])), pattern: polygons ? undefined : STRUCTURES.boxPatterns[String(solid.props?.pattern ?? '')] });
       if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
       if (!polygons) continue;
       const whole = polygons.reduce((sum, q) => sum + polygonArea(q), 0);

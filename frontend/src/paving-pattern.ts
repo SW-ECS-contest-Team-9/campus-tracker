@@ -1,6 +1,7 @@
 // Z08: the unlit per-vertex-colour appearance of the road surfaces and the structures, with a subtle procedural
 // joint pattern where a surface is paved with blocks or slabs. Each vertex carries `paving` = (x, y, kind): its plan
-// position in metres from PAVING.origin (EPSG:5186) and which pattern its face has (0 = none; ROAD_SURFACE.patterns).
+// position in metres from PAVING.origin (EPSG:5186) and which pattern its face has (0 = none; ROAD_SURFACE.patterns;
+// 3 = rings, a structure box that says `pattern: "rings"`: STRUCTURES.boxPatterns).
 // The pattern is drawn in plan (world axes, not along the way) and fades out where a joint would be thinner than a
 // pixel, so a far surface is one calm colour (no moire).
 export const PAVING = {
@@ -12,6 +13,12 @@ export const PAVING = {
   /** Joint width (m) and how much darker a joint is than the face (0..1). */
   jointM: 0.035,
   jointShade: 0.13,
+  /**
+   * 3: rings (G03, the sloping way between 북악관·문예관 and 본관·한림관: paving with a regular pattern of small rings).
+   * Rows `cellM` apart along `axis` (the way's direction in plan, a unit vector), every other row shifted half a cell;
+   * a ring of `radiusM` drawn `lineM` wide and `shade` darker than the face.
+   */
+  ring: { cellM: 0.5, radiusM: 0.14, lineM: 0.06, shade: 0.2, axis: [0.8974, -0.4412] },
 };
 
 const VS = `in vec3 position3DHigh;
@@ -38,7 +45,15 @@ float jointLine(float v, float cell, float joint) {
 void main() {
     vec3 c = v_color.rgb;
     float kind = floor(v_paving.z + 0.5);
-    if (kind > 0.5) {
+    if (kind > 2.5) {
+        vec2 a = vec2(${PAVING.ring.axis[0].toFixed(4)}, ${PAVING.ring.axis[1].toFixed(4)});
+        vec2 p = vec2(dot(v_paving.xy, a), dot(v_paving.xy, vec2(-a.y, a.x))) / ${PAVING.ring.cellM.toFixed(3)};
+        p.y += mod(floor(p.x), 2.0) * 0.5;
+        float r = length(fract(p) - 0.5) * ${PAVING.ring.cellM.toFixed(3)};
+        float w = max(fwidth(r), 1e-5);
+        float ring = (1.0 - smoothstep(${PAVING.ring.lineM.toFixed(3)} * 0.5, ${PAVING.ring.lineM.toFixed(3)} * 0.5 + w, abs(r - ${PAVING.ring.radiusM.toFixed(3)}))) * clamp(${PAVING.ring.lineM.toFixed(3)} / w, 0.0, 1.0);
+        c *= 1.0 - ${PAVING.ring.shade.toFixed(3)} * ring;
+    } else if (kind > 0.5) {
         vec2 cell = kind < 1.5 ? vec2(${PAVING.block[0].toFixed(3)}, ${PAVING.block[1].toFixed(3)}) : vec2(${PAVING.slab.toFixed(3)});
         float row = floor(v_paving.y / cell.y);
         float shift = kind < 1.5 ? mod(row, 2.0) * 0.5 * cell.x : 0.0;

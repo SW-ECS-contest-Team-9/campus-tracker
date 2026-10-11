@@ -9,9 +9,8 @@ r2 = lambda v: round(float(v), 2)
 def load(fn): return {f['properties']['id']: f for f in json.loads((STR / fn).read_text(encoding='utf-8'))['features']}
 G02, Z02, WEST = load('g02-way.geojson'), load('z02-daeil-front.geojson'), load('z05-west.geojson')
 # (화단 id 들, 화단마다 그루 수, 근거 사진, 무엇)
+# G03(2026-10-12): 오르막길 양쪽 화단의 소나무 줄은 화단을 다시 만들면서 g02-way.geojson(docs/audit/g02/build_inputs.py, id G03-TREE-…)으로 옮겼다
 ROWS = [
-  (G02, ['G02-NPLANT-A05', 'G02-NPLANT-A10', 'G02-NPLANT-A15', 'G02-NPLANT-A20', 'G02-NPLANT-A25'], 1, '사용자-서문·제2주차장·수인관-20261010/09-오르막보행로-입구-차단기-거리뷰-202502.webp', '오르막길 북쪽(북악관 옆) 화단의 소나무 줄'),
-  (G02, [f'G02-SWALL-{k:02d}' for k in range(3, 56, 8)], 1, '사용자-서문·제2주차장·수인관-20261010/09-오르막보행로-입구-차단기-거리뷰-202502.webp', '오르막길 남쪽(본관 쪽) 돌 화단의 소나무 줄'),
   (G02, ['G02-BUKAK-PLANTER-E'], 1, '사용자-서문·제2주차장·수인관-20261010/10-북악관-정문계단-거리뷰-202502.webp', '북악관 정문 동쪽 화단의 소나무'),
   (Z02, ['Z02-PLANTER-MAIN'], 5, '사용자-공연실습소-은주관-20261010/대일관-현관-계단-가까이.webp, 대일관-운동장에서-정면.webp', '대일관 앞 흰 돌 화단의 소나무 줄'),
   (Z02, ['Z02-PLANTER-EAST'], 2, '사용자-공연실습소-은주관-20261010/대일관-운동장에서-정면.webp', '대일관 앞 화단(동쪽)의 소나무'),
