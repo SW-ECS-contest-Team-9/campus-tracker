@@ -64,10 +64,10 @@ feat('U01-VOID-B1', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 1층: 바
 feat('U01-VOID-B2', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 2층: 바닥 {Z_B2} m(지하 1층과 같은 층고 {STOREY:.1f} m 로 한 층 아래, 140.8~142.3), 천장 {C_B2} m = 지하 1층 바닥 판({SLAB_B1} m) 밑', fromM=Z_B2, toM=C_B2, name='운동장 지하 2층')
 ramp = LineString([R0, R1]).buffer(RAMP_W / 2, cap_style=2)
 feat('U01-VOID-RAMP-OPENING', 'void', 'void', ramp, '추정', '안쪽 경사로 위로 지하 1층 바닥 판을 뚫은 곳(경사로가 지나가는 구멍)', fromM=C_B2, toM=Z_B1, name='경사로 구멍')
-feat('U01-RAMP-B2-B1', 'ramp', 'extrude', ramp, '확정(두 층 모두 차도의 종착지), 추정(안쪽 경사로의 자리·길이·폭)', f'지하 2층({Z_B2}) → 지하 1층({Z_B1}) 안쪽 경사로: 길이 {RAMP_L:.0f} m, 경사 {GRADE_RAMP * 100:.1f} %, 폭 {RAMP_W} m. 지하 차도 축을 그대로 이은 자리', basePlane='U01-VOID-B2 바닥', material='concrete',
+feat('U01-RAMP-B2-B1', 'ramp', 'extrude', ramp, '확정(두 층 모두 차도의 종착지), 추정(안쪽 경사로의 자리·길이·폭)', f'지하 2층({Z_B2}) → 지하 1층({Z_B1}) 안쪽 경사로: 길이 {RAMP_L:.0f} m, 경사 {GRADE_RAMP * 100:.1f} %, 폭 {RAMP_W} m. 지하 차도 축을 그대로 이은 자리', basePlane='U01-VOID-B2 바닥', material='concrete', inVoid=True, color='#8c8a84',
      topProfile={'origin': [r2(R0[0]), r2(R0[1])], 'direction': [float(D[0]), float(D[1])], 'points': [[0.0, Z_B2 + 0.02], [RAMP_L, Z_B1]]}, bottomM=Z_B2)
-# 지하 차도 연장: 내리막길 기단 밑을 지나 운동장 서쪽 벽을 뚫고 지하 2층으로. 4 m 마디마다 평평한 바닥(G02 의 기존 구간과 같은 방식)
-n = int(np.ceil((L_APP + WALL + 0.5) / 4.0)); step = (L_APP + WALL + 0.5) / n; covers = []
+# 지하 차도 연장: 내리막길 기단 밑을 지나 운동장 서쪽 벽을 뚫고 지하 2층으로. 1 m 마디마다 평평한 바닥(빈 곳은 바닥이 평평한 상자뿐이라 잘게 나눠 한 경사로 보이게 한다. 마디 사이 턱 0.1 m 는 형식 탓이고 계단이 아니다)
+n = int(np.ceil((L_APP + WALL + 0.5) / 1.0)); step = (L_APP + WALL + 0.5) / n; covers = []
 for k in range(n):
     a, b = k * step, (k + 1) * step; za, zb = (min(Z_B2, Z_P0 + GRADE_APP * s) for s in (a, b)); mid = P0 + D * (a + b) / 2
     seg = LineString([P0 + D * a, P0 + D * b]).buffer(ROAD_W / 2, cap_style=2)
@@ -84,7 +84,7 @@ for i in range(-12, 13):
         p = c + U * (i * GRID + 4.0) + V * (j * GRID)
         sq = Point(p).buffer(0.3, cap_style=3)
         if not INNER.buffer(-1.5).contains(sq) or lanes.intersects(sq): continue
-        cols += 1; feat(f'U01-COLUMN-{cols:03d}', 'wall', 'extrude', sq, '추정', f'기둥 0.6 × 0.6 m, {GRID:.0f} m 격자(추정: 실제 기둥 자리·간격 모름). 지하 2층 바닥에서 운동장 슬래브 밑까지', fromM=Z_B2, toM=C_B1, basePlane='U01-VOID-B2 바닥', material='concrete')
+        cols += 1; feat(f'U01-COLUMN-{cols:03d}', 'wall', 'extrude', sq, '추정', f'기둥 0.6 × 0.6 m, {GRID:.0f} m 격자(추정: 실제 기둥 자리·간격 모름). 지하 2층 바닥에서 운동장 슬래브 밑까지', fromM=Z_B2, toM=C_B1, basePlane='U01-VOID-B2 바닥', material='concrete', inVoid=True, color='#7d838c')
 
 out = {'type': 'FeatureCollection', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}}, 'provenance': {'script': 'docs/audit/u01/build_parts.py', 'note': '운동장 슬래브 기단(Z02-PLATFORM-FIELD 등) 안의 빈 곳. inside 가 없는 빈 곳은 겹치는 모든 기단에서 비운다'}, 'features': FEATS}
 (STR / 'u01-field-basement.geojson').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')

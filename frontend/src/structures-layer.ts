@@ -388,7 +388,8 @@ export class StructuresLayer {
       if (solid.role === 'void') continue;
       const inside = voids.filter((v) => solid.role === 'platform' && (v.props.inside === undefined || v.props.inside === solid.id));
       const caps = sectionCaps(plane, solid, inside, this.platformPolygons.get(solid) ?? [solid.polygon]);
-      face(caps, css(solidColors(solid).body).map((v) => v * 0.8), 0.03);
+      // a box that stands inside a void (`inVoid`: the columns and the ramp of a basement) is drawn in front of the void's face
+      face(caps, css(solidColors(solid).body).map((v) => v * 0.8), solid.role === 'box' && solid.props?.inVoid === true ? 0.005 : 0.03);
       // the height of what is cut, in numbers (STRUCTURES.sectionLabels)
       const name = STRUCTURES.sectionLabels[solid.role === 'platform' ? 'platform' : solid.type];
       const points = caps.flat(2);

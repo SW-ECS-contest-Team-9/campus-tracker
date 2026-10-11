@@ -85,4 +85,9 @@ if len(sys.argv) > 5:   # 서버 도달 검사(n02.ts state)로 다시 확인할
     def usable(r): return r['pick'] and (r['pick']['dz'] is None or abs(r['pick']['dz']) <= SAME_Z)
     pairs = [{'id': f"{s['id']}>{r['target']}", 'label': f"{s['id']} → {r['target']}", 'from': {'nodeId': s['pick']['nodeId']}, 'to': {'nodeId': r['pick']['nodeId']}, 'vehicle': False,
               'expect': r['from'][s['id']]} for s in srcs if s['pick'] for r in rows if usable(r) and (s['id'] == '정문' or isinstance(r['from'][s['id']], dict))]
+    # U01: 차로 닿는지 보는 쌍(서문·제2주차장 입구 → 운동장 지하 1층·지하 2층 종착 표지). 걷는 길은 아니다(지하 차도는 보행 금지)
+    for sid, sxy, sz in (('서문(후문)', [200984.0, 557399.5], 117.0), ('제2주차장 입구', [201021.95, 557307.07], 129.42)):
+        for tid, txy, tz in (('운동장 지하 1층 주차장', [201200.0, 557245.0], 145.3), ('운동장 지하 2층 주차장', [201185.0, 557250.0], 141.7)):
+            a, b = N.nearest(sxy, sz, 1.0), N.nearest(txy, tz, 1.0)
+            if a and b: pairs.append({'id': f'차량 {sid}>{tid}', 'label': f'(차) {sid} → {tid}', 'from': {'nodeId': a[0][2]}, 'to': {'nodeId': b[0][2]}, 'vehicle': True, 'expect': None})
     pathlib.Path(sys.argv[5]).write_text(json.dumps({'note': 'N03 도달 표를 서버 검사로 다시 확인하는 쌍', 'pairs': pairs}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
