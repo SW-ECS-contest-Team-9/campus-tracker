@@ -48,8 +48,9 @@ for (const [name, w] of Object.entries(V)) {
     await sleep(500);
     const plateM = await ev(`(() => { const L = ${SV}.level; L.showZone(${JSON.stringify(w.lift.zone)}); return Math.max(...L.src.buildings().map((b) => b.roofM), 0) + 15; })()`);
     await sleep(5000);
-    const [cx, cy] = w.lift.centre, up = 2000, fov = (2 * Math.atan(w.lift.widthM / 2 / up) * 180) / Math.PI * (1000 / 1400 < 1 ? 1 : 1);
-    // Cesium 의 fov 는 긴 변(가로) 기준
+    // 틀: widthM(화면 가로가 몇 m) 또는 pxPerM(사용자 그림과 같은 축척). 높이 upM 에서 내려다본다(낮을수록 이름표가 크다). Cesium 의 fov 는 긴 변(가로) 기준
+    const canvasW = await ev(`${VIEWER}.scene.canvas.clientWidth`);
+    const [cx, cy] = w.lift.centre, up = w.lift.upM ?? 2000, widthM = w.lift.widthM ?? canvasW / w.lift.pxPerM, fov = (2 * Math.atan(widthM / 2 / up) * 180) / Math.PI;
     save(name, await ev(`window.__shot(${JSON.stringify({ pos: [cx, cy - 0.5, plateM + up], tgt: [cx, cy, plateM], fov })}, ${first ? 30 : 16})`));
     await ev(`(document.getElementById('${LEVEL}').click(), 1)`); await sleep(1200);
   } else {

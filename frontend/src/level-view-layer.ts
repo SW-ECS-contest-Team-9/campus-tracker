@@ -351,7 +351,7 @@ export class LevelView {
     const material = (hex: string, alpha = 1, dash = false) => C.Material.fromType(dash ? 'PolylineDash' : 'Color', dash ? { color: C.Color.fromCssColorString(hex).withAlpha(alpha), dashLength: 10 } : { color: C.Color.fromCssColorString(hex).withAlpha(alpha) });
     const line = (pts: number[][], width: number, hex: string, alpha = 1, dash = false, into = lines) => { if (pts.length > 1) into.add({ positions: pts.map((p) => this.pos(p)), width, material: material(hex, alpha, dash) }); };
     const seen = new Set<string>();
-    const tag = (kind: keyof typeof show, p: number[], text: string, priority: number, size = 13, color = VIEW_COLORS.label) => {
+    const tag = (kind: keyof typeof show, p: number[], text: string, priority: number, size = 13, color = VIEW_COLORS.label, boxed = false) => {
       if (!show[kind] || !text || seen.has(`${kind}|${text}`)) return;
       seen.add(`${kind}|${text}`);
       const world = this.pos(p);
@@ -359,8 +359,8 @@ export class LevelView {
         position: world, text, font: `${kind === 'title' ? 700 : 600} ${size}px system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`,
         fillColor: C.Color.fromCssColorString(color), outlineColor: C.Color.WHITE, outlineWidth: 4, style: C.LabelStyle.FILL_AND_OUTLINE,
         horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: C.VerticalOrigin.BOTTOM, pixelOffset: new C.Cartesian2(0, -6),
-        ...(kind === 'floor' ? { showBackground: true, backgroundColor: C.Color.WHITE.withAlpha(0.82), backgroundPadding: new C.Cartesian2(5, 3), style: C.LabelStyle.FILL } : {}),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: kind === 'floor' || kind === 'title' ? new C.NearFarScalar(200, 1.2, 2500, 0.9) : new C.NearFarScalar(120, 1.15, 900, 0.6), show: false,
+        ...(kind === 'floor' || boxed ? { showBackground: true, backgroundColor: C.Color.WHITE.withAlpha(0.82), backgroundPadding: new C.Cartesian2(5, 3), style: C.LabelStyle.FILL } : {}),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: kind === 'floor' || kind === 'title' || boxed ? new C.NearFarScalar(200, 1.2, 2500, 0.9) : new C.NearFarScalar(120, 1.15, 900, 0.6), show: false,
       });
       this.tags.push({ label, world, priority });
     };
@@ -436,7 +436,7 @@ export class LevelView {
           const end = stub[stub.length - 1];
           const next = zoneAt(this.zones, end[0], end[1], ground ? undefined : end[2]);
           dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 7);
-          if (next && next.id !== zone.id) tag('link', raised([wide ? stub[Math.floor(stub.length / 2)] : end], move, 1)[0], `→ ${shortName(next.name, 16)}`, wide ? 8 : 4, wide ? 15 : 12, wide ? VIEW_COLORS.label : VIEW_COLORS.stub);
+          if (next && next.id !== zone.id) tag('link', raised([wide ? stub[Math.floor(stub.length / 2)] : end], move, 1)[0], `→ ${shortName(next.name, 16)}`, wide ? 8 : 4, wide ? 14 : 12, wide ? VIEW_COLORS.label : VIEW_COLORS.stub, wide);
         }
       }
       if (ground) {
