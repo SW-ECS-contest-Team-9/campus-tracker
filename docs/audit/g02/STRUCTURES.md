@@ -74,3 +74,9 @@
 - 이음 표본 `backend/data/terrain/samples/z09_edge_blend_5186.json`(만드는 스크립트 `docs/audit/z09/blend.py`, `z05/write_out.py` 가 부른다): 캠퍼스 밖으로 나간 기단의 바깥 변에서 지형이 기단 윗면과 턱 없이 만나게 하는 추정 표본. 잰 값이 아니다.
 - `frontend/public/structures/z09-parts.geojson`(만드는 스크립트 `docs/audit/z09/build_parts.py`): 뒤편 숲 비탈의 듬성듬성한 나무, 문예관 3층 로비 입구의 차양과 문 면.
 - 건물 겉모습(동 노트 `겉모습`, 양식은 `docs/audit/registry/appearance.py`): 창 모양 `작은 아치`·`기둥 발코니`, 지붕 `겹: 2`, `밑동`.
+
+## Z10 에서 더한 것
+- `frontend/public/structures/z10-parts.geojson`(만드는 스크립트 `docs/audit/z10/build_parts.py`): 사진에 있는 덧붙은 덩어리. 둥근 아치(네모난 뚫린 곳의 윗모서리를 계단 모양 조각 `…-ARCHn-Lk/Rk` 로 채운다: 형식에 굽은 면이 없어서), 북악관 서쪽 옆길의 자연석 쌓기·생울타리·풀밭·GS25 문과 차양, 북악관 정면 화단, 서문 위·굽이 섬의 소나무, 외국인 생활관의 유리 띠·문·지붕 상자·지붕창, 공연실습소의 간판 면·탑·옥상 틀, 한림관 1층 차양.
+- 기단 정의에 `terrainCut`(build_inputs.py 의 S(...)): 그 도형 안과 둘레 1 m 는 지형 입력에서 뺀다(캠퍼스 지도에 없는 추가 건물 밑의 지형 칸을 지키려고. 구조물 파일의 기단 외곽은 벽까지 그대로). 그런 기단 안의 S-MAP 표본은 빼지 않는다.
+- 건물 겉모습: 모임지붕에 `테두리` 색이 있으면 처마를 그 색으로 그린다.
+
