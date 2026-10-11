@@ -323,3 +323,29 @@ test('Z09 기운 판(thicknessM): 밑면이 윗면과 나란하다, 닫힌 덩�
   const heights = caps.flat(2).map((p) => p[1]).sort((a, b) => a - b);
   assert.ok(Math.abs(heights[0] - 139.75) < 1e-6 && Math.abs(heights[heights.length - 1] - 141) < 1e-6);
 });
+
+test('U01: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기단의 자른 면에서 구멍 두 개가 된다', async () => {
+  const { voidName } = await import('../src/structures.ts');
+  const file = JSON.parse(fs.readFileSync(new URL('../public/structures/u01-field-basement.geojson', import.meta.url), 'utf8'));
+  const { solids, skipped } = parseStructures('u01', file);
+  assert.deepEqual(skipped, []);
+  const b1 = solids.find((s: any) => s.id === 'U01-VOID-B1'), b2 = solids.find((s: any) => s.id === 'U01-VOID-B2');
+  assert.deepEqual([b1.role, voidName(b1), b2.role, voidName(b2)], ['void', '운동장 지하 1층', 'void', '운동장 지하 2층']);
+  assert.equal(voidName({ props: {} } as any), '빈 곳');
+  // 운동장 슬래브 148.9 m 아래: 지하 1층 천장 < 148.9, 지하 2층 천장 < 지하 1층 바닥(사이는 바닥 판)
+  assert.ok(b1.topM < 148.9 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
+  // 지하 차도 연장의 바닥은 서쪽에서 동쪽으로 내려가지 않는다(계단 없는 한 경사), 끝은 지하 2층 바닥 아래로 가지 않는다
+  const road = solids.filter((s: any) => s.id.startsWith('U01-VOID-ROAD-')).sort((a: any, b: any) => a.id.localeCompare(b.id));
+  assert.ok(road.length > 5 && road.every((s: any, i: number) => i === 0 || s.bottomM >= road[i - 1].bottomM) && road[road.length - 1].bottomM <= b2.bottomM);
+  // 슬래브 기단을 가로로 자른 면: 두 층이 구멍으로 빠져 넓이가 준다
+  const field = parseStructures('z02', JSON.parse(fs.readFileSync(new URL('../public/structures/z02-daeil-front.geojson', import.meta.url), 'utf8'))).solids.find((s: any) => s.id === 'Z02-PLATFORM-FIELD');
+  assert.equal(topHeight(field)(201190, 557245), 148.9);
+  const plane = sectionPlane([201150, 557245], [201230, 557245]);
+  const area = (polys: P[][][]) => polys.reduce((s, p) => s + polygonArea(p), 0);
+  const whole = area(sectionCaps(plane, field)), holed = area(sectionCaps(plane, field, [b1, b2]));
+  assert.ok(whole - holed > 60 * ((b1.topM - b1.bottomM) + (b2.topM - b2.bottomM)), `${whole} ${holed}`);
+  // 안쪽 경사로는 기운 윗면의 상자(운동장 면을 가리는 계단·참이 아니다)
+  const ramp = solids.find((s: any) => s.id === 'U01-RAMP-B2-B1');
+  assert.ok(ramp.role === 'box' && ramp.type === 'ramp' && ramp.profile && Math.abs(ramp.topM - b1.bottomM) < 1e-9);
+  assert.equal(surfaceExclusions(solids).treads.length, 0);
+});

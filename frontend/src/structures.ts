@@ -52,7 +52,7 @@ export const STRUCTURES = {
    * bottom–top), so a deck, a corridor floor and its cover can be compared in numbers. One label per kind within
    * `sectionLabelGapM` along the cut (a flight of landings is not labelled step by step).
    */
-  sectionLabels: { platform: '기단', deck: '데크', landing: '바닥', canopy: '덮개' } as Record<string, string>,
+  sectionLabels: { platform: '기단', deck: '데크', landing: '바닥', canopy: '덮개', ramp: '경사로' } as Record<string, string>,
   sectionLabelGapM: 6,
 };
 
@@ -432,4 +432,10 @@ export function solidColors(solid: Solid): { body: string; top: string } {
   const color = solid.role === 'box' ? own(solid.props?.color) : null;
   const top = (solid.role === 'box' ? own(solid.props?.topColor) : null) ?? (solid.type === 'planter' ? STRUCTURES.planterTop : color ?? body);
   return { body: color ?? body, top };
+}
+
+/** What a void is called on the cut face: its own `name` (U01: the storeys under the field), else the plain word. */
+export function voidName(solid: Solid): string {
+  const name = solid.props?.name;
+  return typeof name === 'string' && name.trim() ? name.trim() : '빈 곳';
 }

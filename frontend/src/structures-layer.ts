@@ -11,7 +11,7 @@ import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
-import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, surfaceExclusions, topHeight, topMesh, type Solid } from './structures';
+import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
@@ -404,13 +404,15 @@ export class StructuresLayer {
       else if (solid.type === 'deck') text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`, 'higher');
       else text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`);
     }
-    let last = -Infinity;
+    // one label per 15 m of the cut for each name: stacked levels (a basement of two storeys) are each named
+    const last = new Map<string, number>();
     for (const v of voids) {
+      const name = voidName(v);
       for (const [from, to] of polygonIntervals(plane, v.polygon)) {
         face([[[[from, v.bottomM], [to, v.bottomM], [to, v.topM], [from, v.topM]]]], css(STRUCTURES.voidFace), 0.01);
-        if (from - last < 15) continue;
-        last = from;
-        text((from + to) / 2, (v.bottomM + v.topM) / 2, `빈 곳 ${v.bottomM.toFixed(1)}–${v.topM.toFixed(1)} m`);
+        if (from - (last.get(name) ?? -Infinity) < 15) continue;
+        last.set(name, from);
+        text((from + to) / 2, (v.bottomM + v.topM) / 2, `${name} ${v.bottomM.toFixed(1)}–${v.topM.toFixed(1)} m`);
       }
     }
     // not cut again: the faces lie in the plane

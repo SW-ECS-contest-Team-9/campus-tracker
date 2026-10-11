@@ -24,8 +24,8 @@
     "grade": "측정(높이 148.9 m: E06), S-MAP(외곽: F05 곧은 변 22개)",
     "surfaceName": "field (f05-plateaus.geojson)",
     "topM": 148.9,
-    "bottomM": 141.0,
-    "bottomNote": "옛 지형(141.6 m)보다 아래의 안전 깊이",
+    "bottomM": 140.7,
+    "bottomNote": "운동장 지하 2층 바닥(141.7 m, 추정) 아래 기초 판 1.0 m(U01). 지하 1층·2층은 u01-field-basement.geojson 의 빈 곳",
     "material": "paving",
     "assumption": "외곽은 F05 운동장 영역 그대로(다시 그리지 않음). 북쪽 변은 화단 벽 선과 최대 2 m 어긋난다(위에 얹은 화단 상자가 덮는다)",
     "source": "docs/audit/e10/field-area-f05.geojson, 실험 E06"
