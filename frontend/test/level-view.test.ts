@@ -88,6 +88,16 @@ test('구획에 속한 것: 지상은 실내·지하 길과 빈 곳 속 구조�
   assert.deepEqual(under.solids.map((s: any) => [s.solid.id, s.bottomM, s.topM]), [['PILLAR', 141.4, 144.4]]);
   assert.deepEqual(under.places.map((p: any) => p.id), ['p2']);
   assert.equal(under.minM, 141.4);
+  // U08: 바닥에서 끝나는 빈 곳 = 바닥 구멍. 그 밑의 openAbove 조각(내려가는 경사로)은 자르지 않고 그린다(기운 윗면은 얇은 판으로). 띄우는 높이(minM)는 그대로
+  const hole = { id: 'HOLE', file: 'f', role: 'void', type: 'void', polygon: [rect(7, 7, 2, 2)], bottomM: 140.4, topM: 141.4, estimated: true, props: {} };
+  const rampDown = { id: 'RAMP', file: 'f', role: 'box', type: 'ramp', polygon: [rect(7, 7, 2, 2)], bottomM: 133, topM: 141.4, estimated: true, props: { openAbove: true, inVoid: true },
+    profile: { origin: [X0 + 7, Y0 + 7], direction: [1, 0], points: [[0, 141.4], [2, 141.1]] } };
+  const hidden = { ...rampDown, id: 'RAMP-UNDER-SLAB', props: { inVoid: true }, topM: 140.0, profile: undefined };
+  const open = zoneContent(zones[2], { roads, areas, solids: [...solids, hole, rampDown, hidden], places });
+  assert.equal(open.openings.length, 1);
+  assert.deepEqual(open.solids.map((s: any) => [s.solid.id, s.bottomM, s.topM, !!s.below]), [['PILLAR', 141.4, 144.4, false], ['RAMP', 141.1 - LEVEL_VIEW.openSlabM, 141.4, true]]);
+  assert.equal(open.minM, 141.4);
+  assert.equal(under.openings.length, 0);
   // 바닥이 평평하지 않은 지하 구획(경사 차도): 범위가 넓어 위의 지상 길·구조물이 걸리므로, 지하인 길과 지하 표시가 있는 구조물만
   const tunnel = { ...zones[2], floorM: undefined, fromM: 130, toM: 155 };
   const sloped = zoneContent(tunnel, { roads: [...roads, road('t', [[X0 + 6, Y0 + 9, 136], [X0 + 18, Y0 + 9, 140]], { name: '지하 차도' })], areas: [], solids });

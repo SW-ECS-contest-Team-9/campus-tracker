@@ -388,9 +388,10 @@ export class LevelView {
       const lift = (z: number) => z + baseM - content.minM;
       const move = (p: number[]) => [p[0], p[1], lift(p[2])];
       dropM = baseM - content.minM;
-      veilM = baseM - 2.5;
+      // U08: what is seen through an opening in the floor lies below the plate: the veil goes below it
+      veilM = baseM - 2.5 - Math.max(0, ...content.solids.filter((s) => s.below).map((s) => content.minM - s.bottomM));
       const floorAt = (x: number, y: number) => (ground ? this.src.groundAt(x, y) : zone.floorM ?? content.minM);
-      if (!ground && zone.floorM !== undefined) for (const polygon of zone.polygons) this.addSolid(solid, this.plate(polygon, zone.floorM), move, { body: '#aab1ba', top: VIEW_COLORS.plate });
+      if (!ground && zone.floorM !== undefined) for (const polygon of polygonOps('minus', zone.polygons, content.openings)) this.addSolid(solid, this.plate(polygon, zone.floorM), move, { body: '#aab1ba', top: VIEW_COLORS.plate });
       for (const s of content.solids) {
         const cut = ground
           ? (s.solid.thicknessM ? s.solid : { ...s.solid, bottomM: Math.max(s.solid.bottomM, content.minM - 2) })

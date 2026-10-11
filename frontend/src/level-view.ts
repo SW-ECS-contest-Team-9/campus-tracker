@@ -31,6 +31,10 @@ export const LEVEL_VIEW = {
   stubWideM: 14, wideRoadM: 4,
   /** Height tolerance of an underground zone's range for roads and clicks. */
   rangeSlackM: 0.6,
+  /** U08: below an opening in the floor of a level underground zone, what is marked `openAbove` (a ramp going down, its kerbs and guide line) is shown down to this depth. */
+  openDepthM: 6,
+  /** U08: a sloping solid seen through such an opening is drawn as a slab this thick (not as its fill down to the floor below). */
+  openSlabM: 0.4,
 };
 
 export type LvRoad = {
@@ -166,7 +170,9 @@ export type ZoneContent = {
   roads: { road: LvRoad; cut: RoadCut }[];
   areas: LvArea[];
   /** Solids with the heights to draw them at (an underground zone shows only the part inside its range). */
-  solids: { solid: Solid; bottomM: number; topM: number }[];
+  solids: { solid: Solid; bottomM: number; topM: number; below?: true }[];
+  /** U08: openings in the floor of a level underground zone (voids that end at its floor: the hole over a ramp going down). */
+  openings: Polygon[];
   places: LvPlace[];
   /** Lowest and highest height of what is drawn. */
   minM: number; maxM: number;
@@ -191,11 +197,16 @@ export function zoneContent(zone: Zone, data: { roads: LvRoad[]; areas: LvArea[]
   const areas = data.areas.filter((a) => a.rings[0]?.length && inside(centroid(open(a.rings[0])))
     && (ground ? !isUndergroundArea(a) : a.elevationM != null && inRange(zone, a.elevationM)));
   const solids: ZoneContent['solids'] = [];
+  const openings: Polygon[] = [];
   for (const solid of data.solids) {
-    if (solid.role === 'void' || !inside(centroid(solid.polygon[0]))) continue;
+    if (!inside(centroid(solid.polygon[0]))) continue;
+    if (solid.role === 'void') { if (level && Math.abs(solid.topM - zone.floorM!) < 0.01) openings.push(solid.polygon); continue; }
     if (ground) {
       if (flag(solid, 'inVoid') || flag(solid, 'underground')) continue;
       solids.push({ solid, bottomM: solid.bottomM, topM: solid.topM });
+    } else if (level && solid.role === 'box' && flag(solid, 'openAbove') && solid.bottomM < zone.fromM! && solid.topM > zone.fromM! - LEVEL_VIEW.openDepthM) {
+      // seen from above through the opening in the floor: drawn whole (a sloping top as a slab), below the floor plate
+      solids.push({ solid, bottomM: solid.profile && !solid.thicknessM ? Math.max(solid.bottomM, lowestTop(solid) - LEVEL_VIEW.openSlabM) : solid.bottomM, topM: solid.topM, below: true });
     } else if (solid.role === 'box' && solid.topM > zone.fromM! && solid.bottomM < zone.toM! && (level || flag(solid, 'inVoid') || flag(solid, 'underground'))) {
       solids.push({ solid, bottomM: Math.max(solid.bottomM, zone.fromM!), topM: Math.min(solid.topM, zone.toM!) });
     }
@@ -204,12 +215,12 @@ export function zoneContent(zone: Zone, data: { roads: LvRoad[]; areas: LvArea[]
   const heights = [
     ...roads.flatMap((r) => r.cut.pieces.flat().map((p) => p[2])),
     ...areas.flatMap((a) => (a.elevationM != null ? [a.elevationM] : [])),
-    ...solids.filter((s) => ground ? s.solid.role === 'platform' : true).flatMap((s) => (ground ? [lowestTop(s.solid)] : [s.bottomM, s.topM])),
+    ...solids.filter((s) => (ground ? s.solid.role === 'platform' : !s.below)).flatMap((s) => (ground ? [lowestTop(s.solid)] : [s.bottomM, s.topM])),
     ...(zone.floorM !== undefined ? [zone.floorM] : []),
   ];
   const minM = heights.length ? Math.min(...heights) : zone.fromM ?? 0;
   const maxM = Math.max(minM, ...heights, ...solids.map((s) => s.topM));
-  return { roads, areas, solids, places, minM, maxM };
+  return { roads, areas, solids, places, openings, minM, maxM };
 }
 
 /** The lowest point of the top of a solid. */

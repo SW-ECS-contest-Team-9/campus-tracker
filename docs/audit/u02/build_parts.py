@@ -64,10 +64,11 @@ assert INNER.buffer(0.01).contains(LANE.intersection(FIELD.buffer(-WALL - 0.01, 
 WA, WB = np.array([201140.1, 557255.5]), np.array([201146.2, 557293.5])   # 운동장 서쪽 변(은주1관 벽)
 w = (WB - WA) / np.hypot(*(WB - WA)); e = np.array([w[1], -w[0]])           # w = 북, e = 동(안쪽)
 ws_ = lambda s_, x_: WA + w * s_ + e * x_                                   # 서쪽 벽 좌표(s = 벽을 따라 북으로, x = 벽에서 안쪽으로) → 좌표
-# U07(사용자 2026-10-12 "이거(학교 지하도 지도) 보면 이해될 텐데"): 층 사이 경사로 = 학교 지도가 주차장 서쪽에 그린 굽은 부채꼴 띠 그대로(docs/audit/u07/crescent.py 가 블로그-03 에서 읽은 중심·반지름·두 끝).
-#   평면은 지도(원천, 좌표 맞춤 잔차 RMS 3.3 m). 바닥 구멍 = 부채꼴. 섬 = 굽은 띠의 안쪽(주차 줄 S04 의 남서 끝을 감싼다). 낮은 벽 = 부채꼴의 북쪽 끝 변(은주관 문 쪽, 사용자 표시 3).
-#   내려가는 방향(추정): 남쪽 끝이 어귀(지하 1층 바닥), 섬을 오른쪽에 끼고 시계 방향으로 돌며 내려가 북쪽 끝의 낮은 벽 밑으로 지하 1층 바닥 아래에 든다(사진 11: 청록 벽 옆 어귀 너머로 낮은 벽, 그 밑으로 아래층. 지도의 채운 색도 북쪽 끝이 가장 짙다).
-#   바닥 아래(추정): 같은 원을 그대로 더 돌아(섬 둘레) 주차 줄 방향(남서)이 되는 곳에서 곧은 구간으로 지하 2층에 닿는다(사진 04: 한 차로 곧은 경사로·양옆 낮은 벽, 위쪽이 굽음). U06 의 "문 앞 바닥 밑으로 북쪽 → 북서 모서리 밑에서 되돎"은 버렸다.
+# U08(사용자 확정 2026-10-12 "딱 그냥 ㄴ자야"): 층 사이 경사로의 평면은 ㄴ자다. 곧은 다리 둘이 직각으로 만나고, 학교 지도의 굽은 부채꼴(docs/audit/u07/crescent.json)은 그 모서리의 굽은 부분이다(부채꼴 자리는 그대로).
+#   두 다리는 주차 줄 격자에 맞춘다(구조물의 축): 북쪽 다리 = 주차 줄 방향(북동), 남쪽 다리 = 그 직각(남동). 가운데 선은 부채꼴과 같은 원을 90도 돌고 양 끝에서 접선으로 곧게 나간다.
+#   (부채꼴 두 끝의 접선은 방위 51도·131도로 80도를 이룬다. 서쪽 벽(9도)을 따라가는 다리와 주차 줄(31도)에 나란한 다리는 22도 또는 158도라 ㄴ자가 되지 않는다. 그래서 줄 격자의 31도·121도로 두었다: 접선과 20도·10도 차)
+#   내려가는 방향(추정): 남쪽 다리의 먼 끝이 머리(지하 1층 바닥, 과속방지턱) → 모서리(부채꼴) → 부채꼴 북쪽 끝의 낮은 벽 밑 → 북쪽 다리(지하 1층 바닥 아래) → 지하 2층. 확정된 것은 "낮은 벽 밑이 낮은 쪽"뿐이다.
+#   U07 의 "같은 원을 260도까지 더 도는 구간 + 곧은 구간", U06 의 되도는 고리, U05 의 두 차로는 없다.
 DOOR_NODE = np.array([201146.21, 557283.45]); S_DOOR = float((DOOR_NODE - WA) @ w)
 ha, hb = np.array([201200.7, 557180.9]), np.array([201246.0, 557255.8]); ht = (hb - ha) / np.hypot(*(hb - ha)); hn = np.array([ht[1], -ht[0]])   # 혜인관 운동장 쪽 벽: ht = 주차 줄 방향(북동), hn = 혜인관 쪽(남동)
 CR = json.loads((HERE.parent / 'u07' / 'crescent.json').read_text(encoding='utf-8'))
@@ -75,13 +76,14 @@ CC = np.array(CR['centre']); R_OUT, R_IN = CR['outerRadiusM'], CR['innerRadiusM'
 B_S, B_N = CR['bearingSouthEndDeg'], CR['bearingNorthEndDeg']               # 중심에서 본 두 끝의 방위(북 0, 시계 방향)
 pol = lambda r, b: CC + r * np.array([np.sin(np.radians(b)), np.cos(np.radians(b))])
 B_ROW = float(np.degrees(np.arctan2(ht[0], ht[1])))
-B_E = B_ROW + 90 + 360                  # 시계 방향으로 돌 때 진행 방향 = 방위 + 90. 진행 방향이 주차 줄의 남서(B_ROW + 180)가 되는 곳에서 굽은 구간이 끝난다
-G_RAMP_PCT = 0.15                       # 추정: 한 경사(상한 15 %). 높이 차 8.4 m 는 줄이지 않는다
-DROP = Z_B1 - Z_B2; L_VIS = float(np.radians(B_N - B_S) * R_C); L_ARC = float(np.radians(B_E - B_S) * R_C); L_RAMP = DROP / G_RAMP_PCT; L_S = L_RAMP - L_ARC; LANE_W_S = 5.0   # 곧은 구간 폭 추정(사진 04 의 한 차로)
-assert L_S > 5.0, L_S
+B_A, B_B = B_ROW + 180, B_ROW + 270     # 가운데 선이 도는 범위(시계 방향으로 돌 때 진행 방향 = 방위 + 90): 남쪽 다리의 끝(진행 방향 = 줄의 직각, 북서) ~ 북쪽 다리의 머리(진행 방향 = 주차 줄, 북동)
+assert B_A < B_S < B_B < B_N, (B_A, B_S, B_B, B_N)
+LEG_S, LEG_N, LANE_W_S = 14.5, 26.1, 5.0   # 추정: 남쪽 다리(위가 트임)·북쪽 다리(바닥 아래)의 길이, 한 차로 폭(사진 04)
+DROP = Z_B1 - Z_B2; L_ARC = float(np.radians(B_B - B_A) * R_C); L_VIS = float(np.radians(B_N - B_S) * R_C); L_RAMP = LEG_S + L_ARC + LEG_N; G_RAMP_PCT = DROP / L_RAMP   # 한 경사. 높이 차 8.4 m 는 줄이지 않는다
+assert G_RAMP_PCT <= 0.1505, G_RAMP_PCT
 z_at = lambda s: Z_B1 - G_RAMP_PCT * s                                       # 경사로 가운데 선을 따라 잰 길이 → 높이
-T0, NB, N1 = pol(R_C, B_S), pol(R_C, B_N), pol(R_C, B_E); RB = N1 - ht * L_S   # 어귀(머리), 낮은 벽 밑, 굽은 구간 끝, 발치
-Z_BAND = z_at(L_VIS)
+A0, B0 = pol(R_C, B_A), pol(R_C, B_B); T0 = A0 + hn * LEG_S; RB = B0 + ht * LEG_N   # 굽은 구간의 두 끝, 머리(남쪽 다리의 먼 끝), 발치(북쪽 다리의 먼 끝)
+T_BAND = float(R_C * np.tan(np.radians(B_N - B_B))); NB = B0 + ht * T_BAND; S_BAND = LEG_S + L_ARC + T_BAND; Z_BAND = z_at(S_BAND)   # 낮은 벽(부채꼴 북쪽 끝 변)이 북쪽 다리의 가운데 선을 지나는 곳
 def sector(r0, r1, b0, b1, n=None):
     bb = np.linspace(b0, b1, n or max(2, int(abs(b1 - b0) / 2.5) + 1)); return Polygon([pol(r1, b) for b in bb] + [pol(r0, b) for b in bb[::-1]])
 CRESCENT = sector(R_IN, R_OUT, B_S, B_N)
@@ -101,7 +103,7 @@ Z_HB1 = 149.3; Z_HMID = r2((Z_HB1 + Z_B1) / 2)
 H_OUT = H_BOT - hn * 6.5                                 # 계단 발치에서 벽을 지나 주차장 안으로
 PV1, PV2 = np.array([201203.0, 557247.0]), np.array([201170.0, 557285.0])   # 보행 동선이 지하 1층 차로 둘을 건너지 않고 돌아가는 점(주차 자리 동쪽, 들머리 차로 북동쪽)
 for name, p in (('L0', H_L0), ('F1', H_F1), ('L1', H_L1), ('BOT', H_BOT)): assert HYEIN.contains(Point(p)), name
-for name, p in (('J0', J0), ('T0', T0), ('NB', NB), ('N1', N1), ('RB', RB), ('C1', C1), ('C2', C2), ('DOOR', DOOR), ('SBN', SBN), ('H_OUT', H_OUT)): assert INNER.contains(Point(p)), (name, p)
+for name, p in (('J0', J0), ('T0', T0), ('A0', A0), ('B0', B0), ('NB', NB), ('RB', RB), ('C1', C1), ('C2', C2), ('DOOR', DOOR), ('SBN', SBN), ('H_OUT', H_OUT)): assert INNER.contains(Point(p)), (name, p)
 assert INNER_OLD.buffer(-0.5).contains(Point(CC).buffer(R_OUT)), '굽은 구간이 주차장 평면 밖으로 나간다'
 assert FIELD.contains(Point(ST)) and not INNER_OLD.contains(Point(ST))
 CLIP_BLD = LineString([P0, LANE_END]).buffer(ROAD_W / 2, cap_style=2).intersection(BLD).area   # U05: 띠의 남쪽 가장자리가 은주1관 북동 모서리를 스친다(지도에서 지하 차도가 닿는 그 모서리). 그 조각은 빈 곳에서 뺀다
@@ -147,45 +149,56 @@ for side, off in (('N', ROAD_W / 2 - 0.1), ('S', -ROAD_W / 2 + 0.1)):   # 벽 �
 
 # U07: 곧은 차로의 짙은 바닥은 주차 칸을 알아야 해서 u04/build.py 가 그린다(U07-THROUGH-LANE-FLOOR). U06 의 갈림 구조물(가운데 기둥·표지·신호등·둥근 벽·파란 기둥 줄)은 없앴다: 사진 09 의 자리가 지도·사진에서 나오지 않는다
 
-# U07 층 사이 경사로: 굽은 구간(부채꼴 조각. 지도의 부채꼴 = 처음 조각들, 그 뒤는 지하 1층 바닥 아래) + 곧은 구간. 기운 윗면의 상자들, 아래는 지하 2층 바닥까지 채움
-G_RAMP = f'원천(평면: 학교 지도의 굽은 부채꼴 띠, 좌표 맞춤 잔차 RMS {RES} m), 확정(낮은 벽이 은주관 문 쪽: 사용자 표시 3, 사진 11·14·15), 추정(내려가는 방향·경사·바닥 아래 구간·발치)'
-N_ARC = int(np.ceil((B_E - B_S) / 10.0)); bs = np.linspace(B_S, B_E, N_ARC + 1); segs = []
-N_VIS = int(np.searchsorted(bs, B_N - 1e-6))                                 # 지도의 부채꼴에 걸치는 조각 수
+# U08 층 사이 경사로(ㄴ자): 남쪽 다리(위가 트임) + 굽은 구간(부채꼴) + 북쪽 다리(낮은 벽부터 지하 1층 바닥 아래). 기운 윗면의 상자들, 아래는 지하 2층 바닥까지 채움
+G_RAMP = f'확정(평면이 ㄴ자: 사용자 2026-10-12), 원천(모서리 자리: 학교 지도의 굽은 부채꼴, 좌표 맞춤 잔차 RMS {RES} m), 확정(낮은 벽이 은주관 문 쪽·그 밑이 낮은 쪽: 사용자 표시 3), 추정(다리 방향·길이·내려가는 방향·경사)'
+LEG_S_RECT = LineString([T0, A0]).buffer(LANE_W_S / 2, cap_style=2); LEG_N_RECT = LineString([B0, RB]).buffer(LANE_W_S / 2, cap_style=2)
+assert INNER_OLD.buffer(-0.5).contains(LEG_S_RECT) and INNER_OLD.buffer(-0.5).contains(LEG_N_RECT), '다리가 주차장 평면 밖으로 나간다'
+LANE_GAP = LEG_N_RECT.distance(LANE); assert LANE_GAP > 1.0, LANE_GAP        # 북쪽 다리는 곧은 차로(U05)의 띠에 닿지 않는다
+assert LEG_S_RECT.distance(LANE) > 20 and LEG_S_RECT.distance(THROAT) > 20
+OPEN_S = LineString([T0, A0]).buffer(LANE_W_S / 2 + 0.2, cap_style=2)        # 남쪽 다리 위의 구멍(옆벽까지)
+opening = unary_union([CRESCENT, sector(R_IN, R_OUT, B_A, B_S + 0.5), OPEN_S]).buffer(0.02, join_style=2).buffer(-0.02, join_style=2)
+assert opening.geom_type == 'Polygon', opening.geom_type
+N_ARC = 9; bs = np.linspace(B_A, B_B, N_ARC + 1); segs = [(T0, A0, 0.0, LEG_S, LEG_S_RECT, f'남쪽 다리 {LEG_S} m(위가 트임: 지하 1층 바닥에서 내려간다)', True)]
 for k in range(N_ARC):
-    b0, b1 = bs[k], bs[k + 1]; s0, s1 = np.radians(b0 - B_S) * R_C, np.radians(b1 - B_S) * R_C
-    segs.append((pol(R_C, b0), pol(R_C, b1), s0, s1, sector(R_IN, R_OUT, b0, b1, 5), f"굽은 구간 {s0:.1f}~{s1:.1f} m ({'지도의 부채꼴' if k < N_VIS else '지하 1층 바닥 아래, 추정'})"))
-segs.append((N1, RB, L_ARC, L_RAMP, LineString([N1, RB]).buffer(LANE_W_S / 2, cap_style=2), f'곧은 구간 {L_S:.1f} m(지하 1층 바닥 아래, 추정). 전체 {L_RAMP:.1f} m 에 {DROP:.1f} m, 경사 {G_RAMP_PCT * 100:.1f} %'))
-for k, (a, b, s0, s1, poly, what) in enumerate(segs):
-    d = (b - a) / np.hypot(*(b - a)); zb = z_at(s1) if k < len(segs) - 1 else Z_B2 + 0.02
-    feat(f'U07-RAMP-SEG-{k:02d}', 'ramp', 'extrude', poly, G_RAMP, f'{what}: {z_at(s0):.2f} → {z_at(s1):.2f} m', basePlane='U02-VOID-B2 바닥', material='concrete', inVoid=True, color='#9a9892',
-         topProfile={'origin': [r2(a[0]), r2(a[1])], 'direction': [float(d[0]), float(d[1])], 'points': [[0.0, r2(z_at(s0))], [r2(np.hypot(*(b - a))), r2(zb)]]}, bottomM=Z_B2)
+    b0, b1 = bs[k], bs[k + 1]; s0, s1 = LEG_S + np.radians(b0 - B_A) * R_C, LEG_S + np.radians(b1 - B_A) * R_C
+    segs.append((pol(R_C, b0), pol(R_C, b1), s0, s1, sector(R_IN, R_OUT, b0, b1, 5), f'굽은 구간(모서리, 학교 지도의 부채꼴) {s0 - LEG_S:.1f}~{s1 - LEG_S:.1f} m', True))
+LN_OPEN = unary_union([LEG_N_RECT, sector(R_IN, R_OUT, B_B, B_N)]).intersection(CRESCENT.buffer(0.01))
+segs.append((B0, RB, LEG_S + L_ARC, L_RAMP, LN_OPEN, f'북쪽 다리의 첫 {T_BAND:.1f} m(부채꼴 안, 위가 트임. 낮은 벽 앞)', True))
+segs.append((B0, RB, LEG_S + L_ARC, L_RAMP, LEG_N_RECT.difference(CRESCENT.buffer(0.01)), f'북쪽 다리 {LEG_N} m(낮은 벽부터 지하 1층 바닥 아래). 전체 {L_RAMP:.1f} m 에 {DROP:.1f} m, 경사 {G_RAMP_PCT * 100:.1f} %', False))
+def prof(a, b, s0, s1, up=0.0): d = (b - a) / np.hypot(*(b - a)); return {'origin': [r2(a[0]), r2(a[1])], 'direction': [float(d[0]), float(d[1])], 'points': [[0.0, r2(z_at(s0) + up)], [r2(np.hypot(*(b - a))), r2((z_at(s1) if s1 < L_RAMP - 1e-6 else Z_B2 + 0.02) + up)]]}
+GUIDE = '#e3b505'
+for k, (a, b, s0, s1, poly, what, seen) in enumerate(segs):
+    feat(f'U08-RAMP-SEG-{k:02d}', 'ramp', 'extrude', poly, G_RAMP, f'{what}: {z_at(s0):.2f} → {z_at(s1):.2f} m', basePlane='U02-VOID-B2 바닥', material='concrete', inVoid=True, color='#9a9892', topProfile=prof(a, b, s0, s1), bottomM=Z_B2, openAbove=seen)
+    # 경사로 바닥의 노란 유도선(사진 04·11): 가운데 선을 따라 얇은 기운 판
+    gl = (sector(R_C - 0.12, R_C + 0.12, bs[k - 1], bs[k], 5) if 1 <= k <= N_ARC else LineString([a, b]).buffer(0.12, cap_style=2)).intersection(poly.buffer(0.01))
+    if not gl.is_empty and gl.area > 0.05: feat(f'U08-RAMP-GUIDE-{k:02d}', 'wall', 'extrude', gl, '확정(유도선이 있다: 사진 04·11), 추정(자리)', '경사로 가운데의 노란 유도선', material='concrete', inVoid=True, color=GUIDE, topProfile=prof(a, b, s0, s1, 0.05), thicknessM=0.05, openAbove=seen)
 RAMP_FOOT = unary_union([sg[4] for sg in segs]).buffer(0.01)
-opening = CRESCENT
-feat('U02-VOID-RAMP-OPENING', 'void', 'void', opening, f'원천(학교 지도의 부채꼴 그대로, 잔차 RMS {RES} m), 확정(아래층이 보인다: 사진 03·11)', f'경사로 위로 지하 1층 바닥을 틔운 곳 = 지도의 부채꼴({CRESCENT.area:.0f} ㎡, 가운데 선 {L_VIS:.1f} m). 북쪽 끝의 낮은 벽 밑에서 경사로는 지하 1층 바닥보다 {Z_B1 - Z_BAND:.2f} m 아래', fromM=C_B2, toM=Z_B1, name='경사로 구멍')
+feat('U02-VOID-RAMP-OPENING', 'void', 'void', opening, f'원천(모서리 = 학교 지도의 부채꼴, 잔차 RMS {RES} m), 확정(아래층이 보인다: 사진 03·11, 곧은 경사로가 주차 칸 옆에서 트여 있다: 사진 04), 추정(남쪽 다리 범위)', f'경사로 위로 지하 1층 바닥을 틔운 곳 = 지도의 부채꼴({CRESCENT.area:.0f} ㎡) + 남쪽 다리({LEG_S} m × {LANE_W_S + 0.4:.1f} m). 합 {opening.area:.0f} ㎡. 북쪽 끝의 낮은 벽 밑에서 경사로는 지하 1층 바닥보다 {Z_B1 - Z_BAND:.2f} m 아래', fromM=C_B2, toM=Z_B1, name='경사로 구멍')
 TEAL, STRIPE, LOWWALL = '#2f7f86', '#d8b000', '#6f8fa3'
 G_SEEN = '확정(있음·색: 사진 11·15), 원천(자리: 학교 지도의 부채꼴 가장자리), 추정(치수)'
-box('U07-RAMP-OUTERWALL', 'wall', sector(R_OUT, R_OUT + 0.25, B_S, B_N), C_B2, C_B1, TEAL, '굽은 경사로 바깥쪽(서쪽 벽 쪽)의 청록 벽(사진 11 왼쪽). 바닥에서 천장까지', grade=G_SEEN)
-box('U02-ISLAND-WALL', 'wall', sector(R_IN - 0.25, R_IN, B_S, B_N), C_B2, Z_B1 + 1.1, LOWWALL, '섬의 낮은 벽(사진 11: 푸른 회색, 높이 1.1 m 추정) = 굽은 경사로의 안쪽 가장자리. 벽 뒤는 주차 줄 S04 의 남서 끝', grade=G_SEEN)
-for k in range(N_VIS):   # 벽 밑의 노랑·검정 턱(노랑 한 색): 경사로 바닥을 따라 내려간다
-    b0, b1 = bs[k], min(bs[k + 1], B_N); zl = z_at(np.radians(b1 - B_S) * R_C); zh = z_at(np.radians(b0 - B_S) * R_C)
-    box(f'U02-ISLAND-STRIPE-{k:02d}', 'wall', sector(R_IN, R_IN + 0.08, b0, b1, 4), zl, zh + 0.25, STRIPE, '섬 벽 밑의 노랑·검정 줄무늬 턱(사진 11)', grade=G_SEEN)
-    box(f'U07-OUTERWALL-KERB-{k:02d}', 'wall', sector(R_OUT - 0.08, R_OUT, b0, b1, 4), zl, zh + 0.2, STRIPE, '청록 벽 밑의 노랑·검정 턱(사진 11)', grade=G_SEEN)
+box('U07-RAMP-OUTERWALL', 'wall', sector(R_OUT, R_OUT + 0.25, B_A, B_N), C_B2, C_B1, TEAL, '굽은 구간 바깥쪽(서쪽 벽 쪽)의 청록 벽(사진 11 왼쪽, 사진 04 의 먼 끝). 바닥에서 천장까지', grade=G_SEEN)
+box('U02-ISLAND-WALL', 'wall', sector(R_IN - 0.25, R_IN, B_A, B_N), C_B2, Z_B1 + 1.1, LOWWALL, '섬의 낮은 벽(사진 11: 푸른 회색, 높이 1.1 m 추정) = 굽은 구간의 안쪽 가장자리. 벽 뒤는 주차 줄 S04 의 남서 끝', grade=G_SEEN)
+bk = np.linspace(B_A, B_N, 12)
+for k in range(len(bk) - 1):   # 벽 밑의 노랑·검정 턱(노랑 한 색): 경사로 바닥을 따라 내려간다
+    b0, b1 = bk[k], bk[k + 1]; zl = z_at(LEG_S + np.radians(b1 - B_A) * R_C); zh = z_at(LEG_S + np.radians(b0 - B_A) * R_C)
+    box(f'U02-ISLAND-STRIPE-{k:02d}', 'wall', sector(R_IN, R_IN + 0.08, b0, b1, 4), zl, zh + 0.25, STRIPE, '섬 벽 밑의 노랑·검정 줄무늬 턱(사진 11)', grade=G_SEEN, openAbove=True)
+    box(f'U07-OUTERWALL-KERB-{k:02d}', 'wall', sector(R_OUT - 0.08, R_OUT, b0, b1, 4), zl, zh + 0.2, STRIPE, '청록 벽 밑의 노랑·검정 턱(사진 11)', grade=G_SEEN, openAbove=True)
 dn_b = B_N + float(np.degrees(0.25 / R_C))
-box('U06-BAND-WALL', 'wall', sector(R_IN - 0.25, R_OUT + 0.25, B_N, dn_b, 2), Z_B1, Z_B1 + 1.1, LOWWALL, '부채꼴 북쪽 끝 변의 낮은 벽(사진 15 의 붉은 네모 = 사진 14 오른쪽의 낮은 벽). 경사로는 이 벽 밑으로 지하 1층 바닥 아래에 든다. 벽 북쪽은 지하 1층 바닥(문 앞 주차 칸)',
+box('U06-BAND-WALL', 'wall', sector(R_IN - 0.25, R_OUT + 0.25, B_N, dn_b, 2), Z_B1, Z_B1 + 1.1, LOWWALL, '부채꼴 북쪽 끝 변의 낮은 벽(사진 15 의 붉은 네모 = 사진 14 오른쪽의 낮은 벽). 북쪽 다리는 이 벽 밑으로 지하 1층 바닥 아래에 든다. 벽 북쪽은 지하 1층 바닥(문 앞 주차 칸)',
     grade='확정(있음·은주관 문 벽을 등지면 오른쪽: 사용자 표시 3), 원천(자리: 지도의 부채꼴 북쪽 끝), 추정(치수)')
 pc = pol(R_IN - 0.1, B_N)
 box('U07-ISLAND-PIER', 'wall', Polygon([pc + ht * a_ + hn * b_ for a_, b_ in ((-0.4, -0.4), (0.4, -0.4), (0.4, 0.4), (-0.4, 0.4))]), C_B2, C_B1, '#5f7f93', '섬 벽의 북쪽 끝과 낮은 벽이 만나는 곳의 기둥(사진 11: 푸른 회색 기둥)', grade=G_SEEN)
-for side, off in (('E', LANE_W_S / 2), ('W', -LANE_W_S / 2)):   # 곧은 구간 옆벽(사진 04)
-    a_, b_ = N1 + hn * off, RB + hn * off
-    feat(f'U02-RAMP-SIDEWALL-{side}', 'wall', 'extrude', LineString([a_, b_]).buffer(0.1, cap_style=2), '확정(양옆 낮은 벽: 사진 04), 추정(자리·치수)', '곧은 구간 옆벽: 경사로 윗면 + 0.9 m', basePlane='U02-VOID-B2 바닥', material='concrete', inVoid=True, color='#3c6f78',
-         topProfile={'origin': [r2(a_[0]), r2(a_[1])], 'direction': [float(-ht[0]), float(-ht[1])], 'points': [[0.0, r2(z_at(L_ARC) + 0.9)], [r2(L_S), r2(Z_B2 + 0.9)]]}, bottomM=Z_B2)
-# 바닥의 노란 유도선(사진 11): 주차 줄 S04·S07 사이 통로에서 내려와 섬의 남쪽 끝을 끼고 돌아 부채꼴 남쪽 끝(어귀)으로 든다
-KC = pol(R_IN, B_S); ur = (T0 - KC) / np.hypot(*(T0 - KC)); rg = float(np.hypot(*(T0 - KC)))
-rot = lambda v, deg: np.array([v[0] * np.cos(np.radians(deg)) - v[1] * np.sin(np.radians(deg)), v[0] * np.sin(np.radians(deg)) + v[1] * np.cos(np.radians(deg))])
-turn_deg = float(np.degrees(np.arctan2(ur[0] * hn[1] - ur[1] * hn[0], ur @ hn)))   # 어귀 쪽 반지름 방향에서 통로 쪽(혜인관 쪽)까지 도는 각
-gpts = [KC + rg * rot(ur, t) for t in np.linspace(0, turn_deg, 16)]; gpts.append(gpts[-1] + ht * 12.0)
-guide = LineString(gpts).buffer(0.12, cap_style=2).difference(opening.buffer(0.05))
-box('U06-GUIDE-LINE', 'wall', guide, Z_B1, Z_B1 + 0.03, '#e3b505', '섬의 남쪽 끝을 끼고 어귀로 도는 바닥의 노란 유도선(사진 11). 자리 추정', grade='확정(있음: 사진 11), 추정(자리)')
+G_SIDE = '확정(곧은 한 차로 경사로의 양옆 낮은 벽: 사진 04), 추정(자리·치수)'
+for side, off in (('NE', -LANE_W_S / 2 - 0.1), ('SW', LANE_W_S / 2 + 0.1)):   # 남쪽 다리 옆벽: 윗선이 평평하다(지하 1층 바닥 + 0.9 m), 밑은 경사로 바닥
+    box(f'U08-LEGS-SIDEWALL-{side}', 'wall', LineString([T0 - ht * off, A0 - ht * off]).buffer(0.1, cap_style=2), Z_B2, Z_B1 + 0.9, '#3c6f78', '남쪽 다리 옆의 낮은 벽: 지하 1층 바닥 + 0.9 m. 옆은 주차 칸(긴 줄 S07 의 잘린 끝)', grade=G_SIDE)
+for side, off in (('SE', LANE_W_S / 2 + 0.1), ('NW', -LANE_W_S / 2 - 0.1)):   # 북쪽 다리 옆벽: 경사로 윗면 + 0.9 m (지하 2층에서 보인다)
+    a_, b_ = NB + hn * off, RB + hn * off
+    feat(f'U08-LEGN-SIDEWALL-{side}', 'wall', 'extrude', LineString([a_, b_]).buffer(0.1, cap_style=2), G_SIDE, '북쪽 다리 옆벽: 경사로 윗면 + 0.9 m', basePlane='U02-VOID-B2 바닥', material='concrete', inVoid=True, color='#3c6f78',
+         topProfile={'origin': [r2(a_[0]), r2(a_[1])], 'direction': [float(ht[0]), float(ht[1])], 'points': [[0.0, r2(Z_BAND + 0.9)], [r2(LEG_N - T_BAND), r2(Z_B2 + 0.9)]]}, bottomM=Z_B2)
+# 머리 앞(지하 1층 바닥): 과속방지턱(사진 04)과 유도선
+box('U08-SPEED-BUMP', 'wall', LineString([T0 + hn * 1.2 - ht * 2.6, T0 + hn * 1.2 + ht * 2.6]).buffer(0.2, cap_style=2), Z_B1, Z_B1 + 0.08, '#d8b000', '경사로 머리 앞의 과속방지턱(사진 04: 노랑·검정). 노랑 한 색, 자리 추정', grade='확정(있음: 사진 04), 추정(자리·어느 끝인지)')
+gpts = [T0 + hn * 2.5 + ht * 8.0, T0 + hn * 2.5 + ht * 2.5] + [T0 + ht * 2.5 + 2.5 * (-ht * np.sin(t) + hn * np.cos(t)) for t in np.linspace(0.2, np.pi / 2, 6)]
+box('U06-GUIDE-LINE', 'wall', LineString(gpts).buffer(0.12, cap_style=2).difference(opening.buffer(0.05)), Z_B1, Z_B1 + 0.03, GUIDE, '통로(긴 줄 S07·S08 사이)에서 경사로 머리로 꺾어 드는 바닥의 노란 유도선. 자리 추정', grade='확정(있음: 사진 04·11), 추정(자리)')
 
 # 사람 통로의 빈 곳: 혜인관 계단 발치 ~ 주차장(운동장 슬래브 가장자리 밑), 은주1관 북쪽 끝 옆 계단(주차장 ~ 운동장 슬래브 밑)
 hy = LineString([H_BOT, H_OUT]).buffer(1.2, cap_style=2).intersection(FIELD).difference(INNER.buffer(-0.3))
@@ -222,7 +235,7 @@ for j in (range(-14, 15) if STALLS is None else ()):
 out = {'type': 'FeatureCollection', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}}, 'provenance': {'script': 'docs/audit/u02/build_parts.py', 'note': '운동장 슬래브 기단(Z02-PLATFORM-FIELD 등) 안의 빈 곳과 그 안의 상자. inside 가 없는 빈 곳은 겹치는 모든 기단에서 비운다. U01 의 것을 대신한다'}, 'features': FEATS}
 (STR / 'u01-field-basement.geojson').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 pt = lambda p, z: {'xy': [r2(p[0]), r2(p[1])], 'z': r2(z)}
-path = [pt(pol(R_C, b), z_at(np.radians(b - B_S) * R_C)) for b in np.linspace(B_S, B_E, N_ARC + 1)] + [pt(RB, Z_B2)]
+path = [pt(T0, Z_B1)] + [pt(pol(R_C, b), z_at(LEG_S + np.radians(b - B_A) * R_C)) for b in bs] + [pt(NB, Z_BAND), pt(RB, Z_B2)]
 SYM = [np.array(q) for q in GEO['xy']['rampSymbol']]
 model = {'heights': {'field': Z_FIELD, 'b1Floor': Z_B1, 'b1FloorRange': [140.1, 141.7], 'b1Ceiling': C_B1, 'b1SlabM': SLAB_B1, 'b2Ceiling': C_B2, 'b2Floor': Z_B2, 'solidAboveB1M': r2(Z_FIELD - C_B1), 'platformBottom': r2(Z_B2 - BASE), 'userLines': [144.4, 140.1, 133.0]},
          'areaM2': r2(INNER.area), 'areaB2M2': r2(INNER_B2.area), 'areaU02M2': r2(INNER_OLD.area), 'fieldAreaM2': r2(FIELD.area), 'u01AreaM2': 8072.05, 'mapOutlineAreaM2': r2(MAPPOLY.area), 'mapOutlineOverlap': r2(MAPPOLY.intersection(INNER).area / MAPPOLY.union(INNER).area),
@@ -232,11 +245,14 @@ model = {'heights': {'field': Z_FIELD, 'b1Floor': Z_B1, 'b1FloorRange': [140.1, 
                       'bendAtFromDeg': {'vsRoad951c157d': r2(np.degrees(np.arctan2(-D[1], D[0])) - np.degrees(np.arctan2(557349.2 - 557327.58, 201100.3 - 201053.9))), 'vsWayDirection': r2(np.degrees(np.arccos(np.dot(D, D_WAY))))},
                       'laneEnd': pt(LANE_END, Z_B1), 'laneLengthM': LANE_L, 'buildingClipM2': r2(CLIP_BLD), 'throatAreaM2': r2(INNER.area - INNER_OLD.area), 'mapEndOffAxisM': r2(float((MAP_END - P0) @ NRM)), 'mapNwCornerOffAxisM': r2(float((MAP_NW - P0) @ NRM)),
                       'mapEndOffM': r2(np.hypot(*(E0 - MAP_END)))},
-         'ramp': {'top': pt(T0, Z_B1), 'band': pt(NB, Z_BAND), 'turnEnd': pt(N1, z_at(L_ARC)), 'bottom': pt(RB, Z_B2), 'path': path, 'centre': [r2(v) for v in CC], 'outerRadiusM': R_OUT, 'innerRadiusM': R_IN, 'centreRadiusM': r2(R_C), 'laneWidthM': r2(LANE_W), 'straightWidthM': LANE_W_S,
-                  'bearingTopDeg': B_S, 'bearingBandDeg': B_N, 'bearingTurnEndDeg': r2(B_E - 360), 'turnDeg': r2(B_E - B_S), 'visibleM': r2(L_VIS), 'turnM': r2(L_ARC), 'straightM': r2(L_S), 'lengthM': r2(L_RAMP), 'dropM': r2(DROP), 'gradePct': r2(G_RAMP_PCT * 100),
-                  'belowFloorAtBandM': r2(Z_B1 - Z_BAND), 'clearUnderSlabAtBandM': r2(C_B2 - Z_BAND), 'doorToBandM': r2(np.hypot(*(DOOR_NODE - pol(R_OUT, B_N)))), 'doorToTopM': r2(np.hypot(*(DOOR_NODE - T0))), 'westWallToOuterArcM': r2(float((CC - WA) @ e) - R_OUT), 'rowDirection': [float(ht[0]), float(ht[1])],
-                  'island': {'polygon': [[r2(x), r2(y)] for x, y in ISLAND.exterior.coords], 'wall': [[r2(x), r2(y)] for x, y in sector(R_IN - 0.25, R_IN, B_S, B_N).exterior.coords], 'radiusM': R_IN},
-                  'footprint': [[r2(x), r2(y)] for x, y in RAMP_FOOT.exterior.coords], 'opening': [[r2(x), r2(y)] for x, y in opening.exterior.coords], 'guide': [[r2(x), r2(y)] for x, y in gpts],
+         'ramp': {'shape': 'L', 'top': pt(T0, Z_B1), 'arcStart': pt(A0, z_at(LEG_S)), 'arcEnd': pt(B0, z_at(LEG_S + L_ARC)), 'band': pt(NB, Z_BAND), 'bottom': pt(RB, Z_B2), 'path': path, 'centre': [r2(v) for v in CC], 'outerRadiusM': R_OUT, 'innerRadiusM': R_IN, 'centreRadiusM': r2(R_C), 'laneWidthM': r2(LANE_W), 'straightWidthM': LANE_W_S,
+                  'legSouthM': LEG_S, 'legNorthM': LEG_N, 'arcM': r2(L_ARC), 'legSouthAzimuthDeg': r2((B_ROW + 90) % 360), 'legNorthAzimuthDeg': r2(B_ROW), 'westWallAzimuthDeg': r2(np.degrees(np.arctan2(w[0], w[1]))), 'crescentTangentAzimuthDeg': [r2((B_S + 270) % 360), r2((B_N + 90) % 360)],
+                  'bearingArcDeg': [r2(B_A), r2(B_B)], 'bearingTopDeg': B_S, 'bearingBandDeg': B_N, 'visibleM': r2(L_VIS), 'lengthM': r2(L_RAMP), 'dropM': r2(DROP), 'gradePct': r2(G_RAMP_PCT * 100),
+                  'bandAlongM': r2(S_BAND), 'belowFloorAtBandM': r2(Z_B1 - Z_BAND), 'clearUnderSlabAtBandM': r2(C_B2 - Z_BAND), 'clearUnderSlabLegNorthM': [r2(C_B2 - Z_BAND), r2(C_B2 - Z_B2)], 'openDepthAtArcM': [r2(Z_B1 - z_at(LEG_S)), r2(Z_B1 - z_at(LEG_S + L_ARC))],
+                  'legNorthToThroughLaneM': r2(LANE_GAP), 'legNorthEndToDoorM': r2(np.hypot(*(DOOR_NODE - RB))), 'legNorthToDoorM': r2(LEG_N_RECT.distance(Point(DOOR_NODE))), 'bottomToB2WallAheadM': r2(Point(RB).distance(LineString([RB, RB + ht * 60]).intersection(INNER_B2.exterior))), 'bottomToB2WallM': r2(INNER_B2.exterior.distance(Point(RB))),
+                  'doorToBandM': r2(np.hypot(*(DOOR_NODE - pol(R_OUT, B_N)))), 'doorToTopM': r2(np.hypot(*(DOOR_NODE - T0))), 'westWallToOuterArcM': r2(float((CC - WA) @ e) - R_OUT), 'rowDirection': [float(ht[0]), float(ht[1])],
+                  'island': {'polygon': [[r2(x), r2(y)] for x, y in ISLAND.exterior.coords], 'wall': [[r2(x), r2(y)] for x, y in sector(R_IN - 0.25, R_IN, B_A, B_N).exterior.coords], 'radiusM': R_IN},
+                  'footprint': [[r2(x), r2(y)] for x, y in RAMP_FOOT.exterior.coords], 'opening': [[r2(x), r2(y)] for x, y in opening.exterior.coords], 'guide': [[r2(x), r2(y)] for x, y in gpts], 'legSouthRect': [[r2(x), r2(y)] for x, y in LEG_S_RECT.exterior.coords], 'legNorthRect': [[r2(x), r2(y)] for x, y in LEG_N_RECT.exterior.coords],
                   'mapSymbol': {'source': 'docs/audit/u07/crescent.json', 'oldThreePointsOffM': [r2(CRESCENT.distance(Point(q))) for q in SYM]}},
          'points': {'C1': pt(C1, Z_B1), 'C2': pt(C2, Z_B2), 'DOOR': pt(DOOR, Z_B1), 'SBN': pt(SBN, Z_B1), 'ST': pt(ST, Z_FIELD)},
          'hyein': {'door': pt(HD, Z_HB1), 'l0': pt(H_L0, Z_HB1), 'f1': pt(H_F1, Z_HMID), 'l1': pt(H_L1, Z_HMID), 'bottom': pt(H_BOT, Z_B1), 'out': pt(H_OUT, Z_B1), 'via': [pt(PV1, Z_B1), pt(PV2, Z_B1)], 'dropM': r2(Z_HB1 - Z_B1), 'mapDotOffM': r2(np.hypot(*(HD - np.array(GEO['xy']['dots']['혜인관']))))},
