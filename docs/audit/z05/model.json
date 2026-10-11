@@ -1,13 +1,13 @@
 {
  "crs": "EPSG:5186",
  "counts": {
-  "platforms": 91,
+  "platforms": 93,
   "roadPieces": 37,
   "handOther": 5,
-  "planes": 49,
-  "boxes": 263,
-  "terrainSurfaces": 91,
-  "edgeSamples": 1855,
+  "planes": 51,
+  "boxes": 274,
+  "terrainSurfaces": 93,
+  "edgeSamples": 1815,
   "z04": {
    "platforms": 205,
    "roadPieces": 55,
@@ -23,9 +23,9 @@
   "coveredByPlatformsM2": 34241
  },
  "vsSmap1m": {
-  "points": 28852,
-  "p50abs": 0.43,
-  "p90abs": 6.19
+  "points": 29247,
+  "p50abs": 0.42,
+  "p90abs": 6.09
  },
  "zones": {
   "turnaround": {
@@ -38,7 +38,7 @@
       130.14,
       131.43
      ],
-     "area": 1340.7,
+     "area": 1354.1,
      "grade": "확정(회차 공간·북악관 현관 앞·본관 앞·오르막길이 끊김 없는 한 포장면: 사용자 그림 11), S-MAP(높이)",
      "material": "paving",
      "terrain": true,
@@ -90,7 +90,7 @@
       131.75,
       133.1
      ],
-     "area": 334.3,
+     "area": 334.0,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -484,11 +484,24 @@
      "id": "Z05-PLATFORM-BACK-SIDE-WAY",
      "what": "북악관 서쪽 옆길(GS25 문 앞 131.7 m)",
      "top": [
-      131.13,
-      133.24
+      131.14,
+      133.21
      ],
-     "area": 577.1,
-     "grade": "확정(GS25 문 = 북악관 지하 1층 입구), S-MAP(높이), 추정(외곽)",
+     "area": 182.9,
+     "grade": "확정(GS25 문 = 북악관 지하 1층 입구, 좁은 포장길: 거리뷰), S-MAP(높이), 추정(폭·외곽)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-BACK-SIDE-WAY-b",
+     "what": "북악관 서쪽 옆길(GS25 문 앞 131.7 m)",
+     "top": [
+      131.14,
+      133.21
+     ],
+     "area": 48.5,
+     "grade": "확정(GS25 문 = 북악관 지하 1층 입구, 좁은 포장길: 거리뷰), S-MAP(높이), 추정(폭·외곽)",
      "material": "paving",
      "terrain": true,
      "kind": "spec"
@@ -497,10 +510,10 @@
      "id": "Z05-PLATFORM-BACK-BEHIND-BUKAK-W",
      "what": "북악관 뒤(서쪽 반)",
      "top": [
-      132.74,
+      132.79,
       134.74
      ],
-     "area": 734.4,
+     "area": 718.9,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -592,7 +605,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 22
+   "boxes": 33
   },
   "cheongun": {
    "title": "청운관 앞",
@@ -982,10 +995,10 @@
      "id": "Z05-PLATFORM-WEST-STREET",
      "what": "서쪽 옹벽 아래 공도",
      "top": [
-      94.0,
+      93.4,
       121.0
      ],
-     "area": 3446.2,
+     "area": 3443.7,
      "grade": "S-MAP(종단), 추정(폭 11~23 m: 캠퍼스 외곽까지, 북쪽 끝, 유담관 벽 앞 틈)",
      "material": "asphalt",
      "terrain": true,
@@ -1005,7 +1018,7 @@
      "id": "Z05-PLATFORM-WEST-WALLTOP-NORTH",
      "what": "옹벽 위 북쪽 끝(포장면이 옹벽까지 닿는 곳)",
      "top": 131.3,
-     "area": 178.7,
+     "area": 172.6,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -1016,10 +1029,10 @@
      "what": "서문 위 화단 비탈",
      "top": [
       126.65,
-      131.96
+      132.0
      ],
-     "area": 580.7,
-     "grade": "S-MAP(높이), 확정(옹벽 위 화단: 서문 사진), 추정(외곽)",
+     "area": 889.5,
+     "grade": "S-MAP(높이), 확정(옹벽 위 화단: 서문 사진, 옆길 서쪽의 생울타리·나무: 거리뷰 GS25 02), 추정(외곽)",
      "material": "planting",
      "terrain": true,
      "kind": "spec"
@@ -1154,8 +1167,21 @@
       95.0,
       106.9
      ],
-     "area": 3042.7,
+     "area": 3029.6,
      "grade": "S-MAP(종단), 추정(폭·축)",
+     "material": "asphalt",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-GATE-ROUNDABOUT",
+     "what": "외국인 생활관 앞 회전교차로와 건물 북쪽 벽 앞",
+     "top": [
+      91.74,
+      93.76
+     ],
+     "area": 535.1,
+     "grade": "S-MAP(높이), 확정(건물 앞이 회전교차로: 사용자 사진 외국인생활관.jpg), 추정(외곽, 메시 밖 5 m)",
      "material": "asphalt",
      "terrain": true,
      "kind": "spec"
@@ -1206,8 +1232,8 @@
  "residuals": {
   "Z05-PLATFORM-TURN-PLAZA": [
    -0.02,
-   0.24,
-   1293
+   0.25,
+   1300
   ],
   "Z05-PLATFORM-TURN-V4-01": [
    0.09,
@@ -1415,29 +1441,34 @@
    54
   ],
   "Z05-PLATFORM-WEST-STREET": [
-   -0.72,
-   17.29,
-   1902
+   -0.73,
+   17.33,
+   1899
   ],
   "Z05-PLATFORM-WEST-WALLTOP-PLANTER": [
    -1.8,
    4.12,
    720
   ],
+  "Z05-PLATFORM-BACK-SIDE-WAY": [
+   0.22,
+   0.36,
+   147
+  ],
+  "Z05-PLATFORM-BACK-SIDE-WAY-b": [
+   -0.66,
+   0.94,
+   44
+  ],
   "Z05-PLATFORM-WEST-WALLTOP-NORTH": [
    0.2,
    3.54,
-   163
+   159
   ],
   "Z05-PLATFORM-WEST-GATE-BANK": [
-   0.03,
-   0.82,
-   480
-  ],
-  "Z05-PLATFORM-BACK-SIDE-WAY": [
-   0.05,
-   0.76,
-   378
+   -0.11,
+   0.91,
+   665
   ],
   "Z05-PLATFORM-BACK-BEHIND-BUKAK-W": [
    0.01,
@@ -1626,8 +1657,13 @@
   ],
   "Z05-PLATFORM-GATE-STREET-SW": [
    -0.01,
-   16.01,
-   2953
+   16.02,
+   2939
+  ],
+  "Z05-PLATFORM-GATE-ROUNDABOUT": [
+   -0.05,
+   0.56,
+   411
   ],
   "Z05-PLATFORM-GATE-ROAD-EAST-EDGE": [
    -4.2,

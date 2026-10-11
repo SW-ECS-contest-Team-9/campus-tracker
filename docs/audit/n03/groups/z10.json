@@ -1,0 +1,176 @@
+{
+ "id": "Z10",
+ "zone": "안",
+ "comment": "Z10: 은주관 서쪽 윗길·제1주차장 차로 보행 허용, 북악관 서쪽 옆길 폭 3 m, 입구(3) 계단 선",
+ "ops": [
+  {
+   "ref": "보행 허용 6c877e98 은주관 서쪽 윗길",
+   "op": "update_road",
+   "args": {
+    "id": "6c877e98-dd45-4271-8365-0aa90e568d39",
+    "expectedRevision": 2,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   },
+   "grade": "확정(자유 보행)",
+   "evidence": "사용자 확정 2026-10-11(모델링 개선-홈 확정 표): 제2주차장 위쪽 공간은 사람들이 비교적 자유롭게 다닌다. 은주관 서쪽 윗길은 본관·한림관 사이 갈림에서 은주1관 앞으로 가는 그 위쪽 공간의 포장길이다"
+  },
+  {
+   "ref": "보행 허용 5d39a29f 제1주차장 차로",
+   "op": "update_road",
+   "args": {
+    "id": "5d39a29f-caa3-4a5a-882e-c535b07b6b9f",
+    "expectedRevision": 1,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   },
+   "grade": "추정(주차장 진입 포장을 걸어 나옴)",
+   "evidence": "사용자 확정 2026-10-10·11: 제1주차장 입구는 정문 바로 옆이고, 정문~제2주차장은 차도 양옆 인도로 걷는다. 주차장 차로는 인도가 없는 주차장 진입 포장이라 차를 댄 사람이 걸어 나오는 길로 본다(보행 허용은 추정: 인도가 따로 있는지 사진 없음)"
+  },
+  {
+   "ref": "보행 허용 402f91df 제1주차장 차로",
+   "op": "update_road",
+   "args": {
+    "id": "402f91df-5219-4abd-90cc-d6db720b0899",
+    "expectedRevision": 1,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   },
+   "grade": "추정(주차장 진입 포장을 걸어 나옴)",
+   "evidence": "사용자 확정 2026-10-10·11: 제1주차장 입구는 정문 바로 옆이고, 정문~제2주차장은 차도 양옆 인도로 걷는다. 주차장 차로는 인도가 없는 주차장 진입 포장이라 차를 댄 사람이 걸어 나오는 길로 본다(보행 허용은 추정: 인도가 따로 있는지 사진 없음)"
+  },
+  {
+   "ref": "옆길 폭 5335ba4d 6 → 3 m",
+   "op": "update_road",
+   "args": {
+    "id": "5335ba4d-5166-4f70-8cd7-bf384ef3c3f5",
+    "expectedRevision": 3,
+    "attrs": {
+     "widthM": 3,
+     "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 좁은 포장길 폭 약 3 m: 거리뷰, 높이 S-MAP)"
+    }
+   },
+   "grade": "확정(좁은 포장길: 거리뷰), 폭 값은 추정",
+   "evidence": "streetview-bukak-gs25-202502-02.png: 옆길은 폭 3 m 남짓의 좁은 포장길(왼쪽 자연석 쌓기, 오른쪽 건물 벽). 6 m 는 S-MAP 메시의 평평한 폭이었다"
+  },
+  {
+   "ref": "옆길 폭 eb66229b 6 → 3 m, 꺾이는 점을 길 가운데로",
+   "op": "update_road",
+   "args": {
+    "id": "eb66229b-98a2-436a-be33-28aba4158c6f",
+    "expectedRevision": 3,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "widthM": 3,
+     "name": "북악관 서쪽 옆길 (회차 공간 ~ GS25 문 앞. 좁은 포장길 폭 약 3 m: 거리뷰, 높이 S-MAP)"
+    },
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201003.6,
+        557388.87
+       ],
+       "z": 131.47
+      }
+     }
+    ]
+   },
+   "grade": "확정(좁은 포장길: 거리뷰), 폭 값은 추정",
+   "evidence": "streetview-bukak-gs25-202502-02.png: 옆길은 폭 3 m 남짓의 좁은 포장길(왼쪽 자연석 쌓기, 오른쪽 건물 벽). 6 m 는 S-MAP 메시의 평평한 폭이었다"
+  },
+  {
+   "ref": "옆길 폭 db3fe999 6 → 3 m",
+   "op": "update_road",
+   "args": {
+    "id": "db3fe999-f295-4b84-bad8-b8f8ae24e8a8",
+    "expectedRevision": 6,
+    "attrs": {
+     "widthM": 3,
+     "name": "북악관 서쪽 옆길 (GS25 문 앞 ~ 북서 모서리. 좁은 포장길 폭 약 3 m: 거리뷰, 높이 S-MAP)"
+    }
+   },
+   "grade": "확정(좁은 포장길: 거리뷰), 폭 값은 추정",
+   "evidence": "streetview-bukak-gs25-202502-02.png: 옆길은 폭 3 m 남짓의 좁은 포장길(왼쪽 자연석 쌓기, 오른쪽 건물 벽). 6 m 는 S-MAP 메시의 평평한 폭이었다"
+  },
+  {
+   "ref": "입구(3) 계단 4e0e45f2 를 회차 공간 쪽으로",
+   "op": "update_road",
+   "args": {
+    "id": "4e0e45f2-1770-43a3-8bb3-1650cdc69ef5",
+    "expectedRevision": 1,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "widthM": 5,
+     "name": "북악관 입구(3) 계단 (1층 복도 서쪽 끝 ~ 회차 공간 쪽 계단 발치 ~ 옆길 어귀. 계단은 정면 맨 서쪽 칸에서 곧게 내려옴: 거리뷰, 칸 수 추정)"
+    },
+    "path": [
+     {
+      "at": {
+       "nodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8"
+      }
+     },
+     {
+      "xy": [
+       201005.46,
+       557379.85
+      ],
+      "z": 131.4
+     },
+     {
+      "at": {
+       "nodeId": "2910733c-1907-4fdb-bc3e-0f090ec6932c"
+      }
+     }
+    ]
+   },
+   "grade": "확정(계단 자리·방향: 거리뷰), 추정(선 ±1 m)",
+   "evidence": "streetview-bukak-gs25-202502-01.png·02.png: 입구(3) 계단은 정면 맨 서쪽 칸에서 회차 공간 쪽으로 곧게 내려온다(옆길 쪽으로 내려오지 않는다)"
+  },
+  {
+   "ref": "옆길 어귀 노드 be0dbc5c 를 길 가운데로(서쪽 2.6 m)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "be0dbc5c-e76b-4b0c-9d87-1051086087e4",
+    "to": {
+     "xy": [
+      201001.9,
+      557385.25
+     ],
+     "z": 131.26
+    }
+   },
+   "grade": "추정(선 ±1 m)",
+   "evidence": "streetview-bukak-gs25-202502-02.png: 옆길은 폭 3 m 남짓의 좁은 포장길(왼쪽 자연석 쌓기, 오른쪽 건물 벽). 6 m 는 S-MAP 메시의 평평한 폭이었다. 길 가운데 = 건물 끝 벽에서 1.8 m"
+  },
+  {
+   "ref": "옆길 노드 2910733c 를 길 가운데로(서쪽 2.2 m)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "2910733c-1907-4fdb-bc3e-0f090ec6932c",
+    "to": {
+     "xy": [
+      201002.75,
+      557387.06
+     ],
+     "z": 131.39
+    }
+   },
+   "grade": "추정(선 ±1 m)",
+   "evidence": "streetview-bukak-gs25-202502-02.png: 옆길은 폭 3 m 남짓의 좁은 포장길(왼쪽 자연석 쌓기, 오른쪽 건물 벽). 6 m 는 S-MAP 메시의 평평한 폭이었다. 길 가운데 = 건물 끝 벽에서 1.8 m"
+  }
+ ]
+}

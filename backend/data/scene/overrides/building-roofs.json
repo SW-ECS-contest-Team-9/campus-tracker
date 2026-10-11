@@ -1302,10 +1302,10 @@
       },
       "features": [
         {
-          "what": "옥상 콘크리트 틀과 길가 탑",
+          "what": "옥상 콘크리트 틀과 길가 탑, 길 쪽 벽의 검은 간판 면(구조물 z10-parts)",
           "evidence": "사용자-서문-공연실습소-생활관-20261010/공연실습소.webp",
-          "grade": "확정",
-          "drawn": false
+          "grade": "확정(있음), 추정(자리·치수)",
+          "drawn": true
         }
       ]
     },
@@ -1370,21 +1370,30 @@
         "color": "#5b6068"
       },
       "roof": {
-        "type": "flat",
-        "material": "metal"
+        "type": "hipped",
+        "material": "metal",
+        "riseM": 1.5,
+        "runM": 2.0,
+        "dormers": true
       },
       "grades": {
         "wall": "확정(사용자 사진)",
         "windows": "추정",
         "upper": "확정(재질), 높이는 추정",
-        "roof": "S-MAP"
+        "roof": "S-MAP(가운데 107.0, 가장자리 105.5), 확정(경사 지붕과 지붕창: 사용자 사진), 추정(들임 2 m)"
       },
       "features": [
         {
           "what": "금속판 지붕층의 세모 지붕창",
           "evidence": "사용자-서문-공연실습소-생활관-20261010/외국인생활관.jpg",
           "grade": "확정",
-          "drawn": false
+          "drawn": true
+        },
+        {
+          "what": "회전교차로 쪽 가운데의 세로 유리 띠와 문, 지붕 위 가운데 상자(구조물 z10-parts)",
+          "evidence": "사용자-서문-공연실습소-생활관-20261010/외국인생활관.jpg",
+          "grade": "확정(있음), 추정(치수)",
+          "drawn": true
         }
       ]
     },
