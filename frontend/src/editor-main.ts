@@ -144,6 +144,7 @@ root.innerHTML = `
           <button id="view-ortho" data-view="ortho" title="원근/정사영 전환 (5)">원근</button>
           <button data-view="frame-selected" title="선택 맞춤 (. / Numpad .)">선택 맞춤</button><button data-view="frame-all" title="전체 맞춤 (Home)">전체</button>
           <button id="view-isolate" data-view="isolate" title="선택 경로만 보기 (/)">단독</button>
+          <button id="view-section" type="button" title="단면도: 켜고 지도에서 두 점을 찍으면 그 선을 따라 세로로 잘라 봄. 다시 누르면 끔 (오른쪽 '면 표시 · 단면도'와 같음)">단면도</button>
         </div>
         <div id="editor-hover-tip" class="editor-hover-tip" hidden></div></main>
       <aside class="editor-inspector">
@@ -1519,6 +1520,11 @@ function bindViewPrefs() {
   $('nav-help-btn').onclick = () => toggleHelp(true);
   $('editor-help-close').onclick = () => toggleHelp(false);
   $('editor-help').addEventListener('click', (e) => { if (e.target === $('editor-help')) toggleHelp(false); });
+  {
+    const sectionButton = $<HTMLButtonElement>('view-section'), sectionBox = $<HTMLInputElement>('layer-section');
+    sectionButton.onclick = () => { sectionBox.click(); viewer.scene.canvas.focus(); };
+    sectionBox.addEventListener('change', () => sectionButton.classList.toggle('active', sectionBox.checked));
+  }
   document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) => b.onclick = () => { viewCommand(b.dataset.view!); viewer.scene.canvas.focus(); });
 }
 
