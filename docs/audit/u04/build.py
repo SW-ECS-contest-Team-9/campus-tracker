@@ -10,6 +10,7 @@ import json, pathlib
 import numpy as np
 from shapely.geometry import Polygon, LineString, Point, shape
 from shapely.ops import unary_union
+from shapely import set_precision
 HERE = pathlib.Path(__file__).parent; REPO = HERE.parents[2]; STR = REPO / 'frontend' / 'public' / 'structures'
 r2 = lambda v: round(float(v), 2)
 GEO = json.loads((HERE.parent / 'u02' / 'georef.json').read_text(encoding='utf-8')); MX = np.array(GEO['matrix']); RES = GEO['residualM']['rms']
@@ -77,7 +78,8 @@ S_DOOR = float((DOOR - WA) @ w)
 FORECOURT = Polygon([ws_(S_DOOR - 5.0, 1.0), ws_(S_DOOR - 5.0, 6.5), ws_(S_DOOR + 8.0, 6.5), ws_(S_DOOR + 8.0, 1.0)])   # 은주관 문 앞(서쪽 벽 옆 폭 5.5 m): 사진 14 를 찍은 자리
 KEEP_B1 = unary_union([HOLE_B1.buffer(0.3), THROAT,
                        FORECOURT, lane(DOOR, SBN, 4.0), Point(SBN).buffer(2.5), lane(H_OUT, H_OUT - V * 5.0, 3.0), Point(H_OUT).buffer(2.0)])   # 은주관 문·운동장 계단 발치, 혜인관 통로 어귀
-KEEP_B2 = unary_union([HOLE_B2.buffer(0.25), lane(RB - U * 0.5, RB + U * 7.5, 7.0)])              # U08: 경사로(ㄴ자) 판 자리 전부와, 발치에서 주차 줄 방향(북동)으로 나오는 자리(북쪽 벽 앞 통로까지). 지하 2층 배치는 추정
+LN = np.array(RP['legNorthDir'])   # U09: 북쪽 다리 = 서쪽 벽과 나란히(북)
+KEEP_B2 = unary_union([HOLE_B2.buffer(0.25), lane(RB - LN * 0.5, RB + LN * 7.5, 7.0)])              # U08: 경사로(ㄴ자) 판 자리 전부와, 발치에서 주차 줄 방향(북동)으로 나오는 자리(북쪽 벽 앞 통로까지). 지하 2층 배치는 추정
 
 def level(keep, hole, z, tag, inner):
     out = []; dropped = 0
@@ -91,8 +93,8 @@ def level(keep, hole, z, tag, inner):
             if len(mine) < 2: dropped += len(mine); continue   # 혼자 남은 칸은 두지 않는다
             out.append({'block': b['id'], 'id': f"{b['id']}{'abc'[j] if hasattr(g, 'geoms') else ''}", 'polygon': part, 'stalls': mine, 'rows': b['rows']})
     solid = unary_union([o['polygon'] for o in out])
-    raw = inner.difference(solid).difference(hole)
-    aisle = raw.buffer(-0.6, join_style=2).buffer(0.6, join_style=2).intersection(raw).buffer(0)      # 폭 1.2 m 가 안 되는 틈(묶음과 벽 사이, 경사로 옆)은 길이 아니다
+    raw = set_precision(inner.difference(solid).difference(hole.buffer(0)), 0.001)   # U09: 2자리로 적힌 경사로 외곽의 실금 때문에 겹침 계산이 깨지지 않게 1 mm 격자에 맞춘다
+    aisle = set_precision(raw.buffer(-0.6, join_style=2).buffer(0.6, join_style=2), 0.001).intersection(raw).buffer(0)      # 폭 1.2 m 가 안 되는 틈(묶음과 벽 사이, 경사로 옆)은 길이 아니다
     aisle = max(aisle.geoms, key=lambda g: g.area) if hasattr(aisle, 'geoms') else aisle
     aisle = aisle.simplify(0.02)
     return {'tag': tag, 'z': z, 'blocks': out, 'aisle': aisle, 'dropped': dropped, 'stalls': sum(len(o['stalls']) for o in out), 'stallArea': solid.area}
@@ -157,9 +159,9 @@ FEATS[-1]['properties']['surface'] = 'carriageway'
 def area_body(lv, name, extra):
     a = lv['aisle']; open_ring = lambda r: [[r2(x), r2(y)] for x, y in list(r.coords)[:-1]]
     return {'name': name, 'kind': 'parking', 'elevationM': lv['z'], 'coordinates': open_ring(a.exterior), 'holes': [open_ring(r) for r in a.interiors],
-            'note': f"U04. 사용자 지시 2026-10-12: 주차 자리를 뺀 나머지를 길로. 주차장 평면(U02 + U05 의 목, 학교 지도 외곽)에서 주차 칸 묶음 {len(lv['blocks'])}개와 층 사이 경사로 자리(U08, ㄴ자)를 뺀 면. 차와 사람이 함께 쓴다(kind parking). 묶음 배치는 학교 지도(원천, 좌표 맞춤 잔차 RMS {RES} m), 칸 치수 {STALL_W} × {STALL_D} m 는 추정. {extra}"}
+            'note': f"U04. 사용자 지시 2026-10-12: 주차 자리를 뺀 나머지를 길로. 주차장 평면(U09: 학교 지하도 지도의 사다리꼴 그대로 + U05 의 목)에서 주차 칸 묶음 {len(lv['blocks'])}개와 층 사이 경사로 자리(U09, 서쪽 벽에 맞춘 ㄴ자)를 뺀 면. 차와 사람이 함께 쓴다(kind parking). 묶음 배치는 학교 지도(원천, 좌표 맞춤 잔차 RMS {RES} m), 칸 치수 {STALL_W} × {STALL_D} m 는 추정. {extra}"}
 bodies = {'b1': area_body(B1, '운동장 지하 1층 주차장 통로 면', 'U05·U07: 지하 차도가 북서 모서리의 목으로 곧게 들어와, 북쪽 변의 칸 묶음과 긴 줄 머리 사이의 통로(학교 지도가 비워 둔 자리)로 이어진다. 접속: 북서 들머리(지하 차도), 층 사이 경사로 머리(ㄴ자의 남쪽 다리 끝, 긴 줄 S07·S08 사이 통로), 은주관 문·운동장 계단 발치, 혜인관 통로 어귀.'),
-          'b2': area_body(B2, '운동장 지하 2층 주차장 통로 면', '배치는 지하 1층과 같게 두고(추정) 층 사이 경사로 판 자리(ㄴ자: 남쪽 다리·모서리·북쪽 다리)와 발치 앞의 칸을 뺐다. 접속: 경사로 발치 하나(걷는 길 없음).')}
+          'b2': area_body(B2, '운동장 지하 2층 주차장 통로 면', '배치는 지하 1층과 같게 두고(추정) 층 사이 경사로 판 자리(ㄴ자: 남쪽 다리·모서리·서쪽 벽과 나란한 북쪽 다리)와 발치 앞의 칸을 뺐다. 접속: 경사로 발치 하나(걷는 길 없음).')}
 for k, b in bodies.items(): (HERE / 'areas' / f'{k}.json').write_text(json.dumps(b, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 
 # ---------- 길 변경 묶음: 주차장 안의 추정 선을 거두고, 혜인관 계단 발치에서 벽을 지나 통로 면에 닿는 통로만 새로 ----------
