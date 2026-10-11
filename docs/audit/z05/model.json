@@ -5,7 +5,7 @@
   "roadPieces": 37,
   "handOther": 5,
   "planes": 51,
-  "boxes": 274,
+  "boxes": 269,
   "terrainSurfaces": 93,
   "edgeSamples": 1855,
   "z04": {
@@ -605,7 +605,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 33
+   "boxes": 28
   },
   "cheongun": {
    "title": "청운관 앞",

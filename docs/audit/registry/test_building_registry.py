@@ -213,6 +213,13 @@ class Registry(unittest.TestCase):
         self.assertEqual(got[0]['faces'], [{'azimuth': 26, 'grade': '확정', 'spread': 30, 'wall': 'ivy'}, {'azimuth': 180, 'grade': '추정', 'style': 'none', 'columns': 4}])
         self.assertTrue(br.appearance.from_note(head(z07.replace('방향: 남,', '방향: 위,')))[1])
         self.assertTrue(br.appearance.from_note(head(z07.replace('값: 담쟁이, 출처: 사진, 등급: 확정', '값: 담쟁이')))[1])   # a face needs its evidence and grade too
+        # Z11: the building's own window size and paired windows
+        z11 = look.replace('창: {모양: 낱창,', '창: {모양: 낱창, 폭: 1.2, 높이: 1.5, 간격: 4.4, 창턱: 0.9, 쌍: true,')
+        got, bad = br.appearance.from_note(head(z11))
+        self.assertEqual(bad, [])
+        self.assertEqual(got[0]['windows'], {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'widthM': 1.2, 'heightM': 1.5, 'pitchM': 4.4, 'sillM': 0.9, 'paired': True})
+        self.assertTrue(br.appearance.from_note(head(z11.replace('간격: 4.4', '간격: 2.0')))[1])   # two windows of 1.2 m do not fit in 2 m
+        self.assertTrue(br.appearance.from_note(head(z11.replace('폭: 1.2', '폭: 넓게')))[1])
 
     def test_check_and_write_commands(self):
         d = folder(가관=ROOF, 나관=PARTS)

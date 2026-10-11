@@ -41,16 +41,18 @@ stairs('hyein', 'Z05-HYEIN-PORCH-STAIR', hD + hR * 11.1 + hn * 1.6, hD + hR * 3.
 # Z10: 입구(3) 계단을 건물 서쪽 모서리 옆으로 옮긴다. 거리뷰 GS25 01·02: 문은 정면의 맨 서쪽 칸(GS25 간판이 붙은 모서리 기둥 바로 옆)이고, 계단은 회차 공간 쪽으로 곧게 내려오며 양옆에 비스듬한 화강석 난간벽이 있다. Z05 의 자리(모서리에서 9.5 m)는 표지 ±7 m 로 잡은 것이었다
 bf = unit((78.0, -41.0)); bn = np.array([bf[1], -bf[0]]); bn = bn if bn[1] < 0 else -bn   # bf = 남서 정면 방향, bn = 포장면 쪽
 b3 = np.array([201004.8, 557387.2]) + bf * 4.0   # 서쪽 모서리에서 정면을 따라 4.0 m = 계단 가운데(모서리 기둥 1.5 m + 계단 폭 5 m 의 반)
-BSRC = '건물 노트 북악관(입구(3): 1층 복도 134.1 m, 문 앞 지면 131.4 m, 보행 기록의 높이차 2.6~2.9 m), streetview-bukak-gs25-202502-01.png, streetview-bukak-gs25-202502-02.png'
-BG = '확정(자리: 정면 맨 서쪽 칸, 회차 공간 쪽으로 곧게 내려옴, 양옆 화강석 난간벽: 거리뷰), 원천(층), S-MAP(문 앞 지면), 추정(단 수·폭 5 m, 1층 바닥 134.1)'
-stairs('back-paths', 'Z05-BUKAK-ENTRANCE3-STAIR', b3 + bn * 6.2, b3 + bn * 1.4, 5.0, 17, 131.4, 134.1, '북악관 입구(3) 앞 계단: 포장면(131.4 m)에서 정면 벽 쪽으로 17단(2.7 m ÷ 0.159, 디딤 0.28 m) 올라 1층 복도 문 앞(134.1 m). 거리뷰에서는 12단 안팎으로 보인다(단 수는 높이차에서 계산한 값이라 추정)', BSRC, grade=BG, basePlane='회차 공간 포장면')
-box('back-paths', 'Z05-BUKAK-ENTRANCE3-LANDING', 'landing', rect(b3 + bn * 0.7, bf, 2.5, 0.7), 131.1, 134.1, '북악관 입구(3) 문 앞 참 134.1 m', BSRC, grade=BG, basePlane='회차 공간 포장면')
+# Z11: 바깥 계단은 12단(거리뷰 02 에서 센 수)이고 문 앞 참은 133.3 m 다. 1층 복도 134.1 m 까지 남는 0.8 m 는 문 안의 단(정문이 바깥 12단 + 안쪽 5단인 것과 같은 짜임: 사용자 확정은 정문만, 입구(3)은 추정).
+#      보행 기록의 2.6~2.9 m 는 1층 복도에서 바깥 바닥까지라 그대로다(줄이지 않는다). 17단은 그 전체를 바깥 계단 하나에 실은 계산이었다
+BSRC = '건물 노트 북악관(입구(3): 1층 복도 134.1 m, 문 앞 참 133.3 m, 문 앞 지면 131.4 m, 보행 기록의 높이차 2.6~2.9 m = 바깥 12단 1.9 m + 문 안 0.8 m), streetview-bukak-gs25-202502-01.png, streetview-bukak-gs25-202502-02.png'
+BG = '확정(자리: 정면 맨 서쪽 칸, 회차 공간 쪽으로 곧게 내려옴, 양옆 화강석 난간벽: 거리뷰), 원천(층), S-MAP(문 앞 지면), 확정(바깥 계단 12단 안팎: 거리뷰에서 셈), 추정(단 높이 0.158 m·폭 5 m, 문 앞 참 133.3 = 131.4 + 12단, 문 안의 단 0.8 m)'
+stairs('back-paths', 'Z05-BUKAK-ENTRANCE3-STAIR', b3 + bn * 6.2, b3 + bn * 1.4, 5.0, 12, 131.4, 133.3, '북악관 입구(3) 앞 계단: 포장면(131.4 m)에서 정면 벽 쪽으로 12단(단 높이 0.158 m, 디딤 0.40 m) 올라 문 앞 참(133.3 m). 1층 복도(134.1 m)까지 남는 0.8 m 는 문 안의 단(추정)', BSRC, grade=BG, basePlane='회차 공간 포장면')
+box('back-paths', 'Z05-BUKAK-ENTRANCE3-LANDING', 'landing', rect(b3 + bn * 0.7, bf, 2.5, 0.7), 131.1, 133.3, '북악관 입구(3) 문 앞 참 133.3 m(유리문이 이 높이에 있다: 거리뷰 02)', BSRC, grade=BG, basePlane='회차 공간 포장면')
 for _side, _s in (('W', -2.5), ('E', 2.5)):   # 비스듬한 화강석 난간벽: 네 마디로 줄임(윗선 = 그 마디 위쪽 끝의 디딤 높이 + 0.9 m), 문 앞 참 옆은 한 높이
     for _j in range(4):
         _d0, _d1 = 6.2 - 4.8 * _j / 4, 6.2 - 4.8 * (_j + 1) / 4
-        box('back-paths', f'Z10-BUKAK-ENTRANCE3-CHEEK-{_side}{_j + 1}', 'wall', rect(b3 + bf * (_s + (0.2 if _s > 0 else -0.2)) + bn * (_d0 + _d1) / 2, bn, (_d0 - _d1) / 2, 0.2), 131.0, 131.4 + 2.7 * (_j + 1) / 4 + 0.9, '입구(3) 계단 옆의 비스듬한 화강석 난간벽(두께 0.4 m, 디딤 위 0.9 m: 거리뷰 눈대중). 네 마디의 단으로 줄여 그림', BSRC, grade=BG, basePlane='회차 공간 포장면', material='stone')
-    box('back-paths', f'Z10-BUKAK-ENTRANCE3-CHEEK-{_side}5', 'wall', rect(b3 + bf * (_s + (0.2 if _s > 0 else -0.2)) + bn * 0.7, bn, 0.7, 0.2), 131.0, 135.0, '입구(3) 문 앞 참 옆 난간벽', BSRC, grade=BG, basePlane='회차 공간 포장면', material='stone')
-box('back-paths', 'Z10-BUKAK-ENTRANCE3-DOOR', 'wall', rect(b3 + bn * 0.06, bf, 2.0, 0.08), 134.1, 137.0, '입구(3) 유리문 면(폭 4 m, 높이 2.9 m: 거리뷰 눈대중)', BSRC, grade=BG, basePlane='Z05-BUKAK-ENTRANCE3-LANDING', material='glass')
+        box('back-paths', f'Z10-BUKAK-ENTRANCE3-CHEEK-{_side}{_j + 1}', 'wall', rect(b3 + bf * (_s + (0.2 if _s > 0 else -0.2)) + bn * (_d0 + _d1) / 2, bn, (_d0 - _d1) / 2, 0.2), 131.0, 131.4 + 1.9 * (_j + 1) / 4 + 0.9, '입구(3) 계단 옆의 비스듬한 화강석 난간벽(두께 0.4 m, 디딤 위 0.9 m: 거리뷰 눈대중). 네 마디의 단으로 줄여 그림', BSRC, grade=BG, basePlane='회차 공간 포장면', material='stone')
+    box('back-paths', f'Z10-BUKAK-ENTRANCE3-CHEEK-{_side}5', 'wall', rect(b3 + bf * (_s + (0.2 if _s > 0 else -0.2)) + bn * 0.7, bn, 0.7, 0.2), 131.0, 134.2, '입구(3) 문 앞 참 옆 난간벽', BSRC, grade=BG, basePlane='회차 공간 포장면', material='stone')
+box('back-paths', 'Z10-BUKAK-ENTRANCE3-DOOR', 'wall', rect(b3 + bn * 0.06, bf, 2.0, 0.08), 133.3, 136.2, '입구(3) 유리문 면(폭 4 m, 높이 2.9 m: 거리뷰 눈대중)', BSRC, grade=BG, basePlane='Z05-BUKAK-ENTRANCE3-LANDING', material='glass')
 
 # ---- 주차장 입구(벽면의 문틀) ----
 pl = LINES['P-LOW']; pu = LINES['P-UP']

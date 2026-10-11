@@ -323,7 +323,9 @@ export interface BuildingAppearance {
   wall: string;
   wallColor?: string;
   /** Window rows: one per storey at the note's floor heights (MSL), or `count` equal storeys when the note has no floor table. */
-  windows?: { style: WindowStyle; floorsM?: number[]; count?: number; color?: string; accent?: string; /** the lines go on above the last floor of the table up to the roof (Z07) */ toRoof?: boolean };
+  windows?: { style: WindowStyle; floorsM?: number[]; count?: number; color?: string; accent?: string; /** the lines go on above the last floor of the table up to the roof (Z07) */ toRoof?: boolean;
+    /** Z11 the building's own window instead of the size of the style: width and height of one window, spacing of the windows (or pairs) along the wall, sill above the floor (m); `paired`: two windows side by side at every position. */
+    widthM?: number; heightM?: number; pitchM?: number; sillM?: number; paired?: boolean };
   /**
    * Wall faces that differ from the rest (Z07), chosen by the compass direction the wall faces (degrees, north 0, east 90;
    * `spread`: how far off a wall may face, default 45): another wall material or colour, another window style ('none': no

@@ -140,3 +140,29 @@ test('Z09 두 겹 지붕: 아래 지붕 위에 벽 띠와 작은 윗지붕(한 �
   assert.ok(Math.abs(Math.max(...zs(two)) - Math.max(...zs(one)) - 0.9) < 1e-6);
   assert.ok(tris(two) > tris(one));
 });
+
+test('Z11 그 동의 창 크기: 폭·높이·간격·창턱을 노트 값으로, 쌍이면 자리마다 창 둘', () => {
+  const own = { wall: 'brick', windows: { style: 'rows' as const, floorsM: [100, 104], widthM: 1.2, heightM: 1.6, pitchM: 5, sillM: 1.0 } };
+  const one = decorate([block], { roofM: 108, groundM: 100 }, own);
+  // 긴 변 40 m: 간격 5 m 로 7칸, 짧은 변 12 m: 2칸 → 한 층 18칸, 두 층
+  assert.equal(tris(one), 18 * 2 * 2);
+  const z = zs(one);
+  assert.ok(Math.abs(Math.min(...z) - 101) < 1e-9 && z.some((v) => Math.abs(v - 102.6) < 1e-9)); // 창턱 1.0, 높이 1.6
+  const xs = one.positions.filter((_, i) => i % 3 === 0 && Math.abs(one.positions[i + 1] - (Y0 - 0.08)) < 1e-6);
+  assert.ok(Math.abs(Math.max(...xs) - Math.min(...xs) - (6 * 5 + 1.2)) < 1e-6); // 남쪽 벽: 첫 창 왼쪽 끝 ~ 마지막 창 오른쪽 끝
+  const pair = decorate([block], { roofM: 108, groundM: 100 }, { ...own, windows: { ...own.windows, paired: true } });
+  assert.equal(tris(pair), 2 * tris(one));
+  // 크기를 주지 않은 동은 전과 같다
+  assert.equal(tris(decorate([block], { roofM: 120, groundM: 100 }, brick)), 30 * 6 * 2);
+  // 벽면에서 다른 창 모양을 준 면은 그 모양의 기본 크기(동의 크기를 쓰지 않는다)
+  const faced = decorate([block], { roofM: 108, groundM: 100 }, { ...own, faces: [{ azimuth: 180, style: 'bands' as const }] });
+  assert.equal(tris(faced), (18 - 7 + 6) * 2 * 2); // 남쪽 벽만 띠창 6칸
+});
+
+test('Z11 띠창의 덧색: 층마다 벽 길이의 밝은 띠 하나가 창 밑에 깔린다', () => {
+  const ribbon = { wall: 'brick', windows: { style: 'bands' as const, floorsM: [100, 104], color: '#4d5f66' } };
+  const plain = decorate([block], { roofM: 108, groundM: 100 }, ribbon);
+  const banded = decorate([block], { roofM: 108, groundM: 100 }, { ...ribbon, windows: { ...ribbon.windows, accent: '#dcd8c8' } });
+  assert.equal(tris(banded) - tris(plain), 4 * 2 * 2); // 벽 넷, 층 둘
+});
+

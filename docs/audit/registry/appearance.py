@@ -21,6 +21,10 @@ Z09 에서 더한 것:
       밑동: {색: "#rrggbb", 위_높이: m(없으면 기초만), 출처, 등급}   # 건물이 올라선 기단·옹벽: 기초와 위_높이 아래 벽을 이 색으로, 창 없이
 Z10 에서 더한 것:
       지붕.테두리 가 모임지붕에 있으면 처마(밑면과 가장자리 띠)를 그 색으로 그린다(짙은 금속판 지붕층: 밝은 처마가 없다)
+Z11 에서 더한 것:
+      창.폭: m(창 하나의 폭), 창.높이: m(창 하나의 높이), 창.간격: m(벽을 따라 창(또는 쌍)이 되풀이되는 간격), 창.창턱: m(층 바닥에서 창 밑까지), 창.쌍: true(자리마다 창 둘을 나란히)
+            # 없으면 모양의 기본 크기. 그 동의 창 모양을 그리는 벽에만 쓴다(벽면에서 다른 모양을 준 면은 그 모양의 기본 크기)
+      띠창의 덧색: 창 줄이 놓이는 밝은 띠의 색(벽 전체 길이)
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정).
 """
@@ -94,6 +98,16 @@ def from_note(head):
                 rec['windows'] = {'style': STYLES[win['모양']], 'floorsM': floors}
                 color(win, '색', rec['windows'], 'color'); color(win, '덧색', rec['windows'], 'accent')
                 if win.get('지붕까지') is True: rec['windows']['toRoof'] = True
+                for key, name, lo, hi in (('폭', 'widthM', 0.3, 12), ('높이', 'heightM', 0.3, 6), ('간격', 'pitchM', 0.5, 20), ('창턱', 'sillM', 0, 3)):   # Z11: 그 동의 창 크기
+                    v = win.get(key)
+                    if v is None: continue
+                    if not isinstance(v, (int, float)) or isinstance(v, bool) or not lo <= v <= hi: bad.append(f'{at}.창.{key} 는 {lo}~{hi} m'); continue
+                    rec['windows'][name] = v
+                if win.get('쌍') is not None:
+                    if win['쌍'] is not True: bad.append(f'{at}.창.쌍 은 true')
+                    else: rec['windows']['paired'] = True
+                w_, p_ = rec['windows'].get('widthM'), rec['windows'].get('pitchM')
+                if w_ is not None and p_ is not None and p_ < (2 * w_ if rec['windows'].get('paired') else w_): bad.append(f'{at}.창.간격 이 창 폭보다 좁다')
         faces = []
         for k, f in enumerate(e.get('벽면') or []):
             fa = f'{at}.벽면[{k}]'

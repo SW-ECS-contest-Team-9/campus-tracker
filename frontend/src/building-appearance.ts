@@ -1,6 +1,7 @@
 // How a building looks beyond its plain block (F07): wall colour, window rows per storey, a pitched roof with an
 // eave. The record comes from the building notes through the scene API (SceneBuilding.appearance); nothing here is
-// measured from photos, the shapes are schematic (one window size per style, square panels, a roof inset by a fixed run).
+// measured from photos, the shapes are schematic (square panels, a roof inset by a fixed run). A window has the size of its
+// style unless the note gives the building its own (Z11: width, height, spacing, sill, paired windows).
 // Pure geometry in EPSG:5186 metres + MSL heights (tested in test/building-appearance.test.ts); campus-map.ts draws it.
 import earcut from 'earcut';
 import type { BuildingAppearance } from './api';
@@ -45,6 +46,8 @@ const STYLES = {
   // Z09: straight piers through all the storeys with deep balconies between them (a dark recess, a railing band and a window strip per floor, a beam on top)
   piers: { pitch: 4.6, width: 3.7, sill: 0, head: 99, gap: 0 },
 } as const;
+/** Z11 paired windows: the pier between the two windows of a pair. */
+const PAIR_GAP = 0.25;
 /** The bays between straight piers (style `piers`): how far the piers stand out, the balcony railing band, the window strip above it. */
 const PIERS = { depth: 0.9, railM: 1.15, railDepth: 0.45, rail: '#6d6f73', recess: '#3a3d40', glassFrom: 1.35, glassTo: 2.5, beam: 1.0 };
 /** A row of tall columns in front of a wall face (Z07): column width and spacing, how far they stand out, the beam on top. */
@@ -198,9 +201,17 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
           out.pier(p, u, n, s0 - 0.4, s0 + span + 0.4, z1 - COLONNADE.beam, z1, COLONNADE.depth + 0.2, col);
           clear = [s0 - 0.5, s0 + span + 0.5, z0 - 0.5];
         }
-        const style = face?.style === 'none' ? null : face?.style ? STYLES[face.style] : baseStyle;
+        const preset = face?.style === 'none' ? null : face?.style ? STYLES[face.style] : baseStyle;
         const kind = face?.style ?? a.windows?.style;
-        if (!style) continue;
+        if (!preset) continue;
+        // Z11: the building's own window size (the note), on the walls that show the building's own style
+        const own = kind === a.windows?.style ? a.windows : undefined;
+        const pane = own?.widthM ?? preset.width, paired = own?.paired === true && kind !== 'bays' && kind !== 'piers';
+        const group = paired ? 2 * pane + PAIR_GAP : pane;
+        const sillM = own?.sillM ?? preset.sill;
+        const style = { width: group, pitch: own?.pitchM ?? (group > preset.width ? Math.max(preset.pitch, group + 0.4) : preset.pitch), sill: sillM, head: own?.heightM !== undefined ? sillM + own.heightM : preset.head, gap: preset.gap };
+        /** The glass of the window (or the pair) that starts at `s`. */
+        const panes = (s: number, w: number): [number, number][] => (paired && w >= group - 0.01 ? [[s, s + pane], [s + pane + PAIR_GAP, s + w]] : [[s, s + w]]);
         let count = Math.floor((len - 0.6) / style.pitch), width: number = style.width, pitch: number = style.pitch;
         if (count < 1) { count = 1; width = Math.min(width, len - 0.3); pitch = len - 0.6; }
         const start = (len - count * pitch) / 2 + (pitch - width) / 2;
@@ -246,14 +257,25 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         levels.forEach(([z0, z1], k) => {
           if (z0 < hidden - 0.5) return;
           const sill = z0 + style.sill, head = Math.min(z0 + style.head, z1 - style.gap);
+          // Z11 a ribbon: the light band the windows of a row sit in, along the whole wall
+          if (accent && kind === 'bands' && !behind(0, z0)) out.panel(p, u, n, 0.2, len - 0.2, sill - 0.3, head + 0.3, 0.06, accent);
           for (let c = 0; c < count; c++) {
             const s = start + c * pitch;
             if (behind(s, z0)) continue;
-            out.panel(p, u, n, s, s + width, sill, head, 0.08, glass);
-            // the panel under the window: the accent colour and grey in a checker (the real pattern is irregular)
-            if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, sill - 0.05, 0.08, (c + k) % 2 ? infill : accent);
-            if ((kind === 'arches' && k === levels.length - 1) || kind === 'archrows') { // the bay ends in a round head (drawn flatter when the wall above is short)
-              const r = width / 2, ry = kind === 'archrows' ? Math.min(r, z1 - style.gap - head + 0.3) : Math.min(r, top - head - 0.4);
+            // the panel of the bay: the accent colour and grey in a checker (the real pattern is irregular); it shows under the window and between paired ones
+            if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, paired ? head + 0.15 : sill - 0.05, paired ? 0.06 : 0.08, (c + k) % 2 ? infill : accent);
+            for (const [s0, s1] of panes(s, width)) {
+              out.panel(p, u, n, s0, s1, sill, head, 0.08, glass);
+              if (kind !== 'archrows') continue; // every small window ends in a round head (drawn flatter when the storey above is short)
+              const r = (s1 - s0) / 2, ry = Math.min(r, z1 - style.gap - head + 0.3);
+              if (ry > 0.3) {
+                const at = (t: number) => { const q1 = s0 + r - r * Math.cos(t); return [p[0] + u[0] * q1 + n[0] * 0.08, p[1] + u[1] * q1 + n[1] * 0.08, head + ry * Math.sin(t)]; };
+                const centre = [p[0] + u[0] * (s0 + r) + n[0] * 0.08, p[1] + u[1] * (s0 + r) + n[1] * 0.08, head];
+                for (let j = 0; j < 8; j++) out.tri(centre, at((j * Math.PI) / 8), at(((j + 1) * Math.PI) / 8), glass);
+              }
+            }
+            if (kind === 'arches' && k === levels.length - 1) { // the bay ends in a round head (drawn flatter when the wall above is short)
+              const r = width / 2, ry = Math.min(r, top - head - 0.4);
               if (ry > 0.3) {
                 const at = (t: number) => { const s1 = s + r - r * Math.cos(t); return [p[0] + u[0] * s1 + n[0] * 0.08, p[1] + u[1] * s1 + n[1] * 0.08, head + ry * Math.sin(t)]; };
                 const centre = [p[0] + u[0] * (s + r) + n[0] * 0.08, p[1] + u[1] * (s + r) + n[1] * 0.08, head];
