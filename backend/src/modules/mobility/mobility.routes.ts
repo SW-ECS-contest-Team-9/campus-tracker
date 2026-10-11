@@ -41,6 +41,30 @@ mobilityRoutes.get('/mobility/roads', async (_req, res) => {
   res.json({ roads: rows });
 });
 
+// GET /api/v1/mobility/elevators — the elevator segments the roads endpoint leaves out (F09: the preview's lifted floor view and
+// first-person walk step between floors with them). Same fields as the roads; read-only.
+mobilityRoutes.get('/mobility/elevators', async (_req, res) => {
+  const { rows } = await pool.query(
+    `SELECT id, name, road_class "roadClass", structure, vehicle_access "vehicleAccess", width_m "widthM", level_id "levelId", building_id "buildingId",
+            from_node_id "fromNodeId", to_node_id "toNodeId", ST_AsGeoJSON(geom, 3)::json geometry
+       FROM mobility.road_segments WHERE status IN ('DRAFT', 'APPROVED') AND structure = 'elevator' ORDER BY created_at, id`,
+  );
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ roads: rows });
+});
+
+// GET /api/v1/mobility/places — the places of the editor (entrances, facilities, stops), read-only, for the preview (F09).
+// Only what the editor shows on the map: name, category, building, level and the point (EPSG:5186 x, y, MSL height).
+// No description, no author, no times.
+mobilityRoutes.get('/mobility/places', async (_req, res) => {
+  const { rows } = await pool.query(
+    `SELECT id, name, category, building_id "buildingId", level_id "levelId", ST_AsGeoJSON(geom, 3)::json geometry
+       FROM mobility.places WHERE status IN ('DRAFT', 'APPROVED') ORDER BY name, id`,
+  );
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ places: rows });
+});
+
 // GET /api/v1/mobility/edits?limit=50 — latest QGIS edits (audit log)
 mobilityRoutes.get('/mobility/edits', async (req, res) => {
   const { limit } = z.object({ limit: z.coerce.number().int().min(1).max(500).default(50) }).parse(req.query);

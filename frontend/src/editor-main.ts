@@ -12,6 +12,10 @@ import { areaSurfacePart } from './road-surface-layer';
 import { SceneLayers, bindLayerControls } from './scene-layers';
 import { editorLayerData } from './scene-layer-data';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
+import { declutter as keepTags, textWidth } from './label-layout';
+import { shortName } from './level-view';
+import { isUnderground } from './road-surface';
+import { LABELS, MAP_LINE_SCALE, bindViewStyleControls, onViewStyle, viewStyle, viewStyleControls } from './view-style';
 
 let areaEditor: AreaEditor | null = null;
 
@@ -158,13 +162,14 @@ root.innerHTML = `
         <section class="editor-section"><h2>면 표시 · 단면도</h2>
           <label class="inline-check" title="차도·포장면 영역과 거기에 붙은 넓은 보행로를 한 검은 면으로 (프리뷰의 '차도'와 같음)"><input id="layer-ground" type="checkbox" checked> 차도 면</label>
           <label class="inline-check" title="실외 보행로·계단·횡단 길을 회색 면으로 (프리뷰의 '보행로'와 같음)"><input id="layer-pedestrian" type="checkbox" checked> 보행로 면</label>
-          <label class="inline-check" title="지하에 있는 길을 저장된 높이에 면으로. 땅·건물에 가린 부분도 비쳐 보임"><input id="layer-underground" type="checkbox"> 지하 길</label>
+          <label class="inline-check" title="지하에 있는 길을 저장된 높이에 면으로. 땅·건물에 가린 부분도 비쳐 보임. 끄면 지하 길의 편집 선·지하 장소도 땅 너머로 비치지 않음(고른 길은 보임)"><input id="layer-underground" type="checkbox"> 지하 길</label>
           <label class="inline-check" title="운동장처럼 면으로 채우는 공간 영역. 포장면 영역은 '차도 면'에 들어 있음"><input id="layer-area" type="checkbox" checked> 영역</label>
           <label class="inline-check" title="구조물 파일(기단·계단·참·화단·벽·데크)을 덩어리로 (프리뷰의 '구조물'과 같음). 기단 안의 길 면은 기단 윗면에 색으로만 칠해짐"><input id="layer-structures" type="checkbox" checked> 구조물</label>
           <label class="inline-check" title="캠퍼스 안의 옛 등고선 지형을 숨기고, 기단·길 면이 없는 곳은 중립 바닥(미확정)으로 (프리뷰의 '캠퍼스 바닥 정리'와 같음). 커서 높이는 전처럼 서버 지형 값"><input id="layer-campus-ground" type="checkbox" checked> 캠퍼스 바닥 정리</label>
           <label class="inline-check" title="켜고 지도에서 두 점을 찍으면 그 선을 따라 세로로 잘라 카메라 쪽 절반을 숨김. 끄면 원래대로"><input id="layer-section" type="checkbox"> 단면도</label>
           <div id="layer-section-tools" hidden><div class="feature-actions"><button id="layer-section-look" type="button" title="자른 면을 정면에서 멀리 보기(원근 없는 보기)">단면 보기</button><button id="layer-section-flip" type="button" title="숨기는 쪽을 반대로">반대쪽</button></div></div>
           <div id="layer-section-status" class="editor-hint"></div>
+          <div id="view-style-row" class="view-style-row" title="보기 설정: 편집 선 굵기, 장소 이름표 밀도(없음 / 주요: 짧은 이름·겹치면 중요한 것만 / 전체), 단면도·층 따로 보기에서 나머지를 흐리게·숨김. 프리뷰와 같은 설정"></div>
           <div class="editor-hint">면은 편집 선 아래에 깔리는 보기 전용입니다(눌리지 않음). 선의 색(층)·모양(유형)은 그대로이고, 저장 전 편집도 잠시 뒤 면에 반영됩니다.</div>
         </section>
         <section class="editor-section"><h2>경로 표시</h2>
@@ -587,15 +592,25 @@ function stairChevrons(c: XYZ[]): XYZ[][] {
 }
 /** The light halo of a road line: [where it is seen, where something is in front of it]. Made on first use (Cesium is loaded by then). */
 let roadHalo: [any, any] | null = null;
+/**
+ * F09: an underground way while the "지하 길" toggle is off (and it is not the selected one): its line is drawn, but it
+ * does not show through the ground or a building (no see-through material, not among the see-through centre lines).
+ */
+const buriedRoads = new Set<string>();
+const isBuried = (r: Road) => !(sceneLayers?.surfaces.isVisible('underground') ?? true) && isUnderground(r) && selectedRoad?.id !== r.id;
 function drawRoad(r: Road) {
   const coords = r.geometry.coordinates;
   if (coords.length < 2) return;
   const positions = coords.map(drawPoint);
   roadWorld.set(r.id, positions);
   computeRoadStyle(r);
+  const buried = isBuried(r);
+  if (buried) buriedRoads.add(r.id);
+  /** What a line looks like where something is in front of it: nothing for a buried way. */
+  const through = <T>(material: T): T | undefined => (buried ? undefined : material);
   const common = { positions, arcType: C.ArcType.NONE };
   const focus = selectedRoad?.id === r.id;
-  const base = r.structure === 'elevator' ? 8 : CLASS_WIDTH[r.roadClass] ?? 5;
+  const base = Math.max(2, Math.round((r.structure === 'elevator' ? 8 : CLASS_WIDTH[r.roadClass] ?? 5) * MAP_LINE_SCALE[viewStyle().line]));
   const width = focus ? base + 3 : base;
   const css = roadCss(r);
   if (focus) {
@@ -606,11 +621,11 @@ function drawRoad(r: Road) {
   // sidewalks get a light edge instead of the dark casing
   const casing = r.structure === 'sidewalk' ? new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(0.95)) : styleProperty(r.id, 'casing');
   // Z08: a thin light halo outside the dark casing, so a line reads on the black asphalt and on the grey paving alike
-  if (r.structure !== 'sidewalk') addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 8 : 7), material: (roadHalo ??= [0.7, 0.2].map((alpha) => new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(alpha))) as [any, any])[0], depthFailMaterial: roadHalo[1] } });
-  addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 5 : 4), material: casing, depthFailMaterial: casing } });
-  addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: roadMaterial(r, 'line'), depthFailMaterial: roadMaterial(r, 'fail') } });
+  if (r.structure !== 'sidewalk') addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 8 : 7), material: (roadHalo ??= [0.7, 0.2].map((alpha) => new C.ColorMaterialProperty(C.Color.fromCssColorString('#f4f1e6').withAlpha(alpha))) as [any, any])[0], depthFailMaterial: through(roadHalo[1]) } });
+  addEntity({ polyline: { ...common, width: width + (r.roadClass === 'vehicle' ? 5 : 4), material: casing, depthFailMaterial: through(casing) } });
+  addEntity({ id: `editor:road:${r.id}`, polyline: { ...common, width, material: roadMaterial(r, 'line'), depthFailMaterial: buried ? undefined : roadMaterial(r, 'fail') } });
   if (r.structure === 'stairs') for (const chevron of stairChevrons(coords)) {
-    addEntity({ polyline: { positions: chevron.map(drawPoint), width: 2.5, arcType: C.ArcType.NONE, material: C.Color.WHITE.withAlpha(0.95), depthFailMaterial: C.Color.WHITE.withAlpha(0.6) } });
+    addEntity({ polyline: { positions: chevron.map(drawPoint), width: 2.5, arcType: C.ArcType.NONE, material: C.Color.WHITE.withAlpha(0.95), depthFailMaterial: through(C.Color.WHITE.withAlpha(0.6)) } });
   }
   if (!prefs.solids) return;
   const tint = cssColor(css);
@@ -650,33 +665,83 @@ function drawEndpoints(coords: XYZ[], labelled: boolean) {
   marker(coords[0], '#16a34a', '시작');
   if (coords.length >= 2) marker(coords.at(-1)!, '#dc2626', '도착');
 }
+/** A lifted view or the walk is on (mountSpaceViews onChange). */
+let spaceViewOn = false;
+/**
+ * The editor's own entities (road lines, place markers and tags, the cursor, area outlines, other editors' drafts) are
+ * put away while a lifted view or the walk is on, and (F09) while a cut is on, unless the section panel's switch shows
+ * them: they would bury the cut face, which marks every way at its height itself.
+ */
+function syncEntityVisibility() {
+  const cutHides = !!sceneLayers?.section.active && !sceneLayers.section.showOverlays;
+  viewer.entities.show = !spaceViewOn && !cutHides;
+}
+/** F09: the place tags that are thinned out on screen (not at density 전체). */
+let placeTags: { entity: any; world: any; text: string; priority: number; always: boolean; shown: boolean }[] = [];
+let lastPlaceDeclutter = 0;
+/** Which kind of place keeps its tag when two would overlap: stops, car parks and destinations before the many building entrances. */
+const PLACE_RANK: Record<string, number> = { bus_stop: 6, parking: 5, landmark: 5, destination: 5, facility: 4, building_entrance: 3, other: 2 };
+/** Hides the place tags that would cover a more important one (label-layout.ts), a few times a second while the camera may move. */
+function declutterPlaceTags() {
+  if (!placeTags.length || performance.now() - lastPlaceDeclutter < 200) return;
+  lastPlaceDeclutter = performance.now();
+  const toWindow = C.SceneTransforms.worldToWindowCoordinates ?? C.SceneTransforms.wgs84ToWindowCoordinates;
+  const seen = placeTags.flatMap((tag) => {
+    const w = toWindow(viewer.scene, tag.world);
+    if (!w) return [];
+    const width = textWidth(tag.text, 12) + 12;
+    return [{ tag, x: w.x - width / 2, y: w.y - 36, w: width, h: 22, priority: tag.priority, always: tag.always }];
+  });
+  const keep = keepTags(seen, 4);
+  const visible = new Set(seen.filter((_, i) => keep[i]).map((b) => b.tag));
+  for (const tag of placeTags) {
+    const show = visible.has(tag);
+    if (show !== tag.shown) { tag.shown = show; tag.entity.label.show = show; }
+  }
+}
 function drawAll() {
   if (!viewer) return;
   sceneLayers?.section.uncutObjects();
   cleanMapEntities();
   roadWorld.clear();
+  buriedRoads.clear();
+  placeTags = [];
   for (const r of roads) drawRoad(r);
-  xrayPaths?.replace(roads.filter((r) => roadWorld.has(r.id)).map((r) => ({
+  xrayPaths?.replace(roads.filter((r) => roadWorld.has(r.id) && !buriedRoads.has(r.id)).map((r) => ({
     id: r.id, positions: roadWorld.get(r.id)!, width: selectedRoad?.id === r.id ? 6 : 4,
     color: roadStyles.get(r.id)!.line,
   })));
   xrayPaths?.setVisible(prefs.xrayPaths);
   renderLegend();
   if (prefs.endpoints === 'all') for (const r of roads) if (r.id !== selectedRoad?.id) drawEndpoints(r.geometry.coordinates, false);
+  // F09: the place tags. Density from the reading options (view-style.ts): 없음 = dots only; 주요 = the short name
+  // (the text before a bracket), and a tag that would cover a more important one is hidden (declutterPlaceTags, as the
+  // camera moves: zooming in makes room for more); 전체 = every full name. A place under the ground is not seen through
+  // it while "지하 길" is off (unless it is the selected one).
+  const density = viewStyle().labels, undergroundOn = sceneLayers?.surfaces.isVisible('underground') ?? true;
   for (const p of places) {
-    addEntity({ id: `editor:place:${p.id}`, position: drawPoint(p.geometry.coordinates), point: { pixelSize: 11,
-      color: C.Color.fromCssColorString(COLORS.place), outlineColor: C.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY },
-      label: { text: p.name, font: '12px system-ui', pixelOffset: new C.Cartesian2(0, -14), fillColor: C.Color.WHITE,
-        outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, disableDepthTestDistance: Number.POSITIVE_INFINITY } });
+    const c = p.geometry.coordinates, chosen = selectedPlace?.id === p.id;
+    const buried = !undergroundOn && !chosen && !!sceneLayers && c[2] < sceneLayers.structures.groundAt(c[0], c[1]) - 1.5;
+    const seeThrough = buried ? undefined : Number.POSITIVE_INFINITY;
+    const text = density === 'all' ? p.name : shortName(p.name, 18);
+    const entity = addEntity({ id: `editor:place:${p.id}`, position: drawPoint(c), point: { pixelSize: 11,
+      color: C.Color.fromCssColorString(COLORS.place), outlineColor: C.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: seeThrough },
+      label: LABELS[density].place && !buried ? { text, font: '600 12px system-ui', pixelOffset: new C.Cartesian2(0, -14), fillColor: C.Color.WHITE, verticalOrigin: C.VerticalOrigin.BOTTOM,
+        outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        showBackground: true, backgroundColor: C.Color.fromCssColorString('#111827').withAlpha(0.72), backgroundPadding: new C.Cartesian2(5, 3),
+        scaleByDistance: new C.NearFarScalar(150, 1, 1200, 0.8), show: density === 'all' || chosen } : undefined });
+    if (entity.label && density !== 'all') placeTags.push({ entity, world: entity.position.getValue(viewer.clock.currentTime), text, priority: PLACE_RANK[p.category] ?? 2, always: chosen, shown: chosen });
   }
+  lastPlaceDeclutter = 0;
   for (const n of nodes) {
-    const connected = roads.some((r) => (r as any).fromNodeId === n.id || (r as any).toNodeId === n.id);
-    if (!connected) continue;
+    const joined = roads.filter((r) => (r as any).fromNodeId === n.id || (r as any).toNodeId === n.id);
+    if (!joined.length) continue;
     const coords = n.geometry?.coordinates;
+    // F09: a node of buried ways only (underground, "지하 길" off) does not show through the ground either
     if (coords) addEntity({ id: `editor:node:${n.id}`, position: drawPoint(coords), point: { pixelSize: n.kind === 'junction' ? 10 : 6,
       color: C.Color.fromCssColorString(n.kind === 'junction' ? '#ffca45' : COLORS.junction),
       outlineColor: C.Color.fromCssColorString('#14251d'), outlineWidth: 2,
-      disableDepthTestDistance: Number.POSITIVE_INFINITY } });
+      disableDepthTestDistance: joined.every((r) => buriedRoads.has(r.id)) ? undefined : Number.POSITIVE_INFINITY } });
   }
   updateCursorGraphics();
   if (roadDraft?.coordinates.length) {
@@ -694,6 +759,11 @@ function drawAll() {
     color: i === selectedVertex ? C.Color.ORANGE : C.Color.WHITE, outlineColor: C.Color.fromCssColorString('#14251d'),
     outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY } }));
   drawFusionOverlay();
+  // F09: while a cut is on, the edit lines and markers are put away so they do not bury the cut face (its own marks
+  // show every way at its height); the switch in the section panel shows them again. Turning the cut off redraws.
+  const cutOn = !!sceneLayers?.section.active;
+  syncEntityVisibility();
+  buildingScene?.setShowLabels(!cutOn && !spaceViews?.level.active);
   sceneLayers?.section.cutObjects();
   scheduleLayers();
   updateReadouts(); renderLists();
@@ -1866,6 +1936,7 @@ function installControls() {
   nav.install();
   bindViewPrefs();
   viewer.scene.preRender.addEventListener(updateRoadStyles);
+  viewer.scene.preRender.addEventListener(declutterPlaceTags);
   mouseHandler = new C.ScreenSpaceEventHandler(viewer.scene.canvas);
   mouseHandler.setInputAction((movement: any) => {
     if (sceneLayers?.section.placing) return; // the click places the section line
@@ -1917,7 +1988,8 @@ async function startEditor() {
   // Surfaces start on like the preview (underground off); the road lines draw on top of them.
   sceneLayers = new SceneLayers(viewer, { grid: result.grid, scene: result.scene, pickable: false, campusTint: result.setCampusTint,
     visible: { ground: true, pedestrian: true, area: true, underground: false }, structures: { structures: true, ground: true },
-    sectionObjects: (entity) => drawnEntities.has(entity) });
+    sectionObjects: (entity) => drawnEntities.has(entity),
+    onSection: () => drawAll(), sectionOverlayLabel: '편집 선·표지도 보기' });
   void sceneLayers.loadStructures().catch((err) => console.error('structures unavailable', err));
   bindLayerControls(sceneLayers, {
     parts: { ground: $('layer-ground'), pedestrian: $('layer-pedestrian'), underground: $('layer-underground'), area: $('layer-area') },
@@ -1927,15 +1999,20 @@ async function startEditor() {
   // after the tool's own handlers: the lines are cut with the new plane, and the 원근/정사영 button follows the view
   for (const id of ['layer-section', 'layer-section-look', 'layer-section-flip']) $(id).addEventListener(id === 'layer-section' ? 'change' : 'click', () => { drawAll(); showOrthoState(); });
   for (const id of ['layer-ground', 'layer-area']) $(id).addEventListener('change', () => areaEditor?.refresh());
+  // F09: the reading options (line weight, tag density, the rest) and the underground toggle change what the edit lines and place tags show
+  $('view-style-row').innerHTML = viewStyleControls();
+  bindViewStyleControls($('view-style-row'));
+  onViewStyle(() => drawAll());
+  $('layer-underground').addEventListener('change', () => drawAll());
   spaceViews = mountSpaceViews(viewer, {
     roads: () => roads, buildings: () => buildingScene?.scene.buildings ?? [], groundAt: (x, y) => sceneLayers!.structures.groundAt(x, y),
     areas: () => editorLayerData([], null, areaEditor?.saved ?? []).areas,
     places: () => places.map((p) => ({ id: p.id, name: p.name, category: p.category, buildingId: p.buildingId, x: p.geometry.coordinates[0], y: p.geometry.coordinates[1], z: p.geometry.coordinates[2] })),
     blocked: () => { const busy = roadDraft || placeDraft || areaEditor?.active; if (busy) say('작성 중인 것을 먼저 저장하거나 취소한 뒤 켜세요.', 'warning'); return busy ? '작성 중' : null; },
     lockKeys: true, walkInputs: [$<HTMLInputElement>('layer-underground')],
-    onWalk: (on) => buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity), onLevel: (on) => buildingScene?.setShowLabels(!on),
+    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.structures.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => buildingScene?.setShowLabels(!on),
     // view only: the editor's own lines, markers and tags are put away meanwhile (they would show through what is lifted)
-    onChange: (state) => { const on = state.level || state.walk; viewer.entities.show = !on; if (on) { clearHeldKeys(); setTool('select'); } },
+    onChange: (state) => { const on = state.level || state.walk; spaceViewOn = on; syncEntityVisibility(); if (on) { clearHeldKeys(); setTool('select'); } },
   }, { level: $('view-level'), walk: $('view-walk') });
   if (import.meta.env.DEV) (window as any).__editor = { viewer, layers: sceneLayers, spaceViews };
   // The terrain-grid endpoint is binary; read it directly, matching the Preview's grid DTO.

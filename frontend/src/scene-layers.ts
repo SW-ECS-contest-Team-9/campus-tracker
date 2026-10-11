@@ -28,6 +28,10 @@ export type SceneLayersOptions = {
   pickable?: boolean;
   /** Which entities the cross-section cuts (section-layer.ts `objects`); default: all. */
   sectionObjects?: (entity: any) => boolean;
+  /** F09: called after a cut was set, changed or removed (the page hides its own name tags; the editor its edit lines). */
+  onSection?: () => void;
+  /** F09: the label of the switch in the section panel that shows the page's own lines again while a cut is on (the editor). */
+  sectionOverlayLabel?: string;
 };
 
 export class SceneLayers {
@@ -56,6 +60,9 @@ export class SceneLayers {
       areas: () => this.data.areas,
       layers: () => [options.scene, this.structures, this.surfaces, ...this.extra.map((get) => get())],
       objects: options.sectionObjects,
+      cutItems: (plane) => this.structures.cutItems(plane),
+      onChange: () => options.onSection?.(),
+      overlayToggleLabel: options.sectionOverlayLabel,
     }, (text) => this.onSectionStatus(text));
   }
 

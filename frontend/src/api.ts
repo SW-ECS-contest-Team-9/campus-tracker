@@ -323,7 +323,7 @@ export interface BuildingAppearance {
   wall: string;
   wallColor?: string;
   /** Window rows: one per storey at the note's floor heights (MSL), or `count` equal storeys when the note has no floor table. */
-  windows?: { style: WindowStyle; floorsM?: number[]; count?: number; color?: string; accent?: string; /** the lines go on above the last floor of the table up to the roof (Z07) */ toRoof?: boolean;
+  windows?: { style: WindowStyle; floorsM?: number[]; /** F09: the floor names of the note's floor table, in the order of floorsM (absent when the building has no table) */ floorNames?: string[]; count?: number; color?: string; accent?: string; /** the lines go on above the last floor of the table up to the roof (Z07) */ toRoof?: boolean;
     /** Z11 the building's own window instead of the size of the style: width and height of one window, spacing of the windows (or pairs) along the wall, sill above the floor (m); `paired`: two windows side by side at every position. */
     widthM?: number; heightM?: number; pitchM?: number; sillM?: number; paired?: boolean };
   /**
@@ -412,6 +412,9 @@ export const api = {
   scene: () => get<CampusScene>('/api/v1/scene'),
   mobility: () => get<MobilitySpaces>('/api/v1/mobility'),
   roads: () => get<{ roads: CarriagewayRoad[] }>('/api/v1/mobility/roads'),
+  /** F09: the elevator segments (left out of roads()) and the places, read-only, for the lifted floor view and the walk. */
+  elevators: () => get<{ roads: CarriagewayRoad[] }>('/api/v1/mobility/elevators'),
+  places: () => get<{ places: { id: string; name: string; category: string; buildingId: string | null; levelId: string | null; geometry: { coordinates: number[] } }[] }>('/api/v1/mobility/places'),
   terrainGrid: async (): Promise<TerrainGrid> => {
     const res = await fetch(`${API_BASE_URL}/api/v1/terrain/grid`);
     if (!res.ok) throw new Error(`terrain grid: HTTP ${res.status}`);

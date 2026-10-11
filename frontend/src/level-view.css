@@ -23,3 +23,15 @@
 /* the editor's drawing tools rest while a view is on (view only) */
 body.space-view-on [data-tool], body.space-view-on #editor-save, body.space-view-on #editor-cancel { pointer-events: none; opacity: 0.45; }
 #scene-level-view.active, #scene-first-person.active { background: #0759c7; border-color: #0759c7; color: #fff; }
+/* F09: 누른 자리 아래의 층 고르기 */
+.level-chooser { position: absolute; z-index: 6; min-width: 190px; max-width: 240px; padding: 6px; border-radius: 8px; background: #fffffff5; color: #1f2933; font: 12px/1.4 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; box-shadow: 0 4px 18px #0f172a55; display: grid; gap: 3px; }
+.level-chooser[hidden] { display: none; }
+.level-chooser-head { color: #52606d; padding: 0 2px 2px; }
+.level-chooser button { text-align: left; padding: 4px 7px; border: 1px solid #c3cad3; border-radius: 5px; background: #fff; color: #1f2933; font: inherit; cursor: pointer; }
+.level-chooser button:hover { border-color: #0759c7; background: #eff5ff; }
+.level-chooser button b { color: #0759c7; margin-right: 3px; }
+.level-chooser button span { color: #52606d; }
+/* F09: 편집기 오른쪽 패널의 보기 설정 */
+.view-style-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+.view-style-row label { display: grid; gap: 2px; font-size: 12px; color: #52606d; }
+.view-style-row select { width: 100%; padding: 3px 4px; font-size: 12px; }

@@ -5,12 +5,13 @@ import type { CarriagewayRoad, SceneBuilding } from './api';
 import { AREA_FILLS, type MobilityPick } from './mobility-map';
 import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { PAVED, buildPavedSurfaces, type Material, type PavedSurfaces, type SurfaceArea } from './paved-surface';
-import { ROAD_SURFACE, buildRoadSurfaces, flatAreaMesh, isUnderground, isUndergroundArea, type RoadMesh } from './road-surface';
+import { ROAD_SURFACE, buildRoadSurfaces, flatAreaMesh, isUnderground, isUndergroundArea, surfaceKind, type RoadMesh } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import { STRUCTURES } from './structures';
 import { clipMesh, type Mesh, type SectionPlane } from './section';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
+import { LINE_PX, VIEW_COLORS, onViewStyle, viewStyle } from './view-style';
 import type { Viewer } from './vworld';
 
 /**
@@ -104,6 +105,7 @@ export class RoadSurfaceLayer {
   constructor(private readonly viewer: Viewer, private readonly src: RoadSurfaceSources) {
     this.prims = viewer.scene.primitives.add(new (window as any).Cesium.PrimitiveCollection());
     Object.assign(this.visible, src.visible);
+    onViewStyle(() => { if (this.visible.underground) this.draw(); }); // F09: the walking lines of the underground part follow the chosen line weight
   }
 
   /** New roads and areas. The surfaces are built now if any part is shown, otherwise when one is turned on. */
@@ -296,6 +298,30 @@ export class RoadSurfaceLayer {
         allowPicking: this.src.pickable !== false,
       }));
     }
+    // F09: the walking ways underground (passages, stairs, crossings) get a line with a light casing on top of
+    // everything underground, in the colours of the lifted view: on the dark carriageway, the aisles and the voids
+    // their grey bands were hard to tell apart. They show through the ground like the bands.
+    const px = LINE_PX[viewStyle().line];
+    const instances: any[] = [];
+    // not while a cut is on: they would show through the cut face, which marks every way it cuts itself
+    for (const road of this.section ? [] : this.roads) {
+      const kind = surfaceKind(road);
+      if (!kind || kind === 'carriageway' || !isUnderground(road) || road.geometry.coordinates.length < 2) continue;
+      const css = kind === 'stairs' ? VIEW_COLORS.stairs : VIEW_COLORS.pedestrian;
+      for (const piece of [road.geometry.coordinates]) {
+        const positions = piece.map((p) => this.position(p[0], p[1], p[2] + 0.12));
+        for (const [width, color] of [[px.road + 3, C.Color.WHITE.withAlpha(0.95)], [px.road, C.Color.fromCssColorString(css)]] as [number, any][]) {
+          instances.push(new C.GeometryInstance({
+            geometry: new C.PolylineGeometry({ positions, width, arcType: C.ArcType.NONE, vertexFormat: C.PolylineColorAppearance.VERTEX_FORMAT }),
+            attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(color) },
+          }));
+        }
+      }
+    }
+    if (instances.length) add('underground', new C.Primitive({
+      geometryInstances: instances, asynchronous: false, allowPicking: false,
+      appearance: new C.PolylineColorAppearance({ translucent: true, renderState: { depthTest: { enabled: false }, depthMask: false } }),
+    }));
     this.clipGround();
   }
 }

@@ -217,7 +217,7 @@ class Registry(unittest.TestCase):
         head = lambda text: br.read_head(ROOF.replace('---', '', 1).replace('---', text, 1).join(['---', '']))
         got, bad = br.appearance.from_note(head(look))
         self.assertEqual(bad, [])
-        self.assertEqual(got, [{'id': '가관', 'wall': 'brick', 'windows': {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5]},
+        self.assertEqual(got, [{'id': '가관', 'wall': 'brick', 'windows': {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'floorNames': ['1층', '2층', '3층', '5층']},
                                 'roof': {'type': 'hipped', 'material': 'tile', 'riseM': 3.0, 'dormers': True},
                                 'grades': {'wall': '원천(학교 사진)', 'windows': '추정', 'roof': '확정'},
                                 'features': [{'what': '굽은 정면', 'evidence': '사진', 'grade': '추정', 'drawn': False}]}])
@@ -230,7 +230,7 @@ class Registry(unittest.TestCase):
             '    특징:', '    벽면:\n      - {방향: 26, 폭: 30, 값: 담쟁이, 출처: 사진, 등급: 확정}\n      - {방향: 남, 기둥: 4, 창: 없음, 출처: 사진, 등급: 추정}\n    특징:')
         got, bad = br.appearance.from_note(head(z07))
         self.assertEqual(bad, [])
-        self.assertEqual(got[0]['windows'], {'style': 'bays', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'toRoof': True})
+        self.assertEqual(got[0]['windows'], {'style': 'bays', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'floorNames': ['1층', '2층', '3층', '5층'], 'toRoof': True})
         self.assertEqual(got[0]['roof']['eaveBandM'], 1.2)
         self.assertEqual(got[0]['faces'], [{'azimuth': 26, 'grade': '확정', 'spread': 30, 'wall': 'ivy'}, {'azimuth': 180, 'grade': '추정', 'style': 'none', 'columns': 4}])
         self.assertTrue(br.appearance.from_note(head(z07.replace('방향: 남,', '방향: 위,')))[1])
@@ -239,7 +239,7 @@ class Registry(unittest.TestCase):
         z11 = look.replace('창: {모양: 낱창,', '창: {모양: 낱창, 폭: 1.2, 높이: 1.5, 간격: 4.4, 창턱: 0.9, 쌍: true,')
         got, bad = br.appearance.from_note(head(z11))
         self.assertEqual(bad, [])
-        self.assertEqual(got[0]['windows'], {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'widthM': 1.2, 'heightM': 1.5, 'pitchM': 4.4, 'sillM': 0.9, 'paired': True})
+        self.assertEqual(got[0]['windows'], {'style': 'rows', 'floorsM': [100.0, 103.5, 107.0, 110.5], 'floorNames': ['1층', '2층', '3층', '5층'], 'widthM': 1.2, 'heightM': 1.5, 'pitchM': 4.4, 'sillM': 0.9, 'paired': True})
         self.assertTrue(br.appearance.from_note(head(z11.replace('간격: 4.4', '간격: 2.0')))[1])   # two windows of 1.2 m do not fit in 2 m
         self.assertTrue(br.appearance.from_note(head(z11.replace('폭: 1.2', '폭: 넓게')))[1])
 

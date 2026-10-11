@@ -9,7 +9,18 @@
 //    afterwards are not cut until the plane is set again (approximate). The review layers of scene-local-corrections.ts are not cut.
 // The cut face: the ground profile along the line down to a base level, a height scale, the outline of each cut
 // building with its base and roof height, and a mark where a road or a level area meets the plane.
+// F09 (readability, all from view-style.ts so the choices are the same as in 층 따로 보기):
+//  - everything the plane cuts has a firm outline (slabs, voids, platforms, building walls) in the chosen line weight,
+//    a cut building is a light face with a line and a tag ("3층") per floor of its note's floor table (scene API);
+//  - roads and passages are thick cross-marks with a light casing, in the colours of the lifted view;
+//  - what stands behind the cut is dimmed by a veil just behind the face (나머지: 흐리게 / 숨김);
+//  - the tags are laid out on screen by section-overlay.ts: one per height in a column at the right edge with a
+//    leader line, names and floors where they are, none covering another; a legend and the options in a panel.
 import type { CarriagewayRoad, SceneBuilding } from './api';
+import { floorOfRoad, floorText, shortName, tableFloorName } from './level-view';
+import { SectionOverlay, type FaceTag, type LegendEntry } from './section-overlay';
+import type { CutItem } from './structures-layer';
+import { LABELS, SECTION_BACKDROP, SECTION_PX, VIEW_COLORS, onViewStyle, viewStyle } from './view-style';
 import { AREA_FILLS } from './mobility-map';
 import { ROAD_SURFACE, isUnderground, isUndergroundArea, roadWidthM, surfaceKind } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
@@ -36,6 +47,12 @@ export const SECTION = {
   offsetM: 0.05,
   /** Z08: the plain wall lookAt() may stand behind the cut, so that far buildings (as large as near ones without perspective) do not crowd the cut face. */
   backdropColor: '#f4f2ec',
+  /** F09: the veil that dims what stands behind the cut sits this far behind the plane (behind the cut ground and the cut faces of the structures). */
+  veilOffsetM: 0.12,
+  /** F09: the light face of a cut building, just in front of the plane: the scene layer closes a cut building with a wall in the plane (bricks, windows, glass), which this face fades so that the floor lines read; a hint of the wall colour stays. */
+  buildingFace: '#fffdf7', buildingFaceOffsetM: -0.02, buildingFaceAlpha: 0.86,
+  /** F09: a box (stair step, wall, planter ...) narrower than this on the cut gets no outline of its own. */
+  outlineMinM: 0.4,
 };
 
 export type Cuttable = { setSection(plane: SectionPlane | null): void };
@@ -51,6 +68,12 @@ export type SectionSources = {
   surfaces: () => { color: string; mesh: Mesh }[];
   /** The layers that cut their own shapes. */
   layers: () => (Cuttable | null)[];
+  /** F09: what the plane cuts of the structures (structures-layer.ts cutItems): outlined and named on the face. */
+  cutItems?: (plane: SectionPlane) => CutItem[];
+  /** F09: called after a cut was set, changed or removed (a page hides its own name tags and edit lines meanwhile). */
+  onChange?: () => void;
+  /** F09: a page whose own lines would bury the face (the editor) names the switch that shows them again; they are hidden while a cut is on unless it is checked. */
+  overlayToggleLabel?: string;
   /**
    * Which map objects (entities) are cut; default: all. A page that draws its entities again and again (the editor)
    * names the ones it redraws and calls uncutObjects() before and cutObjects() after each redraw.
@@ -73,8 +96,17 @@ export class SectionTool {
   private perspective: any = null;
   /** Distance behind the cut of the plain backdrop wall, or null (lookAt sets it). */
   private backdropM: number | null = null;
+  /** F09: the page's own lines and markers stay visible although a cut is on (the panel's switch; default: hidden). */
+  showOverlays = false;
+  private readonly overlay: SectionOverlay;
 
-  constructor(private readonly viewer: Viewer, private readonly src: SectionSources, private readonly onStatus: (text: string) => void) {}
+  constructor(private readonly viewer: Viewer, private readonly src: SectionSources, private readonly onStatus: (text: string) => void) {
+    this.overlay = new SectionOverlay(viewer, { overlayToggleLabel: src.overlayToggleLabel, onOverlayToggle: (show) => { this.showOverlays = show; this.src.onChange?.(); } });
+    onViewStyle(() => this.refresh());
+  }
+
+  /** The tags as laid out on screen (scripted checks). */
+  get tags() { return this.overlay.placed; }
 
   get active() { return this.plane !== null; }
 
@@ -143,6 +175,7 @@ export class SectionTool {
     this.perspective = null;
     this.backdropM = null;
     this.onStatus('');
+    this.src.onChange?.();
   }
 
   /**
@@ -201,6 +234,7 @@ export class SectionTool {
     this.uncutObjects();
     for (const p of this.drawn) this.viewer.scene.primitives.remove(p);
     this.drawn = [];
+    this.overlay.hide();
   }
 
   private apply() {
@@ -223,6 +257,7 @@ export class SectionTool {
     this.cutMapObjects(plane);
     this.drawFace(plane);
     this.onStatus(`단면 ${Math.abs(this.frame.to - this.frame.from).toFixed(0)} m`);
+    this.src.onChange?.();
   }
 
   /** Entities and point collections that are in the scene now (tracks, markers, hand-drawn spaces above the ground). */
@@ -345,46 +380,140 @@ export class SectionTool {
       })));
     }
 
+    // ---- F09: what is drawn on the face, in the chosen line weight ----
+    const style = viewStyle(), px = SECTION_PX[style.line], show = LABELS[style.labels];
+    const quad = (corners: unknown[], css: string, alpha: number) => {
+      const values = new Float64Array((corners as { x: number; y: number; z: number }[]).flatMap((c) => [c.x, c.y, c.z]));
+      this.drawn.push(this.viewer.scene.primitives.add(new C.Primitive({
+        geometryInstances: new C.GeometryInstance({
+          geometry: new C.Geometry({
+            attributes: { position: new C.GeometryAttribute({ componentDatatype: C.ComponentDatatype.DOUBLE, componentsPerAttribute: 3, values }) } as any,
+            indices: new Uint32Array([0, 1, 2, 0, 2, 3]), primitiveType: C.PrimitiveType.TRIANGLES, boundingSphere: C.BoundingSphere.fromVertices(values as unknown as number[]),
+          }),
+          attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString(css).withAlpha(alpha)) },
+        }),
+        appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: alpha < 1, closed: false }), asynchronous: false, allowPicking: false,
+      })));
+    };
+    // what stands behind the cut is dimmed (or hidden): a veil just behind the face. The face itself stays at full contrast.
+    const backdrop = SECTION_BACKDROP[style.others];
+    quad([at(0, base, SECTION.veilOffsetM), at(plane.length, base, SECTION.veilOffsetM), at(plane.length, top + 300, SECTION.veilOffsetM), at(0, top + 300, SECTION.veilOffsetM)], VIEW_COLORS.backdrop, 1 - backdrop);
+    // a cut building: a light face, so its floors read
+    for (const { b, from, to } of buildings) quad([at(from, b.baseM, SECTION.buildingFaceOffsetM), at(to, b.baseM, SECTION.buildingFaceOffsetM), at(to, b.roofM, SECTION.buildingFaceOffsetM), at(from, b.roofM, SECTION.buildingFaceOffsetM)], SECTION.buildingFace, SECTION.buildingFaceAlpha);
+
     const lines = new C.PolylineCollection();
-    const labels = new C.LabelCollection();
+    const tags: FaceTag[] = [];
     const line = (positions: unknown[], css: string, width: number, alpha = 1) => lines.add({ positions, width, material: C.Material.fromType('Color', { color: C.Color.fromCssColorString(css).withAlpha(alpha) }) });
-    const label = (d: number, z: number, text: string, css = SECTION.lineColor, right = false) => labels.add({
-      position: front(d, z), text, font: '12px system-ui, "Apple SD Gothic Neo", sans-serif', fillColor: C.Color.fromCssColorString(css), outlineColor: C.Color.WHITE, outlineWidth: 3,
-      style: C.LabelStyle.FILL_AND_OUTLINE, horizontalOrigin: right ? C.HorizontalOrigin.RIGHT : C.HorizontalOrigin.LEFT, verticalOrigin: C.VerticalOrigin.BOTTOM,
-      pixelOffset: new C.Cartesian2(right ? -4 : 4, -2), disableDepthTestDistance: Number.POSITIVE_INFINITY,
-    });
+    /** A cross-mark with a light casing, so it reads on a dark slab and on a light void alike. */
+    const mark = (d0: number, z0: number, d1: number, z1: number, css: string, width = px.mark) => {
+      line([front(d0, z0), front(d1, z1)], '#ffffff', width + 3, 0.95);
+      line([front(d0, z0), front(d1, z1)], css, width);
+    };
+    const inFrame = (from: number, to = from) => to >= lo - 2 && from <= hi + 2;
+    const clampD = (d: number) => Math.min(hi, Math.max(lo, d));
     // seen from the hidden side A → B runs left to right when the kept side is on its left (not flipped)
     const leftEnd = this.picked!.flip ? Math.max(this.frame.from, this.frame.to) : Math.min(this.frame.from, this.frame.to);
-    const rightEnd = this.frame.from + this.frame.to - leftEnd;
     for (const z of heightTicks(base, top)) {
-      line([front(0, z), front(plane.length, z)], SECTION.lineColor, 1, 0.3);
-      label(leftEnd, z, `${z} m`);
-      label(rightEnd, z, `${z} m`, SECTION.lineColor, true);
+      line([front(0, z), front(plane.length, z)], SECTION.lineColor, px.grid, 0.22);
+      tags.push({ kind: 'tick', world: front(leftEnd, z), text: `${z} m` });
     }
-    line(profile.map((s) => front(s.d, s.z)), SECTION.lineColor, 2);
-    for (const { b, from, to } of buildings) {
-      line([front(from, b.baseM), front(from, b.roofM), front(to, b.roofM), front(to, b.baseM), front(from, b.baseM)], SECTION.lineColor, 2);
-      label((from + to) / 2, b.roofM, `${b.name ?? ''} ${b.baseM.toFixed(1)}–${b.roofM.toFixed(1)} m`.trim());
+    line(profile.map((s) => front(s.d, s.z)), SECTION.lineColor, px.cut);
+
+    // the structures the plane cuts: firm outlines (voids and platforms in the cut weight, small boxes thin)
+    const cutItems = this.src.cutItems?.(plane) ?? [];
+    // an underground space made of many pieces of one name (a sloping passage: a piece per step of its floor) is one
+    // thing on the face: named once, with the heights of its two ends, not a tag per piece
+    const spaces = new Map<string, { from: number; to: number; pieces: typeof cutItems }>();
+    for (const item of cutItems) {
+      if (item.solid.role !== 'void' || !item.name || !inFrame(item.from, item.to)) continue;
+      const g = spaces.get(item.name) ?? { from: Infinity, to: -Infinity, pieces: [] };
+      g.from = Math.min(g.from, item.from); g.to = Math.max(g.to, item.to); g.pieces.push(item);
+      spaces.set(item.name, g);
     }
+    for (const [name, g] of spaces) {
+      const floors = new Set(g.pieces.map((p) => p.bottomM.toFixed(1)));
+      const low = g.pieces.reduce((a, b) => (b.bottomM < a.bottomM ? b : a)), high = g.pieces.reduce((a, b) => (b.bottomM > a.bottomM ? b : a));
+      const widest = g.pieces.reduce((a, b) => (Math.min(hi, b.to) - Math.max(lo, b.from) > Math.min(hi, a.to) - Math.max(lo, a.from) ? b : a));
+      const mid = (clampD(widest.from) + clampD(widest.to)) / 2;
+      if (floors.size <= 2) {
+        if (g.to - g.from > 3) tags.push({ kind: 'title', world: front(mid, (widest.bottomM + widest.topM) / 2 - 0.4), text: name, sub: `${widest.bottomM.toFixed(1)}–${widest.topM.toFixed(1)} m`, priority: 7 });
+        for (const piece of floors.size === 1 ? [widest] : [low, high]) {
+          tags.push({ kind: 'level', world: front(clampD(piece.to), piece.bottomM), z: piece.bottomM, d: piece.to, name: `${name} 바닥`, priority: 5, rank: 'major' });
+          tags.push({ kind: 'level', world: front(clampD(piece.to), piece.topM), z: piece.topM, d: piece.to, name: `${name} 천장`, priority: 3, rank: 'major' });
+        }
+      } else {
+        const at = g.pieces.reduce((a, b) => (Math.abs((b.from + b.to) / 2 - (g.from + g.to) / 2) < Math.abs((a.from + a.to) / 2 - (g.from + g.to) / 2) ? b : a));
+        tags.push({ kind: 'title', world: front((clampD(at.from) + clampD(at.to)) / 2, at.topM + 0.3), text: name, sub: `바닥 ${low.bottomM.toFixed(1)}–${high.bottomM.toFixed(1)} m`, priority: 7 });
+        tags.push({ kind: 'level', world: front((clampD(low.from) + clampD(low.to)) / 2, low.bottomM), z: low.bottomM, d: low.to, name: `${name} 바닥(낮은 끝)`, priority: 5, rank: 'major' });
+        tags.push({ kind: 'level', world: front((clampD(high.from) + clampD(high.to)) / 2, high.bottomM), z: high.bottomM, d: high.to, name: `${name} 바닥(높은 끝)`, priority: 5, rank: 'major' });
+      }
+    }
+    for (const item of cutItems) {
+      const role = item.solid.role, wide = item.to - item.from >= SECTION.outlineMinM;
+      if (role !== 'box' || wide) {
+        const width = role === 'box' ? Math.max(1, px.cut - 1.5) : px.cut;
+        for (const polygon of item.polygons) for (const ring of polygon) line([...ring, ring[0]].map(([d, z]) => front(d, z)), role === 'void' ? VIEW_COLORS.outline : SECTION.lineColor, width, role === 'box' ? 0.8 : 1);
+      }
+      if (!inFrame(item.from, item.to)) continue;
+      const mid = (clampD(item.from) + clampD(item.to)) / 2;
+      if (role === 'void') continue; // named above, as one space
+      if (item.name && item.to - item.from >= 0.3) {
+        tags.push({ kind: 'level', world: front(mid, item.topM), z: item.topM, d: mid, name: item.name, priority: role === 'platform' ? 2 : 4, rank: 'minor' });
+      }
+    }
+
+    // buildings: the cut outline, a line and a tag per floor of the note's floor table, the name above the roof
+    const floorTagged = new Set<string>();
+    // from the left of the view on, so that a building cut twice (a ring, two wings) has its floor tags on its first stretch
+    for (const { b, from, to } of [...buildings].sort((p, q) => (this.picked!.flip ? q.to - p.to : p.from - q.from))) {
+      line([front(from, b.baseM), front(from, b.roofM), front(to, b.roofM), front(to, b.baseM), front(from, b.baseM)], SECTION.lineColor, px.cut + 0.5);
+      if (!inFrame(from, to)) continue;
+      const w = b.appearance?.windows, floors = w?.floorsM ?? [], names = w?.floorNames?.length === floors.length ? w!.floorNames! : null;
+      const leftD = this.picked!.flip ? clampD(to) : clampD(from);
+      floors.forEach((m, i) => {
+        if (m <= b.baseM - 2.5 || m >= b.roofM - 0.5) return;
+        line([front(from, m), front(to, m)], VIEW_COLORS.floorLine, px.floor, 0.9);
+        const name = names ? tableFloorName(names[i]) : '';
+        const key = `${b.buildingId.split('#')[0]}:${m}`;
+        if (!show.floor || floorTagged.has(key)) return;
+        floorTagged.add(key);
+        tags.push({ kind: 'floor', world: front(leftD, m), text: name ? (show.road ? `${name} ${m.toFixed(1)}` : name) : `${m.toFixed(1)} m`, priority: 3 });
+      });
+      const name = b.name ?? '';
+      if (name) tags.push({ kind: 'title', world: front((clampD(from) + clampD(to)) / 2, b.roofM), text: name, sub: `${b.baseM.toFixed(1)}–${b.roofM.toFixed(1)} m`, priority: 8 + Math.min(1, (to - from) / 200), low: front((clampD(from) + clampD(to)) / 2, Math.max(b.baseM, b.terrainMinM ?? b.baseM)) });
+    }
+
     // the merged ground surfaces where the plane cuts them, at the height they are drawn at
-    for (const s of surfaces) for (const [p, q] of s.cuts) line([front(p[0], p[1] + 0.05), front(q[0], q[1] + 0.05)], s.color, 6);
-    for (const { a, from, to, below, first } of areas) {
+    for (const s of surfaces) for (const [p, q] of s.cuts) line([front(p[0], p[1] + 0.05), front(q[0], q[1] + 0.05)], s.color, Math.max(3, px.mark - 2));
+    for (const { a, from, to, below } of areas) {
       const css = AREA_FILLS.find((f) => f.match(a))?.color ?? SECTION.areaColor;
-      if (below) line([front(from, a.elevationM! + 0.05), front(to, a.elevationM! + 0.05)], ROAD_SURFACE.colors.carriageway, 6);
-      else if (!AREA_FILLS.some((f) => f.match(a))) line([front(from, a.elevationM!), front(to, a.elevationM!)], css, 4);
-      if (!below || first) label((from + to) / 2, a.elevationM!, `${a.name ?? '영역'} ${a.elevationM!.toFixed(1)} m`);
+      if (below) mark(from, a.elevationM! + 0.05, to, a.elevationM! + 0.05, VIEW_COLORS.aisle);
+      else if (!AREA_FILLS.some((f) => f.match(a))) line([front(from, a.elevationM!), front(to, a.elevationM!)], css, Math.max(3, px.mark - 3));
+      if (inFrame(from, to)) tags.push({ kind: 'level', world: front(clampD(to), a.elevationM!), z: a.elevationM!, d: to, name: shortName(a.name ?? '영역', 18), priority: 6, rank: 'major' });
     }
-    const labelled = new Set<string>();
+    // roads and passages that are not ground surfaces (underground, indoor): thick cross-marks in the colours of the lifted view
+    const crossings = new Map<string, number[]>();
+    for (const r of roads) if (inFrame(r.d)) crossings.set(r.road.id, [...(crossings.get(r.road.id) ?? []), r.z]);
     for (const r of roads) {
-      const css = r.kind ? ROAD_SURFACE.colors[r.kind] : SECTION.indoorColor;
-      line([front(r.d - r.half, r.z), front(r.d + r.half, r.z)], css, 6);
-      // one label per height within 5 m, and (Z08) one per road within 15 m: a way that runs along the cut meets it at every bend
-      const keys = [`${Math.round(r.d / 5)}:${r.z.toFixed(1)}`, `${r.road.id}:${Math.round(r.d / 15)}`];
-      if (keys.some((key) => labelled.has(key))) continue;
-      for (const key of keys) labelled.add(key);
-      const name = r.kind && r.road.name ? r.road.name.split(' (')[0] : '';
-      label(r.d + r.half, r.z, `${r.z.toFixed(1)} m${name ? ` ${name.length > 16 ? `${name.slice(0, 15)}…` : name}` : ''}`);
+      const road = r.road, walk = road.roadClass === 'pedestrian';
+      const css = !r.kind ? VIEW_COLORS.indoor : road.structure === 'stairs' ? VIEW_COLORS.stairs : walk ? VIEW_COLORS.pedestrian : VIEW_COLORS.vehicle;
+      mark(r.d - r.half, r.z, r.d + r.half, r.z, css);
+      if (!inFrame(r.d)) continue;
+      // a way that runs along the cut meets it at every bend: only its lowest and highest crossing are named
+      const zs = crossings.get(road.id)!;
+      if (zs.length > 2 && r.z !== Math.min(...zs) && r.z !== Math.max(...zs)) continue;
+      const floor = road.buildingId ? floorOfRoad(road) : null;
+      const name = shortName(road.name, 18) || (floor !== null ? floorText(floor) : '');
+      tags.push({ kind: 'level', world: front(r.d + r.half, r.z), z: r.z, d: r.d, name, priority: walk ? 4 : 3, rank: 'way' });
     }
-    this.drawn.push(this.viewer.scene.primitives.add(lines), this.viewer.scene.primitives.add(labels));
+    this.drawn.push(this.viewer.scene.primitives.add(lines));
+
+    const legend: LegendEntry[] = [
+      { color: SECTION.faceColor, label: '자른 땅', shape: 'fill' }, { color: '#9a968e', label: '자른 구조물(기단·슬래브)', shape: 'fill' }, { color: VIEW_COLORS.outline, label: '빈 곳(지하 공간)', shape: 'box' },
+      { color: SECTION.lineColor, label: '건물 윤곽', shape: 'box' }, { color: VIEW_COLORS.floorLine, label: '층 바닥(노트 층 표)' },
+      { color: VIEW_COLORS.vehicle, label: '차도', shape: 'thick' }, { color: VIEW_COLORS.pedestrian, label: '보행 길', shape: 'thick' }, { color: VIEW_COLORS.stairs, label: '계단', shape: 'thick' },
+      { color: VIEW_COLORS.indoor, label: '실내 길', shape: 'thick' }, { color: VIEW_COLORS.aisle, label: '주차장 통로 면', shape: 'thick' }, { color: VIEW_COLORS.leader, label: '높이 지시선', shape: 'dash' },
+    ];
+    this.overlay.show(tags, legend, `단면도 · ${Math.abs(this.frame.to - this.frame.from).toFixed(0)} m`, this.showOverlays);
   }
 }

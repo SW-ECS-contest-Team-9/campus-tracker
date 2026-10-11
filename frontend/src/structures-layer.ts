@@ -18,6 +18,8 @@ import type { Viewer } from './vworld';
 
 export type StructurePart = 'structures' | 'ground';
 export type StructurePick = { kind: 'structure'; id: string };
+/** Something the section plane cuts (cutItems): its cut face as polygons of [distance from A, height], the stretch it spans, its heights in the middle of that. */
+export type CutItem = { solid: Solid; polygons: Polygon[]; from: number; to: number; topM: number; bottomM: number; name: string | null };
 /** The visible road / area surfaces as drawn (RoadSurfaceLayer.drawn()). */
 export type DrawnSurfaces = { surfaces: KnownSurface[]; covered: { color: string; pattern?: number; polygons: Polygon[] }[] };
 
@@ -58,6 +60,7 @@ export class StructuresLayer {
   private version = 0;
   private visible: Record<StructurePart, boolean> = { structures: true, ground: true };
   private underground = false;
+  private walkInside = false;
   private section: SectionPlane | null = null;
   private drawnSurfaces: DrawnSurfaces = { surfaces: [], covered: [] };
   private campus: Polygon[] | null = null;
@@ -114,6 +117,16 @@ export class StructuresLayer {
   /** The voids (underground spaces inside the platforms) show with the underground ways. */
   setUnderground(visible: boolean) {
     this.underground = visible;
+    this.draw();
+  }
+
+  /**
+   * F09: while the first-person walk is inside (underground or indoors) the void boxes are not drawn: they show through
+   * whatever is in front of them, so from inside one they would cover the schematic room of the walk (first-person.ts).
+   */
+  setWalkInside(inside: boolean) {
+    if (inside === this.walkInside) return;
+    this.walkInside = inside;
     this.draw();
   }
 
@@ -327,7 +340,7 @@ export class StructuresLayer {
       this.prims.add(lines);
     }
     if (plane && this.visible.structures) this.drawCutFaces(plane);
-    else if (this.underground && this.visible.structures) this.drawVoids();
+    else if (this.underground && this.visible.structures && !this.walkInside) this.drawVoids();
     this.viewer.scene.requestRender?.();
   }
 
@@ -374,67 +387,52 @@ export class StructuresLayer {
   }
 
   /**
+   * F09: what the section plane cuts, for the cut face of section-layer.ts (outlines and name tags): each solid with
+   * the polygons of its cut face ([distance from A, height] points), and each void as a rectangle per stretch.
+   * `name`: what it is called on the face (STRUCTURES.sectionLabels, a void's own name), null for the rest.
+   */
+  cutItems(plane: SectionPlane): CutItem[] {
+    const voids = this.solids.filter((s) => s.role === 'void');
+    const items: CutItem[] = [];
+    if (!this.visible.structures) return items;
+    for (const solid of this.solids) {
+      if (solid.role === 'void') continue;
+      const inside = voids.filter((v) => solid.role === 'platform' && (v.props.inside === undefined || v.props.inside === solid.id));
+      const polygons = sectionCaps(plane, solid, inside, this.platformPolygons.get(solid) ?? [solid.polygon]);
+      const points = polygons.flat(2);
+      if (!points.length) continue;
+      const from = Math.min(...points.map((p) => p[0])), to = Math.max(...points.map((p) => p[0]));
+      const [x, y] = planePoint(plane, (from + to) / 2);
+      items.push({ solid, polygons, from, to, topM: topHeight(solid)(x, y), bottomM: solid.bottomM, name: STRUCTURES.sectionLabels[solid.role === 'platform' ? 'platform' : solid.type] ?? null });
+    }
+    for (const v of voids) for (const [from, to] of polygonIntervals(plane, v.polygon)) {
+      items.push({ solid: v, polygons: [[[[from, v.bottomM], [to, v.bottomM], [to, v.topM], [from, v.topM]]]], from, to, topM: v.topM, bottomM: v.bottomM, name: voidName(v) });
+    }
+    return items;
+  }
+
+  /**
    * The faces the section plane cuts through the solids, filled in a darker tone of their colour, just in front of the
-   * cut ground of section-layer.ts. A void inside a platform is a hole in that face: drawn in the background colour
-   * with its floor and ceiling height.
+   * cut ground of section-layer.ts. A void inside a platform is a hole in that face, drawn in the background colour.
+   * Their outlines and names are drawn by section-layer.ts from cutItems() (F09: one layout for every tag of the face).
    */
   private drawCutFaces(plane: SectionPlane) {
     const C = (window as any).Cesium;
-    const voids = this.solids.filter((s) => s.role === 'void');
     const parts: Drawable[] = [];
     const face = (polygons: Polygon[], rgb: number[], off: number) => {
       const { points, indices } = fillPolygons(polygons);
       const positions = points.flatMap(([d, z]) => { const [x, y] = planePoint(plane, d, off); return [x, y, z]; });
       if (indices.length) parts.push({ mesh: { positions, indices }, stride: 3, rgb: () => rgb });
     };
-    const labels = new C.LabelCollection();
-    // where: above the point, below it (inside the mass), or one line higher than `above` (clear of a road's own label at the same height)
-    const text = (d: number, z: number, value: string, where: 'above' | 'below' | 'higher' = 'above') => {
-      const [x, y] = planePoint(plane, d, -0.05);
-      labels.add({
-        position: this.position(x, y, z), text: value, font: '12px system-ui, "Apple SD Gothic Neo", sans-serif',
-        fillColor: C.Color.fromCssColorString('#3b352d'), outlineColor: C.Color.WHITE, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
-        horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: where === 'below' ? C.VerticalOrigin.TOP : C.VerticalOrigin.BOTTOM,
-        pixelOffset: new C.Cartesian2(0, where === 'below' ? 3 : where === 'higher' ? -20 : -3), disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      });
-    };
-    const named = new Map<string, number[]>();
-    for (const solid of this.solids) {
-      if (solid.role === 'void') continue;
-      const inside = voids.filter((v) => solid.role === 'platform' && (v.props.inside === undefined || v.props.inside === solid.id));
-      const caps = sectionCaps(plane, solid, inside, this.platformPolygons.get(solid) ?? [solid.polygon]);
+    for (const item of this.cutItems(plane)) {
+      const solid = item.solid;
+      if (solid.role === 'void') face(item.polygons, css(STRUCTURES.voidFace), 0.01);
       // a box that stands inside a void (`inVoid`: the columns and the ramp of a basement) is drawn in front of the void's face
-      face(caps, css(solidColors(solid).body).map((v) => v * 0.8), solid.role === 'box' && solid.props?.inVoid === true ? 0.005 : 0.03);
-      // the height of what is cut, in numbers (STRUCTURES.sectionLabels)
-      const name = STRUCTURES.sectionLabels[solid.role === 'platform' ? 'platform' : solid.type];
-      const points = caps.flat(2);
-      if (!name || !points.length) continue;
-      const from = Math.min(...points.map((p) => p[0])), to = Math.max(...points.map((p) => p[0])), mid = (from + to) / 2;
-      const seen = named.get(name) ?? [];
-      if (to - from < 0.3 || seen.some((d) => Math.abs(d - mid) < STRUCTURES.sectionLabelGapM)) continue;
-      named.set(name, [...seen, mid]);
-      const [x, y] = planePoint(plane, mid);
-      const top = topHeight(solid)(x, y);
-      if (solid.role === 'platform') text(mid, top, `${name} ${top.toFixed(1)} m`, 'below');
-      else if (solid.type === 'landing') text(mid, top, `${name} ${top.toFixed(1)} m`, 'below');
-      else if (solid.type === 'deck') text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`, 'higher');
-      else text(mid, top, `${name} ${solid.bottomM.toFixed(1)}–${top.toFixed(1)} m`);
-    }
-    // one label per 15 m of the cut for each name: stacked levels (a basement of two storeys) are each named
-    const last = new Map<string, number>();
-    for (const v of voids) {
-      const name = voidName(v);
-      for (const [from, to] of polygonIntervals(plane, v.polygon)) {
-        face([[[[from, v.bottomM], [to, v.bottomM], [to, v.topM], [from, v.topM]]]], css(STRUCTURES.voidFace), 0.01);
-        if (from - (last.get(name) ?? -Infinity) < 15) continue;
-        last.set(name, from);
-        text((from + to) / 2, (v.bottomM + v.topM) / 2, `${name} ${v.bottomM.toFixed(1)}–${v.topM.toFixed(1)} m`);
-      }
+      else face(item.polygons, css(solidColors(solid).body).map((v) => v * 0.8), solid.role === 'box' && solid.props?.inVoid === true ? 0.005 : 0.03);
     }
     // not cut again: the faces lie in the plane
     const instances = parts.map((d) => this.instance(d));
     if (instances.length) this.prims.add(new C.Primitive({ geometryInstances: instances, appearance: pavingAppearance(C), asynchronous: false, allowPicking: false }));
-    this.prims.add(labels);
   }
 
   /** What the detail panel shows for a structure: name, kind, heights, evidence grade (estimated ones marked). */

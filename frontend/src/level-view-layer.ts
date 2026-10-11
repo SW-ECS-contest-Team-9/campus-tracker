@@ -10,12 +10,13 @@
 // The pure part is level-view.ts. first-person.ts (the walk) is started from here as well (mountSpaceViews).
 import type { SceneBuilding } from './api';
 import './level-view.css';
+import { declutter as keepTags, textWidth } from './label-layout';
 import {
-  LEVEL_VIEW, baseBuildingId, buildingFloors, explode, floorIndexAt, isConnector, parseZones, shortName, zoneAt, zoneContent,
+  FAN, LEVEL_VIEW, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, isConnector, levelsUnder, parseZones, shortName, zoneAt, zoneContent,
   type Floor, type LvArea, type LvPlace, type LvRoad, type Zone,
 } from './level-view';
 import { FirstPerson } from './first-person';
-import type { Polygon } from './polygon-ops';
+import { polygonArea, polygonOps, type Polygon } from './polygon-ops';
 import { ribbon, roadWidthM, type P3 } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import { SOLID_STRIDE, STRUCTURES, parseStructures, solidColors, solidMesh, type Solid } from './structures';
@@ -79,6 +80,12 @@ export class LevelView {
   private animation = 0;
   private lastDeclutter = 0;
   private message = '';
+  /** F09: the small list of what lies under a click (the ground zone and the underground levels below it). */
+  private readonly chooser: HTMLElement;
+  /** What the chooser offers now (scripted checks): zone ids, the ground zone first. */
+  choices: string[] = [];
+  /** F09: the direction the floors of the lifted building are fanned out in (the default camera looks along it). */
+  private fanHeading: number | null = null;
 
   constructor(private readonly viewer: any, private readonly src: SpaceViewSources, private readonly changed: () => void) {
     this.C = (window as any).Cesium;
@@ -88,6 +95,14 @@ export class LevelView {
     viewer.container.append(this.panel);
     this.panel.addEventListener('change', (e) => this.onPanelChange(e));
     this.panel.addEventListener('click', (e) => this.onPanelClick(e));
+    this.chooser = document.createElement('div');
+    this.chooser.className = 'level-chooser';
+    this.chooser.hidden = true;
+    viewer.container.append(this.chooser);
+    this.chooser.addEventListener('click', (e) => {
+      const id = (e.target as HTMLElement).closest<HTMLElement>('[data-zone]')?.dataset.zone;
+      if (id) { this.closeChooser(); this.showZone(id); }
+    });
     window.addEventListener('keydown', (e) => this.onKey(e), true);
     viewer.scene.postRender.addEventListener(() => this.declutter());
     onViewStyle(() => { if (this.active) { this.draw(false); this.renderPanel(); } });
@@ -134,6 +149,7 @@ export class LevelView {
     } else {
       this.active = false;
       this.unit = null;
+      this.closeChooser();
       this.src.onLevel?.(false);
       this.clear();
       this.panel.hidden = true;
@@ -156,6 +172,7 @@ export class LevelView {
   /** A map click while the view is on. true: the click is used up (the page does nothing with it). */
   handleClick(position: any): boolean {
     if (!this.active) return false;
+    this.closeChooser();
     const scene = this.viewer.scene;
     const picked = scene.pick(position);
     if (picked && (this.prims.includes(picked.primitive) || this.prims.includes(picked.collection))) return true; // on what is lifted
@@ -163,10 +180,32 @@ export class LevelView {
     if (id?.kind === 'building' && id.buildingId) { this.showBuilding(baseBuildingId(id.buildingId)); return true; }
     const p = this.pickPoint(position);
     if (!p) return true;
+    const groundM = this.src.groundAt(p.x, p.y);
     // an underground zone only when what was hit lies under the ground as drawn (its height range also holds the road above a tunnel)
-    const zone = zoneAt(this.zones, p.x, p.y, p.z < this.src.groundAt(p.x, p.y) - 1.5 ? p.z : undefined);
-    if (zone) this.showZone(zone.id); else this.say('구획 밖입니다(캠퍼스 안을 누르세요).');
+    const zone = zoneAt(this.zones, p.x, p.y, p.z < groundM - 1.5 ? p.z : undefined);
+    // F09: the click hit the ground and there are underground levels under it: offer them (the ground hides them from a click)
+    const under = zone?.layer === 'underground' ? [] : levelsUnder(this.zones, p.x, p.y, groundM, this.src.roads());
+    if (under.length) this.openChooser(position, [...(zone ? [zone] : []), ...under]);
+    else if (zone) this.showZone(zone.id);
+    else this.say('구획 밖입니다(캠퍼스 안을 누르세요).');
     return true;
+  }
+
+  /** F09: the list of what lies under the clicked point, beside it: the ground zone and each underground level below, highest first. */
+  private openChooser(position: { x: number; y: number }, zones: Zone[]) {
+    const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+    this.choices = zones.map((z) => z.id);
+    this.chooser.innerHTML = `<div class="level-chooser-head">이 자리의 층</div>${zones.map((z) => `<button type="button" data-zone="${esc(z.id)}"><b>${z.layer === 'ground' ? '지상' : '지하'}</b> ${esc(z.name)}${
+      z.layer === 'underground' ? ` <span>${z.floorM !== undefined ? `바닥 ${z.floorM.toFixed(1)} m` : `${z.fromM!.toFixed(1)}~${z.toM!.toFixed(1)} m`}</span>` : ''}</button>`).join('')}`;
+    const box: HTMLElement = this.viewer.container;
+    this.chooser.hidden = false;
+    this.chooser.style.left = `${Math.max(8, Math.min(position.x + 12, box.clientWidth - 250))}px`;
+    this.chooser.style.top = `${Math.max(8, Math.min(position.y - 10, box.clientHeight - 40 - zones.length * 28))}px`;
+  }
+
+  private closeChooser() {
+    this.chooser.hidden = true;
+    this.choices = [];
   }
 
   /** The plan point and height of what is under a screen position. */
@@ -194,7 +233,7 @@ export class LevelView {
     if (!blocks.length) return;
     const main = blocks.find((b) => b.buildingId === id) ?? blocks[0];
     const roads = this.src.roads().filter((r) => r.buildingId && baseBuildingId(r.buildingId) === id);
-    const floors = buildingFloors(blocks, main.appearance?.windows?.floorsM, roads);
+    const floors = buildingFloors(blocks, main.appearance?.windows?.floorsM, roads, main.appearance?.windows?.floorNames);
     this.unit = { kind: 'building', id, name: main.name ?? id, floors, focus: focus !== null && focus < floors.length ? focus : null };
     this.message = floors.length ? '' : '이 건물은 층 자료(층 표·실내 길)가 없어 바닥 판 하나만 띄웁니다.';
     this.draw(true);
@@ -271,14 +310,14 @@ export class LevelView {
     return new C.Primitive({ geometryInstances: new C.GeometryInstance({ geometry }), appearance: new C.PerInstanceColorAppearance({ flat: true, translucent, closed: false }), asynchronous: false });
   }
 
-  /** A solid (or a plate written like one) into a batch, heights through `lift`. */
-  private addSolid(batch: Batch, solid: Solid, lift: (z: number) => number, colors: { body: string; top: string }, alpha = 255) {
+  /** A solid (or a plate written like one) into a batch, every point through `move` (lifted, and for a fanned-out floor also shifted). */
+  private addSolid(batch: Batch, solid: Solid, move: (p: number[]) => number[], colors: { body: string; top: string }, alpha = 255) {
     const { mesh } = solidMesh(solid);
     const body = rgb(colors.body), top = rgb(colors.top);
     const points: number[][] = [];
     const shades: number[][] = [];
     for (let i = 0; i < mesh.positions.length; i += SOLID_STRIDE) {
-      points.push([mesh.positions[i], mesh.positions[i + 1], lift(mesh.positions[i + 2])]);
+      points.push(move([mesh.positions[i], mesh.positions[i + 1], mesh.positions[i + 2]]));
       const c = mesh.positions[i + 4] ? top : body, s = mesh.positions[i + 3];
       shades.push([c[0] * s, c[1] * s, c[2] * s]);
     }
@@ -290,10 +329,10 @@ export class LevelView {
   }
 
   /** A road piece as a flat band of its width. */
-  private addRibbon(batch: Batch, line: number[][], widthM: number, lift: (z: number) => number, color: string, alpha = 255) {
+  private addRibbon(batch: Batch, line: number[][], widthM: number, move: (p: number[]) => number[], color: string, alpha = 255, upM = 0.15) {
     if (line.length < 2) return;
     const { left, right } = ribbon(line.map((p) => [p[0], p[1], p[2]] as P3), widthM);
-    const points = [...left, ...right].map((p) => [p[0], p[1], lift(p[2]) + 0.15]);
+    const points = [...left, ...right].map((p) => { const q = move(p); return [q[0], q[1], q[2] + upM]; });
     const indices: number[] = [];
     for (let i = 0; i + 1 < left.length; i++) indices.push(i, left.length + i, i + 1, i + 1, left.length + i, left.length + i + 1);
     const c = rgb(color);
@@ -320,7 +359,7 @@ export class LevelView {
         position: world, text, font: `${kind === 'title' ? 700 : 600} ${size}px system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`,
         fillColor: C.Color.fromCssColorString(color), outlineColor: C.Color.WHITE, outlineWidth: 4, style: C.LabelStyle.FILL_AND_OUTLINE,
         horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: C.VerticalOrigin.BOTTOM, pixelOffset: new C.Cartesian2(0, -6),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: new C.NearFarScalar(120, 1.15, 900, 0.6), show: false,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: kind === 'floor' || kind === 'title' ? new C.NearFarScalar(200, 1.2, 2500, 0.9) : new C.NearFarScalar(120, 1.15, 900, 0.6), show: false,
       });
       this.tags.push({ label, world, priority });
     };
@@ -329,7 +368,7 @@ export class LevelView {
     const linking = (r: LvRoad) => r.structure === 'stairs' || r.structure === 'elevator' || (r.roadClass === 'pedestrian' && (r.structure === 'ramp' || (!!r.buildingId && isConnector(r))));
     const roadColor = (r: LvRoad) => (r.structure === 'elevator' ? VIEW_COLORS.elevator : linking(r) ? VIEW_COLORS.stairs : r.roadClass === 'pedestrian' ? VIEW_COLORS.pedestrian : VIEW_COLORS.vehicle);
     const roadFill = (r: LvRoad) => (linking(r) ? '#f3c79b' : r.roadClass === 'pedestrian' ? '#bcd4f2' : '#4a5059');
-    const raised = (pts: number[][], lift: (z: number) => number, up = 0.35) => pts.map((p) => [p[0], p[1], lift(p[2]) + up]);
+    const raised = (pts: number[][], move: (p: number[]) => number[], up = 0.35) => pts.map((p) => { const q = move(p); return [q[0], q[1], q[2] + up]; });
     const middle = (pts: number[][]) => pts[Math.floor(pts.length / 2)];
     const corners = (rings: number[][][]) => {
       const all = rings.flat();
@@ -340,24 +379,33 @@ export class LevelView {
     const frame: number[][] = []; // lifted points the camera frames
     let dropM = 0; // how far the whole drawing starts below its place (the animation)
     let veilM = baseM;
+    this.fanHeading = null;
 
     if (u.kind === 'zone') {
       const zone = u.zone, ground = zone.layer === 'ground';
       const content = zoneContent(zone, { roads: this.src.roads(), areas: this.areas(), solids: this.solids, places: this.src.places?.() });
       const lift = (z: number) => z + baseM - content.minM;
+      const move = (p: number[]) => [p[0], p[1], lift(p[2])];
       dropM = baseM - content.minM;
       veilM = baseM - 2.5;
       const floorAt = (x: number, y: number) => (ground ? this.src.groundAt(x, y) : zone.floorM ?? content.minM);
-      if (!ground && zone.floorM !== undefined) for (const polygon of zone.polygons) this.addSolid(solid, this.plate(polygon, zone.floorM), lift, { body: '#aab1ba', top: VIEW_COLORS.plate });
+      if (!ground && zone.floorM !== undefined) for (const polygon of zone.polygons) this.addSolid(solid, this.plate(polygon, zone.floorM), move, { body: '#aab1ba', top: VIEW_COLORS.plate });
       for (const s of content.solids) {
         const cut = ground
           ? (s.solid.thicknessM ? s.solid : { ...s.solid, bottomM: Math.max(s.solid.bottomM, content.minM - 2) })
           : { ...s.solid, bottomM: s.bottomM, topM: s.topM, profile: s.topM < s.solid.topM ? undefined : s.solid.profile };
-        if (cut.topM - cut.bottomM > 0.001 || cut.profile) this.addSolid(solid, cut as Solid, lift, solidColors(s.solid));
+        if (!(cut.topM - cut.bottomM > 0.001 || cut.profile)) continue;
+        // F09: the floor markings of an underground level (stall blocks, bay lines: a few centimetres thick) lie on top of
+        // the floor plate and the aisle surface, the lines above the blocks; a stall block is drawn light so it differs from the aisle
+        const marking = !ground && s.solid.props?.underground === true && s.solid.topM - s.solid.bottomM < 0.1;
+        const up = marking ? 0.1 + (s.solid.topM - s.solid.bottomM) * 2 : 0;
+        const colors = marking && polygonArea(s.solid.polygon) > 8 ? { body: VIEW_COLORS.stall, top: VIEW_COLORS.stall } : solidColors(s.solid);
+        this.addSolid(solid, cut as Solid, up ? (p) => [p[0], p[1], lift(p[2]) + up] : move, colors);
       }
       for (const area of content.areas) {
         const ring = openRing(area.rings[0]);
-        if (!ground && area.elevationM != null) this.addSolid(solid, this.plate([ring], area.elevationM + 0.04, 0.04), lift, { body: '#c9ced6', top: '#c9ced6' });
+        // F09: the surface of an underground area with its holes (the aisles of a car park: the stall blocks are holes in it)
+        if (!ground && area.elevationM != null) for (const polygon of polygonOps('union', [area.rings.map(openRing)])) this.addSolid(solid, this.plate(polygon, area.elevationM + 0.06, 0.06), move, { body: VIEW_COLORS.aisle, top: VIEW_COLORS.aisle });
         const z = area.elevationM ?? floorAt(ring[0][0], ring[0][1]);
         line([...ring, ring[0]].map((p) => [p[0], p[1], lift(z) + 0.3]), px.faint + 0.5, VIEW_COLORS.outline, 0.7);
         tag('place', [...middle(ring), lift(z) + 1], shortName(area.name), 3);
@@ -371,18 +419,20 @@ export class LevelView {
       for (const { road, cut } of content.roads) {
         const width = roadWidthM(road);
         for (const piece of cut.pieces) {
-          this.addRibbon(solid, piece, width, lift, roadFill(road));
-          line(raised(piece, lift), px.road, roadColor(road));
+          this.addRibbon(solid, piece, width, move, roadFill(road), 255, ground ? 0.15 : 0.3);
+          // a walking way gets a light casing under its line, so it stands out from a dark carriageway or aisle
+          if (road.roadClass === 'pedestrian') line(raised(piece, move, 0.33), px.road + 3, '#ffffff', 0.95);
+          line(raised(piece, move), px.road, roadColor(road));
         }
         const longest = cut.pieces.reduce((a, b) => (b.length > a.length ? b : a));
-        tag('road', raised([middle(longest)], lift, 1)[0], shortName(road.name), 1, 12);
-        if (linking(road)) for (const end of [cut.pieces[0][0], cut.pieces[cut.pieces.length - 1].slice(-1)[0]]) dot(raised([end], lift)[0], VIEW_COLORS.stairs, 7);
+        tag('road', raised([middle(longest)], move, 1)[0], shortName(road.name), 1, 12);
+        if (linking(road)) for (const end of [cut.pieces[0][0], cut.pieces[cut.pieces.length - 1].slice(-1)[0]]) dot(raised([end], move)[0], VIEW_COLORS.stairs, 7);
         for (const stub of cut.stubs) {
-          line(raised(stub, lift), px.connector, VIEW_COLORS.stub, 1, true);
+          line(raised(stub, move), px.connector, VIEW_COLORS.stub, 1, true);
           const end = stub[stub.length - 1];
           const next = zoneAt(this.zones, end[0], end[1], ground ? undefined : end[2]);
-          dot(raised([stub[0]], lift)[0], VIEW_COLORS.stub, 7);
-          if (next && next.id !== zone.id) tag('link', raised([end], lift, 1)[0], `→ ${shortName(next.name, 16)}`, 4, 12, VIEW_COLORS.stub);
+          dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 7);
+          if (next && next.id !== zone.id) tag('link', raised([end], move, 1)[0], `→ ${shortName(next.name, 16)}`, 4, 12, VIEW_COLORS.stub);
         }
       }
       if (ground) {
@@ -404,29 +454,44 @@ export class LevelView {
     } else {
       const blocks = buildings.filter((b) => baseBuildingId(b.buildingId) === u.id);
       const floors: Floor[] = u.floors.length ? u.floors : [{ m: Math.min(...blocks.map((b) => b.baseM)), name: null, fromTable: false, roadIds: [] }];
-      const lift = explode(floors.map((f) => f.m), baseM);
+      const footprints = blocks.map((b) => ({ b, rings: b.geometry.coordinates.map((poly) => metres(poly[0])) }));
+      // F09: the floors are fanned out: each a step to the side (across the footprint's short width) and a little higher,
+      // so no plate lies over another; the camera looks along that direction (frame())
+      const axis = fanAxis(footprints.flatMap((f) => f.rings));
+      const { step, gapM } = fanStep(axis);
+      const fan = fanOut(floors.map((f) => f.m), baseM, step, gapM);
+      /** A point of floor i: moved with its floor whatever its own height (a plate's underside, a road a little off the floor height). */
+      const onFloor = (i: number) => (p: number[]) => { const q = fan([p[0], p[1], floors[i].m]); return [q[0], q[1], q[2] + (p[2] - floors[i].m)]; };
+      this.fanHeading = floors.length > 1 ? Math.atan2(axis.dir[0], axis.dir[1]) : null;
       dropM = baseM - floors[0].m;
       veilM = baseM - 2.5;
       const roads = this.src.roads();
       const own = roads.filter((r) => r.buildingId && baseBuildingId(r.buildingId) === u.id);
       const focused = (i: number) => u.focus === null || u.focus === i;
       const others = OTHERS[style.others].plate;
-      const footprints = blocks.map((b) => ({ b, rings: b.geometry.coordinates.map((poly) => metres(poly[0])) }));
+      const main = footprints.reduce((a, b) => (b.rings[0].length > a.rings[0].length ? b : a)).rings[0];
+      // the corner the plates are tied together at: the one furthest back along the fan direction and to the right of it
+      const tie = main.reduce((a, b) => (b[0] * (axis.dir[0] + axis.dir[1]) + b[1] * (axis.dir[1] - axis.dir[0]) > a[0] * (axis.dir[0] + axis.dir[1]) + a[1] * (axis.dir[1] - axis.dir[0]) ? b : a));
       floors.forEach((floor, i) => {
-        const on = focused(i);
+        const on = focused(i), chosen = u.focus === i;
+        const move = onFloor(i);
+        if (i > 0) line([onFloor(i - 1)([tie[0], tie[1], floors[i - 1].m]), move([tie[0], tie[1], floor.m])], 1.5, VIEW_COLORS.leader, 0.7, true, leaders);
         if (!on && others <= 0) return;
         let here = footprints.filter(({ b }) => floor.m >= b.baseM - LEVEL_VIEW.belowBaseM && floor.m < b.roofM);
         if (!here.length) here = footprints;
         for (const { rings } of here) for (const ring of rings) {
-          this.addSolid(on ? solid : faint, this.plate([ring], floor.m), lift, { body: '#aab1ba', top: floor.roadIds.length ? '#f3f5f7' : '#dfe3e8' }, on ? 255 : Math.round(255 * others));
-          const edge = [...ring, ring[0]].map((p) => [p[0], p[1], lift(floor.m) + 0.05]);
-          line(edge, on ? px.outline : px.faint, VIEW_COLORS.outline, on ? 1 : 0.25);
+          this.addSolid(on ? solid : faint, this.plate([ring], floor.m), move, { body: chosen ? '#7f9cc4' : '#aab1ba', top: floor.roadIds.length ? '#f3f5f7' : '#dfe3e8' }, on ? 255 : Math.round(255 * others));
+          const edge = [...ring, ring[0]].map((p) => { const q = move([p[0], p[1], floor.m]); return [q[0], q[1], q[2] + 0.05]; });
+          line(edge, chosen ? px.outline + 2 : on ? px.outline : px.faint + 0.5, chosen ? VIEW_COLORS.focus : VIEW_COLORS.outline, on ? 1 : 0.45);
           if (on) frame.push(...edge);
         }
         const ring = here.reduce((a, b) => (b.rings[0].length > a.rings[0].length ? b : a)).rings[0];
-        const corner = ring.reduce((a, b) => (b[0] - b[1] > a[0] - a[1] ? b : a)); // the south-east corner: beside the plate, not on it
-        const text = `${floor.name ? `${floor.name} · ` : ''}${floor.m.toFixed(1)} m${floor.fromTable ? '' : ' (길 높이)'}`;
-        if (on) tag('floor', [corner[0], corner[1], lift(floor.m) + 0.6], u.floors.length ? text : `층 자료 없음 · 바닥 ${floor.m.toFixed(1)} m`, u.focus === i ? 9 : 6, u.focus === i ? 15 : 12);
+        // the corner nearest to the default camera and to its right: beside the plate, not on it
+        const corner = ring.reduce((a, b) => (b[0] * (axis.dir[1] - axis.dir[0]) - b[1] * (axis.dir[0] + axis.dir[1]) > a[0] * (axis.dir[1] - axis.dir[0]) - a[1] * (axis.dir[0] + axis.dir[1]) ? b : a));
+        const at = move([corner[0], corner[1], floor.m]);
+        // the floor's number first (F09): from the note's floor table, else what its roads say; a floor nobody names shows its height
+        const text = floor.name ? `${floor.name}${on ? ` · ${floor.m.toFixed(1)} m` : ''}` : `${floor.m.toFixed(1)} m${floor.fromTable ? '' : ' (길 높이)'}`;
+        tag('floor', [at[0], at[1], at[2] + 0.6], u.floors.length ? text : `층 자료 없음 · 바닥 ${floor.m.toFixed(1)} m`, chosen ? 9 : on ? 6 : 5, chosen ? 16 : 13, chosen ? VIEW_COLORS.focus : on ? VIEW_COLORS.label : VIEW_COLORS.leader);
       });
       const nodeFloor = new Map<string, number>(); // node id -> its height, for the stubs
       for (const road of own) {
@@ -435,19 +500,22 @@ export class LevelView {
         if (road.fromNodeId) nodeFloor.set(road.fromNodeId, coords[0][2]);
         if (road.toNodeId) nodeFloor.set(road.toNodeId, coords[coords.length - 1][2]);
         const connector = isConnector(road);
-        const on = connector ? u.focus === null || ends.includes(u.focus) : focused(floorIndexAt(floors, (coords[0][2] + coords[coords.length - 1][2]) / 2));
+        const level = floorIndexAt(floors, (coords[0][2] + coords[coords.length - 1][2]) / 2);
+        const on = connector ? u.focus === null || ends.includes(u.focus) : focused(level);
         if (!on && others <= 0) continue;
-        if (on && !connector) this.addRibbon(solid, coords, roadWidthM(road), lift, roadFill(road));
-        line(raised(coords, lift, connector ? 0.2 : 0.35), on ? (connector ? px.connector : px.road) : px.faint, roadColor(road), on ? 1 : 0.2);
+        // a level road moves with its floor; stairs, ramps and shafts stretch from plate to plate
+        const move = connector || level < 0 ? fan : onFloor(level);
+        if (on && !connector) this.addRibbon(solid, coords, roadWidthM(road), move, roadFill(road));
+        line(raised(coords, move, connector ? 0.2 : 0.35), on ? (connector ? px.connector : px.road) : px.faint, roadColor(road), on ? 1 : 0.3);
         if (!on) continue;
-        if (!connector) tag('road', raised([middle(coords)], lift, 1)[0], shortName(road.name), 1, 12);
+        if (!connector) tag('road', raised([middle(coords)], move, 1)[0], shortName(road.name), 1, 12);
         else {
-          for (const end of [coords[0], coords[coords.length - 1]]) dot(raised([end], lift, 0.3)[0], roadColor(road), 8);
+          for (const end of [coords[0], coords[coords.length - 1]]) dot(raised([end], move, 0.3)[0], roadColor(road), 8);
           if (u.focus !== null) {
             const far = ends[0] === u.focus ? coords[coords.length - 1] : coords[0];
             const to = floorIndexAt(floors, far[2]);
             const where = to >= 0 ? `${floors[to].name ?? ''} ${floors[to].m.toFixed(1)} m`.trim() : `${far[2].toFixed(1)} m`;
-            tag('link', raised([far], lift, 0.8)[0], `${road.structure === 'elevator' ? '승강기' : road.structure === 'ramp' ? '경사로' : '계단'} → ${where}`, 5, 12, roadColor(road));
+            tag('link', raised([far], move, 0.8)[0], `${road.structure === 'elevator' ? '승강기' : road.structure === 'ramp' ? '경사로' : '계단'} → ${where}`, 5, 12, roadColor(road));
           }
         }
       }
@@ -465,21 +533,24 @@ export class LevelView {
           for (let k = 1; k < pts.length && left > 0; k++) { const d = Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]); const t = Math.min(1, left / (d || 1)); stub.push(pts[k - 1].map((v, j) => v + (pts[k][j] - v) * t)); left -= d; }
           // the stub keeps the plate's height: where it leads is told by its tag
           stub = stub.map((p) => [p[0], p[1], pts[0][2]]);
-          line(raised(stub, lift), px.connector, VIEW_COLORS.stub, 1, true);
-          dot(raised([stub[0]], lift)[0], VIEW_COLORS.stub, 8);
+          const move = i >= 0 ? onFloor(i) : fan;
+          line(raised(stub, move), px.connector, VIEW_COLORS.stub, 1, true);
+          dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 8);
           const end = pts[Math.min(pts.length - 1, 1)];
           const where = road.buildingId ? this.buildingList().find((b) => b.id === baseBuildingId(road.buildingId!))?.name ?? road.buildingId : zoneAt(this.zones, end[0], end[1], end[2])?.name ?? shortName(road.name);
-          tag('link', raised([stub[stub.length - 1]], lift, 0.9)[0], `→ ${shortName(where, 16)}`, 4, 12, VIEW_COLORS.stub);
+          tag('link', raised([stub[stub.length - 1]], move, 0.9)[0], `→ ${shortName(where, 16)}`, 4, 12, VIEW_COLORS.stub);
         }
       }
       for (const place of this.src.places?.() ?? []) {
-        if (!place.buildingId || baseBuildingId(place.buildingId) !== u.id || !focused(floorIndexAt(floors, place.z))) continue;
-        dot([place.x, place.y, lift(place.z) + 0.5], VIEW_COLORS.place);
-        tag('place', [place.x, place.y, lift(place.z) + 1.2], shortName(place.name), 5, 12, VIEW_COLORS.place);
+        const i = floorIndexAt(floors, place.z);
+        if (!place.buildingId || baseBuildingId(place.buildingId) !== u.id || !focused(i)) continue;
+        const move = i >= 0 ? onFloor(i) : fan;
+        dot(raised([[place.x, place.y, place.z]], move, 0.5)[0], VIEW_COLORS.place);
+        tag('place', raised([[place.x, place.y, place.z]], move, 1.2)[0], shortName(place.name), 5, 12, VIEW_COLORS.place);
       }
-      const main = footprints.reduce((a, b) => (b.rings[0].length > a.rings[0].length ? b : a)).rings[0];
-      tag('title', [...middle(main), lift(floors[floors.length - 1].m) + 6], u.name, 10, 16);
-      for (const p of corners([main])) line([[p[0], p[1], floors[0].m], [p[0], p[1], lift(floors[0].m)]], 1.5, VIEW_COLORS.leader, 0.9, true, leaders);
+      const top = onFloor(floors.length - 1)([...middle(main), floors[floors.length - 1].m]);
+      tag('title', [top[0], top[1], top[2] + 6], u.name, 10, 16);
+      for (const p of corners([main])) line([[p[0], p[1], floors[0].m], [p[0], p[1], fan([p[0], p[1], floors[0].m])[2]]], 1.5, VIEW_COLORS.leader, 0.9, true, leaders);
     }
 
     // everything of the campus below is faded by a veil under what is lifted (view-style.ts OTHERS.veil = what still shows)
@@ -520,11 +591,15 @@ export class LevelView {
   }
 
   private frameSphere: any = null;
-  /** The camera looks at what is lifted (the chosen floor of a building), from the side it was on. */
+  /**
+   * The camera looks at what is lifted: a zone from the side the camera was on; the fanned-out floors of a building
+   * along the fan direction and steeply from above (F09), so that every floor's plan is seen whole, one behind the other.
+   */
   private frame() {
     const C = this.C;
     if (!this.frameSphere) return;
-    this.viewer.camera.flyToBoundingSphere(this.frameSphere, { duration: 0.9, offset: new C.HeadingPitchRange(this.viewer.camera.heading, C.Math.toRadians(-38), Math.max(60, this.frameSphere.radius * 2.6)) });
+    const fan = this.fanHeading !== null;
+    this.viewer.camera.flyToBoundingSphere(this.frameSphere, { duration: 0.9, offset: new C.HeadingPitchRange(fan ? this.fanHeading! : this.viewer.camera.heading, C.Math.toRadians(fan ? FAN.pitchDeg : -38), Math.max(60, this.frameSphere.radius * (fan ? 3.1 : 2.6))) });
   }
 
   /** Tags that would cover a more important one are hidden (checked a few times a second while the view is on). */
@@ -533,16 +608,14 @@ export class LevelView {
     this.lastDeclutter = performance.now();
     const C = this.C, scene = this.viewer.scene;
     const toWindow = C.SceneTransforms.worldToWindowCoordinates ?? C.SceneTransforms.wgs84ToWindowCoordinates;
-    const kept: number[][] = [];
-    for (const tag of [...this.tags].sort((a, b) => b.priority - a.priority)) {
+    // which tags stay is decided by label-layout.ts (the same rule as on the cut face and for the editor's place tags)
+    const seen = this.tags.flatMap((tag) => {
       const w = toWindow(scene, tag.world);
-      if (!w) { tag.label.show = false; continue; }
-      const half = (tag.label.text.length * 7.5 + 12) / 2;
-      const box = [w.x - half, w.y - 26, w.x + half, w.y];
-      const free = kept.every((k) => box[2] < k[0] || box[0] > k[2] || box[3] < k[1] || box[1] > k[3]);
-      tag.label.show = free;
-      if (free) kept.push(box);
-    }
+      if (!w) { tag.label.show = false; return []; }
+      const width = textWidth(tag.label.text, 13) + 12;
+      return [{ tag, x: w.x - width / 2, y: w.y - 26, w: width, h: 22, priority: tag.priority }];
+    });
+    keepTags(seen, 2).forEach((show, i) => { seen[i].tag.label.show = show; });
   }
 
   // ---------- panel ----------
@@ -554,7 +627,7 @@ export class LevelView {
     const title = !u ? '지도에서 건물·길·공간을 누르세요'
       : u.kind === 'zone' ? `${u.zone.name}${u.zone.layer === 'underground' ? ` · ${u.zone.floorM !== undefined ? `바닥 ${u.zone.floorM.toFixed(1)} m` : `${u.zone.fromM!.toFixed(1)}~${u.zone.toM!.toFixed(1)} m`}` : ''}`
       : `${u.name}${u.focus !== null ? ` ${u.floors[u.focus].name ?? ''} · 바닥 ${u.floors[u.focus].m.toFixed(1)} m` : ` · 층 ${u.floors.length}개 벌려 보기`}`;
-    const sub = !u ? '' : u.kind === 'zone' ? `${u.zone.description} — 구획 경계는 작업 구분(추정)` : '층: 건물 노트의 층 표 + 실내 길이 있는 높이. 층 이름은 길에 적힌 것만(없으면 높이만)';
+    const sub = !u ? '' : u.kind === 'zone' ? `${u.zone.description} — 구획 경계는 작업 구분(추정)` : '층: 건물 노트의 층 표(이름·높이) + 실내 길이 있는 높이. 표에 없는 높이는 길에 적힌 층 이름만(없으면 높이만). 층마다 옆으로 펼쳐 놓음';
     const floors = u?.kind === 'building' && u.floors.length
       ? `<div class="level-floors"><button type="button" data-floor="all" class="${u.focus === null ? 'on' : ''}">전체</button>${[...u.floors.keys()].reverse().map((i) => {
         const f = u.floors[i];
@@ -571,8 +644,8 @@ export class LevelView {
         <optgroup label="건물(층 벌려 보기)">${this.buildingList().map((b) => option(`building:${b.id}`, b.name, u?.kind === 'building' && u.id === b.id)).join('')}</optgroup></select>
       ${floors}
       <div class="level-style">${choice('line')}${choice('labels')}${choice('others')}</div>
-      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}</div>
-      <div class="level-hint">띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. ↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>`;
+      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}</div>
+      <div class="level-hint">띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. ↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>`;
   }
 
   private onPanelChange(e: Event) {
@@ -601,7 +674,7 @@ export class LevelView {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const delta = e.code === 'ArrowUp' || e.code === 'PageUp' ? 1 : e.code === 'ArrowDown' || e.code === 'PageDown' ? -1 : 0;
     if (delta) { e.preventDefault(); e.stopImmediatePropagation(); this.step(delta); }
-    else if (e.code === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); this.setActive(false); }
+    else if (e.code === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); if (!this.chooser.hidden) this.closeChooser(); else this.setActive(false); }
   }
 }
 

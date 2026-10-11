@@ -142,6 +142,7 @@ def from_note(head):
                 else: floors = [round(low + i * (top - low) / count, 2) for i in range(count)]
             if floors and win.get('모양') in STYLES:
                 rec['windows'] = {'style': STYLES[win['모양']], 'floorsM': floors}
+                if table: rec['windows']['floorNames'] = [k for k, _ in sorted(table.items(), key=lambda kv: kv[1])]   # F09: 층 표의 층 이름(floorsM 과 같은 차례). 층 표가 없는 동은 싣지 않는다(층 번호를 만들지 않는다)
                 color(win, '색', rec['windows'], 'color'); color(win, '덧색', rec['windows'], 'accent')
                 if win.get('지붕까지') is True: rec['windows']['toRoof'] = True
                 for key, name, lo, hi in (('폭', 'widthM', 0.3, 12), ('높이', 'heightM', 0.3, 6), ('간격', 'pitchM', 0.5, 20), ('창턱', 'sillM', 0, 3)):   # Z11: 그 동의 창 크기

@@ -226,6 +226,11 @@ export function floorInText(text: string | null | undefined): number | null {
 /** The floor a road says it is on: its levelId, else the floor its name names before any bracket (remarks in brackets name other floors). */
 export const floorOfRoad = (road: Pick<LvRoad, 'levelId' | 'name'>) => (road.levelId ? floorFromLevelId(road.levelId) : null) ?? floorInText((road.name ?? '').split('(')[0]);
 export const floorText = (floor: number) => (floor < 0 ? `지하 ${-floor}층` : `${floor}층`);
+/** A floor name of a note's table as shown: "B1" -> "지하 1층", "3층" -> "3층"; a name that tells no floor number stays as written. */
+export function tableFloorName(name: string): string {
+  const n = floorInText(name);
+  return n === null ? name : floorText(n);
+}
 
 const span = (road: LvRoad) => { const zs = road.geometry.coordinates.map((c) => c[2]); return { min: Math.min(...zs), max: Math.max(...zs) }; };
 /** Stairs, a ramp or an elevator between floors (not a level corridor). */
@@ -234,7 +239,7 @@ export const isConnector = (road: LvRoad) => { const s = span(road); return road
 export type Floor = {
   /** Floor height (MSL). */
   m: number;
-  /** "3층", "지하 1층": only when the roads on it say so (levelId or name); null otherwise. */
+  /** "3층", "지하 1층": from the note's floor table (scene API) when it names the floor, else what the roads on it say (levelId or name); null otherwise. */
   name: string | null;
   /** From the floor table of the building note (false: only the roads are there). */
   fromTable: boolean;
@@ -248,11 +253,14 @@ export type Floor = {
  * floorMatchM of a table floor lies on it, otherwise its own height becomes a floor). A floor's name is the floor most
  * of its roads name (levelId first, then the road name).
  */
-export function buildingFloors(blocks: { baseM: number; roofM: number }[], tableM: number[] | null | undefined, roads: LvRoad[]): Floor[] {
+export function buildingFloors(blocks: { baseM: number; roofM: number }[], tableM: number[] | null | undefined, roads: LvRoad[], tableNames?: string[] | null): Floor[] {
   const lowest = Math.min(...blocks.map((b) => b.baseM)), highest = Math.max(...blocks.map((b) => b.roofM));
+  // F09: the note's own floor names (scene API, in the order of the table) win over what the roads say
+  const noted = new Map<number, string>();
+  if (tableNames && tableM && tableNames.length === tableM.length) tableM.forEach((m, i) => { if (!noted.has(m)) noted.set(m, tableFloorName(tableNames[i])); });
   const floors: (Floor & { votes: Map<number, number> })[] = [...new Set(tableM ?? [])]
     .filter((m) => m >= lowest - LEVEL_VIEW.belowBaseM && m < highest)
-    .map((m) => ({ m, name: null, fromTable: true, roadIds: [], votes: new Map() }));
+    .map((m) => ({ m, name: noted.get(m) ?? null, fromTable: true, roadIds: [], votes: new Map() }));
   for (const road of roads) {
     if (isConnector(road)) continue;
     const s = span(road), z = (s.min + s.max) / 2;
@@ -264,7 +272,7 @@ export function buildingFloors(blocks: { baseM: number; roofM: number }[], table
   }
   return floors.sort((a, b) => a.m - b.m).map(({ votes, ...floor }) => {
     const best = [...votes].sort((a, b) => b[1] - a[1])[0];
-    return { ...floor, name: best ? floorText(best[0]) : null };
+    return { ...floor, name: floor.name ?? (best ? floorText(best[0]) : null) };
   });
 }
 
@@ -289,6 +297,102 @@ export function explode(floorsM: number[], baseM: number, gapM = LEVEL_VIEW.floo
     }
     return at[at.length - 1] + (z - floorsM[floorsM.length - 1]);
   };
+}
+
+// ---------- F09: the floors of an exploded building fanned out ----------
+export const FAN = {
+  /** Each floor is moved sideways by the footprint's short width times this (>= 1: no plan of one floor lies over another). */
+  stepShare: 1.08,
+  /** ... plus this many metres between two plans. */
+  stepGapM: 3,
+  /** The extra height between two floors grows with the short width (share of it), within these limits. */
+  gapShare: 0.22, gapMinM: 4, gapMaxM: 12,
+  /** The default camera looks along the fan direction, this far down. */
+  pitchDeg: -48,
+};
+
+/**
+ * The short side of a footprint: the direction (unit vector) across which the rings are narrowest, their width that
+ * way and their length along the other. The direction is turned to point north (east when it lies east–west).
+ */
+export function fanAxis(rings: number[][][]): { dir: [number, number]; widthM: number; lengthM: number } {
+  const points = rings.flat();
+  let best: { dir: [number, number]; widthM: number; lengthM: number } | null = null;
+  const extent = (ux: number, uy: number) => { let lo = Infinity, hi = -Infinity; for (const p of points) { const v = p[0] * ux + p[1] * uy; if (v < lo) lo = v; if (v > hi) hi = v; } return hi - lo; };
+  for (const ring of rings) for (let i = 0; i < ring.length; i++) {
+    const a = ring[i], b = ring[(i + 1) % ring.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 0.5) continue;
+    const nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len; // across this edge
+    const widthM = extent(nx, ny);
+    if (!best || widthM < best.widthM - 1e-9) best = { dir: [nx, ny], widthM, lengthM: extent(-ny, nx) };
+  }
+  if (!best) return { dir: [0, 1], widthM: 0, lengthM: 0 };
+  const [x, y] = best.dir;
+  if (y < -1e-9 || (Math.abs(y) <= 1e-9 && x < 0)) best.dir = [-x, -y];
+  return best;
+}
+
+/** The sideways step and the extra height between two floors for a footprint of this short width. */
+export function fanStep(axis: { dir: number[]; widthM: number }): { step: [number, number]; gapM: number } {
+  const d = axis.widthM * FAN.stepShare + FAN.stepGapM;
+  return { step: [axis.dir[0] * d, axis.dir[1] * d], gapM: Math.min(FAN.gapMaxM, Math.max(FAN.gapMinM, axis.widthM * FAN.gapShare)) };
+}
+
+/**
+ * The map that fans the floors of a building out: floor i (height m_i) goes to height baseM + (m_i - m_0) + i × gapM
+ * and is moved i × step sideways, so every floor's plan lies clear of the others (step longer than the footprint is
+ * wide) and each a little higher than the one before. Between two floors both go linearly with the height (stairs
+ * and shafts stretch from plate to plate); below the first and above the last floor nothing more is added.
+ */
+export function fanOut(floorsM: number[], baseM: number, step: number[], gapM = LEVEL_VIEW.floorGapM): (p: number[]) => number[] {
+  const up = explode(floorsM, baseM, gapM);
+  const index = (z: number) => {
+    if (!floorsM.length || z <= floorsM[0]) return 0;
+    for (let i = 1; i < floorsM.length; i++) if (z <= floorsM[i]) return i - 1 + (z - floorsM[i - 1]) / (floorsM[i] - floorsM[i - 1] || 1);
+    return floorsM.length - 1;
+  };
+  return (p) => { const k = index(p[2]); return [p[0] + step[0] * k, p[1] + step[1] * k, up(p[2])]; };
+}
+
+// ---------- F09: the levels under a click ----------
+/**
+ * The underground zones under a plan point, highest first: a level zone (parking storey) whose outline holds the
+ * point and whose floor lies below the ground there; a sloping one (tunnel, passage) when one of its own underground
+ * roads passes within `reachM` of the point below the ground.
+ */
+export function levelsUnder(zones: Zone[], x: number, y: number, groundM: number, roads: LvRoad[], reachM = 6): Zone[] {
+  const out = zones.filter((zone) => {
+    if (zone.layer !== 'underground' || !inPolygons(zone.polygons, x, y)) return false;
+    if (zone.floorM !== undefined) return zone.floorM < groundM - 1.5;
+    return roads.some((r) => {
+      if (r.buildingId || !isUnderground(r)) return false;
+      const h = roadHeightAt(r.geometry.coordinates, x, y);
+      return !!h && h.distanceM <= reachM && h.z < groundM - 1.5 && inRange(zone, h.z);
+    });
+  });
+  const height = (zone: Zone) => zone.floorM ?? zone.toM!;
+  return out.sort((a, b) => height(b) - height(a));
+}
+
+// ---------- F09: elevators in the walk ----------
+/** The heights an elevator stops at near a plan point (the ends of the elevator roads within `reachM`), lowest first; [] when there is none. */
+export function elevatorStops(roads: LvRoad[], x: number, y: number, reachM = 2.5): number[] {
+  const stops: number[] = [];
+  for (const road of roads) {
+    if (road.structure !== 'elevator') continue;
+    const c = road.geometry.coordinates;
+    if (!c.length || Math.hypot(c[0][0] - x, c[0][1] - y) > reachM) continue;
+    for (const z of [c[0][2], c[c.length - 1][2]]) if (!stops.some((s) => Math.abs(s - z) < 0.3)) stops.push(z);
+  }
+  return stops.sort((a, b) => a - b);
+}
+
+/** The next stop above (direction 1) or below (-1) the feet; null at the end of the shaft or when the feet are not at a stop (within 1.2 m). */
+export function nextStop(stops: number[], feetM: number, direction: 1 | -1): number | null {
+  const at = stops.findIndex((s) => Math.abs(s - feetM) <= 1.2);
+  if (at < 0) return null;
+  return stops[at + direction] ?? null;
 }
 
 /** A short name for a tag: the text before the first bracket, cut to `max` characters. */

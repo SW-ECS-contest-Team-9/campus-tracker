@@ -3,6 +3,7 @@ import {
   api,
   DELETE_CONFIRM_TEXT,
   type CollectorState,
+  type CarriagewayRoad,
   type FusedPosition,
   type FusedUpdate,
   type FusionRun,
@@ -19,6 +20,7 @@ import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campu
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 import { SceneLayers, bindLayerControls, loadPublicLayerData } from './scene-layers';
+import type { LvPlace } from './level-view';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import type { LayerData } from './scene-layer-data';
 
@@ -64,7 +66,17 @@ let campusScene: CampusSceneLayer | null = null;
 let mobilityLayer: MobilityLayer | null = null;
 let sceneLayers: SceneLayers | null = null;
 /** Roads and areas of the shared layers, read again from the public endpoints. */
-const reloadSceneLayers = () => loadPublicLayerData().then((data) => { layerData = data; sceneLayers?.setData(data); });
+const reloadSceneLayers = () => loadPublicLayerData().then((data) => { layerData = data; sceneLayers?.setData(data); void reloadSpaceExtras(); });
+/**
+ * F09: what the lifted floor view and the walk show besides the surfaces: the elevator segments (the roads endpoint
+ * leaves them out, the surfaces do not want them) and the places, read-only. A backend without these endpoints leaves both empty.
+ */
+let elevators: CarriagewayRoad[] = [];
+let scenePlaces: LvPlace[] = [];
+const reloadSpaceExtras = () => Promise.all([
+  api.elevators().then((r) => { elevators = r.roads; }).catch(() => undefined),
+  api.places().then((r) => { scenePlaces = r.places.map((p) => ({ id: p.id, name: p.name, category: p.category, buildingId: p.buildingId, x: p.geometry.coordinates[0], y: p.geometry.coordinates[1], z: p.geometry.coordinates[2] })); }).catch(() => undefined),
+]);
 /** 층 따로 보기 · 1인칭 (level-view-layer.ts): the same roads and areas as the layers. */
 let layerData: LayerData = { roads: [], areas: [] };
 let spaceViews: SpaceViews | null = null;
@@ -1005,7 +1017,9 @@ async function boot() {
         setupSceneControls();
         // 길 면(편집기 도로, 읽기 전용): '차도'·'보행로' 기본 표시, '지하 길'은 체크 시
         // 단면도: 체크 뒤 지도에서 두 점을 찍으면 그 선으로 자름. 끄면 원래대로 (편집기와 같은 scene-layers.ts)
-        const layers = new SceneLayers(r.viewer, { grid: r.grid, scene: r.scene, campusTint: r.setCampusTint, onStructures: () => mobilityLayer?.refresh() });
+        const layers: SceneLayers = new SceneLayers(r.viewer, { grid: r.grid, scene: r.scene, campusTint: r.setCampusTint, onStructures: () => mobilityLayer?.refresh(),
+          // F09: while a cut is on, the building names of the map stand back (the cut face names what it cuts)
+          onSection: () => r.scene?.setShowLabels(!layers.section.active && !spaceViews?.level.active && $<HTMLInputElement>('scene-labels').checked) });
         sceneLayers = layers;
         // 구조물(기단·계단·벽 등)과 캠퍼스 안 미확정 바닥: 둘 다 기본 켬 (structures-layer.ts)
         void layers.loadStructures().catch((err) => console.error('structures unavailable', err));
@@ -1018,9 +1032,12 @@ async function boot() {
         void reloadSceneLayers().catch((err) => console.error('road surfaces unavailable', err));
         // 층 따로 보기(누른 건물·구획을 공중에 띄움)와 1인칭 걷기: 편집기와 같은 level-view-layer.ts
         spaceViews = mountSpaceViews(r.viewer, {
-          roads: () => layerData.roads, areas: () => layerData.areas, buildings: () => r.scene?.scene.buildings ?? [], groundAt: (x, y) => layers.structures.groundAt(x, y),
+          roads: () => [...layerData.roads, ...elevators], areas: () => layerData.areas, buildings: () => r.scene?.scene.buildings ?? [], groundAt: (x, y) => layers.structures.groundAt(x, y),
+          places: () => scenePlaces,
           walkInputs: [$<HTMLInputElement>('scene-roads-underground'), $<HTMLInputElement>('scene-xray')],
-          onLevel: (on) => r.scene?.setShowLabels(!on && $<HTMLInputElement>('scene-labels').checked),
+          // inside (underground, indoors): no void boxes over the walk's schematic room, no building names showing through the walls
+          onWalk: (on) => { layers.structures.setWalkInside(on); r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked); },
+          onLevel: (on) => r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked),
         }, { level: $('scene-level-view'), walk: $('scene-first-person') });
         if (import.meta.env.DEV) (window as any).__spaceViews = spaceViews;
         if (import.meta.env.DEV) { (window as any).__section = layers.section; (window as any).__layers = layers; }

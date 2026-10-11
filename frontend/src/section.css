@@ -1,0 +1,26 @@
+/* 단면도의 이름표·지시선·범례 (section-overlay.ts): 지도 캔버스 위의 HTML. 누르기는 지도로 지나간다. */
+.section-overlay { position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none; }
+.section-overlay[hidden], .section-panel[hidden] { display: none; }
+.section-overlay svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.section-overlay polyline { fill: none; stroke: var(--leader, #4b5563); stroke-width: 1; stroke-dasharray: 5 3; opacity: 0.8; }
+.section-overlay circle { fill: #fff; stroke: var(--leader, #4b5563); stroke-width: 1.5; }
+.section-tag { position: absolute; box-sizing: border-box; height: 17px; padding: 0 5px; border-radius: 3px; font: 600 12px/17px system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; white-space: nowrap; overflow: hidden; color: #111827; background: #ffffffe0; }
+.section-tag.tick { color: #6b7280; background: none; font-weight: 500; padding: 0 2px; }
+.section-tag.level { background: #fff; border: 1px solid #4b5563; line-height: 15px; }
+.section-tag.title { background: #111827e6; color: #fff; font-weight: 700; text-align: center; padding: 0 7px; }
+.section-tag.floor { color: #8a4b12; background: #fff7edeb; font-weight: 700; }
+.section-panel { position: absolute; left: 14px; bottom: 14px; z-index: 5; width: 262px; padding: 8px 10px; border-radius: 10px; background: #fffffff2; color: #1f2933; font: 12px/1.45 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; box-shadow: 0 4px 18px #0f172a40; }
+.section-panel summary { cursor: pointer; font-size: 13px; }
+.section-panel details[open] summary { margin-bottom: 5px; }
+.section-style { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.section-style label { display: grid; gap: 2px; color: #52606d; }
+.section-style select { width: 100%; padding: 2px 3px; font-size: 12px; }
+.section-legend { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 7px; }
+.section-legend span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.section-legend i { width: 18px; height: 0; border-top: 3px solid var(--c); }
+.section-legend i.thick { border-top-width: 6px; }
+.section-legend i.dash { border-top: 2px dashed var(--c); }
+.section-legend i.box { height: 9px; border: 2px solid var(--c); background: #fbfbf8; }
+.section-legend i.fill { height: 10px; border: 1px solid #3b352d; background: var(--c); }
+.section-check { display: flex; align-items: center; gap: 5px; margin-top: 7px; }
+.section-hint { margin-top: 6px; color: #52606d; }
