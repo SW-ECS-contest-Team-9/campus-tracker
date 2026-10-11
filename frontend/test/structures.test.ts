@@ -346,16 +346,21 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   const area = (polys: P[][][]) => polys.reduce((s, p) => s + polygonArea(p), 0);
   const whole = area(sectionCaps(plane, field)), holed = area(sectionCaps(plane, field, [b1, b2]));
   assert.ok(whole - holed > 60 * ((b1.topM - b1.bottomM) + (b2.topM - b2.bottomM)), `${whole} ${holed}`);
-  // U06 층 사이 경사로: 기운 윗면의 상자들(운동장 면을 가리는 계단·참이 아니다). 지하 1층 바닥에서 지하 2층 바닥까지 끊김 없이 내려가고 어느 조각도 15 % 를 넘지 않는다
-  const ramp = solids.filter((s: any) => s.id.startsWith('U06-RAMP-SEG-')).sort((a: any, b: any) => a.id.localeCompare(b.id));
-  assert.ok(ramp.length === 14 && ramp.every((s: any) => s.role === 'box' && s.type === 'ramp' && s.profile));
+  // U07 층 사이 경사로: 기운 윗면의 상자들(운동장 면을 가리는 계단·참이 아니다). 지하 1층 바닥에서 지하 2층 바닥까지 끊김 없이 내려가고 15 % 를 넘지 않는다(굽은 조각은 현의 길이로 재므로 0.2 %p 여유)
+  const ramp = solids.filter((s: any) => s.id.startsWith('U07-RAMP-SEG-')).sort((a: any, b: any) => a.id.localeCompare(b.id));
+  const last = ramp.length - 1;
+  assert.ok(ramp.length > 10 && ramp.every((s: any) => s.role === 'box' && s.type === 'ramp' && s.profile));
   const ends = ramp.map((s: any) => s.profile.points.map((q: number[]) => q[1]));
-  assert.ok(Math.abs(ends[0][0] - b1.bottomM) < 1e-9 && Math.abs(ends[13][1] - b2.bottomM) < 0.03 && ends.every((q: number[], i: number) => q[1] < q[0] && (i === 0 || Math.abs(q[0] - ends[i - 1][1]) < 0.011)));
+  assert.ok(Math.abs(ends[0][0] - b1.bottomM) < 1e-9 && Math.abs(ends[last][1] - b2.bottomM) < 0.03 && ends.every((q: number[], i: number) => q[1] < q[0] && (i === 0 || Math.abs(q[0] - ends[i - 1][1]) < 0.011)));
   assert.ok(ramp.every((s: any) => (s.profile.points[0][1] - s.profile.points[1][1]) / s.profile.points[1][0] <= 0.152), 'grade');
   const runM = ramp.reduce((t: number, s: any) => t + s.profile.points[1][0], 0);
-  assert.ok((b1.bottomM - b2.bottomM) / runM <= 0.15, `${runM}`);
-  // 어귀 구멍(지하 1층 바닥이 트인 곳)은 은주관 문(201146.21, 557283.45)의 남쪽에서 끝난다: 문 앞은 다시 지하 1층 바닥(사용자 표시 3)
+  assert.ok((b1.bottomM - b2.bottomM) / runM <= 0.152, `${runM}`);
+  // 바닥 구멍 = 학교 지하도 지도의 굽은 부채꼴(docs/audit/u07/crescent.json): 모든 꼭짓점이 안쪽·바깥 반지름 사이, 은주관 문(201146.21, 557283.45)의 남쪽
+  const cr = JSON.parse(fs.readFileSync(new URL('../../docs/audit/u07/crescent.json', import.meta.url), 'utf8'));
   const hole = solids.find((s: any) => s.id === 'U02-VOID-RAMP-OPENING');
-  assert.ok(hole && Math.max(...hole.polygon[0].map((q: number[]) => q[1])) < 557283.45 - 4, 'opening south of the door');
+  const radii = hole.polygon[0].map((q: number[]) => Math.hypot(q[0] - cr.centre[0], q[1] - cr.centre[1]));
+  assert.ok(radii.every((r: number) => r > cr.innerRadiusM - 0.03 && r < cr.outerRadiusM + 0.03) && Math.abs(Math.max(...radii) - cr.outerRadiusM) < 0.03 && Math.abs(Math.min(...radii) - cr.innerRadiusM) < 0.03, 'opening = crescent');
+  assert.ok(Math.max(...hole.polygon[0].map((q: number[]) => q[1])) < 557283.45 - 4, 'opening south of the door');
+  assert.ok(!solids.some((s: any) => s.id.startsWith('U06-FORK-') || s.id.startsWith('U06-RAMP-SEG-')), 'U06 의 갈림·옛 경사로 조각은 없다');
   assert.equal(surfaceExclusions(solids).treads.length, 0);
 });
