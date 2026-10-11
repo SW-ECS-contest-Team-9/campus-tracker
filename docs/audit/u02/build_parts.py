@@ -72,6 +72,7 @@ ha, hb = np.array([201200.7, 557180.9]), np.array([201246.0, 557255.8]); ht = (h
 H_L0, H_F1 = HD + hn * 3.0, HD + hn * 11.0; H_L1 = H_F1 + ht * 1.8; H_BOT = HD + hn * 3.0 + ht * 1.8
 Z_HB1 = 149.3; Z_HMID = r2((Z_HB1 + Z_B1) / 2)
 H_OUT = H_BOT - hn * 6.5                                 # 계단 발치에서 벽을 지나 주차장 안으로
+PV1, PV2 = np.array([201203.0, 557247.0]), np.array([201170.0, 557285.0])   # 보행 동선이 지하 1층 차로 둘을 건너지 않고 돌아가는 점(주차 자리 동쪽, 들머리 차로 북동쪽)
 for name, p in (('L0', H_L0), ('F1', H_F1), ('L1', H_L1), ('BOT', H_BOT)): assert HYEIN.contains(Point(p)), name
 for name, p in (('J0', J0), ('S0', S0), ('W0', W0), ('RB', RB), ('E1', E1), ('C1', C1), ('C2', C2), ('K2', K2), ('DOOR', DOOR), ('SBN', SBN), ('H_OUT', H_OUT)): assert INNER.contains(Point(p)), (name, p)
 assert FIELD.contains(Point(ST)) and not INNER.contains(Point(ST))
@@ -139,7 +140,7 @@ feat('U02-VOID-FIELD-STAIR', 'void', 'void', st, '원천(은주관 문 오른쪽
 # 기둥(8 m 격자, 주차 줄 방향 = 혜인관 벽과 나란한 북동–남서)과 색 띠, 주차 줄 선
 U, V = ht, np.array([-ht[1], ht[0]]); c = np.array(INNER.centroid.coords[0]); GRID = 8.0; cols = 0
 ramp_zone = unary_union([half(0.0, R_LANE + LANE_W / 2 + 0.6), LineString([W0, RB]).buffer(LANE_W / 2 + 0.8, cap_style=2)])
-lanes = unary_union([ramp_zone, LineString([E0, W1, J0, E1, S0]).buffer(4.0), LineString([S0, C1]).buffer(3.6), LineString([RB, K2, C2]).buffer(3.6), LineString([H_BOT, H_OUT, J0]).buffer(1.6), LineString([J0, SBN, DOOR]).buffer(1.6), LineString([SBN, ST]).buffer(1.6)])
+lanes = unary_union([ramp_zone, LineString([E0, W1, J0, E1, S0]).buffer(4.0), LineString([S0, C1]).buffer(3.6), LineString([RB, K2, C2]).buffer(3.6), LineString([H_BOT, H_OUT, PV1, PV2, J0]).buffer(1.6), LineString([J0, SBN, DOOR]).buffer(1.6), LineString([SBN, ST]).buffer(1.6)])
 BANDS = ['#2f6fb5', '#e0b400', '#3f9a4a', '#c8402f']
 sq_at = lambda p, h: Polygon([p + U * a + V * b for a, b in ((-h, -h), (h, -h), (h, h), (-h, h))])
 for i in range(-14, 15):
@@ -169,7 +170,7 @@ model = {'heights': {'field': Z_FIELD, 'b1Floor': Z_B1, 'b1FloorRange': [140.1, 
          'ramp': {'top': pt(S0, Z_B1), 'curveEnd': pt(W0, z_at(L_ARC)), 'bottom': pt(RB, Z_B2), 'arc': arc_pts, 'center': [r2(CC[0]), r2(CC[1])], 'laneRadiusM': R_LANE, 'laneWidthM': LANE_W, 'arcM': r2(L_ARC), 'straightM': L_STRAIGHT, 'lengthM': r2(L_RAMP), 'dropM': r2(DROP), 'gradePct': r2(GRADE_RAMP * 100), 'openingStraightM': r2(OPEN_L),
                   'mapSymbolOffM': r2(min(np.hypot(*(CC - np.array(q))) for q in GEO['xy']['rampSymbol']))},
          'points': {'E1': pt(E1, Z_B1), 'C1': pt(C1, Z_B1), 'C2': pt(C2, Z_B2), 'K2': pt(K2, Z_B2), 'DOOR': pt(DOOR, Z_B1), 'SBN': pt(SBN, Z_B1), 'ST': pt(ST, Z_FIELD)},
-         'hyein': {'door': pt(HD, Z_HB1), 'l0': pt(H_L0, Z_HB1), 'f1': pt(H_F1, Z_HMID), 'l1': pt(H_L1, Z_HMID), 'bottom': pt(H_BOT, Z_B1), 'out': pt(H_OUT, Z_B1), 'dropM': r2(Z_HB1 - Z_B1), 'mapDotOffM': r2(np.hypot(*(HD - np.array(GEO['xy']['dots']['혜인관']))))},
+         'hyein': {'door': pt(HD, Z_HB1), 'l0': pt(H_L0, Z_HB1), 'f1': pt(H_F1, Z_HMID), 'l1': pt(H_L1, Z_HMID), 'bottom': pt(H_BOT, Z_B1), 'out': pt(H_OUT, Z_B1), 'via': [pt(PV1, Z_B1), pt(PV2, Z_B1)], 'dropM': r2(Z_HB1 - Z_B1), 'mapDotOffM': r2(np.hypot(*(HD - np.array(GEO['xy']['dots']['혜인관']))))},
          'eunju': {'doorMapDotOffM': r2(np.hypot(*(DOOR - DOT))), 'stairRiseM': r2(Z_FIELD - Z_B1), 'stairRunM': r2(np.hypot(*(ST - SBN)))}}
 (HERE / 'model.json').write_text(json.dumps(model, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(json.dumps(model, ensure_ascii=False)); print(len(FEATS), 'features')

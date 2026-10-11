@@ -9698,24 +9698,24 @@
     "coordinates": [
      [
       [
-       201217.62,
-       557219.37
+       201210.78,
+       557223.51
       ],
       [
-       201217.11,
-       557219.68
+       201210.26,
+       557223.82
       ],
       [
-       201217.42,
-       557220.2
+       201210.57,
+       557224.34
       ],
       [
-       201217.93,
-       557219.88
+       201211.09,
+       557224.02
       ],
       [
-       201217.62,
-       557219.37
+       201210.78,
+       557223.51
       ]
      ]
     ]
@@ -9735,31 +9735,31 @@
     "toM": 143.2,
     "material": "concrete",
     "inVoid": true,
-    "color": "#c8402f"
+    "color": "#2f6fb5"
    },
    "geometry": {
     "type": "Polygon",
     "coordinates": [
      [
       [
-       201217.63,
-       557219.33
+       201210.79,
+       557223.47
       ],
       [
-       201217.07,
-       557219.67
+       201210.22,
+       557223.81
       ],
       [
-       201217.41,
-       557220.24
+       201210.56,
+       557224.38
       ],
       [
-       201217.97,
-       557219.89
+       201211.13,
+       557224.03
       ],
       [
-       201217.63,
-       557219.33
+       201210.79,
+       557223.47
       ]
      ]
     ]
@@ -9779,31 +9779,31 @@
     "toM": 134.8,
     "material": "concrete",
     "inVoid": true,
-    "color": "#c8402f"
+    "color": "#2f6fb5"
    },
    "geometry": {
     "type": "Polygon",
     "coordinates": [
      [
       [
-       201217.63,
-       557219.33
+       201210.79,
+       557223.47
       ],
       [
-       201217.07,
-       557219.67
+       201210.22,
+       557223.81
       ],
       [
-       201217.41,
-       557220.24
+       201210.56,
+       557224.38
       ],
       [
-       201217.97,
-       557219.89
+       201211.13,
+       557224.03
       ],
       [
-       201217.63,
-       557219.33
+       201210.79,
+       557223.47
       ]
      ]
     ]
@@ -10762,139 +10762,6 @@
     "coordinates": [
      [
       [
-       201208.07,
-       557234.5
-      ],
-      [
-       201207.56,
-       557234.81
-      ],
-      [
-       201207.87,
-       557235.32
-      ],
-      [
-       201208.38,
-       557235.01
-      ],
-      [
-       201208.07,
-       557234.5
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-046-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#e0b400"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201208.08,
-       557234.46
-      ],
-      [
-       201207.52,
-       557234.8
-      ],
-      [
-       201207.86,
-       557235.36
-      ],
-      [
-       201208.42,
-       557235.02
-      ],
-      [
-       201208.08,
-       557234.46
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-046-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#e0b400"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201208.08,
-       557234.46
-      ],
-      [
-       201207.52,
-       557234.8
-      ],
-      [
-       201207.86,
-       557235.36
-      ],
-      [
-       201208.42,
-       557235.02
-      ],
-      [
-       201208.08,
-       557234.46
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-047",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
        201201.22,
        557238.64
       ],
@@ -10921,7 +10788,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-047-BAND-B1",
+    "id": "U02-COLUMN-046-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -10965,7 +10832,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-047-BAND-B2",
+    "id": "U02-COLUMN-046-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11009,7 +10876,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-048",
+    "id": "U02-COLUMN-047",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11054,7 +10921,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-048-BAND-B1",
+    "id": "U02-COLUMN-047-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11098,7 +10965,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-048-BAND-B2",
+    "id": "U02-COLUMN-047-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11142,7 +11009,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-049",
+    "id": "U02-COLUMN-048",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11187,7 +11054,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-049-BAND-B1",
+    "id": "U02-COLUMN-048-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11231,7 +11098,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-049-BAND-B2",
+    "id": "U02-COLUMN-048-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11275,7 +11142,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-050",
+    "id": "U02-COLUMN-049",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11320,7 +11187,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-050-BAND-B1",
+    "id": "U02-COLUMN-049-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11364,7 +11231,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-050-BAND-B2",
+    "id": "U02-COLUMN-049-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11408,7 +11275,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-051",
+    "id": "U02-COLUMN-050",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11453,7 +11320,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-051-BAND-B1",
+    "id": "U02-COLUMN-050-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11497,7 +11364,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-051-BAND-B2",
+    "id": "U02-COLUMN-050-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11541,7 +11408,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-052",
+    "id": "U02-COLUMN-051",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11586,7 +11453,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-052-BAND-B1",
+    "id": "U02-COLUMN-051-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11630,7 +11497,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-052-BAND-B2",
+    "id": "U02-COLUMN-051-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11674,273 +11541,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-053",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201205.37,
-       557245.48
-      ],
-      [
-       201204.85,
-       557245.79
-      ],
-      [
-       201205.16,
-       557246.31
-      ],
-      [
-       201205.68,
-       557246.0
-      ],
-      [
-       201205.37,
-       557245.48
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-053-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#3f9a4a"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201205.38,
-       557245.44
-      ],
-      [
-       201204.81,
-       557245.78
-      ],
-      [
-       201205.15,
-       557246.35
-      ],
-      [
-       201205.72,
-       557246.01
-      ],
-      [
-       201205.38,
-       557245.44
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-053-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#3f9a4a"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201205.38,
-       557245.44
-      ],
-      [
-       201204.81,
-       557245.78
-      ],
-      [
-       201205.15,
-       557246.35
-      ],
-      [
-       201205.72,
-       557246.01
-      ],
-      [
-       201205.38,
-       557245.44
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-054",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201198.52,
-       557249.62
-      ],
-      [
-       201198.01,
-       557249.93
-      ],
-      [
-       201198.32,
-       557250.45
-      ],
-      [
-       201198.83,
-       557250.14
-      ],
-      [
-       201198.52,
-       557249.62
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-054-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#c8402f"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201198.53,
-       557249.58
-      ],
-      [
-       201197.97,
-       557249.92
-      ],
-      [
-       201198.31,
-       557250.49
-      ],
-      [
-       201198.87,
-       557250.15
-      ],
-      [
-       201198.53,
-       557249.58
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-054-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#c8402f"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201198.53,
-       557249.58
-      ],
-      [
-       201197.97,
-       557249.92
-      ],
-      [
-       201198.31,
-       557250.49
-      ],
-      [
-       201198.87,
-       557250.15
-      ],
-      [
-       201198.53,
-       557249.58
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-055",
+    "id": "U02-COLUMN-052",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -11985,7 +11586,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-055-BAND-B1",
+    "id": "U02-COLUMN-052-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12029,7 +11630,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-055-BAND-B2",
+    "id": "U02-COLUMN-052-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12073,7 +11674,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-056",
+    "id": "U02-COLUMN-053",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12118,7 +11719,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-056-BAND-B1",
+    "id": "U02-COLUMN-053-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12162,7 +11763,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-056-BAND-B2",
+    "id": "U02-COLUMN-053-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12206,7 +11807,140 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-057",
+    "id": "U02-COLUMN-054",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
+    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
+    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
+    "fromM": 133.0,
+    "toM": 144.4,
+    "material": "concrete",
+    "inVoid": true,
+    "color": "#b9b6ad",
+    "basePlane": "U02-VOID-B2 바닥"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201177.98,
+       557262.04
+      ],
+      [
+       201177.47,
+       557262.35
+      ],
+      [
+       201177.78,
+       557262.87
+      ],
+      [
+       201178.29,
+       557262.56
+      ],
+      [
+       201177.98,
+       557262.04
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U02-COLUMN-054-BAND-B1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
+    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
+    "fromM": 142.4,
+    "toM": 143.2,
+    "material": "concrete",
+    "inVoid": true,
+    "color": "#3f9a4a"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201177.99,
+       557262.0
+      ],
+      [
+       201177.43,
+       557262.34
+      ],
+      [
+       201177.77,
+       557262.91
+      ],
+      [
+       201178.34,
+       557262.57
+      ],
+      [
+       201177.99,
+       557262.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U02-COLUMN-054-BAND-B2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
+    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
+    "fromM": 134.0,
+    "toM": 134.8,
+    "material": "concrete",
+    "inVoid": true,
+    "color": "#3f9a4a"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201177.99,
+       557262.0
+      ],
+      [
+       201177.43,
+       557262.34
+      ],
+      [
+       201177.77,
+       557262.91
+      ],
+      [
+       201178.34,
+       557262.57
+      ],
+      [
+       201177.99,
+       557262.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U02-COLUMN-055",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12251,7 +11985,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-057-BAND-B1",
+    "id": "U02-COLUMN-055-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12295,7 +12029,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-057-BAND-B2",
+    "id": "U02-COLUMN-055-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12339,7 +12073,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-058",
+    "id": "U02-COLUMN-056",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12384,7 +12118,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-058-BAND-B1",
+    "id": "U02-COLUMN-056-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12428,7 +12162,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-058-BAND-B2",
+    "id": "U02-COLUMN-056-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12472,7 +12206,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-059",
+    "id": "U02-COLUMN-057",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12517,7 +12251,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-059-BAND-B1",
+    "id": "U02-COLUMN-057-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12561,7 +12295,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-059-BAND-B2",
+    "id": "U02-COLUMN-057-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12605,7 +12339,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-060",
+    "id": "U02-COLUMN-058",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12650,7 +12384,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-060-BAND-B1",
+    "id": "U02-COLUMN-058-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12694,7 +12428,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-060-BAND-B2",
+    "id": "U02-COLUMN-058-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12738,7 +12472,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-061",
+    "id": "U02-COLUMN-059",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12783,7 +12517,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-061-BAND-B1",
+    "id": "U02-COLUMN-059-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12827,7 +12561,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-061-BAND-B2",
+    "id": "U02-COLUMN-059-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12871,7 +12605,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-062",
+    "id": "U02-COLUMN-060",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12916,7 +12650,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-062-BAND-B1",
+    "id": "U02-COLUMN-060-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -12960,7 +12694,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-062-BAND-B2",
+    "id": "U02-COLUMN-060-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13004,273 +12738,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-063",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201188.97,
-       557264.75
-      ],
-      [
-       201188.46,
-       557265.06
-      ],
-      [
-       201188.77,
-       557265.57
-      ],
-      [
-       201189.28,
-       557265.26
-      ],
-      [
-       201188.97,
-       557264.75
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-063-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#e0b400"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201188.98,
-       557264.71
-      ],
-      [
-       201188.41,
-       557265.05
-      ],
-      [
-       201188.76,
-       557265.61
-      ],
-      [
-       201189.32,
-       557265.27
-      ],
-      [
-       201188.98,
-       557264.71
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-063-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#e0b400"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201188.98,
-       557264.71
-      ],
-      [
-       201188.41,
-       557265.05
-      ],
-      [
-       201188.76,
-       557265.61
-      ],
-      [
-       201189.32,
-       557265.27
-      ],
-      [
-       201188.98,
-       557264.71
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-064",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201182.12,
-       557268.89
-      ],
-      [
-       201181.61,
-       557269.2
-      ],
-      [
-       201181.92,
-       557269.71
-      ],
-      [
-       201182.43,
-       557269.4
-      ],
-      [
-       201182.12,
-       557268.89
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-064-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#3f9a4a"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201182.13,
-       557268.85
-      ],
-      [
-       201181.57,
-       557269.19
-      ],
-      [
-       201181.91,
-       557269.75
-      ],
-      [
-       201182.48,
-       557269.41
-      ],
-      [
-       201182.13,
-       557268.85
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-064-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#3f9a4a"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201182.13,
-       557268.85
-      ],
-      [
-       201181.57,
-       557269.19
-      ],
-      [
-       201181.91,
-       557269.75
-      ],
-      [
-       201182.48,
-       557269.41
-      ],
-      [
-       201182.13,
-       557268.85
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-065",
+    "id": "U02-COLUMN-061",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13315,7 +12783,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-065-BAND-B1",
+    "id": "U02-COLUMN-061-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13359,7 +12827,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-065-BAND-B2",
+    "id": "U02-COLUMN-061-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13403,7 +12871,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-066",
+    "id": "U02-COLUMN-062",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13448,7 +12916,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-066-BAND-B1",
+    "id": "U02-COLUMN-062-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13492,7 +12960,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-066-BAND-B2",
+    "id": "U02-COLUMN-062-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13536,7 +13004,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-067",
+    "id": "U02-COLUMN-063",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13581,7 +13049,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-067-BAND-B1",
+    "id": "U02-COLUMN-063-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13625,7 +13093,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-067-BAND-B2",
+    "id": "U02-COLUMN-063-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13669,7 +13137,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-068",
+    "id": "U02-COLUMN-064",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13714,7 +13182,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-068-BAND-B1",
+    "id": "U02-COLUMN-064-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13758,7 +13226,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-068-BAND-B2",
+    "id": "U02-COLUMN-064-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13802,7 +13270,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-069",
+    "id": "U02-COLUMN-065",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13847,7 +13315,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-069-BAND-B1",
+    "id": "U02-COLUMN-065-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13891,7 +13359,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-069-BAND-B2",
+    "id": "U02-COLUMN-065-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13935,7 +13403,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-070",
+    "id": "U02-COLUMN-066",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -13980,7 +13448,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-070-BAND-B1",
+    "id": "U02-COLUMN-066-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14024,7 +13492,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-070-BAND-B2",
+    "id": "U02-COLUMN-066-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14068,7 +13536,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-071",
+    "id": "U02-COLUMN-067",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14113,7 +13581,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-071-BAND-B1",
+    "id": "U02-COLUMN-067-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14157,7 +13625,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-071-BAND-B2",
+    "id": "U02-COLUMN-067-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14201,7 +13669,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-072",
+    "id": "U02-COLUMN-068",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14246,7 +13714,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-072-BAND-B1",
+    "id": "U02-COLUMN-068-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14290,7 +13758,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-072-BAND-B2",
+    "id": "U02-COLUMN-068-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14334,7 +13802,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-073",
+    "id": "U02-COLUMN-069",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14379,7 +13847,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-073-BAND-B1",
+    "id": "U02-COLUMN-069-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14423,7 +13891,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-073-BAND-B2",
+    "id": "U02-COLUMN-069-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14467,7 +13935,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-074",
+    "id": "U02-COLUMN-070",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14512,7 +13980,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-074-BAND-B1",
+    "id": "U02-COLUMN-070-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14556,7 +14024,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-074-BAND-B2",
+    "id": "U02-COLUMN-070-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14600,7 +14068,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-075",
+    "id": "U02-COLUMN-071",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14645,7 +14113,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-075-BAND-B1",
+    "id": "U02-COLUMN-071-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14689,7 +14157,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-075-BAND-B2",
+    "id": "U02-COLUMN-071-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14733,140 +14201,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-076",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "확정(네모 콘크리트 기둥·색 띠: 사진 03·04), 추정(자리)",
-    "assumption": "네모 콘크리트 기둥 0.6 m, 8 m 격자(자리·간격 추정). 지하 2층 바닥에서 지하 1층 천장까지",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 133.0,
-    "toM": 144.4,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#b9b6ad",
-    "basePlane": "U02-VOID-B2 바닥"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201172.57,
-       557284.01
-      ],
-      [
-       201172.06,
-       557284.32
-      ],
-      [
-       201172.37,
-       557284.84
-      ],
-      [
-       201172.88,
-       557284.53
-      ],
-      [
-       201172.57,
-       557284.01
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-076-BAND-B1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 142.4,
-    "toM": 143.2,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#2f6fb5"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201172.58,
-       557283.97
-      ],
-      [
-       201172.02,
-       557284.31
-      ],
-      [
-       201172.36,
-       557284.88
-      ],
-      [
-       201172.92,
-       557284.54
-      ],
-      [
-       201172.58,
-       557283.97
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-076-BAND-B2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "추정",
-    "assumption": "기둥의 색 띠(사진: 파랑·노랑·초록·빨강). 줄마다 한 색으로 둠(추정)",
-    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
-    "fromM": 134.0,
-    "toM": 134.8,
-    "material": "concrete",
-    "inVoid": true,
-    "color": "#2f6fb5"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201172.58,
-       557283.97
-      ],
-      [
-       201172.02,
-       557284.31
-      ],
-      [
-       201172.36,
-       557284.88
-      ],
-      [
-       201172.92,
-       557284.54
-      ],
-      [
-       201172.58,
-       557283.97
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "U02-COLUMN-077",
+    "id": "U02-COLUMN-072",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14911,7 +14246,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-077-BAND-B1",
+    "id": "U02-COLUMN-072-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14955,7 +14290,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-077-BAND-B2",
+    "id": "U02-COLUMN-072-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -14999,7 +14334,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-078",
+    "id": "U02-COLUMN-073",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15044,7 +14379,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-078-BAND-B1",
+    "id": "U02-COLUMN-073-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15088,7 +14423,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-078-BAND-B2",
+    "id": "U02-COLUMN-073-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15132,7 +14467,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-079",
+    "id": "U02-COLUMN-074",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15177,7 +14512,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-079-BAND-B1",
+    "id": "U02-COLUMN-074-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15221,7 +14556,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-079-BAND-B2",
+    "id": "U02-COLUMN-074-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15265,7 +14600,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-080",
+    "id": "U02-COLUMN-075",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15310,7 +14645,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-080-BAND-B1",
+    "id": "U02-COLUMN-075-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15354,7 +14689,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-080-BAND-B2",
+    "id": "U02-COLUMN-075-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15398,7 +14733,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-081",
+    "id": "U02-COLUMN-076",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15443,7 +14778,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-081-BAND-B1",
+    "id": "U02-COLUMN-076-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15487,7 +14822,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-081-BAND-B2",
+    "id": "U02-COLUMN-076-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15531,7 +14866,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-082",
+    "id": "U02-COLUMN-077",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15576,7 +14911,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-082-BAND-B1",
+    "id": "U02-COLUMN-077-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15620,7 +14955,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-082-BAND-B2",
+    "id": "U02-COLUMN-077-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15664,7 +14999,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-083",
+    "id": "U02-COLUMN-078",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15709,7 +15044,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-083-BAND-B1",
+    "id": "U02-COLUMN-078-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15753,7 +15088,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-083-BAND-B2",
+    "id": "U02-COLUMN-078-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15797,7 +15132,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-084",
+    "id": "U02-COLUMN-079",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15842,7 +15177,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-084-BAND-B1",
+    "id": "U02-COLUMN-079-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15886,7 +15221,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-084-BAND-B2",
+    "id": "U02-COLUMN-079-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15930,7 +15265,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-085",
+    "id": "U02-COLUMN-080",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -15975,7 +15310,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-085-BAND-B1",
+    "id": "U02-COLUMN-080-BAND-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -16019,7 +15354,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-COLUMN-085-BAND-B2",
+    "id": "U02-COLUMN-080-BAND-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -16085,12 +15420,12 @@
        557185.87
       ],
       [
-       201211.93,
-       557218.43
+       201212.63,
+       557219.58
       ],
       [
-       201212.05,
-       557218.31
+       201212.71,
+       557219.4
       ],
       [
        201192.36,
@@ -16129,12 +15464,12 @@
        557185.87
       ],
       [
-       201211.93,
-       557218.43
+       201212.63,
+       557219.58
       ],
       [
-       201212.05,
-       557218.31
+       201212.71,
+       557219.4
       ],
       [
        201192.36,
@@ -16177,12 +15512,12 @@
        557258.51
       ],
       [
-       201214.86,
-       557222.97
+       201215.97,
+       557224.79
       ],
       [
-       201214.75,
-       557223.09
+       201215.89,
+       557224.97
       ],
       [
        201236.23,
@@ -16221,12 +15556,12 @@
        557258.51
       ],
       [
-       201214.86,
-       557222.97
+       201215.97,
+       557224.79
       ],
       [
-       201214.75,
-       557223.09
+       201215.89,
+       557224.97
       ],
       [
        201236.23,
@@ -16261,12 +15596,12 @@
        557191.28
       ],
       [
-       201206.37,
-       557224.7
+       201208.61,
+       557228.4
       ],
       [
-       201206.48,
-       557224.57
+       201208.69,
+       557228.22
       ],
       [
        201186.29,
@@ -16305,12 +15640,12 @@
        557191.28
       ],
       [
-       201206.37,
-       557224.7
+       201208.61,
+       557228.4
       ],
       [
-       201206.48,
-       557224.57
+       201208.69,
+       557228.22
       ],
       [
        201186.29,
@@ -16353,12 +15688,12 @@
        557264.33
       ],
       [
-       201209.3,
-       557229.23
+       201211.95,
+       557233.61
       ],
       [
-       201209.19,
-       557229.36
+       201211.87,
+       557233.79
       ],
       [
        201230.42,
@@ -16397,12 +15732,12 @@
        557264.33
       ],
       [
-       201209.3,
-       557229.23
+       201211.95,
+       557233.61
       ],
       [
-       201209.19,
-       557229.36
+       201211.87,
+       557233.79
       ],
       [
        201230.42,
@@ -16437,12 +15772,12 @@
        557196.7
       ],
       [
-       201200.81,
-       557230.96
+       201204.6,
+       557237.22
       ],
       [
-       201200.92,
-       557230.84
+       201204.68,
+       557237.04
       ],
       [
        201180.21,
@@ -16481,12 +15816,12 @@
        557196.7
       ],
       [
-       201200.81,
-       557230.96
+       201204.6,
+       557237.22
       ],
       [
-       201200.92,
-       557230.84
+       201204.68,
+       557237.04
       ],
       [
        201180.21,
@@ -16529,12 +15864,12 @@
        557270.21
       ],
       [
-       201203.74,
-       557235.49
+       201207.94,
+       557242.43
       ],
       [
-       201203.63,
-       557235.62
+       201207.86,
+       557242.61
       ],
       [
        201224.57,
@@ -16573,12 +15908,12 @@
        557270.21
       ],
       [
-       201203.74,
-       557235.49
+       201207.94,
+       557242.43
       ],
       [
-       201203.63,
-       557235.62
+       201207.86,
+       557242.61
       ],
       [
        201224.57,
@@ -16613,12 +15948,12 @@
        557202.12
       ],
       [
-       201195.25,
-       557237.23
+       201197.09,
+       557240.27
       ],
       [
-       201195.36,
-       557237.1
+       201197.28,
+       557240.27
       ],
       [
        201174.14,
@@ -16657,12 +15992,12 @@
        557202.12
       ],
       [
-       201195.25,
-       557237.23
+       201197.09,
+       557240.27
       ],
       [
-       201195.36,
-       557237.1
+       201197.28,
+       557240.27
       ],
       [
        201174.14,
@@ -16705,16 +16040,12 @@
        557272.91
       ],
       [
-       201202.48,
-       557248.87
+       201203.44,
+       557250.46
       ],
       [
-       201202.42,
-       557248.91
-      ],
-      [
-       201202.35,
-       557248.96
+       201203.33,
+       557250.58
       ],
       [
        201216.89,
@@ -16753,16 +16084,12 @@
        557272.91
       ],
       [
-       201202.48,
-       557248.87
+       201203.44,
+       557250.46
       ],
       [
-       201202.42,
-       557248.91
-      ],
-      [
-       201202.35,
-       557248.96
+       201203.33,
+       557250.58
       ],
       [
        201216.89,
@@ -16889,12 +16216,12 @@
        557277.33
       ],
       [
-       201193.4,
-       557249.31
+       201197.93,
+       557256.8
       ],
       [
-       201193.21,
-       557249.3
+       201197.82,
+       557256.93
       ],
       [
        201210.23,
@@ -16933,12 +16260,12 @@
        557277.33
       ],
       [
-       201193.4,
-       557249.31
+       201197.93,
+       557256.8
       ],
       [
-       201193.21,
-       557249.3
+       201197.82,
+       557256.93
       ],
       [
        201210.23,
@@ -17065,12 +16392,12 @@
        557279.6
       ],
       [
-       201187.1,
-       557254.36
+       201192.42,
+       557263.15
       ],
       [
-       201186.98,
-       557254.47
+       201192.31,
+       557263.28
       ],
       [
        201202.21,
@@ -17109,12 +16436,12 @@
        557279.6
       ],
       [
-       201187.1,
-       557254.36
+       201192.42,
+       557263.15
       ],
       [
-       201186.98,
-       557254.47
+       201192.31,
+       557263.28
       ],
       [
        201202.21,
@@ -17241,12 +16568,12 @@
        557281.79
       ],
       [
-       201181.5,
-       557260.55
+       201186.91,
+       557269.5
       ],
       [
-       201181.39,
-       557260.68
+       201186.8,
+       557269.62
       ],
       [
        201194.18,
@@ -17285,12 +16612,12 @@
        557281.79
       ],
       [
-       201181.5,
-       557260.55
+       201186.91,
+       557269.5
       ],
       [
-       201181.39,
-       557260.68
+       201186.8,
+       557269.62
       ],
       [
        201194.18,
@@ -17497,24 +16824,24 @@
     "coordinates": [
      [
       [
-       201186.15,
-       557284.02
+       201178.46,
+       557271.29
       ],
       [
-       201186.32,
-       557283.97
+       201178.57,
+       557271.17
       ],
       [
-       201175.94,
-       557266.82
+       201175.27,
+       557265.71
       ],
       [
-       201175.83,
-       557266.94
+       201175.15,
+       557265.83
       ],
       [
-       201186.15,
-       557284.02
+       201178.46,
+       557271.29
       ]
      ]
     ]
@@ -17541,24 +16868,24 @@
     "coordinates": [
      [
       [
-       201186.15,
-       557284.02
+       201178.46,
+       557271.29
       ],
       [
-       201186.32,
-       557283.97
+       201178.57,
+       557271.17
       ],
       [
-       201175.94,
-       557266.82
+       201175.27,
+       557265.71
       ],
       [
-       201175.83,
-       557266.94
+       201175.15,
+       557265.83
       ],
       [
-       201186.15,
-       557284.02
+       201178.46,
+       557271.29
       ]
      ]
     ]
@@ -17585,24 +16912,24 @@
     "coordinates": [
      [
       [
-       201178.13,
-       557286.2
+       201186.15,
+       557284.02
       ],
       [
-       201178.29,
-       557286.16
+       201186.32,
+       557283.97
       ],
       [
-       201170.38,
-       557273.08
+       201181.4,
+       557275.84
       ],
       [
-       201170.27,
-       557273.21
+       201181.29,
+       557275.97
       ],
       [
-       201178.13,
-       557286.2
+       201186.15,
+       557284.02
       ]
      ]
     ]
@@ -17629,24 +16956,24 @@
     "coordinates": [
      [
       [
-       201178.13,
-       557286.2
+       201186.15,
+       557284.02
       ],
       [
-       201178.29,
-       557286.16
+       201186.32,
+       557283.97
       ],
       [
-       201170.38,
-       557273.08
+       201181.4,
+       557275.84
       ],
       [
-       201170.27,
-       557273.21
+       201181.29,
+       557275.97
       ],
       [
-       201178.13,
-       557286.2
+       201186.15,
+       557284.02
       ]
      ]
     ]
@@ -17656,6 +16983,94 @@
    "type": "Feature",
    "properties": {
     "id": "U02-BAYLINE-019-B1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "원천(줄 방향), 추정(자리)",
+    "assumption": "주차 줄의 가운데 선(학교 지도: 주차 줄이 북동–남서 방향). 칸마다의 선은 그리지 않음, 자리 추정",
+    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
+    "fromM": 141.4,
+    "toM": 141.43,
+    "material": "concrete",
+    "inVoid": true,
+    "color": "#e8e6dc"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201172.95,
+       557277.64
+      ],
+      [
+       201173.06,
+       557277.51
+      ],
+      [
+       201169.36,
+       557271.39
+      ],
+      [
+       201169.24,
+       557271.51
+      ],
+      [
+       201172.95,
+       557277.64
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U02-BAYLINE-019-B2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "원천(줄 방향), 추정(자리)",
+    "assumption": "주차 줄의 가운데 선(학교 지도: 주차 줄이 북동–남서 방향). 칸마다의 선은 그리지 않음, 자리 추정",
+    "source": "사용자 2026-10-12: 단면 표시(01-단면-사용자표시-B1-B2.png), 학교 캠퍼스맵 지하도 연결 지점(02, 원천), 지하 1층→2층 내려가는 길 사진(03·04), 학교 지하도 안내 글. 구역 노트 운동장 아래 지하층과 지하 차도",
+    "fromM": 133.0,
+    "toM": 133.03,
+    "material": "concrete",
+    "inVoid": true,
+    "color": "#e8e6dc"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201172.95,
+       557277.64
+      ],
+      [
+       201173.06,
+       557277.51
+      ],
+      [
+       201169.36,
+       557271.39
+      ],
+      [
+       201169.24,
+       557271.51
+      ],
+      [
+       201172.95,
+       557277.64
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "U02-BAYLINE-020-B1",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
@@ -17699,7 +17114,7 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "U02-BAYLINE-019-B2",
+    "id": "U02-BAYLINE-020-B2",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,

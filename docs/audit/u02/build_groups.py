@@ -16,6 +16,7 @@ N_C1, N_C2 = '69707760-7092-45ac-a7a9-d5afbc620526', '58dbed52-ac58-402e-a9ee-81
 N_HDOOR, N_HBOT = '07c38541-4d1c-4619-8ca5-2c8e93dfe5ac', '79988154-51eb-4e57-bff2-a78064906646'  # 혜인관 입구(1) 문, 혜인관 계단 아래
 R = {'ext': 'df83f454-f120-4dab-86d9-137e8da84dd0', 'lead': '428a3aeb-2c54-4b78-9e3d-585548f75d74', 'aisle': '9880169d-71d8-4acd-8941-56933ce51b09', 'old': 'd3431c28-784c-4624-b872-7707ebf75c24',
      'b2': 'e34f896c-ef52-4cf0-9451-8451adc20577', 'stair': '5aea9b42-15e8-4fa1-be44-50e22922d65a', 'pass': 'a789c985-e419-4509-a709-76422a37ad0e'}
+REV_PASS = 7   # U02 적용 뒤 a789c985 의 개정 번호
 Z1, Z2, ZF = H['b1Floor'], H['b2Floor'], H['field']
 LINES = '사용자 2026-10-12: U01 단면 그림에 붉은 선으로 지하 1층(약 140~144.5 m)·지하 2층(약 133~140 m)을 표시, 지하 차도는 그림대로 지하 1층으로 들어온다'
 MAP = f"학교 캠퍼스맵 지하도 연결 지점(사용자 제공 2026-10-12, 원천. 좌표 맞춤 잔차 RMS {M['georefRmsM']} m)"
@@ -71,6 +72,12 @@ for pid, name, key, z in (('3f9a0e6c-be18-4e53-bb4f-7a52e0ad99ea', '운동장 �
 op('장소 은주1관 3층 문', 'create_place', {'name': '은주1관 지하통로 입구 (3층, 운동장 지하 1층 주차장 쪽 문. 자리 ±3 m)', 'category': 'building_entrance', 'buildingId': '은주관',
    'description': f"U02. {BLOG}: 주차장 벽 '은주관' 간판 옆 문 → 은주1관 3층. {MAP}의 초록 점. 문 안쪽 길은 아직 없음(U03)", 'position': P['DOOR']}, '원천(있음·층), 추정(자리)', BLOG)
 out = {'id': 'U02', 'zone': '운동장 아래 지하층과 지하 차도', 'comment': 'U02: 운동장 지하 1층 141.4 m·지하 2층 133.0 m, 지하 차도가 지하 1층 북서 모서리로, U자 경사로, 혜인관 안 계단·은주1관 3층 문·운동장 계단, 제2주차장 쪽 선', 'ops': ops, 'numbers': {'p1ToJoinM': r2(s[-1])}}
+# ---------- U02b: 적용 뒤 고침. 보행 동선이 지하 1층 차로 둘과 같은 높이에서 노드 없이 엇갈려 길 검사 오류 2건이 났다 → 차로를 건너지 않게 돌린다 ----------
+ops_b = [{'ref': '보행 동선을 차로 밖으로', 'op': 'update_road', 'args': {'id': R['pass'], 'expectedRevision': REV_PASS, 'zMode': 'explicit', 'densify': False, 'path': [node(N_HBOT), HY['out']] + HY['via'] + [node(N_J0)]},
+          'grade': '원천(주차장을 가로질러 은주관 문으로), 추정(선)', 'evidence': f'{BLOG}. 주차 자리 동쪽과 들머리 차로 북동쪽으로 돌아 차로와 엇갈리지 않게 함(실제 걷는 선은 모름)'}]
 (HERE / 'groups').mkdir(exist_ok=True)
+(HERE / 'groups' / 'u02b.json').write_text(json.dumps({'id': 'U02b', 'zone': out['zone'], 'comment': 'U02b: 지하 1층 보행 동선이 차로를 건너지 않게', 'ops': ops_b}, ensure_ascii=False, indent=1) + '
+', encoding='utf-8', newline='
+')
 (HERE / 'groups' / 'u02.json').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(len(ops), out['numbers'])
