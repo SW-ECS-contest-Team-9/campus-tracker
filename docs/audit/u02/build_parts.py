@@ -149,7 +149,7 @@ for side, off in (('N', ROAD_W / 2 - 0.1), ('S', -ROAD_W / 2 + 0.1)):   # 벽 �
     box(f'U05-THROAT-KERB-{side}', 'wall', LineString([E0 + NRM * off, E0 + NRM * off + D * 12.0]).buffer(0.1, cap_style=2), Z_B1, Z_B1 + 0.25, '#d8b000', '벽 밑 노랑·검정 턱(사진 08·09). 노랑 한 색으로 그림', grade='확정(있음: 사진), 추정(자리·치수)')
 
 # U06: 곧은 차로를 지하 차도와 같은 짙은 바닥으로(띄운 화면에서 전체 길이가 차도 색으로 보인다). 젖은 어두운 콘크리트(사진 08·09)
-box('U06-THROUGH-LANE-FLOOR', 'wall', LANE.intersection(INNER).buffer(-0.05), Z_B1, Z_B1 + 0.025, '#33363b', f'지하 차도에서 곧게 이어지는 차로의 바닥(폭 {ROAD_W} m, {LANE_L} m). 짙은 콘크리트 색', grade='확정(곧게 빠지는 차로: 사용자), 사용자 그림(위치: 붉은 선 1), 추정(색 경계)', underground=True)
+box('U06-THROUGH-LANE-FLOOR', 'wall', LANE.intersection(INNER).buffer(-0.05), Z_B1, Z_B1 + 0.025, '#33363b', f'지하 차도에서 곧게 이어지는 차로의 바닥(폭 {ROAD_W} m, {LANE_L} m). 짙은 콘크리트 색', grade='확정(곧게 빠지는 차로: 사용자), 사용자 그림(위치: 붉은 선 1), 추정(색 경계)', underground=True, surface='carriageway')
 # U06 갈림(사진 09: 가운데 기둥의 직진·좌회전 표지와 신호등, 둥근 벽, 파랑 바탕에 노란 세로 줄 기둥 줄). 찍은 자리는 모른다 → 들머리에서 곧은 차로와 은주관 문 앞 통로(경사로 어귀 쪽)가 갈리는 곳에 둔다(추정)
 G_FORK = '확정(이런 갈림이 있다: 사진 09), 추정(자리·치수. 들어오는 쪽에서 보면 경사로 쪽 갈래는 오른쪽이라 사진의 좌회전과 맞지 않는다)'
 FK = E0 + D * 9.0 - NRM * (ROAD_W / 2 + 0.5)
@@ -191,8 +191,8 @@ box('U02-ISLAND-STRIPE', 'wall', half(R_ISL, R_ISL + 0.08), Z_B1, Z_B1 + 0.25, S
 xe = X_BAR + LANE_W / 2 + 0.05
 box('U06-OPENING-EASTWALL', 'wall', Polygon([ws_(S_T + 0.3, xe), ws_(S_T + 0.3, xe + 0.25), ws_(S_BAND, xe + 0.25), ws_(S_BAND, xe)]), C_B2, Z_B1 + 1.1, LOWWALL, '어귀 구멍의 동쪽 가장자리 낮은 벽(섬의 곧은 변과 그 북쪽). 사진 11 에서 섬 벽의 왼쪽 끝', grade=G_SEEN)
 box('U06-BAND-WALL', 'wall', Polygon([ws_(S_BAND, 1.0), ws_(S_BAND, xe + 0.25), ws_(S_BAND + 0.25, xe + 0.25), ws_(S_BAND + 0.25, 1.0)]), Z_B1, Z_B1 + 1.1, LOWWALL, '어귀 위를 가로지르는 낮은 벽(사진 15 의 붉은 네모 = 사진 14 오른쪽의 낮은 벽). 이 벽 북쪽은 다시 지하 1층 바닥', grade='확정(있음·사진 사이의 관계: 사용자 표시 3), 추정(문에서 8 m·치수)')
-box('U06-WESTWALL-TEAL', 'wall', Polygon([ws_(S_T - 10.0, 1.0), ws_(S_T - 10.0, 1.08), ws_(S_BAND, 1.08), ws_(S_BAND, 1.0)]), Z_B1, C_B1, TEAL, '어귀 옆 서쪽 벽의 청록색 면(사진 11 왼쪽)', grade=G_SEEN)
-box('U06-WESTWALL-KERB', 'wall', Polygon([ws_(S_T - 10.0, 1.08), ws_(S_T - 10.0, 1.2), ws_(S_T, 1.2), ws_(S_T, 1.08)]), Z_B1, Z_B1 + 0.2, STRIPE, '청록 벽 밑의 노랑·검정 턱(사진 11)', grade=G_SEEN)
+box('U06-WESTWALL-TEAL', 'wall', Polygon([ws_(S_T - 10.0, 1.12), ws_(S_T - 10.0, 1.24), ws_(S_BAND, 1.24), ws_(S_BAND, 1.12)]), Z_B1, C_B1, TEAL, '어귀 옆 서쪽 벽의 청록색 면(사진 11 왼쪽)', grade=G_SEEN)
+box('U06-WESTWALL-KERB', 'wall', Polygon([ws_(S_T - 10.0, 1.24), ws_(S_T - 10.0, 1.4), ws_(S_T, 1.4), ws_(S_T, 1.24)]), Z_B1, Z_B1 + 0.2, STRIPE, '청록 벽 밑의 노랑·검정 턱(사진 11)', grade=G_SEEN)
 gc = ws_(S_ISL, X_ISL); R_G = R_ISL + 3.6
 guide = LineString([gc + R_G * (np.sin(t) * e - np.cos(t) * w) for t in np.linspace(np.pi * 0.62, -np.pi * 0.33, 40)]).buffer(0.12, cap_style=2).intersection(INNER_OLD.buffer(-1.3)).difference(opening)
 box('U06-GUIDE-LINE', 'wall', guide, Z_B1, Z_B1 + 0.03, '#e3b505', '섬을 끼고 어귀로 도는 바닥의 노란 유도선(사진 11). 자리 추정', grade=G_SEEN)

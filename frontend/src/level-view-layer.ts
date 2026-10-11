@@ -400,7 +400,8 @@ export class LevelView {
         // the floor plate and the aisle surface, the lines above the blocks; a stall block is drawn light so it differs from the aisle
         const marking = !ground && s.solid.props?.underground === true && s.solid.topM - s.solid.bottomM < 0.1;
         const up = marking ? 0.1 + (s.solid.topM - s.solid.bottomM) * 2 : 0;
-        const colors = marking && polygonArea(s.solid.polygon) > 8 ? { body: VIEW_COLORS.stall, top: VIEW_COLORS.stall } : solidColors(s.solid);
+        // U06: a marking with surface 'carriageway' (the straight lane continuing the underground carriageway) keeps its own dark colour
+        const colors = marking && polygonArea(s.solid.polygon) > 8 && s.solid.props?.surface !== 'carriageway' ? { body: VIEW_COLORS.stall, top: VIEW_COLORS.stall } : solidColors(s.solid);
         this.addSolid(solid, cut as Solid, up ? (p) => [p[0], p[1], lift(p[2]) + up] : move, colors);
       }
       for (const area of content.areas) {
