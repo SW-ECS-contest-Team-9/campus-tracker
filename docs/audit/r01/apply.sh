@@ -25,7 +25,8 @@ if [ "$MODE" != "save" ]; then
   exit 0
 fi
 ID=$(grep -m1 '"id"' "$V/$TAG-12-recipe-save.txt" | sed 's/.*"\(recipe-[0-9a-f]*\)".*/\1/')
-npx tsx scripts/terrain-versions.ts relevel-roads $PREV $ID --save --as=T05 > "$V/$TAG-16-relevel-save.txt" 2>&1 || true; grep -m2 'saved\|changeSetId\|rror' "$V/$TAG-16-relevel-save.txt" || true
+if grep -q '"roads": \[\]' "$V/$TAG-15-relevel-preview.txt" && grep -q '"nodes": \[\]' "$V/$TAG-15-relevel-preview.txt"; then echo "옮길 길·노드 없음: 길 다시 맞추기를 저장하지 않는다"
+else npx tsx scripts/terrain-versions.ts relevel-roads $PREV $ID --save --as=T05 > "$V/$TAG-16-relevel-save.txt" 2>&1 || true; grep -m2 'saved\|changeSetId\|rror' "$V/$TAG-16-relevel-save.txt" || true; fi
 npm run scene:import -- --dir=data/scene/source > "$V/$TAG-22-scene-import.txt" 2>&1; tail -1 "$V/$TAG-22-scene-import.txt"
 npx tsx $N02 state "$V/$TAG-40-state-after.json" ../docs/audit/u04/pairs.json > "$V/$TAG-40-state-after.txt" 2>&1
 python ../docs/audit/b11/compare_state.py "$V/$TAG-01-state-before.json" "$V/$TAG-40-state-after.json"
