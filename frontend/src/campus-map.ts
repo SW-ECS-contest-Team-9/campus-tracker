@@ -386,6 +386,7 @@ export class CampusSceneLayer {
         // roof outline, slightly above the roof so it is not z-fighting
         this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat]) => [lon, lat, this.wallTop(b) + 0.05])), width: 1.5, material: edge, id: this.picks.get(b.buildingId) });
         // vertical edges only at real corners (not along curved walls)
+        if (!this.elevation && ownWalls(b.appearance)) continue; // B12: the footprint is the eave there, the walls stand inside it
         const open = r.slice(0, -1);
         for (let i = 0; i < open.length; i++) {
           const p = open[(i + open.length - 1) % open.length];
