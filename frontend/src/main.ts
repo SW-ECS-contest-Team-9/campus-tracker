@@ -19,6 +19,8 @@ import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campu
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 import { SceneLayers, bindLayerControls, loadPublicLayerData } from './scene-layers';
+import { mountSpaceViews, type SpaceViews } from './level-view-layer';
+import type { LayerData } from './scene-layer-data';
 
 /** campus (default): Cesium + campus 3D model + server DEM; vworld: the former VWorld WebGL map (VITE_MAP_ENGINE). */
 const MAP_ENGINE: 'campus' | 'vworld' = import.meta.env.VITE_MAP_ENGINE === 'vworld' ? 'vworld' : 'campus';
@@ -62,7 +64,10 @@ let campusScene: CampusSceneLayer | null = null;
 let mobilityLayer: MobilityLayer | null = null;
 let sceneLayers: SceneLayers | null = null;
 /** Roads and areas of the shared layers, read again from the public endpoints. */
-const reloadSceneLayers = () => loadPublicLayerData().then((data) => sceneLayers?.setData(data));
+const reloadSceneLayers = () => loadPublicLayerData().then((data) => { layerData = data; sceneLayers?.setData(data); });
+/** 층 따로 보기 · 1인칭 (level-view-layer.ts): the same roads and areas as the layers. */
+let layerData: LayerData = { roads: [], areas: [] };
+let spaceViews: SpaceViews | null = null;
 const tracks = new Map<string, SessionTrack>(); // sessionId -> track
 const trackLoads = new Map<string, Promise<void>>();
 const liveSessionIds = new Set<string>(); // sessions drawn in Live mode
@@ -920,6 +925,7 @@ function enablePicking(v: Viewer) {
   const handler = new C.ScreenSpaceEventHandler(v.scene.canvas);
   handler.setInputAction((movement: { position: unknown }) => {
     if (sceneLayers?.section.placing) return; // the click places the section line
+    if (spaceViews?.handleClick(movement.position)) return; // 층 따로 보기 · 1인칭
     // drillPick: dots usually sit on top of a polyline, which would win a plain pick().
     const hits: { id?: unknown }[] = v.scene.drillPick(movement.position, 10);
     const id = hits.map((h) => h.id as PickId | undefined).find((x) => x?.kind === 'raw' || x?.kind === 'fused');
@@ -1010,6 +1016,13 @@ async function boot() {
           section: $<HTMLInputElement>('scene-section'), sectionTools: $('scene-section-tools'), sectionLook: $('scene-section-look'), sectionFlip: $('scene-section-flip'), sectionStatus: $('scene-section-status'),
         });
         void reloadSceneLayers().catch((err) => console.error('road surfaces unavailable', err));
+        // 층 따로 보기(누른 건물·구획을 공중에 띄움)와 1인칭 걷기: 편집기와 같은 level-view-layer.ts
+        spaceViews = mountSpaceViews(r.viewer, {
+          roads: () => layerData.roads, areas: () => layerData.areas, buildings: () => r.scene?.scene.buildings ?? [], groundAt: (x, y) => layers.structures.groundAt(x, y),
+          walkInputs: [$<HTMLInputElement>('scene-roads-underground'), $<HTMLInputElement>('scene-xray')],
+          onLevel: (on) => r.scene?.setShowLabels(!on && $<HTMLInputElement>('scene-labels').checked),
+        }, { level: $('scene-level-view'), walk: $('scene-first-person') });
+        if (import.meta.env.DEV) (window as any).__spaceViews = spaceViews;
         if (import.meta.env.DEV) { (window as any).__section = layers.section; (window as any).__layers = layers; }
         // 국소 표면 보정(추정, 검토용): 기본 숨김, 'Corrected' 체크 시 표시
         void addLocalCorrections((window as any).Cesium, r.viewer, r.scene).then((c) => {

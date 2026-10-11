@@ -1,0 +1,25 @@
+/* 층 따로 보기 · 1인칭 (level-view-layer.ts, first-person.ts): the panel and the HUD inside the map container. */
+.level-panel { position: absolute; left: 14px; bottom: 14px; z-index: 5; width: 300px; max-height: calc(100% - 90px); overflow: auto; padding: 10px 12px; border-radius: 10px; background: #fffffff2; color: #1f2933; font: 12px/1.45 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; box-shadow: 0 4px 18px #0f172a40; }
+.level-panel[hidden], .walk-hud[hidden] { display: none; }
+.level-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.level-head button { font-size: 11px; padding: 2px 8px; }
+.level-title { font-size: 14px; font-weight: 700; margin: 2px 0; }
+.level-sub { color: #52606d; margin-bottom: 6px; }
+.level-msg { color: #9a3412; margin-bottom: 6px; }
+.level-panel select { width: 100%; padding: 3px 4px; font-size: 12px; }
+.level-floors { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+.level-floors button { padding: 2px 6px; font-size: 11px; border: 1px solid #9aa5b1; border-radius: 4px; background: #fff; color: #1f2933; cursor: pointer; }
+.level-floors button.empty { color: #9aa5b1; border-style: dashed; }
+.level-floors button.on { background: #0759c7; border-color: #0759c7; color: #fff; }
+.level-style { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+.level-style label { display: grid; gap: 2px; color: #52606d; }
+.level-legend { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 8px; }
+.level-legend span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.level-legend i { width: 18px; height: 0; border-top: 4px solid var(--c); }
+.level-legend i.dash { border-top: 3px dashed var(--c); }
+.level-legend i.dot { width: 9px; height: 9px; border: 0; border-radius: 50%; background: var(--c); }
+.level-hint { margin-top: 8px; color: #52606d; }
+.walk-hud { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5; max-width: calc(100% - 28px); padding: 6px 12px; border-radius: 8px; background: #111827e6; color: #f9fafb; font: 12px/1.4 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+/* the editor's drawing tools rest while a view is on (view only) */
+body.space-view-on [data-tool], body.space-view-on #editor-save, body.space-view-on #editor-cancel { pointer-events: none; opacity: 0.45; }
+#scene-level-view.active, #scene-first-person.active { background: #0759c7; border-color: #0759c7; color: #fff; }

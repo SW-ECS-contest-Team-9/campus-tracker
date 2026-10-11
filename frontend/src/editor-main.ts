@@ -11,6 +11,7 @@ import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
 import { areaSurfacePart } from './road-surface-layer';
 import { SceneLayers, bindLayerControls } from './scene-layers';
 import { editorLayerData } from './scene-layer-data';
+import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 
 let areaEditor: AreaEditor | null = null;
 
@@ -145,6 +146,8 @@ root.innerHTML = `
           <button data-view="frame-selected" title="선택 맞춤 (. / Numpad .)">선택 맞춤</button><button data-view="frame-all" title="전체 맞춤 (Home)">전체</button>
           <button id="view-isolate" data-view="isolate" title="선택 경로만 보기 (/)">단독</button>
           <button id="view-section" type="button" title="단면도: 켜고 지도에서 두 점을 찍으면 그 선을 따라 세로로 잘라 봄. 다시 누르면 끔 (오른쪽 '면 표시 · 단면도'와 같음)">단면도</button>
+          <button id="view-level" type="button" title="층 따로 보기: 켜고 지도에서 건물·길·공간을 누르면 그 건물의 층들(벌려서) 또는 그 구획을 공중에 따로 띄워 봄. ↑↓ 층·구획 차례로, Esc 제자리로. 띄운 동안 편집 잠금(보기 전용)">층 따로 보기</button>
+          <button id="view-walk" type="button" title="1인칭: 켜고 지도에서 들어갈 곳을 누르면 눈높이(1.6 m)로 걸어 다님. W/S 앞뒤, A/D 옆, 끌기·화살표·Q/E 둘러보기, Shift 달리기, Esc 나가기. 걷는 동안 편집 잠금">1인칭</button>
         </div>
         <div id="editor-hover-tip" class="editor-hover-tip" hidden></div></main>
       <aside class="editor-inspector">
@@ -280,6 +283,8 @@ let cursorAxisEntities: any[] = [];
 let buildingScene: CampusSceneLayer | null = null;
 // Surfaces and the cross-section of the preview (scene-layers.ts), fed from this page's own roads and areas.
 let sceneLayers: SceneLayers | null = null;
+// 층 따로 보기 · 1인칭 (level-view-layer.ts): view only, the editing keys and clicks rest while one is on.
+let spaceViews: SpaceViews | null = null;
 let layerTimer: ReturnType<typeof setTimeout> | null = null;
 const drawnEntities = new Set<any>(); // what drawAll() drew: the entities the cross-section cuts
 let xrayPaths: XrayPaths | null = null;
@@ -536,7 +541,7 @@ function computeRoadStyle(r: Road) {
 }
 function updateRoadStyles() {
   if (!viewer) return;
-  xrayPaths?.setVisible(prefs.xrayPaths && !sceneLayers?.section.active); // a cut hides one half; the see-through lines would show it again
+  xrayPaths?.setVisible(prefs.xrayPaths && !sceneLayers?.section.active && !spaceViews?.busy()); // a cut hides one half; the see-through lines would show it again
   for (const r of roads) if (roadWorld.has(r.id)) {
     computeRoadStyle(r);
     const dimmed = !!selectedRoad && selectedRoad.id !== r.id;
@@ -1864,6 +1869,7 @@ function installControls() {
   mouseHandler = new C.ScreenSpaceEventHandler(viewer.scene.canvas);
   mouseHandler.setInputAction((movement: any) => {
     if (sceneLayers?.section.placing) return; // the click places the section line
+    if (spaceViews?.handleClick(movement.position)) return; // 층 따로 보기 · 1인칭: no selection, no cursor move
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
     const feature = tool === 'select' && !areaEditor?.active ? hits.map((h: any) => h.id?.cutFrom ?? h.id?.id).find((id: unknown) =>
       typeof id === 'string' && /^editor:(road|place):/.test(id))?.replace(/:(tube|shaft)$/, '') : null;
@@ -1880,6 +1886,7 @@ function installControls() {
   }, C.ScreenSpaceEventType.LEFT_CLICK);
   viewer.screenSpaceEventHandler.removeInputAction(C.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
   mouseHandler.setInputAction((movement: any) => {
+    if (spaceViews?.busy()) return;
     const vertexId = viewer.scene.drillPick(movement.position, 8, 8)
       .map((hit: any) => hit.id?.id).find((id: unknown) => typeof id === 'string'
         && (id.startsWith('editor:vertex:') || id.startsWith('editor:draft-vertex:')));
@@ -1920,7 +1927,17 @@ async function startEditor() {
   // after the tool's own handlers: the lines are cut with the new plane, and the 원근/정사영 button follows the view
   for (const id of ['layer-section', 'layer-section-look', 'layer-section-flip']) $(id).addEventListener(id === 'layer-section' ? 'change' : 'click', () => { drawAll(); showOrthoState(); });
   for (const id of ['layer-ground', 'layer-area']) $(id).addEventListener('change', () => areaEditor?.refresh());
-  if (import.meta.env.DEV) (window as any).__editor = { viewer, layers: sceneLayers };
+  spaceViews = mountSpaceViews(viewer, {
+    roads: () => roads, buildings: () => buildingScene?.scene.buildings ?? [], groundAt: (x, y) => sceneLayers!.structures.groundAt(x, y),
+    areas: () => editorLayerData([], null, areaEditor?.saved ?? []).areas,
+    places: () => places.map((p) => ({ id: p.id, name: p.name, category: p.category, buildingId: p.buildingId, x: p.geometry.coordinates[0], y: p.geometry.coordinates[1], z: p.geometry.coordinates[2] })),
+    blocked: () => { const busy = roadDraft || placeDraft || areaEditor?.active; if (busy) say('작성 중인 것을 먼저 저장하거나 취소한 뒤 켜세요.', 'warning'); return busy ? '작성 중' : null; },
+    lockKeys: true, walkInputs: [$<HTMLInputElement>('layer-underground')],
+    onWalk: (on) => buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity), onLevel: (on) => buildingScene?.setShowLabels(!on),
+    // view only: the editor's own lines, markers and tags are put away meanwhile (they would show through what is lifted)
+    onChange: (state) => { const on = state.level || state.walk; viewer.entities.show = !on; if (on) { clearHeldKeys(); setTool('select'); } },
+  }, { level: $('view-level'), walk: $('view-walk') });
+  if (import.meta.env.DEV) (window as any).__editor = { viewer, layers: sceneLayers, spaceViews };
   // The terrain-grid endpoint is binary; read it directly, matching the Preview's grid DTO.
   try {
     const res = await fetch(`${API_BASE_URL}/api/v1/terrain/grid`);
