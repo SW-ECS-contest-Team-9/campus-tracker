@@ -37,7 +37,7 @@ export type StructureSources = {
 };
 
 /** Triangles in metres with a colour (0..255) per vertex, and what a click on them selects. */
-type Drawable = { mesh: Mesh; stride: number; rgb: (vertex: number) => number[]; pick?: StructurePick; /** Joint pattern of the faces (paving-pattern.ts), 0 or missing = none. */ pattern?: number };
+type Drawable = { mesh: Mesh; stride: number; /** Colour of a vertex of `positions` (the mesh as drawn: after a cross-section cut it is not the mesh the part was built with). */ rgb: (vertex: number, positions: number[]) => number[]; pick?: StructurePick; /** Joint pattern of the faces (paving-pattern.ts), 0 or missing = none. */ pattern?: number };
 
 async function loadJson(url: string): Promise<any | null> {
   try {
@@ -226,7 +226,7 @@ export class StructuresLayer {
         const b = buildings[k];
         const { mesh } = solidMesh({ id: '', file: '', role: 'box', type: 'foundation', polygon: b.polygon, bottomM: fromM, topM: b.baseM, estimated: true, props: {} });
         const own = b.plinth ? css(b.plinth) : tone; // Z09: the base of a building that names its plinth colour
-        this.groundParts.push({ mesh, stride: SOLID_STRIDE, rgb: (i) => own.map((v) => v * mesh.positions[i * SOLID_STRIDE + 3]) });
+        this.groundParts.push({ mesh, stride: SOLID_STRIDE, rgb: (i, at) => own.map((v) => v * at[i * SOLID_STRIDE + 3]) });
       });
     }
 
@@ -242,7 +242,7 @@ export class StructuresLayer {
       // No side face where a neighbouring platform stands at least as high: the face is inside that neighbour.
       const inNeighbour = (x: number, y: number, z: number) => platforms.some((o) => o !== solid && o.bottomM < z && topHeight(o)(x, y) >= z - 0.01 && this.platformPolygons.get(o)!.some((p) => polygonContains(x, y, p)));
       const { mesh, edges } = solidMesh(solid, polygons ? { polygons, bottomAt: below, top: false, hiddenSide: inNeighbour } : {});
-      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i) => (mesh.positions[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * mesh.positions[i * SOLID_STRIDE + 3])) });
+      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])) });
       if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
       if (!polygons) continue;
       const whole = polygons.reduce((sum, q) => sum + polygonArea(q), 0);
@@ -274,7 +274,7 @@ export class StructuresLayer {
     for (let i = 0; i < n; i++) {
       const c = this.position(d.mesh.positions[i * d.stride], d.mesh.positions[i * d.stride + 1], d.mesh.positions[i * d.stride + 2]);
       values.set([c.x, c.y, c.z], i * 3);
-      colors.set([...d.rgb(i), 255], i * 4);
+      colors.set([...d.rgb(i, d.mesh.positions), 255], i * 4);
     }
     return new C.GeometryInstance({
       geometry: new C.Geometry({
