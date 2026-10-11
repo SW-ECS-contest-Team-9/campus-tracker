@@ -26,7 +26,7 @@
    "evidence": "사진 22: 섬과 긴 줄 사이 통로 5.5~6 m, 모델 4.1 m. 섬 반지름을 2.8 m 로 줄이고 중심을 0.2 m 북서로(경사로 쪽 벽 선·발치·낮은 벽은 제자리). 굽은 구간의 가운데 선과 마루만 따라 옮김. 20.0 m 에 3.5 m, 17.5 % 그대로",
    "args": {
     "id": "f3501fc8-8e18-4875-b081-61aa94eca7e3",
-    "expectedRevision": 1,
+    "expectedRevision": 2,
     "zMode": "explicit",
     "densify": false,
     "path": [
