@@ -85,11 +85,13 @@ for (const [name, s, under] of SECTIONS) {
     return { 수: t.length, 겹침: over, 높이: t.filter((x) => x.kind === 'level').map((x) => x.text) }; })()`)));
   // 보기 설정을 바꾸면 바로 따라옴: 굵게 + 이름표 전체 + 나머지 숨김 / 가늘게 + 이름표 없음
   if (after && name.startsWith('11-')) {
-    await ev(`(async () => { const s = await import('/src/view-style.ts'); s.setViewStyle({ line: 'thick', labels: 'all', others: 'hide' }); return 1; })()`);
+    // 단면 패널의 고르기 상자를 실제로 바꾼다(화면의 설정이 바로 따라오는지)
+    const setStyle = (o) => ev(`(() => { for (const [k, v] of Object.entries(${JSON.stringify(o)})) { const el = document.querySelector('.section-panel select[data-style="' + k + '"]'); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); } return 1; })()`);
+    await setStyle({ line: 'thick', labels: 'all', others: 'hide' });
     await sleep(3500); await shot('14-단면-운동장지하-굵게·전체·숨김');
-    await ev(`(async () => { const s = await import('/src/view-style.ts'); s.setViewStyle({ line: 'thin', labels: 'none', others: 'dim' }); return 1; })()`);
+    await setStyle({ line: 'thin', labels: 'none', others: 'dim' });
     await sleep(3500); await shot('15-단면-운동장지하-가늘게·없음·흐리게');
-    await ev(`(async () => { const s = await import('/src/view-style.ts'); s.setViewStyle(s.VIEW_STYLE_DEFAULT); return 1; })()`);
+    await setStyle({ line: 'normal', labels: 'main', others: 'dim' });
     if (editor) { // 편집 선·표지도 보기를 켠 모습(기본은 꺼짐)
       await ev(`(() => { const b = document.querySelector('.section-panel input[data-overlay]'); b.click(); return b.checked; })()`);
       await sleep(3000); await shot('16-단면-운동장지하-편집선켬');

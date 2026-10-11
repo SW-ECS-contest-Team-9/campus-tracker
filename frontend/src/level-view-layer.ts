@@ -359,6 +359,7 @@ export class LevelView {
         position: world, text, font: `${kind === 'title' ? 700 : 600} ${size}px system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`,
         fillColor: C.Color.fromCssColorString(color), outlineColor: C.Color.WHITE, outlineWidth: 4, style: C.LabelStyle.FILL_AND_OUTLINE,
         horizontalOrigin: C.HorizontalOrigin.CENTER, verticalOrigin: C.VerticalOrigin.BOTTOM, pixelOffset: new C.Cartesian2(0, -6),
+        ...(kind === 'floor' ? { showBackground: true, backgroundColor: C.Color.WHITE.withAlpha(0.82), backgroundPadding: new C.Cartesian2(5, 3), style: C.LabelStyle.FILL } : {}),
         disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: kind === 'floor' || kind === 'title' ? new C.NearFarScalar(200, 1.2, 2500, 0.9) : new C.NearFarScalar(120, 1.15, 900, 0.6), show: false,
       });
       this.tags.push({ label, world, priority });

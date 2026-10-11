@@ -6,8 +6,9 @@
 // underground level or an indoor floor is walked at its own height and the walker never jumps to a roof or the field.
 // There is no collision with walls. Nothing of the data is touched; the camera is put back on leaving.
 // F09: underground and indoors there is no wall or ceiling model, so the level one stands on is drawn as a schematic
-// room from what the data has (ROOM below): the outline of an underground storey as translucent walls with an opaque
-// ceiling (nothing above it is seen), and around every indoor or underground way a box of the way's width. These are
+// room from what the data has (ROOM below): the outline of an underground storey or of a building floor as plain
+// walls with a ceiling (nothing above or outside is seen), and around every indoor or underground way a translucent
+// box of the way's width. These are
 // drawings of the walk only, not walls of the model. PageUp / PageDown on an elevator steps to its next stop.
 import type { SceneBuilding } from './api';
 import { WALK, baseBuildingId, elevatorStops, feetHeight, floorOfRoad, floorText, inPolygons, isConnector, nextStop, roadHeightAt, shortName, walkSurfaces, zoneAt, type LvArea, type LvRoad, type Zone } from './level-view';
@@ -325,11 +326,15 @@ export class FirstPerson {
     const edges = new C.PolylineCollection();
     const pos = (p: number[]) => { const g = tmInverse(p[0], p[1]); return C.Cartesian3.fromDegrees(g.longitude, g.latitude, p[2]); };
     const edge = (pts: number[][], width = 1.5) => edges.add({ positions: pts.map(pos), width, material: C.Material.fromType('Color', { color: C.Color.fromCssColorString(ROOM.edge).withAlpha(0.85) }) });
-    /** A wall along a line of plan points, from `lowM` (per point or one value) up `heightM`. */
-    const wall = (line: number[][], heightM: number, lowM?: number) => {
+    /**
+     * A wall along a line of plan points, from `lowM` (per point or one value) up `heightM`. `shell`: the outer wall of a
+     * storey or a floor, drawn solid (nothing of the campus shows through it); the walls of a way's box stay
+     * translucent, so where two ways meet one sees on into the other.
+     */
+    const wall = (line: number[][], heightM: number, lowM?: number, shell = false) => {
       for (let i = 0; i + 1 < line.length; i++) {
         const a = line[i], b = line[i + 1], za = lowM ?? a[2], zb = lowM ?? b[2];
-        glass.quad([a[0], a[1], za], [b[0], b[1], zb], [b[0], b[1], zb + heightM], [a[0], a[1], za + heightM], ROOM.wall, ROOM.wallAlpha);
+        (shell ? solid : glass).quad([a[0], a[1], za], [b[0], b[1], zb], [b[0], b[1], zb + heightM], [a[0], a[1], za + heightM], ROOM.wall, shell ? 1 : ROOM.wallAlpha);
       }
       edge(line.map((p) => [p[0], p[1], (lowM ?? p[2]) + heightM]));
       edge(line.map((p) => [p[0], p[1], (lowM ?? p[2]) + 0.03]), 1);
@@ -381,7 +386,7 @@ export class FirstPerson {
       const floorM = zone.floorM!, heightM = zone.toM! - floorM - ROOM.insetM;
       const inner = growPolygons(zone.polygons, -ROOM.insetM);
       for (const polygon of inner) {
-        for (const ring of polygon) wall([...ring, ring[0]], heightM, floorM);
+        for (const ring of polygon) wall([...ring, ring[0]], heightM, floorM, true);
         solid.fill(polygon, floorM + heightM, ROOM.ceiling);
       }
       ceilingGrid(inner, floorM + heightM - 0.02);
@@ -398,7 +403,7 @@ export class FirstPerson {
           const ring = poly[0].slice(0, -1).map(([lon, lat]) => { const m = tmForward(lat, lon); return [m.x, m.y]; });
           solid.fill([ring], floorM - 0.05, ROOM.floor);
           solid.fill([ring], floorM + heightM, ROOM.ceiling);
-          wall([...ring, ring[0]], heightM, floorM);
+          wall([...ring, ring[0]], heightM, floorM, true);
           ceilingGrid([[ring]], floorM + heightM - 0.02);
         }
       }

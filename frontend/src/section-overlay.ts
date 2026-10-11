@@ -120,14 +120,14 @@ export class SectionOverlay {
       }
       const levels = mergeLevels(seen).map((level) => {
         const items = level.items as Seen[];
-        // at "주요" a height is named by its areas and spaces, else by one way; at "전체" by everything there
+        // at "주요" a height is named by its areas and spaces, else by the way the leader points at (and how many more
+        // there are); at "전체" by everything there. The leader goes to the nearest of the things that are named.
         const major = items.filter((i) => i.name && i.rank === 'major');
-        const named = show.road ? items.filter((i) => i.name) : major.length ? major : items.filter((i) => i.name).slice(0, 1);
-        const names = [...new Set(named.map((i) => i.name))];
-        const shownItems = show.road || !major.length ? items : major;
-        const anchor = shownItems.reduce((a, b) => (b.p.x > a.p.x ? b : a)).p;
-        const text = levelText({ z: level.z, names }, show.road ? 3 : 2);
-        return { text, anchor, ...size(text) };
+        const pool = show.road || !major.length ? items : major;
+        const nearest = pool.reduce((a, b) => (b.p.x > a.p.x ? b : a));
+        const names = [...new Set([nearest, ...pool].map((i) => i.name).filter(Boolean))];
+        const text = levelText({ z: level.z, names }, show.road ? 3 : major.length ? 2 : 1);
+        return { text, anchor: nearest.p, ...size(text) };
       });
       const ys = spread(levels.map((l) => l.anchor.y - TAG_H / 2), TAG_H, 4, H - 4, 3);
       levels.forEach((level, i) => {
