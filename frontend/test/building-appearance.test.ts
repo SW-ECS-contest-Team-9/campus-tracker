@@ -219,3 +219,32 @@ test('B13 띠와 색 판: 띠 안에서 시작하는 줄만 둥근 머리, 띠 �
   const faced = decorate([block], { roofM: 112, groundM: 100 }, { ...look, faces: [0, 90, 180, 270].map((azimuth) => ({ azimuth, wall: 'metal' })) });
   assert.equal(yellow(faced).length, 0);
 });
+
+test('P02 외쪽지붕: 벽은 기운 면까지 서고 지붕은 그 면 하나, 창 줄은 그 벽의 낮은 쪽 꼭대기 아래까지만', async () => {
+  const { planeAt, ownWalls } = await import('../src/building-appearance.ts');
+  const plane = { origin: [X0, Y0], direction: [1, 0], points: [[0, 130], [40, 118]] };
+  const z = planeAt(plane);
+  assert.equal(z(X0 - 5, Y0), 130); assert.equal(z(X0 + 20, Y0 + 7), 124); assert.equal(z(X0 + 99, Y0), 118);
+  const a = { wall: 'glass', windows: { style: 'curtain' as const, floorsM: [100, 104, 108, 112, 116, 120, 124] }, roof: { type: 'shed' as const, plane } };
+  assert.equal(ownWalls(a), true); // 민무늬 블록은 그리지 않는다
+  const mesh = decorate([block], { roofM: 124, groundM: 100 }, a);
+  assert.equal(Math.max(...zs(mesh)), 130.3); // 가장 높은 곳 = 높은 쪽 끝의 테두리
+  // 지붕 꼭짓점은 모두 그 면 위에 있다(낮은 쪽 끝 118, 높은 쪽 끝 130)
+  const onPlane = []; for (let i = 0; i < mesh.positions.length; i += 3) if (Math.abs(mesh.positions[i + 2] - z(mesh.positions[i], mesh.positions[i + 1])) < 1e-9) onPlane.push(mesh.positions[i + 2]);
+  assert.ok(onPlane.includes(118) && onPlane.includes(130));
+  // 낮은 쪽 끝 벽(x = X0 + 40, 꼭대기 118)에는 116 m 층의 유리가 없다, 높은 쪽 끝 벽에는 124 m 층까지 있다
+  const glassTop = (x: number) => { let top = -Infinity; for (let i = 0; i < mesh.positions.length; i += 9) { const xs = [0, 3, 6].map((k) => mesh.positions[i + k]), ys = [1, 4, 7].map((k) => mesh.positions[i + k]); if (xs.every((v) => Math.abs(v - x) < 0.2 && Math.abs(v - x) > 0.05) && ys.every((v) => v > Y0 && v < Y0 + 12)) top = Math.max(top, mesh.positions[i + 2], mesh.positions[i + 5], mesh.positions[i + 8]); } return top; };
+  assert.ok(glassTop(X0 + 40) <= 117.1 + 1e-9, String(glassTop(X0 + 40)));
+  assert.ok(glassTop(X0) > 124, String(glassTop(X0)));
+});
+
+test('P02 묶음 아치: 칸 간격마다 돌 기둥, 칸마다 층마다 판과 창(쌍이면 둘), 아치 머리는 어두운 반타원', () => {
+  const a = { wall: 'stone', windows: { style: 'archbays' as const, floorsM: [100, 104, 108, 112], pitchM: 6, widthM: 1.8, heightM: 1.3, sillM: 1.1, paired: true, accent: '#e3a43c' } };
+  const mesh = decorate([[[[X0, Y0], [X0 + 40, Y0], [X0 + 40, Y0 + 2], [X0, Y0 + 2], [X0, Y0]]]], { roofM: 120, groundM: 100 }, a);
+  const count = (rgb: number[]) => { let k = 0; for (let i = 0; i < mesh.colors.length; i += 9) if (mesh.colors[i] === rgb[0] && mesh.colors[i + 1] === rgb[1] && mesh.colors[i + 2] === rgb[2]) k++; return k; };
+  // 긴 벽 40 m: 칸 6개(간격 6 m, 기둥 0.95 m), 두 벽. 짧은 벽 2 m 에는 칸이 없다
+  assert.equal(count([0x3d, 0x40, 0x43]), 2 * 6 * 10); // 어두운 아치 머리: 칸마다 세모 10개
+  assert.equal(count([0xe3, 0xa4, 0x3c]) + count([0x77, 0x78, 0x7a]), 2 * 6 * 4 * 2); // 층마다 판 하나(네모 = 세모 둘), 두 색을 번갈아
+  assert.equal(count([0xe3, 0xa4, 0x3c]), count([0x77, 0x78, 0x7a]));
+  assert.equal(count([0xe9, 0xeb, 0xe8]), 2 * 6 * 4 * 2 * 2); // 흰 틀: 칸·층마다 창 둘
+});

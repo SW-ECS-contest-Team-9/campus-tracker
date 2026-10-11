@@ -37,6 +37,10 @@ B13 에서 더한 것(혜인관: 벽돌 본체 위의 기와 띠와 옥상 상�
             # 두 높이 사이의 벽 띠만 다른 재질·색으로, 그 안에서 시작하는 층의 창 줄만 다른 모양으로(기와 띠의 둥근 지붕창 줄, 맨 윗줄만 둥근 머리). 값·색·창 중 하나는 있어야 한다
       판: {색: ["#rrggbb", ...], 부터_층 또는 부터_높이(없으면 벽 전체), 출처, 등급}
             # 벽에 불규칙하게 붙은 색 판(컨테이너 상자의 노랑 판). 자리·크기는 그림용으로 지어낸 것이고 잰 것이 아니다. 벽면 규칙이 재질을 바꾼 면에는 그리지 않는다
+P02 에서 더한 것:
+      지붕.모양 "외쪽지붕" + 지붕.기울기: {원점: [x, y], 방향: [dx, dy], 점: [[거리 m, 높이 m], ...]}   # 한 면으로 기운 지붕(유담관 탑). 높이 = 그 점을 방향 축에 내린 거리에서의 값(사이는 직선, 폭 방향으로 평평).
+            # 벽은 그 면까지 서고 지붕은 그 면 하나다. 저장된 지붕 높이(부분마다 평평한 값)는 그대로 둔다. 같은 기울기를 적은 부분들은 한 덩어리로 보인다
+      창.모양 "묶음 아치": 여러 층을 한 아치로 묶은 칸(북악관). 돌 기둥 사이의 칸마다 층마다 판(덧색과 회색을 번갈아)과 흰 틀 창, 아치 머리에는 어두운 판. 창.간격 = 칸 간격, 창.폭·높이·창턱·쌍 = 칸 안의 창
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정). 다만 그 층의 등급에 "사용자 조건부 승인"이 적혀 있으면 둔다(U03, 은주1관).
 """
@@ -44,9 +48,9 @@ import re
 
 GRADES = ('확정', '원천', 'S-MAP', '추정')
 WALLS = {'붉은 벽돌': 'brick', '유리': 'glass', '밝은 돌': 'stone', '흰 돌': 'white', '콘크리트': 'concrete', '담쟁이': 'ivy', '판': 'panel', '금속판': 'metal'}
-STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches', '긴 아치': 'bays', '작은 아치': 'archrows', '기둥 발코니': 'piers'}
+STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치': 'arches', '긴 아치': 'bays', '작은 아치': 'archrows', '기둥 발코니': 'piers', '묶음 아치': 'archbays'}
 DIRECTIONS = {'북': 0, '북동': 45, '동': 90, '남동': 135, '남': 180, '남서': 225, '서': 270, '북서': 315}
-ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped'}
+ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped', '외쪽지붕': 'shed'}
 ROOF_MATERIALS = {'기와': 'tile', '콘크리트': 'concrete', '유리': 'glass', '옥상 정원': 'green', '금속판': 'metal', '코트': 'court'}
 BAND_STYLES = ('rows', 'bands', 'arches', 'archrows')
 KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof', '밑동': 'plinth', '큰_기둥': 'order'}
@@ -243,6 +247,13 @@ def from_note(head):
                     else: roof['eaveBandM'] = r['처마띠']
                 if r.get('지붕창') is True: roof['dormers'] = True
                 roof.update(eave(r, f'{at}.지붕', bad))
+                if roof['type'] == 'shed':   # P02: 한 면으로 기운 지붕
+                    g = r.get('기울기'); o, d, ps = (g.get('원점'), g.get('방향'), g.get('점')) if isinstance(g, dict) else (None, None, None)
+                    pair = lambda v: isinstance(v, list) and len(v) == 2 and all(isinstance(c, (int, float)) and not isinstance(c, bool) for c in v)
+                    if not (pair(o) and pair(d) and (d[0] or d[1]) and isinstance(ps, list) and len(ps) >= 2 and all(pair(q) and num(q[1], 0, 400) for q in ps) and all(ps[i][0] < ps[i + 1][0] for i in range(len(ps) - 1))):
+                        bad.append(f'{at}.지붕.기울기: 원점 [x, y], 방향 [dx, dy], 점 [[거리, 높이], ...](거리가 커지는 차례, 둘 이상)')
+                    else: roof['plane'] = {'origin': o, 'direction': d, 'points': ps}
+                elif r.get('기울기') is not None: bad.append(f'{at}.지붕.기울기 는 외쪽지붕에만')
                 if r.get('겹') is not None:
                     if r['겹'] != 2: bad.append(f'{at}.지붕.겹 은 2')
                     else: roof['tiers'] = 2

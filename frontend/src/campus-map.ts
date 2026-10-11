@@ -384,7 +384,7 @@ export class CampusSceneLayer {
         const r = poly[0];
         if (r.length > best.length) best = r;
         // roof outline, slightly above the roof so it is not z-fighting
-        this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat]) => [lon, lat, this.wallTop(b) + 0.05])), width: 1.5, material: edge, id: this.picks.get(b.buildingId) });
+        if (this.elevation || b.appearance?.roof?.type !== 'shed') this.edges.add({ positions: C.Cartesian3.fromDegreesArrayHeights(r.flatMap(([lon, lat]) => [lon, lat, this.wallTop(b) + 0.05])), width: 1.5, material: edge, id: this.picks.get(b.buildingId) }); // P02: a roof in one plane has no level outline
         // vertical edges only at real corners (not along curved walls)
         if (!this.elevation && ownWalls(b.appearance)) continue; // B12: the footprint is the eave there, the walls stand inside it
         const open = r.slice(0, -1);

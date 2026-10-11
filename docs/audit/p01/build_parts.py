@@ -255,7 +255,7 @@ def hanlim_rock():
         box(f'P01-ROCKGARDEN-ROCK-{k + 1}-B', 'wall', R(s0 + 0.6, s1 - 0.8, -0.6, d * 0.55), top, top + 1.4, '바위 덩어리의 윗단', HS, G, f'P01-ROCKGARDEN-ROCK-{k + 1}', color='#9a958a')
     for k, (s, d, z) in enumerate(((2.0, 1.5, 122.5), (6.0, 1.2, 126.4), (12.5, 1.5, 127.4), (19.5, 1.2, 125.9), (9.0, 1.4, 121.0))): tree(f'P01-ROCKGARDEN-PINE-{k + 1}', P(s, d), z, '바위 정원의 소나무', HS, 'P01-ROCKGARDEN-ROCK')
 
-PARTS = [arcade, bongwan_west, bongwan_south, field_pattern, suin_roof, munye_end, hanlim_rock]
+PARTS = [arcade, bongwan_west, bongwan_south, suin_roof, munye_end, hanlim_rock]   # 운동장 바닥 무늬(field_pattern)는 P02 가 사진을 펴서 다시 읽었다: docs/audit/p02/field.py
 def write():
     for part in PARTS: part()
     out = {'type': 'FeatureCollection', 'name': 'p01-parts', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}}, 'provenance': {'script': 'docs/audit/p01/build_parts.py', 'note': '사용자 전경 사진·아치 건물 사진·네이버 거리뷰로 더한 덩어리. 전부 추정 치수'}, 'features': FEATS}
