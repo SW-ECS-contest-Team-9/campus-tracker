@@ -76,8 +76,6 @@ out = {'id': 'U02', 'zone': '운동장 아래 지하층과 지하 차도', 'comm
 ops_b = [{'ref': '보행 동선을 차로 밖으로', 'op': 'update_road', 'args': {'id': R['pass'], 'expectedRevision': REV_PASS, 'zMode': 'explicit', 'densify': False, 'path': [node(N_HBOT), HY['out']] + HY['via'] + [node(N_J0)]},
           'grade': '원천(주차장을 가로질러 은주관 문으로), 추정(선)', 'evidence': f'{BLOG}. 주차 자리 동쪽과 들머리 차로 북동쪽으로 돌아 차로와 엇갈리지 않게 함(실제 걷는 선은 모름)'}]
 (HERE / 'groups').mkdir(exist_ok=True)
-(HERE / 'groups' / 'u02b.json').write_text(json.dumps({'id': 'U02b', 'zone': out['zone'], 'comment': 'U02b: 지하 1층 보행 동선이 차로를 건너지 않게', 'ops': ops_b}, ensure_ascii=False, indent=1) + '
-', encoding='utf-8', newline='
-')
+(HERE / 'groups' / 'u02b.json').write_text(json.dumps({'id': 'U02b', 'zone': out['zone'], 'comment': 'U02b: 지하 1층 보행 동선이 차로를 건너지 않게', 'ops': ops_b}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 (HERE / 'groups' / 'u02.json').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(len(ops), out['numbers'])
