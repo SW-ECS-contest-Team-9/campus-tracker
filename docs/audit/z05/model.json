@@ -1,12 +1,12 @@
 {
  "crs": "EPSG:5186",
  "counts": {
-  "platforms": 93,
+  "platforms": 96,
   "roadPieces": 37,
   "handOther": 5,
-  "planes": 51,
+  "planes": 54,
   "boxes": 216,
-  "terrainSurfaces": 93,
+  "terrainSurfaces": 96,
   "edgeSamples": 1855,
   "z04": {
    "platforms": 205,
@@ -20,12 +20,12 @@
  },
  "coverage": {
   "campusOutsideBuildingsM2": 34388,
-  "coveredByPlatformsM2": 34241
+  "coveredByPlatformsM2": 34243
  },
  "vsSmap1m": {
-  "points": 29369,
-  "p50abs": 0.42,
-  "p90abs": 6.07
+  "points": 30033,
+  "p50abs": 0.44,
+  "p90abs": 6.46
  },
  "zones": {
   "turnaround": {
@@ -90,7 +90,7 @@
       131.75,
       133.1
      ],
-     "area": 334.0,
+     "area": 334.1,
      "grade": "S-MAP(높이), 추정(외곽: 곧은 변으로 잡음)",
      "material": "paving",
      "terrain": true,
@@ -265,7 +265,7 @@
       128.99,
       129.44
      ],
-     "area": 38.5,
+     "area": 38.8,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
      "material": "paving",
      "terrain": true,
@@ -278,7 +278,7 @@
       129.44,
       129.99
      ],
-     "area": 60.2,
+     "area": 60.3,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
      "material": "paving",
      "terrain": true,
@@ -317,7 +317,7 @@
       130.29,
       130.92
      ],
-     "area": 93.3,
+     "area": 93.6,
      "grade": "S-MAP·사용자 핀(종단, V02), 추정(폭), 사용자 높이 표시 121.4~126.1 m(그림 13)",
      "material": "paving",
      "terrain": true,
@@ -377,7 +377,7 @@
      "id": "Z05-PLATFORM-UPPER-HAIRPIN-ISLAND",
      "what": "위쪽 갈래 굽이 안쪽의 섬(화단으로 봄)",
      "top": 125.4,
-     "area": 194.3,
+     "area": 191.6,
      "grade": "S-MAP(높이), 추정(외곽·재질)",
      "material": "planting",
      "terrain": true,
@@ -682,14 +682,34 @@
      "kind": "hand"
     },
     {
+     "id": "Z05-PLATFORM-EUNJU-ROCK-TERRACE",
+     "what": "바위 정원 아래의 넓은 돌 단(굽이 아래, 두 바위 덩이 사이)",
+     "top": 117.8,
+     "area": 49.3,
+     "grade": "S-MAP(높이·범위), 원천(넓은 돌 단과 돌 화분: 사용자 사진 04·거리뷰 09), 추정(바위 면 자리 ±1 m)",
+     "material": "paving",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-EUNJU-CENTRAL-LEDGE",
+     "what": "가운데 옹벽의 아랫벽(바위 면) 위 턱",
+     "top": 125.5,
+     "area": 222.0,
+     "grade": "S-MAP(높이), 원천(바위 위 소나무 띠와 그 뒤 콘크리트 윗벽: 사용자 사진 04·거리뷰 09), 추정(한 높이로 봄, 두 벽 면의 자리 ±1.5 m)",
+     "material": "planting",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
      "id": "Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP",
      "what": "주 진입로(아래)와 위쪽 갈래(위) 사이 옹벽의 윗부분",
      "top": [
       127.3,
       131.0
      ],
-     "area": 442.2,
-     "grade": "S-MAP·사용자 핀(위쪽 갈래 높이), 추정(벽 면 자리 ±2 m, 띠가 화단인지 보도인지)",
+     "area": 80.7,
+     "grade": "S-MAP·사용자 핀(위쪽 갈래 높이), 추정(벽 면 자리 ±1.5 m, 띠가 화단인지 보도인지)",
      "material": "planting",
      "terrain": true,
      "kind": "spec"
@@ -701,7 +721,7 @@
       126.5,
       129.61
      ],
-     "area": 251.4,
+     "area": 246.9,
      "grade": "S-MAP(높이), 추정(무엇인지 모름: 비탈·계단 구분 근거 없음)",
      "material": "planting",
      "terrain": true,
@@ -777,9 +797,22 @@
      "id": "Z05-PLATFORM-EUNJU-SUIN-SOUTH-EDGE",
      "what": "수인관 남동 가장자리(건물 덩어리와 캠퍼스 외곽 사이의 좁은 띠)",
      "top": 132.1,
-     "area": 354.9,
+     "area": 342.0,
      "grade": "추정(S-MAP 128~132 m, 무엇인지 모름)",
      "material": "concrete",
+     "terrain": true,
+     "kind": "spec"
+    },
+    {
+     "id": "Z05-PLATFORM-EUNJU-GLASSBLOCK-STREET",
+     "what": "수인관 남동쪽 유리 덩어리의 밑과 길 쪽 앞, 수인관과의 틈(캠퍼스 밖)",
+     "top": [
+      114.3,
+      111.4
+     ],
+     "area": 1165.2,
+     "grade": "S-MAP(덩어리 앞 땅 110.3~114.2 m), 추정(범위: 덩어리 외곽 = P02 추정, 남동 끝 11 m 는 메시 밖이라 같은 높이로 늘임, 앞마당이 무엇인지 모름)",
+     "material": "paving",
      "terrain": true,
      "kind": "spec"
     }
@@ -1141,7 +1174,7 @@
       106.69,
       108.86
      ],
-     "area": 712.2,
+     "area": 707.4,
      "grade": "S-MAP·사용자 핀(높이), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -1193,7 +1226,7 @@
       108.14,
       119.09
      ],
-     "area": 360.0,
+     "area": 493.0,
      "grade": "S-MAP·사용자 핀(차도 종단, V02), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -1206,7 +1239,7 @@
       108.14,
       119.09
      ],
-     "area": 27.9,
+     "area": 33.2,
      "grade": "S-MAP·사용자 핀(차도 종단, V02), 추정(외곽)",
      "material": "paving",
      "terrain": true,
@@ -1560,15 +1593,25 @@
    2.67,
    92
   ],
+  "Z05-PLATFORM-EUNJU-ROCK-TERRACE": [
+   -0.22,
+   2.1,
+   31
+  ],
+  "Z05-PLATFORM-EUNJU-CENTRAL-LEDGE": [
+   0.27,
+   4.39,
+   221
+  ],
   "Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP": [
-   5.41,
-   10.82,
-   435
+   1.6,
+   3.28,
+   80
   ],
   "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH": [
-   -0.01,
-   3.74,
-   245
+   -0.02,
+   3.44,
+   236
   ],
   "Z05-PLATFORM-EUNJU-EUNJU1-NW": [
    -2.03,
@@ -1647,8 +1690,8 @@
   ],
   "Z05-PLATFORM-GATE-APRON": [
    -2.78,
-   19.09,
-   701
+   19.11,
+   699
   ],
   "Z05-PLATFORM-GATE-APRON-b": [
    -0.31,
@@ -1666,19 +1709,24 @@
    538
   ],
   "Z05-PLATFORM-GATE-ROAD-EAST-EDGE": [
-   -4.2,
-   19.32,
-   333
+   -4.9,
+   18.11,
+   447
   ],
   "Z05-PLATFORM-GATE-ROAD-EAST-EDGE-b": [
-   -1.84,
-   3.3,
-   18
+   -2.37,
+   3.94,
+   23
   ],
   "Z05-PLATFORM-EUNJU-SUIN-SOUTH-EDGE": [
-   0.03,
-   10.51,
-   350
+   0.01,
+   9.38,
+   337
+  ],
+  "Z05-PLATFORM-EUNJU-GLASSBLOCK-STREET": [
+   -22.68,
+   24.39,
+   672
   ],
   "Z05-PLATFORM-GATE-SEOGYEONG-RO": [
    -0.03,

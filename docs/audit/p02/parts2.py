@@ -55,49 +55,82 @@ def letters(pid, text, P, s0, d0, cw, ch, what, src, grade, base, color='#f2f2ee
         poly(f'{pid}-{i + 1}-{c}', 'wall', g, z, z + 0.03, f'{what}: 글자 {c}', src, grade, base, color=color, surfaceMark=True)
 
 # ================= 1. 굽잇길 아래 바위 정원 =================
+# R01: 가운데 옹벽의 기단을 다시 잡았다(z05/build_inputs.py): 아랫벽 면 = 동좌표 201102.9 의 곧은 선, 그 위 소나무 턱 125.5 m, 굽이 아래 돌 단 117.8 m. 바위 덩이는 아랫벽 면 앞에 얹는다
+WALLX, LEDGE_Z, TERR_Z = 201102.9, 125.5, 117.8
 def rocks():
-    SRC = '사용자-학교전경-20261012/04-한림관-원통-아래에서-바위정원-계단.jpg, 사용자-네이버거리뷰-20261012/09-네이버거리뷰-전방위.jpg, S-MAP 0.5 m 메시(z03/smap-mesh-z03-plaza-05m-c·d)'
-    G = '원천(큰 바위 절벽과 소나무: 사용자 사진 04·거리뷰 09), S-MAP(바위 면이 117.5 → 125 m 로 오르는 자리: 동좌표 201097~201103, 북좌표 557222~557241 과 557254~557264), 추정(바위 낱덩이의 자리·크기·모양: 가운데 옹벽 면 앞에 붙인 조각. 실제 바위 면은 옹벽 선보다 4 m 쯤 동쪽까지 들어가 있다)'
+    SRC = '사용자-학교전경-20261012/04-한림관-원통-아래에서-바위정원-계단.jpg, 사용자-네이버거리뷰-20261012/09·10-네이버거리뷰-전방위.jpg, S-MAP 0.5 m 메시(z03/smap-mesh-z03-plaza-05m-c·d)'
+    G = '원천(큰 바위 절벽과 소나무, 그 위 콘크리트 윗벽: 사용자 사진 04·거리뷰 09), S-MAP(바위 면의 발치와 머리: 남쪽 덩이 동좌표 201098.7 → 201103(117.8 → 125 m)·북좌표 557227~557240, 굽이 아래 돌 단 뒤 동좌표 201102.6~201105, 북쪽 덩이 북좌표 557252~557256), 추정(바위 낱덩이의 자리·크기·모양, 남쪽 덩이의 남쪽 끝 북좌표 557227: 거리뷰 09 에서 그 남쪽은 짙은 돌 옹벽)'
     rnd = random.Random(402); COL = ['#b7b2a6', '#a59f93', '#c4bfb3', '#958f84', '#aeb0ab']
     def blob(c, r):   # 모난 바위 평면
         n = rnd.randint(5, 7); a0 = rnd.random() * 6.28
         return SP([(c[0] + r * rnd.uniform(0.7, 1.15) * math.cos(a0 + 2 * math.pi * k / n), c[1] + r * rnd.uniform(0.7, 1.15) * math.sin(a0 + 2 * math.pi * k / n)) for k in range(n)]).buffer(0)
-    k = 0
-    # 남쪽 덩어리: 가운데 옹벽의 서쪽 면(동좌표 201099.0~201099.5)에 붙여, 계단식 인도(Z03 동쪽 계단)의 동쪽 가장자리를 0.6 m 까지만 덮는다
     Z03 = [(shape(f['geometry']).buffer(0), f['properties']['toM']) for f in json.loads((STR / 'z03-fountain.geojson').read_text(encoding='utf-8'))['features'] if f['properties']['id'].startswith('Z03-EAST-')]
-    def stand(g, f0):   # 바위 조각이 딛는 높이: 그 자리 계단식 인도(Z03)의 참·단 윗면(바위는 그 위에 선다: 겹치지 않게)
-        return max([t for q, t in Z03 if q.intersects(g)] + [f0])
-    foot = lambda y: float(np.interp(y, [557222, 557228, 557234, 557240, 557244], [114.5, 115.5, 116.4, 117.3, 117.9]))   # 인도 옆 땅 높이(Z03)
-    y = 557221.5
-    while y < 557243.0:
-        w = rnd.uniform(1.6, 3.0); yc = y + w / 2; f = foot(yc); wallx = 201099.5 if yc < 557233.6 else 201099.0
-        for tier, (dx, hr) in enumerate(((0.15, (5.5, 9.5)), (-0.55, (2.2, 5.0)), (-1.05, (0.7, 2.0)))):   # 벽에 붙은 높은 조각, 그 앞의 중간 조각, 발치의 낮은 조각
-            if tier == 2 and rnd.random() < 0.35: continue
-            top = min(f + rnd.uniform(*hr), 126.6); r = w * rnd.uniform(0.5, 0.68)
-            g = blob((wallx + dx, yc + rnd.uniform(-0.3, 0.3)), r).intersection(SP([(wallx - 0.9, y - 0.6), (wallx + 0.7, y - 0.6), (wallx + 0.7, y + w + 0.6), (wallx - 0.9, y + w + 0.6)]))
-            if g.is_empty: continue
-            b0 = stand(g, f - 0.6); top = max(top, b0 + 0.6)
-            k += 1; poly(f'P02-ROCKGARDEN-S-{k:02d}', 'wall', g, b0, top, '바위 정원(남쪽 덩어리)의 바위 조각', SRC, G, 'Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP 의 서쪽 벽면', color=COL[k % len(COL)])
+    def stand(g, embed=0.0):   # 바위 조각·화단이 딛는 높이: 그 자리 계단식 인도(Z03)의 참·단 윗면(그 위에 선다: 겹치지 않게), 없으면 기단 윗면에서 embed 만큼 묻는다
+        c = g.representative_point(); on = [t for q, t in Z03 if q.intersects(g)]; return max(on) if on else ground(c.x, c.y) - embed
+    k = [0]
+    def rock(tag, g, top, what, base):
+        if g.is_empty or g.area < 0.15: return
+        b0 = stand(g, 0.5); k[0] += 1; poly(f'P02-ROCKGARDEN-ROCK-{tag}{k[0]:02d}', 'wall', g, b0, max(top, b0 + 0.6), what, SRC, G, base, color=COL[k[0] % len(COL)])
+    # 남쪽 덩이: 아랫벽 면에서 서쪽으로 4 m 나온 바위(발치 동좌표 201098.8). 벽 쪽이 높고 발치로 낮아지는 네 줄
+    y = 557226.4
+    while y < 557240.3:
+        w = rnd.uniform(1.7, 3.0); yc = y + w / 2; f = ground(201099.3, min(yc, 557240.0)); taper = min(1.0, 0.45 + (yc - 557226.4) / 4.0)   # 남쪽 끝은 낮게 시작
+        for xc, half, hr, pr in ((WALLX - 0.6, 1.25, None, 1.0), (WALLX - 1.9, 1.05, (5.4, 7.0), 1.0), (WALLX - 3.0, 0.95, (3.2, 5.0), 1.0), (WALLX - 3.75, 0.7, (0.9, 2.3), 0.7)):
+            if rnd.random() > pr: continue
+            top = LEDGE_Z + rnd.uniform(0.2, 1.7) if hr is None else f + rnd.uniform(*hr) * taper
+            y1 = min(y + w + 0.5, 557240.5)
+            g = blob((xc + rnd.uniform(-0.15, 0.15), yc + rnd.uniform(-0.3, 0.3)), w * rnd.uniform(0.5, 0.66)).intersection(SP([(xc - half, y - 0.5), (xc + half, y - 0.5), (xc + half, y1), (xc - half, y1)]))
+            rock('S', g, top, '바위 정원(남쪽 덩이)의 바위 조각', 'Z05-PLATFORM-EUNJU-CENTRAL-LEDGE 의 서쪽 벽면(아랫벽) 앞')
         y += w * 0.8
-    # 벽 머리 위로 솟은 바위와 소나무(사진: 바위 꼭대기마다 소나무)
-    for j, (yy, up) in enumerate(((557224.0, 0.9), (557229.5, 1.5), (557235.0, 1.1), (557240.0, 0.7))):
-        zt = float(np.interp(yy, [557205, 557213, 557220, 557230, 557240, 557250, 557256], [131.0, 130.8, 130.4, 130.2, 129.3, 127.8, 127.3]))
-        poly(f'P02-ROCKGARDEN-CAP-{j + 1}', 'wall', blob((201100.6, yy), 1.3), zt - 0.3, zt + up, '벽 머리 위로 솟은 바위', SRC, G, 'Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP', color=COL[j % len(COL)])
-        tree(f'P02-ROCKGARDEN-PINE-S{j + 1}', (201101.6, yy + 1.2), zt, '바위 정원 꼭대기의 소나무', SRC, 'Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP', s=0.9)
-    # 북쪽 덩어리: 굽이 안쪽 섬(125.4 m)의 남쪽 면(북좌표 557255.5) 앞. 메시: 동좌표 201093(119.6) → 201096(125)
+    # 굽이 아래 돌 단의 뒤(동쪽) 바위 면: 아랫벽 면에 붙은 얇은 바위 켜와 발치의 낮은 조각
+    y = 557240.7
+    while y < 557253.6:
+        w = rnd.uniform(1.6, 2.8); yc = y + w / 2
+        g = blob((WALLX - 0.35, yc), w * rnd.uniform(0.5, 0.64)).intersection(SP([(WALLX - 1.0, y - 0.4), (WALLX + 0.35, y - 0.4), (WALLX + 0.35, y + w + 0.4), (WALLX - 1.0, y + w + 0.4)]))
+        rock('E', g, LEDGE_Z + rnd.uniform(0.2, 1.5), '바위 정원(돌 단 뒤 바위 면)의 바위 조각', 'Z05-PLATFORM-EUNJU-CENTRAL-LEDGE 의 서쪽 벽면(아랫벽)')
+        if rnd.random() < 0.6 and not 557245.3 < yc < 557250.3:   # 돌 단으로 내려서는 단 앞은 비운다
+            g = blob((WALLX - 1.3, yc + rnd.uniform(-0.3, 0.3)), w * 0.42).intersection(SP([(WALLX - 1.9, y), (WALLX - 0.9, y), (WALLX - 0.9, y + w), (WALLX - 1.9, y + w)]))
+            rock('E', g, TERR_Z + rnd.uniform(1.0, 3.4), '돌 단 뒤 바위 면 발치의 바위 조각', 'Z05-PLATFORM-EUNJU-ROCK-TERRACE')
+        y += w * 0.8
+    # 북쪽 덩이: 굽이 안쪽 섬(125.4 m)의 남쪽 면(북좌표 557255.5)과 턱의 북쪽 끝(동좌표 201100 동쪽은 북좌표 557253.8) 앞
     x = 201093.2
-    while x < 201099.6:
-        w = rnd.uniform(1.5, 2.6); xc = x + w / 2; f = float(np.interp(xc, [201093, 201100], [118.9, 118.3]))
-        for tier, (dy, hr) in enumerate(((0.1, (5.2, 7.4)), (-0.6, (2.0, 4.6)), (-1.2, (0.6, 1.8)))):
-            top = min(f + rnd.uniform(*hr), 126.0) if xc > 201095 else f + rnd.uniform(*hr) * 0.6
-            g = blob((xc, 557255.5 + dy), w * rnd.uniform(0.5, 0.66)).intersection(SP([(x - 0.5, 557253.6), (x + w + 0.5, 557253.6), (x + w + 0.5, 557256.2), (x - 0.5, 557256.2)]))
-            k += 1; poly(f'P02-ROCKGARDEN-N-{k:02d}', 'wall', g, f - 0.6, top, '바위 정원(북쪽 덩어리: 굽이 안쪽 섬의 남쪽 면)의 바위 조각', SRC, G, 'Z05-PLATFORM-UPPER-HAIRPIN-ISLAND 의 남쪽 면', color=COL[k % len(COL)])
+    while x < WALLX - 0.2:
+        w = rnd.uniform(1.5, 2.6); xc = x + w / 2; fy = 557255.5 if xc < 201100.0 else 557253.8; x1 = min(x + w + 0.5, WALLX - 0.05)
+        for dy, hr in ((0.1, (5.2, 7.4)), (-0.6, (2.0, 4.6)), (-1.2, (0.6, 1.8))):
+            g = blob((xc, fy + dy), w * rnd.uniform(0.5, 0.66)).intersection(SP([(x - 0.5, fy - 1.9), (x1, fy - 1.9), (x1, fy + 0.7), (x - 0.5, fy + 0.7)]))
+            if g.is_empty or g.area < 0.15: continue
+            f = stand(g, 0.0); top = min(f + rnd.uniform(*hr), 126.4) if xc > 201095 else f + rnd.uniform(*hr) * 0.6
+            rock('N', g, top, '바위 정원(북쪽 덩이: 굽이 안쪽 섬의 남쪽 면)의 바위 조각', 'Z05-PLATFORM-UPPER-HAIRPIN-ISLAND 의 남쪽 면')
         x += w * 0.8
-    # 두 덩어리 사이의 넓은 돌 단(메시: 117.8 m 평면, 동좌표 201097.5~201102.5, 북좌표 557242~557252)은 Z03 의 참 5·6 과 같은 자리다. 그 위의 돌 화분만 더한다
+    # 아랫벽 머리의 바위와 턱 위의 소나무(사진: 바위 꼭대기마다 소나무, 그 뒤 윗벽)
+    for j, (yy, up) in enumerate(((557229.0, 0.9), (557234.5, 1.5), (557239.0, 1.1), (557246.0, 0.8), (557251.0, 1.2))):
+        g = blob((WALLX + 0.7, yy), 1.0).intersection(SP([(WALLX + 0.4, yy - 1.5), (WALLX + 1.9, yy - 1.5), (WALLX + 1.9, yy + 1.5), (WALLX + 0.4, yy + 1.5)]))
+        poly(f'P02-ROCKGARDEN-ROCK-CAP{j + 1}', 'wall', g, LEDGE_Z - 0.3, LEDGE_Z + up, '아랫벽 머리 위로 솟은 바위', SRC, G, 'Z05-PLATFORM-EUNJU-CENTRAL-LEDGE', color=COL[j % len(COL)])
+    for j, (xx, yy, sc) in enumerate(((201105.3, 557208.5, 1.0), (201104.6, 557214.5, 0.9), (201105.6, 557220.5, 1.0), (201104.4, 557226.5, 0.9), (201105.2, 557231.5, 1.0), (201104.3, 557236.8, 0.9), (201104.4, 557243.0, 0.8), (201104.3, 557248.5, 0.9), (201103.9, 557254.6, 0.8))):
+        tree(f'P02-ROCKGARDEN-PINE-S{j + 1}', (xx, yy), LEDGE_Z, '아랫벽 위 턱의 소나무', SRC, 'Z05-PLATFORM-EUNJU-CENTRAL-LEDGE', s=sc)
+    # 돌 화분: 계단식 인도의 참(Z03)과 돌 단 위
     TG = '원천(넓은 돌 단과 계단, 돌 화분: 사용자 사진 04·거리뷰 09), S-MAP(단 117.8 m), 추정(화분의 자리·크기)'
-    for j, (c, z) in enumerate((((201096.0, 557240.6), 117.83), ((201096.6, 557243.0), 117.83), ((201097.3, 557246.2), 118.76), ((201098.2, 557249.2), 118.76))):
-        box(f'P02-ROCKGARDEN-URN-{j + 1}', 'wall', ngon(c, 0.42), z, z + 0.75, '돌 단 위의 둥근 돌 화분', SRC, TG, 'Z03-EAST-LANDING', color='#c9c5ba')
+    for j, (c, z, base) in enumerate((((201096.0, 557240.6), 117.83, 'Z03-EAST-LANDING'), ((201096.6, 557243.0), 117.83, 'Z03-EAST-LANDING'), ((201097.3, 557246.2), 118.76, 'Z03-EAST-LANDING'), ((201098.2, 557249.2), 118.76, 'Z03-EAST-LANDING'),
+                                      ((201100.6, 557242.0), TERR_Z, 'Z05-PLATFORM-EUNJU-ROCK-TERRACE'), ((201101.3, 557244.6), TERR_Z, 'Z05-PLATFORM-EUNJU-ROCK-TERRACE'))):
+        box(f'P02-ROCKGARDEN-URN-{j + 1}', 'wall', ngon(c, 0.42), z, z + 0.75, '돌 단 위의 둥근 돌 화분', SRC, TG, base, color='#c9c5ba')
         box(f'P02-ROCKGARDEN-URN-{j + 1}-FLOWER', 'wall', ngon(c, 0.36), z + 0.75, z + 1.0, '돌 화분의 꽃', SRC, TG, 'P02-ROCKGARDEN-URN', color='#c9566a' if j % 2 else '#e6c84e')
+    # 돌 단으로 내려서는 낮은 단(인도의 참 118.76 m 에서 돌 단 117.8 m 로): 참의 동쪽 변을 따라 세 단
+    a, b = np.array([201099.93, 557245.73]), np.array([201100.93, 557249.71]); R, P = frame(a, b - a, (1, 0))
+    for n in range(3):
+        box(f'P02-ROCKGARDEN-STEP-S{n + 1:02d}', 'stair_step', R(0.3, 3.8, n * 0.32, (n + 1) * 0.32), TERR_Z - 0.3, 118.76 - (n + 1) * 0.24, '인도의 참에서 돌 단으로 내려서는 낮은 단 셋(메시: 인도 118.4~119, 돌 단 117.8)', SRC, 'S-MAP(높이 차 1 m), 추정(단이 있는지·자리·수)', 'Z05-PLATFORM-EUNJU-ROCK-TERRACE', color='#c8c3b6', stair='P02-ROCKGARDEN-STEP')
+    # 바위 덩이 앞 참의 둥근 화단(거리뷰 09: 계단 오른쪽, 바위 발치의 흰 돌 화단과 소나무)과 옹벽 발치의 화단 넷(거리뷰 10: 짙은 돌 옹벽 앞의 굽은 흰 돌 화단, 소나무, 긴 의자)
+    PG = '원천(바위·옹벽 발치의 굽은 흰 돌 화단과 소나무, 긴 의자: 거리뷰 09·10), S-MAP(화단 자리의 땅이 인도보다 1 m 안팎 높게 읽힘), 추정(화단의 수·자리·크기)'
+    def planter(pid, g, base, pine=None):
+        z = stand(g, 0.4); poly(pid, 'planter', g, z, z + 0.8 + (0.4 if z < ground(g.centroid.x, g.centroid.y) else 0.0), '바위·옹벽 발치의 흰 돌 화단(높이 0.8 m)', SRC, PG, base, color='#cfcbc0', topColor='#8a7a55')
+        if pine: tree(pid + '-PINE', pine, FEATS[-1]['properties']['toM'], '화단의 소나무', SRC, pid, s=0.85)
+    planter('P02-ROCKGARDEN-PLANTER-1', SP(ngon((201097.6, 557230.0), 0.8, 10)), 'Z03-EAST-LANDING-3', (201097.6, 557230.0))
+    planter('P02-ROCKGARDEN-PLANTER-2', SP(ngon((201097.45, 557236.0), 0.8, 10)), 'Z03-EAST-LANDING-4')
+    for j, yy in enumerate((557208.2, 557213.4, 557218.6, 557223.6)):   # 벽에 붙은 반달꼴
+        g = SP([(WALLX - 0.05 - 2.9 * math.cos(t), yy + 2.1 * math.sin(t)) for t in np.linspace(-math.pi / 2, math.pi / 2, 9)]).buffer(0)
+        planter(f'P02-ROCKGARDEN-WALLPLANTER-{j + 1}', g, 'Z05-PLATFORM-GATE-ROAD-EAST-EDGE', (201101.5, yy))
+    for j, yy in enumerate((557210.8, 557221.1)):
+        g = SP([(201099.2, yy - 0.9), (201099.65, yy - 0.9), (201099.65, yy + 0.9), (201099.2, yy + 0.9)]); z = stand(g, 0.3)
+        poly(f'P02-ROCKGARDEN-BENCH-{j + 1}', 'wall', g, z, z + 0.75, '화단 사이의 긴 돌 의자', SRC, PG, 'Z05-PLATFORM-GATE-ROAD-EAST-EDGE', color='#bdb9ad')
 
 # ================= 2. 수인관 남동쪽의 유리 덩어리 =================
 SUIN = [[201102.94, 557190.11], [201125.57, 557204.29], [201192.29, 557144.08], [201174.74, 557125.62], [201148.21, 557110.27]]
@@ -106,7 +139,7 @@ def suin_glass():
     G = '원천(수인관 기둥 면 남동쪽에 틈을 두고 선 짙은 유리 덩어리, 흰 돌 틀, 지붕 정원과 정자 둘: 사용자 사진 20·07), S-MAP(윗면 135.3 m, 북서 변이 수인관 모서리에서 8 m, 길 쪽 면이 기둥 면보다 13 m 뒤, 앞으로 나온 날개 136.1 m), 추정(남동 끝: 메시 밖이라 사진 07 의 길이 34 m, 유리 칸 나눔, 무엇인지: 학교 건물인지 모름)'
     o = np.array(SUIN[4]); R, P = frame(o, o - np.array(SUIN[0]), (1, 1))   # s = 수인관 길 쪽 면을 따라 남동으로(남쪽 모서리 0), d = 북동(길 반대쪽)
     STONE, GLASS = '#c2bfb5', '#27323a'
-    box('P02-SUIN-GLASSBLOCK-MAIN', 'wall', R(19, 42, 13, 30), 109.5, 135.3, '수인관 남동쪽 유리 덩어리의 본체(길 쪽 면 23 m, 깊이 17 m, 윗면 135.3 m 는 지붕 정원)', SRC, G, 'Z05-PLATFORM-GATE-ROAD-EAST-EDGE(수인관 옆 땅)', color=STONE, topColor='#7f9a6b')
+    box('P02-SUIN-GLASSBLOCK-MAIN', 'wall', R(19, 42, 13, 30), 109.5, 135.3, '수인관 남동쪽 유리 덩어리의 본체(길 쪽 면 23 m, 깊이 17 m, 윗면 135.3 m 는 지붕 정원)', SRC, G, 'Z05-PLATFORM-EUNJU-GLASSBLOCK-STREET(덩어리 앞 땅, R01)', color=STONE, topColor='#7f9a6b')
     box('P02-SUIN-GLASSBLOCK-WING', 'wall', R(8, 19, 7, 30), 109.5, 136.1, '유리 덩어리의 북서쪽 날개(길 쪽으로 6 m 나옴, 윗면 136.1 m)', SRC, G, 'P02-SUIN-GLASSBLOCK-MAIN', color=STONE, topColor='#8a8d86')
     for j, (s0, s1, d) in enumerate(((9.0, 18.0, 7.0), (20.0, 32.5, 13.0), (34.0, 41.0, 13.0))):
         box(f'P02-SUIN-GLASSBLOCK-GLASS-{j + 1}', 'wall', R(s0, s1, d - 0.12, d), 113.0, 133.2, '길 쪽 면의 짙은 유리 벽(흰 돌 틀 안. 칸 나눔 추정)', SRC, G, 'P02-SUIN-GLASSBLOCK-MAIN', color=GLASS)

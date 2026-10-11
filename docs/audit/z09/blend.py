@@ -5,10 +5,10 @@
 #  - S-MAP 표본(z05_edge_sw)이 8 m 안에 있으면 놓지 않는다(잰 값이 먼저다). 건물에서 18 m 안, 캠퍼스 안, 다른 기단 안에도 놓지 않는다(건물 칸을 바꾸지 않게).
 from shapely.ops import nearest_points
 _real = shapely.MultiPoint([(p[0], p[1]) for p in pts]).buffer(8.0) if pts else Polygon()
-_keep_off = unary_union([DRAWN.buffer(18.0), BLD_ALL.buffer(18.0), CAMPUS.buffer(1.0), unary_union([q['poly0'] for q in PLATS]).buffer(1.0), DONE.buffer(1.0), FIELD.buffer(1.0), _real]).buffer(0)
+_keep_off = unary_union([DRAWN.buffer(18.0), BLD_ALL.buffer(18.0), CAMPUS.buffer(1.0), unary_union([q['poly0'] for q in PLATS if not q.get('keepSamples')]).buffer(1.0), DONE.buffer(1.0), FIELD.buffer(1.0), _real]).buffer(0)
 BLEND_PTS = []; BLEND_BY = {}
 for q in PLATS:
-    if not q.get('outside'): continue
+    if not q.get('outside') or q.get('noBlend'): continue   # R01: noBlend = 이음 표본을 놓지 않는 기단(건물 옆의 좁은 앞마당)
     n0 = len(BLEND_PTS)
     for d in (1.5, 4.5, 7.5):
         ring = q['poly0'].buffer(d, join_style=1).exterior
