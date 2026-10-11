@@ -26,3 +26,26 @@ ops = [
 (HERE / 'groups').mkdir(exist_ok=True)
 (HERE / 'groups' / 'u11.json').write_text(json.dumps({'id': 'U11', 'zone': '운동장 아래 지하층과 지하 차도', 'comment': 'U11: 층 사이 경사로를 사진에서 잰 치수로 다시(한 층 3.5 m), 은주관 계단 어귀를 세모 구역의 빗변으로', 'ops': ops}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(len(ops), 'ops', len(RP['path']), 'points')
+
+# ---------- 갈무리 시점(shots.mjs): 사진과 같은 자리·방향. 자리는 사진에서 잰 값(구역 노트 U11 표) ----------
+import numpy as np
+ISL = np.array(RP['islandCentre']); ht = np.array(RP['rowDirection']); hn = np.array(RP['towardHyein']); Z1, Z2 = H['b1Floor'], H['b2Floor']
+sp = lambda s, v: ISL + ht * s + hn * v
+rad = lambda deg: round(float(np.radians(deg)), 4); row = RP['rowAzimuthDeg']
+at = lambda p, z: [round(float(p[0]), 2), round(float(p[1]), 2), round(z + 0.3, 2)]
+p2 = lambda p: [round(float(p[0]), 2), round(float(p[1]), 2)]
+toe_in = np.array(RP['toeColumns'][0]); h23 = row + 180 - 30; f23 = np.array([np.sin(np.radians(h23)), np.cos(np.radians(h23))]); r23 = np.array([f23[1], -f23[0]])
+FRAME = {'lowM': 134, 'highM': 147, 'backdropM': 4}
+V = {
+ '01-1인칭-지하2층-사진23': {'walk': {'at': at(toe_in - f23 * 12.2 + r23 * 0.15, Z2), 'heading': rad(h23), 'pitch': -0.08, 'fov': 68}, 'cam': '지하 2층 통로, 발치의 왼쪽 기둥에서 12.2 m 앞·통로 오른쪽 가장자리. 경사로 축에서 왼쪽으로 30도(사진 23 의 소실점에서 잼)'},
+ '02-1인칭-경사로위-사진26': {'walk': {'at': at(sp(5.0, -4.3), Z2 + RP['gradePct'] / 100 * 7.0), 'heading': rad(row + 180 + 6), 'pitch': 0.1, 'fov': 72}, 'cam': '경사로 위(발치에서 7 m), 안쪽 남색 벽 옆에서 위쪽을 봄. 사진 26'},
+ '03-1인칭-지하1층-섬앞-사진22': {'walk': {'at': at(sp(-6.8, 0.3), Z1), 'heading': rad(row - 2), 'pitch': -0.09, 'fov': 110}, 'cam': '지하 1층, 섬의 남서 3.8 m 에서 북동(경사로를 내려다보는 쪽). 사진 22(= 11)'},
+ '04-1인칭-지하1층-사진24': {'walk': {'at': at(sp(14.7, -9.4), Z1), 'heading': rad(row + 180 - 46), 'pitch': -0.04, 'fov': 70}, 'cam': '지하 1층, 간판 벽 앞 7 m(S03 앞 통로)에서 남남동. 낮은 벽 왼쪽 끝 기둥이 10.5 m 앞 오른쪽 27도(사진 24 에서 잼)'},
+ '05-1인칭-간판벽-사진20·21': {'walk': {'at': at(sp(14.0, -5.5), Z1), 'heading': rad(row + 270), 'pitch': 0.02, 'fov': 80}, 'cam': '지하 1층, 간판 벽(세모의 빗변)을 11 m 앞에서 정면으로'},
+ '06-띄움-지하1층-그림29틀': {'lift': {'zone': 'b1', 'centre': [201176.0, 557262.0], 'widthM': 125.0, 'upM': 700, 'upAzDeg': 209.0}, 'cam': '띄운 지하 1층, 사용자 그림 29 와 같은 방향(화면 위 = 방위 209도)'},
+ '07-띄움-지하1층-학교지도틀': {'lift': {'zone': 'b1', 'centre': [201161.0, 557262.0], 'widthM': 70.0, 'upM': 300}, 'cam': '띄운 지하 1층(북이 위, 가로 70 m)'},
+ '08-띄움-지하2층-학교지도틀': {'lift': {'zone': 'b2', 'centre': [201161.0, 557262.0], 'widthM': 70.0, 'upM': 300}, 'cam': '띄운 지하 2층(같은 틀)'},
+ '09-단면-경사로-곧은구간-따라': {'pos': [201100, 557258, 220], 'tgt': [201150, 557258, 140], 'fov': 50, 'section': {'a': p2(sp(28.0, -6.2)), 'b': p2(sp(-14.0, -6.2)), 'ortho': True, 'frame': FRAME}, 'cam': '단면선 = 곧은 구간의 가운데(북동 → 남서): 지하 2층 통로, 발치, 낮은 벽, 트인 곳, 굽은 곳'},
+ '10-운동장-위에서-지하길끔': {'pos': [201110.0, 557235.0, 215.0], 'tgt': [201200.0, 557275.0, 150.0], 'fov': 75, 'cam': '지하 길 끔: 운동장 면과 둘레는 그대로여야 한다'},
+}
+(HERE / 'views.json').write_text(json.dumps(V, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n'); print(len(V), 'views')
