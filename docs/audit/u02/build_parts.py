@@ -52,13 +52,13 @@ MAP_END = np.array(GEO['xy']['carriageway'][-1])
 # ---------- 서쪽 벽 기준 축, U자 경사로(사진 03·04, 지도의 서쪽 반원 표시) ----------
 WA, WB = np.array([201140.1, 557255.5]), np.array([201146.2, 557293.5])   # 운동장 서쪽 변(은주1관 벽)
 w = (WB - WA) / np.hypot(*(WB - WA)); e = np.array([w[1], -w[0]])           # w = 북, e = 동(안쪽)
-CC = WA + w * (557246.0 - WA[1]) / w[1] + e * 11.0                          # 섬의 중심
+CC = WA + w * (557252.0 - WA[1]) / w[1] + e * 11.0                          # 섬의 중심
 R_LANE, LANE_W, L_STRAIGHT = 7.5, 5.0, 36.4
 arc = lambda r, th: CC + r * (np.cos(th) * e - np.sin(th) * w)              # th 0 = 동쪽(지하 1층에서 들어섬), pi/2 = 남쪽, pi = 서쪽
 S0, W0 = arc(R_LANE, 0.0), arc(R_LANE, np.pi); RB = W0 + w * L_STRAIGHT
 L_ARC = np.pi * R_LANE; L_RAMP = L_ARC + L_STRAIGHT; DROP = Z_B1 - Z_B2; GRADE_RAMP = DROP / L_RAMP
 z_at = lambda s: Z_B1 - GRADE_RAMP * s
-E1 = S0 + w * 40.0                                                          # 지하 1층 차로가 경사로 머리로 내려오는 선(섬 동쪽)
+E1 = S0 + w * 32.0                                                          # 지하 1층 차로가 경사로 머리로 내려오는 선(섬 동쪽)
 C1, C2 = np.array([201200.0, 557245.0]), np.array([201185.0, 557250.0])     # 종착 표지 자리(U01 그대로, 추정)
 K2 = np.array([201160.0, 557274.0])
 

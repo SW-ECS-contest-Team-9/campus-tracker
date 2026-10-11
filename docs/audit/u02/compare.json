@@ -1,0 +1,32 @@
+{
+ "userLinesM": [
+  144.33,
+  140.69,
+  133.13
+ ],
+ "userLineSpreadM": [
+  [
+   143.98,
+   144.94
+  ],
+  [
+   139.73,
+   141.29
+  ],
+  [
+   132.57,
+   134.26
+  ]
+ ],
+ "modelM": {
+  "b1Ceiling": 144.4,
+  "b1Floor": 141.4,
+  "b1SlabBottom": 140.4,
+  "b2Floor": 133.0
+ },
+ "fieldFromAbove": {
+  "maxPixelDiff": 15,
+  "pixelsOver32": 0,
+  "pixels": 898880
+ }
+}
