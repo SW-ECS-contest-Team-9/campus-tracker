@@ -224,13 +224,13 @@ cbox('CLADDING', 'wall', CR(D0, D1, 0.0, 0.12), DZ + 3.0, DZ + 5.2, '차양 위�
 cbox('DECK', 'deck', CR(D0, D1, 0.0, DD), ZT - 0.1, DZ, '짙은 나무 데크(바닥에서 0.45 m, 야외 탁자 자리)', color='#4b423b')
 for k in range(2):
     cbox(f'DECK-STEP-{k + 1}', 'stair_step', CR(D0 - 0.3 * (2 - k), D0 - 0.3 * (1 - k), 0.0, DD), ZT - 0.1, ZT + 0.15 * (k + 1), '데크 서쪽 끝의 계단(3단: 0.15 m 씩, 맨 윗단이 데크 바닥)', stair='G03-CAFE-DECK-STAIR', riseM=0.15, runM=0.3, widthM=DD, color='#4b423b')
-RAILC = '#565b63'
+RAILC = '#c8262c'   # Q01: 데크 난간은 붉은 판(새 사진 03)
 cbox('RAIL-S', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ, DZ + 1.0, '데크 길 쪽 세로 살 난간(높이 1.0 m). 사진 02 는 짙은 회색, 사진 03(다른 시기)은 붉은색', color=RAILC)
 cbox('RAIL-E', 'wall', CR(D1 - 0.06, D1, 0.0, DD), DZ, DZ + 1.0, '데크 동쪽 끝 난간', color=RAILC)
 cbox('RAIL-W', 'wall', CR(D0 + 2.6, D0 + 2.66, DD - 0.9, DD), DZ, DZ + 1.0, '데크 난간의 서쪽 끝(계단 옆은 트임)', color=RAILC)
 for k, sc in enumerate((D0 + 2.6, D0 + 6.4, D1 - 0.1)):
     cbox(f'AWNING-POST-{k + 1}', 'wall', CR(sc - 0.04, sc + 0.04, DD - 0.1, DD - 0.02), DZ, DZ + 2.75, '긴 차양을 받치는 가는 기둥', color='#2f3136')
-STRIPE = ('#d9627c', '#f3ece6')    # 분홍·흰 줄무늬(사진 01·02). 사진 03 은 붉은·초록
+STRIPE = ('#b8323a', '#4f7a5c')    # Q01: 붉은·초록 줄무늬(새 사진 03. 사진 01·02 의 분홍·흰은 옛 차양)
 ns = int(round((D1 + 0.2 - (D0 - 0.3)) / 0.52))
 for k in range(ns):
     a = D0 - 0.3 + k * (D1 + 0.5 - D0) / ns; b = D0 - 0.3 + (k + 1) * (D1 + 0.5 - D0) / ns

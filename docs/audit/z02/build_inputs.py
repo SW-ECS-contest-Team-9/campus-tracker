@@ -101,7 +101,10 @@ piers = [(-2.9, -1.9), (1.1, 2.3), (5.3, 6.3)]
 for k, (a, b) in enumerate(piers):
     box(f'PORCH-PIER-{k + 1}', 'wall', rect(a, b, 3.4, BOX[2]), Z_ENT, 155.2, EN, 'S-MAP(자리), 추정(치수)', '현관 앞면 벽돌 기둥. 아치 문 둘(폭 3.0 m, 추정)은 기둥 사이의 빈 곳. 벽돌 상자 폭 9.2 m = 지붕 폭 13.4 m x 사진의 폭 비 0.69', SRCP, material='brick')
 box('PORCH-HEADER', 'wall', rect(BOX[0], BOX[1], 3.4, BOX[2]), 154.2, 155.2, '없음(기둥 위에 걸침)', '추정', '아치 위 벽돌 벽. 아치 꼭대기 154.2 m(바닥 + 3.2 m, 사진 눈대중). 아치의 둥근 모양은 싣지 않음', SRCP, material='brick')
-box('PORCH-SIDE-W', 'wall', [(BOX[0], BAY_V), (BOX[0] + 0.6, BAY_V), (BOX[0] + 0.6, 3.4), (BOX[0], 3.4)], Z_ENT, 155.2, EN, '추정', '현관 서쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)', SRCP, material='brick')
+# Q01: 서쪽 옆은 막힌 벽이 아니라 아치로 뚫려 있다(사용자-SP카페·대일관계단·3생활관-20261012/03: 내려가는 계단 머리에서 본 현관, 회색 기와지붕 밑의 벽돌 아치). 아치 위 벽과 앞 모서리의 기둥만 둔다
+box('PORCH-SIDE-W', 'wall', [(BOX[0], BAY_V), (BOX[0] + 0.6, BAY_V), (BOX[0] + 0.6, 3.4), (BOX[0], 3.4)], 154.0, 155.2, '없음(아치 위에 걸침)', '원천(서쪽 옆이 아치로 뚫림: 사용자 사진 03), 추정(치수)', '현관 서쪽 옆의 아치 위 벽돌 벽(아래는 뚫림: 옆 계단에서 현관으로 들어옴)', SRCP + ', 사용자-SP카페·대일관계단·3생활관-20261012/03-SP카페-사용자표시-대일관-계단.png', material='brick')
+box('PORCH-SIDE-W-HEAD', 'wall', [(BOX[0], BAY_V), (BOX[0] + 0.6, BAY_V), (BOX[0] + 0.6, BAY_V + 0.25), (BOX[0], BAY_V + 0.25)], 153.5, 154.0, 'Z02-PORCH-SIDE-W', '추정', '아치 머리의 어깨(계단 모양 조각, 건물 쪽)', SRCP, material='brick')
+box('PORCH-SIDE-W-HEAD-2', 'wall', [(BOX[0], 3.15), (BOX[0] + 0.6, 3.15), (BOX[0] + 0.6, 3.4), (BOX[0], 3.4)], 153.5, 154.0, 'Z02-PORCH-SIDE-W', '추정', '아치 머리의 어깨(계단 모양 조각, 앞쪽)', SRCP, material='brick')
 box('PORCH-SIDE-E', 'wall', rect(BOX[1] - 0.6, BOX[1], 0.0, 3.4), Z_ENT, 155.2, EN, '추정', '현관 동쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)', SRCP, material='brick')
 for k in range(1, 3):
     box(f'PORCH-INNER-STEP-{k}', 'stair_step', rect(BOX[0] + 0.6, BOX[1] - 0.6, 3.4 - 0.3 * k, 3.4 - 0.3 * (k - 1)), Z_ENT, Z_ENT + (Z_1F - Z_ENT) * k / 3, EN, '추정(단 수 3: 사진에 아치 밑 2~3단), S-MAP(1층 151.8)', '아치 밑에서 1층 로비 바닥으로 오르는 3단 중 아래 두 단(한 단 0.167 m, 디딤 0.30 m)', SRCP, stair='Z02-PORCH-INNER-STAIR', riseM=r2((Z_1F - Z_ENT) / 3), runM=0.3, widthM=r2(BOX[1] - BOX[0] - 1.2), material='stone')

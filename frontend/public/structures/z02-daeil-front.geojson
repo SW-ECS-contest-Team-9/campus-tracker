@@ -641,12 +641,12 @@
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
-    "grade": "추정",
-    "basePlane": "Z02-PLATFORM-ENTRANCE",
-    "fromM": 151.3,
+    "grade": "원천(서쪽 옆이 아치로 뚫림: 사용자 사진 03), 추정(치수)",
+    "basePlane": "없음(아치 위에 걸침)",
+    "fromM": 154.0,
     "toM": 155.2,
-    "assumption": "현관 서쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)",
-    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "assumption": "현관 서쪽 옆의 아치 위 벽돌 벽(아래는 뚫림: 옆 계단에서 현관으로 들어옴)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0), 사용자-SP카페·대일관계단·3생활관-20261012/03-SP카페-사용자표시-대일관-계단.png",
     "material": "brick"
    },
    "geometry": {
@@ -672,6 +672,92 @@
       [
        201153.49,
        557313.66
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-SIDE-W-HEAD",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PORCH-SIDE-W",
+    "fromM": 153.5,
+    "toM": 154.0,
+    "assumption": "아치 머리의 어깨(계단 모양 조각, 건물 쪽)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201153.49,
+       557313.66
+      ],
+      [
+       201154.03,
+       557313.42
+      ],
+      [
+       201153.93,
+       557313.19
+      ],
+      [
+       201153.38,
+       557313.43
+      ],
+      [
+       201153.49,
+       557313.66
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z02-PORCH-SIDE-W-HEAD-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "추정",
+    "basePlane": "Z02-PORCH-SIDE-W",
+    "fromM": 153.5,
+    "toM": 154.0,
+    "assumption": "아치 머리의 어깨(계단 모양 조각, 앞쪽)",
+    "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
+    "material": "brick"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201152.98,
+       557312.52
+      ],
+      [
+       201153.52,
+       557312.28
+      ],
+      [
+       201153.42,
+       557312.05
+      ],
+      [
+       201152.87,
+       557312.29
+      ],
+      [
+       201152.98,
+       557312.52
       ]
      ]
     ]
