@@ -1,0 +1,593 @@
+{
+ "id": "U03",
+ "zone": "운동장 아래 지하층과 지하 차도",
+ "comment": "U03: 학교 지하도 걷는 길(은주1관 문 안 계단 ~ 연결통로 둘 ~ 본관 5층·승강기·2층 ~ 유리문 지하통로 ~ 유담관 7층·승강기·9층)",
+ "ops": [
+  {
+   "ref": "은주1관 문 안 계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "은주1관 지하통로 문 안 계단 (주차장 쪽 문 141.4 → 3층 137.8 m, 한 층 내려감. 있음은 사진, 단 수·모양 추정)",
+    "structure": "stairs",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "at": {
+       "nodeId": "8e608a71-5268-42d6-9fe9-b64eafda79e3"
+      }
+     },
+     {
+      "xy": [
+       201142.0,
+       557284.1
+      ],
+      "z": 141.4
+     },
+     {
+      "xy": [
+       201141.2,
+       557279.9
+      ],
+      "z": 139.6
+     },
+     {
+      "xy": [
+       201139.4,
+       557280.2
+      ],
+      "z": 139.6
+     },
+     {
+      "xy": [
+       201140.1,
+       557284.4
+      ],
+      "z": 137.8
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "은주관"
+   },
+   "grade": "원천(문으로 들어가면 3층, 문 안에 난간 계단), 추정(내려가는 높이 3.6 m·모양)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-06: '은주관' 간판 옆 문 안 왼쪽에 아래로 내려가는 난간, 안쪽 창이 문턱보다 낮게 보인다. 3층에서 본관 5층까지는 계단 없이 걷는다(블로그-09~11)이고 본관 5층은 137.8 m 라 문(141.4)과의 차 3.6 m 를 이 계단에 두었다"
+  },
+  {
+   "ref": "은주1관 3층 복도",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "은주1관 3층 복도 ~ 계단실 (파란 문 앞, 137.8 m. 선 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201140.1,
+       557284.4
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201136.5,
+       557288.8
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201133.6,
+       557292.3
+      ],
+      "z": 137.8
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "은주관"
+   },
+   "grade": "원천(복도·계단실), 추정(선)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-07(복도), 블로그-08(계단실: 바닥 3층, 오르는 계단 4층 표기, 계단 밑으로 한림관 방향)"
+  },
+  {
+   "ref": "한림관–은주1관 연결통로",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "한림관–은주1관 연결통로 (파란 문·파란 둥근 지붕 유리 통로, 137.8 m 평지. 자리는 학교 지도 ±3.3 m)",
+    "structure": "ordinary",
+    "widthM": 2.4,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201133.6,
+       557292.3
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201132.6,
+       557292.4
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201127.4,
+       557293.1
+      ],
+      "z": 137.8
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(있음·모양·자리), 추정(높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-09·10: 계단실 계단 밑 파란 철문 → 낮은 흰 벽·파란 띠·파란 둥근 지붕의 타일 바닥 통로 → 한림관 안. 학교 캠퍼스맵 지하도 연결 지점(블로그-03, 원천. 좌표 맞춤 잔차 RMS 3.3 m)의 갈색 연결통로 (201130.3, 557292.1)"
+  },
+  {
+   "ref": "한림관 연결 층",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "한림관 연결 층 통로 (은주1관 쪽 통로 ~ 식당 가는 지하 계단을 지나 ~ 본관 쪽 통로. 137.8 m, 지도 표기 2층·사용자 표기 3층. 선 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201127.4,
+       557293.1
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201124.6,
+       557298.6
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201119.5,
+       557303.6
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201112.5,
+       557305.3
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201105.5,
+       557303.4
+      ],
+      "z": 137.8
+     },
+     {
+      "at": {
+       "nodeId": "5bcc9f6d-6d73-451b-b5b4-b5717418c247"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "한림관"
+   },
+   "grade": "원천(한 층으로 이어짐), 추정(선)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천): '한림관 식당으로 가는 지하 계단을 지나쳐서 쭉 앞으로 가면 본관으로 가는 통로'. 블로그-10(흰 벽·둥근 기둥의 홀). 층 이동 없음"
+  },
+  {
+   "ref": "본관–한림관 연결통로 이름(본관 쪽 문 ~ 가운데)",
+   "op": "update_road",
+   "args": {
+    "id": "0399773c-4737-4573-a24e-c9e600c9b048",
+    "expectedRevision": 6,
+    "attrs": {
+     "name": "본관 5층–한림관 연결통로 (파란 둥근 지붕 유리 통로 = 사용자가 말한 나무 데크 자리, 본관 쪽 문 ~ 가운데. 137.8 m, 지하 보행 구간과 같은 높이)"
+    }
+   },
+   "grade": "확정(자리·이어짐), 원천(모양: 블로그-11)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-11: 파란 둥근 지붕·타일 바닥 통로, 끝에서 오른쪽이 '지하 폭언'(= 지하 보행 구간 2b765aa4). 길·높이는 그대로, 이름만 고침"
+  },
+  {
+   "ref": "본관–한림관 연결통로 이름(가운데 ~ 한림관 쪽 문)",
+   "op": "update_road",
+   "args": {
+    "id": "f8bb47f5-9ffd-4cd4-9650-1cf933aad31e",
+    "expectedRevision": 6,
+    "attrs": {
+     "name": "본관 5층–한림관 연결통로 (파란 둥근 지붕 유리 통로 = 사용자가 말한 나무 데크 자리, 가운데 ~ 한림관 쪽 문. 137.8 m, 지하 보행 구간과 같은 높이)"
+    }
+   },
+   "grade": "확정(자리·이어짐), 원천(모양: 블로그-11)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-11: 파란 둥근 지붕·타일 바닥 통로, 끝에서 오른쪽이 '지하 폭언'(= 지하 보행 구간 2b765aa4). 길·높이는 그대로, 이름만 고침"
+  },
+  {
+   "ref": "본관 5층 계단실 → 입구(3)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 5층 계단실 ~ 입구(3) 문 (반 층 올라가 내리막길로 나감, 137.8 → 139.9 m. 11단쯤, 선 추정)",
+    "structure": "stairs",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "at": {
+       "nodeId": "0ba82e17-c082-4efb-ae45-1269b982f1e5"
+      }
+     },
+     {
+      "xy": [
+       201099.3,
+       557309.8
+      ],
+      "z": 138.85
+     },
+     {
+      "at": {
+       "nodeId": "2995173c-585b-4a1b-9405-54b22ca26bc6"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(계단실에서 반 층 위 문이 바깥), 추정(선)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-12: 통로가 닿는 계단실에서 올라가는 계단 11단쯤 위로 바깥(나무)이 보이고 '폭풍의 언덕' 화살표. 학교 지도의 입구(3) = 5·6층 사이 계단"
+  },
+  {
+   "ref": "본관 5층 복도",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 5층 복도 (동쪽 계단실 ~ 중앙 계단 옆 승강기. 137.8 m, 선 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "at": {
+       "nodeId": "0ba82e17-c082-4efb-ae45-1269b982f1e5"
+      }
+     },
+     {
+      "xy": [
+       201068.0,
+       557318.5
+      ],
+      "z": 137.8
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(있음), 추정(선·승강기 자리)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-12·13: '본관 중심' 화살표, 승강기 표시등·벽 표지 5"
+  },
+  {
+   "ref": "본관 승강기",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 승강기 5층–2층 (중앙 계단 왼쪽, 137.8 ↔ 128.5 m. 자리 추정, 3층은 길을 두지 않음)",
+    "structure": "elevator",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201068.0,
+       557318.5
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201068.0,
+       557318.5
+      ],
+      "z": 128.5
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(5층에서 타고 2층에서 내림), 추정(자리·2층 높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천): '웅장하고 큰 중앙 계단의 왼쪽 엘리베이터를 타고 본관의 2층으로'"
+  },
+  {
+   "ref": "본관 2층 홀",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 2층 홀 (승강기 ~ 정문 쪽 문 앞, 128.5 m. 선 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201068.0,
+       557318.5
+      ],
+      "z": 128.5
+     },
+     {
+      "xy": [
+       201062.6,
+       557307.6
+      ],
+      "z": 128.5
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(있음), 추정(선·높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-14: 대리석 기둥 홀, 왼쪽 '본관 정문'"
+  },
+  {
+   "ref": "본관 2층 ~ 정문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 2층 홀 ~ 정문(입구(1)) 문 (128.5 → 127.8 m, 몇 단. 단 수 추정)",
+    "structure": "stairs",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201062.6,
+       557307.6
+      ],
+      "z": 128.5
+     },
+     {
+      "at": {
+       "nodeId": "59e77b01-41b4-4d20-b8a4-a01f6a74e4ac"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(2층 왼쪽 문이 정문·바깥), 추정(높이 차 0.7 m)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천): '본관 2층 계단의 좌측으로는 본관 정문으로 나가는 문 … 야외 캠퍼스에서 유담관으로'. 학교 지도: 입구(1)은 1층과 2층으로 갈 수 있음"
+  },
+  {
+   "ref": "본관 2층 복도",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 2층 복도 (승강기 ~ 북서 끝 아치 창 앞에서 우회전 ~ 유리문 앞. 128.5 m, 선 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201068.0,
+       557318.5
+      ],
+      "z": 128.5
+     },
+     {
+      "xy": [
+       201043.9,
+       557330.3
+      ],
+      "z": 128.5
+     },
+     {
+      "xy": [
+       201045.6,
+       557342.2
+      ],
+      "z": 128.5
+     },
+     {
+      "at": {
+       "nodeId": "2b5185cc-9133-44a0-b898-66d2cbc34ea0"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "본관"
+   },
+   "grade": "원천(있음), 추정(선·높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-14·15·16: 오른쪽 '지하 통로' 복도, 끝의 반원 아치 창 앞에서 우회전, 큰 유리 양문. 유리문 옆 계단('셔틀 정류장')은 본관 모서리 앞 계단 e996a8f7 로 봄"
+  },
+  {
+   "ref": "유리문 뒤 단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 2층 유리문 ~ 지하통로 머리 (유리문 뒤 4~5단, 128.5 → 127.75 m. 지하, 단 수 추정)",
+    "structure": "stairs",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "at": {
+       "nodeId": "2b5185cc-9133-44a0-b898-66d2cbc34ea0"
+      }
+     },
+     {
+      "xy": [
+       201038.9,
+       557346.4
+      ],
+      "z": 127.75
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(유리문 뒤 몇 단 내려감), 추정(자리·높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-16·17"
+  },
+  {
+   "ref": "본관–유담관 지하통로",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "본관 2층–유담관 7층 지하통로 (흰 벽의 곧은 통로, 127.75 → 121.6 m, 경사 11.0 %. 있음·곧음은 원천, 선·높이 추정)",
+    "structure": "ordinary",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201038.9,
+       557346.4
+      ],
+      "z": 127.75
+     },
+     {
+      "xy": [
+       201026.2,
+       557296.0
+      ],
+      "z": 122.01
+     },
+     {
+      "xy": [
+       201025.9,
+       557292.3
+      ],
+      "z": 121.6
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false
+   },
+   "grade": "원천(있음·곧게 내려감·끝이 유담관 7층 승강기), 추정(선·높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-17·18: 흰 벽의 좁고 곧은 통로가 아래로 기울며 이어지고 끝이 유담관 7층 승강기. 학교 캠퍼스맵 지하도 연결 지점(블로그-03, 원천. 좌표 맞춤 잔차 RMS 3.3 m)의 붉은 선: 본관 북서 모서리 → 버스 정류장 옆"
+  },
+  {
+   "ref": "유담관 지하통로 승강기",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "유담관 지하통로 승강기 7층–9층 (정류장 쪽 문 안 8단 아래, 121.6 ↔ 129.38 m. 자리 추정, 6층에 서는지는 모름)",
+    "structure": "elevator",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201025.9,
+       557292.3
+      ],
+      "z": 121.6
+     },
+     {
+      "xy": [
+       201025.9,
+       557292.3
+      ],
+      "z": 129.38
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "유담관"
+   },
+   "grade": "원천(7층에서 타고 9층에서 내림), 추정(자리·7층 높이)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-18(층 표지 7)·블로그-19(9층: 승강기 옆 8단 위 유리문 '정류장')"
+  },
+  {
+   "ref": "유담관 9층 승강기 앞",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "name": "유담관 9층 승강기 앞 ~ 반 층 계단 아래 (129.38 m)",
+    "structure": "indoor_corridor",
+    "widthM": 2,
+    "vehicleAccess": "prohibited",
+    "pedestrianAccess": "allowed",
+    "vehicleDirection": "both",
+    "pedestrianDirection": "both",
+    "path": [
+     {
+      "xy": [
+       201025.9,
+       557292.3
+      ],
+      "z": 129.38
+     },
+     {
+      "at": {
+       "nodeId": "43a7f874-9382-496b-ad7c-62953e1ac02f"
+      }
+     }
+    ],
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "유담관"
+   },
+   "grade": "원천(승강기 바로 옆이 8단 계단), 추정(자리)",
+   "evidence": "학교 지하도 안내 글(SKU CAST, 사용자 제공 2026-10-12, 원천) 블로그-19. 위의 8단은 있는 길 699d0cbc(1.59 m)"
+  }
+ ]
+}

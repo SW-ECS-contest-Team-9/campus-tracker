@@ -201,6 +201,7 @@ class Registry(unittest.TestCase):
                                 'grades': {'wall': '원천(학교 사진)', 'windows': '추정', 'roof': '확정'},
                                 'features': [{'what': '굽은 정면', 'evidence': '사진', 'grade': '추정', 'drawn': False}]}])
         self.assertTrue(br.appearance.from_note(head(look.replace('5층: {값: 110.5', '4층: {값: 110.5')))[1])      # there is no 4th floor
+        self.assertFalse(br.appearance.from_note(head(look.replace('5층: {값: 110.5, 등급: 추정}', '4층: {값: 110.5, 등급: "수치 근거 + 사용자 조건부 승인"}')))[1])     # unless the row carries the user's conditional approval (U03)
         self.assertTrue(br.appearance.from_note(head(look.replace('등급: 확정}', '등급: 모름}')))[1])                # an unknown is not written down
         self.assertTrue(br.appearance.from_note(head(look.replace('값: 붉은 벽돌', '값: 나무')))[1])
         # Z07: one wall face in another material, tall columns, the long arch bay, lines up to the roof, the eave band

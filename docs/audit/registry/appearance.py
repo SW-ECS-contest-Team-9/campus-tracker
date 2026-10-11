@@ -26,7 +26,7 @@ Z11 에서 더한 것:
             # 없으면 모양의 기본 크기. 그 동의 창 모양을 그리는 벽에만 쓴다(벽면에서 다른 모양을 준 면은 그 모양의 기본 크기)
       띠창의 덧색: 창 줄이 놓이는 밝은 띠의 색(벽 전체 길이)
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
-창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정).
+창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정). 다만 그 층의 등급에 "사용자 조건부 승인"이 적혀 있으면 둔다(U03, 은주1관).
 """
 import re
 
@@ -50,6 +50,13 @@ def floor_table(head, name=None):
     t = head.get('층_바닥_높이') or {}
     if name: t = t.get(name) or {}
     return {k: v.get('값') for k, v in (t.get('층') or {}).items() if isinstance(v, dict) and isinstance(v.get('값'), (int, float))}
+
+
+def approved_4f(head, name=None):
+    """True when the table's 4층 row says 사용자 조건부 승인 (user 2026-10-12: a 4th floor may stay where the heights do not work without it)."""
+    t = head.get('층_바닥_높이') or {}
+    if name: t = t.get(name) or {}
+    return '사용자 조건부 승인' in str(((t.get('층') or {}).get('4층') or {}).get('등급', ''))
 
 
 def from_note(head):
@@ -86,7 +93,7 @@ def from_note(head):
         win = item('창')
         if win:
             table = floor_table(head, win.get('층_표'))
-            if '4층' in table: bad.append(f'{at}.창: 층 표에 4층이 있다(학교 건물에는 4층이 없다)')
+            if '4층' in table and not approved_4f(head, win.get('층_표')): bad.append(f'{at}.창: 층 표에 4층이 있다(학교 건물에는 4층이 없다. 수치 근거로 두려면 그 층의 등급에 "사용자 조건부 승인"을 적는다)')
             if win.get('모양') not in STYLES: bad.append(f"{at}.창.모양 {win.get('모양')!r}: {', '.join(STYLES)} 중 하나")
             floors = sorted(table.values())
             if not floors:   # no floor table: equal storeys between a stated level and the roof
