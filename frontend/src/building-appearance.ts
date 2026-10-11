@@ -555,6 +555,12 @@ function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, o
         return [lo[0] + (hi[0] - lo[0]) * t + e.n[0] * 0.1, lo[1] + (hi[1] - lo[1]) * t + e.n[1] * 0.1, top + h * t + 0.12];
       };
       const s0 = (c + 0.5) / count - 0.55 / e.len, s1 = (c + 0.5) / count + 0.55 / e.len;
+      if (a.roof!.dormerShape === 'gable') { // P02: a small gable standing on the slope: a light triangle in front, two roof faces running back to the slope
+        const w = 1.1 / e.len, sc = (c + 0.5) / count, A = lerp(sc - w, 0.22), B = lerp(sc + w, 0.22), up = Math.min(1.9, h * 0.5), back = lerp(sc, Math.min(0.95, 0.22 + up / h));
+        const apex = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2, A[2] + up];
+        out.tri(A, B, apex, cornice); out.tri(A, apex, back, color); out.tri(B, back, apex, color);
+        continue;
+      }
       out.quad(lerp(s0, 0.3), lerp(s1, 0.3), lerp(s1, 0.6), lerp(s0, 0.6), dormer);
     }
   });

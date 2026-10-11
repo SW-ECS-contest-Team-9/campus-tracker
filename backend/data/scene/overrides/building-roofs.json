@@ -907,7 +907,9 @@
           120.05,
           124.07,
           128.08
-        ]
+        ],
+        "widthM": 3.9,
+        "pitchM": 4.8
       },
       "roof": {
         "type": "flat",
@@ -1420,13 +1422,15 @@
           "4층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
-        "dormers": true
+        "dormers": true,
+        "dormerShape": "gable"
       },
       "grades": {
         "wall": "원천(학교 사진)",
@@ -1439,7 +1443,7 @@
       "wall": "stone",
       "wallColor": "#b9b5aa",
       "windows": {
-        "style": "arches",
+        "style": "bays",
         "floorsM": [
           132.2,
           137.8,
@@ -1453,7 +1457,10 @@
           "3층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e9a9c",
+        "widthM": 3.0,
+        "pitchM": 3.85
       },
       "roof": {
         "type": "hipped",
@@ -1463,7 +1470,7 @@
       },
       "grades": {
         "wall": "추정",
-        "windows": "원천(아치 칸), 높이는 추정",
+        "windows": "원천(청록 긴 아치 칸 14개: 사용자 사진), 추정(칸 폭·간격, 높이는 층 표)",
         "roof": "확정(경사·지붕창), 단면은 모름"
       }
     },
@@ -1498,7 +1505,8 @@
           "3층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
@@ -1531,7 +1539,8 @@
           "3층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
@@ -1564,7 +1573,8 @@
           "3층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
@@ -1598,13 +1608,15 @@
           "4층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
-        "dormers": true
+        "dormers": true,
+        "dormerShape": "gable"
       },
       "grades": {
         "wall": "원천(학교 사진)",
@@ -1632,13 +1644,15 @@
           "4층",
           "5층",
           "6층"
-        ]
+        ],
+        "color": "#2e8a8c"
       },
       "roof": {
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
-        "dormers": true
+        "dormers": true,
+        "dormerShape": "gable"
       },
       "grades": {
         "wall": "원천(학교 사진)",
@@ -1903,15 +1917,29 @@
         ],
         "color": "#5aa3a6"
       },
+      "bands": [
+        {
+          "fromM": 127.2,
+          "toM": 132.5,
+          "grade": "원천(열린 기둥 층: 사용자 사진·거리뷰), 추정(높이 = 층 표의 1층)",
+          "wallColor": "#262b2f",
+          "style": "none"
+        }
+      ],
       "roof": {
         "type": "flat",
         "material": "concrete",
         "rim": "#3b82c4"
       },
+      "plinth": {
+        "color": "#55585c",
+        "topM": 127.2
+      },
       "grades": {
         "wall": "확정(사용자 사진)",
         "windows": "추정(높이는 층 표)",
-        "roof": "확정(사용자 영상 캡처)"
+        "roof": "확정(사용자 영상 캡처)",
+        "plinth": "원천(짙은 기단부), 추정(윗면 = 1층 바닥)"
       },
       "features": [
         {
@@ -1964,15 +1992,29 @@
         ],
         "color": "#5aa3a6"
       },
+      "bands": [
+        {
+          "fromM": 127.2,
+          "toM": 132.5,
+          "grade": "원천(열린 기둥 층: 사용자 사진·거리뷰), 추정(높이 = 층 표의 1층)",
+          "wallColor": "#262b2f",
+          "style": "none"
+        }
+      ],
       "roof": {
         "type": "flat",
         "material": "concrete",
         "rim": "#3b82c4"
       },
+      "plinth": {
+        "color": "#55585c",
+        "topM": 127.2
+      },
       "grades": {
         "wall": "확정(사용자 사진)",
         "windows": "추정(높이는 층 표)",
-        "roof": "확정(사용자 영상 캡처)"
+        "roof": "확정(사용자 영상 캡처)",
+        "plinth": "원천(짙은 기단부), 추정(윗면 = 1층 바닥)"
       },
       "features": [
         {
