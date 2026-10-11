@@ -82,8 +82,9 @@ CC = np.array(CR['centre']); _cp = lambda r, b: CC + r * np.array([np.sin(np.rad
 CRESCENT = Polygon([_cp(CR['outerRadiusM'], b) for b in np.linspace(CR['bearingSouthEndDeg'], CR['bearingNorthEndDeg'], 30)] + [_cp(CR['innerRadiusM'], b) for b in np.linspace(CR['bearingNorthEndDeg'], CR['bearingSouthEndDeg'], 30)])   # 지도의 부채꼴(견줌에만 쓴다)
 B_ROW = float(np.degrees(np.arctan2(ht[0], ht[1]))); B_WALL = float(np.degrees(np.arctan2(lN[0], lN[1])))
 S04_C, S04_N, STALL_W, STALL_D = np.array([201163.26, 557270.11]), 12, 2.5, 5.0   # 지도에서 읽은 한 줄 묶음 S04(가운데, 칸 수: docs/audit/u04/stalls.json mapBlocks)
-ISL = S04_C - ht * (S04_N * STALL_W / 2)   # 섬의 중심 = S04 의 남서 끝(마지막 칸의 끝 선 가운데)
-R_ISL = 3.0                                # 섬(반원)의 반지름 = S04 띠의 반 폭(칸 깊이 5.0 + 양쪽 벽 0.5). 사진 22: 2.5~3.5 m
+Q01_AISLE = 0.2                            # Q01: 섬과 긴 줄 S07 사이 통로가 4.1 m 였다(사진 22 는 5.5~6 m). 섬의 반지름을 2.8 m 로 줄이고 중심을 그만큼 북서로 옮긴다: 경사로 쪽(북서) 벽 선·발치·낮은 벽은 제자리, 섬의 S07 쪽만 0.4 m 물러난다(통로 4.5 m). 더 줄이면 섬 벽이 S04 의 칸(깊이 5.0 m)에 걸린다
+ISL = S04_C - ht * (S04_N * STALL_W / 2) - hn * Q01_AISLE   # 섬의 중심 = S04 의 남서 끝(마지막 칸의 끝 선 가운데)에서 북서로 0.5 m
+R_ISL = 3.0 - Q01_AISLE                    # 섬(반원)의 반지름. 사진 22: 2.5~3.5 m
 RAMP_W = 6.4                               # 경사로 폭(벽에서 벽). 사진 23: 발치의 두 기둥 사이 6.4 m, 통로 6.0~6.8 m. 가운데 노란 선(두 방향)
 R_OUT, R_C, V_C = R_ISL + RAMP_W, R_ISL + RAMP_W / 2, -(R_ISL + RAMP_W / 2)
 S_TOE = 12.0                               # 발치(기둥 줄) ~ 안쪽 벽이 굽기 시작하는 곳. 사진 23: 12.3 m(11~13.5)
@@ -105,7 +106,7 @@ opening = unary_union([strip(0.0, S_BAND), sector(R_ISL, R_OUT, 0.0, PHI_CREST)]
 assert opening.geom_type == 'Polygon', opening.geom_type
 # U11(사용자 확정 2026-10-12, 그림 29): 지하 1층 북서쪽 세모 = 주차관리센터(관리실)·화장실·은주관으로 가는 통로. 주차 바닥이 아니다. 간판 벽(사진 13·20·21)은 서쪽 외벽이 아니라 이 세모의 빗변(주차장 쪽 벽)이다.
 #   빗변: 그림 29 에서 주차 줄과 나란하게 읽힌다(방위 209도, 줄 31도). 서쪽 변을 북서 모서리에서 남쪽으로 29~31 m 내려온 곳에서 시작해 지하 차도 목의 남쪽 가장자리까지. 섬 중심에서 북서로 V_HYP m 의 선(손그림 ±1.5 m)
-V_HYP, S_MOUTH = -16.5, 17.6            # 빗변의 자리, 빗변 위 계단 어귀의 자리(옛 문 노드를 빗변에 직각으로 옮긴 곳). 추정
+V_HYP, S_MOUTH = -16.5 + Q01_AISLE, 17.6            # 빗변의 자리, 빗변 위 계단 어귀의 자리(옛 문 노드를 빗변에 직각으로 옮긴 곳). 추정
 ROOM = INNER_OLD.intersection(Polygon([sp(-60, V_HYP), sp(90, V_HYP), sp(90, V_HYP - 60), sp(-60, V_HYP - 60)])).difference(LineString([E0 - D * 5, LANE_END]).buffer(ROAD_W / 2, cap_style=2)).buffer(0)
 ROOM = max(ROOM.geoms, key=lambda g: g.area) if hasattr(ROOM, 'geoms') else ROOM
 _hyp = LineString([sp(-60, V_HYP), sp(90, V_HYP)]).intersection(ROOM.buffer(0.05)); HYP_S = sorted(float((np.array(c) - ISL) @ ht) for c in _hyp.coords)   # 빗변이 놓인 s 범위
@@ -199,7 +200,7 @@ line_band = lambda s0, s1, v_, t=0.1: LineString([sp(s0, v_), sp(s1, v_)]).buffe
 # 안쪽(섬 쪽)의 짙은 남색 벽: 발치의 기둥에서 섬 옆까지 곧게, 섬을 따라 굽는다. 지하 2층 바닥 ~ 지하 1층 바닥(사진 23 왼쪽, 사진 26 왼쪽)
 box('U11-RAMP-INNERWALL-UNDER', 'wall', line_band(S_BAND, S_TOE, -R_ISL - 0.15), Z_B2, C_B2, NAVY, '경사로 안쪽(S04 쪽)의 짙은 남색 벽, 지하 1층 바닥 밑 구간(사진 23 왼쪽: 발치의 흰 기둥에서 시작)', grade=G_SEEN)
 box('U11-RAMP-INNERWALL', 'wall', unary_union([line_band(0.0, S_BAND, -R_ISL - 0.15), arc_band(R_ISL + 0.15, 0.0, PHI_CREST)]), Z_B2, Z_B1, NAVY, '경사로 안쪽의 짙은 남색 벽, 위가 트인 구간과 섬 둘레(사진 23·26 왼쪽). 윗선 = 지하 1층 바닥', grade=G_SEEN)
-ISL_WALL = unary_union([line_band(0.0, S_BAND, -R_ISL + 0.05, 0.12), arc_band(R_ISL - 0.05, 0.0, 180.0, 0.12)]).buffer(0)
+ISL_WALL = unary_union([line_band(0.0, S_BAND, -R_ISL + 0.05, 0.12), arc_band(R_ISL - 0.05, 0.0, 180.0, 0.12)]).buffer(0.01, join_style=2).buffer(-0.01, join_style=2)
 box('U02-ISLAND-WALL', 'wall', ISL_WALL, Z_B1, Z_B1 + 1.1, LOWWALL, '섬의 낮은 벽(사진 22: 푸른 회색, 높이 1.1 m 추정): S04 띠의 남서 끝 반원과 트인 곳 옆. 벽 뒤는 S04 의 주차 칸', grade=G_SEEN)
 box('U02-ISLAND-STRIPE', 'wall', arc_band(R_ISL + 0.25, PHI_CREST, 180.0, 0.13), Z_B1, Z_B1 + 0.2, STRIPE, '섬 벽 밑의 노랑·검정 줄무늬 턱(사진 22: 지하 1층 바닥 위)', grade=G_SEEN)
 # 바깥(서쪽 벽 쪽)의 청록 벽: 발치의 기둥에서 곧게, 굽은 곳 바깥을 돌아 마루를 조금 지난 곳까지(사진 22 왼쪽, 사진 23 먼 끝, 사진 26 오른쪽)

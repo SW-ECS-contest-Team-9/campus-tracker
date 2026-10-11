@@ -57,6 +57,8 @@ for b in blocks:
         else: shift = shift + inward * 2.0; why = (why + ', ' if why else '') + '외곽 밖으로 나가 안으로 2 m 밂(그래도 나간 칸은 뺌)'
     b['c'] = c + shift; b['shiftM'] = r2(np.hypot(*shift)); b['shiftWhy'] = why
 
+# Q01: 한 줄 묶음 S04 를 섬과 함께 북서로 0.2 m(u02/build_parts.py Q01_AISLE). S04 ~ S07 통로 4.6 → 4.8 m, 섬 ~ S07 4.1 → 4.5 m(사진 22: 5.5~6 m). 지도 잔차(RMS 3.3 m) 안
+_s04 = next(b for b in blocks if b['id'] == 'S04'); _s04['c'] = _s04['c'] - V * 0.2; _s04['shiftM'] = 0.2; _s04['shiftWhy'] = 'Q01: 섬과 함께 북서로 0.2 m(사진 22 의 통로 폭)'
 # ---------- 칸 ----------
 # U11: 사진이 정한 자리. 지하 1층 S03 = 간판 벽(세모의 빗변) 앞에 벽을 보고 서는 칸(사진 21): 빗변에 붙인다. 지하 2층 S03 = 경사로 발치 오른쪽(북서)의 칸(사진 23): 발치 기둥의 북동쪽부터
 ISL = np.array(RP['islandCentre'])
