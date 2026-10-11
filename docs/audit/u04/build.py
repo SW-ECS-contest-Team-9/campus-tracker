@@ -15,7 +15,8 @@ r2 = lambda v: round(float(v), 2)
 GEO = json.loads((HERE.parent / 'u02' / 'georef.json').read_text(encoding='utf-8')); MX = np.array(GEO['matrix']); RES = GEO['residualM']['rms']
 M = json.loads((HERE.parent / 'u02' / 'model.json').read_text(encoding='utf-8')); H = M['heights']; RP = M['ramp']; AP = M['approach']; PT = M['points']; HY = M['hyein']
 F = {f['properties']['id']: f for f in json.loads((STR / 'u01-field-basement.geojson').read_text(encoding='utf-8'))['features']}
-INNER = shape(F['U02-VOID-B1']['geometry']).buffer(0)
+INNER1, INNER2 = shape(F['U02-VOID-B1']['geometry']).buffer(0), shape(F['U02-VOID-B2']['geometry']).buffer(0)   # U05: 두 층의 평면이 다르다(지하 1층 = + 지하 차도 목, 지하 2층 = + 서쪽 바깥 차로 띠)
+INNER = INNER1.intersection(INNER2).buffer(-0.3, join_style=2).buffer(0.3, join_style=2).buffer(0)                  # 둘 다에 있는 평면(= U02 의 평면): 주차 칸 묶음은 여기에 맞춘다
 Z1, Z2 = H['b1Floor'], H['b2Floor']
 world = lambda p: np.r_[p, 1.0] @ MX
 xy = lambda o: np.array(o['xy'])
@@ -64,18 +65,19 @@ def stalls_of(b):
 CC = np.array(RP['center']); R, LW = RP['laneRadiusM'], RP['laneWidthM']
 WA, WB = np.array([201140.1, 557255.5]), np.array([201146.2, 557293.5]); w = (WB - WA) / np.hypot(*(WB - WA)); e = np.array([w[1], -w[0]])   # 운동장 서쪽 변(U02 와 같은 축)
 arc = lambda r, th: CC + r * (np.cos(th) * e - np.sin(th) * w)
-S0, W0, RB = xy(RP['top']), xy(RP['curveEnd']), xy(RP['bottom']); J0, WALLPT = xy(AP['junction']), xy(AP['wall']); DOOR, SBN, ST = xy(PT['DOOR']), xy(PT['SBN']), xy(PT['ST']); H_BOT, H_OUT = xy(HY['bottom']), xy(HY['out'])
+S0, W0, RB = xy(RP['top']), xy(RP['curveEnd']), xy(RP['bottom']); J0, MOUTH, LANE_END = xy(AP['junction']), xy(AP['entry']), xy(AP['laneEnd']); OUTER = Polygon(RP['outer']['polygon']); OUT_BOT = xy(RP['outer']['bottom']); DOOR, SBN, ST = xy(PT['DOOR']), xy(PT['SBN']), xy(PT['ST']); H_BOT, H_OUT = xy(HY['bottom']), xy(HY['out'])
 half = Polygon([arc(R + LW / 2 + 0.2, t) for t in np.linspace(0, np.pi, 37)])                      # 섬 + 굽은 차로 + 바깥 낮은 벽
 strip = lambda a, b: LineString([a, b]).buffer(LW / 2 + 0.2, cap_style=2)
 HOLE_B1 = unary_union([half, strip(W0, W0 + w * RP['openingStraightM'])])                          # 지하 1층: 바닥이 트인 곳(경사로 구멍)과 섬
-HOLE_B2 = unary_union([half, strip(W0, RB)])                                                       # 지하 2층: 경사로 판이 바닥에서 올라가는 자리 전부
+HOLE_B2 = unary_union([half, strip(W0, RB), OUTER.buffer(0.2, join_style=2)])                                                       # 지하 2층: 경사로 판이 바닥에서 올라가는 자리 전부
 lane = lambda a, b, wd: LineString([a, b]).buffer(wd / 2, cap_style=2)
+THROUGH = lane(MOUTH, LANE_END, AP['widthM'] - 0.3)   # 칸 선 굵기만큼 줄여 스치기만 하는 칸은 남긴다
 KEEP_B1 = unary_union([HOLE_B1.buffer(0.5), lane(S0, S0 + w * 9.0, 6.0),                           # 경사로 머리로 들어서는 차로(머리에서 북쪽으로 9 m)
-                       lane(WALLPT, J0 - (WALLPT - J0) / np.hypot(*(WALLPT - J0)) * 6.0, AP['widthM']),   # 북서 들머리(지하 차도가 들어오는 폭 7.2 m)를 6 m 더 안으로
+                       THROUGH,                                                                    # U05: 지하 차도에서 곧게 이어지는 차로(폭 7.2 m, 들머리에서 97.4 m: 사용자 붉은 선 1)
                        lane(DOOR, SBN, 4.0), Point(SBN).buffer(2.5), lane(H_OUT, H_OUT - V * 5.0, 3.0), Point(H_OUT).buffer(2.0)])   # 은주관 문·운동장 계단 발치, 혜인관 통로 어귀
-KEEP_B2 = unary_union([HOLE_B2.buffer(0.5), lane(RB, RB + w * 9.0, 6.0)])                           # 경사로 발치에서 나오는 차로
+KEEP_B2 = unary_union([HOLE_B2.buffer(0.5), lane(RB, RB + w * 9.0, 6.0), lane(OUT_BOT, OUT_BOT + w * 4.0, RP['outer']['widthM']), THROUGH])   # U05: 지하 2층에도 같은 곧은 차로(사용자가 지하 2층 화면에 그림)                           # 경사로 발치에서 나오는 차로
 
-def level(keep, hole, z, tag):
+def level(keep, hole, z, tag, inner):
     out = []; dropped = 0
     for b in blocks:
         cells = stalls_of(b); kept = [s for s in cells if SAFE.contains(s) and not keep.intersects(s)]; dropped += len(cells) - len(kept)
@@ -86,15 +88,15 @@ def level(keep, hole, z, tag):
             if len(mine) < 2: dropped += len(mine); continue   # 혼자 남은 칸은 두지 않는다
             out.append({'block': b['id'], 'id': f"{b['id']}{'abc'[j] if hasattr(g, 'geoms') else ''}", 'polygon': part, 'stalls': mine, 'rows': b['rows']})
     solid = unary_union([o['polygon'] for o in out])
-    raw = INNER.difference(solid).difference(hole)
+    raw = inner.difference(solid).difference(hole)
     aisle = raw.buffer(-0.6, join_style=2).buffer(0.6, join_style=2).intersection(raw).buffer(0)      # 폭 1.2 m 가 안 되는 틈(묶음과 벽 사이, 경사로 옆)은 길이 아니다
     aisle = max(aisle.geoms, key=lambda g: g.area) if hasattr(aisle, 'geoms') else aisle
     aisle = aisle.simplify(0.02)
     return {'tag': tag, 'z': z, 'blocks': out, 'aisle': aisle, 'dropped': dropped, 'stalls': sum(len(o['stalls']) for o in out), 'stallArea': solid.area}
-B1 = level(KEEP_B1, HOLE_B1, Z1, 'B1'); B2 = level(KEEP_B2, HOLE_B2, Z2, 'B2')
+B1 = level(KEEP_B1, HOLE_B1, Z1, 'B1', INNER1); B2 = level(KEEP_B2, HOLE_B2, Z2, 'B2', INNER2)
 
 # 접속점이 면 위(또는 경계 0.5 m 안)에 있어야 서버가 면을 건너는 길로 센다
-for name, p, lv in (('북서 들머리', J0, B1), ('U자 경사로 머리', S0, B1), ('은주관 문', DOOR, B1), ('운동장 계단 발치', SBN, B1), ('혜인관 통로 어귀', H_OUT, B1), ('U자 경사로 발치', RB, B2)):
+for name, p, lv in (('북서 들머리', J0, B1), ('U자 경사로 머리', S0, B1), ('은주관 문', DOOR, B1), ('운동장 계단 발치', SBN, B1), ('혜인관 통로 어귀', H_OUT, B1), ('U자 경사로 발치', RB, B2), ('바깥 차로 발치', OUT_BOT, B2), ('곧은 차로 끝', LANE_END, B1), ('곧은 차로 끝(지하 2층)', LANE_END, B2)):
     d = lv['aisle'].distance(Point(p)); assert d < 0.3, (name, d)
 assert not B1['aisle'].contains(Point(H_BOT))
 for lv in (B1, B2): assert len(lv['aisle'].interiors) <= 100 and lv['aisle'].is_valid, len(lv['aisle'].interiors)
@@ -130,8 +132,8 @@ for lv in (B2, B1):   # 지하 2층을 먼저: 위에서 비쳐 볼 때 지하 1
 def area_body(lv, name, extra):
     a = lv['aisle']; open_ring = lambda r: [[r2(x), r2(y)] for x, y in list(r.coords)[:-1]]
     return {'name': name, 'kind': 'parking', 'elevationM': lv['z'], 'coordinates': open_ring(a.exterior), 'holes': [open_ring(r) for r in a.interiors],
-            'note': f"U04. 사용자 지시 2026-10-12: 주차 자리를 뺀 나머지를 길로. 주차장 평면(U02, 학교 지도 외곽)에서 주차 칸 묶음 {len(lv['blocks'])}개와 U자 경사로 자리를 뺀 면. 차와 사람이 함께 쓴다(kind parking). 묶음 배치는 학교 지도(원천, 좌표 맞춤 잔차 RMS {RES} m), 칸 치수 {STALL_W} × {STALL_D} m 는 추정. {extra}"}
-bodies = {'b1': area_body(B1, '운동장 지하 1층 주차장 통로 면', '접속: 북서 들머리(지하 차도), U자 경사로 머리, 은주관 문·운동장 계단 발치, 혜인관 통로 어귀.'),
+            'note': f"U04. 사용자 지시 2026-10-12: 주차 자리를 뺀 나머지를 길로. 주차장 평면(U02 + U05 의 목·서쪽 띠, 학교 지도 외곽)에서 주차 칸 묶음 {len(lv['blocks'])}개와 U자 경사로 자리를 뺀 면. 차와 사람이 함께 쓴다(kind parking). 묶음 배치는 학교 지도(원천, 좌표 맞춤 잔차 RMS {RES} m), 칸 치수 {STALL_W} × {STALL_D} m 는 추정. {extra}"}
+bodies = {'b1': area_body(B1, '운동장 지하 1층 주차장 통로 면', 'U05: 지하 차도가 북서 모서리의 목으로 곧게 들어와 폭 7.2 m 의 곧은 차로(97 m, 주차 칸 없음)로 이어진다. 접속: 북서 들머리(지하 차도), U자 경사로 머리, 은주관 문·운동장 계단 발치, 혜인관 통로 어귀.'),
           'b2': area_body(B2, '운동장 지하 2층 주차장 통로 면', '배치는 지하 1층과 같게 두고(추정) U자 경사로 판 자리의 칸을 뺐다. 접속: U자 경사로 발치 하나(걷는 길 없음).')}
 for k, b in bodies.items(): (HERE / 'areas' / f'{k}.json').write_text(json.dumps(b, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 
@@ -154,7 +156,7 @@ pl = lambda p: [[r2(x), r2(y)] for x, y in p.exterior.coords]
 def lv_out(lv): return {'floorM': lv['z'], 'blocks': [{'id': o['id'], 'rows': o['rows'], 'stalls': len(o['stalls']), 'polygon': pl(o['polygon'])} for o in lv['blocks']], 'stalls': lv['stalls'], 'stallsDropped': lv['dropped'],
                         'stallAreaM2': r2(lv['stallArea']), 'aisleAreaM2': r2(lv['aisle'].area), 'aisleHoles': len(lv['aisle'].interiors), 'aisleVertices': len(lv['aisle'].exterior.coords) + sum(len(r.coords) for r in lv['aisle'].interiors),
                         'aisle': ring(lv['aisle']), 'gapsBetweenBlocksM': {'min': gaps(lv)[0], 'median': r2(np.median(gaps(lv)))}}
-out = {'georefRmsM': RES, 'stallM': [STALL_W, STALL_D], 'rowAzimuthDeg': {'map': r2(MAP_AZ), 'hyeinWall': r2(WALL_AZ), 'used': r2(WALL_AZ)}, 'parkingAreaM2': r2(INNER.area), 'longRowPitchM': pitch,
+out = {'georefRmsM': RES, 'stallM': [STALL_W, STALL_D], 'rowAzimuthDeg': {'map': r2(MAP_AZ), 'hyeinWall': r2(WALL_AZ), 'used': r2(WALL_AZ)}, 'parkingAreaM2': r2(INNER.area), 'parkingAreaB1M2': r2(INNER1.area), 'parkingAreaB2M2': r2(INNER2.area), 'throughLane': {'from': [r2(MOUTH[0]), r2(MOUTH[1])], 'to': [r2(LANE_END[0]), r2(LANE_END[1])], 'widthM': AP['widthM']}, 'longRowPitchM': pitch,
        'mapBlocks': [{k: b[k] for k in ('id', 'px', 'mapCentre', 'mapAlongM', 'mapAcrossM', 'rows', 'stallsPerRow', 'shiftM', 'shiftWhy', 'manual')} | {'centre': [r2(b['c'][0]), r2(b['c'][1])]} for b in blocks],
        'B1': lv_out(B1), 'B2': lv_out(B2), 'points': {'hyeinOut': [r2(H_OUT[0]), r2(H_OUT[1]), Z1], 'rampBottomNode': '89be4757-d080-42d9-a175-e1f39885b8f4'}}
 (HERE / 'stalls.json').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')

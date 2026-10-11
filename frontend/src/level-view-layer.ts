@@ -12,7 +12,7 @@ import type { SceneBuilding } from './api';
 import './level-view.css';
 import { declutter as keepTags, textWidth } from './label-layout';
 import {
-  FAN, LEVEL_VIEW, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, isConnector, levelsUnder, parseZones, shortName, zoneAt, zoneContent,
+  FAN, LEVEL_VIEW, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, isConnector, isWideRoad, levelsUnder, parseZones, shortName, zoneAt, zoneContent,
   type Floor, type LvArea, type LvPlace, type LvRoad, type Zone,
 } from './level-view';
 import { FirstPerson } from './first-person';
@@ -429,11 +429,14 @@ export class LevelView {
         tag('road', raised([middle(longest)], move, 1)[0], shortName(road.name), 1, 12);
         if (linking(road)) for (const end of [cut.pieces[0][0], cut.pieces[cut.pieces.length - 1].slice(-1)[0]]) dot(raised([end], move)[0], VIEW_COLORS.stairs, 7);
         for (const stub of cut.stubs) {
+          // U05: where a carriageway goes on into a neighbour (a tunnel mouth) its stub is a pale ribbon of the road's width with a larger tag
+          const wide = isWideRoad(road);
+          if (wide) this.addRibbon(solid, stub, width, move, VIEW_COLORS.stubFill, 255, ground ? 0.15 : 0.3);
           line(raised(stub, move), px.connector, VIEW_COLORS.stub, 1, true);
           const end = stub[stub.length - 1];
           const next = zoneAt(this.zones, end[0], end[1], ground ? undefined : end[2]);
           dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 7);
-          if (next && next.id !== zone.id) tag('link', raised([end], move, 1)[0], `→ ${shortName(next.name, 16)}`, 4, 12, VIEW_COLORS.stub);
+          if (next && next.id !== zone.id) tag('link', raised([wide ? stub[Math.floor(stub.length / 2)] : end], move, 1)[0], `→ ${shortName(next.name, 16)}`, wide ? 8 : 4, wide ? 15 : 12, wide ? VIEW_COLORS.label : VIEW_COLORS.stub);
         }
       }
       if (ground) {

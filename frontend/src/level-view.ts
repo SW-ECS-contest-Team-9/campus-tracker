@@ -27,6 +27,8 @@ export const LEVEL_VIEW = {
   belowBaseM: 2.5,
   /** Length of the stub of a road that goes on into a neighbouring zone. */
   stubM: 6,
+  /** U05: the stub of a carriageway (a vehicle road at least wideRoadM wide) is this long and drawn as a ribbon of its width: the mouth of a tunnel into a parking level must read as a way in. */
+  stubWideM: 14, wideRoadM: 4,
   /** Height tolerance of an underground zone's range for roads and clicks. */
   rangeSlackM: 0.6,
 };
@@ -124,7 +126,7 @@ function head(points: number[][], length: number): number[][] {
  * A road line cut by a zone: the line is split where it crosses the outline; a part is inside when its middle is in
  * the polygons and, for an underground zone, in the height range. Display only: the stored road is not changed.
  */
-export function cutRoad(coordinates: number[][], zone: Pick<Zone, 'polygons' | 'layer' | 'fromM' | 'toM'>): RoadCut {
+export function cutRoad(coordinates: number[][], zone: Pick<Zone, 'polygons' | 'layer' | 'fromM' | 'toM'>, stubM = LEVEL_VIEW.stubM): RoadCut {
   const parts: { a: number[]; b: number[]; inside: boolean }[] = [];
   for (let i = 0; i + 1 < coordinates.length; i++) {
     const a = coordinates[i], b = coordinates[i + 1];
@@ -146,12 +148,15 @@ export function cutRoad(coordinates: number[][], zone: Pick<Zone, 'polygons' | '
   const stubs: number[][][] = [];
   runs.forEach((run, i) => {
     if (run.inside) return;
-    if (runs[i - 1]?.inside) stubs.push(head(run.points, LEVEL_VIEW.stubM));
-    if (runs[i + 1]?.inside) stubs.push(head([...run.points].reverse(), LEVEL_VIEW.stubM));
+    if (runs[i - 1]?.inside) stubs.push(head(run.points, stubM));
+    if (runs[i + 1]?.inside) stubs.push(head([...run.points].reverse(), stubM));
   });
   const total = length(coordinates);
   return { pieces, stubs, share: total > 0 ? pieces.reduce((s, p) => s + length(p), 0) / total : 0 };
 }
+
+/** U05: a carriageway whose stub into a neighbour is drawn long and as a ribbon. */
+export const isWideRoad = (road: Pick<LvRoad, 'roadClass' | 'widthM'>) => road.roadClass === 'vehicle' && (road.widthM ?? 0) >= LEVEL_VIEW.wideRoadM;
 
 // ---------- what a zone holds ----------
 const centroid = (ring: number[][]) => [ring.reduce((s, p) => s + p[0], 0) / ring.length, ring.reduce((s, p) => s + p[1], 0) / ring.length];
@@ -181,7 +186,7 @@ export function zoneContent(zone: Zone, data: { roads: LvRoad[]; areas: LvArea[]
   const inside = (p: number[]) => inPolygons(zone.polygons, p[0], p[1]);
   const roads = data.roads
     .filter((r) => !r.buildingId && r.structure !== 'elevator' && (ground ? !isUnderground(r) : level || isUnderground(r)))
-    .map((road) => ({ road, cut: cutRoad(road.geometry.coordinates, zone) }))
+    .map((road) => ({ road, cut: cutRoad(road.geometry.coordinates, zone, isWideRoad(road) ? LEVEL_VIEW.stubWideM : LEVEL_VIEW.stubM) }))
     .filter((r) => r.cut.pieces.length);
   const areas = data.areas.filter((a) => a.rings[0]?.length && inside(centroid(open(a.rings[0])))
     && (ground ? !isUndergroundArea(a) : a.elevationM != null && inRange(zone, a.elevationM)));

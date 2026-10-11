@@ -58,7 +58,7 @@ export const OTHERS: Record<OthersMode, { veil: number; plate: number }> = {
 };
 /** Colours of the things a lifted view draws (also its legend). */
 export const VIEW_COLORS = {
-  vehicle: '#2b2f36', pedestrian: '#1d6fd6', stairs: '#e07a1f', elevator: '#8b3fc9', stub: '#5b6570', place: '#c2185b',
+  vehicle: '#2b2f36', pedestrian: '#1d6fd6', stairs: '#e07a1f', elevator: '#8b3fc9', stub: '#5b6570', stubFill: '#9aa3ad', place: '#c2185b',
   outline: '#1f2937', leader: '#4b5563', plate: '#eef1f4', veil: '#eef0ec', label: '#111827',
   /** F09: the chosen floor of a fanned-out building, the aisle surface and the stalls of a parking level. */
   focus: '#0759c7', aisle: '#6a717b', stall: '#c8cdd4',

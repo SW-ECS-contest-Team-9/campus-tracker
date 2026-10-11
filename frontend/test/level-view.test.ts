@@ -5,7 +5,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
 const { parseStructures } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
@@ -44,6 +44,11 @@ test('길을 구획 경계에서 자름: 안쪽 조각, 이웃으로 나가는 �
   assert.deepEqual(cut.stubs[0][0], [X0 + 20, Y0 + 10, 105]);
   assert.ok(Math.abs(cut.stubs[0][1][0] - (X0 + 20 + LEVEL_VIEW.stubM)) < 1e-9);
   assert.ok(Math.abs(cut.share - 0.5) < 1e-9);
+  // U05: 차도(폭 4 m 이상의 차량 길)의 꼬리는 길게(터널 들머리가 들어오는 길로 읽히게)
+  assert.ok(Math.abs(cutRoad([[X0 + 10, Y0 + 10, 100], [X0 + 60, Y0 + 10, 110]], zones[0], LEVEL_VIEW.stubWideM).stubs[0][1][0] - (X0 + 20 + LEVEL_VIEW.stubWideM)) < 1e-9);
+  assert.equal(isWideRoad({ roadClass: 'vehicle', widthM: 7.2 }), true);
+  assert.equal(isWideRoad({ roadClass: 'vehicle', widthM: null }), false);
+  assert.equal(isWideRoad({ roadClass: 'pedestrian', widthM: 7.2 }), false);
   // 지나가는 길: 조각 하나에 꼬리 둘
   const through = cutRoad([[X0 - 5, Y0 + 3, 1], [X0 + 25, Y0 + 3, 1]], zones[0]);
   assert.equal(through.pieces.length, 1);

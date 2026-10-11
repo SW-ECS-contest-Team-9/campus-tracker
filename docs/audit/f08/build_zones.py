@@ -131,8 +131,10 @@ def band(rs, half):
 under = []
 
 
-def add(zid, name, desc, geoms, lo, hi, floor=None):
+def add(zid, name, desc, geoms, lo, hi, floor=None, minus=None):
     geom = clean(unary_union(geoms)) if geoms else Polygon()
+    if minus is not None:   # U05: 지하 차도 구획은 주차장 들머리에서 끝난다(그 안쪽은 지하 1층 구획) -> 띄우면 서로 "→ 이웃" 꼬리가 나온다
+        geom = clean(geom.difference(minus))
     if geom.is_empty:
         print('  (자료 없음, 만들지 않음)', name)
         return
@@ -144,7 +146,7 @@ add('b2', '운동장 지하 2층', '운동장 아래 주차장 지하 2층. 평�
 rs = named(r'지하 차도', 'vehicle')
 if rs:
     add('tunnel', '지하 차도(서문·제2주차장 → 내리막길 밑)', '지하 차도 선의 폭 7 m 띠와 구조물 파일의 지하 차도 빈 곳. 경사 구간이라 바닥 판 없음',
-        [band(rs, 3.5)] + voids(r'^지하 차도$'), min(zs(rs)) - 0.3, max(zs(rs)) + 3.6)
+        [band(rs, 3.5)] + voids(r'^지하 차도$'), min(zs(rs)) - 0.3, max(zs(rs)) + 3.6, minus=unary_union(voids(r'^운동장 지하 1층$')))
 rs = named(r'지하 차도 보행 구간|지하 횡단보도', 'pedestrian')
 if rs:
     add('walk', '지하 보행 구간·지하 횡단보도', '지하 차도 옆 보행 구간과 횡단보도·통로 선의 폭 4 m 띠', [band(rs, 2.0)], min(zs(rs)) - 0.3, max(zs(rs)) + 3.0)
