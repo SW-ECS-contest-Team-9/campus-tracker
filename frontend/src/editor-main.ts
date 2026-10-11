@@ -763,7 +763,7 @@ function drawAll() {
   // show every way at its height); the switch in the section panel shows them again. Turning the cut off redraws.
   const cutOn = !!sceneLayers?.section.active;
   syncEntityVisibility();
-  buildingScene?.setShowLabels(!cutOn && !spaceViews?.level.active);
+  buildingScene?.setShowLabels(!cutOn && !spaceViewOn);
   sceneLayers?.section.cutObjects();
   scheduleLayers();
   updateReadouts(); renderLists();
