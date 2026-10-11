@@ -149,21 +149,30 @@ for k in range(1, 13):
     box(f'RIGHT-STAIR-S{k:02d}', 'stair_step', rect(R_U0 + RUN * (k - 1), R_U0 + RUN * k, R_V[0], R_V[1]), Z_FIELD, Z_PLAZA + RR * k, AP, '확정(있음: 사용자 그림 07, 주석 "광장에서 청운관으로 가는 계단"), S-MAP(151.0 → 153.1 비탈 자리), 추정(단 수·폭·방향)',
         '광장에서 안쪽 마당으로 오르는 계단: 13단 = 2.1 ÷ 0.16, 디딤 0.30, 폭 4 m. 아래 끝을 광장으로 봄(그림 07 은 운동장 쪽에 그려져 있어 미정)', f'사용자 그림 07, 운동장 구조 주석, {MESH}', stair='Z02-RIGHT-STAIR', riseM=r2(RR), runM=RUN, widthM=4.0, material='stone')
 
-# ---------- 6. 대일관 출구 옆 하행 계단 (B6): 현관 단 서쪽 끝 → G02 기단 TOP(145.5) ----------
-SU0, SU1, SV = ENT_U[0], -24.0, (2.1, 4.3)
-NR = int(round((Z_ENT - Z_TOP) / 0.16)); RS = (Z_ENT - Z_TOP) / NR; LAND = 2.0; GO = (SU0 - SU1 - LAND) / (NR - 2)
+# ---------- 6. 대일관에서 내려오는 계단 (B6): 현관 단 서쪽 끝 → 내리막길 맨 위(SP 카페 데크 끝 옆) ----------
+# G03(2026-10-12): 사용자 표시 사진(사용자-SP카페·대일관계단·3생활관-20261012/03, "대일")과 영상 05 로 다시. 넓은 돌계단(여럿이 나란히 다님), 가운데 난간, 발치는 카페 데크 끝과 돌 화단 바로 너머.
+# 폭 = 현관 단의 깊이 그대로(v 1.9~6.2, 4.3 m). 발치는 평탄부 145.5 가 아니라 그 동쪽의 길 경사면 위(S-MAP: s 96 에서 145.8, s 110 에서 150.5 로 오름): 디딤 0.36 m 로 두고 높이차에서 단 수를 셈(줄이지 않음)
+import importlib.util as _ilu
+_sp = _ilu.spec_from_file_location('g02common', HERE.parent / 'g02' / 'common.py'); _g = _ilu.module_from_spec(_sp); _sp.loader.exec_module(_g)
+def _s_of(u_): return float(_g.xy_to_st(*uv_to_xy(u_, 4.05))[0])
+SU0, SV, LAND, GO = ENT_U[0], (BAY_V, ST_TOP), 2.0, 0.36
+NR = min(range(16, 44), key=lambda n_: abs((Z_ENT - float(_g.way_z(_s_of(SU0 - LAND - (n_ - 2) * GO)))) / n_ - 0.16))
+SU1 = SU0 - LAND - (NR - 2) * GO; Z_FOOT = float(_g.way_z(_s_of(SU1))); RS = (Z_ENT - Z_FOOT) / NR
+P03 = '사용자-SP카페·대일관계단·3생활관-20261012/03·05'
 u = SU0; side = []
-for k in range(1, NR):           # k 번째 디딤판(위에서 아래로), 윗면 = 151.0 − k x 한 단
+for k in range(1, NR):           # k 번째 디딤판(위에서 아래로), 윗면 = 151.3 − k x 한 단
     d = LAND if k == NR // 2 else GO
     side.append((u - d, u, Z_ENT - RS * k, k == NR // 2)); u -= d
 for n, (a, b, top, landing) in enumerate(reversed(side), 1):
-    box(f'SIDE-STAIR-S{n:02d}', 'landing' if landing else 'stair_step', rect(a, b, SV[0], SV[1]), 145.0, top, 'G02-PLATFORM-WAY / G02-PLATFORM-TOP (서쪽), Z02-PLATFORM-APRON (동쪽 끝)',
-        '확정(현관 앞 바닥에서 갈라져 내려감, 계단이 실제로 있음: 사진 27), S-MAP(비탈 자리 u −6~−22, 151 → 145.7), 추정(단 수·참·폭)',
-        f'현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 붉은 벽돌 계단: {NR}단 = 5.5 ÷ 0.16, 한 단 {RS:.3f} m, 디딤 {GO:.2f} m(사진의 깊은 벽돌 디딤, 길이 18.4 m 에 맞춤), 가운데 참 2.0 m 하나, 폭 2.2 m. 아래는 G02 평탄부 145.5 m. 계단 덩어리가 길 경사면 위에 서 있어 골이 아니라 단으로 보인다',
-        f'{P27}, {P18}, 사용자 확정 2026-10-11, {MESH}', stair='Z02-SIDE-STAIR', riseM=r2(RS), runM=r2(LAND if landing else GO), widthM=r2(SV[1] - SV[0]), material='brick')
+    box(f'SIDE-STAIR-S{n:02d}', 'landing' if landing else 'stair_step', rect(a, b, SV[0], SV[1]), 145.0, top, 'G02-PLATFORM-WAY (길 경사면), Z02-PLATFORM-APRON (동쪽 끝)',
+        '확정(대일관 현관 앞 바닥에서 갈라져 내려오는 계단, SP 카페 데크 끝 옆으로 내려옴: 사용자 2026-10-11·2026-10-12), S-MAP(비탈 자리 s 96~110, 145.8 → 150.5), 추정(단 수·참·폭)',
+        f'현관 단 서쪽 끝에서 벽을 따라 서쪽으로 내려가는 넓은 돌계단: {NR}단 = {Z_ENT - Z_FOOT:.2f} ÷ 0.16, 한 단 {RS:.3f} m, 디딤 {GO} m, 가운데 참 {LAND} m 하나(추정), 폭 {SV[1] - SV[0]:.1f} m(사진 03·영상: 여럿이 나란히). 발치 {Z_FOOT:.2f} m 는 길 경사면. 맨 위 참은 붉은 벽돌 바닥(사진 27)',
+        f'{P03}, {P27}, {P18}, 사용자 확정, {MESH}', stair='Z02-SIDE-STAIR', riseM=r2(RS), runM=r2(LAND if landing else GO), widthM=r2(SV[1] - SV[0]), material='stone')
+    box(f'SIDE-STAIR-RAIL-{n:02d}', 'wall', rect(a, b, 4.02, 4.08), top + 0.82, top + 0.9, 'Z02-SIDE-STAIR', '원천(가운데 난간: 사진 03·영상 05), 추정(높이)', '넓은 계단의 가운데 난간(손잡이 줄)', P03, color='#4b4f55')
+    if n % 4 == 1: box(f'SIDE-STAIR-RAILPOST-{n:02d}', 'wall', rect((a + b) / 2 - 0.03, (a + b) / 2 + 0.03, 4.02, 4.08), top, top + 0.82, 'Z02-SIDE-STAIR', '추정', '가운데 난간의 기둥', P03, color='#4b4f55')
 for j, a in enumerate(np.arange(SU1, SU0, 2.0)):
     b = min(a + 2.0, SU0); top = max(t for (x0, x1, t, _) in side if x1 > a and x0 < b) + 0.9
-    box(f'SIDE-STAIR-WALL-{j + 1:02d}', 'wall', rect(a, b, SV[1], SV[1] + 0.3), 145.0, top, 'G02-PLATFORM-WAY', '추정', '하행 계단의 운동장 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디)', f'{P27}, {P18}', material='stone')
+    box(f'SIDE-STAIR-WALL-{j + 1:02d}', 'wall', rect(a, b, SV[1], SV[1] + 0.3), 145.0, top, 'G02-PLATFORM-WAY', '추정', '내려오는 계단의 길 쪽 돌 옆벽과 난간(디딤 + 0.9 m, 2 m 마디: 계단 옆이라 계단을 따라 단이 짐)', f'{P03}, {P27}, {P18}', material='stone')
 
 # ---------- 쓰기 ----------
 STRUCT = REPO / 'frontend' / 'public' / 'structures' / 'z02-daeil-front.geojson'
@@ -175,11 +184,11 @@ dump(REC / 'z02-smooth-ground.json', {'crs': 'EPSG:5186', 'protectBuildings': Tr
     'reason': 'Z02: G02 조리법에 대일관 정면·운동장 북쪽 가장자리의 기단을 더함: 운동장 슬래브를 정면 벽까지 이은 바닥(148.9), 현관 단 151.3, 작은 광장 151.0, 안쪽 마당 153.1 m(높은 가장자리 길 151.25 m 는 격자 한 칸보다 좁아 지형에 싣지 않음). 지형 칸은 구조물 파일(frontend/public/structures/z02-daeil-front.geojson)의 기단 윗면에서 나온다. 계단·화단·현관·데크는 구조물 파일이 싣는다.',
     'steps': g02['steps'] + [{'type': 'surface', 'file': 'z02-surface.geojson'}]})
 xy = lambda u, v: [r2(c) for c in uv_to_xy(u, v)]
-dump(HERE / 'model.json', {'crs': 'EPSG:5186', 'axis': {'origin': W0.tolist(), 'u': U.tolist(), 'v': V.tolist(), 'note': 'u = 대일관 정면 벽을 따라 동쪽, v = 벽에서 운동장 쪽'},
-    'levels': {'field': Z_FIELD, 'entrance': Z_ENT, 'floor1F': Z_1F, 'passage': Z_PASS, 'planterTop': Z_PLANT, 'plaza': Z_PLAZA, 'yard': Z_YARD, 'sideStairFoot': Z_TOP},
+dump(HERE / 'model.json', {'crs': 'EPSG:5186', 'sideStairFootS': r2(_s_of(SU1)), 'axis': {'origin': W0.tolist(), 'u': U.tolist(), 'v': V.tolist(), 'note': 'u = 대일관 정면 벽을 따라 동쪽, v = 벽에서 운동장 쪽'},
+    'levels': {'field': Z_FIELD, 'entrance': Z_ENT, 'floor1F': Z_1F, 'passage': Z_PASS, 'planterTop': Z_PLANT, 'plaza': Z_PLAZA, 'yard': Z_YARD, 'sideStairFoot': r2(Z_FOOT)},
     'stairs': {'front': {'risers': 13, 'riseM': r2(RISE13)}, 'east': {'risers': 13, 'riseM': r2(RE)}, 'right': {'risers': 13, 'riseM': r2(RR)}, 'side': {'risers': NR, 'riseM': r2(RS), 'goingM': r2(GO), 'landingM': LAND}},
     'points': {'frontStairFoot': xy(1.7, ST_BOT), 'frontStairTop': xy(1.7, ST_TOP), 'entranceDoor': xy(1.7, 2.0), 'entranceWest': xy(SU0 + 0.8, 5.2), 'entranceEast': xy(ENT_U[1] - 0.5, 1.25),
-               'sideStairTop': xy(SU0, 3.2), 'sideStairLandingE': xy([s for s in side if s[3]][0][1], 3.2), 'sideStairLandingW': xy([s for s in side if s[3]][0][0], 3.2), 'sideStairFoot': xy(SU1, 3.2), 'sideStairLandingZ': r2([s for s in side if s[3]][0][2]),
+               'sideStairTop': xy(SU0, 4.05), 'sideStairLandingE': xy([s for s in side if s[3]][0][1], 4.05), 'sideStairLandingW': xy([s for s in side if s[3]][0][0], 4.05), 'sideStairFoot': xy(SU1, 4.05), 'sideStairLandingZ': r2([s for s in side if s[3]][0][2]),
                'deckWest': xy(ENT_U[1] + 0.6, 1.25), 'deckDoor2': xy(31.9, 1.25), 'deckJog': xy(40.1, 2.2), 'deckEast': xy(53.4, 2.6), 'plazaW': xy(54.6, 2.2), 'plaza': xy(56.4, 0.5),
                'eastStairFoot': xy(56.4, PL_V), 'eastStairTop': xy(56.4, E_TOP), 'rightStairFoot': xy(R_U0, 0.0), 'rightStairTop': xy(R_U0 + 12 * RUN, 0.0), 'yardSouth': xy(61.6, -3.0), 'yardNorth': [201217.9, 557305.0], 'sangseungDoor': [201217.6, 557306.4],
                'rearDoor': [201182.5, 557321.4]},

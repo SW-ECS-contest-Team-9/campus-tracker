@@ -1,5 +1,6 @@
 {
  "crs": "EPSG:5186",
+ "sideStairFootS": 99.95,
  "axis": {
   "origin": [
    201156.91,
@@ -23,7 +24,7 @@
   "planterTop": 150.2,
   "plaza": 151.0,
   "yard": 153.1,
-  "sideStairFoot": 145.5
+  "sideStairFoot": 146.67
  },
  "stairs": {
   "front": {
@@ -39,9 +40,9 @@
    "riseM": 0.16
   },
   "side": {
-   "risers": 36,
+   "risers": 29,
    "riseM": 0.16,
-   "goingM": 0.48,
+   "goingM": 0.36,
    "landingM": 2.0
   }
  },
@@ -67,22 +68,22 @@
    557309.84
   ],
   "sideStairTop": [
-   201150.49,
-   557313.58
+   201150.14,
+   557312.8
   ],
   "sideStairLandingE": [
-   201143.01,
-   557316.93
+   201145.87,
+   557314.72
   ],
   "sideStairLandingW": [
-   201141.18,
-   557317.75
+   201144.05,
+   557315.53
   ],
   "sideStairFoot": [
-   201133.7,
-   557321.1
+   201139.45,
+   557317.59
   ],
-  "sideStairLandingZ": 148.4,
+  "sideStairLandingZ": 149.07,
   "deckWest": [
    201164.61,
    557309.39
@@ -146,7 +147,7 @@
   "landing": 2,
   "planter": 6,
   "platform": 6,
-  "stair_step": 73,
-  "wall": 23
+  "stair_step": 66,
+  "wall": 54
  }
 }
