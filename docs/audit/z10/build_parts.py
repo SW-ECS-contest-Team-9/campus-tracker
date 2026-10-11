@@ -115,7 +115,11 @@ HS = '사용자-출입구·주차장-20261010/05-한림관1층-가는길-네이�
 isl = next(poly for poly, p in PLATS if p['id'] == 'Z05-PLATFORM-UPPER-HAIRPIN-ISLAND')
 for k, c in enumerate(((201096.0, 557258.5), (201102.5, 557258.5), (201096.0, 557264.5), (201102.5, 557264.5), (201099.5, 557269.0))):
     assert isl.contains(Point(c)); tree(f'Z10-HAIRPIN-TREE-{k + 1}', c, ground(*c), '위쪽 갈래 굽이 안쪽 섬의 소나무', HS, 'Z05-PLATFORM-UPPER-HAIRPIN-ISLAND')
-box('Z10-HANLIM-1F-CANOPY', 'canopy', [(201102.0, 557280.2), (201109.5, 557280.2), (201109.5, 557283.4), (201102.0, 557283.4)], 130.6, 130.9, '한림관 1층 문 위의 차양(짙은 틀의 유리 차양: 폭 7.5 m, 내민 길이 3 m, 문 앞 단 127.2 m 위 3.4 m). 문 자리는 문 앞 단의 건물 쪽으로 봄', HS, DG, '없음(건물 벽에 붙음)', color='#3a4046')
+# Z11: 차양을 네모에서 둥근 벽을 따라 도는 띠로(네모는 서쪽 끝이 벽에서 3 m 떨어져 떠 보이고 동쪽 끝은 벽 속에 묻혔다)
+from shapely.geometry import box as _sbox
+_ring = Polygon(next(b['ring'] for b in json.loads((REPO / 'docs/audit/z04/scene-buildings-before.json').read_text(encoding='utf-8'))['buildings'] if b['id'] == '한림관#고리')).buffer(0)
+_can = _ring.buffer(2.2, resolution=8).difference(_ring.buffer(-0.2)).intersection(_sbox(201102.5, 557276.0, 201110.5, 557286.5)); assert _can.geom_type == 'Polygon' and 12 < _can.area < 30, _can.area
+box('Z10-HANLIM-1F-CANOPY', 'canopy', _can.simplify(0.05), 130.6, 130.9, '한림관 1층 문 위의 차양(짙은 틀의 유리 차양: 둥근 벽을 따라 폭 8 m 쯤, 내민 길이 2.2 m, 문 앞 단 127.2 m 위 3.4 m). 문 자리는 문 앞 단의 건물 쪽으로 봄', HS, DG, '없음(건물 벽에 붙음)', color='#3a4046')
 ids = [f['properties']['id'] for f in FEATS]; assert len(ids) == len(set(ids))
 out = {'type': 'FeatureCollection', 'name': 'z10-parts', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}},
        'provenance': {'builder': 'docs/audit/z10/build_parts.py', 'schema': 'docs/audit/g02/STRUCTURES.md', 'note': '사진에 있는 것만: 둥근 아치(계단 모양 조각), 북악관 옆길의 돌 쌓기·생울타리·풀밭·GS25 문, 북악관 정면 화단, 서문 위 소나무, 외국인 생활관·공연실습소의 덧붙은 덩어리. 치수는 눈대중(추정).'}, 'features': FEATS}

@@ -238,22 +238,27 @@ export function buildCampusGround(input: {
     return z;
   };
   /** The lowest known surface within GROUND.wallGapM of a point at a building wall (rings of 8 directions, the nearest ring that finds one), else null. */
-  const besideWall = (x: number, y: number): number | null => {
-    if (!walls.at(x, y).some((s) => segmentDistance(x, y, s.a, s.b) < GROUND.wallReachM)) return null;
-    for (const r of [GROUND.wallGapM / 8, GROUND.wallGapM / 3, GROUND.wallGapM]) {
+  const nearKnown = (x: number, y: number, radii: number[]): number | null => {
+    for (const r of radii) {
       let best: number | null = null;
       for (let k = 0; k < 8; k++) { const z = known(x + r * Math.cos((k * Math.PI) / 4), y + r * Math.sin((k * Math.PI) / 4)); if (z !== null && (best === null || z < best)) best = z; }
       if (best !== null) return best;
     }
     return null;
   };
+  const besideWall = (x: number, y: number): number | null =>
+    (walls.at(x, y).some((s) => segmentDistance(x, y, s.a, s.b) < GROUND.wallReachM) ? nearKnown(x, y, [GROUND.wallGapM / 8, GROUND.wallGapM / 3, GROUND.wallGapM]) : null);
+  // Z11: a point inside the region that lies right beside a known surface (the 5 cm strip between a platform and a building wall is one long sliver:
+  // the middle of its inner edges is such a point) takes that surface's height too. The membrane there is a mix of the platform cell and the
+  // building cell beside it, which drew the strip as a row of teeth standing up the wall
+  const inside = (x: number, y: number): number => known(x, y, 0.02) ?? nearKnown(x, y, [GROUND.wallGapM / 8]) ?? height(x, y);
   // Z09: a wall point takes the height of a known surface that ends just short of the wall (a platform stops 5 cm before it): the sliver between the two is
   // then level with that surface, not a near-vertical strip of floor up to the building's own ground level
   const outlineHeight = (x: number, y: number): number => (onEdge(x, y) ? input.terrain(x, y) : atWalls(x, y, known(x, y, 0.02) ?? besideWall(x, y) ?? height(x, y)));
 
   // ----- triangles: ear cutting, then every long edge halved until none is longer than GROUND.edgeM -----
   // an outline edge stays straight between its ends (flush with what it runs along), except along the campus edge (the terrain)
-  const floor = triangulate(region, outlineHeight, (x, y, p, q, outline) => (outline ? (onEdge(x, y) && onEdge(p[0], p[1]) && onEdge(q[0], q[1]) ? input.terrain(x, y) : atWalls(x, y, (p[2] + q[2]) / 2)) : height(x, y)));
+  const floor = triangulate(region, outlineHeight, (x, y, p, q, outline) => (outline ? (onEdge(x, y) && onEdge(p[0], p[1]) && onEdge(q[0], q[1]) ? input.terrain(x, y) : atWalls(x, y, (p[2] + q[2]) / 2)) : inside(x, y)));
 
   // ----- the apron: a band of terrain just outside the campus edge, drawn here in the colour of the outside ground -----
   // (the terrain is hidden a little beyond the edge, see `clip`, so the edge of the neutral surface is a clean straight line)

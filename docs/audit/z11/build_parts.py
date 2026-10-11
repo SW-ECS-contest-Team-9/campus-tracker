@@ -51,7 +51,7 @@ out_m = [Point(p).distance(line) * (1 if SHELL.contains(Point(p)) else -1) for p
 assert min(out_m) > 0.15, ('벽 선이 건물·테라스 꼭짓점을 자른다', sorted(zip(out_m, hull_pts))[:4])
 _g = SHELL.difference(core).buffer(0); fill = min((q for q in (_g.geoms if hasattr(_g, 'geoms') else [_g])), key=lambda q: q.distance(line.interpolate(line.length / 2)))   # 벽 선에 붙은 덩어리(탑 쪽 조각은 버린다)
 zb = min(ground(x, y, lowest=True) for x, y in [line.interpolate(s).coords[0] for s in np.arange(1, line.length, 4)] ) - 1.0
-box('Z11-YUDAM-STREET-PLINTH', 'wall', fill, zb, DECK_TOP + 0.05, f'유담관 공도 쪽 기단 벽: 길을 따라 굽은 벽 한 면(곧은 구간 셋, 모서리는 반지름 14 m 호)과 건물 벽 사이를 기단 데크 윗면(129.3 m)까지 채운 덩어리. 건물 자료의 톱니 외곽(깊이 최대 {max(out_m):.1f} m)과 남서 테라스 기단의 옆면을 가린다. 아래는 공도 기단 밑까지', YS, YG, 'Z05-PLATFORM-WEST-STREET, Z05-PLATFORM-GATE-STREET-SW', color=WALL, topColor='#b5b3ac')
+box('Z11-YUDAM-STREET-PLINTH', 'wall', fill, zb, DECK_TOP + 0.05, f'유담관 공도 쪽 기단 벽: 길을 따라 굽은 벽 한 면(곧은 구간 셋, 모서리는 반지름 14 m 호)과 건물 벽 사이를 기단 데크 윗면(129.3 m)까지 채운 덩어리. 건물 자료의 톱니 외곽(깊이 최대 {max(out_m):.1f} m)과 남서 테라스 기단의 옆면을 가린다. 아래는 공도 기단 밑까지', YS, YG, 'Z05-PLATFORM-WEST-STREET, Z05-PLATFORM-GATE-STREET-SW', color=WALL, topColor='#dad7ce')   # 윗면 색 = 화면에 그려지는 기단 데크 지붕(콘크리트)의 밝기: 톱니 외곽이 색 차이로 드러나지 않게
 skin = big(line.buffer(0.1, cap_style=2).difference(SHELL))   # 벽 바깥 면에서 0.1 m 내민 띠(창 줄)
 street = lambda s: ground(*line.interpolate(s).coords[0], lowest=True)
 for name, z in (('5F', 110.0), ('6F', 115.1), ('7F', 122.6)):
