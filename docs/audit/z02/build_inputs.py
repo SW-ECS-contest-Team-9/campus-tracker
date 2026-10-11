@@ -70,7 +70,7 @@ def box(id, typ, uv, fromM, toM, base, grade, assumption, source, **extra):
 # ---------- 1. 기단 ----------
 field = json.loads((REPO / 'docs/audit/e10/field-area-f05.geojson').read_text(encoding='utf-8'))
 fgeo = (field['features'][0] if 'features' in field else field)['geometry'] if field.get('type') != 'Polygon' else field
-platform('FIELD', Polygon(fgeo['coordinates'][0]), Z_FIELD, 140.7, '운동장 지하 2층 바닥(141.7 m, 추정) 아래 기초 판 1.0 m(U01). 지하 1층·2층은 u01-field-basement.geojson 의 빈 곳', 'paving', '측정(높이 148.9 m: E06), S-MAP(외곽: F05 곧은 변 22개)',
+platform('FIELD', Polygon(fgeo['coordinates'][0]), Z_FIELD, 132.0, '운동장 지하 2층 바닥(133.0 m, 사용자 표시 ±1) 아래 기초 판 1.0 m(U02). 지하 1층·2층은 u01-field-basement.geojson 의 빈 곳', 'paving', '측정(높이 148.9 m: E06), S-MAP(외곽: F05 곧은 변 22개)',
          '외곽은 F05 운동장 영역 그대로(다시 그리지 않음). 북쪽 변은 화단 벽 선과 최대 2 m 어긋난다(위에 얹은 화단 상자가 덮는다)', 'docs/audit/e10/field-area-f05.geojson, 실험 E06', '', terrain=False)
 apron = P([(-9.5, -0.5), (40.0, -0.5), (40.0, 1.3), (53.9, 1.3), (53.9, -4.8), (58.2, -4.8), (60.5, -0.6), (64.0, 8.2), (64.0, 10.5), (-9.5, 10.5)])
 platform('APRON', apron, Z_FIELD, 141.0, '옛 지형(141.6 m)보다 아래의 안전 깊이', 'paving', '측정(높이: 운동장과 같은 슬래브), 추정(외곽)',
