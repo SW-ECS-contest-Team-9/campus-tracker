@@ -81,6 +81,12 @@ export class SceneLayers {
     this.sync();
   }
 
+  /** The first-person walk went inside (underground, indoors) or came out: see the two layers' setWalkInside. */
+  setWalkInside(inside: boolean) {
+    this.structures.setWalkInside(inside);
+    this.surfaces.setWalkInside(inside);
+  }
+
   setVisible(part: RoadSurfacePart, visible: boolean) {
     this.surfaces.setVisible(visible, part);
     if (part === 'underground') this.structures.setUnderground(visible);

@@ -1036,7 +1036,7 @@ async function boot() {
           places: () => scenePlaces,
           walkInputs: [$<HTMLInputElement>('scene-roads-underground'), $<HTMLInputElement>('scene-xray')],
           // inside (underground, indoors): no void boxes over the walk's schematic room, no building names showing through the walls
-          onWalk: (on) => { layers.structures.setWalkInside(on); r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked); },
+          onWalk: (on) => { layers.setWalkInside(on); r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked); },
           onLevel: (on) => r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked),
         }, { level: $('scene-level-view'), walk: $('scene-first-person') });
         if (import.meta.env.DEV) (window as any).__spaceViews = spaceViews;

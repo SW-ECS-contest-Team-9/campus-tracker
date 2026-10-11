@@ -89,6 +89,7 @@ export class RoadSurfaceLayer {
   private parts: { part: RoadSurfacePart; prim: any }[] = [];
   private visible: Record<RoadSurfacePart, boolean> = { ground: true, pedestrian: true, area: true, underground: false };
   private section: SectionPlane | null = null;
+  private walkInside = false;
   private areas: LayerArea[] = [];
   /** The data changed since the surfaces were built (they are built only while a part is shown). */
   private stale = false;
@@ -173,6 +174,18 @@ export class RoadSurfaceLayer {
     this.build();
     for (const p of this.parts) if (p.part === part) p.prim.show = visible;
     this.clipGround();
+  }
+
+  /**
+   * Q01: while the first-person walk is inside (underground or indoors) the underground floors, markings and ways are
+   * drawn by depth like everything else. Seen from above they show through the ground and through each other; from
+   * inside a storey that put the aisle and stall faces over the walls that stand on them (the low wall and the island
+   * wall of the ramp under the field).
+   */
+  setWalkInside(inside: boolean) {
+    if (inside === this.walkInside) return;
+    this.walkInside = inside;
+    this.draw();
   }
 
   /** Cross-section (section-layer.ts): every surface is cut at the plane; null restores them. */
@@ -293,7 +306,7 @@ export class RoadSurfaceLayer {
           },
         }),
         appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
-        depthFailAppearance: new C.PerInstanceColorAppearance({ flat: true, translucent: true, closed: false }),
+        depthFailAppearance: this.walkInside ? undefined : new C.PerInstanceColorAppearance({ flat: true, translucent: true, closed: false }),
         asynchronous: false,
         allowPicking: this.src.pickable !== false,
       }));
@@ -320,7 +333,7 @@ export class RoadSurfaceLayer {
     }
     if (instances.length) add('underground', new C.Primitive({
       geometryInstances: instances, asynchronous: false, allowPicking: false,
-      appearance: new C.PolylineColorAppearance({ translucent: true, renderState: { depthTest: { enabled: false }, depthMask: false } }),
+      appearance: new C.PolylineColorAppearance({ translucent: true, renderState: { depthTest: { enabled: this.walkInside }, depthMask: false } }),
     }));
     this.clipGround();
   }

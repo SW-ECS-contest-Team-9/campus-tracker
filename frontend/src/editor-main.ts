@@ -2010,7 +2010,7 @@ async function startEditor() {
     places: () => places.map((p) => ({ id: p.id, name: p.name, category: p.category, buildingId: p.buildingId, x: p.geometry.coordinates[0], y: p.geometry.coordinates[1], z: p.geometry.coordinates[2] })),
     blocked: () => { const busy = roadDraft || placeDraft || areaEditor?.active; if (busy) say('작성 중인 것을 먼저 저장하거나 취소한 뒤 켜세요.', 'warning'); return busy ? '작성 중' : null; },
     lockKeys: true, walkInputs: [$<HTMLInputElement>('layer-underground')],
-    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.structures.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => buildingScene?.setShowLabels(!on),
+    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => buildingScene?.setShowLabels(!on),
     // view only: the editor's own lines, markers and tags are put away meanwhile (they would show through what is lifted)
     onChange: (state) => { const on = state.level || state.walk; spaceViewOn = on; syncEntityVisibility(); if (on) { clearHeldKeys(); setTool('select'); } },
   }, { level: $('view-level'), walk: $('view-walk') });
