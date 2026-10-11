@@ -99,6 +99,7 @@ export class SceneLayers {
    */
   private sync() {
     this.surfaces.setContext(this.structures.context());
+    this.surfaces.setUndergroundMarks(this.structures.undergroundMarks());
     this.structures.setSurfaces(this.surfaces.drawn());
     this.section.refresh();
     this.options.onStructures?.();

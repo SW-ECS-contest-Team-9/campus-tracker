@@ -1,0 +1,17 @@
+{
+ "sameFrame": {
+  "centre": [
+   201190.0,
+   557237.0
+  ],
+  "sideM": 136.0,
+  "pxPerM": 5.408
+ },
+ "fieldFromAbove": {
+  "maxPixelDiffOnField": 0,
+  "fieldPixels": 317732,
+  "fieldPixelsOver32": 0,
+  "allPixelsOver32": 870,
+  "pixels": 898880
+ }
+}

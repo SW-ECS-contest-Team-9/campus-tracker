@@ -7,6 +7,7 @@ import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { PAVED, buildPavedSurfaces, type Material, type PavedSurfaces, type SurfaceArea } from './paved-surface';
 import { ROAD_SURFACE, buildRoadSurfaces, flatAreaMesh, isUnderground, isUndergroundArea, type RoadMesh } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
+import { STRUCTURES } from './structures';
 import { clipMesh, type Mesh, type SectionPlane } from './section';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
@@ -79,6 +80,9 @@ export type SurfaceContext = {
   flush?: (x: number, y: number) => boolean;
 };
 
+/** A floor marking of an underground storey (structures-layer.ts undergroundMarks): triangles (x, y, z), colour, top height. */
+export type UndergroundMark = { mesh: RoadMesh; css: string; z: number };
+
 export class RoadSurfaceLayer {
   private readonly prims: any;
   private parts: { part: RoadSurfacePart; prim: any }[] = [];
@@ -91,6 +95,7 @@ export class RoadSurfaceLayer {
   private paved: PavedSurfaces = { surfaces: [], joinedRoadIds: [], heightSource: {}, covered: [], rawOutline: [], outline: [] };
   private underground: ReturnType<typeof buildRoadSurfaces>['underground'] = [];
   private undergroundFloors: ReturnType<typeof undergroundAreas> = [];
+  private undergroundMarks: UndergroundMark[] = [];
   roads: CarriagewayRoad[] = [];
   /** How long the last build of the merged surfaces took. */
   buildMs = 0;
@@ -134,6 +139,12 @@ export class RoadSurfaceLayer {
   }
 
   isVisible(part: RoadSurfacePart) { return this.visible[part]; }
+
+  /** The floor markings of the underground storeys (stall blocks, bay lines): drawn with the underground part. */
+  setUndergroundMarks(marks: UndergroundMark[]) {
+    this.undergroundMarks = marks;
+    this.draw();
+  }
 
   /** The structures changed (or were turned on or off): the surfaces are built again around them. */
   setContext(context: SurfaceContext) {
@@ -246,11 +257,15 @@ export class RoadSurfaceLayer {
       const skirt = cut(s.skirt, 3);
       if (skirt.indices.length) add(PART[s.material], this.primitive(skirt, 3, () => skirtColor));
     }
-    // the floors (aisles of an underground car park) first, the ways on top of them
-    const below: { mesh: RoadMesh; css: string; id?: object }[] = [
-      ...this.undergroundFloors.map((f) => ({ mesh: f.mesh, css: ROAD_SURFACE.colors.carriageway, id: { mobilityPick: { kind: 'mobility', table: 'openAreas', id: f.id } satisfies MobilityPick } })),
-      ...this.underground.map((g) => ({ mesh: g.mesh, css: ROAD_SURFACE.colors[g.kind] })),
-    ];
+    // Everything underground shows through the ground, so nothing hides anything by depth: what is drawn later lies on
+    // top. Order (U04): the carriageways (a ramp between two storeys passes under the upper floor), then the floors
+    // (aisles of an underground car park) and their markings from the lowest storey up, then the pedestrian ways.
+    const storeys = [
+      ...this.undergroundFloors.map((f) => ({ mesh: f.mesh, css: ROAD_SURFACE.colors.carriageway, z: f.mesh.positions[2] ?? 0, alpha: ROAD_SURFACE.undergroundHiddenAlpha, id: { mobilityPick: { kind: 'mobility', table: 'openAreas', id: f.id } satisfies MobilityPick } as object | undefined })),
+      ...this.undergroundMarks.map((m) => ({ mesh: m.mesh, css: m.css, z: m.z, alpha: STRUCTURES.undergroundMarkAlpha, id: undefined as object | undefined })),
+    ].sort((a, b) => a.z - b.z);
+    const ways = (wide: boolean) => this.underground.filter((g) => (g.kind === 'carriageway') === wide).map((g) => ({ mesh: g.mesh, css: ROAD_SURFACE.colors[g.kind], alpha: ROAD_SURFACE.undergroundHiddenAlpha, id: undefined as object | undefined }));
+    const below = [...ways(true), ...storeys, ...ways(false)];
     for (const group of below) {
       const mesh = cut(group.mesh, 3);
       if (!mesh.indices.length) continue;
@@ -272,7 +287,7 @@ export class RoadSurfaceLayer {
           id: group.id,
           attributes: {
             color: C.ColorGeometryInstanceAttribute.fromColor(color),
-            depthFailColor: C.ColorGeometryInstanceAttribute.fromColor(color.withAlpha(ROAD_SURFACE.undergroundHiddenAlpha)),
+            depthFailColor: C.ColorGeometryInstanceAttribute.fromColor(color.withAlpha(group.alpha)),
           },
         }),
         appearance: new C.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false }),
