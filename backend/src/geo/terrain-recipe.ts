@@ -3,7 +3,9 @@
 //   -> surface (base planes of built ground: platforms and ramps with hard edges).
 // Each step works on the result of the previous one. The candidate id depends only on the base id, the recipe and
 // the content of its input files (and the building footprints when they are protected), so the same recipe on the
-// same base gives the same id on every machine. Pure: files and the database are read by scripts/terrain-recipe.ts.
+// same base gives the same id on every machine. No database here (terrain-recipe-build.ts); readRecipe reads the files.
+import fs from 'node:fs';
+import path from 'node:path';
 import { createHash } from 'node:crypto';
 import type { Grid } from './dem.js';
 import { burnCorridors, polygonsMask, CORRIDOR_DEFAULTS, type CorridorLine } from './terrain-corridor.js';
@@ -159,4 +161,12 @@ export const RECIPE_DEFAULTS = { localSamples: LOCAL_SAMPLE_DEFAULTS, plateauEdg
 /** Deterministic candidate id: base version + recipe + default settings + input contents (+ protected footprints). */
 export function recipeId(baseVersion: string, recipe: Recipe, inputs: Record<string, unknown>, buildings: Polygons = []): string {
   return `recipe-${sha({ algorithm: RECIPE_ALGORITHM, baseVersion, recipe, defaults: RECIPE_DEFAULTS, inputs: recipeInputHashes(recipe, inputs, buildings) }).slice(0, 16)}`;
+}
+
+const readJson = (f: string) => JSON.parse(fs.readFileSync(f, 'utf8').replace(/^\uFEFF/, ''));
+
+/** Reads a recipe file and its input files (paths relative to the recipe file). */
+export function readRecipe(file: string): { recipe: Recipe; inputs: Record<string, unknown> } {
+  const recipe = parseRecipe(readJson(file));
+  return { recipe, inputs: Object.fromEntries(recipeFiles(recipe).map((f) => [f, readJson(path.resolve(path.dirname(file), f))])) };
 }

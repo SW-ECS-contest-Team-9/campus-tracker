@@ -1,0 +1,220 @@
+// The campus 3D scene import (gates, heights on the active terrain, overrides), split in two: plan (reads only, gives the
+// version id) and save (one transaction that replaces and activates that id). Used by scripts/scene-import.ts, whose
+// header describes the rules, and by the deploy reconcile (src/deploy), which saves only when the id is the expected one.
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { pool, withTransaction } from '../../config/database.js';
+import { readGpkgLayer, type Ring } from '../../geo/gpkg.js';
+import { terrain } from '../../geo/terrain.js';
+import { blockHeights, outlineSamples } from './scene-heights.js';
+import { overrideHeights, parseAppearance, parseSceneOverrides, partBuildingId, partsAreaProblem, polygonArea, sceneVersionId } from './scene-overrides.js';
+
+const sha = (f: string) => createHash('sha256').update(fs.readFileSync(f)).digest('hex');
+const r2 = (v: number) => Math.round(v * 100) / 100;
+
+export interface SceneImportOptions {
+  /** folder with campus.gpkg */
+  dir: string;
+  /** overrides file; null (or a missing file) imports exactly the GeoPackage model */
+  overridesFile: string | null;
+  keepAbsolute?: boolean;
+  /** print the per-building table (the command line) */
+  table?: boolean;
+}
+
+export async function planSceneImport(o: SceneImportOptions) {
+  const OVERRIDES = o.overridesFile && fs.existsSync(o.overridesFile) ? o.overridesFile : null;
+  const gpkg = path.join(o.dir, 'campus.gpkg');
+  if (!fs.existsSync(gpkg)) throw new Error(`${gpkg} not found`);
+  const layer = readGpkgLayer(gpkg, 'buildings_3d');
+  if (layer.srsId !== 5186) throw new Error(`buildings_3d must be EPSG:5186 (got ${layer.srsId})`);
+
+  const terrainVersion = await terrain.activeVersion();
+  const ctx = await terrain.context(terrainVersion);
+  if (!ctx || !terrainVersion) throw new Error('No active terrain version (npm run terrain:import)');
+  const { rows: mv } = await pool.query<{ id: string }>('SELECT id FROM spatial_map_versions WHERE active');
+  if (!mv.length) throw new Error('No active campus map (npm run spatial:import)');
+  const mapVersion = mv[0].id;
+  const mode = o.keepAbsolute ? 'ABSOLUTE' : 'RECOMPUTED';
+  const all = !OVERRIDES ? { roofs: [], hidden: [], parts: [], added: [] } : parseSceneOverrides(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
+  const overrides = all.roofs;
+  const appearance = !OVERRIDES ? [] : parseAppearance(JSON.parse(fs.readFileSync(OVERRIDES, 'utf8')));
+  const applied = overrides.length + all.hidden.length + all.parts.length + all.added.length;
+
+  const problems: string[] = [];
+  const freed = { ids: [] as string[], drawn: [] as string[] }; // split buildings that leave part of their footprint undrawn: their campus ids and the parts they do draw
+  const rows: Record<string, unknown>[] = [];
+  const out: { buildingId: string; name: string | null; heightM: number; source: string; registerId: string | null; floors: number | null;
+    baseM: number; roofM: number; tMin: number; tMax: number; srcBase: number | null; srcRoof: number | null; note: string | null; geojson: string }[] = [];
+  const used = new Set<string>();
+  for (const o of [...overrides, ...all.hidden, ...all.parts]) if (!layer.features.some((f) => f.properties.name === o.name)) problems.push(`override ${o.name}: no such building in buildings_3d`);
+  for (const f of layer.features) {
+    const p = f.properties as { name: string | null; height_m: number | null; height_source: string | null; register_id: string | null; ground_floors: number | null; base_m: number | null; roof_m: number | null; note: string | null };
+    const g = f.geometry;
+    if (!g || (g.type !== 'MultiPolygon' && g.type !== 'Polygon')) {
+      problems.push(`fid ${f.fid}: not a polygon`);
+      continue;
+    }
+    const polygons: Ring[][] = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+    const geojson = JSON.stringify({ type: 'MultiPolygon', coordinates: polygons });
+    const { rows: m } = await pool.query<{ building_id: string; display: string | null; iou: number; valid: boolean; px: number; py: number }>(
+      `WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 5186) g)
+       SELECT b.building_id, md.display_name display, ST_Area(ST_Intersection(b.geom, g.g)) / NULLIF(ST_Area(ST_Union(b.geom, g.g)), 0) iou,
+              ST_IsValid(g.g) valid, ST_X(ST_PointOnSurface(g.g)) px, ST_Y(ST_PointOnSurface(g.g)) py
+         FROM g, campus_buildings b LEFT JOIN building_metadata md ON md.map_version_id = b.map_version_id AND md.building_id = b.building_id
+        WHERE b.map_version_id = $2 AND ST_Intersects(b.geom, g.g) ORDER BY 3 DESC LIMIT 1`,
+      [geojson, mapVersion],
+    );
+    const best = m[0];
+    if (!best) {
+      problems.push(`${p.name}: no campus building footprint`);
+      continue;
+    }
+    if (!best.valid) problems.push(`${p.name}: invalid geometry`);
+    if (best.iou < 0.99) problems.push(`${p.name}: footprint IoU ${best.iou.toFixed(3)} with ${best.building_id} < 0.99`);
+    if (used.has(best.building_id)) problems.push(`${p.name}: ${best.building_id} matched twice`);
+    used.add(best.building_id);
+    if (!(typeof p.height_m === 'number' && p.height_m > 0)) problems.push(`${p.name}: height_m missing`);
+    const samples = [...outlineSamples(polygons), [best.px, best.py] as [number, number]].map(([x, y]) => terrain.sampleXY(ctx, x, y)?.height ?? null);
+    if (samples.some((s) => s === null)) {
+      problems.push(`${p.name}: outside the terrain DEM`);
+      continue;
+    }
+    const h = blockHeights(samples as number[], p.height_m ?? 0);
+    const baseM = mode === 'ABSOLUTE' && p.base_m !== null ? p.base_m : h.baseM;
+    let roofM = mode === 'ABSOLUTE' && p.roof_m !== null ? p.roof_m : h.roofM;
+    let heightM = p.height_m ?? 0;
+    const o = overrides.find((x) => x.name === p.name);
+    if (o) {
+      try {
+        ({ heightM, roofM } = overrideHeights(samples as number[], h, o.roofM, o.terrace !== undefined));
+      } catch (err) {
+        problems.push(`${p.name}: ${(err as Error).message}`);
+      }
+    }
+    if (!(baseM < h.terrainMinM)) problems.push(`${p.name}: base ${baseM} not below the ground ${h.terrainMinM}`);
+    if (!(roofM > h.terrainMaxM) && o?.terrace === undefined) problems.push(`${p.name}: roof ${roofM} not above the ground ${h.terrainMaxM}`); // a terrace roof is checked against the median ground above
+    if (p.name && best.display && p.name !== best.display) problems.push(`${p.name}: building metadata calls ${best.building_id} "${best.display}"`);
+    const note = [p.note, h.roofRaised && mode === 'RECOMPUTED' && !o ? 'roof raised to DEM max + 3 m on the server DEM' : null,
+      o ? `${o.terrace === undefined ? '' : 'terrace, roof below the highest ground on its outline; '}roof ${o.roofM} m from ${o.evidence.source} (${o.evidence.collectedOn}, ${o.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); GeoPackage height ${p.height_m} m ${p.height_source}` : null].filter(Boolean).join('; ') || null;
+    if (all.hidden.some((x) => x.name === p.name)) { // checked like any building of the model, but not drawn
+      rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), source: 'hidden (override)' });
+      continue;
+    }
+    const split = all.parts.find((x) => x.name === p.name);
+    if (split) {
+      const area = polygons.reduce((s, poly) => s + polygonArea(poly), 0);
+      const bad = partsAreaProblem(split, area);
+      if (bad) problems.push(bad);
+      if (split.uncovered !== undefined) { // without tiling, equal areas no longer rule out overlapping parts
+        freed.ids.push(best.building_id); // the undrawn rest of this footprint is free ground for an added building
+        freed.drawn.push(...split.parts.map((part) => JSON.stringify({ type: 'MultiPolygon', coordinates: [part.polygon] })));
+        const { rows: [ov] } = await pool.query<{ overlap: number }>(
+          `SELECT COALESCE(SUM(ST_Area(g)) - ST_Area(ST_Union(g)), 0) overlap FROM (SELECT ST_SetSRID(ST_GeomFromGeoJSON(j), 5186) g FROM unnest($1::text[]) j) t`,
+          [split.parts.map((part) => JSON.stringify({ type: 'MultiPolygon', coordinates: [part.polygon] }))],
+        );
+        if (ov.overlap > 0.5) problems.push(`parts of ${p.name} overlap by ${ov.overlap.toFixed(1)} m2`);
+      }
+      for (const [k, part] of split.parts.entries()) {
+        const label = `${p.name} part ${part.id}`;
+        const ring: Ring[][] = [part.polygon];
+        const partJson = JSON.stringify({ type: 'MultiPolygon', coordinates: ring });
+        const { rows: [q] } = await pool.query<{ valid: boolean; outside: number; px: number; py: number }>(
+          `WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 5186) g, ST_SetSRID(ST_GeomFromGeoJSON($2), 5186) f)
+           SELECT ST_IsValid(g) valid, ST_Area(ST_Difference(g, f)) outside, ST_X(ST_PointOnSurface(g)) px, ST_Y(ST_PointOnSurface(g)) py FROM g`,
+          [partJson, geojson],
+        );
+        if (!q.valid) problems.push(`${label}: invalid geometry`);
+        if (q.outside > 0.5) problems.push(`${label}: ${q.outside.toFixed(1)} m2 outside the footprint of ${p.name}`);
+        const ps = [...outlineSamples(ring), [q.px, q.py] as [number, number]].map(([x, y]) => terrain.sampleXY(ctx, x, y)?.height ?? null);
+        if (ps.some((s) => s === null)) {
+          problems.push(`${label}: outside the terrain DEM`);
+          continue;
+        }
+        const ph = blockHeights(ps as number[], 0); // base and ground under this part; the roof is the part's own
+        let partHeight = 0;
+        try {
+          partHeight = overrideHeights(ps as number[], ph, part.roofM, part.terrace !== undefined).heightM;
+        } catch (err) {
+          problems.push(`${label}: ${(err as Error).message}`);
+        }
+        const buildingId = partBuildingId(best.building_id, split.parts, k);
+        out.push({ buildingId, name: part.name, heightM: partHeight, source: split.heightSource, registerId: p.register_id || null, floors: part.name ? split.floors ?? null : null,
+          baseM: ph.baseM, roofM: part.roofM, tMin: ph.terrainMinM, tMax: ph.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, geojson: partJson,
+          note: `part "${part.id}" of ${p.name} (${split.parts.length} parts${split.uncovered === undefined ? '' : '; the rest of the footprint is not drawn'})${part.terrace === undefined ? '' : '; terrace, roof below the highest ground on its outline'}; flat roof ${part.roofM} m from ${split.evidence.source} (${split.evidence.collectedOn}, ${split.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'}); whole building in the GeoPackage: ${p.height_m} m ${p.height_source}, ${p.ground_floors ?? '?'} floors` });
+        rows.push({ name: `${p.name} / ${part.id}`, building: buildingId, iou: k === 0 ? r2(best.iou) : '', height: partHeight, source: split.heightSource, base: ph.baseM, roof: part.roofM,
+          'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(part.roofM - p.roof_m), raised: '' });
+      }
+      continue;
+    }
+    out.push({ buildingId: best.building_id, name: p.name, heightM, source: o?.heightSource ?? p.height_source ?? 'ESTIMATE', registerId: p.register_id || null,
+      floors: o ? o.floors ?? (p.height_source === 'REGISTER' ? p.ground_floors : null) : p.ground_floors, baseM, roofM, tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: p.base_m, srcRoof: p.roof_m, note, geojson });
+    rows.push({ name: p.name, building: best.building_id, iou: r2(best.iou), height: heightM, source: o?.heightSource ?? p.height_source, base: baseM, roof: roofM,
+      'gpkg roof': p.roof_m, 'Δroof': p.roof_m === null ? '' : r2(roofM - p.roof_m), raised: h.roofRaised ? 'yes' : '' });
+  }
+  for (const a of all.added) { // not in the GeoPackage or the campus map: nothing to match, so the gates are "new id, free ground"
+    const label = `added ${a.name}`;
+    const geojson = JSON.stringify({ type: 'MultiPolygon', coordinates: [a.polygon] });
+    if (layer.features.some((f) => f.properties.name === a.name) && !all.hidden.some((x) => x.name === a.name)) problems.push(`${label}: the GeoPackage building of that name is still drawn`);
+    const { rows: [q] } = await pool.query<{ valid: boolean; px: number; py: number; taken: boolean; overlap: number }>(
+      `WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 5186) g)
+       SELECT ST_IsValid(g.g) valid, ST_X(ST_PointOnSurface(g.g)) px, ST_Y(ST_PointOnSurface(g.g)) py,
+              EXISTS (SELECT 1 FROM campus_buildings b WHERE b.map_version_id = $2 AND b.building_id = $3) taken,
+              COALESCE((SELECT SUM(ST_Area(ST_Intersection(b.geom, g.g))) FROM campus_buildings b WHERE b.map_version_id = $2 AND b.building_id <> ALL($4::text[]) AND ST_Intersects(b.geom, g.g)), 0)
+              + COALESCE((SELECT SUM(ST_Area(ST_Intersection(ST_SetSRID(ST_GeomFromGeoJSON(j), 5186), g.g))) FROM unnest($5::text[]) j), 0) overlap
+         FROM g`,
+      [geojson, mapVersion, a.id, freed.ids, freed.drawn],
+    );
+    if (!q.valid) problems.push(`${label}: invalid geometry`);
+    if (q.taken) problems.push(`${label}: id ${a.id} is a campus map building`);
+    if (q.overlap > 0.5) problems.push(`${label}: overlaps campus map footprints by ${q.overlap.toFixed(1)} m2`);
+    const samples = [...outlineSamples([a.polygon]), [q.px, q.py] as [number, number]].map(([x, y]) => terrain.sampleXY(ctx, x, y)?.height ?? null);
+    if (samples.some((s) => s === null)) {
+      problems.push(`${label}: outside the terrain DEM`);
+      continue;
+    }
+    const h = blockHeights(samples as number[], 0); // base and ground under the outline; the roof is the stated one
+    let heightM = 0;
+    try {
+      heightM = overrideHeights(samples as number[], h, a.roofM).heightM;
+    } catch (err) {
+      problems.push(`${label}: ${(err as Error).message}`);
+    }
+    out.push({ buildingId: a.id, name: a.name, heightM, source: a.heightSource, registerId: a.registerId ?? null, floors: a.floors ?? null, baseM: h.baseM, roofM: a.roofM,
+      tMin: h.terrainMinM, tMax: h.terrainMaxM, srcBase: null, srcRoof: null, geojson,
+      note: `added by the scene overrides (not in the GeoPackage or the campus map); outline and flat roof ${a.roofM} m from ${a.evidence.source} (${a.evidence.collectedOn}, ${a.evidence.independentSurvey ? 'independent survey' : 'not an independent survey'})` });
+    rows.push({ name: `${a.name} (added)`, building: a.id, iou: '', height: heightM, source: a.heightSource, base: h.baseM, roof: a.roofM, 'gpkg roof': '', 'Δroof': '', raised: '' });
+  }
+  if (o.table) console.table(rows);
+  for (const a of appearance) if (!out.some((b) => b.buildingId === a.id)) problems.push(`appearance ${a.id}: no such building in the scene`);
+  if (problems.length) {
+    console.log(`\n${problems.length} problem(s):\n  ${problems.join('\n  ')}`);
+    throw new Error('Gates failed: nothing imported');
+  }
+  const gpkgSha = sha(gpkg);
+  const id = sceneVersionId(gpkgSha, terrainVersion, mapVersion, mode, applied ? sha(OVERRIDES!) : undefined);
+  const summary = `terrain ${terrainVersion}, map ${mapVersion}, ${mode}, roof overrides ${overrides.length}, hidden ${all.hidden.length}, split ${all.parts.length}, added ${all.added.length}`;
+  /** Replaces the scene of this id and makes it the active one (one transaction). */
+  const save = async () => {
+    await withTransaction(async (client) => {
+      await client.query('DELETE FROM scene_versions WHERE id = $1', [id]);
+      await client.query('UPDATE scene_versions SET active = false WHERE active');
+      await client.query(
+        `INSERT INTO scene_versions (id, source_sha256, terrain_version_id, map_version_id, height_mode, active, metadata) VALUES ($1, $2, $3, $4, $5, true, $6)`,
+        [id, gpkgSha, terrainVersion, mapVersion, mode, JSON.stringify({ buildings: out.length, estimated: out.filter((b) => b.source !== 'REGISTER').length, rows, ...(overrides.length ? { roofOverrides: overrides } : {}),
+          ...(all.hidden.length ? { hiddenBuildings: all.hidden } : {}), ...(all.parts.length ? { buildingParts: all.parts } : {}),
+          ...(all.added.length ? { addedBuildings: all.added } : {}), ...(appearance.length ? { appearance } : {}) })],
+      );
+      for (const b of out) {
+        await client.query(
+          `INSERT INTO scene_buildings (scene_version_id, building_id, name, height_m, height_source, register_id, ground_floors, base_m, roof_m,
+             terrain_min_m, terrain_max_m, source_base_m, source_roof_m, note, geom)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON($15), 5186)))`,
+          [id, b.buildingId, b.name, b.heightM, b.source, b.registerId, b.floors, b.baseM, b.roofM, b.tMin, b.tMax, b.srcBase, b.srcRoof, b.note, b.geojson],
+        );
+      }
+    });
+  };
+  return { id, terrainVersion, buildings: out.length, summary, save };
+}

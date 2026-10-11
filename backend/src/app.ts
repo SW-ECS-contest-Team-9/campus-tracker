@@ -4,6 +4,7 @@ import { env } from './config/env.js';
 import { checkDatabase } from './config/database.js';
 import { errorHandler, notFoundHandler } from './common/middleware/error-handler.js';
 import { logger } from './common/logger.js';
+import { deployStatus } from './deploy/reconcile-db.js';
 import { collectorRoutes } from './modules/collectors/collector.routes.js';
 import { sessionRoutes } from './modules/sessions/session.routes.js';
 import { fusionRoutes } from './modules/fusion/fusion.routes.js';
@@ -32,7 +33,8 @@ export function createApp() {
 
   app.get('/health', async (_req, res) => {
     const dbOk = await checkDatabase();
-    res.status(dbOk ? 200 : 503).json({ status: dbOk ? 'ok' : 'degraded', database: dbOk ? 'ok' : 'error' });
+    // deploy: last reconcile result (manifest ids, what is pending or was refused) and the ids active right now
+    res.status(dbOk ? 200 : 503).json({ status: dbOk ? 'ok' : 'degraded', database: dbOk ? 'ok' : 'error', ...(dbOk ? { deploy: await deployStatus() } : {}) });
   });
 
   app.use('/api/v1/collectors', collectorRoutes);

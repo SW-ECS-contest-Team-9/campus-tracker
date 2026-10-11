@@ -42,7 +42,9 @@
     "check:delayed-upload": "npm run check:delayed-upload -w backend --",
     "terrain:extract": "npm run terrain:extract -w backend --",
     "terrain:import": "npm run terrain:import -w backend --",
-    "buildings:calibrate": "npm run buildings:calibrate -w backend --"
+    "buildings:calibrate": "npm run buildings:calibrate -w backend --",
+    "deploy:sync": "npm run -s deploy:sync -w backend --",
+    "deploy:manifest": "npm run -s deploy:manifest -w backend --"
   },
   "devDependencies": {
     "concurrently": "^9.2.4"

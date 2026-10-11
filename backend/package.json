@@ -36,7 +36,9 @@
     "terrain:list": "tsx scripts/terrain-versions.ts list",
     "terrain:activate": "tsx scripts/terrain-versions.ts activate",
     "terrain:relevel-roads": "tsx scripts/terrain-versions.ts relevel-roads",
-    "buildings:calibrate": "tsx scripts/buildings-calibrate.ts"
+    "buildings:calibrate": "tsx scripts/buildings-calibrate.ts",
+    "deploy:sync": "tsx scripts/deploy-sync.ts",
+    "deploy:manifest": "tsx scripts/deploy-manifest.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/express": "^2.0.2",

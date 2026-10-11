@@ -12,12 +12,9 @@ import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { pool, withTransaction } from '../src/config/database.js';
 import { planRelevel, RELEVEL_FIELD } from '../src/geo/terrain-relevel.js';
-import { gridDifferences, type TerrainVersionGrid } from '../src/geo/terrain-versions.js';
+import { activateTerrainVersion, gridDifferences, TERRAIN_GRID_COLUMNS as GRID, type TerrainVersionGrid } from '../src/geo/terrain-versions.js';
 import { assertNotLockedByOthers } from '../src/modules/editor/editor.ops.js';
 import { addChange, geoJSONLine, roadBefore, roadSelect, withEditorActor, type RoadRow } from '../src/modules/editor/editor.service.js';
-
-const GRID = `srid, vertical_datum "verticalDatum", geoid_separation_m::float8 "geoidSeparationM", origin_x "originX", origin_y "originY",
-  resolution_m::float8 "resolutionM", width, height`;
 
 async function list() {
   const { rows } = await pool.query(
@@ -91,21 +88,12 @@ async function relevelRoads(fromId: string, toId: string, owner: string | null) 
 
 async function activate(id: string) {
   const result = await withTransaction(async (db) => {
-    const { rows } = await db.query<TerrainVersionGrid & { id: string; active: boolean }>(
-      `SELECT id, active, ${GRID} FROM terrain_versions WHERE id = $1 OR active FOR UPDATE`, [id]);
-    const target = rows.find((r) => r.id === id);
-    const previous = rows.find((r) => r.active);
-    if (!target) throw new Error(`Unknown terrain version: ${id}`);
-    if (target.active) return { previous: id, scene: null, unchanged: true, roads: null };
-    const diff = previous ? gridDifferences(previous, target) : [];
-    if (diff.length) throw new Error(`Refused: ${id} differs from the active version ${previous!.id} in ${diff.join(', ')}`);
-    // same order as terrain-import.ts: clear the flag first (unique partial index terrain_one_active_idx)
-    await db.query('UPDATE terrain_versions SET active = false WHERE active');
-    await db.query('UPDATE terrain_versions SET active = true WHERE id = $1', [id]);
+    const { previous, unchanged } = await activateTerrainVersion(db, id);
+    if (unchanged) return { previous: id, scene: null, unchanged: true, roads: null };
     const { rows: scene } = await db.query<{ id: string; terrainVersionId: string }>(
       'SELECT id, terrain_version_id "terrainVersionId" FROM scene_versions WHERE active');
-    const roads = previous ? (await relevelPlan(db, previous.id, id)).plan : null;
-    return { previous: previous?.id ?? null, scene: scene[0] ?? null, unchanged: false, roads };
+    const roads = previous ? (await relevelPlan(db, previous, id)).plan : null;
+    return { previous, scene: scene[0] ?? null, unchanged: false, roads };
   });
   if (result.unchanged) { console.log(`${id} is already active; nothing changed`); return; }
   console.log(`activated terrain version ${id} (was ${result.previous ?? 'none'})`);

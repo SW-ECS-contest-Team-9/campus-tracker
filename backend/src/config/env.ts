@@ -37,6 +37,9 @@ const EnvSchema = z.object({
   EDITOR_MCP: z.enum(['on', 'off']).default('on'),
   /** false = /mcp answers loopback clients only (the server itself listens on the LAN for phones). */
   MCP_ALLOW_REMOTE: z.stringbool().default(false),
+  /** Database vs. committed desired state (backend/data/deploy/desired-state.json) at start-up: dry-run = compare and
+   * report only (apply with `npm run deploy:sync`), on = apply automatically, off = do not compare. */
+  DEPLOY_RECONCILE: z.enum(['on', 'dry-run', 'off']).default('dry-run'),
   PUBLIC_BASE_URL: z.url().optional().or(z.literal('').transform(() => undefined)),
 });
 

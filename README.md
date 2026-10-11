@@ -87,6 +87,16 @@ npm run spatial:import # backend/data/campus-map/source SHP를 버전 등록하�
 
 SHP 내용과 이름만 확인할 때는 `npm run spatial:import -w backend -- --dry-run`을 실행합니다. 신규 세션은 활성 지도 버전에 고정됩니다. 지도 적재 후 시작한 세션에서 `fusion-v3` 또는 `fusion-v3.1`을 재처리하면 캠퍼스 경계 필터가 적용됩니다. v3는 반복 고정밀 GPS 앵커 사이를 v2.1 PDR로 추정하고, v3.1은 별도 센서 중심 엔진에서 보행·기기 자세·기압을 주 추정 자료로 쓰며 GPS는 자격이 확인된 앵커 이벤트로만 적용합니다. 둘 다 현재 실시간 기본값은 아니며 Preview 비교 레이어에서 세션별 결과와 v3.1 센서 판정 이력을 확인할 수 있습니다.
 
+### 받은 뒤 DB 맞추기 (`npm run deploy:sync`)
+
+서버에서 `git pull` 뒤 한 번 돌린다. 커밋된 목표 상태(`backend/data/deploy/desired-state.json`: 지형 조리법이 만들어야 할 지형 id, 건물 보정 파일이 만들어야 할 건물 장면 id)에 DB를 맞춘다: DB 이행 → 건물 id 정정 → 지형(조리법으로 만들어 저장·전환) → 건물 장면. 이미 맞으면 아무것도 하지 않는다.
+
+- 자료 파일이 목표 상태와 다르거나(줄바꿈 CRLF, 손으로 고친 파일, 다른 캠퍼스 지도) 만들어진 id가 다르면 **거부**하고 DB를 그대로 둔다. 다른 id로 진행하지 않는다.
+- **도로망은 건드리지 않는다**: 길 높이 옮기기(relevel-roads)도, 길·장소·영역 쓰기도 없다. 따로 승인받아 하는 단계다.
+- 서버는 켜질 때 DB와 목표 상태를 비교해 한 줄(`deploy.reconcile`)로 알리고 `GET /health` 의 `deploy` 에 싣는다. `DEPLOY_RECONCILE`: `dry-run`(기본, 비교만) / `on`(켜질 때 자동 적용) / `off`(비교 안 함).
+- `package-lock.json` 이 `node_modules` 와 다르면 켜질 때 `deploy.dependencies` 한 줄로 `npm ci` 를 알린다(스스로 설치하지 않는다).
+- 개발자: 조리법·표본·건물 보정·건물 id 정정 파일을 고쳤으면 커밋 전에 `npm run deploy:manifest`(캠퍼스 지도가 들어 있는 시험 DB 필요, 읽기만). 안 하면 `backend/test/deploy-manifest.test.ts` 가 실패한다.
+
 기타: `npm run db:logs`, `npm run db:psql`, `npm run db:down` (볼륨은 유지, 완전 초기화는 `docker compose down -v`).
 
 Apple Silicon에서도 네이티브로 돌도록 기본 이미지는 `imresamu/postgis:16-3.5`(공식 postgis Dockerfile의 multi-arch 빌드)입니다. amd64 머신에서 공식 이미지를 쓰려면 `.env`에 `POSTGIS_IMAGE=postgis/postgis:16-3.5`.
@@ -387,7 +397,7 @@ GPS + Pedometer + 휴대폰 Motion + Barometer를 이용한 **휴리스틱 dead 
 
 ```
 backend/src
-├── app.ts / server.ts            Express + Socket.IO 부트스트랩, /health
+├── app.ts / server.ts / main.ts  Express + Socket.IO 부트스트랩(server.ts 는 의존성 확인 뒤 main.ts 를 부른다), /health
 ├── config/                       env(Zod), pg Pool, withTransaction
 ├── common/                       AppError·에러 핸들러, JWT, 로거, 공통 DTO
 ├── modules/<feature>/            route/controller → service → repository(SQL) + dto(Zod)
