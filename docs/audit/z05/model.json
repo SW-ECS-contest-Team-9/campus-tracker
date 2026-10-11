@@ -5,7 +5,7 @@
   "roadPieces": 37,
   "handOther": 5,
   "planes": 51,
-  "boxes": 269,
+  "boxes": 216,
   "terrainSurfaces": 93,
   "edgeSamples": 1855,
   "z04": {
@@ -637,7 +637,7 @@
      "kind": "spec"
     }
    ],
-   "boxes": 55
+   "boxes": 2
   },
   "eunju": {
    "title": "은주관 둘레(풋살장·수인관)",

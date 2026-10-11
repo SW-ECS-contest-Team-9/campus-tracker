@@ -195,3 +195,27 @@ test('B12 깊은 처마와 큰 기둥: 벽은 외곽에서 처마 깊이만큼 �
   const withWing = decorate([block], { roofM: 999, groundM: 100, baseM: 100 }, { ...look, order: undefined, wings: [wing] });
   assert.ok(tris(withWing) > 0 && Math.abs(Math.max(...zs(withWing)) - 123) < 1e-6);
 });
+
+test('B13 띠와 색 판: 띠 안에서 시작하는 줄만 둥근 머리, 띠 색 판은 벽마다 하나, 색 판은 같은 벽에 늘 같은 자리', () => {
+  const plain = { wall: 'metal', windows: { style: 'rows' as const, floorsM: [100, 104, 108] } };
+  const base = decorate([block], { roofM: 112, groundM: 100 }, plain);
+  // 2층 줄(104~108)만 둥근 머리: 창마다 세모 8개가 더해진다. 띠 색이 없으면 벽 판은 더해지지 않는다
+  const arched = decorate([block], { roofM: 112, groundM: 100 }, { ...plain, bands: [{ fromM: 104, toM: 108, style: 'archrows' as const }] });
+  const perRow = (Math.floor((40 - 0.6) / 3.2) + Math.floor((12 - 0.6) / 3.2)) * 2;
+  assert.equal(tris(arched) - tris(base), perRow * 8);
+  // 창 없음: 그 줄의 창이 빠진다
+  const none = decorate([block], { roofM: 112, groundM: 100 }, { ...plain, bands: [{ fromM: 104, toM: 108, style: 'none' as const }] });
+  assert.equal(tris(base) - tris(none), perRow * 2);
+  // 띠 색: 벽 넷에 판 하나씩(세모 둘), 높이는 띠의 두 높이
+  const tiled = decorate([block], { roofM: 112, groundM: 100 }, { ...plain, bands: [{ fromM: 104, toM: 108, wallColor: '#8f9296' }] });
+  assert.equal(tris(tiled) - tris(base), 4 * 2);
+  // 색 판: 부터 높이 위에만, 다시 그려도 같은 그림. 재질을 바꾼 벽면에는 없다
+  const look = { ...plain, panels: { colors: ['#e0a02b'], fromM: 104 } };
+  const a = decorate([block], { roofM: 112, groundM: 100 }, look), b2 = decorate([block], { roofM: 112, groundM: 100 }, look);
+  assert.ok(tris(a) > tris(base) + 8);
+  assert.deepEqual(a.positions, b2.positions);
+  const yellow = (m: { colors: number[]; positions: number[] }) => m.positions.filter((_, i) => i % 3 === 2 && m.colors[i - 2] === 0xe0 && m.colors[i - 1] === 0xa0);
+  assert.ok(yellow(a).length > 0 && Math.min(...yellow(a)) >= 104 && Math.max(...yellow(a)) <= 112);
+  const faced = decorate([block], { roofM: 112, groundM: 100 }, { ...look, faces: [0, 90, 180, 270].map((azimuth) => ({ azimuth, wall: 'metal' })) });
+  assert.equal(yellow(faced).length, 0);
+});

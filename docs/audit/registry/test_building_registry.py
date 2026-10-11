@@ -204,6 +204,29 @@ class Registry(unittest.TestCase):
         self.assertTrue(br.appearance.from_note(head(look.replace('머리: 114.0', '머리: 103.0')))[1])      # columns shorter than 3 m
         self.assertTrue(br.appearance.from_note(head(look.replace('마루_높이: 112.0, 출처: 사진, 등급: 추정', '마루_높이: 112.0')))[1])   # a wing needs its evidence and grade
 
+    def test_b13_wall_bands_and_irregular_panels(self):
+        look = """층_바닥_높이:
+  층: {1층: {값: 100.0, 등급: 추정}, 2층: {값: 104.0, 등급: 추정}, 3층: {값: 108.0, 등급: 추정}}
+겉모습:
+  - 대상: ["가관"]
+    벽: {값: 금속판, 출처: 사진, 등급: 확정}
+    창: {모양: 낱창, 출처: 사진, 등급: 추정}
+    띠:
+      - {부터_층: "2층", 까지_층: "3층", 값: 붉은 벽돌, 색: "#8f9296", 창: 작은 아치, 창_폭: 3.0, 출처: 사진, 등급: 확정}
+      - {부터_높이: 110.0, 창: 없음, 출처: 사진, 등급: 추정}
+    판: {색: ["#e0a02b"], 부터_층: "3층", 출처: 사진, 등급: "확정(노랑 판), 추정(자리)"}
+---"""
+        head = lambda text: br.read_head(ROOF.replace('---', '', 1).replace('---', text, 1).join(['---', '']))
+        got, bad = br.appearance.from_note(head(look))
+        self.assertEqual(bad, [])
+        self.assertEqual(got[0]['bands'], [{'fromM': 104.0, 'toM': 108.0, 'grade': '확정', 'wall': 'brick', 'wallColor': '#8f9296', 'style': 'archrows', 'widthM': 3.0}, {'fromM': 110.0, 'grade': '추정', 'style': 'none'}])
+        self.assertEqual(got[0]['panels'], {'colors': ['#e0a02b'], 'fromM': 108.0})
+        self.assertEqual(got[0]['grades']['panels'], '확정(노랑 판), 추정(자리)')
+        self.assertTrue(br.appearance.from_note(head(look.replace('창: 작은 아치', '창: 긴 아치')))[1])          # a band takes row styles only
+        self.assertTrue(br.appearance.from_note(head(look.replace('부터_높이: 110.0, 창: 없음, ', '부터_높이: 110.0, ')))[1])   # a band changes something
+        self.assertTrue(br.appearance.from_note(head(look.replace('까지_층: "3층"', '까지_층: "1층"')))[1])       # the top is above the bottom
+        self.assertTrue(br.appearance.from_note(head(look.replace('색: ["#e0a02b"]', '색: []')))[1])              # panels need a colour
+
     def test_appearance_goes_to_the_file_with_window_rows_at_the_floor_table(self):
         look = """층_바닥_높이:
   층: {1층: {값: 100.0, 등급: 추정}, 2층: {값: 103.5, 등급: 추정}, 3층: {값: 107.0, 등급: 추정}, 5층: {값: 110.5, 등급: 추정}}

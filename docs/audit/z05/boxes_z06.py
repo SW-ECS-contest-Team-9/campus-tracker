@@ -32,27 +32,7 @@ for tag, s_foot, s_top in (('L', 3.1, 10.4), ('R', 20.3, 13.0)):
 box('cheongun', 'Z06-CHEONGUN-PORCH-LANDING', 'deck', cR(10.4, 13.0, CD, CD + 2.2), 152.5, 153.1, '좌우 계단이 만나는 참(1층 현관 판과 이어짐). 아래는 비어 있다: 지하 1층 문(운동장 높이)으로 드나드는 자리', CSRC, grade=CG6, basePlane='없음(뜬 판)', material='concrete')
 box('cheongun', 'Z06-CHEONGUN-PORCH-LANDING-RAIL', 'wall', cR(10.4, 13.0, CD + 2.2, CD + 2.38), 153.1, 154.0, '참 앞 난간벽', CSRC, grade=CG6, basePlane='Z06-CHEONGUN-PORCH-LANDING', material='white_stone')
 
-# ---- 혜인관 운동장 쪽 현관: 사진 01 처럼 붉은 벽돌 덩어리(아래 B1 문, 위 1층 아치), 붉은 기와 모임지붕, 오른쪽 계단 ----
-hRc, hP = frame(hD, hw, hn)   # s = 벽을 따라(북동으로 +), d = 운동장 쪽
-HG6 = HG + ', 추정(벽·아치·지붕 모양: 사진 눈대중)'
-for k, (a, b) in enumerate(((-3.6, -3.2), (3.2, 3.6))): box('hyein', f'Z06-HYEIN-PORCH-SIDE-{k + 1}', 'wall', hRc(a, b, 0, 3.8), 149.0, 153.1, '혜인관 현관 아래층(B1) 옆 벽: 붉은 벽돌. 폭 7.2 m, 깊이 3.8 m', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='brick')
-for k, (a, b) in enumerate(((-3.6, -1.4), (1.4, 3.6))): box('hyein', f'Z06-HYEIN-PORCH-FRONT-{k + 1}', 'wall', hRc(a, b, 3.4, 3.8), 149.0, 152.7, '현관 아래층 앞 벽(벽돌). 가운데 2.8 m 는 B1 유리문', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='brick')
-box('hyein', 'Z06-HYEIN-PORCH-DOOR-B1', 'wall', hRc(-1.4, 1.4, 3.45, 3.7), 149.0, 151.6, 'B1 유리문(운동장 높이의 문): 폭 2.8 m·높이 2.6 m 눈대중', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='glass')
-box('hyein', 'Z06-HYEIN-PORCH-DOOR-HEAD', 'wall', hRc(-1.4, 1.4, 3.4, 3.8), 151.6, 152.7, 'B1 문 위 벽(간판 자리)', HSRC2, grade=HG6, basePlane='없음', material='brick')
-box('hyein', 'Z06-HYEIN-PORCH-FLOOR-1F', 'deck', hRc(-3.6, 3.6, 0, 3.8), 152.7, 153.1, '혜인관 현관의 1층 바닥(계단 위 로비 앞): 153.1 m. 아래는 B1 문 안쪽', HSRC2, grade=HG6, basePlane='없음(벽 위)', material='concrete')
-for k, sc in enumerate((-3.3, -1.1, 1.1, 3.3)):
-    box('hyein', f'Z06-HYEIN-PORCH-PIER-{k + 1}', 'wall', hRc(sc - 0.3, sc + 0.3, 3.2, 3.8), 153.1, 156.3, '1층 현관 앞면의 벽돌 기둥(기둥 넷 = 아치 셋, 사진 눈대중)', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-FLOOR-1F', material='brick')
-for k, sc in enumerate((-3.3, 3.3)):
-    box('hyein', f'Z06-HYEIN-PORCH-PIER-B{k + 1}', 'wall', hRc(sc - 0.3, sc + 0.3, 0.0, 0.6), 153.1, 156.3, '1층 현관 옆면의 벽 쪽 기둥', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-FLOOR-1F', material='brick')
-box('hyein', 'Z06-HYEIN-PORCH-HEADER', 'wall', hRc(-3.6, 3.6, 3.2, 3.8), 155.5, 156.3, '아치 위 벽돌 벽(아치 꼭대기 155.5 m, 둥근 모양은 싣지 않음)', HSRC2, grade=HG6, basePlane='없음(기둥 위)', material='brick')
-for k, (a, b) in enumerate(((-3.6, -3.0), (3.0, 3.6))): box('hyein', f'Z06-HYEIN-PORCH-SIDE-HEADER-{k + 1}', 'wall', hRc(a, b, 0.0, 3.2), 155.5, 156.3, '옆면 아치 위 벽돌 벽', HSRC2, grade=HG6, basePlane='없음(기둥 위)', material='brick')
-box('hyein', 'Z06-HYEIN-PORCH-EAVE', 'canopy', hRc(-4.3, 4.3, 0, 4.5), 156.3, 156.7, '흰 처마 띠(벽보다 0.7 m 내밂)', HSRC2, grade=HG6, basePlane='없음(벽 위)', material='white_stone')
-box('hyein', 'Z06-HYEIN-PORCH-ROOF-1', 'canopy', hRc(-3.9, 3.9, 0, 4.1), 156.7, 157.7, '붉은 기와 모임지붕 아랫단(기울기를 두 단 상자로 줄임)', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-EAVE', material='roof_red')
-box('hyein', 'Z06-HYEIN-PORCH-ROOF-2', 'canopy', hRc(-2.6, 2.6, 0, 2.8), 157.7, 158.6, '붉은 기와 모임지붕 윗단', HSRC2, grade=HG6, basePlane='Z06-HYEIN-PORCH-ROOF-1', material='roof_red')
-stairs('hyein', 'Z06-HYEIN-PORCH-STAIR', hP(-11.1, 1.6), hP(-3.6, 1.6), 2.6, 26, 149.0, 153.1, '혜인관 현관 오른쪽 계단(운동장에서 볼 때): 벽을 따라 현관 쪽으로 올라 1층 바닥에 닿는다. 26단 = 4.1 m ÷ 0.158, 디딤 0.29 m, 폭 2.6 m(사진 눈대중)', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0')
-for j in range(8):
-    a, b = -11.1 + 7.5 * j / 8, -11.1 + 7.5 * (j + 1) / 8
-    box('hyein', f'Z06-HYEIN-PORCH-STAIR-RAIL{j + 1}', 'wall', hRc(a, b, 2.9, 3.1), 148.7, 149.0 + 4.1 * (j + 1) / 8 + 0.9, '계단 운동장 쪽 돌 난간벽(여덟 마디로 줄임)', HSRC2, grade=HG6, basePlane='혜인관 둘레 149.0', material='white_stone')
+# ---- 혜인관 운동장 쪽 현관: B13 에서 docs/audit/b13/build_parts.py 로 옮겼다(자리를 출입부 가운데로, 계단 양쪽, 줄무늬 가림벽). 여기서는 Z05 상자만 걷는다 ----
 
 # ---- 서문: 사진처럼 넓은 문 세 칸(차량 두 칸 3.8·3.4 m + 좁은 칸 2.0 m), 그 위는 글자가 있는 돌 옹벽 면. Z05 는 2.9 m 두 칸이라 좁았다 ----
 _w0 = np.array([wx(557399.5), 557399.5]); wR, wP = frame(_w0, WDIR, (-1.0, -0.1375))   # s = 옹벽 면을 따라 북으로, d = 공도 쪽

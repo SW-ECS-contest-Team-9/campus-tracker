@@ -248,6 +248,12 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         if (face && (face.wall || face.wallColor) && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), top, 0.03, hex(face.wallColor ?? WALL_COLORS[face.wall ?? ''] ?? WALL_COLORS.panel));
         if (a.plinth?.topM !== undefined && hidden < a.plinth.topM - 0.5) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), Math.min(a.plinth.topM, top), 0.05, hex(a.plinth.color));
         if (a.upper && top > a.upper.fromM && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(a.upper.fromM, hidden), top, 0.04, hex(a.upper.color));
+        // B13 bands between two heights in another material, then colour panels scattered over the cladding (not on a face in its own material)
+        for (const band of a.bands ?? []) {
+          const z1 = Math.min(band.toM ?? top, top), z0 = Math.max(band.fromM, hidden, b.groundM - 3);
+          if ((band.wall || band.wallColor) && z1 - z0 > 0.05) out.panel(p, u, n, 0, len, z0, z1, 0.045, hex(band.wallColor ?? WALL_COLORS[band.wall ?? ''] ?? WALL_COLORS.panel));
+        }
+        if (a.panels?.colors.length && !(face && (face.wall || face.wallColor))) scatter(out, p, u, n, len, Math.max(a.panels.fromM ?? -Infinity, hidden, b.groundM), top, a.panels.colors.map(hex));
         if (a.roof?.rim && hidden < top - 1) out.panel(p, u, n, 0, len, top - 1.2, top, 0.1, hex(a.roof.rim));
         if (a.roof?.eaveBandM && hidden < top - 1) out.panel(p, u, n, 0, len, top - a.roof.eaveBandM, top, 0.12, hex(WINDOW.cornice));
         // tall columns with a beam on top, centred on the longest wall of the face; no windows behind them
@@ -261,7 +267,7 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
           clear = [s0 - 0.5, s0 + span + 0.5, z0 - 0.5];
         }
         const preset = face?.style === 'none' ? null : face?.style ? STYLES[face.style] : baseStyle;
-        const kind = face?.style ?? a.windows?.style;
+        const kind = face?.style ?? a.windows?.style, rowKind = kind;
         if (!preset) continue;
         // Z11: the building's own window size (the note), on the walls that show the building's own style
         const own = kind === a.windows?.style ? a.windows : undefined;
@@ -316,6 +322,10 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         levels.forEach(([z0, z1], k) => {
           if (z0 < hidden - 0.5) return;
           const sill = z0 + style.sill, head = Math.min(z0 + style.head, z1 - style.gap);
+          // B13: a row that starts inside a band with its own window style (a round head on the top row, dormers in a tiled band)
+          const band = (a.bands ?? []).find((d) => d.style && z0 >= d.fromM - 0.3 && z0 < (d.toM ?? Infinity) - 0.3);
+          if (band?.style === 'none') return;
+          const kind = band?.style ?? rowKind, own = Math.min(band?.widthM ?? width, pitch - 0.2), shift = (width - own) / 2; // the band's own window, centred where the wall's window would be
           // Z11 a ribbon: the light band the windows of a row sit in, along the whole wall
           if (accent && kind === 'bands' && !behind(0, z0)) out.panel(p, u, n, 0.2, len - 0.2, sill - 0.3, head + 0.3, 0.06, accent);
           for (let c = 0; c < count; c++) {
@@ -323,7 +333,7 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
             if (behind(s, z0)) continue;
             // the panel of the bay: the accent colour and grey in a checker (the real pattern is irregular); it shows under the window and between paired ones
             if (accent && kind === 'arches') out.panel(p, u, n, s, s + width, z0 + 0.05, paired ? head + 0.15 : sill - 0.05, paired ? 0.06 : 0.08, (c + k) % 2 ? infill : accent);
-            for (const [s0, s1] of panes(s, width)) {
+            for (const [s0, s1] of band?.widthM ? [[s + shift, s + shift + own]] : panes(s, width)) {
               out.panel(p, u, n, s0, s1, sill, head, 0.08, glass);
               if (kind !== 'archrows') continue; // every small window ends in a round head (drawn flatter when the storey above is short)
               const r = (s1 - s0) / 2, ry = Math.min(r, z1 - style.gap - head + 0.3);
@@ -348,6 +358,24 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
     roof(out, rings, top, a, opts, neighbour, frame);
   }
   return out.mesh;
+}
+
+/**
+ * B13 colour panels on a wall of stacked boxes: rows about 2.6 m high from `z0` to `z1`, in each row panels of uneven width with uneven
+ * gaps. The places come from a hash of the wall's position (the same wall always gets the same pattern); nothing is measured.
+ */
+function scatter(out: Builder, p: XY, u: XY, n: XY, len: number, z0: number, z1: number, colors: RGB[]) {
+  if (!(z1 - z0 > 1.5) || len < 2) return;
+  const rows = Math.max(1, Math.round((z1 - z0) / 2.6)), h = (z1 - z0) / rows;
+  let seed = (Math.round(p[0] * 10) * 73856093) ^ (Math.round(p[1] * 10) * 19349663);
+  const rnd = () => { seed = (Math.imul(seed ^ (seed >>> 15), 0x2c1b3c6d) + 0x9e3779b9) | 0; return ((seed >>> 8) & 0xffff) / 0x10000; };
+  for (let r = 0; r < rows; r++) {
+    for (let s = 0.3 + rnd() * 2; s < len - 1.3; ) {
+      const w = Math.min(1.0 + rnd() * 2.4, len - 0.3 - s), tall = rnd() < 0.7;
+      if (rnd() < 0.62) out.panel(p, u, n, s, s + w, z0 + r * h + 0.12, z0 + (r + 1) * h - (tall ? 0.12 : h * 0.55), 0.05, colors[Math.floor(rnd() * colors.length) % colors.length]);
+      s += w + 0.5 + rnd() * 2.6;
+    }
+  }
 }
 
 /** The ring moved by `d[i]` metres along the outward normal `n[i]` of each edge (negative: inwards); corners stay where the moved edges meet. */

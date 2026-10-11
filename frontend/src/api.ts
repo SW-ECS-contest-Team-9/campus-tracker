@@ -334,6 +334,10 @@ export interface BuildingAppearance {
   faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; /** the columns stand on this height (default: the lowest storey shown) */ columnsFromM?: number; grade?: string }[];
   /** A band of another colour on the walls above a height (upper storeys clad differently). */
   upper?: { fromM: number; color: string };
+  /** B13 bands of the walls between two heights (to the top of the walls without `toM`): another material or colour, and another window style ('none': no windows) for the rows that start inside the band. */
+  bands?: { fromM: number; toM?: number; wall?: string; wallColor?: string; style?: 'rows' | 'bands' | 'arches' | 'archrows' | 'none'; /** width of one window of those rows (the spacing stays the building's own) */ widthM?: number; grade?: string }[];
+  /** B13 colour panels scattered irregularly over the walls from `fromM` up (cladding of stacked boxes); places and sizes are made up for the drawing. Not drawn on a face whose rule changes the material. */
+  panels?: { colors: string[]; fromM?: number };
   roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string; /** 2: a second, smaller roof above a low wall band on the first (a double eave, Z09) */ tiers?: number ;
     /** B12: the eave and the ridge as heights (MSL) instead of the stored roof height and a rise; `overhangM`: the footprint is the line of the eave and the walls stand this far inside it (a deep eave with a soffit and rafters). */
     eaveTopM?: number; ridgeM?: number; overhangM?: number };

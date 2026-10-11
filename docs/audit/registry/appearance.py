@@ -32,6 +32,11 @@ B12 에서 더한 것(고전 양식 건물: 본관):
             # 여러 층을 꿰뚫는 둥근 기둥 열: 그 벽은 발치~머리 사이가 열린 현관(안쪽 벽이 물러남)이 되고, 모든 벽의 머리 높이에 돌 띠(보), 그 위 처마까지 어두운 띠. 창 줄은 발치와 머리 사이에만
       날개: [{이름, 외곽: [[x, y], ...](외곽 안의 고리), 처마_높이, 마루_높이, 처마_깊이, 큰_기둥: {...}(없어도 됨), 출처, 등급}]
             # 본체보다 낮은 제 지붕을 가진 덩어리(표시 전용. 높이가 추정이라 건물 부분으로 올리지 않는다). 벽·창·밑동은 본체 것을 쓴다
+B13 에서 더한 것(혜인관: 벽돌 본체 위의 기와 띠와 옥상 상자):
+      띠: [{부터_층 또는 부터_높이, 까지_층 또는 까지_높이(없으면 벽 꼭대기), 값: 벽 재질, 색, 창: 낱창|띠창|아치|작은 아치|없음, 창_폭: m(그 줄의 창 폭. 자리 간격은 그 동의 것), 출처, 등급}]
+            # 두 높이 사이의 벽 띠만 다른 재질·색으로, 그 안에서 시작하는 층의 창 줄만 다른 모양으로(기와 띠의 둥근 지붕창 줄, 맨 윗줄만 둥근 머리). 값·색·창 중 하나는 있어야 한다
+      판: {색: ["#rrggbb", ...], 부터_층 또는 부터_높이(없으면 벽 전체), 출처, 등급}
+            # 벽에 불규칙하게 붙은 색 판(컨테이너 상자의 노랑 판). 자리·크기는 그림용으로 지어낸 것이고 잰 것이 아니다. 벽면 규칙이 재질을 바꾼 면에는 그리지 않는다
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정). 다만 그 층의 등급에 "사용자 조건부 승인"이 적혀 있으면 둔다(U03, 은주1관).
 """
@@ -43,6 +48,7 @@ STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치':
 DIRECTIONS = {'북': 0, '북동': 45, '동': 90, '남동': 135, '남': 180, '남서': 225, '서': 270, '북서': 315}
 ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped'}
 ROOF_MATERIALS = {'기와': 'tile', '콘크리트': 'concrete', '유리': 'glass', '옥상 정원': 'green', '금속판': 'metal', '코트': 'court'}
+BAND_STYLES = ('rows', 'bands', 'arches', 'archrows')
 KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof', '밑동': 'plinth', '큰_기둥': 'order'}
 num = lambda v, lo, hi: isinstance(v, (int, float)) and not isinstance(v, bool) and lo <= v <= hi
 
@@ -182,6 +188,35 @@ def from_note(head):
             if len(face) == 2: bad.append(f'{fa}: 값·색·창·기둥 중 하나는 있어야 한다'); continue
             faces.append(face)
         if faces: rec['faces'] = faces
+        level = lambda v, a, b: (floor_table(head, (e.get('창') or {}).get('층_표')).get(v[a]) if v.get(a) is not None else v.get(b))
+        bands = []
+        for k, f in enumerate(e.get('띠') or []):   # B13
+            fa = f'{at}.띠[{k}]'
+            if not isinstance(f, dict) or _grade(f) is None or not f.get('출처'): bad.append(f'{fa}: 출처와 등급이 있어야 한다'); continue
+            lo, hi = level(f, '부터_층', '부터_높이'), level(f, '까지_층', '까지_높이')
+            if not num(lo, 0, 400) or (hi is not None and not (num(hi, 0, 400) and hi > lo)): bad.append(f'{fa}: 부터_층(층 표의 층) 또는 부터_높이, 까지는 그보다 높게'); continue
+            band = {'fromM': lo, **({'toM': hi} if hi is not None else {}), 'grade': str(f['등급'])}
+            if f.get('값') is not None:
+                if f['값'] not in WALLS: bad.append(f"{fa}.값 {f['값']!r}: {', '.join(WALLS)} 중 하나"); continue
+                band['wall'] = WALLS[f['값']]
+            color(f, '색', band, 'wallColor')
+            if f.get('창') is not None:
+                if f['창'] != '없음' and STYLES.get(f['창']) not in BAND_STYLES: bad.append(f"{fa}.창 {f['창']!r}: 낱창·띠창·아치·작은 아치 또는 없음"); continue
+                band['style'] = 'none' if f['창'] == '없음' else STYLES[f['창']]
+            if f.get('창_폭') is not None:
+                if not num(f['창_폭'], 0.3, 12) or band.get('style') in (None, 'none'): bad.append(f'{fa}.창_폭 은 0.3~12 m, 창 모양과 함께'); continue
+                band['widthM'] = f['창_폭']
+            if len(band) == (3 if hi is not None else 2): bad.append(f'{fa}: 값·색·창 중 하나는 있어야 한다'); continue
+            bands.append(band)
+        if bands: rec['bands'] = bands
+        pn = e.get('판')
+        if pn is not None:   # B13
+            cs = pn.get('색') if isinstance(pn, dict) else None
+            lo = level(pn, '부터_층', '부터_높이') if isinstance(pn, dict) else None
+            if not isinstance(pn, dict) or _grade(pn) is None or not pn.get('출처') or not (isinstance(cs, list) and cs and all(isinstance(c, str) and COLOR.match(c) for c in cs)) or (lo is not None and not num(lo, 0, 400)):
+                bad.append(f'{at}.판: 색 목록("#rrggbb"), 출처, 등급, 있으면 부터_층 또는 부터_높이')
+            else:
+                rec['panels'] = {'colors': cs, **({'fromM': lo} if lo is not None else {})}; grades['panels'] = str(pn['등급'])
         up = item('윗벽')
         if up:
             z = up.get('부터_높이')
