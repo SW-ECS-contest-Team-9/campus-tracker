@@ -23,7 +23,7 @@ xy = lambda o: np.array(o['xy'])
 # ---------- 방향: 주차 줄은 혜인관 벽과 나란하다(U02 와 같은 축) ----------
 ha, hb = np.array([201200.7, 557180.9]), np.array([201246.0, 557255.8]); U = (hb - ha) / np.hypot(*(hb - ha)); V = np.array([U[1], -U[0]])   # U = 줄 방향(북동), V = 혜인관 쪽
 STALL_W, STALL_D = 2.5, 5.0      # 추정: 칸 너비·깊이(지도의 칸은 선 굵기 때문에 깊이 5.6~6 m 로 그려져 있다)
-LINE = 0.12
+LINE = 0.15
 
 # ---------- 지도에서 읽은 묶음 → 좌표, 줄 수, 칸 수 ----------
 PX = json.loads((HERE / 'stalls-px.json').read_text(encoding='utf-8'))['blocks']
@@ -52,6 +52,7 @@ for b in blocks:
         q = INNER.exterior.interpolate(INNER.exterior.project(Point(c))); inward = c - np.array(q.coords[0]); inward /= np.hypot(*inward)   # 가장 가까운 벽에서 직각으로 안쪽
         for step in np.arange(0.25, 2.01, 0.25):   # 2 m 까지만 민다(잔차 안). 그래도 나가는 칸은 아래에서 뺀다
             if SAFE.contains(rect(c + shift + inward * step, lu, lv)): shift = shift + inward * step; why = (why + ', ' if why else '') + '외곽 밖으로 나가 안으로 밂'; break
+        else: shift = shift + inward * 2.0; why = (why + ', ' if why else '') + '외곽 밖으로 나가 안으로 2 m 밂(그래도 나간 칸은 뺌)'
     b['c'] = c + shift; b['shiftM'] = r2(np.hypot(*shift)); b['shiftWhy'] = why
 
 # ---------- 칸 ----------
