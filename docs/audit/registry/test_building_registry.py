@@ -183,6 +183,27 @@ class Registry(unittest.TestCase):
         self.assertEqual(set(problems), set(bad))
         self.assertEqual(doc['buildings'] + doc['hidden'] + doc['parts'], [])
 
+    def test_b12_deep_eave_giant_order_and_wing(self):
+        look = """층_바닥_높이:
+  층: {1층: {값: 100.0, 등급: 추정}, 2층: {값: 104.0, 등급: 추정}}
+겉모습:
+  - 대상: ["본관"]
+    벽: {값: 밝은 돌, 출처: 사진, 등급: 원천}
+    지붕: {모양: 모임지붕, 재질: 기와, 처마_높이: 118.0, 마루_높이: 123.0, 처마_깊이: 1.5, 출처: 메시, 등급: S-MAP}
+    큰_기둥: {발치: 102.0, 머리: 114.0, 보: 2.0, 열: [{자리: [201020.0, 557300.0], 기둥: 5}], 출처: 사진, 등급: 추정}
+    날개:
+      - {이름: 현관부, 외곽: [[201010.0, 557300.0], [201030.0, 557300.0], [201030.0, 557304.0]], 처마_높이: 110.0, 마루_높이: 112.0, 출처: 사진, 등급: 추정}
+---"""
+        head = lambda text: br.read_head(ROOF.replace('---', '', 1).replace('---', text, 1).join(['---', '']))
+        got, bad = br.appearance.from_note(head(look))
+        self.assertEqual(bad, [])
+        self.assertEqual(got[0]['roof'], {'type': 'hipped', 'material': 'tile', 'eaveTopM': 118.0, 'ridgeM': 123.0, 'overhangM': 1.5})
+        self.assertEqual(got[0]['order'], {'fromM': 102.0, 'toM': 114.0, 'beamM': 2.0, 'rows': [{'at': [201020.0, 557300.0], 'count': 5}]})
+        self.assertEqual(got[0]['wings'], [{'polygon': [[201010.0, 557300.0], [201030.0, 557300.0], [201030.0, 557304.0]], 'roof': {'eaveTopM': 110.0, 'ridgeM': 112.0}, 'grade': '추정'}])
+        self.assertTrue(br.appearance.from_note(head(look.replace('마루_높이: 123.0, ', '')))[1])        # the eave and the ridge come together
+        self.assertTrue(br.appearance.from_note(head(look.replace('머리: 114.0', '머리: 103.0')))[1])      # columns shorter than 3 m
+        self.assertTrue(br.appearance.from_note(head(look.replace('마루_높이: 112.0, 출처: 사진, 등급: 추정', '마루_높이: 112.0')))[1])   # a wing needs its evidence and grade
+
     def test_appearance_goes_to_the_file_with_window_rows_at_the_floor_table(self):
         look = """층_바닥_높이:
   층: {1층: {값: 100.0, 등급: 추정}, 2층: {값: 103.5, 등급: 추정}, 3층: {값: 107.0, 등급: 추정}, 5층: {값: 110.5, 등급: 추정}}

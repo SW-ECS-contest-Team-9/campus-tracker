@@ -166,3 +166,32 @@ test('Z11 띠창의 덧색: 층마다 벽 길이의 밝은 띠 하나가 창 밑
   assert.equal(tris(banded) - tris(plain), 4 * 2 * 2); // 벽 넷, 층 둘
 });
 
+
+test('B12 깊은 처마와 큰 기둥: 벽은 외곽에서 처마 깊이만큼 안쪽, 처마 끝은 외곽, 처마·마루는 적은 높이', async () => {
+  const { ownWalls } = await import('../src/building-appearance.ts');
+  const look = { wall: 'stone', windows: { style: 'archrows' as const, floorsM: [100, 104, 108, 112, 116] },
+    roof: { type: 'hipped' as const, material: 'tile', eaveTopM: 118, ridgeM: 123, overhangM: 1.5 },
+    order: { fromM: 102, toM: 114, beamM: 2, diameterM: 1.2, rows: [{ at: [X0 + 20, Y0], count: 5 }] } };
+  assert.equal(wallTopM(999, look), 118);                 // 저장된 지붕 높이가 아니라 적은 처마 높이
+  assert.ok(ownWalls(look) && !ownWalls(brick));
+  const mesh = decorate([block], { roofM: 999, groundM: 100, baseM: 100 }, look);
+  const z = zs(mesh);
+  assert.ok(Math.abs(Math.max(...z) - 123) < 1e-6 && Math.min(...z) < 100);
+  let outside = 0, wallPlane = 0; // 외곽 밖으로 나가는 것은 없다
+  for (let i = 0; i < mesh.positions.length; i += 3) {
+    const [x, y, zz] = mesh.positions.slice(i, i + 3);
+    const out = Math.max(X0 - x, x - (X0 + 40), Y0 - y, y - (Y0 + 12));
+    if (out > 1e-6) outside++;
+    if (Math.abs(out + 1.5) < 1e-6 && zz < 101) wallPlane++;
+  }
+  assert.equal(outside, 0);
+  assert.ok(wallPlane > 0);                               // 벽 밑동이 외곽 1.5 m 안쪽에 있다
+  // 기둥 열이 선 남쪽 벽: 발치~머리 사이 창이 없고(열린 현관), 기둥 다섯(열두 모 x 2 삼각형 + 머리 상자)
+  const columnTris = (m: { colors: number[] }) => { let k = 0; for (let i = 0; i < m.colors.length; i += 9) if (m.colors[i] === 0xec && m.colors[i + 1] === 0xe8 && m.colors[i + 2] === 0xde) k++; return k; };
+  assert.equal(columnTris(mesh), 5 * (12 * 2 + 5 * 2));
+  assert.equal(columnTris(decorate([block], { roofM: 999, groundM: 100, baseM: 100 }, { ...look, order: { ...look.order, rows: [] } })), 0);
+  // 낮은 날개: 제 처마 높이까지만 올라가고 본체에서 떼어 그린다
+  const wing = { polygon: [[X0 + 10, Y0], [X0 + 30, Y0], [X0 + 30, Y0 + 4], [X0 + 10, Y0 + 4]], roof: { eaveTopM: 110, ridgeM: 112, overhangM: 1 } };
+  const withWing = decorate([block], { roofM: 999, groundM: 100, baseM: 100 }, { ...look, order: undefined, wings: [wing] });
+  assert.ok(tris(withWing) > 0 && Math.abs(Math.max(...zs(withWing)) - 123) < 1e-6);
+});

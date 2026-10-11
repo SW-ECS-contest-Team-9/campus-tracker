@@ -5,7 +5,7 @@
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import './elevation-colors.css';
 import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './api';
-import { decorate, wallColor, wallTopM } from './building-appearance';
+import { decorate, ownWalls, wallColor, wallTopM } from './building-appearance';
 import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
 import { clipLonLatPolygons, planeSide, type SectionPlane } from './section';
 import { tmForward, tmInverse } from './tm';
@@ -284,7 +284,7 @@ export class CampusSceneLayer {
     for (const b of this.scene.buildings) {
       if (!b.appearance) continue;
       const neighbourTop = (x: number, y: number) => all.reduce((m, o) => (o.b !== b && o.top > m && o.polys.some((poly) => ringContains(x, y, poly[0] as [number, number][])) ? o.top : m), -Infinity);
-      const mesh = decorate(xy(this.footprint(b)), { roofM: b.roofM, groundM: b.terrainMinM ?? b.baseM + 1 }, b.appearance, { neighbourTop, cut });
+      const mesh = decorate(xy(this.footprint(b)), { roofM: b.roofM, groundM: b.terrainMinM ?? b.baseM + 1, baseM: b.baseM }, b.appearance, { neighbourTop, cut });
       const n = mesh.positions.length / 3;
       if (!n) continue;
       const positions = new Float64Array(n * 3), normals = new Float32Array(n * 3), colors = new Uint8Array(n * 4);
@@ -318,6 +318,7 @@ export class CampusSceneLayer {
     const C = this.C;
     const instances: any[] = [];
     for (const b of this.scene.buildings) {
+      if (!this.elevation && ownWalls(b.appearance)) continue; // B12: walls inside the footprint (a deep eave) are drawn with the windows and the roof
       const own = !this.elevation && b.appearance ? wallColor(b.appearance) : null;
       const css = b.buildingId === this.selected ? COLORS.selected : own ?? (this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall);
       const color = C.Color.fromCssColorString(css).withAlpha(this.opacity);

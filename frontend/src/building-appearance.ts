@@ -5,6 +5,7 @@
 // Pure geometry in EPSG:5186 metres + MSL heights (tested in test/building-appearance.test.ts); campus-map.ts draws it.
 import earcut from 'earcut';
 import type { BuildingAppearance } from './api';
+import { polygonOps } from './polygon-ops';
 
 export type XY = number[];
 /** Triangles, three vertices each: positions x, y, z / unit normals / colours r, g, b (0-255). */
@@ -14,6 +15,9 @@ export type DecorOptions = {
   neighbourTop?: (x: number, y: number) => number;
   /** true: this point lies on a cross-section cut (the face there is not a wall). */
   cut?: (x: number, y: number) => boolean;
+  /** B12 (a wing): true inside the block the wing leans on; the wing has no wall and no eave there and runs `partyBackM` further in, to that block's wall. */
+  party?: (x: number, y: number) => boolean;
+  partyBackM?: number;
 };
 
 type RGB = [number, number, number];
@@ -28,10 +32,14 @@ const WINDOW = { glass: '#6f8794', frame: '#d3d8d5', dormer: '#aeb4b8', cornice:
 
 export const wallColor = (a: BuildingAppearance) => a.wallColor ?? WALL_COLORS[a.wall] ?? WALL_COLORS.panel;
 const roofColor = (a: BuildingAppearance) => a.roof?.color ?? ROOF_COLORS[a.roof?.material ?? ''] ?? ROOF_COLORS.concrete;
-const rise = (a: BuildingAppearance | null | undefined) => (a?.roof?.type === 'hipped' ? a.roof.riseM ?? 3 : 0);
+const rise = (a: BuildingAppearance | null | undefined) => (a?.roof?.type !== 'hipped' ? 0 : a.roof.eaveTopM !== undefined && a.roof.ridgeM !== undefined ? a.roof.ridgeM - a.roof.eaveTopM : a.roof.riseM ?? 3);
 
 /** Top of the walls: a pitched roof takes its rise half below and half above the stored (flat) roof height. */
-export const wallTopM = (roofM: number, a: BuildingAppearance | null | undefined) => roofM - rise(a) / 2;
+export const wallTopM = (roofM: number, a: BuildingAppearance | null | undefined) => a?.roof?.eaveTopM ?? roofM - rise(a) / 2;
+/** B12: true when the walls stand inside the footprint (a deep eave) or the footprint has lower wings: `decorate` then draws the walls itself and the plain block is left out. */
+export const ownWalls = (a: BuildingAppearance | null | undefined) => !!a && ((a.roof?.overhangM ?? 0) > 0 || !!a.wings?.length);
+/** B12 the deep eave and the giant order: fascia of the eave, soffit and rafters, corner piers of a porch and how deep it is, the capital, the attic strip. */
+const CLASSICAL = { fasciaM: 0.35, soffit: '#d6cbb4', rafter: '#b9ad94', rafterPitch: 1.1, pierM: 1.5, porchM: 2.2, capitalM: 0.5, beam: '#e3ddcf', attic: '#33373a', column: '#ece8de', shade: 0.78 };
 
 /** Window layout per style: spacing and width along the wall, sill and head above the floor (head also limited by the storey). */
 const STYLES = {
@@ -109,6 +117,15 @@ class Builder {
     this.quad(at(s1, depth, z0), at(s1, 0, z0), at(s1, 0, z1), at(s1, depth, z1), color);
     this.quad(at(s0, 0, z1), at(s0, depth, z1), at(s1, depth, z1), at(s1, 0, z1), color);
   }
+  /** A box on a wall edge: from `s0` to `s1` along it, from `d0` to `d1` out of it (negative: behind it), between two heights; all faces but the back. */
+  box(p: XY, u: XY, n: XY, s0: number, s1: number, d0: number, d1: number, z0: number, z1: number, color: RGB) {
+    const at = (s: number, d: number, z: number) => [p[0] + u[0] * s + n[0] * d, p[1] + u[1] * s + n[1] * d, z];
+    this.quad(at(s0, d1, z0), at(s1, d1, z0), at(s1, d1, z1), at(s0, d1, z1), color);
+    this.quad(at(s0, d0, z0), at(s0, d1, z0), at(s0, d1, z1), at(s0, d0, z1), color);
+    this.quad(at(s1, d1, z0), at(s1, d0, z0), at(s1, d0, z1), at(s1, d1, z1), color);
+    this.quad(at(s0, d0, z0), at(s1, d0, z0), at(s1, d1, z0), at(s0, d1, z0), color);
+    this.quad(at(s0, d0, z1), at(s0, d1, z1), at(s1, d1, z1), at(s1, d0, z1), color);
+  }
   /** Flat polygon (outer ring + holes) at one height. */
   cap(rings: XY[][], z: number, color: RGB) {
     const flat = rings.flatMap((r) => r.flatMap((p) => [p[0], p[1]]));
@@ -144,11 +161,22 @@ export function storeys(a: BuildingAppearance, groundM: number, topM: number): [
  * the roof (a coloured cap on a flat roof; slopes from an overhanging eave up to a smaller flat top on a pitched one).
  * `polygons`: the footprint, each polygon as outer ring + holes (rings may be closed). `groundM`: lowest ground at the walls.
  */
-export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number }, a: BuildingAppearance, opts: DecorOptions = {}): Mesh {
+export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number; baseM?: number }, a: BuildingAppearance, opts: DecorOptions = {}): Mesh {
   const out = new Builder();
+  if (a.wings?.length) { // B12: the main block without the wings, then every wing as a block of its own that runs back to the main wall
+    const { wings, ...rest } = a;
+    const main = polygonOps('minus', polygons, wings.map((w) => [w.polygon]));
+    const add = (m: Mesh) => { for (const k of ['positions', 'normals', 'colors'] as const) for (const v of m[k]) out.mesh[k].push(v); };
+    add(decorate(main, b, rest, opts));
+    const inMain = (x: number, y: number) => main.some((poly) => contains(x, y, poly[0]) && !poly.slice(1).some((h) => contains(x, y, h)));
+    for (const w of wings) add(decorate(polygonOps('both', [[w.polygon]], polygons), b, { ...rest, faces: undefined, roof: { ...(rest.roof ?? { type: 'hipped' }), tiers: undefined, ...w.roof }, order: w.order }, { ...opts, party: inMain, partyBackM: rest.roof?.overhangM ?? 0 }));
+    return out.mesh;
+  }
   const top = wallTopM(b.roofM, a);
+  const overhang = a.roof?.overhangM ?? 0, order = a.order;
+  const dark = (c: RGB): RGB => [c[0] * CLASSICAL.shade, c[1] * CLASSICAL.shade, c[2] * CLASSICAL.shade];
   // Z09: below the top of a plinth there are no windows (the walls there are the podium or the retaining wall the building stands on)
-  const levels = storeys(a, b.groundM, top).filter(([z0]) => a.plinth?.topM === undefined || z0 >= a.plinth.topM - 0.5);
+  const levels = storeys(a, b.groundM, top).filter(([z0]) => (a.plinth?.topM === undefined || z0 >= a.plinth.topM - 0.5) && (!order || (z0 >= order.fromM - 0.5 && z0 + 2.6 <= order.toM)));
   const baseStyle = a.windows ? STYLES[a.windows.style] : null;
   const glass = hex(a.windows?.color ?? (a.windows?.style === 'rows' ? WINDOW.frame : WINDOW.glass)); // punched windows read as their light frames
   const wall = hex(wallColor(a));
@@ -171,18 +199,50 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
   for (const poly of polygons) {
     const rings = poly.map((r) => tidy(r, 0.02)).filter((r) => r.length >= 3);
     if (!rings.length) continue;
-    const inside = (x: number, y: number) => contains(x, y, rings[0]) && !rings.slice(1).some((h) => contains(x, y, h));
-    for (const ring of rings) {
+    // B12: under a deep eave the walls stand inside the footprint (edge i of the wall ring belongs to edge i of the footprint)
+    const frame = overhang > 0 || opts.party ? eaveFrame(rings[0], overhang, opts, order?.rows) : null;
+    const walls = frame ? [frame.wall, ...rings.slice(1)] : rings;
+    const inside = (x: number, y: number) => contains(x, y, walls[0]) && !walls.slice(1).some((h) => contains(x, y, h));
+    for (const ring of walls) {
       for (let i = 0; i < ring.length; i++) {
         const p = ring[i], q = ring[(i + 1) % ring.length];
         const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
-        if (len < 0.9) continue;
+        if (frame && ring === frame.wall && frame.edges[i].party) continue;
+        if (len < (frame ? 0.05 : 0.9)) continue;
         const u = [(q[0] - p[0]) / len, (q[1] - p[1]) / len];
         let n = [u[1], -u[0]];
         const mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
         if (inside(mid[0] + n[0] * 0.05, mid[1] + n[1] * 0.05)) n = [-n[0], -n[1]];
         if (opts.cut?.(mid[0], mid[1])) continue;
         const hidden = neighbour(mid[0] + n[0] * 0.4, mid[1] + n[1] * 0.4); // a neighbour stands against this wall up to here
+        let clear: [number, number, number] | null = null; // no windows along the wall from, to; from this height up
+        if (frame) { // the wall itself (the plain block is not drawn), with an open porch behind a row of columns
+          const low = Math.min(b.baseM ?? b.groundM - 3, b.groundM) - 0.5;
+          const row = order && ring === frame.wall ? order.rows?.find((r) => frame.edges[i].row === r) : undefined;
+          const s0 = CLASSICAL.pierM, s1 = len - CLASSICAL.pierM;
+          if (!row || s1 - s0 < 2) out.panel(p, u, n, 0, len, low, top, 0, wall);
+          else {
+            const z0 = order!.fromM, z1 = order!.toM, d = CLASSICAL.porchM, at = (s: number, off: number, z: number) => [p[0] + u[0] * s + n[0] * off, p[1] + u[1] * s + n[1] * off, z];
+            out.panel(p, u, n, 0, s0, low, top, 0, wall); out.panel(p, u, n, s1, len, low, top, 0, wall);
+            out.panel(p, u, n, s0, s1, low, z0, 0, wall); out.panel(p, u, n, s0, s1, z1, top, 0, wall);
+            out.panel(p, u, n, s0, s1, z0, z1, -d, dark(wall));
+            out.quad(at(s0, 0, z0), at(s0, -d, z0), at(s0, -d, z1), at(s0, 0, z1), dark(wall)); out.quad(at(s1, -d, z0), at(s1, 0, z0), at(s1, 0, z1), at(s1, -d, z1), dark(wall));
+            out.quad(at(s0, -d, z0), at(s1, -d, z0), at(s1, 0, z0), at(s0, 0, z0), wall); out.quad(at(s0, -d, z1), at(s1, -d, z1), at(s1, 0, z1), at(s0, 0, z1), dark(wall));
+            const r = (order!.diameterM ?? 1.2) / 2, col = hex(CLASSICAL.column), k = Math.max(2, Math.min(row.count, Math.floor((s1 - s0) / (3 * r))));
+            for (let c = 0; c < k; c++) { // round columns (twelve sides) with a square capital, their fronts in the plane of the wall
+              const s = s0 + ((c + 0.5) * (s1 - s0)) / k, rim = (j: number, z: number) => at(s + r * Math.cos((j * Math.PI) / 6), -r + r * Math.sin((j * Math.PI) / 6), z);
+              for (let j = 0; j < 12; j++) out.quad(rim(j + 1, z0), rim(j, z0), rim(j, z1 - CLASSICAL.capitalM), rim(j + 1, z1 - CLASSICAL.capitalM), col);
+              out.box(p, u, n, s - 1.25 * r, s + 1.25 * r, -2.25 * r, 0.05, z1 - CLASSICAL.capitalM, z1, col);
+            }
+            clear = [s0 - 0.3, s1 + 0.3, z0 - 0.5];
+          }
+          if (order) { // the entablature and the dark attic strip above it, round the whole block
+            const zb = Math.min(order.toM + (order.beamM ?? 2), top);
+            out.pier(p, u, n, -0.25, len + 0.25, order.toM, zb, 0.25, hex(CLASSICAL.beam));
+            out.panel(p, u, n, 0, len, zb, top, 0.04, hex(CLASSICAL.attic));
+          }
+          if (len < 0.9) continue;
+        }
         const face = faceOf(a, n);
         // this face in another material: one panel over the whole wall, under the windows
         if (face && (face.wall || face.wallColor) && hidden < top - 1) out.panel(p, u, n, 0, len, Math.max(b.groundM - 3, hidden), top, 0.03, hex(face.wallColor ?? WALL_COLORS[face.wall ?? ''] ?? WALL_COLORS.panel));
@@ -191,7 +251,6 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         if (a.roof?.rim && hidden < top - 1) out.panel(p, u, n, 0, len, top - 1.2, top, 0.1, hex(a.roof.rim));
         if (a.roof?.eaveBandM && hidden < top - 1) out.panel(p, u, n, 0, len, top - a.roof.eaveBandM, top, 0.12, hex(WINDOW.cornice));
         // tall columns with a beam on top, centred on the longest wall of the face; no windows behind them
-        let clear: [number, number, number] | null = null; // along the wall from, to; from this height up
         if (face?.columns && longest.get(face) === len && levels.length && hidden < levels[0][0]) {
           const k = Math.max(2, Math.min(face.columns, Math.floor((len - 1) / COLONNADE.pitch) + 1));
           const span = (k - 1) * COLONNADE.pitch + COLONNADE.width, s0 = (len - span) / 2;
@@ -286,13 +345,63 @@ export function decorate(polygons: XY[][][], b: { roofM: number; groundM: number
         });
       }
     }
-    roof(out, rings, top, a, opts, neighbour);
+    roof(out, rings, top, a, opts, neighbour, frame);
   }
   return out.mesh;
 }
 
-function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, opts: DecorOptions, neighbour: (x: number, y: number) => number) {
+/** The ring moved by `d[i]` metres along the outward normal `n[i]` of each edge (negative: inwards); corners stay where the moved edges meet. */
+function moved(ring: XY[], n: XY[], d: number[]): XY[] {
+  const N = ring.length;
+  return ring.map((p, i) => {
+    const h = (i + N - 1) % N, det = n[h][0] * n[i][1] - n[h][1] * n[i][0];
+    if (Math.abs(det) < 0.2) { const k = (d[h] + d[i]) / 2; return [p[0] + ((n[h][0] + n[i][0]) / 2) * k, p[1] + ((n[h][1] + n[i][1]) / 2) * k]; }
+    return [p[0] + (d[h] * n[i][1] - d[i] * n[h][1]) / det, p[1] + (n[h][0] * d[i] - n[i][0] * d[h]) / det];
+  });
+}
+type EaveFrame = { eave: XY[]; wall: XY[]; edges: { party: boolean; cut: boolean; row?: object }[] };
+/**
+ * B12: the footprint as the line of the eave (counter-clockwise) and the walls `overhang` inside it. An edge on a section cut
+ * stays where it is; an edge of a wing against its main block moves `partyBackM` out, to that block's wall, eave and wall alike.
+ */
+function eaveFrame(ring: XY[], overhang: number, opts: DecorOptions, rows: { at: number[] }[] = []): EaveFrame {
+  let outer = tidy(ring, 0.02);
+  if (area2(outer) < 0) outer = [...outer].reverse();
+  const N = outer.length;
+  const n = outer.map((p, i) => { const q = outer[(i + 1) % N], len = Math.hypot(q[0] - p[0], q[1] - p[1]); return [(q[1] - p[1]) / len, -(q[0] - p[0]) / len]; });
+  const mid = outer.map((p, i) => [(p[0] + outer[(i + 1) % N][0]) / 2, (p[1] + outer[(i + 1) % N][1]) / 2]);
+  const edges: EaveFrame['edges'] = mid.map((m, i) => ({ cut: !!opts.cut?.(m[0], m[1]), party: !!opts.party?.(m[0] + n[i][0] * 0.3, m[1] + n[i][1] * 0.3) }));
+  for (const r of rows) { // a row of columns stands on the edge whose middle is nearest to its point (within 4 m)
+    const k = mid.reduce((best, m, i) => (Math.hypot(m[0] - r.at[0], m[1] - r.at[1]) < Math.hypot(mid[best][0] - r.at[0], mid[best][1] - r.at[1]) ? i : best), 0);
+    if (Math.hypot(mid[k][0] - r.at[0], mid[k][1] - r.at[1]) < 4) edges[k].row = r;
+  }
+  const back = opts.partyBackM ?? 0;
+  return { eave: moved(outer, n, edges.map((e) => (e.party ? back : 0))), wall: moved(outer, n, edges.map((e) => (e.party ? back : e.cut ? 0 : -overhang))), edges };
+}
+
+function roof(out: Builder, rings: XY[][], top: number, a: BuildingAppearance, opts: DecorOptions, neighbour: (x: number, y: number) => number, frame: EaveFrame | null = null) {
   if (!a.roof) return;
+  if (frame && rise(a) > CLASSICAL.fasciaM) { // B12 a deep eave: soffit with rafters from the walls out to the footprint, a fascia, then the slopes
+    const color = hex(roofColor(a)), N = frame.eave.length, zf = top + CLASSICAL.fasciaM, zr = top + rise(a);
+    const at = (p: XY, zz: number) => [p[0], p[1], zz];
+    const n = frame.eave.map((p, i) => { const q = frame.eave[(i + 1) % N], len = Math.hypot(q[0] - p[0], q[1] - p[1]); return [(q[1] - p[1]) / len, -(q[0] - p[0]) / len]; });
+    const open = frame.edges.map((e) => !e.party && !e.cut);
+    const area = Math.abs(area2(frame.eave)), perimeter = frame.eave.reduce((s, p, i) => s + Math.hypot(frame.eave[(i + 1) % N][0] - p[0], frame.eave[(i + 1) % N][1] - p[1]), 0);
+    let run = Math.min(a.roof.runM ?? rise(a) * 1.9, (0.9 * area) / perimeter), ridge = moved(frame.eave, n, open.map((o) => (o ? -run : 0)));
+    for (let k = 0; k < 4 && !(area2(ridge) > 0.02 * area); k++) { run /= 2; ridge = moved(frame.eave, n, open.map((o) => (o ? -run : 0))); }
+    const overhang = a.roof.overhangM ?? 0;
+    frame.edges.forEach((e, i) => {
+      const j = (i + 1) % N, p = frame.eave[i], q = frame.eave[j], len = Math.hypot(q[0] - p[0], q[1] - p[1]), u = [(q[0] - p[0]) / len, (q[1] - p[1]) / len];
+      if (open[i]) {
+        out.quad(at(frame.wall[i], top), at(frame.wall[j], top), at(q, top), at(p, top), hex(CLASSICAL.soffit));
+        out.quad(at(p, top), at(q, top), at(q, zf), at(p, zf), color);
+        for (let s = overhang + 0.4; overhang > 0.6 && s < len - overhang - 0.4; s += CLASSICAL.rafterPitch) out.box(p, u, n[i], s, s + 0.24, -overhang, -0.12, top - 0.26, top, hex(CLASSICAL.rafter));
+      }
+      if (area2(ridge) > 0) out.quad(at(p, open[i] ? zf : top), at(q, open[i] ? zf : top), at(ridge[j], zr), at(ridge[i], zr), open[i] ? color : hex(wallColor(a)));
+    });
+    if (area2(ridge) > 0) out.cap([ridge], zr, color); else out.cap([frame.eave], zf, color);
+    return;
+  }
   const color = hex(roofColor(a));
   const h = rise(a);
   let outer = tidy(rings[0]);

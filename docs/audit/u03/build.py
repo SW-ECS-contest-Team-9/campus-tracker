@@ -149,18 +149,9 @@ for a, b, za, zb in segs:
         zf = za + (zb - za) * (j + 1) / n   # 마디의 낮은 끝
         void(f'VOID-PASS-{k:02d}', R(L * j / n, L * (j + 1) / n, -1.0, 1.0), zf, zf + 2.3, '본관 2층–유담관 7층 지하통로', f'흰 벽 통로(폭 2.0 m·안 높이 2.3 m 추정). 1 m 마디, 바닥 {zf:.2f} m'); k += 1
 void('VOID-YUDAM7', [(24.4, 290.8), (27.4, 290.8), (27.4, 293.8), (24.4, 293.8)], H['yu7'], H['yu7'] + 2.6, f"유담관 7층 승강기 홀 {H['yu7']} m", '통로 끝 승강기 홀(3 × 3 m 추정)')
-# 본관 정류장 쪽 큰 기둥 열과 큰 처마(블로그-20): 남쪽 면의 서쪽 벽 (33.4,319.4)~(48.2,312.1) 앞
-GC = '원천(있음: 블로그-20. 둥근 흰 기둥 5개 이상, 2~3개 층 높이, 깊은 기와 처마), 추정(자리·치수·높이)'
-WA, WB = (33.4, 319.4), (48.2, 312.1); L, R = frame(WA, WB)   # 왼손 법선 = 건물 안쪽(북동), 바깥은 t < 0
-COLTOP = H['bon5']
-for j in range(5):
-    s = 1.6 + (L - 3.2) * j / 4; a0, b0 = WA[0] + (WB[0] - WA[0]) * s / L, WA[1] + (WB[1] - WA[1]) * s / L; u = ((WB[0] - WA[0]) / L, (WB[1] - WA[1]) / L); nx, ny = -u[1], u[0]
-    cx, cy = a0 - nx * 2.0, b0 - ny * 2.0
-    box(f'BONGWAN-COL-{j + 1}', 'wall', [(cx + 0.55 * math.cos(math.pi * q / 4), cy + 0.55 * math.sin(math.pi * q / 4)) for q in range(8)], 127.6, COLTOP, f'둥근 흰 기둥(여덟 모, 지름 1.1 m). 발치 127.6(본관 남쪽 평탄부 S-MAP), 머리 {COLTOP} m(5층 바닥: 2~3개 층 높이로 읽음)', GC, '#f4f2ec', basePlane='본관 남쪽 평탄부 127.6')
-box('BONGWAN-COL-BEAM', 'wall', R(0.4, L - 0.4, -2.7, 0.0), COLTOP, COLTOP + 1.2, '기둥 위 보(돌 띠, 높이 1.2 m 추정)', GC, '#e6e1d6')
-box('BONGWAN-COL-EAVE', 'canopy', R(-0.8, L + 0.8, -4.6, 0.0), COLTOP + 1.2, COLTOP + 1.75, '기둥 열 위 깊은 기와 처마(벽에서 4.6 m 내밂, 추정). 사진에서는 이 처마 바로 위가 큰 지붕인데 건물 모델의 벽은 그 위로 더 올라간다(본관 서쪽 부분의 지붕 높이 모름)', GC, '#6b7280')
+# (B12) 본관 정류장 쪽 기둥 열은 여기서 뺐다: 본관 겉모습의 큰_기둥(동 노트)이 그린다
 (REPO / 'frontend/public/structures/u03-underground-walk.geojson').write_text(json.dumps({'type': 'FeatureCollection', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}},
-    'provenance': {'script': 'docs/audit/u03/build.py', 'note': '학교 지하도 걷는 길의 구조물: 파란 둥근 지붕 연결통로 둘, 본관 2층 유리문과 단, 본관–유담관 지하통로(빈 곳), 본관 정류장 쪽 기둥 열'}, 'features': feats}, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+    'provenance': {'script': 'docs/audit/u03/build.py', 'note': '학교 지하도 걷는 길의 구조물: 파란 둥근 지붕 연결통로 둘, 본관 2층 유리문과 단, 본관–유담관 지하통로(빈 곳)'}, 'features': feats}, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
 model = {'heights': H, 'passage': {'lengthM': r2(L1 + L2), 'dropM': r2(H['glassLow'] - H['yu7']), 'gradePct': r2(passGrade)}, 'links': {'eunjuHanlimM': r2(len1), 'bongwanHanlimM': r2(len2)}, 'nodes': N,
          'points': {'ST': ST, 'EW': EW, 'P1A': P1A, 'P1B': P1B, 'HAN': HAN, 'EV_B': EV_B, 'HALL2': HALL2, 'COR2': COR2, 'GL': GL, 'PASS': PASS}, 'ops': len(ops), 'features': len(feats)}
 (HERE / 'model.json').write_text(json.dumps(model, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')

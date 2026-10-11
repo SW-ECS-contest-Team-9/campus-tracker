@@ -25,6 +25,13 @@ Z11 에서 더한 것:
       창.폭: m(창 하나의 폭), 창.높이: m(창 하나의 높이), 창.간격: m(벽을 따라 창(또는 쌍)이 되풀이되는 간격), 창.창턱: m(층 바닥에서 창 밑까지), 창.쌍: true(자리마다 창 둘을 나란히)
             # 없으면 모양의 기본 크기. 그 동의 창 모양을 그리는 벽에만 쓴다(벽면에서 다른 모양을 준 면은 그 모양의 기본 크기)
       띠창의 덧색: 창 줄이 놓이는 밝은 띠의 색(벽 전체 길이)
+B12 에서 더한 것(고전 양식 건물: 본관):
+      지붕.처마_높이: m, 지붕.마루_높이: m     # 모임지붕의 처마(= 벽 꼭대기)와 마루를 절대 높이로. 둘을 함께 적는다(저장된 지붕 높이·오름 대신 이 값으로 그린다)
+      지붕.처마_깊이: m     # 외곽이 처마 선이고 벽은 이만큼 안쪽에 선다(깊은 처마: 밑면과 서까래를 그린다)
+      큰_기둥: {발치: m, 머리: m, 보: m(기둥 위 돌 띠 높이, 기본 2), 지름: m(기본 1.2), 열: [{자리: [x, y](EPSG:5186, 그 벽 외곽 변의 가운데 근처), 기둥: 개수}], 출처, 등급}
+            # 여러 층을 꿰뚫는 둥근 기둥 열: 그 벽은 발치~머리 사이가 열린 현관(안쪽 벽이 물러남)이 되고, 모든 벽의 머리 높이에 돌 띠(보), 그 위 처마까지 어두운 띠. 창 줄은 발치와 머리 사이에만
+      날개: [{이름, 외곽: [[x, y], ...](외곽 안의 고리), 처마_높이, 마루_높이, 처마_깊이, 큰_기둥: {...}(없어도 됨), 출처, 등급}]
+            # 본체보다 낮은 제 지붕을 가진 덩어리(표시 전용. 높이가 추정이라 건물 부분으로 올리지 않는다). 벽·창·밑동은 본체 것을 쓴다
 등급은 확정·원천·S-MAP·추정 중 하나로 시작해야 한다(겉모습은 표시 전용이라 추정도 싣고, 등급을 그대로 함께 싣는다). 모름은 적지 않는다.
 창 줄은 층 표의 층 바닥 높이에 하나씩이다. 층 표에 4층이 있으면 실패한다(학교 건물에는 4층이 없다: 확정). 다만 그 층의 등급에 "사용자 조건부 승인"이 적혀 있으면 둔다(U03, 은주1관).
 """
@@ -36,7 +43,39 @@ STYLES = {'낱창': 'rows', '띠창': 'bands', '유리벽': 'curtain', '아치':
 DIRECTIONS = {'북': 0, '북동': 45, '동': 90, '남동': 135, '남': 180, '남서': 225, '서': 270, '북서': 315}
 ROOFS = {'평지붕': 'flat', '모임지붕': 'hipped'}
 ROOF_MATERIALS = {'기와': 'tile', '콘크리트': 'concrete', '유리': 'glass', '옥상 정원': 'green', '금속판': 'metal', '코트': 'court'}
-KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof', '밑동': 'plinth'}
+KEYS = {'벽': 'wall', '창': 'windows', '윗벽': 'upper', '지붕': 'roof', '밑동': 'plinth', '큰_기둥': 'order'}
+num = lambda v, lo, hi: isinstance(v, (int, float)) and not isinstance(v, bool) and lo <= v <= hi
+
+
+def eave(r, at, bad):
+    """{eaveTopM, ridgeM, overhangM} of 처마_높이·마루_높이·처마_깊이 (B12); the two heights come together."""
+    out = {}
+    lo, hi, d = r.get('처마_높이'), r.get('마루_높이'), r.get('처마_깊이')
+    if lo is not None or hi is not None:
+        if not (num(lo, 0, 400) and num(hi, 0, 400) and hi > lo): bad.append(f'{at}: 처마_높이 와 마루_높이 를 함께, 마루가 더 높게')
+        else: out.update(eaveTopM=lo, ridgeM=hi)
+    if d is not None:
+        if not num(d, 0.1, 5): bad.append(f'{at}.처마_깊이 는 0.1~5 m')
+        else: out['overhangM'] = d
+    return out
+
+
+def giant_order(o, at, bad):
+    """{fromM, toM, beamM, diameterM, rows} of a 큰_기둥 item (B12), or None."""
+    lo, hi = o.get('발치'), o.get('머리')
+    if not (num(lo, 0, 400) and num(hi, 0, 400) and hi - lo >= 3): bad.append(f'{at}: 발치·머리(m, 3 m 넘게 차이)'); return None
+    out = {'fromM': lo, 'toM': hi}
+    for key, name, a, b in (('보', 'beamM', 0.3, 5), ('지름', 'diameterM', 0.3, 3)):
+        if o.get(key) is None: continue
+        if not num(o[key], a, b): bad.append(f'{at}.{key} 는 {a}~{b} m'); return None
+        out[name] = o[key]
+    rows = []
+    for k, r in enumerate(o.get('열') or []):
+        p = r.get('자리') if isinstance(r, dict) else None
+        if not (isinstance(p, list) and len(p) == 2 and all(num(v, 0, 1e7) for v in p) and isinstance(r.get('기둥'), int) and 2 <= r['기둥'] <= 12): bad.append(f'{at}.열[{k}]: 자리 [x, y] 와 기둥 2~12 개'); return None
+        rows.append({'at': p, 'count': r['기둥']})
+    if rows: out['rows'] = rows
+    return out
 COLOR = re.compile(r'^#[0-9a-f]{6}$')
 
 
@@ -167,10 +206,30 @@ def from_note(head):
                     if not isinstance(r['처마띠'], (int, float)) or not 0 < r['처마띠'] <= 4: bad.append(f'{at}.지붕.처마띠 는 0~4 m')
                     else: roof['eaveBandM'] = r['처마띠']
                 if r.get('지붕창') is True: roof['dormers'] = True
+                roof.update(eave(r, f'{at}.지붕', bad))
                 if r.get('겹') is not None:
                     if r['겹'] != 2: bad.append(f'{at}.지붕.겹 은 2')
                     else: roof['tiers'] = 2
                 rec['roof'] = roof
+        go = item('큰_기둥')
+        if go:
+            o = giant_order(go, f'{at}.큰_기둥', bad)
+            if o: rec['order'] = o
+        wings = []
+        for k, w in enumerate(e.get('날개') or []):
+            wa = f'{at}.날개[{k}]'
+            if not isinstance(w, dict) or _grade(w) is None or not w.get('출처'): bad.append(f'{wa}: 출처와 등급이 있어야 한다'); continue
+            ring = w.get('외곽')
+            if not (isinstance(ring, list) and len(ring) >= 3 and all(isinstance(p, list) and len(p) == 2 and all(num(v, 0, 1e7) for v in p) for p in ring)): bad.append(f'{wa}.외곽: [x, y] 셋 이상'); continue
+            r_ = eave(w, wa, bad)
+            if 'eaveTopM' not in r_: bad.append(f'{wa}: 처마_높이·마루_높이 가 있어야 한다'); continue
+            wing = {'polygon': ring, 'roof': r_, 'grade': str(w['등급'])}
+            if w.get('큰_기둥') is not None:
+                o = giant_order(w['큰_기둥'], f'{wa}.큰_기둥', bad) if isinstance(w['큰_기둥'], dict) else None
+                if not o: continue
+                wing['order'] = o
+            wings.append(wing)
+        if wings: rec['wings'] = wings
         pl = item('밑동')
         if pl:
             c, t = pl.get('색'), pl.get('위_높이')

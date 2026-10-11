@@ -334,7 +334,13 @@ export interface BuildingAppearance {
   faces?: { azimuth: number; spread?: number; wall?: string; wallColor?: string; style?: WindowStyle | 'none'; columns?: number; /** the columns stand on this height (default: the lowest storey shown) */ columnsFromM?: number; grade?: string }[];
   /** A band of another colour on the walls above a height (upper storeys clad differently). */
   upper?: { fromM: number; color: string };
-  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string; /** 2: a second, smaller roof above a low wall band on the first (a double eave, Z09) */ tiers?: number };
+  roof?: { type: 'flat' | 'hipped'; material?: string; color?: string; riseM?: number; runM?: number; eaveM?: number; /** a light band on the walls under the eave, this high (Z07) */ eaveBandM?: number; dormers?: boolean; rim?: string; /** 2: a second, smaller roof above a low wall band on the first (a double eave, Z09) */ tiers?: number ;
+    /** B12: the eave and the ridge as heights (MSL) instead of the stored roof height and a rise; `overhangM`: the footprint is the line of the eave and the walls stand this far inside it (a deep eave with a soffit and rafters). */
+    eaveTopM?: number; ridgeM?: number; overhangM?: number };
+  /** B12 a giant order: an entablature (`beamM` high) on all walls at `toM` with a dark attic strip above it, and rows of round columns from `fromM` to `toM` in an open porch on the wall whose middle is nearest to `at`. */
+  order?: { fromM: number; toM: number; beamM?: number; diameterM?: number; rows?: { at: number[]; count: number }[] };
+  /** B12 lower wings inside the footprint (EPSG:5186 ring each) with their own roof and order; the rest of the record applies to them as well. */
+  wings?: { polygon: number[][]; roof: { eaveTopM: number; ridgeM: number; overhangM?: number }; order?: BuildingAppearance['order']; grade?: string }[];
   /** The base of the building (Z09): the foundation below the block, and the walls up to `topM` when given, in this colour without windows (a tower that stands on a podium or a retaining wall). */
   plinth?: { color: string; topM?: number };
   grades?: Record<string, string>;
