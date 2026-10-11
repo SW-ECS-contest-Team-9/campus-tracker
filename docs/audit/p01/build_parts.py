@@ -121,18 +121,7 @@ def bongwan_west():
     box('P01-BONGWAN-WPLANTER-S', 'planter', WR(2.5, 17.3, -1.5, 2.6), z - 2.5, z + 0.9, '출입부 남쪽 돌 화단(흰 돌 쌓기, 높이 0.9 m, 소나무 줄)', SRC, PG, '회차 공간 내리막', material='white_stone')
     for k, s in enumerate((4.5, 9.5, 14.5)): tree(f'P01-BONGWAN-WPINE-{k + 1}', WP(s, 0.9), z + 0.9, '본관 서쪽 끝 화단의 소나무', SRC, 'P01-BONGWAN-WPLANTER-S')
     tree('P01-BONGWAN-WPINE-4', WP(26.8, 1.2), z + 1.2, '본관 서쪽 끝 북쪽 화단의 소나무', SRC, 'P01-BONGWAN-WPLANTER-N', s=0.9)
-    # 북서 모서리의 흡연장(노란 세로 살 상자). 입구가 아니다(사용자 2026-10-12)
-    NB_ = np.array([201104.2, 557314.95]); NR, NP = frame(BW_B, NB_ - BW_B, (0.44, 0.9))   # s = 북서 모서리에서 내리막길을 따라 동으로, d = 길 쪽
-    SS = '사용자-네이버거리뷰-20261012/22-사용자표시-노란상자는-흡연장-X.webp, 21-네이버거리뷰-면-r.jpg'
-    SG = '확정(노란 세로 살 상자 = 흡연장, 입구 아님: 사용자 2026-10-12), 원천(본관 북서 모서리의 북쪽 벽 앞: 거리뷰 21), 추정(자리 ±2 m·크기 4.6 × 2.6 × 2.8 m)'
-    zs = 131.5
-    box('P01-SMOKING-BOOTH', 'wall', NR(1.0, 5.6, -1.5, 1.1), zs - 0.6, zs + 2.8, '흡연장: 노란 세로 살로 싼 상자. 길을 잇지 않는다', SS, SG, 'G02-PLATFORM-WAY', color=SLAT['y'])
-    for j in range(9): box(f'P01-SMOKING-BOOTH-SLAT-{j + 1}', 'wall', NR(1.15 + 0.5 * j, 1.35 + 0.5 * j, 1.1, 1.15), zs, zs + 2.8, '살 사이의 어두운 틈(세로 살로 읽히게)', SS, SG, 'P01-SMOKING-BOOTH', color='#8a6a1c')
-    box('P01-SMOKING-BOOTH-MAP', 'wall', NR(2.6, 5.0, 1.1, 1.19), zs + 1.1, zs + 2.3, '살 위의 캠퍼스 안내도 판', SS, SG, 'P01-SMOKING-BOOTH', color='#3d3d3f')
-    box('P01-SMOKING-BOOTH-DOOR', 'wall', NR(1.5, 2.3, 1.1, 1.19), zs, zs + 2.2, '들어간 어두운 문 판(노란 원 표지)', SS, SG, 'P01-SMOKING-BOOTH', color='#35373a')
-    disc('P01-SMOKING-BOOTH-SIGN', NR, 1.9, zs + 1.75, 0.22, 1.19, 1.23, '#e3b322', '문 판의 노란 원 표지', SS, SG, 'P01-SMOKING-BOOTH-DOOR', K=2)
-    box('P01-SMOKING-BOOTH-INFO', 'wall', NR(4.3, 5.7, 0.2, 1.2), zs + 2.8, zs + 3.4, '위의 ⓘ INFORMATION 판', SS, SG, 'P01-SMOKING-BOOTH', color='#4a4a4c')
-    box('P01-SMOKING-BOOTH-PLANTER', 'planter', [WP(27.4, 0.2), WP(30.2, 0.2), NP(0.8, 2.6), NP(0.8, -1.2)], zs - 1.2, zs + 0.9, '흡연장 옆(모서리)의 돌 화단', SS, '원천(거리뷰 22), 추정(외곽)', 'G02-PLATFORM-WAY', material='white_stone')
+    # 북서 모서리의 흡연장(노란 세로 살 상자)과 그 옆 돌 화단은 G03 에서 오르막길 구조물 파일로 옮겼다: docs/audit/g02/build_inputs.py (id G03-SMOKING-BOOTH-…)
 
 # ================= 3. 본관 남서·남쪽 앞: 둥근 여러 단 돌 화단, 계단식 돌 화단과 돌계단 =================
 def bongwan_south():
@@ -247,13 +236,7 @@ def hanlim_rock():
     box('P01-HANLIM-SPIRE-BASE', 'wall', sq(c, 1.1), 197.3, 198.4, '한림관 원통 꼭대기 첨탑의 받침', HS, '확정(꼭대기 첨탑: 사용자 사진 04), 추정(크기)', '한림관 지붕 197.3', color='#3d5d78')
     box('P01-HANLIM-SPIRE', 'wall', sq(c, 0.22), 198.4, 203.0, '첨탑(가는 기둥 4.6 m)', HS, '확정(첨탑), 추정(높이)', 'P01-HANLIM-SPIRE-BASE', color='#3a3f47')
     box('P01-HANLIM-SPIRE-BALL', 'wall', sq(c, 0.5), 200.2, 201.1, '첨탑의 구슬(상자로 줄임)', HS, '추정', 'P01-HANLIM-SPIRE', color='#3a3f47')
-    G = '원천(굽잇길 아래 옹벽 자리는 큰 바위 절벽과 소나무의 바위 정원: 사용자 사진 04·거리뷰 09), 추정(바위 덩어리의 자리·크기: 벽면 앞에 쌓은 상자)'
-    R, P = frame((201099.3, 557232.0), (0.0, 1.0), (-1, 0))   # s = 가운데 옹벽 서쪽 면을 따라 북으로, d = 차도 쪽(서)
-    rocks = [(0, 4.5, 3.2, 122.5), (3.5, 8, 4.4, 125.0), (7, 11, 2.6, 121.0), (10, 15.5, 4.8, 126.0), (14.5, 18, 3.0, 123.0), (17, 22, 4.0, 124.5), (21, 24.5, 2.4, 120.5)]
-    for k, (s0, s1, d, top) in enumerate(rocks):
-        box(f'P01-ROCKGARDEN-ROCK-{k + 1}', 'wall', R(s0, s1, -0.6, d), 113.0, top, '바위 정원의 바위 덩어리(절벽을 상자로 줄임)', HS, G, 'Z05-PLATFORM-EUNJU-CENTRAL-WALLTOP 의 서쪽 벽면', color='#8f8a7f' if k % 2 else '#7d786e')
-        box(f'P01-ROCKGARDEN-ROCK-{k + 1}-B', 'wall', R(s0 + 0.6, s1 - 0.8, -0.6, d * 0.55), top, top + 1.4, '바위 덩어리의 윗단', HS, G, f'P01-ROCKGARDEN-ROCK-{k + 1}', color='#9a958a')
-    for k, (s, d, z) in enumerate(((2.0, 1.5, 122.5), (6.0, 1.2, 126.4), (12.5, 1.5, 127.4), (19.5, 1.2, 125.9), (9.0, 1.4, 121.0))): tree(f'P01-ROCKGARDEN-PINE-{k + 1}', P(s, d), z, '바위 정원의 소나무', HS, 'P01-ROCKGARDEN-ROCK')
+    # 바위 정원의 바위·소나무는 P02 가 S-MAP 0.5 m 메시로 다시 놓았다: docs/audit/p02/parts2.py
 
 PARTS = [arcade, bongwan_west, bongwan_south, suin_roof, munye_end, hanlim_rock]   # 운동장 바닥 무늬(field_pattern)는 P02 가 사진을 펴서 다시 읽었다: docs/audit/p02/field.py
 def write():
