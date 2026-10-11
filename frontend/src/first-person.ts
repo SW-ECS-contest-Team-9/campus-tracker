@@ -83,7 +83,8 @@ export class FirstPerson {
     if (this.active) return true;
     if (!this.waiting) return false;
     const p = this.src.pickPoint(position);
-    if (p) this.start(p.x, p.y, p.z + 0.3);
+    // on the ground as drawn there, not on the roof or wall that was hit (underground and indoor floors are entered from what 층 따로 보기 lifted)
+    if (p) this.start(p.x, p.y, Math.min(p.z, this.src.groundAt(p.x, p.y)) + 0.3);
     return true;
   }
 
