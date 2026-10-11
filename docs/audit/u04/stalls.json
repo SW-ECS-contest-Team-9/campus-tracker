@@ -9,9 +9,9 @@
   "hyeinWall": 31.17,
   "used": 31.17
  },
- "parkingAreaM2": 7936.13,
- "parkingAreaB1M2": 8060.88,
- "parkingAreaB2M2": 7936.2,
+ "parkingAreaM2": 8017.16,
+ "parkingAreaB1M2": 8141.85,
+ "parkingAreaB2M2": 8017.23,
  "throughLane": {
   "from": [
    201145.17,
@@ -1891,14 +1891,30 @@
   "stalls": 256,
   "stallsDropped": 16,
   "stallAreaM2": 3200.0,
-  "aisleAreaM2": 4616.56,
+  "aisleAreaM2": 4697.52,
   "aisleHoles": 17,
-  "aisleVertices": 166,
+  "aisleVertices": 170,
   "aisle": [
    [
     [
      201136.8,
      557228.2
+    ],
+    [
+     201138.6,
+     557241.56
+    ],
+    [
+     201135.92,
+     557241.92
+    ],
+    [
+     201139.93,
+     557271.65
+    ],
+    [
+     201142.6,
+     557271.29
     ],
     [
      201146.19,
@@ -4012,14 +4028,30 @@
   "stalls": 252,
   "stallsDropped": 20,
   "stallAreaM2": 3150.0,
-  "aisleAreaM2": 4437.45,
+  "aisleAreaM2": 4518.48,
   "aisleHoles": 16,
-  "aisleVertices": 160,
+  "aisleVertices": 164,
   "aisle": [
    [
     [
      201136.8,
      557228.2
+    ],
+    [
+     201138.6,
+     557241.56
+    ],
+    [
+     201135.92,
+     557241.92
+    ],
+    [
+     201139.93,
+     557271.65
+    ],
+    [
+     201142.6,
+     557271.29
     ],
     [
      201146.2,

@@ -40,7 +40,13 @@ INNER_U08 = FIELD.buffer(-WALL, join_style=2).intersection(south).difference(BLD
 MAPPOLY = Polygon(GEO['xy']['parking'])
 # U09(사용자 지시 2026-10-12 "운동장의 형상을 반드시 따르지 않아도 되지 않을까?"): 지하층 평면 = 학교 지하도 지도의 밝은 사다리꼴 그대로. 운동장 외곽·건물 외곽으로 자르지 않는다(지하층은 건물 가장자리 밑과 운동장 밖으로 나갈 수 있다).
 #   빈 곳은 단면에서만 기단을 비운다(지형 칸·기단 윗면·건물은 그대로: docs/audit/g02/STRUCTURES.md). 운동장 슬래브 기단은 손대지 않는다
-INNER = MAPPOLY.buffer(0)
+#   경사로 굽은 곳 옆만 서쪽으로 넓힌다(사용자 그림 17: 굽은 곳이 평면 가장자리에 끼어 있음): 지도의 서쪽 변에서 EXT_W m, 굽은 구간과 북쪽 다리의 트인 구간 옆 EXT_L m. 은주1관 외곽(서쪽 변 밖 3.2~4.1 m)은 넘지 않는다(같은 높이에 은주1관의 층이 있다). 추정
+_m0, _m1 = np.array(GEO['xy']['parking'][1]), np.array(GEO['xy']['parking'][0]); _n = (_m1 - _m0) / np.hypot(*(_m1 - _m0)); _s = np.array([_n[1], -_n[0]])
+_cc = np.array(json.loads((HERE.parent / 'u07' / 'crescent.json').read_text(encoding='utf-8'))['centre']); _b = _m0 + _n * float((_cc - _m0) @ _n)
+EXT_W, EXT_T = 2.7, (-18.0, 12.0); EXT_L = EXT_T[1] - EXT_T[0]
+EXT = Polygon([_b + _n * EXT_T[0] + _s * 0.05, _b + _n * EXT_T[1] + _s * 0.05, _b + _n * EXT_T[1] - _s * EXT_W, _b + _n * EXT_T[0] - _s * EXT_W])
+assert EXT.distance(BLD) > 0.4, EXT.distance(BLD)
+INNER = MAPPOLY.union(EXT).buffer(0)
 assert INNER.geom_type == 'Polygon', INNER.geom_type
 
 # ---------- 지하 차도: 내리막길 밑(U01 의 선 그대로) → 운동장 서쪽 벽 → 주차장 북서 모서리 ----------
@@ -128,8 +134,8 @@ def box(id, typ, poly, lo, hi, color, assumption, grade='추정', **kw):
     feat(id, typ, 'extrude', poly, grade, assumption, fromM=r2(lo), toM=r2(hi), material='concrete', inVoid=True, color=color, **kw)
 
 G_LEVEL = f'확정(층이 있음, 높이 띠: 사용자 붉은 선 ±1 m), 원천(평면: 학교 지도, 잔차 RMS {RES} m), 추정(판 두께·벽)'
-feat('U02-VOID-B1', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 1층: 바닥 {Z_B1} m(범위 140.1~141.7), 천장 {C_B1} m(사용자 윗선). 그 위 {C_B1}~{Z_FIELD} m 는 빈 층 없이 구조. 평면은 학교 지하도 지도의 사다리꼴 그대로(U09: 운동장 외곽·건물 외곽으로 자르지 않음. 운동장 밖 {sum(q.area for q in INNER.difference(FIELD).geoms) if hasattr(INNER.difference(FIELD), "geoms") else INNER.difference(FIELD).area:.0f} ㎡) + 북서 모서리의 지하 차도 목 {INNER.area - INNER_OLD.area:.0f} ㎡(U05: 지하 차도가 꺾이지 않고 들어오는 폭 {ROAD_W} m 띠가 옛 북쪽 변 밖으로 나가는 부분)', fromM=Z_B1, toM=C_B1, name='운동장 지하 1층')
-feat('U02-VOID-B2', 'void', 'void', INNER_B2, G_LEVEL, f'운동장 지하 2층: 바닥 {Z_B2} m(사용자 아랫선 ±1), 천장 {C_B2} m = 지하 1층 바닥 구조({SLAB_B1} m) 밑. 평면은 학교 지하도 지도의 사다리꼴(목 없음)', fromM=Z_B2, toM=C_B2, name='운동장 지하 2층')
+feat('U02-VOID-B1', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 1층: 바닥 {Z_B1} m(범위 140.1~141.7), 천장 {C_B1} m(사용자 윗선). 그 위 {C_B1}~{Z_FIELD} m 는 빈 층 없이 구조. 평면은 학교 지하도 지도의 사다리꼴 그대로(U09: 운동장 외곽·건물 외곽으로 자르지 않음) + 경사로 굽은 곳 옆 서쪽으로 {EXT_W} m × {EXT_L:.0f} m(추정. 운동장 밖 {sum(q.area for q in INNER.difference(FIELD).geoms) if hasattr(INNER.difference(FIELD), "geoms") else INNER.difference(FIELD).area:.0f} ㎡) + 북서 모서리의 지하 차도 목 {INNER.area - INNER_OLD.area:.0f} ㎡(U05: 지하 차도가 꺾이지 않고 들어오는 폭 {ROAD_W} m 띠가 옛 북쪽 변 밖으로 나가는 부분)', fromM=Z_B1, toM=C_B1, name='운동장 지하 1층')
+feat('U02-VOID-B2', 'void', 'void', INNER_B2, G_LEVEL, f'운동장 지하 2층: 바닥 {Z_B2} m(사용자 아랫선 ±1), 천장 {C_B2} m = 지하 1층 바닥 구조({SLAB_B1} m) 밑. 평면은 학교 지하도 지도의 사다리꼴 + 경사로 굽은 곳 옆 서쪽 {EXT_W} m × {EXT_L:.0f} m(추정). 목 없음', fromM=Z_B2, toM=C_B2, name='운동장 지하 2층')
 
 # 지하 차도 연장(내리막길 밑, U01 의 선) + 운동장 북쪽 띠를 지나 주차장으로 들어가는 평평한 통로
 n = int(np.ceil((L_APP + WALL + 0.5) / 1.0)); step = (L_APP + WALL + 0.5) / n; covers = []
@@ -248,10 +254,10 @@ out = {'type': 'FeatureCollection', 'crs': {'type': 'name', 'properties': {'name
 def _parts(g): return [q for q in (g.geoms if hasattr(g, 'geoms') else [g]) if q.area > 0.5]
 def _far(g, ref): return r2(max(ref.exterior.distance(Point(c)) for c in g.exterior.coords))
 OUT_FIELD = _parts(INNER.difference(FIELD)); OUT_B2 = _parts(INNER_B2.difference(FIELD))
-OUTLINE = {'source': '학교 지하도 지도의 사다리꼴(georef.json xy.parking) 그대로. 운동장·건물 외곽으로 자르지 않음', 'u08AreaM2': r2(INNER_U08.area), 'b2AreaM2': r2(INNER_B2.area), 'b1AreaM2': r2(INNER.area), 'throatM2': r2(INNER.area - INNER_OLD.area),
+OUTLINE = {'source': '학교 지하도 지도의 사다리꼴(georef.json xy.parking) 그대로. 운동장·건물 외곽으로 자르지 않음', 'u08AreaM2': r2(INNER_U08.area), 'b2AreaM2': r2(INNER_B2.area), 'b1AreaM2': r2(INNER.area), 'throatM2': r2(INNER.area - INNER_OLD.area), 'westExtension': {'widthM': EXT_W, 'lengthM': EXT_L, 'areaM2': r2(EXT.difference(MAPPOLY).area), 'toBuildingM': r2(EXT.distance(BLD)), 'beyondFieldM': _far(EXT, FIELD), 'ring': [[r2(x), r2(y)] for x, y in EXT.exterior.coords]},
            'outsideFieldB1': [{'areaM2': r2(q.area), 'centre': [r2(q.centroid.x), r2(q.centroid.y)], 'maxBeyondFieldM': _far(q, FIELD)} for q in OUT_FIELD], 'outsideFieldB1M2': r2(sum(q.area for q in OUT_FIELD)), 'outsideFieldB2M2': r2(sum(q.area for q in OUT_B2)),
            'fieldNotCoveredM2': r2(FIELD.difference(INNER).area), 'underBuildings': {k: r2(v.intersection(INNER).area) for k, v in BLDS.items() if v.intersection(INNER).area > 0.5},
-           'gainedVsU08M2': r2(INNER_B2.difference(INNER_U08).area), 'lostVsU08M2': r2(INNER_U08.difference(INNER_B2).area), 'u08Ring': [[r2(x), r2(y)] for x, y in INNER_U08.exterior.coords], 'ring': [[r2(x), r2(y)] for x, y in INNER.exterior.coords], 'fieldRing': [[r2(x), r2(y)] for x, y in FIELD.exterior.coords]}
+           'mapTrapezoidM2': r2(MAPPOLY.area), 'gainedVsU08M2': r2(INNER_B2.difference(INNER_U08).area), 'lostVsU08M2': r2(INNER_U08.difference(INNER_B2).area), 'u08Ring': [[r2(x), r2(y)] for x, y in INNER_U08.exterior.coords], 'ring': [[r2(x), r2(y)] for x, y in INNER.exterior.coords], 'fieldRing': [[r2(x), r2(y)] for x, y in FIELD.exterior.coords]}
 pt = lambda p, z: {'xy': [r2(p[0]), r2(p[1])], 'z': r2(z)}
 path = [pt(T0, Z_B1)] + [pt(pol(R_C, b), z_at(LEG_S + np.radians(b - B_A) * R_C)) for b in bs] + [pt(NB, Z_BAND), pt(RB, Z_B2)]
 SYM = [np.array(q) for q in GEO['xy']['rampSymbol']]

@@ -18,15 +18,44 @@
    133.0
   ]
  },
- "areaM2": 8060.86,
- "areaB2M2": 7936.2,
- "areaU02M2": 7936.2,
+ "areaM2": 8141.86,
+ "areaB2M2": 8017.2,
+ "areaU02M2": 8017.2,
  "outline": {
   "source": "학교 지하도 지도의 사다리꼴(georef.json xy.parking) 그대로. 운동장·건물 외곽으로 자르지 않음",
   "u08AreaM2": 7526.49,
-  "b2AreaM2": 7936.2,
-  "b1AreaM2": 8060.86,
+  "b2AreaM2": 8017.2,
+  "b1AreaM2": 8141.86,
   "throatM2": 124.66,
+  "westExtension": {
+   "widthM": 2.7,
+   "lengthM": 30.0,
+   "areaM2": 81.0,
+   "toBuildingM": 0.52,
+   "beyondFieldM": 2.75,
+   "ring": [
+    [
+     201138.65,
+     557241.55
+    ],
+    [
+     201142.65,
+     557271.28
+    ],
+    [
+     201139.93,
+     557271.65
+    ],
+    [
+     201135.92,
+     557241.92
+    ],
+    [
+     201138.65,
+     557241.55
+    ]
+   ]
+  },
   "outsideFieldB1": [
    {
     "areaM2": 4.48,
@@ -61,22 +90,31 @@
     "maxBeyondFieldM": 1.31
    },
    {
-    "areaM2": 7.75,
+    "areaM2": 1.93,
     "centre": [
-     201144.73,
-     557285.5
+     201136.61,
+     557242.66
     ],
-    "maxBeyondFieldM": 0.0
+    "maxBeyondFieldM": 1.18
+   },
+   {
+    "areaM2": 48.62,
+    "centre": [
+     201140.87,
+     557267.17
+    ],
+    "maxBeyondFieldM": 2.75
    }
   ],
-  "outsideFieldB1M2": 242.8,
-  "outsideFieldB2M2": 242.8,
-  "fieldNotCoveredM2": 637.16,
+  "outsideFieldB1M2": 285.59,
+  "outsideFieldB2M2": 285.59,
+  "fieldNotCoveredM2": 598.96,
   "underBuildings": {
    "건물5": 57.34
   },
-  "gainedVsU08M2": 465.69,
-  "lostVsU08M2": 55.98,
+  "mapTrapezoidM2": 7936.2,
+  "gainedVsU08M2": 517.78,
+  "lostVsU08M2": 27.07,
   "u08Ring": [
    [
     201138.38,
@@ -183,6 +221,22 @@
    [
     201136.8,
     557228.2
+   ],
+   [
+    201138.6,
+    557241.56
+   ],
+   [
+    201135.92,
+    557241.92
+   ],
+   [
+    201139.93,
+    557271.65
+   ],
+   [
+    201142.6,
+    557271.29
    ],
    [
     201146.19,
@@ -307,13 +361,13 @@
  "fieldAreaM2": 8455.22,
  "u01AreaM2": 8072.05,
  "mapOutlineAreaM2": 7936.2,
- "mapOutlineOverlap": 0.98,
+ "mapOutlineOverlap": 0.97,
  "northWallInsetM": [
   9.79,
   8.07,
   7.06
  ],
- "columns": 34,
+ "columns": 39,
  "bayRows": 0,
  "georefRmsM": 3.33,
  "approach": {
@@ -522,7 +576,7 @@
    -0.13346564947738027
   ],
   "legNorthWestEdgeToWallM": 6.49,
-  "outerArcToWallM": 5.57,
+  "outerArcToWallM": 8.27,
   "outerArcToWallU08M": 4.83,
   "crescentInOpeningM2": 117.47,
   "crescentM2": 117.47,
