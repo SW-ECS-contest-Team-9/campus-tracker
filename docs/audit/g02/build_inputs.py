@@ -57,6 +57,7 @@ STAIR_FOOT_S = json.loads((HERE.parent / 'z02' / 'model.json').read_text(encodin
 # G03(2026-10-12): 띠 경계를 네이버 거리뷰 지점 21(어귀에서 위로 본 앞면)과 S-MAP 정사 그림(0.1 m)으로 다시 잡음. 전부 추정 ±0.5 m
 #   남쪽 옹벽 면 t −3.8(정사 그림의 벽 머릿돌 −4.7 ~ −3.8, 벽 뒤 화단이 보이게 0.4~0.8 m 길 쪽으로 둠) | 본관 쪽 보행 띠 2.2 m | 가운데 차로 4.2 m | 북쪽 띠 2.0 m | 북쪽 화단 벽 t 4.6(정사 그림 4.2~4.5)
 S_WALL, S_PAVE, RAMP_N, STRIP_N = -3.8, -1.6, 2.6, 4.6
+WALL_T = -4.9 - 1.5 + 0.05   # Q01: 본관 북쪽 벽면(외곽 = 처마 선 t −4.9 에서 처마 깊이 1.5 m 안쪽: 동 노트 본관 B12), 5 cm 띄움
 S_GATE = 16.4    # 차단기 선: 정사 그림의 흰 막대(s 16.3, t −1.7~1.7) = 거리뷰에서 아스팔트가 끝나고 블록 포장이 시작하는 선
 S_WALL0 = 15.5   # 남쪽 옹벽이 시작하는 곳(거리뷰: 흡연장 끝 바로 뒤, 차단기 선보다 조금 앞. 정사 그림 16)
 S_STEP0 = 27.6   # 계단식 보행 띠가 시작하는 곳(추정 ±3 m): 거리뷰 21 에서 차단기 뒤 북쪽 띠는 턱 없는 블록 포장이고 화단 셋째 단쯤에서 밝은 돌판으로 바뀜. 사진 21(문예관 기단 옆 계단 앞)에서는 이미 돌판 계단
@@ -113,7 +114,7 @@ for nm, (ring_st, kerb_st, what) in WALKS.items():
 # 남쪽(본관 쪽): 허리 높이의 밝은 돌 옹벽 한 줄(윗선이 길 경사와 나란함) + 그 뒤 좁은 화단 띠와 소나무 줄. 본관으로 통하는 문 앞은 비움
 for nm, (a, b) in {'A': (S_WALL0, 59.2), 'B': (63.4, 69.3)}.items():
     pbox(f'G03-SWALL-{nm}', 'wall', rect(a, b, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽: 밝은 거친 돌판을 세워 붙인 허리 높이 벽(길 + 0.95 m, 추정 0.9~1.1: 거리뷰에서 지나가는 사람 허리), 윗선은 길과 나란히 오름, 두께 0.25 m. 흡연장 끝 바로 뒤(s 15.5)에서 시작. s 59.2~63.4 는 본관으로 통하는 문 앞이라 비움(자리 추정 ±3 m)', SV21 + ', ' + PH + ', SKU 0:58', bottom=way_z(a) - 0.3, color='#d6d1c2')
-    pbox(f'G03-SBED-{nm}', 'planter', rect(a, b, -4.9, S_WALL - 0.25), 0.85, '옹벽 뒤 화단 띠(소나무·바위): 실제 폭은 약 2 m(벽 머릿돌에서 본관 벽까지)로 보이나 건물 외곽(처마 선, t −4.9)까지 0.85 m 만 둠', SV21 + ', ' + PH, bottom=way_z(a) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
+    pbox(f'G03-SBED-{nm}', 'planter', rect(a, b, WALL_T, S_WALL - 0.25), 0.85, 'Q01: 옹벽 뒤 화단 띠(소나무·바위): 벽 머릿돌에서 본관 벽까지 2.3 m(사진: 약 2 m). 본관 외곽(t −4.9)은 처마 선이고 벽은 처마 깊이 1.5 m(동 노트 B12, 추정) 안쪽이라 화단은 처마 밑으로 벽까지 간다', SV21 + ', ' + PH, bottom=way_z(a) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
 k = 0
 for sc in np.arange(18.0, 68.5, 5.5):
     if 58.5 < sc < 64.0: continue
@@ -194,7 +195,7 @@ for j, tc in enumerate((-1.1, -1.75)):
 BS0, BS1, BT, BZ = 4.9, 14.0, -3.4, float(way_z(9.3))
 SB = '사용자-네이버거리뷰-20261012/22-사용자표시-노란상자는-흡연장-X.webp·21-네이버거리뷰-면-r.jpg, 사용자-오르막길-20261012/01·02'
 SG = '확정(노란 세로 살 상자 = 흡연장, 입구 아님: 사용자 2026-10-12), 원천(본관 북서 모서리의 북쪽 벽 앞: 거리뷰 21), 추정(자리 ±1 m, 길이 9.4 m·깊이 1.5 m·높이 3.0 m)'
-box('G03-SMOKING-BOOTH', 'wall', ring(rect(BS0, BS1, -4.9, BT)), way_z(BS0) - 0.4, BZ + 3.0, '흡연장: 노란 세로 살로 싼 한 층 높이 상자, 본관 북쪽 벽에 붙어 섬. 길을 잇지 않는다', SB, grade=SG, color='#d39a2c')
+box('G03-SMOKING-BOOTH', 'wall', ring(rect(BS0, BS1, WALL_T, BT)), way_z(BS0) - 0.4, BZ + 3.0, '흡연장: 노란 세로 살로 싼 한 층 높이 상자, 본관 북쪽 벽에 붙어 섬. 길을 잇지 않는다', SB, grade=SG, color='#d39a2c')
 for j in range(int((BS1 - BS0) / 0.5)):
     box(f'G03-SMOKING-BOOTH-SLAT-{j + 1:02d}', 'wall', ring(rect(BS0 + 0.15 + 0.5 * j, BS0 + 0.33 + 0.5 * j, BT, BT + 0.05)), way_z(BS0 + 0.5 * j) + 0.05, BZ + 3.0, '살 사이의 어두운 틈(세로 살로 읽히게)', SB, grade=SG, basePlane='G03-SMOKING-BOOTH', color='#8a6a1c')
 box('G03-SMOKING-BOOTH-DOOR', 'wall', ring(rect(10.5, 12.7, BT, BT + 0.09)), way_z(10.5) + 0.05, BZ + 2.45, '들어간 어두운 문 판(왼쪽에 세로 살 문, 노란 원 표지)', SB, grade=SG, basePlane='G03-SMOKING-BOOTH', color='#35373a')
