@@ -198,7 +198,7 @@ for side, off in (('SE', LANE_W_S / 2 + 0.1), ('NW', -LANE_W_S / 2 - 0.1)):   # 
 # 머리 앞(지하 1층 바닥): 과속방지턱(사진 04)과 유도선
 box('U08-SPEED-BUMP', 'wall', LineString([T0 + hn * 1.2 - ht * 2.6, T0 + hn * 1.2 + ht * 2.6]).buffer(0.2, cap_style=2), Z_B1, Z_B1 + 0.08, '#d8b000', '경사로 머리 앞의 과속방지턱(사진 04: 노랑·검정). 노랑 한 색, 자리 추정', grade='확정(있음: 사진 04), 추정(자리·어느 끝인지)')
 gpts = [T0 + hn * 2.5 + ht * 8.0, T0 + hn * 2.5 + ht * 2.5] + [T0 + ht * 2.5 + 2.5 * (-ht * np.sin(t) + hn * np.cos(t)) for t in np.linspace(0.2, np.pi / 2, 6)]
-box('U06-GUIDE-LINE', 'wall', LineString(gpts).buffer(0.12, cap_style=2).difference(opening.buffer(0.05)), Z_B1, Z_B1 + 0.03, GUIDE, '통로(긴 줄 S07·S08 사이)에서 경사로 머리로 꺾어 드는 바닥의 노란 유도선. 자리 추정', grade='확정(있음: 사진 04·11), 추정(자리)')
+box('U06-GUIDE-LINE', 'wall', LineString(gpts).buffer(0.12, cap_style=2).difference(opening.buffer(0.05)), Z_B1, Z_B1 + 0.09, GUIDE, '통로(긴 줄 S07·S08 사이)에서 경사로 머리로 꺾어 드는 바닥의 노란 유도선. 자리 추정', grade='확정(있음: 사진 04·11), 추정(자리)')
 
 # 사람 통로의 빈 곳: 혜인관 계단 발치 ~ 주차장(운동장 슬래브 가장자리 밑), 은주1관 북쪽 끝 옆 계단(주차장 ~ 운동장 슬래브 밑)
 hy = LineString([H_BOT, H_OUT]).buffer(1.2, cap_style=2).intersection(FIELD).difference(INNER.buffer(-0.3))
