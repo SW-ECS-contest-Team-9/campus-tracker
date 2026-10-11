@@ -10,7 +10,7 @@ E06 = '데이터/보완자료/3d-map-audit-20261009/사용자-SP카페·대일�
 G = '확정(서경스포렉스 간판의 입구 = 유담관 3층 입구, 바깥 길 쪽·우편취급국 옆: 사용자 2026-10-10·10-12), 원천(넓은 돌계단 8단쯤: 사용자 사진), S-MAP(문 앞 길 103.0~103.3 m), 추정(문 앞 바닥 104.0 m, 계단 선 ±3 m)'
 foot = B.ENT_FOOT; zf = B.ground(foot[0], foot[1])
 ops = []
-if not any(r['name'].startswith('유담관 3층 입구 앞 돌계단') for r in st['roads']):
+if not any((r['name'] or '').startswith('유담관 3층 입구 앞 돌계단') for r in st['roads']):
     ops.append({'ref': '유담관 3층 입구 앞 돌계단', 'op': 'create_road', 'args': {'roadClass': 'pedestrian', 'structure': 'stairs', 'pedestrianAccess': 'allowed', 'vehicleAccess': 'prohibited', 'widthM': 6.3, 'buildingId': '유담관',
         'name': f'유담관 3층 입구 앞 돌계단 (서경스포렉스 간판 아래 문 앞 {B.ENT_FLOOR} m ~ 바깥 길 보도 {zf:.1f} m, 8단쯤. 바깥 길에는 길 자료가 없어 여기서 끝난다)', 'zMode': 'explicit', 'densify': False,
         'path': [pt(B.ENT_DOOR, B.ENT_FLOOR), pt(B.EP(-0.8, 2.0), B.ENT_FLOOR), pt(foot, zf)]}, 'grade': G, 'evidence': f'{E06}, 사용자-학교전경-20261012/13, 사용자-출입구·주차장-20261010/06·07'})
