@@ -80,7 +80,7 @@ def tree(id, s_, t_, z, what, src, base):
 PH = '사용자 사진 20·21·26·31, 거리뷰 09, SKU 영상 0:52~1:00, DAKNAT 영상 3:12~3:24·5:21~5:35'
 SV21 = '네이버 거리뷰 지점 21(2025-02-11, 사용자-오르막길-20261012/01·02), S-MAP 정사 그림 g02/smap-ortho-rectified-01m.png'
 ZS = [p[1] for p in WAY_PROFILE]; SS = [p[0] for p in WAY_PROFILE]
-LANE = '#86857f'     # 가운데 차도의 블록 포장(마른 날: 사진 21·26. 거리뷰 21 은 눈 녹은 물에 젖어 더 짙다). 전 구간 고리 무늬(사용자 확정 2026-10-12)
+LANE = '#9c9b95'     # Q01: 마른 날 사진의 옅은~중간 회색(사진 21·26 의 중간 회색과 사용자 사진 02 의 밝은 회색 사이). 가운데 차도의 블록 포장(마른 날: 사진 21·26. 거리뷰 21 은 눈 녹은 물에 젖어 더 짙다). 전 구간 고리 무늬(사용자 확정 2026-10-12)
 DARK = '#70747a'   # 북쪽 계단식 화단의 짙은 회색 화강석(거리뷰 21, 사진 21·18)
 # 바닥 칠(두께 3 cm 의 기운 판, 길 면 위에 그려진다): 어귀의 아스팔트, 차단기부터 짙은 회색 블록 포장의 가운데 차로, 양쪽 띠
 pbox('G03-PAINT-APRON', 'wall', [(-3.3, -4.9), (S_GATE, -4.9), (S_GATE, STRIP_N), (14.3, STRIP_N), (14.3, 8.5), (0.7, 8.5)], 0.05, '어귀의 아스팔트: 회차 공간의 검은 아스팔트가 차단기 선까지 이어진다(북쪽은 둥근 화단 앞까지)', SV21, thick=0.03, grade='원천(거리뷰 21), 추정(차단기 선 ±1 m)', color='#26282b')
@@ -89,7 +89,7 @@ pbox('G03-PAINT-LANE-2', 'wall', [(69.3, S_PAVE), (73.3, -0.9), (101.0, -0.9), (
 # 양쪽 인도(사용자 확정 2026-10-12: "차도를 두고 양쪽 다 인도", "양쪽 모두 약간 턱 있는 인도, 계단 아님"): 길과 나란히 오르는 판, 차도보다 KERB 만큼 높고 차도 쪽에 밝은 경계석 줄
 KERB = 0.12        # 턱 높이(추정 0.10~0.15)
 STRIP_END = 105.0  # 은주1관 북쪽 끝 옆(사용자 확정 2026-10-11: 띠는 차단기에서 은주관 바로 옆까지)
-SIDEWALK, KERBSTONE = '#a5a39c', '#4f5154'   # 인도는 차도보다 밝은 포장(고리 무늬), 차도와 인도 사이는 짙은 띠(사용자 사진 02)
+SIDEWALK, KERBSTONE = '#b6b4ac', '#4f5154'   # 인도는 차도보다 밝은 포장(고리 무늬), 차도와 인도 사이는 짙은 띠(사용자 사진 02)
 WALKS = {  # 이름: (인도 외곽, 경계석 줄 외곽, 무엇)
   'S1': (rect(S_WALL0, 69.3, S_WALL, S_PAVE), rect(S_WALL0, 69.3, S_PAVE - 0.25, S_PAVE), '본관 쪽 인도: 옹벽 발치에서 차도까지 폭 2.2 m(거리뷰 21 에서 말뚝 둘 바깥 ~ 옹벽)'),
   'S2': ([(69.3, -2.2), (101.0, -2.2), (105.0, -1.0), (101.0, -0.9), (73.3, -0.9), (69.3, S_PAVE)], [(69.3, S_PAVE - 0.25), (73.3, -1.15), (101.0, -1.15), (101.0, -0.9), (73.3, -0.9), (69.3, S_PAVE)], '본관 쪽 인도 윗구간(한림관 쪽 난간 벽 안쪽, 은주관 옆까지), 폭 1.3 m(추정). 본관을 지나며 4 m 에 걸쳐 안으로 들어옴'),
@@ -263,9 +263,9 @@ def ppoly(id, geom_st, dz, thick, what, color):
         rings = [ring(list(r.coords)[:-1]) for r in [g.exterior, *g.interiors]]
         boxes.append({'type': 'Feature', 'properties': {'id': id if q == 0 else f'{id}-{q + 1}', 'type': 'wall', 'kind': 'extrude', 'estimated': True, 'grade': LG, 'basePlane': 'WAY', 'fromM': r2(way_z(s0) + dz - thick), 'toM': r2(way_z(s1) + dz),
             'topProfile': prof(dz, s0, s1), 'thicknessM': thick, 'assumption': what, 'source': LS_, 'color': color}, 'geometry': {'type': 'Polygon', 'coordinates': rings}})
-A0, A1 = np.array([69.0, 1.75]), np.array([60.3, -0.75])      # 잎자루 쪽 끝(위·문예관 쪽) → 잎 끝(아래·본관 쪽), 길이 9 m
+A0, A1 = np.array([70.0, 1.7]), np.array([60.3, -0.7])      # 잎자루 쪽 끝(위·문예관 쪽) → 잎 끝(아래·본관 쪽), 길이 10 m. Q01: 차도 폭(4.2 m)을 거의 채우게(사진 02: 잎이 양쪽 짙은 띠에 닿을 듯)
 ax = (A1 - A0) / np.hypot(*(A1 - A0)); nx_ = np.array([-ax[1], ax[0]]); LL = float(np.hypot(*(A1 - A0)))
-aa = np.linspace(0, 1, 28); hw = 1.5 * np.sin(np.pi * aa) ** 0.7 * (1 - 0.25 * aa)
+aa = np.linspace(0, 1, 28); hw = 1.8 * np.sin(np.pi * aa) ** 0.7 * (1 - 0.25 * aa)
 leaf = _SP([tuple(A0 + ax * LL * a + nx_ * w) for a, w in zip(aa, hw)] + [tuple(A0 + ax * LL * a - nx_ * w * 0.92) for a, w in zip(aa[::-1], hw[::-1])]).buffer(0)
 stem = _LS([tuple(A0 + ax * 0.6), tuple(A0 - ax * 0.8 + nx_ * 0.1), tuple(A0 - ax * 1.7 - nx_ * 0.25), tuple(A0 - ax * 2.3 - nx_ * 0.75)]).buffer(0.17)
 rib = _LS([tuple(A0 + ax * 0.7), tuple(A0 + ax * LL * 0.9)]).buffer(0.06)
@@ -273,11 +273,13 @@ veins = _uu([_LS([tuple(A0 + ax * 1.6), tuple(A0 + ax * 2.4 + nx_ * 0.9)]).buffe
 ppoly('G03-LOGO-LEAF', _uu([leaf, stem]).difference(_uu([rib, veins])), 0.065, 0.015, '학교 로고의 큰 짙은 나뭇잎(길이 약 9 m, 폭 약 3 m: 차도 폭을 거의 채움)과 잎자루. 가운데 잎맥은 비워 둠. 모양은 사진 02 를 눈으로 옮긴 것', INK)
 FONT = {'S': '01111 10000 10000 01110 00001 00001 11110', 'E': '11111 10000 10000 11110 10000 10000 11111', 'O': '01110 10001 10001 10001 10001 10001 01110', 'K': '10001 10010 10100 11000 10100 10010 10001', 'Y': '10001 10001 01010 00100 00100 00100 00100', 'N': '10001 11001 10101 10101 10011 10001 10001',
         'G': '01110 10001 10000 10111 10001 10001 01110', 'U': '10001 10001 10001 10001 10001 10001 01110', 'I': '11111 00100 00100 00100 00100 00100 11111', 'V': '10001 10001 10001 10001 01010 01010 00100', 'R': '11110 10001 10001 11110 10100 10010 10001', 'T': '11111 00100 00100 00100 00100 00100 00100'}
-for word, t0, hgt, s_hi, s_lo in (('SEOKYEONG', -1.25, 1.6, 59.0, 49.6), ('UNIVERSITY', 0.75, 1.15, 59.0, 49.6)):
-    adv = (s_hi - s_lo) / len(word); cw = adv / 6; ch = hgt / 7
+# Q01: 글자 줄은 길을 가로질러 놓인다: 한 줄 길이 ≈ 차도 폭(사용자 가까이 사진 (나), 색인.md). 아래에서 올라오며 읽는 방향(글자 머리가 위쪽, 왼쪽이 문예관 쪽). 나뭇잎 바로 아래에 SEOKYEONG, 그 아래에 UNIVERSITY(사진 02)
+T_HI, T_LO = RAMP_N - 0.25, S_PAVE + 0.25
+for word, s_top, hgt in (('SEOKYEONG', 58.6, 1.5), ('UNIVERSITY', 56.6, 1.0)):
+    adv = (T_HI - T_LO) / len(word); cw = adv / 6; ch = hgt / 7
     for i, c_ in enumerate(word):
-        cells = [_SP([(s_hi - i * adv - (col + 1) * cw, t0 + row * ch), (s_hi - i * adv - col * cw, t0 + row * ch), (s_hi - i * adv - col * cw, t0 + (row + 1) * ch), (s_hi - i * adv - (col + 1) * cw, t0 + (row + 1) * ch)]) for row, bits in enumerate(FONT[c_].split()) for col, b_ in enumerate(bits) if b_ == '1']
-        ppoly(f'G03-LOGO-TEXT-{word}-{i + 1:02d}', _uu(cells).buffer(0), 0.065, 0.015, f'바닥 글자 "{word}"의 {c_}: 5 × 7 칸 글꼴(실제는 굵은 세리프체), 글자 높이 {hgt} m, 줄 길이 {s_hi - s_lo:.1f} m. 길을 따라 놓이고 위쪽 끝이 첫 글자', INK)
+        cells = [_SP([(s_top - (row + 1) * ch, T_HI - i * adv - (col + 1) * cw), (s_top - row * ch, T_HI - i * adv - (col + 1) * cw), (s_top - row * ch, T_HI - i * adv - col * cw), (s_top - (row + 1) * ch, T_HI - i * adv - col * cw)]) for row, bits in enumerate(FONT[c_].split()) for col, b_ in enumerate(bits) if b_ == '1']
+        ppoly(f'G03-LOGO-TEXT-{word}-{i + 1:02d}', _uu(cells).buffer(0), 0.065, 0.015, f'바닥 글자 "{word}"의 {c_}: 5 × 7 칸 글꼴(실제는 굵은 세리프체), 글자 높이 {hgt} m, 줄 길이 {T_HI - T_LO:.1f} m ≈ 차도 폭. 길을 가로질러 놓이고 올라오며 읽는다(방향은 사용자 확인 대기)', INK)
 # ---------- 2b. 기단(땅 덩어리): 기본 평면을 구조물로. 지형 조리법의 surface 입력(g02-surface.geojson)은 이 정의에서 나온 것과 같다 ----------
 BOTTOM = {'WAY': 125.0, 'LANE': 128.0, 'PODIUM': 132.5, 'FORK': 139.0, 'TOP': 139.0}
 BOTTOM_WHY = {'WAY': '지하 차도 바닥(128.5 m)보다 아래의 안전 깊이. 지하 차도 자리는 G02-VOID-UNDERGROUND-ROAD 가 비운다', 'LANE': '옛 지형 최저보다 아래의 안전 깊이', 'PODIUM': '서쪽 낮은 마당 높이(132.5 m)', 'FORK': '옆 길 경사면(141 m)보다 아래', 'TOP': '옆 길 경사면(142.6 m)보다 아래'}

@@ -11,7 +11,7 @@ import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
-import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
+import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
@@ -204,7 +204,8 @@ export class StructuresLayer {
     const platforms = shown.filter((s) => s.role === 'platform');
     // a platform ends just before a building wall: its side face never lies in the wall
     const walls = platforms.length ? growPolygons(buildings.map((b) => b.polygon), 0.05) : [];
-    this.platformPolygons = new Map(platforms.map((s) => [s, polygonOps('minus', [s.polygon], walls)]));
+    // Q01: nor is it drawn where a stair climbs into it below its top (stairWells): the steps would be buried in the mass
+    this.platformPolygons = new Map(platforms.map((s) => [s, polygonOps('minus', [s.polygon], [...walls, ...stairWells(s, shown)])]));
 
     // the ground first: the platform sides reach down to it
     this.ground = null;

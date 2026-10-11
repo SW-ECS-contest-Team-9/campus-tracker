@@ -4,7 +4,7 @@
 // tasks: frontend/public/structures/*.geojson, docs/audit/g02/STRUCTURES.md (EPSG:5186 metres, heights in properties).
 // This file is the pure geometry (tested in test/structures.test.ts); structures-layer.ts draws it.
 import earcut from 'earcut';
-import { polygonOps, ringArea2, type Polygon, type Ring } from './polygon-ops';
+import { polygonContains, polygonOps, ringArea2, type Polygon, type Ring } from './polygon-ops';
 import { planePoint, planeSide, type Mesh, type SectionPlane } from './section';
 
 /** Display and loading constants of the structures. */
@@ -416,6 +416,20 @@ export function fillPolygons(polygons: Polygon[]): { points: number[][]; indices
 }
 
 // ---------- what the road surfaces leave to the structures ----------
+/**
+ * Q01: the wells stairs cut into a platform. A stair step or landing that lies inside a platform with its top below
+ * the platform's top there would be buried in the mass; the platform is drawn (and stood on) without that plan, so the
+ * stair climbs through a cut with wall faces on both sides, up to where it reaches the platform top.
+ */
+export function stairWells(platform: Solid, solids: Solid[], slackM = 0.05): Polygon[] {
+  const top = topHeight(platform);
+  return solids.filter((s) => {
+    if (s.role !== 'box' || (s.type !== 'stair_step' && s.type !== 'landing') || s.topM <= platform.bottomM) return false;
+    const ring = s.polygon[0], x = ring.reduce((t, p) => t + p[0], 0) / ring.length, y = ring.reduce((t, p) => t + p[1], 0) / ring.length;
+    return polygonContains(x, y, platform.polygon) && s.topM < top(x, y) - slackM;
+  }).map((s) => s.polygon);
+}
+
 /** The plan outlines the merged road surfaces give way to (see PRECEDENCE): the platforms, and the stair steps and landings. */
 export function surfaceExclusions(solids: Solid[]): { platforms: { polygon: Polygon; top: (x: number, y: number) => number }[]; treads: Polygon[] } {
   return {
