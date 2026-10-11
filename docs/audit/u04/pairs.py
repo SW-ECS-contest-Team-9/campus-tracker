@@ -6,7 +6,7 @@ d = json.loads((HERE.parent / 'u03' / 'pairs.json').read_text(encoding='utf-8'))
 for q in d['pairs']:
     if not q.get('vehicle'): continue
     if '지하 1층' in q['id']: q['to'] = {'point': S['points']['hyeinOut']}; q['label'] += ' (통로 면을 건너 혜인관 통로 어귀까지)'; q['snapRadiusM'] = 1
-    else: q['to'] = {'nodeId': S['points']['rampBottomNode']}; q['label'] += ' (U자 경사로 발치 = 지하 2층 통로 면의 접속점)'
+    else: q['to'] = {'point': S['points']['rampBottom']}; q['label'] += ' (층 사이 경사로 발치 = 지하 2층 통로 면의 접속점. U06: 노드 id 가 바뀌어 자리로 찾는다)'; q['snapRadiusM'] = 1
 d['note'] = 'U04: u03/pairs.json(걷는 66 + 차량 4 + 지하도 3)에서 차량 쌍의 도착만 바꿈. 쌍 id 는 그대로'
 (HERE / 'pairs.json').write_text(json.dumps(d, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(len(d['pairs']), [q['id'] for q in d['pairs'] if q.get('vehicle')])
