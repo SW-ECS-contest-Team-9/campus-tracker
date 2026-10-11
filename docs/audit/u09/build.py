@@ -13,7 +13,7 @@ ops = [{'ref': '거둠: U08 층 사이 경사로', 'op': 'retire_feature', 'args
        {'ref': '층 사이 경사로(ㄴ자, 서쪽 벽에 맞춤)', 'op': 'create_road', 'grade': '확정(평면이 ㄴ자: 사용자), 원천(모서리 자리: 학교 지도의 부채꼴, 잔차 RMS 3.3 m), 확정(낮은 벽 밑이 낮은 쪽: 사용자 표시 3), 사용자 그림(북쪽 다리가 서쪽 벽·문 쪽: 붉은 화살표), 추정(다리 길이·내려가는 방향·경사)',
         'evidence': EV + (f". 남쪽 다리 {RP['legSouthM']} m(방위 {RP['legSouthAzimuthDeg']}도, 서쪽 벽의 직각, 위가 트임) → 모서리 {RP['arcM']} m → 낮은 벽 밑({RP['belowFloorAtBandM']} m 아래) → 북쪽 다리 {RP['legNorthM']} m(방위 {RP['legNorthAzimuthDeg']}도, 서쪽 벽과 나란히, 벽에서 {RP['legNorthWestEdgeToWallM']} m. 은주관 문 앞 바닥 밑 {RP['levelBelowDoorM']} m 를 지난다) → 지하 2층."
                           f" 높이 차 {RP['dropM']} m 는 줄이지 않았다. 머리가 남쪽 다리 끝이라는 것은 추정"),
-        'args': {'roadClass': 'vehicle', 'name': f"운동장 지하 1층–지하 2층 경사로 (ㄴ자: 남쪽 다리 {RP['legSouthM']} m(서쪽 벽의 직각) ~ 모서리(학교 지도의 부채꼴) ~ 낮은 벽 밑 ~ 북쪽 다리 {RP['legNorthM']} m(서쪽 벽과 나란히) ~ 지하 2층. {RP['lengthM']} m 에 {RP['dropM']} m, 경사 {RP['gradePct']} %. 한 차로. 다리 길이와 내려가는 방향은 추정)",
+        'args': {'roadClass': 'vehicle', 'name': f"운동장 지하 1층–지하 2층 경사로 (ㄴ자: 남쪽 다리 {RP['legSouthM']} m ~ 모서리 ~ 낮은 벽 밑 ~ 서쪽 벽과 나란한 북쪽 다리 {RP['legNorthM']} m. {RP['lengthM']} m 에 {RP['dropM']} m, {RP['gradePct']} %. 한 차로. 길이·내려가는 방향 추정)",
                  'structure': 'ramp', 'widthM': RP['straightWidthM'], 'vehicleAccess': 'allowed', 'pedestrianAccess': 'prohibited', 'vehicleDirection': 'both', 'pedestrianDirection': 'unknown', 'path': RP['path'], 'zMode': 'explicit', 'densify': False}}]
 (HERE / 'groups').mkdir(exist_ok=True)
 (HERE / 'groups' / 'u09.json').write_text(json.dumps({'id': 'U09', 'zone': '운동장 아래 지하층과 지하 차도', 'comment': 'U09: U08 의 층 사이 경사로를 거두고 서쪽 벽에 맞춘 ㄴ자 경사로로', 'ops': ops}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
