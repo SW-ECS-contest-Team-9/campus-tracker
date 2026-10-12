@@ -332,13 +332,20 @@ export class StructuresLayer {
     this.addMeshes(this.structureParts, true);
     const plane = this.section;
     if (this.edges.length) {
-      const lines = new C.PolylineCollection();
+      // F11: one primitive (one draw call) for all the outlines. A PolylineCollection of thousands of lines, each with
+      // its own material, was sorted by material again on every frame (about 4 ms a frame).
+      const lines: any[] = [];
       for (const e of this.edges) {
+        const color = C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromBytes(e.rgb[0], e.rgb[1], e.rgb[2], 150));
         for (const piece of plane ? clipPolyline(plane, e.points) : [e.points]) {
-          lines.add({ positions: piece.map((p) => this.position(p[0], p[1], p[2] + 0.02)), width: 1, material: C.Material.fromType('Color', { color: C.Color.fromBytes(e.rgb[0], e.rgb[1], e.rgb[2], 150) }) });
+          if (piece.length < 2) continue;
+          lines.push(new C.GeometryInstance({
+            geometry: new C.PolylineGeometry({ positions: piece.map((p) => this.position(p[0], p[1], p[2] + 0.02)), width: 1, arcType: C.ArcType.NONE, vertexFormat: C.PolylineColorAppearance.VERTEX_FORMAT }),
+            attributes: { color },
+          }));
         }
       }
-      this.prims.add(lines);
+      if (lines.length) this.prims.add(new C.Primitive({ geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: true }), asynchronous: false, allowPicking: false }));
     }
     if (plane && this.visible.structures) this.drawCutFaces(plane);
     else if (this.underground && this.visible.structures && !this.walkInside) this.drawVoids();
