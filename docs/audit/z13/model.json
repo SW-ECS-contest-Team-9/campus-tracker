@@ -1,0 +1,78 @@
+{
+ "crs": "EPSG:5186",
+ "kerbOffsetM": 3.5,
+ "kerbHeightM": 0.15,
+ "n03bRemoved": 29,
+ "features": 226,
+ "cutAround": [
+  "W01-GATE-TOWER-E-LEG-1",
+  "W01-GATE-TOWER-E-LEG-4",
+  "W01-GATE-TOWER-E-RING-1",
+  "W01-GATE-TOWER-E-RING-2",
+  "W01-GATE-TOWER-E-RING-3",
+  "W01-GATE-TOWER-E-RING-4",
+  "W01-GATE-TOWER-E-RING-5",
+  "W01-GATE-TOWER-E-RING-6"
+ ],
+ "east": {
+  "fromCentre": [
+   201132.56,
+   557104.5
+  ],
+  "toCentre": [
+   201097.66,
+   557179.55
+  ],
+  "lengthM": 82.84,
+  "widthM": [
+   [
+    557104.5,
+    3.3
+   ],
+   [
+    557152.0,
+    3.3
+   ],
+   [
+    557162.0,
+    2.6
+   ],
+   [
+    557176.0,
+    2.6
+   ],
+   [
+    557179.55,
+    3.0
+   ]
+  ],
+  "fromM": 107.15,
+  "toM": 109.77,
+  "pieces": 43
+ },
+ "west": {
+  "fromCentre": [
+   201115.82,
+   557141.0
+  ],
+  "toCentre": [
+   201096.57,
+   557182.6
+  ],
+  "lengthM": 45.88,
+  "widthM": 1.5,
+  "fromM": 107.86,
+  "toM": 110.02,
+  "pieces": 23
+ },
+ "eastPlanter": {
+  "lengthM": 47.15,
+  "lowM": 0.5,
+  "upM": 1.0,
+  "depthM": [
+   1.0,
+   2.0
+  ],
+  "pieces": 24
+ }
+}

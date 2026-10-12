@@ -33,7 +33,7 @@ SRC = '거리뷰 Y02~Y08(streetview-yudam-approach-202602), 사용자 그림 12(
 
 # --- N03b 마디 상자: 이 구간 것을 걷고, 남은 이웃의 끝에서 새 판을 시작·끝낸다
 S_LO = S_Y(557180.0); S_HI = CUM[len(prof_['V2']) - 1] + 2.0
-n03 = load('n03b-sidewalks.geojson'); keep = []; ends = {'W': [0.0, CUM[-1]], 'E': [0.0, CUM[-1]]}
+n03 = load('n03b-sidewalks.geojson'); keep = []; ends = {'W': [66.04922411552397, CUM[-1]], 'E': [62.80832488059668, CUM[-1]]}   # 아래 끝의 기본값 = 옛 N03b 이웃(W14·E13)의 끝. Z13 이 그 이웃을 걷은 뒤에도 같은 자리에서 시작한다
 for f in n03['features']:
     g = shape(f['geometry']); side = f['properties']['id'].split('-')[-1][0]; c = g.centroid
     if LINE.distance(c) > 6: keep.append(f); continue
@@ -51,7 +51,7 @@ z3m = json.loads((HERE.parent / 'z03' / 'model.json').read_text(encoding='utf-8'
 def PLAT(*names): return unary_union([shape(z03['Z03-PLATFORM-' + n]['geometry']).buffer(0) for n in names])
 HIGH_W = PLAT('PLAZA', 'BANK-S', 'BANK-N-LOW', 'BANK-N-UP', 'TERRACE-S')      # 서쪽 인도 뒤의 더 높은 땅(둑·광장): 화단 띠는 그 앞까지만
 ROADBAND = PLAT('ROAD-A', 'ROAD-B')
-others = [(f['properties']['id'], shape(f['geometry']).buffer(0), f['properties']) for fn in sorted(p.name for p in STR.glob('*.geojson')) if not fn.startswith(('z12-', 'n03b-'))
+others = [(f['properties']['id'], shape(f['geometry']).buffer(0), f['properties']) for fn in sorted(p.name for p in STR.glob('*.geojson')) if not fn.startswith(('z12-', 'z13-', 'n03b-'))
           for f in load(fn)['features'] if f['geometry']['type'] == 'Polygon' and f['properties'].get('kind') == 'extrude']
 
 feats = []
