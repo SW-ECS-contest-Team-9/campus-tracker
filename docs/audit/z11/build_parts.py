@@ -37,13 +37,15 @@ def fillet(P, R, step=1.0):
 # ---------- 유담관 공도 쪽 기단 벽 ----------
 YS = '사용자-서문-공연실습소-생활관-20261010/공연실습소.webp(왼쪽 끝: 공도를 따라 굽은 짙은 회색 벽, 창 줄 셋, 위에 나무), smap-yudam-low-road-detail.png(위에서: 탑 기단의 길 쪽 가장자리가 길을 따라 한 줄로 굽는다), 건물 노트 유담관'
 YG = '확정(공도 쪽은 길을 따라 굽은 짙은 회색 벽 한 면, 창 줄 셋: 사진), 추정(벽 선: 건물 자료 외곽·남서 테라스 기단의 바깥을 싼 선 ±1.5 m, 창 줄 높이 = 층 표)'
-DECK = SCENE['유담관#기단데크']; DECK_TOP = 129.3; WALL = '#5a5b5e'
+DECK = SCENE['유담관#기단데크']; DECK_TOP = 129.3; WALL = '#5d5450'   # W01: 짙은 갈회색 화강석 판(거리뷰 27·28)
 TERR = [poly for poly, p in PLATS if p['id'].startswith('Z05-PLATFORM-YUDAM9-TERRACE-SW')]
 # 벽 선(바깥 면): 북쪽 끝(서쪽 옹벽 선과 만나는 곳) → 서쪽 면 → 남서 모서리(둥글게) → 남서쪽 면 → 분수 광장 북쪽 가장자리 앞. 꼭짓점은 건물·테라스의 볼록 껍질에서 0.4 m 바깥
-CTRL = [(201000.45, 557304.6), (201003.2, 557254.2), (201010.6, 557246.3), (201039.0, 557226.2), (201043.3, 557225.4)]
-CURVE = fillet(CTRL[:4], 14.0) + [np.array(CTRL[4])]
+# W01(2026-10-12): 서쪽 면을 원천 외곽(campus.gpkg 유담관)의 서쪽 변 = S-MAP 1 m 메시의 건물 면(북좌표 557280 위로 ±1 m) 선에 맞추고, 남서 모서리를 둥글리지 않는다(거리뷰 27: 곧은 서쪽 면과 남쪽 면이 거친 돌 세로 띠에서 만난다).
+#   전: 북쪽 끝 (201000.45, 557304.6) → (201003.2, 557254.2) → (201010.6, 557246.3) → 남쪽, 모서리 반지름 14 m. 북쪽 끝은 557302.0(3층 입구 현관의 남쪽 끝)으로 줄였다: 그 북쪽은 w01 의 서쪽 날개 덩어리.
+CTRL = [(200998.96, 557302.0), (201005.99, 557247.6), (201039.0, 557226.2), (201043.3, 557225.4)]
+CURVE = fillet(CTRL[:3], 0.6, step=0.3)[:-1] + [np.array(CTRL[2]), np.array(CTRL[3])]
 line = LineString(CURVE)
-inner = [(201043.3, 557230.9), (201030, 557260), (201013, 557285), (201009.2, 557304.6)]   # 건물 안쪽으로 닫는 선(건물 안이라 어디든 된다)
+inner = [(201043.3, 557230.9), (201030, 557260), (201013, 557285), (201009.2, 557302.0)]   # 건물 안쪽으로 닫는 선(건물 안이라 어디든 된다)
 SHELL = Polygon([tuple(p) for p in CURVE] + inner).buffer(0)
 core = DECK.buffer(-0.3)   # 건물 안 0.3 m 까지는 덮는다(벽 면이 겹쳐 깜박이지 않게 벽은 건물 벽보다 바깥이다)
 hull_pts = [p for g in [DECK] + TERR for p in g.exterior.coords if Point(p).distance(line) < 9 and 0.5 < line.project(Point(p)) < line.length - 0.5]
@@ -51,16 +53,8 @@ out_m = [Point(p).distance(line) * (1 if SHELL.contains(Point(p)) else -1) for p
 assert min(out_m) > 0.15, ('벽 선이 건물·테라스 꼭짓점을 자른다', sorted(zip(out_m, hull_pts))[:4])
 _g = SHELL.difference(core).buffer(0); fill = min((q for q in (_g.geoms if hasattr(_g, 'geoms') else [_g])), key=lambda q: q.distance(line.interpolate(line.length / 2)))   # 벽 선에 붙은 덩어리(탑 쪽 조각은 버린다)
 zb = min(ground(x, y, lowest=True) for x, y in [line.interpolate(s).coords[0] for s in np.arange(1, line.length, 4)] ) - 1.0
-box('Z11-YUDAM-STREET-PLINTH', 'wall', fill, zb, DECK_TOP + 0.05, f'유담관 공도 쪽 기단 벽: 길을 따라 굽은 벽 한 면(곧은 구간 셋, 모서리는 반지름 14 m 호)과 건물 벽 사이를 기단 데크 윗면(129.3 m)까지 채운 덩어리. 건물 자료의 톱니 외곽(깊이 최대 {max(out_m):.1f} m)과 남서 테라스 기단의 옆면을 가린다. 아래는 공도 기단 밑까지', YS, YG, 'Z05-PLATFORM-WEST-STREET, Z05-PLATFORM-GATE-STREET-SW', color=WALL, topColor='#dad7ce')   # 윗면 색 = 화면에 그려지는 기단 데크 지붕(콘크리트)의 밝기: 톱니 외곽이 색 차이로 드러나지 않게
-skin = big(line.buffer(0.1, cap_style=2).difference(SHELL))   # 벽 바깥 면에서 0.1 m 내민 띠(창 줄)
-street = lambda s: ground(*line.interpolate(s).coords[0], lowest=True)
-for name, z in (('5F', 110.0), ('6F', 115.1), ('7F', 122.6)):
-    # 길이 창 줄 밑까지 올라온 구간(북쪽 끝)은 뺀다: 창 줄 아래 1.5 m 가 길보다 높은 구간만
-    ss = [s for s in np.arange(2.0, line.length - 3.0, 0.5) if street(s) < z - 1.5]; a, b = min(ss), max(ss); n = max(1, int((b - a) // 6.0)); w = (b - a) / n
-    for k in range(n):
-        s0, s1 = a + k * w + 0.5, a + (k + 1) * w - 0.5
-        seg = LineString([line.interpolate(s).coords[0] for s in np.arange(s0, s1 + 0.01, 0.5)])
-        box(f'Z11-YUDAM-STREET-WINDOW-{name}-{k + 1:02d}', 'wall', big(seg.buffer(0.1, cap_style=2).difference(SHELL)), z + 1.0, z + 2.4, f'공도 쪽 기단 벽의 창 줄({name} 바닥 {z} m 위 1.0~2.4 m, 길이 {w - 1:.1f} m 띠창). 줄 수 셋은 사진, 높이는 층 표(추정)', YS, YG, 'Z11-YUDAM-STREET-PLINTH', color='#6f8794')
+box('Z11-YUDAM-STREET-PLINTH', 'wall', fill, zb, DECK_TOP + 0.05, f'유담관 공도 쪽 기단 벽: 길을 따라 굽은 벽 한 면(곧은 서쪽 면과 남서쪽 면, 모서리는 꺾임)과 건물 벽 사이를 기단 데크 윗면(129.3 m)까지 채운 덩어리. 건물 자료의 톱니 외곽(깊이 최대 {max(out_m):.1f} m)과 남서 테라스 기단의 옆면을 가린다. 아래는 공도 기단 밑까지', YS, YG, 'Z05-PLATFORM-WEST-STREET, Z05-PLATFORM-GATE-STREET-SW', color=WALL, topColor='#dad7ce')   # 윗면 색 = 화면에 그려지는 기단 데크 지붕(콘크리트)의 밝기: 톱니 외곽이 색 차이로 드러나지 않게
+# W01: 창 줄은 여기서 만들지 않는다(거리뷰 27~33 의 줄 수대로 docs/audit/w01/build_parts.py 가 서쪽 면 전체와 함께 만든다)
 par = big(line.buffer(0.45, cap_style=2).intersection(SHELL))
 box('Z11-YUDAM-STREET-PARAPET', 'wall', par, DECK_TOP, DECK_TOP + 0.9, '기단 벽 머리의 난간벽(높이 0.9 m, 두께 0.45 m: 사진에서 벽 위로 나무만 보인다)', YS, YG, 'Z11-YUDAM-STREET-PLINTH', color=WALL)
 
