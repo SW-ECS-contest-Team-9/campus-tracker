@@ -24,6 +24,8 @@
 .level-tracks label { display: grid; gap: 2px; color: #52606d; }
 .level-track-msg { margin-top: 6px; padding: 3px 6px; border-radius: 5px; background: #fdf2f8; color: #9d174d; }
 .level-hint { margin-top: 8px; color: #52606d; }
+.level-help { margin-top: 4px; color: #52606d; }
+.level-help summary { cursor: pointer; color: #0759c7; }
 .walk-hud { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5; max-width: calc(100% - 28px); padding: 6px 12px; border-radius: 8px; background: #111827e6; color: #f9fafb; font: 12px/1.4 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
 /* the editor's drawing tools rest while a view is on (view only) */
 body.space-view-on [data-tool], body.space-view-on #editor-save, body.space-view-on #editor-cancel { pointer-events: none; opacity: 0.45; }

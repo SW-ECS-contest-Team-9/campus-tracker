@@ -30,11 +30,16 @@ for (let k = 0; k < 60; k++) { await sleep(1000); if (await ev(`!!(${editor ? 'w
 for (let k = 0; k < 40; k++) { await sleep(1000); if (await ev(`${SV}.level.zones.length > 0 && ${SV}.level.solids.length > 0`)) break; }
 await sleep(9000);
 await ev(`(() => { ${VIEWER}.scene.screenSpaceCameraController.enableCollisionDetection = false; return 1; })()`);
-/** 띄운 것을 한 방향에서 본다: 방위(도, 북 0·동 90), 내려다보는 각, 거리(띄운 것 반지름의 배수). */
-const look = (v) => ev(`(() => { const C = window.Cesium, cam = ${VIEWER}.camera, s = ${SV}.level.frameSphere; if (!s) return 0;
-  cam.cancelFlight(); cam.frustum.fov = C.Math.toRadians(${v.fov ?? 50});
-  cam.lookAt(s.center, new C.HeadingPitchRange(C.Math.toRadians(${v.heading}), C.Math.toRadians(${v.pitch}), s.radius * ${v.range}));
-  cam.lookAtTransform(C.Matrix4.IDENTITY); return 1; })()`);
+/**
+ * 띄운 것을 한 방향에서 본다: 방위(도, 북 0·동 90), 내려다보는 각, 거리(띄운 것 반지름의 배수, 또는 rangeM 미터),
+ * at: 볼 평면 자리(없으면 띄운 것 가운데), shift: 화면에서 오른쪽으로 미는 양(반지름의 배수. 왼쪽 아래 패널을 피함).
+ */
+const look = (v) => ev(`(async () => { const tm = await import('/src/tm.ts'); const C = window.Cesium, cam = ${VIEWER}.camera, s = ${SV}.level.frameSphere; if (!s) return 0;
+  const v = ${JSON.stringify(v)}; let center = s.center;
+  if (v.at) { const g = tm.tmInverse(v.at[0], v.at[1]); center = C.Cartesian3.fromDegrees(g.longitude, g.latitude, C.Cartographic.fromCartesian(s.center).height); }
+  cam.cancelFlight(); cam.frustum.fov = C.Math.toRadians(v.fov ?? 50);
+  cam.lookAt(center, new C.HeadingPitchRange(C.Math.toRadians(v.heading), C.Math.toRadians(v.pitch), v.rangeM ?? s.radius * v.range));
+  cam.lookAtTransform(C.Matrix4.IDENTITY); cam.moveLeft((v.rangeM ? v.rangeM / 2.5 : s.radius) * (v.shift ?? ${editor ? 0.5 : 0.25})); return 1; })()`);
 const shot = async (name) => {
   const r = await send('Page.captureScreenshot', { format: 'jpeg', quality: 88 });
   const f = path.join(outDir, `${editor ? '편집기' : '지도'}-f10-${name}-${tag}.jpg`);
@@ -57,13 +62,15 @@ const lift = async (id, floor) => {
   await sleep(2500);
   return info;
 };
-const panel = () => ev(`(() => { const p = document.querySelector('.level-panel'); return p ? p.innerText.replace(/\\s+/g, ' ').slice(0, 1200) : ''; })()`);
+const panel = () => ev(`(() => { const p = document.querySelector('.level-panel'); if (!p) return ''; const m = p.querySelector('.level-track-msg');
+  return p.querySelector('.level-title').innerText + ' | ' + (m ? m.innerText : '(궤적 줄 없음)') + ' | 고르기 ' + [...p.querySelectorAll('select[data-mirror]')].map((x) => x.options.length).join(','); })()`);
 
 // ---- 겹침: 지하 1층·2층, 지하 차도, 지하 보행 구간 ----
 const ZONES = [
   ['01-띄움-지하1층-사용자시점', 'b1', USER], ['02-띄움-지하2층-사용자시점', 'b2', USER],
   ['03-띄움-지하1층-위에서', 'b1', TOP], ['04-띄움-지하2층-위에서', 'b2', TOP],
   ['05-띄움-지하1층-옆에서', 'b1', SIDE], ['06-띄움-지하2층-옆에서', 'b2', SIDE],
+  ['09-경사로-지하1층-가까이', 'b1', { heading: -22, pitch: -50, rangeM: 70, at: [201155, 557262], shift: 0.25 }], ['10-경사로-지하2층-가까이', 'b2', { heading: -22, pitch: -50, rangeM: 70, at: [201155, 557262], shift: 0.25 }],
   ['07-띄움-지하차도', 'tunnel', { heading: 20, pitch: -40, range: 2.4 }], ['08-띄움-지하보행구간', 'walk', { heading: 20, pitch: -40, range: 2.6 }],
 ];
 for (const [name, id, view] of ZONES) {

@@ -102,6 +102,8 @@ export class LevelView {
   /** F10: what of the tracks lies on what is lifted now (points drawn; `loaded`: points the page has). */
   trackStats = { raw: 0, fused: 0, unsure: 0, loaded: 0 };
   private trackSignature = '';
+  /** F10: the rules text of the panel is folded away unless the user opened it. */
+  private helpOpen = false;
 
   constructor(private readonly viewer: any, private readonly src: SpaceViewSources, private readonly changed: () => void) {
     this.C = (window as any).Cesium;
@@ -111,6 +113,7 @@ export class LevelView {
     viewer.container.append(this.panel);
     this.panel.addEventListener('change', (e) => this.onPanelChange(e));
     this.panel.addEventListener('click', (e) => this.onPanelClick(e));
+    this.panel.addEventListener('toggle', (e) => { if (e.target instanceof HTMLDetailsElement) this.helpOpen = e.target.open; }, true);
     this.chooser = document.createElement('div');
     this.chooser.className = 'level-chooser';
     this.chooser.hidden = true;
@@ -756,7 +759,8 @@ export class LevelView {
       ${trackLine ? `<div class="level-track-msg">${esc(trackLine)}</div>` : ''}
       <div class="level-style">${choice('line')}${choice('labels')}${choice('others')}</div>
       <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 원본 위치', 'dot')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}${swatch(VIEW_COLORS.trackFused, '높이 미상(흐린 점선)', 'dash faint')}</div>
-      <div class="level-hint">띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. ↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게), 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>`;
+      <div class="level-hint">↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>
+      <details class="level-help"${this.helpOpen ? ' open' : ''}><summary>띄우는 규칙 · 세션 점 규칙</summary>띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게, 윗층은 층 차이 + ${LEVEL_VIEW.floorGapM} m 위). 한 층에는 그 층 바닥에 선 것만 그림. 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).</details>`;
   }
 
   private onPanelChange(e: Event) {
