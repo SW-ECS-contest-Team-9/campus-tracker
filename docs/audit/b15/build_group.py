@@ -23,6 +23,7 @@ if abs(top['coordinate'][0] - PT['stairTop'][0]) > 0.05:
     ops.append({'ref': '왼쪽 계단 길 거둠(사진 11 에 없음)', 'op': 'retire_feature', 'grade': '추정(사진 11·02 에 왼쪽 계단이 없다)', 'evidence': EV, 'args': {'type': 'road', 'id': r['id'], 'expectedRevision': r['revision']}})
     ops.append({'ref': '안쪽 마당 계단 머리 → 첫 단 판 → 1층 현관 문', 'op': 'create_road', 'grade': G, 'evidence': EV, 'args': {'roadClass': 'pedestrian', 'structure': 'ordinary', 'pedestrianAccess': 'allowed', 'vehicleAccess': 'prohibited', 'widthM': 2.5, 'zMode': 'explicit', 'densify': False,
                 'name': '청운관 현관 첫 단 판 (대일관·청운관 사이 계단 머리 ~ 1층 로비 문, 153.1 m. 틈 없이 이어짐: 사용자 확정)', 'path': [{'at': {'nodeId': yard['id']}}, pt(PT['deckWest'], F1), pt(PT['deckMid'], F1), {'at': {'nodeId': door['id']}}]}})
+ops.sort(key=lambda o: o['op'] == 'move_node')   # 노드 옮기기는 맨 뒤(먼저 하면 길 개정 번호가 올라 충돌)
 (HERE / 'groups').mkdir(exist_ok=True)
 (HERE / 'groups' / 'b15.json').write_text(json.dumps({'id': 'B15', 'zone': '청운관 앞', 'comment': 'B15: 청운관 현관 틀의 계단을 오른쪽 한 줄로, 첫 단 판을 안쪽 마당 계단 머리와 이음', 'ops': ops}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print('ops', len(ops))
