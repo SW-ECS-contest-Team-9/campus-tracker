@@ -18,6 +18,7 @@ def box(id, typ, poly, fromM, toM, assumption, basePlane, grade=G, **extra):
     FEATS.append({'type': 'Feature', 'properties': {'id': 'B15-CHEONGUN-PORCH-' + id, 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': grade, 'basePlane': basePlane, 'fromM': r2(fromM), 'toM': r2(toM), 'assumption': assumption, 'source': SRC, **extra},
                   'geometry': {'type': 'Polygon', 'coordinates': [[[r2(x), r2(y)] for x, y in poly.exterior.coords]]}})
 CD, T = 6.0, 0.18                                   # 틀 깊이(S-MAP 돌출부 앞 모서리 4.5~7.1 m), 난간벽 두께
+PT, PH = 0.4, 1.1                                   # Z13: 첫 단 난간벽은 얇은 판이 아니라 돌 덩어리 띠(두께 0.4 m, 바닥 위 1.1 m: 사진 02·11, 추정)
 COLS = [5.2, 9.4, 14.6, 19.9]                       # 앞줄 기둥 가운데
 LV = [153.1, 156.65, 160.2]                         # 층 판 윗면(Z05 값 그대로)
 FIELD, DECK_W, DECK_E = 148.9, 1.4, COLS[2] + 0.45  # 첫 단 판: 안쪽 마당의 혀(s 2.9 까지)와 겹치게 서쪽 끝 1.4, 동쪽 끝 = 셋째 기둥(계단 머리)
@@ -27,8 +28,9 @@ YARD_GAP = 2.6                                      # 첫 단 판 서쪽 끝에�
 
 # 첫 단 판(1층 현관 153.1): 안쪽 마당(Z02-PLATFORM-YARD 153.1)에 겹쳐 닿는다
 box('SLAB-1', 'deck', R(DECK_W, DECK_E, 0, CD), LV[0] - 0.6, LV[0], '첫 단 판 = 1층 로비 앞 현관 바닥 153.1 m. 서쪽 끝은 건물 모서리 옆 안쪽 마당(153.1 m)의 계단 머리에 겹쳐 닿는다(틈 없음: 사용자 확정 2026-10-12). 동쪽 끝은 셋째 기둥 = 계단 머리', '없음(기둥 위 뜬 판, 서쪽 끝은 Z02-PLATFORM-YARD)', material='concrete')
-box('RAIL-1F', 'wall', R(DECK_W, DECK_E, CD - T, CD), LV[0] - 0.9, LV[0] + 1.0, '첫 단 앞 난간벽(밝은 돌 판, 사진에서 띠 높이 약 1.9 m = 보 0.9 + 난간 1.0)', 'SLAB-1', material='white_stone')
-box('RAIL-1W', 'wall', R(DECK_W, DECK_W + T, YARD_GAP, CD), LV[0] - 0.9, LV[0] + 1.0, '첫 단 서쪽 끝 난간벽: 벽 쪽 2.6 m 는 안쪽 마당으로 트여 있다', 'SLAB-1', material='white_stone')
+box('RAIL-1F', 'wall', R(DECK_W, DECK_E, CD - PT, CD), LV[0] - 0.9, LV[0] + PH, f'첫 단 앞 난간벽: 밝은 돌 덩어리 띠(두께 {PT} m, 띠 높이 약 2.0 m = 보 0.9 + 난간 {PH}: 사진 02 는 2.3, 사진 11 은 1.4~1.6 m 로 읽힌다)', 'SLAB-1', material='white_stone')
+box('RAIL-1W', 'wall', R(DECK_W, DECK_W + PT, YARD_GAP, CD), LV[0] - 0.9, LV[0] + PH, '첫 단 서쪽 끝을 돌아 들어가는 난간벽(앞 띠와 같은 덩어리): 벽 쪽 2.6 m 는 안쪽 마당으로 트여 있다', 'SLAB-1', material='white_stone')
+box('END-1W', 'wall', R(DECK_W, DECK_W + PT, YARD_GAP, CD - 2.6), 150.4, LV[0] - 0.9, '첫 단 서쪽 끝의 막힌 면: 난간벽 아래로 떠 있는 화단 통의 밑선(150.4 m)까지 밝은 돌 면(사진 02: 왼쪽 끝은 가는 보가 아니라 한 덩어리로 막혀 보인다). 그 아래는 뚫려 있다. 면의 자리·깊이는 추정', 'SLAB-1', material='white_stone')
 box('RAIL-1E', 'wall', R(DECK_E - T, DECK_E, 0, ST_D0), LV[0], LV[0] + 1.0, '첫 단 동쪽 끝 난간벽(계단 폭만큼은 트임)', 'SLAB-1', material='white_stone')
 for k in (1, 2):
     z = LV[k]
@@ -58,14 +60,14 @@ for j in range(8):
         box(f'STAIR-RAIL{tag}{j + 1}', 'wall', R(a, b, d0, d1), max(FIELD - 0.3, stair_z(b) - 0.7), stair_z(a) + 0.9, '계단 난간벽(밝은 돌, 여덟 마디)', 'STAIR', material='white_stone')
 # 첫 단 판 서쪽 끝 앞의 떠 있는 둥근 화단, 발치의 낮은 돌 화단과 소나무
 GP = '확정(이 자리에 돌 화단과 소나무: 사진 11·02), 추정(평면·높이·그루 수)'
-box('PLANTER-HIGH', 'planter', R(0.0, COLS[0] - 0.5, CD - 2.6, CD + 0.6), 150.4, 152.0, '첫 단 판 서쪽 끝 앞의 떠 있는 화단(사진 11: 둥근 두 굽이의 밝은 돌 통, 윗선이 난간벽 윗선보다 약 2 m 아래, 밑은 뚫림). 네모로 줄였다', '없음(뜬 통)', grade=GP, material='white_stone')
+box('PLANTER-HIGH', 'planter', R(-0.2, COLS[0] - 0.5, CD - 2.6, CD + 1.0), 150.4, LV[0] - 0.9, '첫 단 판 서쪽 끝 앞의 떠 있는 화단(사진 11: 둥근 두 굽이의 밝은 돌 통, 밑은 뚫림). 네모로 줄였다. Z13: 윗선을 난간벽 띠의 밑선에 붙이고 서쪽 끝을 감싸 한 덩어리로 보이게(사진 02). 사진의 통은 건물 모서리 밖 3.5 m 까지지만 그 자리는 대일관 쪽 계단(Z02)이라 넓히지 않았다', '없음(뜬 통)', grade=GP, material='white_stone')
 box('PLANTER-LOW-W', 'planter', R(0.3, COLS[0] - 0.6, CD - 0.4, CD + 1.8), FIELD - 0.3, FIELD + 0.7, '발치의 낮은 돌 화단(서쪽, 살 울타리)', '운동장 148.9', grade=GP, material='white_stone')
 box('PLANTER-LOW-E', 'planter', R(COLS[1] + 2.8, ST_FOOT - 0.2, CD + 0.65, CD + 1.9), FIELD - 0.3, FIELD + 0.7, '발치의 낮은 돌 화단(셋째 기둥 앞에서 계단 발치까지). 둘째~셋째 기둥 사이의 둥근 굽이는 지하 1층 문으로 드는 길 자리라 싣지 않았다', '운동장 148.9', grade=GP, material='white_stone')
 def tree(tid, s, d, z, k=1.0):
     c = O + A * s + N * d; sq = lambda h: Polygon([(c[0] - h, c[1] - h), (c[0] + h, c[1] - h), (c[0] + h, c[1] + h), (c[0] - h, c[1] + h)])
     for part, mat, h, z0, z1 in (('TRUNK', 'trunk', 0.15, 0.0, 2.2), ('CROWN', 'foliage', 1.1, 2.0, 3.2), ('TOP', 'foliage', 0.6, 3.2, 4.0)):
         box(f'{tid}-{part}', 'tree', sq(h * k), z + z0 * k, z + z1 * k, '단순한 나무(소나무 자리. 실제 그루 수·모양이 아니다)', 'PLANTER', grade=GP, material=mat)
-tree('TREE-1', 2.4, CD - 1.0, 152.0, 0.8); tree('TREE-2', 2.6, CD + 0.7, FIELD + 0.7, 0.8); tree('TREE-3', 16.8, CD + 1.25, FIELD + 0.7, 0.7); tree('TREE-4', 21.6, CD + 1.25, FIELD + 0.7, 0.7)
+tree('TREE-1', 2.4, CD + 0.5, LV[0] - 0.9, 0.8); tree('TREE-2', 2.6, CD + 0.7, FIELD + 0.7, 0.8); tree('TREE-3', 16.8, CD + 1.25, FIELD + 0.7, 0.7); tree('TREE-4', 21.6, CD + 1.25, FIELD + 0.7, 0.7)
 out = {'type': 'FeatureCollection', 'name': 'b15-cheongun', 'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::5186'}},
        'provenance': {'builder': 'docs/audit/b15/porch.py', 'schema': 'docs/audit/g02/STRUCTURES.md', 'note': '청운관 운동장 쪽 현관 틀(열린 기둥부). 건물 블록에서는 빠져 있다(건물 노트 청운관의 부분 운동장쪽돌출부)'}, 'features': FEATS}
 (STR / 'b15-cheongun.geojson').write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
