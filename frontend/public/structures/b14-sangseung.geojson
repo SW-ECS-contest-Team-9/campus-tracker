@@ -145,15 +145,15 @@
   {
    "type": "Feature",
    "properties": {
-    "id": "B14-SANG-NORTH-LEDGE",
+    "id": "B14-SANG-NORTH-LEDGE-01",
     "type": "wall",
     "kind": "extrude",
     "estimated": true,
     "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
     "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
-    "fromM": 147.4,
-    "toM": 149.2,
-    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m·윗면 149.2 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "fromM": 147.0,
+    "toM": 149.32,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
     "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
     "material": "white_stone"
    },
@@ -166,12 +166,12 @@
        557328.54
       ],
       [
-       201231.73,
-       557313.12
+       201199.1,
+       557327.0
       ],
       [
-       201231.34,
-       557312.2
+       201198.71,
+       557326.08
       ],
       [
        201195.08,
@@ -180,6 +180,393 @@
       [
        201195.47,
        557328.54
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-02",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.37,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201199.1,
+       557327.0
+      ],
+      [
+       201202.72,
+       557325.46
+      ],
+      [
+       201202.33,
+       557324.54
+      ],
+      [
+       201198.71,
+       557326.08
+      ],
+      [
+       201199.1,
+       557327.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-03",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.43,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201202.72,
+       557325.46
+      ],
+      [
+       201206.35,
+       557323.92
+      ],
+      [
+       201205.96,
+       557322.99
+      ],
+      [
+       201202.33,
+       557324.54
+      ],
+      [
+       201202.72,
+       557325.46
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-04",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.49,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201206.35,
+       557323.92
+      ],
+      [
+       201209.97,
+       557322.37
+      ],
+      [
+       201209.58,
+       557321.45
+      ],
+      [
+       201205.96,
+       557322.99
+      ],
+      [
+       201206.35,
+       557323.92
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-05",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.55,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201209.97,
+       557322.37
+      ],
+      [
+       201213.6,
+       557320.83
+      ],
+      [
+       201213.21,
+       557319.91
+      ],
+      [
+       201209.58,
+       557321.45
+      ],
+      [
+       201209.97,
+       557322.37
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-06",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.6,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201213.6,
+       557320.83
+      ],
+      [
+       201217.23,
+       557319.29
+      ],
+      [
+       201216.83,
+       557318.37
+      ],
+      [
+       201213.21,
+       557319.91
+      ],
+      [
+       201213.6,
+       557320.83
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-07",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.66,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201217.23,
+       557319.29
+      ],
+      [
+       201220.85,
+       557317.75
+      ],
+      [
+       201220.46,
+       557316.83
+      ],
+      [
+       201216.83,
+       557318.37
+      ],
+      [
+       201217.23,
+       557319.29
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-08",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.72,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201220.85,
+       557317.75
+      ],
+      [
+       201224.48,
+       557316.21
+      ],
+      [
+       201224.09,
+       557315.28
+      ],
+      [
+       201220.46,
+       557316.83
+      ],
+      [
+       201220.85,
+       557317.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-09",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.78,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201224.48,
+       557316.21
+      ],
+      [
+       201228.1,
+       557314.66
+      ],
+      [
+       201227.71,
+       557313.74
+      ],
+      [
+       201224.09,
+       557315.28
+      ],
+      [
+       201224.48,
+       557316.21
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE-10",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.0,
+    "toM": 149.83,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201228.1,
+       557314.66
+      ],
+      [
+       201231.73,
+       557313.12
+      ],
+      [
+       201231.34,
+       557312.2
+      ],
+      [
+       201227.71,
+       557313.74
+      ],
+      [
+       201228.1,
+       557314.66
       ]
      ]
     ]

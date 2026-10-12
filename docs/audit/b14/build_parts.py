@@ -20,8 +20,15 @@ G = 'S-MAP(난간 윗선 164.8 m: 66칸), 확정(평지붕 둘레에 난간: 사
 for tag, poly in (('N', rect(S_W, BLOCK_S, D_N, D_N + T)), ('S', rect(S_W, BLOCK_S, D_S - T, D_S)), ('W', rect(S_W, S_W + T, D_N, D_S))):
     box(f'B14-SANG-PARAPET-{tag}', 'wall', poly, ROOF, RIM, '상승관 본체 평지붕 둘레의 난간. S-MAP 화면에는 살이 있는 유리 난간처럼 보인다(한 장의 판으로 그림)', G, '추가-상승관 지붕 163.1', material='glass')
 # 숲 쪽 벽 발치의 밝은 턱
-box('B14-SANG-NORTH-LEDGE', 'wall', rect(S_W - 0.6, S_E_N + 0.3, D_N - 1.0, D_N), 147.4, 149.2,
-    '상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m·윗면 149.2 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)', '확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)', 'Z05-BACK-BEHIND-DAEIL-E', material='white_stone')
+import numpy as np
+PROF = next(f for f in json.loads((STR / 'z05-back-paths.geojson').read_text(encoding='utf-8'))['features'] if f['properties']['id'] == 'Z05-PLATFORM-BACK-BEHIND-DAEIL-E')['properties']['topProfile']
+def ground(s, d):   # 숲 쪽 땅(기단 Z05-BACK-BEHIND-DAEIL-E 의 기운 윗면)
+    v = np.array(W(s, d)) - np.array(PROF['origin']); return float(np.interp(v @ np.array(PROF['direction']), [q[0] for q in PROF['points']], [q[1] for q in PROF['points']]))
+EDGE = np.linspace(S_W - 0.6, S_E_N + 0.3, 11)
+for k in range(10):   # 땅이 동쪽으로 0.6 m 오르므로 마디마다 그 자리 땅 위 0.5 m
+    top = max(ground(EDGE[k], D_N - 1.0), ground(EDGE[k + 1], D_N)) + 0.5
+    box(f'B14-SANG-NORTH-LEDGE-{k + 1:02d}', 'wall', rect(EDGE[k], EDGE[k + 1], D_N - 1.0, D_N), 147.0, top,
+        '상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m, 땅 위 0.5 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)', '확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)', 'Z05-BACK-BEHIND-DAEIL-E', material='white_stone')
 # 대일관 뒷벽과 상승관 사이의 좁은 틈(1.15 m)의 바닥
 box('B14-SANG-DAEIL-SLIT-FLOOR', 'landing', rect(-18.57, DAEIL_STEP_S, D_S, DAEIL_FAR), 147.4, 152.3,
     '대일관 뒷벽과 상승관 사이의 좁은 틈(폭 1.15 m, 길이 17 m)의 바닥. S-MAP 지면 152.2~152.4 m(78칸). 사람이 다니는지는 모른다(길을 넣지 않았다)', 'S-MAP(틈의 폭과 바닥 높이, ±0.5 m)', 'Z05-BACK-BEHIND-DAEIL-E', material='concrete')
