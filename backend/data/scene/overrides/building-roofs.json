@@ -628,7 +628,7 @@
       "heightSource": "SMAP_MESH",
       "polygon": [
         [
-          [201236.02, 557198.13], [201240.68, 557205.84], [201243.76, 557203.97], [201239.1, 557196.27], [201236.02, 557198.13]
+          [201236.88, 557197.62], [201241.54, 557205.32], [201243.76, 557203.97], [201239.1, 557196.27], [201236.88, 557197.62]
         ]
       ],
       "evidence": {
@@ -636,7 +636,7 @@
         "collectedOn": "2026-10-12",
         "level": "source data (one provider), not field verified; outline read from the grid (+-1 m)",
         "independentSurvey": false,
-        "outline": "model cells at 179 m behind the rear (south-east) wall: 33 to 42 m along the wall from its south-west end, up to 3.5 m out of the wall (30 cells)",
+        "outline": "model cells at 179 m behind the rear (south-east) wall: 33 to 42 m along the wall from its south-west end, up to 2.6 m out of the wall (the wall line of the footprint is 22.3 m from the field-side wall)",
         "roof": "flat at 179.0 m (cells 179-182)",
         "notCovered": "the inside (a stair, estimated from the glass tower in the S-MAP view), its door at the foot"
       }
