@@ -127,10 +127,11 @@ def feat(fid, poly, lo, hi, color, grade, assumption, name):
     FEATS.append({'type': 'Feature', 'properties': {'id': fid, 'type': 'wall', 'kind': 'extrude', 'estimated': True, 'grade': grade, 'assumption': assumption, 'source': SRC, 'fromM': r2(lo), 'toM': r2(hi), 'material': 'concrete', 'inVoid': True,
                                                     'underground': True, 'color': color, 'name': name}, 'geometry': geom})
 PAD, PAINT = '#8a8d92', '#ecead9'
+PAD_LV = {'B1': '#5f6165', 'B2': '#b3ab9b'}   # U12: 지하 1층 = 짙은 회색 광택 도장(현장 사진 30·31), 지하 2층 = 밝은 베이지(사진 10·23 을 지하 2층으로 읽음, 추정)
 for lv in (B2, B1):   # 지하 2층을 먼저: 위에서 비쳐 볼 때 지하 1층이 위에 그려진다
     for o in lv['blocks']:
         g_layout = f"원천(묶음의 자리·방향·줄 수: 학교 지도, 좌표 맞춤 잔차 RMS {RES} m), 추정(칸 치수 {STALL_W} × {STALL_D} m·칸 수" + (', 지하 2층도 같은 배치)' if lv is B2 else ')')
-        feat(f"U04-STALLS-{lv['tag']}-{o['id']}", o['polygon'], lv['z'], lv['z'] + 0.02, PAD, g_layout, f"주차 칸 묶음 {o['id']}: {o['rows']}줄, {len(o['stalls'])}칸. 길이 아니다(통로 면에서 뺀 자리)", '주차 칸')
+        feat(f"U04-STALLS-{lv['tag']}-{o['id']}", o['polygon'], lv['z'], lv['z'] + 0.02, PAD_LV[lv['tag']], g_layout, f"주차 칸 묶음 {o['id']}: {o['rows']}줄, {len(o['stalls'])}칸. 길이 아니다(통로 면에서 뺀 자리)", '주차 칸')
         inner = unary_union([s.buffer(-LINE / 2, join_style=2) for s in o['stalls']])
         paint = o['polygon'].buffer(LINE / 2, join_style=2).difference(inner).buffer(0)
         feat(f"U04-BAYLINE-{lv['tag']}-{o['id']}", paint, lv['z'], lv['z'] + 0.04, PAINT, '원천(칸 선이 있음·방향), 추정(칸 너비·선 굵기)', f"주차 칸 선(굵기 {LINE} m): 묶음 외곽과 칸 사이" + (', 두 줄 사이 가운데 선' if o['rows'] == 2 else ''), '주차 칸 선')
@@ -144,6 +145,7 @@ for lv in (B2, B1):
             short = sorted(ed, key=lambda q: np.hypot(*(q[1] - q[0])))[:2]; mids = [(q[0] + q[1]) / 2 for q in short]
             if o['rows'] == 2: back = min(mids, key=lambda m_: abs((m_ - cen) @ (mids[0] - mids[1])))
             else: back = min(mids, key=lambda m_: lv_inner[lv['tag']].exterior.distance(Point(m_)))
+            if lv is B1 and o['block'] == 'S04' and float((c_ - ISL) @ U) > RP['openStraightM']: back = max(mids, key=lambda m_: float((m_ - ISL) @ V))   # U12(현장 사진 30·31, 사진 24): 지하 1층 S04 의 차 막이는 S07 쪽 통로 가장자리(차는 간판 벽 쪽 통로에서 든다). 섬 옆 트인 곳의 칸은 그대로(모름)
             ax = (c_ - back) / np.hypot(*(c_ - back)); tr = np.array([-ax[1], ax[0]]); q0 = back + ax * 0.8
             stops.append(Polygon([q0 + tr * a_ + ax * b_ for a_, b_ in ((-0.9, -0.08), (0.9, -0.08), (0.9, 0.08), (-0.9, 0.08))]))
         feat(f"U06-WHEELSTOP-{lv['tag']}-{o['id']}", MultiPolygon(stops), lv['z'], lv['z'] + 0.12, '#2a2a2a', '확정(차 막이가 있다: 사진 10·14), 추정(자리·치수·지하 2층)', f"차 막이 {len(stops)}개(검정 바탕. 노란 띠는 그리지 않음)", '차 막이')

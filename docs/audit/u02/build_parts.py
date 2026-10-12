@@ -183,6 +183,7 @@ for k in range(len(fs) - 1):
     segs.append((pol(R_C, f0), pol(R_C, f1), d0, d1, sector(R_ISL, R_OUT, f0, f1, 5), f'굽은 곳(섬을 왼쪽에 끼고 오름) {d0 - S_TOE:.1f}~{d1 - S_TOE:.1f} m', True))
 def prof(a, b, d0, d1, up=0.0): d = (b - a) / np.hypot(*(b - a)); return {'origin': [r2(a[0]), r2(a[1])], 'direction': [float(d[0]), float(d[1])], 'points': [[0.0, r2(max(z_up(d0), Z_B2 + 0.02) + up)], [r2(np.hypot(*(b - a))), r2(z_up(d1) + up)]]}
 GUIDE, TEAL, STRIPE, LOWWALL, NAVY = '#e3b505', '#2aa7b8', '#d8b000', '#6f8fa3', '#26405f'
+GREEN_NOW, SIGNWALL_NOW = '#7d9080', '#465068'   # U12: 현장 사진 30·31(2026-10-12)에서 읽은 지금 색. 경사로 바깥 벽 = 회녹색(현수막이 걸린 초록 벽), 간판 벽 = 짙은 푸른 회색
 for k, (a, b, d0, d1, poly, what, seen) in enumerate(segs):
     feat(f'U11-RAMP-SEG-{k:02d}', 'ramp', 'extrude', poly, G_RAMP_T, f'{what}: {z_up(d0):.2f} → {z_up(d1):.2f} m. 전체 {L_RAMP:.1f} m 에 {DROP:.1f} m, {G_RAMP * 100:.1f} %', basePlane='U02-VOID-B2 바닥', material='concrete', inVoid=True, color='#77756f', topProfile=prof(a, b, d0, d1), bottomM=Z_B2, openAbove=seen)
     gl = (sector(R_C - 0.1, R_C + 0.1, fs[k - 2], fs[k - 1], 5) if k >= 2 else LineString([a, b]).buffer(0.1, cap_style=2)).intersection(poly.buffer(0.01))   # 가운데의 노란 선(사진 23·26: 두 방향을 가르는 선)
@@ -205,7 +206,7 @@ box('U02-ISLAND-WALL', 'wall', ISL_WALL, Z_B1, Z_B1 + 1.1, LOWWALL, '섬의 낮�
 box('U02-ISLAND-STRIPE', 'wall', arc_band(R_ISL + 0.25, PHI_CREST, 180.0, 0.13), Z_B1, Z_B1 + 0.2, STRIPE, '섬 벽 밑의 노랑·검정 줄무늬 턱(사진 22: 지하 1층 바닥 위)', grade=G_SEEN)
 # 바깥(서쪽 벽 쪽)의 청록 벽: 발치의 기둥에서 곧게, 굽은 곳 바깥을 돌아 마루를 조금 지난 곳까지(사진 22 왼쪽, 사진 23 먼 끝, 사진 26 오른쪽)
 box('U11-RAMP-OUTERWALL-UNDER', 'wall', line_band(S_BAND, S_TOE, -R_OUT + 0.15), Z_B2, C_B2, TEAL, '경사로 바깥쪽 청록 벽, 지하 1층 바닥 밑 구간', grade=G_SEEN)
-box('U07-RAMP-OUTERWALL', 'wall', unary_union([line_band(0.0, S_BAND, -R_OUT + 0.15), arc_band(R_OUT - 0.15, 0.0, PHI_WALL)]), Z_B2, C_B1, TEAL, f'경사로 바깥쪽 청록 벽: 트인 구간과 굽은 곳 바깥({PHI_WALL:.0f}도까지). 지하 2층 바닥에서 지하 1층 천장까지(사진 22 왼쪽: 바닥에서 천장까지)', grade=G_SEEN)
+box('U07-RAMP-OUTERWALL', 'wall', unary_union([line_band(0.0, S_BAND, -R_OUT + 0.15), arc_band(R_OUT - 0.15, 0.0, PHI_WALL)]), Z_B2, C_B1, GREEN_NOW, f'경사로 바깥쪽 벽(U12: 현장 사진 30·31 의 지금 색 = 회녹색. 옛 사진 22 는 청록): 트인 구간과 굽은 곳 바깥({PHI_WALL:.0f}도까지). 지하 2층 바닥에서 지하 1층 천장까지(사진 22 왼쪽: 바닥에서 천장까지)', grade=G_SEEN)
 box('U11-OUTERWALL-KERB-B1', 'wall', arc_band(R_OUT - 0.4, PHI_CREST, PHI_WALL, 0.13), Z_B1, Z_B1 + 0.2, STRIPE, '청록 벽 밑의 노랑·검정 턱(사진 22 왼쪽 아래: 지하 1층 바닥 위)', grade=G_SEEN)
 # 낮은 벽: 트인 곳의 북동 가장자리(지하 1층 바닥이 다시 시작하는 곳). 밑으로 아래층이 보인다(사진 22). 은주관 벽 쪽에서 보면 오른쪽의 낮은 벽(사진 14·24)
 G_BAND = '확정(있음·청록 벽과 섬 사이·밑으로 아래층이 보임: 사용자 표시 3, 사진 22), 추정(자리: 사진 22 의 빈 높이 2.1 m 에서 계산, 지도의 부채꼴 북쪽 끝과 견줌)'
@@ -226,7 +227,7 @@ box('U06-GUIDE-LINE', 'wall', LineString(gpts).buffer(0.1, cap_style=2).differen
 G_EJ = '확정(있음·차례: 사진 20·21, 블로그-06), 추정(자리·치수)'
 _wl = lambda s_, x0, x1, half: Polygon([DOOR + ht * (s_ - half) + hn * x0, DOOR + ht * (s_ + half) + hn * x0, DOOR + ht * (s_ + half) + hn * x1, DOOR + ht * (s_ - half) + hn * x1])   # U11: s_ = 어귀에서 빗변을 따라 북동(+, 주차장에서 보면 오른쪽)·남서(-), x = 주차장 쪽(+)
 XW = -0.3   # 벽면(DOOR 는 빗변에서 0.3 m 주차장 쪽)
-for nm, s0_, s1_ in (('SW', HYP_S[0], S_MOUTH - 1.0), ('NE', S_MOUTH + 1.0, HYP_S[1])): box(f'U10-EUNJU-WALL-{nm}', 'wall', LineString([sp(s0_, V_HYP), sp(s1_, V_HYP)]).buffer(0.1, cap_style=2), Z_B1, C_B1, '#4a4f55', '세모 구역(주차관리센터·화장실·통로)의 주차장 쪽 벽 = 간판 벽(사진 20·21: 짙은 회색. 블로그-06 때는 흰 벽). 계단 어귀 2 m 는 비움', grade='확정(세모가 관리실·화장실·통로이고 간판 벽이 그 주차장 쪽 벽: 사용자 2026-10-12, 그림 29), 추정(자리 ±1.5 m)')
+for nm, s0_, s1_ in (('SW', HYP_S[0], S_MOUTH - 1.0), ('NE', S_MOUTH + 1.0, HYP_S[1])): box(f'U10-EUNJU-WALL-{nm}', 'wall', LineString([sp(s0_, V_HYP), sp(s1_, V_HYP)]).buffer(0.1, cap_style=2), Z_B1, C_B1, SIGNWALL_NOW, '세모 구역(주차관리센터·화장실·통로)의 주차장 쪽 벽 = 간판 벽(사진 20·21·30·31: 짙은 푸른 회색. 블로그-06 때는 흰 벽). 계단 어귀 2 m 는 비움', grade='확정(세모가 관리실·화장실·통로이고 간판 벽이 그 주차장 쪽 벽: 사용자 2026-10-12, 그림 29), 추정(자리 ±1.5 m)')
 _room = ROOM.difference(LineString([DOOR, SBN, SBN - hn * 3.0]).buffer(1.0, cap_style=2)).buffer(-0.12, join_style=2)
 for k_, g_ in enumerate(_room.geoms if hasattr(_room, 'geoms') else [_room]):
     if g_.area > 2: box(f'U11-OFFICE-BLOCK-{k_}', 'wall', g_, Z_B1, C_B1, '#b3a996', f'주차관리센터(관리실)·화장실이 든 막힌 구역(세모 {ROOM.area:.0f} ㎡). 안의 방 나눔은 모름. 어귀에서 들어가는 통로 2 m 는 비움', grade='확정(주차 바닥이 아니다: 사용자 2026-10-12, 그림 29), 추정(외곽 ±1.5 m, 방 나눔)', name='주차관리센터·화장실')
@@ -245,6 +246,18 @@ box('U10-DIRECTION-SIGN', 'wall', Polygon([SG18 + NRM * 3.4 - D * 0.04, SG18 - N
 for nm, off, col in (('CHEONGUN', 2.3, '#e24f9e'), ('HYEIN', 0.0, '#2fb3b3'), ('EUNJU', -2.3, '#e09a2a')):
     box(f'U10-DIRECTION-SIGN-{nm}', 'wall', Polygon([SG18 + NRM * (off + 0.9) - D * 0.1, SG18 + NRM * (off - 0.9) - D * 0.1, SG18 + NRM * (off - 0.9) - D * 0.04, SG18 + NRM * (off + 0.9) - D * 0.04]), C_B1 - 0.62, C_B1 - 0.23, col, '방향 표지의 색 칸(사진 18)', grade='확정(색·차례: 사진 18), 추정(자리)')
 print('U10 door', DOOR, 'sign column', SIGN_COL, 'door to band', float(np.hypot(*(DOOR - NB))), 'sign18', SG18, INNER.contains(Point(SG18)), INNER.contains(Point(SIGN_COL)))
+
+# ---------- U12(사용자 현장 사진 30·31, 2026-10-12: 지하 1층의 지금 모습). 배치는 그대로, 사진이 새로 보여 준 것만 얹는다 ----------
+#   두 사진은 S04·S07 사이 통로(섬 중심에서 북동 24~25 m)에서 찍었다(구역 노트 U12 절의 자리 맞춤). 통로 바닥의 흰 화살표는 남서(층 사이 경사로 쪽)를 가리킨다
+SRC_U12 = '사용자 현장 사진 2026-10-12: 30-현장-지하1층-통로-화살표-사람.jpg, 31-현장-지하1층-통로-사용자표시-B2방향.webp. 구역 노트 운동장 아래 지하층과 지하 차도(U12 절)'; GUARDS = []
+def box12(id, poly, lo, hi, color, assumption, grade, **kw): box(id, 'wall', poly, lo, hi, color, assumption, grade=grade, **kw); FEATS[-1]['properties']['source'] = SRC_U12
+V_AISLE = 5.0                      # S04(가장자리 v = 2.7)와 S07 사이 통로의 가운데
+ARROW = Polygon([sp(20.5, V_AISLE), sp(21.7, V_AISLE - 0.45), sp(21.7, V_AISLE - 0.08), sp(24.2, V_AISLE - 0.08), sp(24.2, V_AISLE + 0.08), sp(21.7, V_AISLE + 0.08), sp(21.7, V_AISLE + 0.45)])
+box12('U12-AISLE-ARROW', ARROW, Z_B1, Z_B1 + 0.03, '#f1f0ea', 'S04·S07 사이 통로 바닥의 흰 화살표(길이 3.7 m): 남서(층 사이 경사로 쪽)를 가리킨다 = 이 통로의 차량 진행 방향. 두 사진에서 따로 잰 자리가 0.5 m 안에서 같다', '확정(있음·방향: 현장 사진 30·31), 추정(자리 ±2 m·치수)', name='진행 방향 화살표')
+box12('U12-B2-SIGN', sector(R_OUT - 0.33, R_OUT - 0.25, 86.0, 93.5), Z_B1 + 1.9, Z_B1 + 2.4, '#f6f2df', '불 켜진 "B2 ▷" 표지: 통로의 남서 끝, 섬 너머 벽에 걸려 통로 쪽(북동)을 본다. 화살표는 오른쪽(섬을 돌아 내려가는 쪽). 사진에서는 통로 축 위(v = 5 쯤)로 보인다: 벽이 더 돌아 있을 수 있음. 모델은 바깥 벽의 끝(4.5 m 북서)에 붙임', '확정(있음·통로 남서 끝: 사용자 표시 사진 31), 추정(자리)', name='B2 표지')
+box12('U12-B2-MIRROR', sector(R_OUT - 0.33, R_OUT - 0.25, 81.0, 84.5), Z_B1 + 1.8, Z_B1 + 2.35, '#b0672a', 'B2 표지 오른쪽의 둥근 반사경(주황 테, 네모로 줄임)', '확정(있음: 사진 31), 추정(자리·치수)')
+box12('U12-BANNER', Polygon([sp(0.9, -R_OUT + 0.25), sp(2.1, -R_OUT + 0.25), sp(2.1, -R_OUT + 0.31), sp(0.9, -R_OUT + 0.31)]), Z_B1 + 1.7, Z_B1 + 2.3, '#efece6', '초록 벽(경사로 바깥 벽의 곧은 구간)에 걸린 흰 현수막("지정주차구역" 꼴). 두 사진의 방향에서 섬 중심 기준 북동 2 ±4 m', '확정(있음: 현장 사진 30·31), 추정(자리·치수)', name='현수막')
+box12('U12-MURAL-WALL', Polygon([sp(HYP_S[1] - 3.5, V_HYP + 0.1), sp(HYP_S[1] - 0.3, V_HYP + 0.1), sp(HYP_S[1] - 0.3, V_HYP + 0.18), sp(HYP_S[1] - 3.5, V_HYP + 0.18)]), Z_B1, C_B1 - 0.3, '#b4aeab', '간판 벽 북동 끝 쪽의 무늬(낙서 꼴 그림) 벽: 민무늬 밝은 면으로 줄임. 사진 30 의 방향으로는 빗변의 북동 끝(섬 중심 기준 북동 31 ±4 m)', '확정(있음: 현장 사진 30), 추정(자리·크기·어느 벽인지)')
 
 # 사람 통로의 빈 곳: 혜인관 계단 발치 ~ 주차장(운동장 슬래브 가장자리 밑), 은주1관 북쪽 끝 옆 계단(주차장 ~ 운동장 슬래브 밑)
 hy = LineString([H_BOT, H_OUT]).buffer(1.2, cap_style=2).difference(INNER.buffer(-0.3)).difference(HYEIN.buffer(-0.3))   # U09: 평면이 혜인관 벽까지(일부는 벽 밑까지) 가서 통로는 벽 두께만 남는다
@@ -273,7 +286,10 @@ for i in range(-14, 15):
         box(f'U02-COLUMN-{cols:03d}', 'wall', sq, Z_B2, Z_B1, '#eceae2', f'네모 콘크리트 기둥 0.6 m, {GRID:.0f} m 격자(자리·간격 추정). 지하 2층 구간(흰색)', grade='확정(지하 2층: 흰 네모 기둥·색 띠, 사진 23), 추정(자리)', basePlane='U02-VOID-B2 바닥')
         box(f'U02-COLUMN-{cols:03d}-B1', 'wall', sq, Z_B1, C_B1, '#4f6f95', '같은 기둥의 지하 1층 구간: 푸른 회색(사진 22 의 섬 뒤 기둥, 사진 18·20)', grade='확정(지하 1층: 푸른 바탕·노란 세로 줄, 사진 18·20·22), 추정(자리)')
         box(f'U02-COLUMN-{cols:03d}-BAND-B2', 'wall', sq_at(p, 0.33), Z_B2 + 1.0, Z_B2 + 1.8, BANDS[j % 3], '지하 2층 흰 네모 기둥의 색 띠(사진 23: 초록·파랑·주황). 줄마다 한 색으로 둠(추정)')
-        box(f'U02-COLUMN-{cols:03d}-STRIPE-B1', 'wall', unary_union([Polygon([p + U * a + V * b for a, b in ((-0.33, -0.09), (0.33, -0.09), (0.33, 0.09), (-0.33, 0.09))]), Polygon([p + U * a + V * b for a, b in ((-0.09, -0.33), (0.09, -0.33), (0.09, 0.33), (-0.09, 0.33))])]), Z_B1, Z_B1 + 1.8, '#e2b62c', '지하 1층 기둥의 노란 세로 줄(사진 18·22). 면마다 한 줄로 둠(사진은 두 줄, 추정)')
+        box(f'U02-COLUMN-{cols:03d}-STRIPE-B1', 'wall', unary_union([Polygon([p + U * a + V * (b + o_) for a, b in ((-0.33, -0.045), (0.33, -0.045), (0.33, 0.045), (-0.33, 0.045))]) for o_ in (-0.14, 0.14)] + [Polygon([p + U * (a + o_) + V * b for a, b in ((-0.045, -0.33), (0.045, -0.33), (0.045, 0.33), (-0.045, 0.33))]) for o_ in (-0.14, 0.14)]), Z_B1, Z_B1 + 1.9, '#e2b62c', '지하 1층 기둥의 노란 세로 줄(사진 18·22, 현장 사진 30·31): 면마다 두 줄')
+        GUARDS += [sq_at(p + U * a + V * b, 0.05) for a in (-0.31, 0.31) for b in (-0.31, 0.31)]
+FEATS.append({'type': 'Feature', 'properties': {'id': 'U12-COLUMN-GUARDS', 'type': 'wall', 'kind': 'extrude', 'estimated': True, 'grade': '확정(있음: 현장 사진 30·31), 추정(치수·기둥 자리)', 'assumption': f'지하 1층 기둥 모서리 보호대(검정·노랑, 높이 1.0 m): 기둥 {cols}개의 네 모서리', 'source': SRC_U12,
+    'fromM': Z_B1, 'toM': r2(Z_B1 + 1.0), 'material': 'concrete', 'inVoid': True, 'color': '#1d1d1d', 'name': '기둥 모서리 보호대'}, 'geometry': {'type': 'MultiPolygon', 'coordinates': [ring(g_) for g_ in GUARDS]}})
 rows = 0
 for j in (range(-14, 15) if STALLS is None else ()):
     o = c + V * (j * GRID + 4.0); strip = LineString([o - U * 200, o + U * 200]).buffer(0.08, cap_style=2).intersection(INNER_OLD.buffer(-3.0)).difference(lanes.buffer(1.0))
