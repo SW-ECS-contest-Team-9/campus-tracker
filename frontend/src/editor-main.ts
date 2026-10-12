@@ -13,7 +13,8 @@ import { SceneLayers, bindLayerControls } from './scene-layers';
 import { editorLayerData } from './scene-layer-data';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import { declutter as keepTags, textWidth } from './label-layout';
-import { shortName } from './level-view';
+import { TRACK, shortName, type LvTrack, type TrackPoint } from './level-view';
+import { heightOf } from './trajectory';
 import { isUnderground } from './road-surface';
 import { LABELS, MAP_LINE_SCALE, bindViewStyleControls, onViewStyle, viewStyle, viewStyleControls } from './view-style';
 
@@ -315,6 +316,8 @@ let followMode: 'off' | 'position' | 'direction' = 'off';
 let orbitCursor = false;
 let lastFollowTarget: any = null;
 let snapPoints: RunPoint[] = [];
+/** F10: the raw location samples of the chosen session (read only), drawn on what the lifted view shows; not drawn on the editing map. */
+let sessionRaw: { sessionId: string; points: TrackPoint[] } = { sessionId: '', points: [] };
 let lockedSnapTarget: SnapTarget | null = null;
 let activeSnapTarget: SnapTarget | null = null;
 let lockedSnapEntity: any = null;
@@ -1675,14 +1678,39 @@ async function loadSessions() {
     const select = $('fusion-session');
     select.innerHTML = '<option value="">세션 선택</option>' + sessions.map((s) => `<option value="${esc(s.sessionId)}">${esc(s.collectorId)} · ${new Date(s.startedAt).toLocaleString()}</option>`).join('');
   } catch (err) { say(`수집 세션 목록을 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
+  spaceViews?.level.tracksChanged();
+}
+/** F10: the raw location samples of a session for the lifted view (GET only). A height with a poor vertical accuracy is not believed. */
+async function loadSessionRaw(sessionId: string) {
+  sessionRaw = { sessionId, points: [] };
+  if (!sessionId) return;
+  try {
+    const list = await request<{ latitude: number; longitude: number; altitude: number | null; ellipsoidalAltitude: number | null; verticalAccuracy: number | null }[]>(`/api/v1/sessions/${sessionId}/locations`);
+    if (sessionId !== $('fusion-session').value) return;
+    sessionRaw = { sessionId, points: list.map((p) => {
+      const q = tmForward(p.latitude, p.longitude), h = heightOf(p);
+      return { x: q.x, y: q.y, h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM) };
+    }) };
+  } catch (err) { say(`세션 원본 위치를 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
+  spaceViews?.level.tracksChanged();
+}
+/** F10: what the lifted view draws of the chosen session and run ("궤적 표시" switches both off). */
+function liftedTracks(): LvTrack[] {
+  if (!$<HTMLInputElement>('fusion-overlay').checked) return [];
+  const out: LvTrack[] = [];
+  if (sessionRaw.points.length) out.push({ id: `${sessionRaw.sessionId}|raw`, kind: 'raw', label: '세션 원본 위치', points: sessionRaw.points });
+  if (snapPoints.length) out.push({ id: `${$('fusion-run').value}|run`, kind: 'fused', label: 'Fusion 실행', points: snapPoints.map((p) => ({ x: p.x + ORIGIN.x, y: p.y + ORIGIN.y, h: p.h })) });
+  return out;
 }
 async function loadRuns(sessionId: string) {
   $('fusion-run').innerHTML = '<option value="">Fusion 실행 선택</option>'; snapPoints = [];
   refreshSnapSources(); drawFusionOverlay();
+  void loadSessionRaw(sessionId);
   if (!sessionId) return;
   const runs = await request<any[]>(`/api/v1/sessions/${sessionId}/runs`);
   if (sessionId !== $('fusion-session').value) return;
   $('fusion-run').innerHTML = '<option value="">Fusion 실행 선택</option>' + runs.filter((r) => r.status === 'COMPLETED').map((r) => `<option value="${esc(r.id)}">${esc(r.algorithmVersion)} r${esc(r.revision ?? '?')} · ${new Date(r.startedAt).toLocaleString()}</option>`).join('');
+  spaceViews?.level.tracksChanged();
 }
 async function loadRun(runId: string) {
   snapPoints = [];
@@ -1695,6 +1723,7 @@ async function loadRun(runId: string) {
   drawFusionOverlay(); refreshSnapSources();
 }
 function drawFusionOverlay() {
+  spaceViews?.level.tracksChanged(); // F10: what is lifted shows the same run
   for (const e of entities.filter((e) => (e as any).__fusion)) viewer.entities.remove(e);
   entities = entities.filter((e) => !(e as any).__fusion);
   if (!$<HTMLInputElement>('fusion-overlay').checked || !snapPoints.length) return;
@@ -2016,7 +2045,9 @@ async function startEditor() {
     places: () => places.map((p) => ({ id: p.id, name: p.name, category: p.category, buildingId: p.buildingId, x: p.geometry.coordinates[0], y: p.geometry.coordinates[1], z: p.geometry.coordinates[2] })),
     blocked: () => { const busy = roadDraft || placeDraft || areaEditor?.active; if (busy) say('작성 중인 것을 먼저 저장하거나 취소한 뒤 켜세요.', 'warning'); return busy ? '작성 중' : null; },
     lockKeys: true, walkInputs: [$<HTMLInputElement>('layer-underground')],
-    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => buildingScene?.setShowLabels(!on),
+    // F10: the chosen session and run are drawn on what is lifted, and can be chosen from its panel (copies of the two selects)
+    tracks: liftedTracks, trackPickers: () => [{ label: '수집 세션', select: $<HTMLSelectElement>('fusion-session') }, { label: 'Fusion 실행', select: $<HTMLSelectElement>('fusion-run') }],
+    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => { buildingScene?.setShowLabels(!on); if (on && $<HTMLSelectElement>('fusion-session').options.length <= 1) void loadSessions(); },
     // view only: the editor's own lines, markers and tags are put away meanwhile (they would show through what is lifted)
     onChange: (state) => { const on = state.level || state.walk; spaceViewOn = on; syncEntityVisibility(); if (on) { clearHeldKeys(); setTool('select'); } },
   }, { level: $('view-level'), walk: $('view-walk') });

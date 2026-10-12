@@ -12,8 +12,9 @@ import type { SceneBuilding } from './api';
 import './level-view.css';
 import { declutter as keepTags, textWidth } from './label-layout';
 import {
-  FAN, LEVEL_VIEW, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, isConnector, isWideRoad, levelsUnder, parseZones, shortName, zoneAt, zoneContent,
-  type Floor, type LvArea, type LvPlace, type LvRoad, type Zone,
+  FAN, LEVEL_VIEW, TRACK, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseZones, shortName, stackLiftM,
+  trackOnBuilding, trackOnZone, trackRuns, zoneAt, zoneContent,
+  type Floor, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackSpot, type Zone,
 } from './level-view';
 import { FirstPerson } from './first-person';
 import { polygonArea, polygonOps, type Polygon } from './polygon-ops';
@@ -21,7 +22,7 @@ import { ribbon, roadWidthM, type P3 } from './road-surface';
 import type { LayerArea } from './scene-layer-data';
 import { SOLID_STRIDE, STRUCTURES, parseStructures, solidColors, solidMesh, type Solid } from './structures';
 import { tmForward, tmInverse } from './tm';
-import { LABELS, LINE_PX, OTHERS, VIEW_COLORS, VIEW_STYLE_CHOICES, VIEW_STYLE_TITLES, onViewStyle, setViewStyle, viewStyle, type ViewStyle } from './view-style';
+import { LABELS, LINE_PX, OTHERS, TRACK_PX, VIEW_COLORS, VIEW_STYLE_CHOICES, VIEW_STYLE_TITLES, onViewStyle, setViewStyle, viewStyle, type ViewStyle } from './view-style';
 
 export type SpaceViewSources = {
   /** Roads as the page has them (the editor's include elevators and unsaved edits). */
@@ -45,11 +46,21 @@ export type SpaceViewSources = {
   onLevel?: (on: boolean) => void;
   /** Extra page work while walking (the editor fades its buildings). */
   onWalk?: (on: boolean) => void;
+  /**
+   * F10: the session tracks the page shows now (its own toggles and selectors decide): raw location samples and fused
+   * paths, plan position in metres and height in the model's datum. Read only. The page calls level.tracksChanged()
+   * when they change.
+   */
+  tracks?: () => LvTrack[];
+  /** F10: the page's own selectors of what track is loaded (the editor: session, fusion run); the lifted panel shows a copy of each bound to it. */
+  trackPickers?: () => { label: string; select: HTMLSelectElement }[];
 };
 
 type Unit = { kind: 'zone'; zone: Zone } | { kind: 'building'; id: string; name: string; floors: Floor[]; focus: number | null };
 type Tag = { label: any; world: any; priority: number };
 
+/** A colour moved towards another (0 = itself, 1 = the other): what is seen through an opening is drawn at reduced contrast. */
+const blend = (hex: string, to: string, share: number) => { const a = rgb(hex), b = rgb(to); return `#${a.map((v, i) => Math.round(v + (b[i] - v) * share).toString(16).padStart(2, '0')).join('')}`; };
 const rgb = (hex: string) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
 const openRing = (ring: number[][]) => (ring.length > 1 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1] ? ring.slice(0, -1) : ring);
 const metres = (ring: number[][]) => openRing(ring).map(([lon, lat]) => { const p = tmForward(lat, lon); return [p.x, p.y]; });
@@ -86,6 +97,11 @@ export class LevelView {
   choices: string[] = [];
   /** F09: the direction the floors of the lifted building are fanned out in (the default camera looks along it). */
   private fanHeading: number | null = null;
+  /** F10: tracks put in by a test or a script (drawn like the page's own; the test DB has no sessions). */
+  extraTracks: LvTrack[] = [];
+  /** F10: what of the tracks lies on what is lifted now (points drawn; `loaded`: points the page has). */
+  trackStats = { raw: 0, fused: 0, unsure: 0, loaded: 0 };
+  private trackSignature = '';
 
   constructor(private readonly viewer: any, private readonly src: SpaceViewSources, private readonly changed: () => void) {
     this.C = (window as any).Cesium;
@@ -122,6 +138,24 @@ export class LevelView {
 
   areas(): LvArea[] {
     return this.src.areas().map((a) => ({ id: a.id, name: a.name, elevationM: a.elevationM, buildingId: a.buildingId, floor: a.floor, rings: a.geometry.coordinates.map(metres) }));
+  }
+
+  /** F10: every track to draw: the page's own and the ones put in by a script. */
+  tracks(): LvTrack[] {
+    return [...(this.src.tracks?.() ?? []), ...this.extraTracks];
+  }
+
+  /** F10: the page says its tracks or its selectors changed: what is lifted is drawn again when they really did. */
+  tracksChanged() {
+    if (!this.active) return;
+    const signature = this.signature();
+    if (signature === this.trackSignature) return;
+    this.draw(false);
+    this.renderPanel();
+  }
+
+  private signature() {
+    return [...this.tracks().map((t) => `${t.id}|${t.kind}|${t.points.length}`), ...(this.src.trackPickers?.() ?? []).map((p) => `${p.select.options.length}:${p.select.value}`)].join(';');
   }
 
   /** The buildings that can be lifted: one per base id, named by the block that has a name. */
@@ -266,7 +300,7 @@ export class LevelView {
     if (!u) return null;
     const mid = (line: number[][]) => { const a = line[Math.floor((line.length - 1) / 2)], b = line[Math.ceil((line.length - 1) / 2)]; return { x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, z: (a[2] + b[2]) / 2 }; };
     if (u.kind === 'zone') {
-      const content = zoneContent(u.zone, { roads: this.src.roads(), areas: this.areas(), solids: this.solids });
+      const content = zoneContent(u.zone, { roads: this.src.roads(), areas: this.areas(), solids: this.solids, zones: this.zones });
       const road = content.roads.find((r) => r.road.roadClass !== 'vehicle') ?? content.roads[0];
       if (road) return mid(road.cut.pieces[0]);
       const ring = u.zone.polygons[0][0];
@@ -378,18 +412,44 @@ export class LevelView {
       return [...new Set([pick((p) => p[0]), pick((p) => -p[0]), pick((p) => p[1]), pick((p) => -p[1])])];
     };
     const frame: number[][] = []; // lifted points the camera frames
+    // F10: a session's track on what is lifted. Raw samples: small dots and a thin line; a fused path: a thick bright
+    // line with a white outline; points whose height is not known: faint and dashed, on the nearest plate.
+    const tpx = TRACK_PX[style.line];
+    const stats = { raw: 0, fused: 0, unsure: 0, loaded: 0 };
+    const tracks = this.tracks();
+    this.trackSignature = this.signature();
+    const drawTrack = (track: LvTrack, spots: TrackSpot[], at: (s: TrackSpot) => number[]) => {
+      const fused = track.kind === 'fused', color = C.Color.fromCssColorString(fused ? VIEW_COLORS.trackFused : VIEW_COLORS.trackRaw);
+      for (const run of trackRuns(spots)) {
+        const sure = run[0].sure, pts = run.map((s) => this.pos(at(s)));
+        if (pts.length > 1) {
+          lines.add({
+            positions: pts, width: sure ? (fused ? tpx.fused + 4 : tpx.raw) : fused ? tpx.fused : tpx.raw + 0.5,
+            material: !sure ? C.Material.fromType('PolylineDash', { color: color.withAlpha(0.5), dashLength: 12 })
+              : fused ? C.Material.fromType('PolylineOutline', { color, outlineColor: C.Color.WHITE, outlineWidth: 2 }) : C.Material.fromType('Color', { color }),
+          });
+        }
+        if (!fused || pts.length === 1) for (const position of pts) points.add({ position, color: color.withAlpha(sure ? 1 : 0.45), pixelSize: tpx.dot, outlineColor: C.Color.WHITE.withAlpha(sure ? 1 : 0.5), outlineWidth: 1 });
+      }
+      stats[track.kind] += spots.length;
+      stats.unsure += spots.filter((s) => !s.sure).length;
+    };
+    for (const t of tracks) stats.loaded += t.points.length;
     let dropM = 0; // how far the whole drawing starts below its place (the animation)
     let veilM = baseM;
     this.fanHeading = null;
 
     if (u.kind === 'zone') {
       const zone = u.zone, ground = zone.layer === 'ground';
-      const content = zoneContent(zone, { roads: this.src.roads(), areas: this.areas(), solids: this.solids, places: this.src.places?.() });
-      const lift = (z: number) => z + baseM - content.minM;
+      const content = zoneContent(zone, { roads: this.src.roads(), areas: this.areas(), solids: this.solids, places: this.src.places?.(), zones: this.zones });
+      // F10: a storey of a car park keeps its own height in the air: the lowest storey of the stack at the lift height,
+      // each next one its true difference + floorGapM higher, so stepping through them (↑↓) goes up and down
+      const refM = zone.floorM ?? content.minM, liftM = baseM + stackLiftM(levelStack(this.zones, zone), zone);
+      const lift = (z: number) => z + liftM - refM;
       const move = (p: number[]) => [p[0], p[1], lift(p[2])];
-      dropM = baseM - content.minM;
+      dropM = liftM - refM;
       // U08: what is seen through an opening in the floor lies below the plate: the veil goes below it
-      veilM = baseM - 2.5 - Math.max(0, ...content.solids.filter((s) => s.below).map((s) => content.minM - s.bottomM));
+      veilM = Math.min(baseM, liftM - Math.max(0, ...content.solids.filter((s) => s.below).map((s) => refM - s.bottomM))) - 2.5;
       const floorAt = (x: number, y: number) => (ground ? this.src.groundAt(x, y) : zone.floorM ?? content.minM);
       if (!ground && zone.floorM !== undefined) for (const polygon of polygonOps('minus', zone.polygons, content.openings)) this.addSolid(solid, this.plate(polygon, zone.floorM), move, { body: '#aab1ba', top: VIEW_COLORS.plate });
       for (const s of content.solids) {
@@ -402,8 +462,11 @@ export class LevelView {
         const marking = !ground && s.solid.props?.underground === true && s.solid.topM - s.solid.bottomM < 0.1;
         const up = marking ? 0.1 + (s.solid.topM - s.solid.bottomM) * 2 : 0;
         // U06: a marking with surface 'carriageway' (the straight lane continuing the underground carriageway) keeps its own dark colour
-        const colors = marking && polygonArea(s.solid.polygon) > 8 && s.solid.props?.surface !== 'carriageway' ? { body: VIEW_COLORS.stall, top: VIEW_COLORS.stall } : solidColors(s.solid);
-        this.addSolid(solid, cut as Solid, up ? (p) => [p[0], p[1], lift(p[2]) + up] : move, colors);
+        const own = marking && polygonArea(s.solid.polygon) > 8 && s.solid.props?.surface !== 'carriageway' ? { body: VIEW_COLORS.stall, top: VIEW_COLORS.stall } : solidColors(s.solid);
+        // F10: what belongs to the storey below is told apart: the ramp surface seen through the opening in the floor at
+        // reduced contrast (towards the plate's colour), a wall that rises through this storey translucent
+        const colors = s.below ? { body: blend(own.body, VIEW_COLORS.plate, 0.6), top: blend(own.top, VIEW_COLORS.plate, 0.6) } : own;
+        this.addSolid(s.shared ? faint : solid, cut as Solid, up ? (p) => [p[0], p[1], lift(p[2]) + up] : move, colors, s.shared ? 90 : 255);
       }
       for (const area of content.areas) {
         const ring = openRing(area.rings[0]);
@@ -430,16 +493,31 @@ export class LevelView {
         const longest = cut.pieces.reduce((a, b) => (b.length > a.length ? b : a));
         tag('road', raised([middle(longest)], move, 1)[0], shortName(road.name), 1, 12);
         if (linking(road)) for (const end of [cut.pieces[0][0], cut.pieces[cut.pieces.length - 1].slice(-1)[0]]) dot(raised([end], move)[0], VIEW_COLORS.stairs, 7);
-        for (const stub of cut.stubs) {
+        cut.stubs.forEach((whole, k) => {
+          // F10: a road that leaves a storey by height (the ramp or stairs to the storey below or above, inside the
+          // outline) gets a short stub at the opening and its tag outside the plate, on a leader: nothing of the other
+          // storey is drawn over the stalls
+          const vertical = zone.floorM !== undefined && (Math.abs(whole[0][2] - (zone.floorM - LEVEL_VIEW.floorSlackM)) < 0.02 || Math.abs(whole[0][2] - zone.toM!) < 0.02);
+          let stub = whole;
+          if (vertical) { stub = [whole[0]]; let left = LEVEL_VIEW.stubM; for (let i = 1; i < whole.length && left > 0; i++) { const d = Math.hypot(whole[i][0] - whole[i - 1][0], whole[i][1] - whole[i - 1][1]); stub.push(d <= left ? whole[i] : whole[i - 1].map((v, j) => v + (whole[i][j] - v) * (left / (d || 1)))); left -= d; } }
           // U05: where a carriageway goes on into a neighbour (a tunnel mouth) its stub is a pale ribbon of the road's width with a larger tag
           const wide = isWideRoad(road);
-          if (wide) this.addRibbon(solid, stub, width, move, VIEW_COLORS.stubFill, 255, ground ? 0.15 : 0.3);
+          if (wide && !vertical) this.addRibbon(solid, stub, width, move, VIEW_COLORS.stubFill, 255, ground ? 0.15 : 0.3);
           line(raised(stub, move), px.connector, VIEW_COLORS.stub, 1, true);
-          const end = stub[stub.length - 1];
-          const next = zoneAt(this.zones, end[0], end[1], ground ? undefined : end[2]);
+          const end = stub[stub.length - 1], far = cut.stubEnds[k];
+          // what the stub leads to: the zone where the part outside ends (the other storey), else the zone at the stub's end
+          const at = (p: number[]) => { const z = zoneAt(this.zones, p[0], p[1], ground ? undefined : p[2]); return z && z.id !== zone.id ? z : null; };
+          const next = at(far) ?? at(end);
           dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 7);
-          if (next && next.id !== zone.id) tag('link', raised([wide ? stub[Math.floor(stub.length / 2)] : end], move, 1)[0], `→ ${shortName(next.name, 16)}`, wide ? 8 : 4, wide ? 14 : 12, wide ? VIEW_COLORS.label : VIEW_COLORS.stub, wide);
-        }
+          if (!next) return;
+          const text = `→ ${shortName(next.name, 16)}`;
+          const out = vertical ? nearestOnOutline(zone.polygons, stub[0][0], stub[0][1]) : null;
+          if (out) {
+            const beside = [out.x + out.dir[0] * 7, out.y + out.dir[1] * 7, zone.floorM!];
+            line([raised([[stub[0][0], stub[0][1], zone.floorM!]], move)[0], raised([beside], move)[0]], 1.5, VIEW_COLORS.stub, 0.9);
+            tag('link', raised([beside], move, 0.6)[0], text, 8, 13, VIEW_COLORS.label, true);
+          } else tag('link', raised([wide ? stub[Math.floor(stub.length / 2)] : end], move, 1)[0], text, wide ? 8 : 4, wide ? 14 : 12, wide ? VIEW_COLORS.label : VIEW_COLORS.stub, wide);
+        });
       }
       if (ground) {
         for (const b of buildings) {
@@ -457,6 +535,17 @@ export class LevelView {
       const outer = zone.polygons.reduce((a, b) => (b[0].length > a[0].length ? b : a))[0];
       tag('title', [...middle(outer), lift(content.maxM) + 4], zone.name, 10, 16);
       for (const p of corners(zone.polygons.map((poly) => poly[0]))) { const z = floorAt(p[0], p[1]); line([[p[0], p[1], z], [p[0], p[1], lift(z)]], 1.5, VIEW_COLORS.leader, 0.9, true, leaders); }
+      // F10: the session tracks on this zone (level-view.ts trackOnZone: inside the outline and at its height)
+      if (tracks.length) {
+        const footprints = new Map<string, { rings: number[][][]; baseM: number; roofM: number }>();
+        for (const b of buildings) {
+          const id = baseBuildingId(b.buildingId), f = footprints.get(id) ?? { rings: [], baseM: Infinity, roofM: -Infinity };
+          f.rings.push(...b.geometry.coordinates.map((poly) => metres(poly[0]))); f.baseM = Math.min(f.baseM, b.baseM); f.roofM = Math.max(f.roofM, b.roofM);
+          footprints.set(id, f);
+        }
+        const ctx: TrackContext = { zones: this.zones, groundAt: this.src.groundAt, buildings: [...footprints.values()], roads: this.src.roads() };
+        for (const track of tracks) drawTrack(track, trackOnZone(track.points, zone, ctx), (s) => [track.points[s.index].x, track.points[s.index].y, lift(s.z) + 0.6]);
+      }
     } else {
       const blocks = buildings.filter((b) => baseBuildingId(b.buildingId) === u.id);
       const floors: Floor[] = u.floors.length ? u.floors : [{ m: Math.min(...blocks.map((b) => b.baseM)), name: null, fromTable: false, roadIds: [] }];
@@ -554,11 +643,18 @@ export class LevelView {
         dot(raised([[place.x, place.y, place.z]], move, 0.5)[0], VIEW_COLORS.place);
         tag('place', raised([[place.x, place.y, place.z]], move, 1.2)[0], shortName(place.name), 5, 12, VIEW_COLORS.place);
       }
+      // F10: the session tracks inside the footprint, each point on the plate of the floor nearest to its height
+      for (const track of tracks) {
+        const spots = trackOnBuilding(track.points, footprints.flatMap((f) => f.rings), floors.map((f) => f.m), { baseM: Math.min(...blocks.map((b) => b.baseM)), roofM: Math.max(...blocks.map((b) => b.roofM)) }, this.src.groundAt)
+          .filter((s) => focused(s.floor!));
+        drawTrack(track, spots, (s) => { const p = track.points[s.index], q = onFloor(s.floor!)([p.x, p.y, floors[s.floor!].m]); return [q[0], q[1], q[2] + 0.6]; });
+      }
       const top = onFloor(floors.length - 1)([...middle(main), floors[floors.length - 1].m]);
       tag('title', [top[0], top[1], top[2] + 6], u.name, 10, 16);
       for (const p of corners([main])) line([[p[0], p[1], floors[0].m], [p[0], p[1], fan([p[0], p[1], floors[0].m])[2]]], 1.5, VIEW_COLORS.leader, 0.9, true, leaders);
     }
 
+    this.trackStats = stats;
     // everything of the campus below is faded by a veil under what is lifted (view-style.ts OTHERS.veil = what still shows)
     const b = buildings.flatMap((x) => x.geometry.coordinates.flatMap((poly) => poly[0]));
     if (b.length) {
@@ -640,6 +736,13 @@ export class LevelView {
         return `<button type="button" data-floor="${i}" class="${u.focus === i ? 'on' : ''}${f.roadIds.length ? '' : ' empty'}" title="바닥 ${f.m.toFixed(1)} m${f.roadIds.length ? ` · 길 ${f.roadIds.length}개` : ' · 길 없음'}">${esc(f.name ?? f.m.toFixed(1))}</button>`;
       }).join('')}</div>` : '';
     const choice = <K extends keyof ViewStyle>(k: K) => `<label>${VIEW_STYLE_TITLES[k]} <select data-style="${k}">${(VIEW_STYLE_CHOICES[k] as { value: string; label: string }[]).map((c) => option(c.value, c.label, style[k] === c.value)).join('')}</select></label>`;
+    // F10: the page's own selectors of the loaded track, copied here so the lifted view need not be left
+    const pickers = (this.src.trackPickers?.() ?? []).map((p, i) => `<label>${esc(p.label)} <select data-mirror="${i}">${[...p.select.options].map((o) => option(o.value, o.textContent ?? '', o.value === p.select.value)).join('')}</select></label>`).join('');
+    const t = this.trackStats, level = u?.kind === 'building' || (u?.kind === 'zone' && u.zone.floorM !== undefined);
+    const trackLine = !u || (!this.src.tracks && !this.extraTracks.length) ? ''
+      : !t.loaded ? '불러온 세션 없음. 세션을 고르면 원본 위치와 퓨전 궤적이 이 위에 함께 뜹니다.'
+      : !(t.raw + t.fused) ? (level ? '이 층을 지나는 세션 점 없음' : '이 구획을 지나는 세션 점 없음')
+      : `세션 점: 원본 ${t.raw} · 퓨전 ${t.fused}${t.unsure ? ` (그중 높이 미상 ${t.unsure})` : ''}`;
     const swatch = (color: string, label: string, cls = '') => `<span><i class="${cls}" style="--c:${color}"></i>${label}</span>`;
     this.panel.innerHTML = `
       <div class="level-head"><b>층 따로 보기</b><button type="button" data-action="close" title="제자리로 돌려놓고 끝냄 (Esc)">닫기</button></div>
@@ -649,14 +752,22 @@ export class LevelView {
       <select data-pick><option value="">구획·건물 고르기…</option><optgroup label="지상 구획">${zoneOptions('ground')}</optgroup><optgroup label="지하">${zoneOptions('underground')}</optgroup>
         <optgroup label="건물(층 벌려 보기)">${this.buildingList().map((b) => option(`building:${b.id}`, b.name, u?.kind === 'building' && u.id === b.id)).join('')}</optgroup></select>
       ${floors}
+      ${pickers ? `<div class="level-tracks">${pickers}</div>` : ''}
+      ${trackLine ? `<div class="level-track-msg">${esc(trackLine)}</div>` : ''}
       <div class="level-style">${choice('line')}${choice('labels')}${choice('others')}</div>
-      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}</div>
-      <div class="level-hint">띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. ↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>`;
+      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 원본 위치', 'dot')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}${swatch(VIEW_COLORS.trackFused, '높이 미상(흐린 점선)', 'dash faint')}</div>
+      <div class="level-hint">띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. ↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게), 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>`;
   }
 
   private onPanelChange(e: Event) {
     const el = e.target as HTMLSelectElement;
     if (el.dataset.style) { setViewStyle({ [el.dataset.style]: el.value } as Partial<ViewStyle>); return; }
+    if (el.dataset.mirror !== undefined) {
+      // F10: the copy of a page selector: the page's own select gets the value and is told, as if it had been changed there
+      const source = this.src.trackPickers?.()[Number(el.dataset.mirror)]?.select;
+      if (source) { source.value = el.value; source.dispatchEvent(new Event('change', { bubbles: true })); }
+      return;
+    }
     if (el.dataset.pick === undefined || !el.value) return;
     const [kind, id] = [el.value.slice(0, el.value.indexOf(':')), el.value.slice(el.value.indexOf(':') + 1)];
     if (kind === 'zone') this.showZone(id); else this.showBuilding(id);

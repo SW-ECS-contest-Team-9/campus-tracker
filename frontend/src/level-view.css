@@ -18,6 +18,11 @@
 .level-legend i { width: 18px; height: 0; border-top: 4px solid var(--c); }
 .level-legend i.dash { border-top: 3px dashed var(--c); }
 .level-legend i.dot { width: 9px; height: 9px; border: 0; border-radius: 50%; background: var(--c); }
+.level-legend i.track { border-top: 5px solid var(--c); outline: 1.5px solid #fff; box-shadow: 0 0 0 2.5px #9aa5b1; }
+.level-legend i.faint { opacity: 0.5; }
+.level-tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 6px; }
+.level-tracks label { display: grid; gap: 2px; color: #52606d; }
+.level-track-msg { margin-top: 6px; padding: 3px 6px; border-radius: 5px; background: #fdf2f8; color: #9d174d; }
 .level-hint { margin-top: 8px; color: #52606d; }
 .walk-hud { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5; max-width: calc(100% - 28px); padding: 6px 12px; border-radius: 8px; background: #111827e6; color: #f9fafb; font: 12px/1.4 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
 /* the editor's drawing tools rest while a view is on (view only) */

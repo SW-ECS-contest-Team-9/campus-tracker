@@ -41,6 +41,15 @@ export const SECTION_PX: Record<LineWeight, { cut: number; mark: number; floor: 
   normal: { cut: 2.5, mark: 8, floor: 1.5, grid: 1 },
   thick: { cut: 4, mark: 12, floor: 2.5, grid: 1 },
 };
+/**
+ * F10, a session's track on what is lifted, in screen pixels per weight: `raw` the thin line through the raw location
+ * samples, `dot` their dots, `fused` the fused path (drawn with a white outline of 2 px either side on top of this).
+ */
+export const TRACK_PX: Record<LineWeight, { raw: number; fused: number; dot: number }> = {
+  thin: { raw: 1, fused: 2.5, dot: 3 },
+  normal: { raw: 1.5, fused: 4, dot: 4.5 },
+  thick: { raw: 2.5, fused: 7, dot: 6.5 },
+};
 /** F09: the editor's own road lines on the general map are this many times their usual width. */
 export const MAP_LINE_SCALE: Record<LineWeight, number> = { thin: 0.65, normal: 1, thick: 1.5 };
 /** F09: how much of what stands behind a cut still shows (0 = a plain wall); the cut face itself is never dimmed. */
@@ -64,6 +73,8 @@ export const VIEW_COLORS = {
   focus: '#0759c7', aisle: '#6a717b', stall: '#c8cdd4',
   /** F09, the cut face: indoor ways, the air of a cut void, floor lines of a cut building, what stands behind the cut. */
   indoor: '#6d4bc4', voidFill: '#fbfbf8', floorLine: '#8a4b12', backdrop: '#f4f2ec',
+  /** F10: a session's raw location samples and its fused path (the editor's bright track colour) on what is lifted. */
+  trackRaw: '#2fb344', trackFused: '#e11d8f',
 };
 
 /** The three choices as form controls (a view puts them in its panel; bindViewStyleControls makes them work). */

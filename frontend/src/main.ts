@@ -20,7 +20,8 @@ import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campu
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 import { SceneLayers, bindLayerControls, loadPublicLayerData } from './scene-layers';
-import type { LvPlace } from './level-view';
+import { TRACK, type LvPlace, type LvTrack } from './level-view';
+import { tmForward } from './tm';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import type { LayerData } from './scene-layer-data';
 
@@ -37,6 +38,7 @@ import {
   collectorColor,
   heightOf,
   horizontalOffsetMeters,
+  sceneHeight,
   type LayerVisibility,
   type PickId,
 } from './trajectory';
@@ -168,6 +170,31 @@ async function reloadTrack(sessionId: string, replace = false) {
     trackLoads.delete(sessionId); // allow retry
   }
   scheduleRender();
+}
+
+/**
+ * F10: the tracks on the map now, for the lifted view (level-view-layer.ts): the sessions drawn (Live: the live ones,
+ * History: the selected one), raw samples and the fused path of every version switched on, as the layer toggles say.
+ * Heights as the map draws them (MSL); a raw height with a poor vertical accuracy is not believed.
+ */
+function liftedTracks(): LvTrack[] {
+  const out: LvTrack[] = [];
+  const selectedSession = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
+  const xy = (p: { latitude: number; longitude: number }) => { const q = tmForward(p.latitude, p.longitude); return { x: q.x, y: q.y }; };
+  for (const [id, track] of tracks) {
+    if (!(state.mode === 'live' ? liveSessionIds.has(id) : state.mode === 'history' && selectedSession === id)) continue;
+    if (state.layers.rawPoints || state.layers.rawTrajectory) {
+      out.push({ id: `${id}|raw`, kind: 'raw', label: `${track.collectorId} 원본`, points: track.points.map((p) => {
+        const h = heightOf(p);
+        return { ...xy(p), h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM) };
+      }) });
+    }
+    if (state.layers.fusedTrajectory) for (const version of state.fusion.versions.filter(versionEnabled)) {
+      const list = track.fused(version);
+      if (list.length) out.push({ id: `${id}|${version}`, kind: 'fused', label: `${track.collectorId} ${version}`, points: list.map((f) => ({ ...xy(f), h: f.ellipsoidalAltitude != null ? sceneHeight(f.ellipsoidalAltitude) : null })) });
+    }
+  }
+  return out;
 }
 
 function applyVisibility() {
@@ -461,6 +488,7 @@ function setHtml(id: string, html: string) {
 }
 
 function render() {
+  spaceViews?.level.tracksChanged(); // F10: what is lifted follows the sessions and layers shown
   const status = $('socket-status');
   status.textContent = state.connected ? 'live' : 'disconnected';
   status.className = `pill ${state.connected ? 'ok' : 'bad'}`;
@@ -1033,7 +1061,7 @@ async function boot() {
         // 층 따로 보기(누른 건물·구획을 공중에 띄움)와 1인칭 걷기: 편집기와 같은 level-view-layer.ts
         spaceViews = mountSpaceViews(r.viewer, {
           roads: () => [...layerData.roads, ...elevators], areas: () => layerData.areas, buildings: () => r.scene?.scene.buildings ?? [], groundAt: (x, y) => layers.structures.groundAt(x, y),
-          places: () => scenePlaces,
+          places: () => scenePlaces, tracks: liftedTracks,
           walkInputs: [$<HTMLInputElement>('scene-roads-underground'), $<HTMLInputElement>('scene-xray')],
           // inside (underground, indoors): no void boxes over the walk's schematic room, no building names showing through the walls
           onWalk: (on) => { layers.setWalkInside(on); r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked); },
