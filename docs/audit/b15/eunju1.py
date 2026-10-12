@@ -5,7 +5,7 @@ import numpy as np
 from shapely.geometry import Polygon
 REPO = pathlib.Path(__file__).parents[3]; r2 = lambda v: round(float(v), 2)
 SRC = '사용자-청운관현관·은주1관돌계단-20261012/07·08·09·10, 건물 노트 은주관 B15 절'
-TOP, BAND = 154.2, 2.8      # 벽 꼭대기(지붕 156.8 - 오름 2.6), 처마 밑 띠
+TOP, BAND = 155.5, 2.8      # 그려지는 벽 꼭대기(지붕 156.8 - 오름 2.6 의 반: building-appearance.ts wallTopM), 처마 밑 띠
 FEATS = []
 def box(id, typ, poly, fromM, toM, assumption, grade, **extra):
     assert toM > fromM, id

@@ -5,16 +5,16 @@ import numpy as np
 from shapely.geometry import Polygon
 REPO = pathlib.Path(__file__).parents[3]; r2 = lambda v: round(float(v), 2)
 roofs = json.loads((REPO / 'backend/data/scene/overrides/building-roofs.json').read_text(encoding='utf-8'))
-part = next(p for e in roofs['parts'] if e['name'] == '대일관' for p in e['parts']); body = Polygon(part['polygon'][0]); ROOF = part['roofM']
+part = next(p for e in roofs['parts'] if e['name'] == '대일관' for p in e['parts']); body = Polygon(part['polygon'][0]); ROOF = part['roofM'] + 2.0   # 겉모습의 모임지붕(오름 4.0)은 저장된 지붕 높이 172.1 을 가운데로 벽 꼭대기 170.1 ~ 윗면 174.1 로 그려진다(building-appearance.ts wallTopM)
 SRC = '사용자-SMAP-건물전후면-20261012/02-SMAP-대일관뒷면-청운관-문예관-북악관-동쪽에서.webp, 건물 노트 대일관 B15 절'
 FEATS = []
 def box(id, typ, poly, fromM, toM, assumption, grade, **extra):
-    FEATS.append({'type': 'Feature', 'properties': {'id': 'B15-DAEIL-' + id, 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': grade, 'basePlane': f'건물 대일관 지붕 {ROOF}', 'fromM': r2(fromM), 'toM': r2(toM), 'assumption': assumption, 'source': SRC, **extra},
+    FEATS.append({'type': 'Feature', 'properties': {'id': 'B15-DAEIL-' + id, 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': grade, 'basePlane': f'건물 대일관의 그려지는 지붕 윗면 {ROOF}', 'fromM': r2(fromM), 'toM': r2(toM), 'assumption': assumption, 'source': SRC, **extra},
                   'geometry': {'type': 'Polygon', 'coordinates': [[[r2(x), r2(y)] for x, y in poly.exterior.coords]]}})
 top = body.buffer(-2.2, join_style=2)
 if top.geom_type != 'Polygon': top = max(top.geoms, key=lambda g: g.area)
 top = top.simplify(0.05)
-box('ROOF-GREEN', 'landing', top, ROOF - 0.1, ROOF + 0.4, '지붕 윗면의 초록 평지붕(가장자리 기와 비탈 안쪽). 건물 지붕 높이 위 0.4 m 의 얇은 판(멀리서 지붕면과 겹쳐 깜박이지 않게)', 'S-MAP(화면: 긴 초록 평지붕), 추정(가장자리에서 2.2 m 안쪽)', color='#4fae7c')
+box('ROOF-GREEN', 'landing', top, ROOF - 0.1, ROOF + 0.15, '지붕 윗면의 초록 평지붕(가장자리 기와 비탈 안쪽). 그려지는 지붕 윗면(174.1 m) 위의 얇은 판', 'S-MAP(화면: 긴 초록 평지붕), 추정(가장자리에서 2.2 m 안쪽)', color='#4fae7c')
 mr = body.minimum_rotated_rectangle; c = np.array(mr.exterior.coords)[:4]; e = [c[1] - c[0], c[2] - c[1]]; long = max(e, key=np.linalg.norm); L = float(np.linalg.norm(long)); u = long / L
 if u[0] < 0: u = -u                      # u = 서쪽 끝 -> 동쪽 끝
 n = np.array([-u[1], u[0]])              # 뒷면(북동, 숲) 쪽
