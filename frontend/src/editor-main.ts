@@ -1674,7 +1674,7 @@ async function loadSessions() {
     const sessions = await request<any[]>('/api/v1/sessions?limit=500');
     const select = $('fusion-session');
     select.innerHTML = '<option value="">세션 선택</option>' + sessions.map((s) => `<option value="${esc(s.sessionId)}">${esc(s.collectorId)} · ${new Date(s.startedAt).toLocaleString()}</option>`).join('');
-  } catch { /* track reference is optional */ }
+  } catch (err) { say(`수집 세션 목록을 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
 }
 async function loadRuns(sessionId: string) {
   $('fusion-run').innerHTML = '<option value="">Fusion 실행 선택</option>'; snapPoints = [];
@@ -1846,6 +1846,8 @@ function installControls() {
   for (const id of ['place-name', 'place-category', 'place-description', 'place-building', 'place-level']) {
     $(id).addEventListener('input', () => { updateControls(); if (placeDraft) publishDraft(); });
   }
+  // An empty list (server was down or busy at login) refills when the list is opened.
+  $('fusion-session').onfocus = () => { if ($<HTMLSelectElement>('fusion-session').options.length <= 1) void loadSessions(); };
   $('fusion-session').onchange = () => void loadRuns($('fusion-session').value).catch((e) => say((e as Error).message, 'error'));
   $('fusion-run').onchange = () => void loadRun($('fusion-run').value).catch((e) => say((e as Error).message, 'error'));
   $('fusion-overlay').onchange = drawFusionOverlay;
@@ -1981,7 +1983,7 @@ async function startEditor() {
   if (viewer) {
     if (!controlsInstalled) installControls();
     socket?.disconnect(); socket = null;
-    installSocket(); await loadSnapshot(); await loadSessions();
+    installSocket(); void loadSessions(); await loadSnapshot();
     return;
   }
   const result = await initCampusMap('editor-map');
@@ -2032,7 +2034,7 @@ async function startEditor() {
   viewer.scene.canvas.setAttribute('tabindex', '0');
   ownCursor[2] = terrainAt(ownCursor[0], ownCursor[1]) ?? ownCursor[2];
   viewer.scene.canvas.addEventListener('click', () => viewer.scene.canvas.focus());
-  installControls(); installSocket(); await loadSnapshot(); await loadSessions();
+  installControls(); installSocket(); void loadSessions(); await loadSnapshot();
   setTool('select');
   if (result.warning) say(result.warning, 'warning');
   $('editor-logout').title = `${userCode()} · tracker account`;
