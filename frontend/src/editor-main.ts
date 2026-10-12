@@ -558,10 +558,16 @@ function updateRoadStyles() {
   }
 }
 function styleProperty(id: string, key: keyof RoadStyle) {
-  return new C.ColorMaterialProperty(new C.CallbackProperty((_t: any, result: any) => {
+  const property = new C.ColorMaterialProperty(new C.CallbackProperty((_t: any, result: any) => {
     const s = roadStyles.get(id);
     return s ? C.Color.clone(s[key], result) : C.Color.clone(C.Color.GRAY, result);
   }, false));
+  // F11: Cesium puts lines in one batch (one draw call) only when their see-through materials are equal, and two
+  // callbacks never are: every road line and casing was a primitive of its own (about 800 draw calls). The colour
+  // is still read per line on every frame (a per-line attribute), so the same kind of line may share a batch.
+  property.roadStyleKey = key;
+  property.equals = (other: any) => other === property || other?.roadStyleKey === key;
+  return property;
 }
 function colorCallback(id: string, key: keyof RoadStyle) {
   return new C.CallbackProperty((_t: any, result: any) => {
