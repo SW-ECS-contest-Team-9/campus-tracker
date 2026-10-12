@@ -45,6 +45,7 @@ for f in n03['features']:
     if f['properties']['id'].startswith('N03B-SIDEWALK-') and LINE.distance(c) < 6 and st(c.x, c.y) < max(S_W1, S_E1): continue
     keep.append(f)
 removed = len(n03['features']) - len(keep); n03['features'] = keep
+if not removed and (HERE / 'model.json').exists(): removed = json.loads((HERE / 'model.json').read_text(encoding='utf-8'))['n03bRemoved']   # 다시 돌릴 때는 처음 걷은 수를 그대로 적는다
 n03['provenance']['z13'] = '정문 ~ 북좌표 557180 구간은 Z13 이 기운 판으로 다시 만들어 여기서 뺐다(docs/audit/z13/sidewalks.py)'
 (STR / 'n03b-sidewalks.geojson').write_text(json.dumps(n03, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
 
@@ -56,7 +57,7 @@ def band(s0, s1, d0, d1):
     return Polygon([tuple(off(s, f0(s))) for s in ss] + [tuple(off(s, f1(s))) for s in ss[::-1]]).buffer(0)
 def slab(id, typ, s0, s1, d0, d1, dz, thick, what, grade, cut=None, **extra):
     """길과 같이 오르는 기운 판: 가운데 선 거리 s0~s1, 옆 거리 d0~d1(수 또는 s 의 함수), 윗면 = 차도 종단 + dz. STEP 마디마다 한 조각."""
-    n = max(1, int(math.ceil((s1 - s0) / STEP))); k = 0
+    n = max(1, int(math.ceil((s1 - s0) / STEP))); k = 0; fz = dz if callable(dz) else (lambda s, dz=dz: dz)
     for i in range(n):
         a, b = s0 + (s1 - s0) * i / n, s0 + (s1 - s0) * (i + 1) / n
         g = band(a, b, d0, d1)
@@ -67,7 +68,7 @@ def slab(id, typ, s0, s1, d0, d1, dz, thick, what, grade, cut=None, **extra):
             ring = [[r2(x), r2(y)] for x, y in q.exterior.coords]; ring[-1] = ring[0]
             feats.append({'type': 'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [ring]}, 'properties': {
                 'id': f'{id}-{k:02d}', 'type': typ, 'kind': 'extrude', 'estimated': True, 'grade': grade, 'basePlane': '차도 포장 띠(V02 종단)',
-                'fromM': r2(Z(a) + dz - thick), 'toM': r2(max(Z(a), Z(b)) + dz), 'topProfile': {'origin': [r2(o[0]), r2(o[1])], 'direction': [round(float(d[0]), 4), round(float(d[1]), 4)], 'points': [[0.0, r2(Z(a) + dz)], [r2(L), r2(Z(b) + dz)]]},
+                'fromM': r2(Z(a) + H_KERB - thick), 'toM': r2(max(Z(a) + fz(a), Z(b) + fz(b))), 'topProfile': {'origin': [r2(o[0]), r2(o[1])], 'direction': [round(float(d[0]), 4), round(float(d[1]), 4)], 'points': [[0.0, r2(Z(a) + fz(a))], [r2(L), r2(Z(b) + fz(b))]]},
                 'thicknessM': thick, 'assumption': what, 'source': SRC, **extra}})
     return k
 def obstacles(reach, types=('planter', 'wall', 'tree')):
@@ -77,9 +78,16 @@ def obstacles(reach, types=('planter', 'wall', 'tree')):
 G_E = '원천(네이버 전방위 사진: 턱 있는 넓은 블록 포장 인도가 정문에서 끊김 없이 오른다), 추정(폭 ±0.4 m·턱 높이)'
 G_W = '원천(네이버 전방위 사진: 쐐기 화단 끝에서 시작해 옹벽 발치를 따라 오르는 좁은 인도), 추정(아래 끝 ±4 m·폭·턱 높이)'
 dE = lambda s: -KERB - w_e(s)
+# 정문 안 포장 기단(한 경사면으로 맞춘 것, 잔차 ±0.3 m)이 차도보다 0.15 m 넘게 높은 곳(북좌표 557116~557143)에서는 인도 윗면을 그 기단 윗면에 맞춘다:
+# 사진에서 인도와 안쪽 포장은 턱 없이 한 면이다. 그래서 그 구간의 턱은 0.15 m 보다 높게 나온다(최대 약 0.4 m, 기단 맞춤 오차 탓: 추정)
+PLATS = [(shape(f['geometry']).buffer(0), f['properties']['topProfile']) for f in load('z05-gate.geojson')['features'] if f['properties'].get('kind') == 'platform' and f['properties']['id'].startswith('Z05-PLATFORM-GATE-APRON')]
+def plat_rel(s, d):
+    q = off(s, d); r = [float(np.interp((q[0] - t['origin'][0]) * t['direction'][0] + (q[1] - t['origin'][1]) * t['direction'][1], *np.array(t['points']).T)) - Z(s) for g, t in PLATS if g.contains(Point(q))]
+    return max(r) if r else -9.0
+def dzE(s): return max(H_KERB, max(plat_rel(s, d) for d in np.linspace(-KERB - EDGE, dE(s), 6)) + 0.02)
 cutE = obstacles(band(S_E0, S_E1, dE, -KERB))
-nE = slab('Z13-SIDEWALK-E', 'landing', S_E0, S_E1, -KERB - EDGE, dE, H_KERB, H_KERB + 0.15, f'수인관 쪽 인도: 차도보다 {H_KERB} m 높은 턱, 폭 3.3 m(북좌표 557152 까지) → 2.6 m(557162~557176) → 3.0 m(Z12 인도에 이음), 길과 같은 기울기의 한 판. 평평한 단이 아니다', G_E, cut=cutE, color=C_WALK_E, material='paving')
-slab('Z13-KERB-E', 'wall', S_E0, S_E1, -KERB, -KERB - EDGE, H_KERB + 0.01, H_KERB + 0.16, '수인관 쪽 인도의 밝은 화강석 경계석 줄', G_E, cut=cutE, color=C_KERB)
+nE = slab('Z13-SIDEWALK-E', 'landing', S_E0, S_E1, -KERB - EDGE, dE, dzE, H_KERB + 0.15, f'수인관 쪽 인도: 차도보다 {H_KERB} m 높은 턱(안쪽 포장 기단이 더 높은 북좌표 557116~557143 에서는 그 기단 윗면에 맞춤), 폭 3.3 m(북좌표 557152 까지) → 2.6 m(557162~557176) → 3.0 m(Z12 인도에 이음), 길과 같은 기울기의 한 판. 평평한 단이 아니다', G_E, cut=cutE, color=C_WALK_E, material='paving')
+slab('Z13-KERB-E', 'wall', S_E0, S_E1, -KERB, -KERB - EDGE, lambda s: dzE(s) + 0.01, H_KERB + 0.16, '수인관 쪽 인도의 밝은 화강석 경계석 줄', G_E, cut=cutE, color=C_KERB)
 cutW = obstacles(band(S_W0, S_W1, KERB, KERB + W_W + ROCK_W + BED_W))
 nW = slab('Z13-SIDEWALK-W', 'landing', S_W0, S_W1, KERB + EDGE, KERB + W_W, H_KERB, H_KERB + 0.15, f'옹벽 쪽 인도: 차도보다 {H_KERB} m 높은 턱, 폭 {W_W} m, 길과 같은 기울기로 Z12 인도에 끊김 없이 이어진다. 북좌표 {Y_W0:.0f} 아래(주차장 차로 어귀)에는 인도가 없다', G_W, cut=cutW, color=C_WALK_W, material='paving')
 slab('Z13-KERB-W', 'wall', S_W0, S_W1, KERB, KERB + EDGE, H_KERB + 0.01, H_KERB + 0.16, '옹벽 쪽 인도의 밝은 화강석 경계석 줄', G_W, cut=cutW, color=C_KERB)
@@ -108,6 +116,7 @@ fc = {'type': 'FeatureCollection', 'name': 'z13-gate-sidewalks', 'crs': {'type':
 (STR / 'z13-gate-sidewalks.geojson').write_text(json.dumps(fc, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
 yx = lambda s: [r2(v) for v in P(s)]
 model = {'crs': 'EPSG:5186', 'kerbOffsetM': KERB, 'kerbHeightM': H_KERB, 'n03bRemoved': removed, 'features': len(feats), 'cutAround': sorted(hits),
+         'eastKerbMaxM': r2(max(dzE(s) for s in np.arange(S_E0, S_E1, 1.0))),
          'east': {'fromCentre': yx(S_E0), 'toCentre': yx(S_E1), 'lengthM': r2(S_E1 - S_E0), 'widthM': [[y, w] for y, w in E_W] + [[r2(P(S_E1)[1]), 3.0]], 'fromM': r2(Z(S_E0) + H_KERB), 'toM': r2(Z(S_E1) + H_KERB), 'pieces': nE},
          'west': {'fromCentre': yx(S_W0), 'toCentre': yx(S_W1), 'lengthM': r2(S_W1 - S_W0), 'widthM': W_W, 'fromM': r2(Z(S_W0) + H_KERB), 'toM': r2(Z(S_W1) + H_KERB), 'pieces': nW},
          'eastPlanter': {'lengthM': r2(S_E1 - s_p0), 'lowM': 0.5, 'upM': 1.0, 'depthM': [PL1, PL2], 'pieces': nP}}

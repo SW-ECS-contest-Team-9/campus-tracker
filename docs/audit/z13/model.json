@@ -14,6 +14,7 @@
   "W01-GATE-TOWER-E-RING-5",
   "W01-GATE-TOWER-E-RING-6"
  ],
+ "eastKerbMaxM": 0.36,
  "east": {
   "fromCentre": [
    201132.56,
