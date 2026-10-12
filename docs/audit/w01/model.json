@@ -1,0 +1,102 @@
+{
+ "removed": {
+  "p02": 0,
+  "west": 0,
+  "gate": 0
+ },
+ "westWing": {
+  "bodyDepthM": [
+   0.95,
+   2.6
+  ],
+  "rows": {
+   "WESTWING-LOUVRE-1F": 1,
+   "WESTWING-RECESS-2F": 5,
+   "WESTWING-WINDOW-3F": 8,
+   "WESTWING-WINDOW-5F": 12,
+   "WESTWING-WINDOW-6F": 18,
+   "WESTWING-WINDOW-7F": 18,
+   "WESTWING-WINDOW-8F": 8,
+   "SOUTHFACE-WINDOW-3F": 3,
+   "SOUTHFACE-WINDOW-5F": 3,
+   "SOUTHFACE-WINDOW-6F": 3,
+   "SOUTHFACE-WINDOW-7F": 3,
+   "SOUTHFACE-WINDOW-8F": 3,
+   "WESTWING-GLASS-TOP": 8
+  }
+ },
+ "entrance3": {
+  "door": [
+   200999.28,
+   557307.4,
+   104.0
+  ],
+  "foot": [
+   200996.81,
+   557307.08,
+   103.23
+  ],
+  "center": [
+   200998.19,
+   557308.06
+  ]
+ },
+ "westGate": {
+  "center": [
+   200976.8,
+   557408.2
+  ],
+  "left": [
+   200971.17,
+   557411.45
+  ],
+  "right": [
+   200982.43,
+   557404.95
+  ],
+  "facingDeg": 210,
+  "sillM": 118.51,
+  "headM": 125.11,
+  "widthM": 13.0,
+  "roadStart": [
+   200976.85,
+   557407.48,
+   118.52
+  ],
+  "wallLenM": 27.78
+ },
+ "westSidewalk": {
+  "lengthM": 155.66,
+  "pieces": {
+   "SIDEWALK": 63,
+   "TACTILE": 63,
+   "KERB": 63
+  }
+ },
+ "mainGate": {
+  "roadWallPieces": {
+   "concrete": 10,
+   "paleStone": 16
+  },
+  "wallDropM": [
+   2.1,
+   9.7
+  ],
+  "walkPieces": 70
+ },
+ "faceLine": {
+  "from": [
+   201005.99,
+   557247.6
+  ],
+  "to": [
+   200989.16,
+   557378.0
+  ],
+  "z11End": [
+   200998.97,
+   557302.0
+  ]
+ },
+ "features": 582
+}

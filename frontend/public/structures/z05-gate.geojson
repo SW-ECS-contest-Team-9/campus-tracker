@@ -12,7 +12,8 @@
   "basePlanes": "backend/data/terrain/recipes/z05-surface.geojson",
   "schema": "docs/audit/g02/STRUCTURES.md",
   "zone": "정문과 남서쪽 공도",
-  "note": "기단은 손으로 정한 곧은 변의 큰 평면이다(평지 또는 한 경사면). 높이는 S-MAP 1 m 메시·사용자 핀, 외곽과 벽면 자리는 추정(±2 m). 상자 치수는 사진 눈대중이라 전부 estimated."
+  "note": "기단은 손으로 정한 곧은 변의 큰 평면이다(평지 또는 한 경사면). 높이는 S-MAP 1 m 메시·사용자 핀, 외곽과 벽면 자리는 추정(±2 m). 상자 치수는 사진 눈대중이라 전부 estimated.",
+  "w01": "W01 이 정문 가로 보를 철골 탑과 보로 다시 만들어 여기서 뺐다(docs/audit/w01/build_parts.py)"
  },
  "features": [
   {
@@ -8432,132 +8433,6 @@
       [
        201126.88,
        557088.69
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "Z05-GATE-POST-1",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "원천(정문 표지 자리), 추정(치수)",
-    "basePlane": "Z05-GATE-V1",
-    "fromM": 106.6,
-    "toM": 113.1,
-    "assumption": "정문 가로 보의 받침 기둥: 길 양쪽 7 m(평평한 띠 폭 13 m 의 바깥), 1 m 각, 높이 6 m. 모두 눈대중(보의 치수·기둥 자리 기록 없음)",
-    "source": "streetview-seogyeongro-202512.png(도로 위를 가로지르는 가로 보), 실험 E09(정문 표지 201129.2, 557112.8, 107.1 m)"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201135.08,
-       557115.62
-      ],
-      [
-       201136.01,
-       557115.98
-      ],
-      [
-       201136.37,
-       557115.05
-      ],
-      [
-       201135.44,
-       557114.69
-      ],
-      [
-       201135.08,
-       557115.62
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "Z05-GATE-POST-2",
-    "type": "wall",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "원천(정문 표지 자리), 추정(치수)",
-    "basePlane": "Z05-GATE-V1",
-    "fromM": 106.6,
-    "toM": 113.1,
-    "assumption": "정문 가로 보의 받침 기둥: 길 양쪽 7 m(평평한 띠 폭 13 m 의 바깥), 1 m 각, 높이 6 m. 모두 눈대중(보의 치수·기둥 자리 기록 없음)",
-    "source": "streetview-seogyeongro-202512.png(도로 위를 가로지르는 가로 보), 실험 E09(정문 표지 201129.2, 557112.8, 107.1 m)"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201122.03,
-       557110.55
-      ],
-      [
-       201122.96,
-       557110.91
-      ],
-      [
-       201123.32,
-       557109.98
-      ],
-      [
-       201122.39,
-       557109.62
-      ],
-      [
-       201122.03,
-       557110.55
-      ]
-     ]
-    ]
-   }
-  },
-  {
-   "type": "Feature",
-   "properties": {
-    "id": "Z05-GATE-BEAM",
-    "type": "canopy",
-    "kind": "extrude",
-    "estimated": true,
-    "grade": "원천(자리), 추정(치수)",
-    "basePlane": "Z05-GATE-POST",
-    "fromM": 112.3,
-    "toM": 113.3,
-    "assumption": "정문 가로 보: 길을 가로지르는 보 하나, 아래 높이 5.2 m·두께 1 m·길이 15 m(눈대중)",
-    "source": "streetview-seogyeongro-202512.png"
-   },
-   "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-     [
-      [
-       201121.99,
-       557110.64
-      ],
-      [
-       201135.97,
-       557116.08
-      ],
-      [
-       201136.41,
-       557114.96
-      ],
-      [
-       201122.43,
-       557109.52
-      ],
-      [
-       201121.99,
-       557110.64
       ]
      ]
     ]
