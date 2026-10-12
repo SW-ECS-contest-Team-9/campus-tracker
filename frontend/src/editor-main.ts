@@ -1703,11 +1703,15 @@ function drawFusionOverlay() {
     const z = p.h ?? terrainAt(x, y) ?? 0;
     return drawPoint([x, y, z]);
   });
-  const line = viewer.entities.add({ polyline: { positions: pts, width: 2, material: C.Color.fromCssColorString('#64748b').withAlpha(0.55), arcType: C.ArcType.NONE } });
+  // Bright and drawn through ground/structures: the track must stay readable on grey paving and under platforms.
+  const trackColor = C.Color.fromCssColorString('#e11d8f');
+  const line = viewer.entities.add({ polyline: { positions: pts, width: 4, arcType: C.ArcType.NONE,
+    material: new C.PolylineOutlineMaterialProperty({ color: trackColor, outlineColor: C.Color.WHITE, outlineWidth: 2 }),
+    depthFailMaterial: new C.PolylineOutlineMaterialProperty({ color: trackColor.withAlpha(0.6), outlineColor: C.Color.WHITE.withAlpha(0.6), outlineWidth: 2 }) } });
   (line as any).__fusion = true; entities.push(line);
   snapPoints.forEach((p) => {
     const x = p.x + ORIGIN.x, y = p.y + ORIGIN.y, z = p.h ?? terrainAt(x, y) ?? 0;
-    const dot = viewer.entities.add({ position: drawPoint([x, y, z]), point: { pixelSize: 4, color: C.Color.fromCssColorString('#94a3b8').withAlpha(0.75), disableDepthTestDistance: Number.POSITIVE_INFINITY } });
+    const dot = viewer.entities.add({ position: drawPoint([x, y, z]), point: { pixelSize: 5, color: trackColor, outlineColor: C.Color.WHITE, outlineWidth: 1, disableDepthTestDistance: Number.POSITIVE_INFINITY } });
     (dot as any).__fusion = true; entities.push(dot);
   });
 }
