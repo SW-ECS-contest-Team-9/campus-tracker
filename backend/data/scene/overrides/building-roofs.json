@@ -620,6 +620,26 @@
         "roof": "flat at 162.9 m (42 cells, p10-p90 162.88-162.89), the level of the low north-east part",
         "notCovered": "what it is (a stair or service block, estimated); 대일관 and 청운관 are not connected (user, 2026-10-11) and nothing shows that this block connects 청운관 to 상승관 indoors"
       }
+    },
+    {
+      "id": "추가-혜인관뒤유리탑",
+      "name": "혜인관 뒤 유리 계단실",
+      "roofM": 179.0,
+      "heightSource": "SMAP_MESH",
+      "polygon": [
+        [
+          [201236.02, 557198.13], [201240.68, 557205.84], [201243.76, 557203.97], [201239.1, 557196.27], [201236.02, 557198.13]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model, 1 m grid read 2026-10-10 (file z04/smap-mesh-z04-1m-e1.txt), cells behind the rear wall read 2026-10-12 (B15); user S-MAP screen 사용자-SMAP-건물전후면-20261012/01",
+        "collectedOn": "2026-10-12",
+        "level": "source data (one provider), not field verified; outline read from the grid (+-1 m)",
+        "independentSurvey": false,
+        "outline": "model cells at 179 m behind the rear (south-east) wall: 33 to 42 m along the wall from its south-west end, up to 3.5 m out of the wall (30 cells)",
+        "roof": "flat at 179.0 m (cells 179-182)",
+        "notCovered": "the inside (a stair, estimated from the glass tower in the S-MAP view), its door at the foot"
+      }
     }
   ],
   "appearance": [
@@ -916,6 +936,16 @@
         "sillM": 1.1,
         "paired": true
       },
+      "faces": [
+        {
+          "azimuth": 295,
+          "grade": "S-MAP(화면)",
+          "spread": 40,
+          "wall": "glass",
+          "wallColor": "#6f8f9c",
+          "style": "curtain"
+        }
+      ],
       "roof": {
         "type": "hipped",
         "material": "tile",
@@ -1765,12 +1795,13 @@
       },
       "roof": {
         "type": "flat",
-        "material": "concrete"
+        "material": "metal",
+        "color": "#4f9bc9"
       },
       "grades": {
         "wall": "확정(사용자 영상 캡처)",
         "windows": "확정(밝은 띠 안의 촘촘한 창 줄: 사용자 영상 캡처), 추정(크기·간격은 눈대중, 줄 수가 사진과 다르다)",
-        "roof": "S-MAP"
+        "roof": "확정(파란 지붕), S-MAP(높이), 추정(평평하게 그림)"
       },
       "features": [
         {
@@ -1792,11 +1823,12 @@
       "wall": "brick",
       "roof": {
         "type": "flat",
-        "material": "concrete"
+        "material": "concrete",
+        "color": "#3f9f73"
       },
       "grades": {
         "wall": "추정",
-        "roof": "S-MAP"
+        "roof": "S-MAP(화면·높이)"
       }
     },
     {
@@ -1976,6 +2008,42 @@
       ]
     },
     {
+      "id": "추가-혜인관뒤유리탑",
+      "wall": "glass",
+      "wallColor": "#2f7f6a",
+      "windows": {
+        "style": "curtain",
+        "floorsM": [
+          149.3,
+          153.4,
+          157.5,
+          161.6,
+          165.8,
+          169.9,
+          174.0
+        ],
+        "floorNames": [
+          "B1",
+          "1층",
+          "2층",
+          "3층",
+          "5층",
+          "6층",
+          "7층"
+        ],
+        "color": "#49a488"
+      },
+      "roof": {
+        "type": "flat",
+        "material": "glass"
+      },
+      "grades": {
+        "wall": "S-MAP(화면)",
+        "windows": "추정(줄 수)",
+        "roof": "S-MAP(화면)"
+      }
+    },
+    {
       "id": "한림관",
       "wall": "glass",
       "wallColor": "#2f6f73",
@@ -2153,6 +2221,14 @@
         "pitchM": 5.8,
         "sillM": 1.0
       },
+      "faces": [
+        {
+          "azimuth": 120,
+          "grade": "S-MAP(화면)",
+          "spread": 40,
+          "wall": "brick"
+        }
+      ],
       "bands": [
         {
           "fromM": 161.6,
