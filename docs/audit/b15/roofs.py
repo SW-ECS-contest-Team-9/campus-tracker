@@ -14,7 +14,7 @@ def box(id, typ, poly, fromM, toM, assumption, grade, **extra):
 top = body.buffer(-2.2, join_style=2)
 if top.geom_type != 'Polygon': top = max(top.geoms, key=lambda g: g.area)
 top = top.simplify(0.05)
-box('ROOF-GREEN', 'landing', top, ROOF - 0.1, ROOF + 0.12, '지붕 윗면의 초록 평지붕(가장자리 기와 비탈 안쪽). 건물 지붕 높이 그대로, 얇은 판', 'S-MAP(화면: 긴 초록 평지붕), 추정(가장자리에서 2.2 m 안쪽)', color='#4fae7c')
+box('ROOF-GREEN', 'landing', top, ROOF - 0.1, ROOF + 0.4, '지붕 윗면의 초록 평지붕(가장자리 기와 비탈 안쪽). 건물 지붕 높이 위 0.4 m 의 얇은 판(멀리서 지붕면과 겹쳐 깜박이지 않게)', 'S-MAP(화면: 긴 초록 평지붕), 추정(가장자리에서 2.2 m 안쪽)', color='#4fae7c')
 mr = body.minimum_rotated_rectangle; c = np.array(mr.exterior.coords)[:4]; e = [c[1] - c[0], c[2] - c[1]]; long = max(e, key=np.linalg.norm); L = float(np.linalg.norm(long)); u = long / L
 if u[0] < 0: u = -u                      # u = 서쪽 끝 -> 동쪽 끝
 n = np.array([-u[1], u[0]])              # 뒷면(북동, 숲) 쪽
