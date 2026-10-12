@@ -35,9 +35,11 @@ for k in (1, 2):
     box(f'SLAB-{k + 1}', 'deck', R(UP_W, UP_E, 0, CD), z - 0.6, z, f'층 판 {k + 1}/3: 윗면 {z} m. 왼쪽은 첫째 기둥 밖으로 3.5 m 내민다(사진 11)', '없음(기둥 위 뜬 판)', material='concrete')
     for tag, poly in (('F', R(UP_W, UP_E, CD - T, CD)), ('W', R(UP_W, UP_W + T, 0, CD)), ('E', R(UP_E - T, UP_E, 0, CD))):
         box(f'RAIL-{k + 1}{tag}', 'wall', poly, z, z + 0.45, '층 판 가장자리의 낮은 턱(사진의 띠 두께 약 1.05 m = 판 0.6 + 턱 0.45)', f'SLAB-{k + 1}', material='white_stone')
-for k, z in enumerate(LV):
-    box(f'GLASS-{k + 1}', 'wall', R(0.5, UP_E - 0.5 if k else DECK_E - 0.5, 0.0, 0.25), z, (LV[k + 1] - 0.6) if k < 2 else 163.0, f'현관 안쪽 벽(본체 벽 앞의 창·유리문 면, 층 {k + 1}). 문 자리·창 나눔은 모름', f'SLAB-{k + 1}', material='glass')
-box('GLASS-B1', 'wall', R(COLS[0] + 0.5, COLS[1] - 0.5, 0.0, 0.25), FIELD, LV[0] - 0.6, '운동장 높이의 안쪽 벽: 첫째~둘째 기둥 사이의 뚫린 통로 안쪽 문(지하 1층). 문 자리는 사진 11 의 게시판·사람 자리', '운동장 148.9', material='glass')
+box('GLASS-1', 'wall', R(COLS[0] + 0.5, COLS[2] - 0.5, 0.0, 0.25), LV[0], LV[0] + 2.6, '1층 현관 안쪽의 큰 유리 면(첫째~셋째 기둥 사이, 사진 11 의 짙은 초록 유리). 문 자리는 모름', 'SLAB-1', material='glass')
+for k in (1, 2):
+    box(f'GLASS-{k + 1}', 'wall', R(2.0, UP_E - 0.5, 0.0, 0.15), LV[k] + 1.0, LV[k] + 2.3, f'틀 뒤 본체 벽의 창 띠(층 {k + 1}). 벽 자체는 붉은 벽돌이다(사진 11)', f'SLAB-{k + 1}', material='glass')
+box('GLASS-B1', 'wall', R(COLS[0] + 0.5, COLS[1] - 0.5, 0.0, 0.25), FIELD, FIELD + 2.4, '운동장 높이의 안쪽 문: 첫째~둘째 기둥 사이의 뚫린 통로 안쪽(지하 1층). 문 자리는 사진 11 의 게시판·사람 자리', '운동장 148.9', material='glass')
+box('FLOOR-B1', 'landing', R(0.0, 23.5, 0.0, 8.0), FIELD - 0.3, FIELD, '틀 아래 바닥: 운동장과 같은 높이로 벽까지 평평하다(운동장 높이 문은 평지로 이어짐: 사용자 확정 2026-10-11)', '운동장 148.9', material='paving')
 def stair_z(s): return LV[0] - (LV[0] - FIELD) * (s - DECK_E) / (ST_FOOT - DECK_E)
 for k, sc in enumerate(COLS):
     z0 = FIELD if k < 3 else stair_z(sc - 0.45) + 0.4     # 넷째 기둥은 계단 난간벽 위에서 시작한다(계단 밑은 뚫림)
