@@ -102,8 +102,10 @@ if (after && FIXTURE) {
     await line('thick'); await sleep(4000); await shot('16-궤적-지하1층-굵게');
     await line('normal');
   }
+  // 궤적은 불러왔지만 이 층을 지나지 않음 / 불러온 것이 없음
+  if (want('17-')) { await lift('links'); await look({ heading: 20, pitch: -40, range: 3 }); await sleep(3000); console.log('   패널:', await panel()); await shot('17-세션점없음-연결통로'); }
   await ev(`(() => { const L = ${SV}.level; L.extraTracks = []; L.tracksChanged(); return 1; })()`);
+  if (want('18-')) { await sleep(1500); console.log('   패널:', await panel()); await shot('18-불러온세션없음-연결통로'); }
 }
-if (after && want('17-세션없음')) { await lift('walk'); await look({ heading: 20, pitch: -40, range: 2.6 }); await sleep(3000); console.log('   패널:', await panel()); await shot('17-세션없음-지하보행구간'); }
 await click(LEVEL); await sleep(1200);
 ws.close();

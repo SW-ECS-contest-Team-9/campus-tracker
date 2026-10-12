@@ -253,7 +253,7 @@ export function zoneContent(zone: Zone, data: { roads: LvRoad[]; areas: LvArea[]
       solids.push({ solid, bottomM: Math.max(solid.bottomM, zone.fromM!), topM: Math.min(solid.topM, zone.toM!) });
     }
   }
-  const places = (data.places ?? []).filter((p) => !p.buildingId && inside([p.x, p.y]) && (ground ? true : inRange(zone, p.z) && !taken([p.x, p.y], p.z)));
+  const places = (data.places ?? []).filter((p) => !p.buildingId && inside([p.x, p.y]) && (ground ? !levelOwner(data.zones, zone, p.x, p.y, p.z) : inRange(zone, p.z) && !taken([p.x, p.y], p.z)));
   const heights = [
     ...roads.flatMap((r) => r.cut.pieces.flat().map((p) => p[2])),
     ...areas.flatMap((a) => (a.elevationM != null ? [a.elevationM] : [])),

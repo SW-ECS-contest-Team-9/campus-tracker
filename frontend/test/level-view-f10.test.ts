@@ -48,6 +48,8 @@ test('F10 지하 1층과 2층은 같은 것을 고르지 않는다: 통로 면·
   assert.deepEqual(c2.areas.map((a: any) => a.id), [5]);
   assert.deepEqual(c1.places.map((p: any) => p.id), ['p1']);
   assert.deepEqual(c2.places.map((p: any) => p.id), ['p2']);
+  // 지하 층의 장소는 그 위 지상 구획(운동장)에 또 나오지 않는다
+  assert.deepEqual(zoneContent(field, data).places.map((p: any) => p.id), []);
   // 구조물: 제 것(아래층에서 비쳐 보이는 것·두 층에 걸친 것 표시가 없는 것)은 한 층에만
   const own = (c: any) => new Set(c.solids.filter((s: any) => !s.below && !s.shared).map((s: any) => s.solid));
   const o1 = own(c1), o2 = own(c2);
