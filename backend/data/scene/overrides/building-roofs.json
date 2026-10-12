@@ -1471,6 +1471,7 @@
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
+        "eaveBandM": 2.8,
         "dormers": true,
         "dormerShape": "gable"
       },
@@ -1657,6 +1658,7 @@
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
+        "eaveBandM": 2.8,
         "dormers": true,
         "dormerShape": "gable"
       },
@@ -1693,6 +1695,7 @@
         "type": "hipped",
         "material": "tile",
         "riseM": 2.6,
+        "eaveBandM": 2.8,
         "dormers": true,
         "dormerShape": "gable"
       },
