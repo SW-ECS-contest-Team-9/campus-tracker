@@ -160,19 +160,28 @@ def rail(id_, line, assumption, source):
         box(f'{id_}-{k + 1:02d}', 'wall', seg.buffer(0.08, cap_style=2), Z_PLAZA, Z_PLAZA + 1.1, assumption, source)
 rail('Z03-RAIL-E', pts(E_EDGE[:12]), '광장 동쪽 가장자리의 검은 난간(광장이 차도·둑보다 높은 구간): 높이 1.1 m(가정)', P_UP)
 rail('Z03-PARAPET-W', pts(W_EDGE), '광장 서쪽 가장자리(바깥 길 위 18~20 m 벽)의 난간 벽: 높이 1.1 m(가정). 사진에서는 나무에 가려 형태 미확인', P_UP + ', ' + MESH)
-# 동쪽 계단식 보도(포장 띠의 동쪽 3.5 m): 계단 6단 + 참을 되풀이. 단 수는 세지 않고 높이차에서 계산
-RISE, RUN, NR = 0.155, 0.35, 6
-y = 212.0; k = 0; flights = []
-grid_y = np.arange(205, 262, 0.25); grid_z = np.array([road_z(v) for v in grid_y])
-while y + NR * RUN < 249.0:
-    base = road_z(y); k += 1
+# 동쪽 계단식 보도. Z12(사용자 확정 2026-10-12, 그림 12 + 거리뷰 Y02~Y08 + 같은 주행의 전방위 사진 08~11 과 그 사이 지점): 계단 형상은 횡단 자리보다 더 아래(작은 동그라미)까지 이어지고,
+# 계단은 차도 턱 바로 옆에서 시작한다(턱과 계단 사이에 따로 인도 줄이 없다). 첫 단: 전방위 사진 "10-11사이"(북좌표 557202.1)에서 차 바로 앞 오른쪽 = 557203.5(±1.5 m).
+# 묶음 7개(사진에서 본 자리: 203, 216, ?, 232, 241, 248, 256 쯤) x 6단. 참은 차도가 그 높이에 닿는 곳까지 평평하다(참의 아래쪽 끝은 차도보다 높아 차도 쪽에 옆벽이 선다).
+# 한 단 높이는 첫 단 ~ 위 끝의 차도 높이차를 단 수로 나눈 값. 위 끝은 포장 띠의 끝 557252 로 둔다: 사진 08 에서는 마지막 단이 557256~259 쯤이지만 그 자리에는 바위 정원 조각(P02)이 놓여 있어 넘지 않는다.
+NR, RUN, NF, Y_FOOT, Y_TOP = 6, 0.35, 7, 203.5, 252.0
+RISE = (road_z(Y_TOP) - road_z(Y_FOOT)) / (NF * NR)
+KERB_OFF = 3.8    # 차도 가운데 선(V02)에서 계단 띠 안쪽 가장자리까지, 동서 방향으로 잰 값: 턱 3.5 m + 경계석 줄 0.2 m 의 바깥(길이 비스듬한 만큼 더함). 경계석 줄은 z12 가 만든다
+def kerb_(y): return float(np.interp(Y + y, V2[:, 1], V2[:, 0])) - X + KERB_OFF
+def out_(y): return re_(max(y, 212.0)) + W_E   # 바깥 가장자리는 전과 같은 선(화단 벽 발치). 557212 아래로는 같은 선을 곧게 늘인다
+grid_y = np.arange(195, 262, 0.05); grid_z = np.array([road_z(v) for v in grid_y])
+y = Y_FOOT; flights = []
+for k in range(1, NF + 1):
+    base = road_z(y)
     for s in range(NR):
         ya, yb = y + s * RUN, y + (s + 1) * RUN
-        box(f'Z03-EAST-STAIR-F{k}-S{s + 1:02d}', 'stair_step', Polygon(pts([(re_(ya), ya), (re_(ya) + W_E, ya), (re_(yb) + W_E, yb), (re_(yb), yb)])), base - 0.1, base + (s + 1) * RISE,
-            f'동쪽 계단식 보도의 계단 묶음 {k}: {NR}단 x {RISE} m, 디딤 {RUN} m, 폭 {W_E} m(모두 가정). 묶음과 참의 수·자리는 사진에서 세지 않았다(차도 경사 약 15 % 에 맞춰 되풀이)', SV(3, 4, 5, 6, 7), basePlane='Z03-ROAD-B', stair=f'Z03-EAST-STAIR-F{k}', riseM=RISE, runM=RUN, widthM=W_E)
+        box(f'Z03-EAST-STAIR-F{k}-S{s + 1:02d}', 'stair_step', Polygon(pts([(kerb_(ya), ya), (out_(ya), ya), (out_(yb), yb), (kerb_(yb), yb)])), base - 0.1, base + (s + 1) * RISE,
+            f'동쪽 계단식 보도의 계단 묶음 {k}: {NR}단 x {RISE:.3f} m, 디딤 {RUN} m, 차도 턱에서 화단 벽 발치까지 폭 {out_(ya) - kerb_(ya):.1f} m. 묶음 수 {NF}(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값', SV(3, 4, 5, 6, 7, 8) + ', 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)',
+            grade='확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)', basePlane='Z03-ROAD-B' if y >= Y_SPLIT else 'Z03-ROAD-A', stair=f'Z03-EAST-STAIR-F{k}', riseM=r2(RISE), runM=RUN, widthM=r2(out_(ya) - kerb_(ya)))
     top = base + NR * RISE; y1 = y + NR * RUN
-    y2 = min(float(np.interp(top, grid_z, grid_y)), 250.0)   # 참은 차도가 그 높이에 닿는 곳까지
-    box(f'Z03-EAST-LANDING-{k}', 'landing', Polygon(pts([(re_(y1), y1), (re_(y1) + W_E, y1), (re_(y2) + W_E, y2), (re_(y2), y2)])), base - 0.1, top, f'계단 묶음 {k} 위의 참(벤치가 놓인 넓은 포장면): 길이 {y2 - y1:.1f} m, 차도가 같은 높이에 닿는 곳까지(가정)', SV(4, 5, 8), basePlane='Z03-ROAD-B')
+    y2 = Y_TOP if k == NF else float(np.interp(top, grid_z, grid_y))   # 참은 차도가 그 높이에 닿는 곳까지
+    box(f'Z03-EAST-LANDING-{k}', 'landing', Polygon(pts([(kerb_(y1), y1), (out_(y1), y1), (out_(y2), y2), (kerb_(y2), y2)])), base - 0.1, top, f'계단 묶음 {k} 위의 참(긴 의자가 놓인 넓은 포장면): 길이 {y2 - y1:.1f} m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 {top - road_z(y1):.2f} m 높다(차도 쪽 옆벽)', SV(4, 5, 6, 8),
+        grade='확정(계단 띠가 이어짐), 추정(자리·길이)', basePlane='Z03-ROAD-B' if y >= Y_SPLIT else 'Z03-ROAD-A')
     flights.append({'flight': k, 'y0': r2(y), 'y1': r2(y1), 'landingTo': r2(y2), 'baseM': r2(base), 'topM': r2(top)}); y = y2
 dump(REPO / 'frontend' / 'public' / 'structures' / 'z03-fountain.geojson', {'type': 'FeatureCollection', 'name': 'z03-fountain', 'crs': CRS,
   'provenance': {'builder': 'docs/audit/z03/build_inputs.py', 'basePlanes': 'backend/data/terrain/recipes/z03-surface.geojson', 'schema': 'docs/audit/g02/STRUCTURES.md',

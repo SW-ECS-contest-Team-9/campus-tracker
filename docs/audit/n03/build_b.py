@@ -92,7 +92,7 @@ def group_C():
     if os.environ.get('N03B_ONE'): ops = [ops[int(os.environ['N03B_ONE'])]]   # 횡단 하나가 인도를 나누면 다음 횡단이 가리킬 조각 id 가 바뀌므로 하나씩 만든다
     return {'id': 'C', 'zone': '밖', 'comment': '인도와 차도 갈림 노드를 잇는 횡단 셋', 'ops': ops}
 
-def structures():
+def structures():   # Z12: 유담관 옆 구간(북좌표 557180 ~ 굽이)의 마디 상자는 docs/audit/z12/build_parts.py 가 걷어 내고 기운 판으로 다시 만든다. 이 함수를 다시 돌린 뒤에는 그 스크립트도 다시 돌릴 것
     pts, _ = centreline(); feats = []
     for sign, side in SIDES:
         ln = side_line(pts, sign); tag = 'W' if sign > 0 else 'E'
