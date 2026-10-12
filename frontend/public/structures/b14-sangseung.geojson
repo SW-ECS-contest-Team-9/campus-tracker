@@ -1,0 +1,232 @@
+{
+ "type": "FeatureCollection",
+ "name": "b14-sangseung",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "provenance": {
+  "builder": "docs/audit/b14/build_parts.py",
+  "schema": "docs/audit/g02/STRUCTURES.md",
+  "note": "상승관(건물 추가 추가-상승관·추가-상승관동쪽끝)에 붙는 것: 지붕 난간, 숲 쪽 발치의 밝은 턱, 대일관과의 좁은 틈 바닥. 건물 외곽·지붕은 건물 보정 파일에 있다"
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-PARAPET-N",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(난간 윗선 164.8 m: 66칸), 확정(평지붕 둘레에 난간: 사용자 S-MAP 화면), 추정(두께·재질)",
+    "basePlane": "추가-상승관 지붕 163.1",
+    "fromM": 163.1,
+    "toM": 164.8,
+    "assumption": "상승관 본체 평지붕 둘레의 난간. S-MAP 화면에는 살이 있는 유리 난간처럼 보인다(한 장의 판으로 그림)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "glass"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201195.63,
+       557327.39
+      ],
+      [
+       201223.24,
+       557315.64
+      ],
+      [
+       201223.18,
+       557315.51
+      ],
+      [
+       201195.57,
+       557327.25
+      ],
+      [
+       201195.63,
+       557327.39
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-PARAPET-S",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(난간 윗선 164.8 m: 66칸), 확정(평지붕 둘레에 난간: 사용자 S-MAP 화면), 추정(두께·재질)",
+    "basePlane": "추가-상승관 지붕 163.1",
+    "fromM": 163.1,
+    "toM": 164.8,
+    "assumption": "상승관 본체 평지붕 둘레의 난간. S-MAP 화면에는 살이 있는 유리 난간처럼 보인다(한 장의 판으로 그림)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "glass"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201192.03,
+       557318.92
+      ],
+      [
+       201219.64,
+       557307.18
+      ],
+      [
+       201219.58,
+       557307.04
+      ],
+      [
+       201191.97,
+       557318.78
+      ],
+      [
+       201192.03,
+       557318.92
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-PARAPET-W",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(난간 윗선 164.8 m: 66칸), 확정(평지붕 둘레에 난간: 사용자 S-MAP 화면), 추정(두께·재질)",
+    "basePlane": "추가-상승관 지붕 163.1",
+    "fromM": 163.1,
+    "toM": 164.8,
+    "assumption": "상승관 본체 평지붕 둘레의 난간. S-MAP 화면에는 살이 있는 유리 난간처럼 보인다(한 장의 판으로 그림)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "glass"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201195.63,
+       557327.39
+      ],
+      [
+       201195.77,
+       557327.33
+      ],
+      [
+       201192.11,
+       557318.72
+      ],
+      [
+       201191.97,
+       557318.78
+      ],
+      [
+       201195.63,
+       557327.39
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-NORTH-LEDGE",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정에 준함(밝은 띠가 있음: 사용자 S-MAP 화면 2장), 추정(폭·높이·무엇인지)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.4,
+    "toM": 149.2,
+    "assumption": "상승관 숲 쪽 벽 발치를 따라 보이는 밝은 턱(옹벽 머리 또는 좁은 통로). 폭 1.0 m·윗면 149.2 m 는 눈대중(벽 앞 S-MAP 지면 148.4~148.9 m)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "white_stone"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201195.47,
+       557328.54
+      ],
+      [
+       201231.73,
+       557313.12
+      ],
+      [
+       201231.34,
+       557312.2
+      ],
+      [
+       201195.08,
+       557327.62
+      ],
+      [
+       201195.47,
+       557328.54
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "B14-SANG-DAEIL-SLIT-FLOOR",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "S-MAP(틈의 폭과 바닥 높이, ±0.5 m)",
+    "basePlane": "Z05-BACK-BEHIND-DAEIL-E",
+    "fromM": 147.4,
+    "toM": 152.3,
+    "assumption": "대일관 뒷벽과 상승관 사이의 좁은 틈(폭 1.15 m, 길이 17 m)의 바닥. S-MAP 지면 152.2~152.4 m(78칸). 사람이 다니는지는 모른다(길을 넣지 않았다)",
+    "source": "S-MAP 건물 모델 0.5 m 격자(볼트 3d-map-audit-20261009/b14/smap-mesh-b14-sangseung-05m.txt, docs/audit/b14/parts.json), 사용자-상승관-SMAP-20261012/01·02",
+    "material": "concrete"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201191.63,
+       557318.93
+      ],
+      [
+       201207.34,
+       557312.25
+      ],
+      [
+       201206.89,
+       557311.19
+      ],
+      [
+       201191.18,
+       557317.87
+      ],
+      [
+       201191.63,
+       557318.93
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

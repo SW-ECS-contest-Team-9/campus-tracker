@@ -149,9 +149,9 @@ test('scene overrides: added buildings (not in the GeoPackage) carry their own o
   const all = parseSceneOverrides(JSON.parse(fs.readFileSync(path.join(dir, 'overrides/building-roofs.json'), 'utf8')));
   const names = readGpkgLayer(path.join(dir, 'source/campus.gpkg'), 'buildings_3d').features.map((f) => f.properties.name);
   // the stored file: three buildings and the low podium strip of 문예관 (outside its footprint); a GeoPackage name is reused only where that GeoPackage building is hidden
-  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-문예관저층부', '문예관 저층부', 148.8, undefined, undefined], ['추가-상승관', '상승관', 163.1, undefined, undefined], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined]]);
+  assert.deepEqual(all.added.map((a) => [a.id, a.name, a.roofM, a.floors, a.registerId]), [['추가-공연실습소', '공연실습소', 107, 5, '53636'], ['추가-문예관저층부', '문예관 저층부', 148.8, undefined, undefined], ['추가-상승관', '상승관', 163.1, undefined, undefined], ['추가-상승관동쪽끝', '상승관 동쪽 끝', 165.3, undefined, undefined], ['추가-외국인생활관', '외국인 생활관', 107, undefined, undefined], ['추가-청운관북서낮은부분', '청운관 북서 낮은 부분', 162.9, undefined, undefined]]);
   assert.ok(all.added.every((a) => !names.includes(a.id) && a.evidence.independentSurvey === false && (!names.includes(a.name) || all.hidden.some((h) => h.name === a.name))));
-  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 61, 293, 311]);
+  assert.deepEqual(all.added.map((a) => Math.round(polygonArea(a.polygon))), [634, 61, 281, 58, 311, 14]);
   // same rules as any block: base 1 m below the lowest ground of the outline, height = stated roof - median ground
   const ground = [85.31, 86, 88.049, 90, 94.033];
   const h = blockHeights(ground, 0);

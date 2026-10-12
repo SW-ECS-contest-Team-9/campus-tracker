@@ -73,13 +73,13 @@
       "name": "대일관",
       "heightSource": "SMAP_MESH",
       "floors": 7,
-      "uncovered": "The north strip of the east block (292 m2, roof 163.1 m) is 상승관, a separate building (user, 2026-10-11); it is drawn by the added entry 추가-상승관.",
+      "uncovered": "The north strip of the east block is 상승관, a separate building (user, 2026-10-11); it is drawn by the added entries 추가-상승관 and 추가-상승관동쪽끝 (S-MAP 0.5 m grid, B14). 대일관 ends at its rear wall there: 1.15 m from the 상승관 wall along the west 16.7 m, touching it along the east 11.4 m.",
       "evidence": {
         "source": "S-MAP 3D viewer building model surface picks, 2 m grid",
         "collectedOn": "2026-10-10",
         "level": "source data (one provider), not field verified; part boundaries read from the grid (+-1 m)",
         "independentSurvey": false,
-        "footprint": "unchanged; the main part covers 1873 of 2165.8 m2. The strip within 9.95 m of the north edge of the east block (edge v8-v9, 292 m2) is 상승관 (user, 2026-10-11) and is not drawn as 대일관",
+        "footprint": "unchanged; the main part covers 1875 of 2165.8 m2. The north strip of the east block is 상승관 (user, 2026-10-11) and is not drawn as 대일관; the wall between them was re-read from the S-MAP 0.5 m grid on 2026-10-12 (B14, +-0.5 m)",
         "roofs": "each part is a flat block at the median of the S-MAP model cells inside it. 본체: 172.1 (p10-p90 169.2-172.4, 450 cells, 77 % within 1.5 m); 동쪽부속부: 163.1 (p10-p90 163.1-163.1, 68 cells, 94 % within 1.5 m)",
         "roofForm": "본체: one roof level at 172.1 m with lower eaves (168-171 m) and roof structures to 176.9 m in the S-MAP model; the official photo shows a pitched roof with dormers, not modelled. 동쪽부속부: flat 163.1 m, a separate S-MAP building object (173604866) inside the source footprint; which building it is, is not established",
         "floors": "7: user statement 2026-10-10 (whether basement levels are included was not stated). Stored on the main part only",
@@ -95,7 +95,7 @@
           "roofM": 172.1,
           "polygon": [
             [
-              [201145.07, 557338.38], [201146.12, 557341.5], [201161.01, 557335.65], [201161.44, 557336.52], [201173.51, 557330.86], [201171.77, 557326.43], [201190.98, 557317.42], [201195.62, 557327.77], [201191.55, 557318.68], [201216.71, 557306.86], [201212.17, 557294.37], [201207.67, 557296.19], [201205.56, 557290.82], [201192.81, 557296.3], [201193.3, 557297.91], [201156.91, 557314.21], [201156.05, 557312.63], [201142.71, 557318.23], [201143.38, 557320.19], [201119.73, 557330.87], [201126.81, 557347.24], [201131.28, 557344.98], [201130.75, 557343.82], [201145.07, 557338.38]
+              [201145.07, 557338.38], [201146.12, 557341.5], [201161.01, 557335.65], [201161.44, 557336.52], [201173.51, 557330.86], [201171.77, 557326.43], [201190.98, 557317.42], [201191.18, 557317.87], [201206.89, 557311.19], [201207.34, 557312.25], [201217.83, 557307.78], [201216.71, 557306.86], [201212.17, 557294.37], [201207.67, 557296.19], [201205.56, 557290.82], [201192.81, 557296.3], [201193.3, 557297.91], [201156.91, 557314.21], [201156.05, 557312.63], [201142.71, 557318.23], [201143.38, 557320.19], [201119.73, 557330.87], [201126.81, 557347.24], [201131.28, 557344.98], [201130.75, 557343.82], [201145.07, 557338.38]
             ]
           ]
         }
@@ -542,17 +542,39 @@
       "heightSource": "SMAP_MESH",
       "polygon": [
         [
-          [201195.62, 557327.77], [201221.91, 557315.41], [201218.54, 557306.02], [201216.83, 557307.19], [201216.71, 557306.86], [201191.55, 557318.68], [201195.62, 557327.77]
+          [201195.63, 557327.39], [201223.24, 557315.64], [201219.58, 557307.04], [201191.97, 557318.78], [201195.63, 557327.39]
         ]
       ],
       "evidence": {
-        "source": "S-MAP 3D viewer building model 173604866 (2 m grid, B02; 1 m grid, B09); user statement and drawings 2026-10-11",
-        "collectedOn": "2026-10-11",
-        "level": "which building is 상승관 is user-confirmed (the low building with the 우편취급국 label between 대일관 and 청운관); outline and roof are S-MAP source data (one provider), not field verified",
+        "source": "S-MAP 3D viewer building model 173604866, 0.5 m grid read 2026-10-12 (B14); user statements 2026-10-11 and 2026-10-12 with two S-MAP screenshots",
+        "collectedOn": "2026-10-12",
+        "level": "which building is 상승관 and that it stands almost without a gap to its neighbours are user-confirmed; outline and roofs are S-MAP source data (one provider), not field verified",
         "independentSurvey": false,
-        "outline": "the strip of the 대일관 GeoPackage footprint within 9.95 m of the north edge of its east block (B02 derive.py, boundary read from the S-MAP grid, +-1 m; 292 m2). The S-MAP model 173604866 has 321 one-metre cells here",
-        "roof": "flat block at 163.1 m, the median of the S-MAP model cells (p10-p90 163.1-163.1, 94 % within 1.5 m)",
-        "notCovered": "floors, the entrance (south end towards the inner yard, estimated), ground behind the building (server DEM is old there)"
+        "outline": "four straight edges fitted to the 0.5 m cells of model 173604866 (bearing -23.04 deg, 38.5 m along the north wall, 9.35 m wide, east end wall oblique and parallel to 청운관): 1301 of 1307 model cells are inside, 54 cells inside are not the model. This entry is the main box west of the east end block (280.6 m2)",
+        "roof": "flat roof at 163.1 m: 837 cells, p10-p90 163.05-163.06, all within 0.3 m. The parapet rim reads 164.77 m and is drawn by the structure file b14-sangseung.geojson, not as roof",
+        "gaps": "to the rear wall of 대일관 (same grid): min 0.0 / median 1.08 / max 1.5 m over 29 m, touching along 12 m; to 청운관 along its north-west wall: min 0.0 / median 0.91 / max 1.62 m",
+        "replaces": "B02/Z02 outline (north strip of the 대일관 GeoPackage footprint, 292 m2, 2 m grid): same west end and north wall within 0.4 m, but 9 m too short at the east end",
+        "notCovered": "floors, the entrance (wall facing the inner yard, estimated), wall material and windows (S-MAP screenshots only), ground heights under the building"
+      }
+    },
+    {
+      "id": "추가-상승관동쪽끝",
+      "name": "상승관 동쪽 끝",
+      "roofM": 165.3,
+      "heightSource": "SMAP_MESH",
+      "polygon": [
+        [
+          [201223.24, 557315.64], [201231.06, 557312.32], [201223.26, 557305.48], [201219.58, 557307.04], [201223.24, 557315.64]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model 173604866, 0.5 m grid read 2026-10-12 (B14); user statements 2026-10-11 and 2026-10-12 with two S-MAP screenshots",
+        "collectedOn": "2026-10-12",
+        "level": "which building is 상승관 and that it stands almost without a gap to its neighbours are user-confirmed; outline and roofs are S-MAP source data (one provider), not field verified",
+        "independentSurvey": false,
+        "outline": "east end of the same S-MAP building model 173604866, east of the roof step at 11.8 m from the centre along the long axis (58.4 m2); its east wall is oblique, parallel to the north-west wall of 청운관",
+        "roof": "flat at 165.3 m: 158 cells, p10-p90 165.34-165.35. It is 2.3 m higher than the main roof and 0.6 m above the parapet rim (side view from the north in the S-MAP viewer, vault b14/smap-옆에서-북쪽면-동쪽끝덩어리가-더높음.jpg); reading it as a lower block from the oblique screenshots was wrong",
+        "notCovered": "what the block is (stair or lift core, estimated)"
       }
     },
     {
@@ -577,6 +599,26 @@
         "alias": "생활관 3동 (university place list marker inside the outline; Naver map label 생활관3동, lot 139; user-confirmed 2026-10-10). The map label stays 외국인 생활관",
         "notCovered": "the sloping roof edge, floors, entrances, street address; campus_buildings and building_metadata do not have this building (the terrain model's building lookup does not know it); vertical datum of S-MAP",
         "reproduce": "docs/audit/b05/sites.py -> docs/audit/b05/sites.json"
+      }
+    },
+    {
+      "id": "추가-청운관북서낮은부분",
+      "name": "청운관 북서 낮은 부분",
+      "roofM": 162.9,
+      "heightSource": "SMAP_MESH",
+      "polygon": [
+        [
+          [201225.03, 557303.23], [201228.55, 557306.78], [201226.76, 557308.55], [201223.26, 557305.48], [201223.3, 557304.69], [201225.03, 557303.23]
+        ]
+      ],
+      "evidence": {
+        "source": "S-MAP 3D viewer building model 173670401 (청운관), 0.5 m grid read 2026-10-12 (B14)",
+        "collectedOn": "2026-10-12",
+        "level": "source data (one provider), not field verified; outline read from the grid (+-0.5 m)",
+        "independentSurvey": false,
+        "outline": "the cells of the 청운관 model that lie outside the GeoPackage footprint in front of the first 5 m of the north-west wall of the low north-east part (50 of 57 such cells, 13.6 m2); it reaches the east end wall of 상승관",
+        "roof": "flat at 162.9 m (42 cells, p10-p90 162.88-162.89), the level of the low north-east part",
+        "notCovered": "what it is (a stair or service block, estimated); 대일관 and 청운관 are not connected (user, 2026-10-11) and nothing shows that this block connects 청운관 to 상승관 indoors"
       }
     }
   ],
@@ -1805,9 +1847,10 @@
       "windows": {
         "style": "rows",
         "floorsM": [
-          153.1,
-          156.43,
-          159.77
+          148.7,
+          152.3,
+          155.9,
+          159.5
         ]
       },
       "roof": {
@@ -1817,14 +1860,68 @@
       "grades": {
         "wall": "추정",
         "windows": "추정",
-        "roof": "확정(짙은 지붕), 재질은 추정"
+        "roof": "확정(짙은 평지붕), 재질은 추정"
       },
       "features": [
         {
           "what": "우편취급국 글자",
-          "evidence": "사용자 확정 2026-10-11(글자가 있는 낮은 건물). 어느 벽에 있는지 모름",
+          "evidence": "사용자 확정 2026-10-11(글자가 있는 낮은 건물). S-MAP 표지일 뿐 어느 벽에 있는지 모름",
           "grade": "확정",
           "drawn": false
+        },
+        {
+          "what": "지붕 둘레 난간(윗선 164.8 m)",
+          "evidence": "S-MAP 0.5 m 격자 66칸 164.8 m, 사용자 S-MAP 화면 2장. 구조물 파일 b14-sangseung 이 그린다",
+          "grade": "S-MAP",
+          "drawn": true
+        },
+        {
+          "what": "숲 쪽 벽 발치의 밝은 턱",
+          "evidence": "사용자 S-MAP 화면 2장: 건물 바깥쪽 발치를 따라 밝은 띠. 구조물 파일 b14-sangseung 이 그린다(폭·높이 추정)",
+          "grade": "추정",
+          "drawn": true
+        }
+      ]
+    },
+    {
+      "id": "추가-상승관동쪽끝",
+      "wall": "brick",
+      "windows": {
+        "style": "rows",
+        "floorsM": [
+          148.7,
+          152.3,
+          155.9,
+          159.5
+        ]
+      },
+      "roof": {
+        "type": "flat",
+        "material": "metal"
+      },
+      "grades": {
+        "wall": "추정",
+        "windows": "추정",
+        "roof": "확정(짙은 평지붕), 재질은 추정"
+      },
+      "features": [
+        {
+          "what": "우편취급국 글자",
+          "evidence": "사용자 확정 2026-10-11(글자가 있는 낮은 건물). S-MAP 표지일 뿐 어느 벽에 있는지 모름",
+          "grade": "확정",
+          "drawn": false
+        },
+        {
+          "what": "지붕 둘레 난간(윗선 164.8 m)",
+          "evidence": "S-MAP 0.5 m 격자 66칸 164.8 m, 사용자 S-MAP 화면 2장. 구조물 파일 b14-sangseung 이 그린다",
+          "grade": "S-MAP",
+          "drawn": true
+        },
+        {
+          "what": "숲 쪽 벽 발치의 밝은 턱",
+          "evidence": "사용자 S-MAP 화면 2장: 건물 바깥쪽 발치를 따라 밝은 띠. 구조물 파일 b14-sangseung 이 그린다(폭·높이 추정)",
+          "grade": "추정",
+          "drawn": true
         }
       ]
     },
