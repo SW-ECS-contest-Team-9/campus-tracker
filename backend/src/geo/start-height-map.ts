@@ -1,6 +1,7 @@
 import { pool } from '../config/database.js';
 import type { FusionConfigV4 } from '../modules/fusion/fusion.config.js';
 import { terrain } from './terrain.js';
+import { circularFootprintAxis, type CircularAxis } from '../modules/fusion/fusion-circular-corridor.js';
 
 export interface StartHeightRoad {
   id: string; buildingId: string | null; levelId: string | null; status: string; revision: number;
@@ -12,7 +13,7 @@ export interface StartHeightFloor {
   /** Calibrated phone height, already includes the phone-to-floor offset. */
   phoneHeightM: number; polygons: [number, number][][][];
 }
-export interface StartHeightMap { mapVersionId: string | null; sceneVersionId?: string | null; roads: StartHeightRoad[]; floors: StartHeightFloor[] }
+export interface StartHeightMap { mapVersionId: string | null; sceneVersionId?: string | null; roads: StartHeightRoad[]; floors: StartHeightFloor[]; circularAxis?: CircularAxis | null }
 export interface StartHeightCandidate { id: string; kind: 'ROAD' | 'FLOOR'; buildingId: string | null; levelId: string | null; phoneHeightM: number }
 export interface StartHeightSelection {
   reason: 'SELECTED' | 'NO_CANDIDATE' | 'AMBIGUOUS' | 'POSITION_UNCERTAIN';
@@ -22,13 +23,14 @@ export interface StartHeightSelection {
 /** Snapshot mutable map materials once per run/session. The exact snapshot is saved in run config. */
 export async function loadStartHeightMap(config: object, mapVersionId: string | null): Promise<StartHeightMap | null> {
   const c = config as FusionConfigV4;
-  if (!c.startHeightRoadsEnabled && !c.startHeightFloorsEnabled && !c.roadHeightAnchorsEnabled) return null;
+  if (!c.startHeightRoadsEnabled && !c.startHeightFloorsEnabled && !c.roadHeightAnchorsEnabled && !c.circularCorridorEnabled) return null;
   const db = await pool.connect();
   try {
     await db.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const roads: StartHeightRoad[] = [];
     const floors: StartHeightFloor[] = [];
     let sceneVersionId: string | null = null;
+    let circularAxis: CircularAxis | null = null;
     if (c.startHeightRoadsEnabled || c.roadHeightAnchorsEnabled) {
       const { rows } = await db.query<StartHeightRoad & { geometry: { coordinates: [number, number, number][] } }>(
         `SELECT id, building_id "buildingId", level_id "levelId", status, revision, ST_AsGeoJSON(geom, 8)::json geometry
@@ -76,8 +78,18 @@ export async function loadStartHeightMap(config: object, mapVersionId: string | 
       for (const a of areas) if (Number.isFinite(a.elevationM)) floors.push({ id: `area:${a.id}`, source: 'AREA',
         buildingId: a.buildingId, levelId: a.floor, phoneHeightM: a.elevationM + c.phoneHeightM, polygons: [a.geometry.coordinates] });
     }
+    if (c.circularCorridorEnabled && c.circularCorridorBuildingId && mapVersionId) {
+      const { rows } = await db.query<{ sceneId: string; geometry: { coordinates: [number, number][][][] } }>(
+        `SELECT v.id "sceneId", ST_AsGeoJSON(b.geom, 8)::json geometry FROM scene_buildings b
+         JOIN scene_versions v ON v.id=b.scene_version_id WHERE v.active AND v.map_version_id=$1 AND b.building_id=$2`,
+        [mapVersionId, c.circularCorridorBuildingId]);
+      if (rows[0]) {
+        sceneVersionId = rows[0].sceneId;
+        circularAxis = circularFootprintAxis(c.circularCorridorBuildingId, rows[0].geometry.coordinates[0]?.[0] ?? []);
+      }
+    }
     await db.query('COMMIT');
-    return { mapVersionId, sceneVersionId, roads, floors };
+    return { mapVersionId, sceneVersionId, roads, floors, circularAxis };
   } catch (err) {
     await db.query('ROLLBACK').catch(() => undefined);
     throw err;

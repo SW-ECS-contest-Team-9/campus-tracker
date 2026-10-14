@@ -273,6 +273,7 @@ export class Lab {
     const correction = fin && a.forward !== a.final ? Math.hypot(fin.x - f.x, fin.y - f.y) : null;
     const start = a.run.metrics?.startHeightSelection;
     const roadAnchors = a.run.metrics?.roadHeightAnchors;
+    const circle = a.run.metrics?.circularCorridor;
     const startReason = start ? { SELECTED: '후보 선택(신뢰 고도 기준이 있으면 그 기준 우선)', NO_CANDIDATE: '근처 후보 없음', AMBIGUOUS: '여러 높이 후보: 기준에 반영하지 않음', POSITION_UNCERTAIN: '수평 위치 불확실: 기준에 반영하지 않음' }[start.reason] : '';
     return `<table>
       <tr><th>source</th><td>${esc(f.source)}${f.stationary ? ' · stationary' : ''}</td></tr>
@@ -283,6 +284,7 @@ export class Lab {
       ${start ? `<tr><th>시작 높이 재료</th><td>${esc(startReason)}${start.selected ? ` · ${esc(start.selected.kind)} ${esc(start.selected.id)} · ${num(start.selected.phoneHeightM, 1, ' m MSL')}` : ''}<br><span class="muted">${start.candidates.map((c) => `${esc(c.id)} (${num(c.phoneHeightM, 1, ' m')}, 층 ${esc(c.levelId ?? '–')})`).join(' / ') || '후보 없음'}</span></td></tr>` : ''}
       <tr><th>building</th><td>${esc(f.buildingName ?? '–')}</td></tr>
       ${roadAnchors ? `<tr><th>길 통과 Z 앵커</th><td>${roadAnchors.count}개 · ${roadAnchors.roadIds.map(esc).join(', ') || '통과 조건을 만족한 길 없음'}</td></tr>` : ''}
+      ${circle && circle.reason !== 'DISABLED' ? `<tr><th>원형 복도 XY 제약</th><td>${esc(circle.reason)} · ${circle.runs.length}구간 · 반지름 ${num(circle.radiusM, 1, ' m')} · ${circle.anchors}개 관측<br><span class="muted">선택한 건물 중심 가정에 따른 보정이며 측정 정확도는 아닙니다.</span></td></tr>` : ''}
       <tr><th>smoother moved</th><td>${correction === null ? '–' : `${correction.toFixed(1)} m (realtime → final)`}</td></tr>
     </table>`;
   }
@@ -599,12 +601,22 @@ export class Lab {
       overrides[line.slice(0, i).trim()] = raw === 'true' ? true : raw === 'false' ? false : Number.isFinite(Number(raw)) && raw !== '' ? Number(raw) : raw;
     }
     if (val('lab-version') === 'fusion-v4') {
-      for (const [id, key] of [['lab-start-roads', 'startHeightRoadsEnabled'], ['lab-start-floors', 'startHeightFloorsEnabled'], ['lab-start-drafts', 'startHeightIncludeDrafts'], ['lab-road-anchors', 'roadHeightAnchorsEnabled'], ['lab-road-anchor-drafts', 'roadHeightAnchorIncludeDrafts']]) {
+      for (const [id, key] of [['lab-start-roads', 'startHeightRoadsEnabled'], ['lab-start-floors', 'startHeightFloorsEnabled'], ['lab-start-drafts', 'startHeightIncludeDrafts'], ['lab-road-anchors', 'roadHeightAnchorsEnabled'], ['lab-road-anchor-drafts', 'roadHeightAnchorIncludeDrafts'], ['lab-circle', 'circularCorridorEnabled']]) {
         if (this.el.querySelector<HTMLInputElement>(`#${id}`)?.checked) overrides[key] = true;
       }
       if (val('lab-start-building').trim()) overrides.startHeightBuildingId = val('lab-start-building').trim();
       if (val('lab-start-level').trim()) overrides.startHeightLevelId = val('lab-start-level').trim();
       if (val('lab-road-anchor-level').trim()) overrides.roadHeightAnchorLevelId = val('lab-road-anchor-level').trim();
+      if (overrides.circularCorridorEnabled === true) {
+        const building = val('lab-circle-building').trim() || overrides.circularCorridorBuildingId;
+        if (!building) { this.message = '원형 복도 보정: 중심축으로 사용할 건물 ID를 입력하세요.'; this.render(); return; }
+        overrides.circularCorridorBuildingId = building;
+        const radius = val('lab-circle-radius').trim();
+        if (radius) {
+          if (!Number.isFinite(Number(radius)) || Number(radius) <= 0) { this.message = '원형 복도 반지름은 양수로 입력하세요.'; this.render(); return; }
+          overrides.circularCorridorRadiusM = Number(radius);
+        }
+      }
     }
     const algorithmVersion = val('lab-version');
     const variant = val('lab-variant') || null;
@@ -722,6 +734,10 @@ export class Lab {
           <label class="small"><input id="lab-road-anchor-drafts" type="checkbox" /> 길 통과 앵커에 DRAFT도 포함</label>
           <input id="lab-road-anchor-level" placeholder="길 통과 앵커 층 ID (선택, 여러 층이 겹친 길의 후보 제한)" />
           <div class="small muted">보행 방향·거리·연속 통과·기압 변화가 일치해야 앵커를 생성합니다. 여러 높이의 길을 구분하지 못하면 보정을 보류합니다.</div>
+          <label class="small"><input id="lab-circle" type="checkbox" /> v4 원형 복도의 층별 공통 중심으로 XY 보정 (최종 Replay)</label>
+          <input id="lab-circle-building" placeholder="중심축이 확인된 원통형 건물 ID (예: 한림관)" />
+          <input id="lab-circle-radius" type="number" min="2" max="12" step="0.1" placeholder="복도 반지름 m (비우면 걸음·회전량에서 추정)" />
+          <div class="small muted">건물 중심과 복도 중심이 같은 경우에만 선택하세요. 평탄한 높이에서 한 방향으로 270° 이상 회전한 보행 구간만 적용하며 계단·엘리베이터 이동은 원에 맞추지 않습니다.</div>
           <button data-action="replay" ${this.busy ? 'disabled' : ''}>Replay 실행</button>
         </div>
         <div class="small muted">결과는 실행 스냅샷으로만 저장됩니다(게시 안 함). 기존 결과는 지워지지 않습니다.</div>

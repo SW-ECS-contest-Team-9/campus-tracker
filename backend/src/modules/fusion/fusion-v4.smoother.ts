@@ -224,8 +224,10 @@ export interface SmoothedPoint { t: number; x: Vec3; P: Mat3; event: SmootherEve
 /**
  * Runs the filter over events sorted by time and smooths it. weights[i] scales fix i's variance (1 / w);
  * w = 0 skips the fix. gate = chi-square gate applied in the forward pass (null = no gate).
+ * still = sorted intervals in which the phone was motion-still: no time noise there (the position cannot drift).
  */
-export function smoothEvents(events: SmootherEvent[], weights: number[], gate: number | null, c: FusionConfigV4) {
+export function smoothEvents(events: SmootherEvent[], weights: number[], gate: number | null, c: FusionConfigV4,
+  still: { from: number; to: number }[] = []) {
   const n = events.length;
   const xs: Vec3[] = new Array(n);
   const Ps: Mat3[] = new Array(n);
@@ -239,9 +241,13 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
   let thetaKnown = false;
   let vehicle = false;
   const rw = (c.headingRandomWalkDegPerStep * Math.PI) / 180;
+  let si = 0;
   for (let k = 0; k < n; k++) {
     const e = events[k];
-    const dt = Math.max(0, (e.t - lastT) / 1000);
+    while (si < still.length && still[si].to <= lastT) si++;
+    let held = 0;
+    for (let j = si; j < still.length && still[j].from < e.t; j++) held += Math.max(0, Math.min(e.t, still[j].to) - Math.max(lastT, still[j].from));
+    const dt = Math.max(0, (e.t - lastT - held) / 1000);
     lastT = e.t;
     // time noise, then the event's own prediction; combined into one transition for RTS
     const qTime = (vehicle ? c.vehicleProcessNoiseM2PerS : c.idleProcessNoiseM2PerS) * dt;

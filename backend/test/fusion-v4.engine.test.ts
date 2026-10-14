@@ -291,6 +291,35 @@ test('standing still with jittery indoor GPS: the position barely moves', () => 
   assert.ok(spread < 8, `spread ${spread.toFixed(1)} m (raw GPS scatters ~40 m)`);
 });
 
+test('rev 13: a still phone ignores a speed spike and a wandering GPS run, and stops adding points', () => {
+  const { obs } = simulate([{ durationS: 120, headingDeg: 0, walking: false }, { durationS: 20, headingDeg: 90, walking: true }], { gpsSigma: 3, gpsAccuracy: 10 });
+  // like session 79587965: one fix reports 3.9 m/s, then 30 s of 40 m fixes walk away 30 m while the phone lies still
+  const wander = obs.map((o) => {
+    const s = (o.t - T0) / 1000;
+    if (o.kind !== 'gps' || s < 60 || s > 90) return o;
+    const p = localToWgs84(ORIGIN, { x: 0, y: (s - 60), z: 0 });
+    return { ...o, latitude: p.latitude, longitude: p.longitude, horizontalAccuracy: 40, speed: s < 62 ? 3.9 : -1 };
+  });
+  const fwd = run(wander);
+  assert.equal(fwd.s.counters.reasons.INNOVATION_TOO_LARGE ?? 0, 0);
+  const stillLive = fwd.outputs.filter((o) => o.timestamp < T0 + 118_000);
+  const dist = (o: FusedOutput) => Math.hypot(o.x, o.y);
+  assert.ok(Math.max(...stillLive.map(dist)) < 5, `live max ${Math.max(...stillLive.map(dist)).toFixed(1)} m`);
+  assert.ok(stillLive.length < 10, `${stillLive.length} live points while still`);
+  const fin = finalizeFusionV4(fwd.s, cfg).outputs;
+  const stillFinal = fin.filter((o) => o.timestamp < T0 + 118_000);
+  // the replay places the whole stop from all its fixes and the walk after it; the 30 m wander (+y) must not show
+  const ys = stillFinal.map((o) => o.y);
+  assert.ok(Math.max(...ys) < 3, `final still y up to ${Math.max(...ys).toFixed(1)} m`);
+  const off = { ...cfg, stationaryHoldEnabled: false };
+  const s2 = createFusionStateV4();
+  for (const o of wander) processObservationV4(s2, o, off);
+  const before = finalizeFusionV4(s2, off).outputs.filter((o) => o.timestamp < T0 + 118_000);
+  assert.ok(Math.max(...before.map((o) => o.y)) > 8, 'rev 12 behaviour followed the wander (guards the scenario)');
+  assert.ok(stillFinal.length < 10, `${stillFinal.length} final points while still`);
+  assert.ok(fin.length - stillFinal.length >= 15, 'walking emits points again');
+});
+
 test('replay is deterministic', () => {
   const { obs } = simulate([{ durationS: 30, headingDeg: 45, walking: true }]);
   const a = finalizeFusionV4(run(obs).s, cfg).outputs;

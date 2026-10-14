@@ -20,10 +20,12 @@ import type { FusionStateV4 } from './fusion-state-v4.js';
 import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fusion.diagnostics.js';
 import type { StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact } from './fusion-road-height.js';
+import type { CircularSummary } from './fusion-circular-corridor.js';
 
 export interface AlgorithmSummary {
   startHeightSelection?: StartHeightSelection | null;
   roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
+  circularCorridor?: CircularSummary;
   gpsAccepted: number;
   gpsRejected: number;
   rejectReasons: Record<string, number>;
@@ -197,7 +199,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   //    outputs of the registered config are identical to rev 6.
   // 8: best vertical-accuracy GPS fallback; 9: fixed provisional DEM datum + barometric changes indoors.
   // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
-  revision: 11,
+  // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
+  revision: 13, // motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

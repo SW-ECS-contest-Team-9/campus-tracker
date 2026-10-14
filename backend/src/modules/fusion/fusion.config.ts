@@ -605,6 +605,13 @@ export const fusionConfigV4 = {
   vehicleSpeedMps: 3,
   vehicleNoStepsMs: 10_000,
   vehicleProcessNoiseM2PerS: 225,
+  // rev 13: motion-still stops. A phone lying still reported 3.9 m/s once and the 225 m2/s vehicle noise then
+  // followed 30-90 m fixes for minutes (79587965). While still: no time noise, the stop's fixes count as one
+  // measurement (median; their errors are correlated), and no new output point unless the estimate moved.
+  stationaryHoldEnabled: true,
+  stationaryOutputMinMoveM: 2,
+  vehicleMinFixes: 3, // consecutive fixes at vehicle speed, not still, accuracy <= vehicleMaxAccuracyM
+  vehicleMaxAccuracyM: 20,
   // smoother (replay / finalization)
   smootherIterations: 3,
   smootherCauchyScale: 2, // residual scale in sigmas for the robust re-weighting
@@ -644,6 +651,19 @@ export const fusionConfigV4 = {
   roadHeightAnchorMaxBaroResidualM: 1.5,
   roadHeightAnchorIntervalMs: 5000,
   roadHeightAnchorSigmaM: 2, // author-supplied map height is not an independent survey
+  circularCorridorEnabled: false, // replay only, user-selected building with a confirmed common axis
+  circularCorridorBuildingId: '',
+  circularCorridorRadiusM: 0, // 0: shared median of walked arc length / yaw turn across confirmed loops
+  circularCorridorMinRadiusM: 2,
+  circularCorridorMaxRadiusM: 12,
+  circularCorridorMaxCentreOffsetM: 35,
+  circularCorridorMaxStepGapMs: 3000,
+  circularCorridorMaxHeightRangeM: 0.8,
+  circularCorridorMinSteps: 20,
+  circularCorridorMinTurnDeg: 270,
+  circularCorridorMinTurnPurity: 0.65,
+  circularCorridorAnchorIntervalMs: 1000,
+  circularCorridorAnchorSigmaM: 1.5,
   contactMaxPositionSigmaM: 15,
   contactBuildingClearanceM: 3, // also at least half the position sigma away from any footprint
   contactMaxHeightSigmaM: 2.5, // DEM sigma + position sigma x slope (campus DEM sigma median 1.1-1.5 m)

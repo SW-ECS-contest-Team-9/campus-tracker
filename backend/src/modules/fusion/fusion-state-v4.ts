@@ -6,6 +6,7 @@ import type { StrideCalibration } from './fusion.stride.js';
 import type { FusionSessionContext } from './fusion.stride.js';
 import type { StartHeightMap, StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
+import type { CircularSummary } from './fusion-circular-corridor.js';
 
 /**
  * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
@@ -25,6 +26,8 @@ export interface FixV4 {
   sigma: number;
   vehicle: boolean;
   forwardUsed: boolean;
+  /** rev 13: taken while the motion sensors said the phone was still (one stop's fixes share one error) */
+  stationary?: boolean;
 }
 /** Stretch with one constant device-to-walking-direction offset (theta). */
 export interface HeadingSegmentV4 { id: number; startT: number; reason: string; firstStep: number }
@@ -71,6 +74,10 @@ export interface FusionStateV4 {
   pendingContinuity?: { thetaPlusRel: number; variance: number };
   lastEventT?: number;
   vehicle: boolean;
+  /** consecutive good fixes reporting vehicle speed while the motion sensors were not still */
+  vehicleRun: number;
+  /** rev 13: current stop (motion-still): state when it began and its fixes, combined into one measurement */
+  stop?: { x: Vec3; P: Mat3; fixes: number[] };
 
   // ---- motion: relative heading, pose, step detection, stationarity ----
   lastMotionT?: number;
@@ -141,6 +148,7 @@ export interface FusionStateV4 {
   mapStartDatum?: DatumV4;
   roadHeightTracker: RoadHeightTracker;
   roadHeightContacts: RoadHeightContact[];
+  circularCorridor?: CircularSummary;
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];
@@ -158,6 +166,8 @@ export interface FusionStateV4 {
   // ---- outputs / bookkeeping ----
   fusionSequence: number;
   nextOutputAt?: number;
+  /** position of the last emitted output (rev 13: a stop emits no further points unless the position moved) */
+  lastOutputXY?: [number, number];
   window: {
     gpsUsed: boolean | null;
     gpsReason: string | null;
@@ -202,6 +212,7 @@ export function createFusionStateV4(context?: FusionSessionContext): FusionState
     headingKnown: false,
     headingSource: 'UNKNOWN',
     vehicle: false,
+    vehicleRun: 0,
     rel: 0,
     relInitialized: false,
     bq: { x1: 0, x2: 0, y1: 0, y2: 0, primed: 0 },

@@ -274,6 +274,11 @@ export interface StartHeightSelection {
   selected: StartHeightSelection['candidates'][number] | null;
 }
 
+export interface CircularCorridorSummary {
+  reason: 'DISABLED' | 'AXIS_UNAVAILABLE' | 'NO_CONFIRMED_LOOP' | 'APPLIED';
+  radiusM: number | null; anchors: number; runs: { from: number; to: number; steps: number; inferredRadiusM: number }[];
+}
+
 export interface LabRun {
   id: string;
   sessionId: string;
@@ -290,7 +295,7 @@ export interface LabRun {
   startedAt: string;
   completedAt: string | null;
   outputCount: number | null;
-  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown; startHeightSelection?: StartHeightSelection | null; roadHeightAnchors?: { count: number; roadIds: string[] } } | null;
+  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown; startHeightSelection?: StartHeightSelection | null; roadHeightAnchors?: { count: number; roadIds: string[] }; circularCorridor?: CircularCorridorSummary } | null;
   error: string | null;
 }
 export interface RunPosition {

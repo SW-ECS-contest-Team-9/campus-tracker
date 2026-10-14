@@ -27,6 +27,7 @@ import { terrain as terrainModel } from '../../geo/terrain.js';
 import { tmForward } from '../../geo/tm.js';
 import { selectStartHeight } from '../../geo/start-height-map.js';
 import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
+import { circularCorridorAnchors } from './fusion-circular-corridor.js';
 import type { FusionConfigV4 } from './fusion.config.js';
 import { checkPedometerCounter, restartPedometerCounter } from './fusion.pedometer.js';
 import type { Observation } from './fusion.timeline.js';
@@ -86,7 +87,7 @@ function biquad(c: FusionConfigV4, sampleHz = 50) {
 /** Time-based process noise up to t (slow drift; large in a vehicle). */
 function advance(s: FusionStateV4, t: number, c: FusionConfigV4) {
   if (!s.initialized) return;
-  if (s.lastEventT !== undefined && t > s.lastEventT) {
+  if (s.lastEventT !== undefined && t > s.lastEventT && !(c.stationaryHoldEnabled && s.stationary)) {
     const q = (s.vehicle ? c.vehicleProcessNoiseM2PerS : c.idleProcessNoiseM2PerS) * ((t - s.lastEventT) / 1000);
     const p = predictTime(s.x, q);
     s.P = applyPrediction(s.P, p);
@@ -401,6 +402,11 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
       : s.accelWindow.length >= 20;
     const stationary = filled && rms <= c.stationaryAccelRmsG && (s.lastStepT === undefined || o.t - s.lastStepT >= c.stationaryWindowMs);
     if (stationary !== s.stationary) {
+      if (c.stationaryHoldEnabled) {
+        advance(s, o.t, c); // the time noise up to here belongs to the moving phase
+        if (stationary) s.vehicle = false;
+        else s.stop = undefined;
+      }
       s.stationary = stationary;
       s.stationaryLog.push({ t: o.t, stationary });
     }
@@ -644,8 +650,16 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
     return;
   }
   const p = wgs84ToLocal(s.origin!, o.latitude, o.longitude, 0);
-  if (finite(o.speed) && o.speed >= c.vehicleSpeedMps && (s.lastStepT === undefined || o.t - s.lastStepT >= c.vehicleNoStepsMs)) s.vehicle = true;
+  const vehicleSpeed = finite(o.speed) && o.speed >= c.vehicleSpeedMps && (s.lastStepT === undefined || o.t - s.lastStepT >= c.vehicleNoStepsMs);
+  if (!c.stationaryHoldEnabled) {
+    if (vehicleSpeed) s.vehicle = true;
+  } else {
+    // one speed spike from a still phone is not a vehicle: several good fixes in a row, and the phone not still
+    s.vehicleRun = vehicleSpeed && !s.stationary && acc <= c.vehicleMaxAccuracyM ? s.vehicleRun + 1 : 0;
+    if (s.vehicleRun >= c.vehicleMinFixes) s.vehicle = true;
+  }
   advance(s, o.t, c);
+  if (c.stationaryHoldEnabled && s.stationary) return stationaryGps(s, o, p.x, p.y, sigma, c, r);
   const u = gpsUpdate(s.x, s.P, p.x, p.y, sigma * sigma);
   const innovation = Math.hypot(p.x - s.x[0], p.y - s.x[1]);
   const used = u.d2 <= c.gpsGateChi2;
@@ -663,6 +677,36 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
     maybeReanchor(s, o.t, c, r);
   }
   tryHeadingFit(s, o.t, c, r);
+}
+
+/**
+ * A fix while the phone is motion-still. Fixes of one stop share one error (multipath, a slowly wandering
+ * solution), so they are not independent measurements: their median, with the median sigma, updates the state
+ * the stop began with, replacing (not adding to) the previous stop update. One wild fix moves nothing.
+ */
+function stationaryGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, x: number, y: number, sigma: number, c: FusionConfigV4, r: StepResultV4) {
+  s.stop ??= { x: s.x, P: s.P, fixes: [] };
+  s.fixes.push({ t: o.t, seq: o.seq, x, y, accuracy: o.horizontalAccuracy!, sigma, vehicle: false, forwardUsed: false, stationary: true });
+  s.stop.fixes.push(s.fixes.length - 1);
+  const fixes = s.stop.fixes.map((i) => s.fixes[i]);
+  const u = gpsUpdate(s.stop.x, s.stop.P, median(fixes.map((f) => f.x))!, median(fixes.map((f) => f.y))!, median(fixes.map((f) => f.sigma))! ** 2);
+  const innovation = Math.hypot(x - s.x[0], y - s.x[1]);
+  if (u.d2 <= c.gpsGateChi2) {
+    s.x = u.x;
+    s.P = floorPosition(u.P, c.positionSigmaFloorM);
+    s.reckonedFrom = s.steps.length;
+    s.rejectRun = [];
+    s.fixes.at(-1)!.forwardUsed = true;
+    acceptGps(s, o, r, innovation);
+  } else {
+    s.rejectRun.push(s.fixes.length - 1);
+    rejectGps(s, o, 'INNOVATION_TOO_LARGE', r, innovation);
+    maybeReanchor(s, o.t, c, r);
+    if (s.window.reanchored) s.stop = { x: s.x, P: s.P, fixes: [] };
+  }
+  const fits = s.counters.headingFits;
+  tryHeadingFit(s, o.t, c, r);
+  if (s.counters.headingFits !== fits) s.stop = { x: s.x, P: s.P, fixes: [] };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -932,10 +976,30 @@ export function processObservationV4(s: FusionStateV4, o: Observation, c: Fusion
   else applyGps(s, o, c, r);
   s.lastObservationT = o.t;
   if (s.initialized && (s.nextOutputAt === undefined || o.t >= s.nextOutputAt)) {
-    r.outputs.push(makeLiveOutput(s, o.t, c));
     s.nextOutputAt = (Math.floor(o.t / c.outputIntervalMs) + 1) * c.outputIntervalMs;
+    if (holdsStill(s, s.x, c) && !s.window.anchored && !s.window.reanchored) s.window = emptyWindowV4();
+    else {
+      r.outputs.push(makeLiveOutput(s, o.t, c));
+      s.lastOutputXY = [s.x[0], s.x[1]];
+    }
   }
   return r;
+}
+
+/** rev 13: motion-still and within stationaryOutputMinMoveM of the last emitted point: no new point. */
+function holdsStill(s: FusionStateV4, x: Vec3, c: FusionConfigV4, stationary = s.stationary) {
+  return c.stationaryHoldEnabled && stationary && s.lastOutputXY !== undefined
+    && Math.hypot(x[0] - s.lastOutputXY[0], x[1] - s.lastOutputXY[1]) < c.stationaryOutputMinMoveM;
+}
+
+/** Motion-still intervals from the stationary log (the last one runs to `end`). */
+function stillIntervals(s: FusionStateV4, end: number) {
+  const out: { from: number; to: number }[] = [];
+  for (const e of s.stationaryLog) {
+    if (e.stationary) out.push({ from: e.t, to: end });
+    else if (out.length && out.at(-1)!.to === end) out.at(-1)!.to = e.t;
+  }
+  return out;
 }
 
 export function flushFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4 {
@@ -1045,6 +1109,15 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   let smoothed: ReturnType<typeof smoothEvents> | null = null;
   let headings: ReturnType<typeof segmentHeadings> = [];
   let lastEvents: SmootherEvent[] = [];
+  // rev 13: no drift while still, and one stop's fixes together weigh as much as one fix (sigma x sqrt(n))
+  const still = c.stationaryHoldEnabled ? stillIntervals(s, s.lastObservationT ?? s.fixes.at(-1)?.t ?? 0) : [];
+  const stopOf = (f: (typeof s.fixes)[number]) => f.stationary ? still.findIndex((g) => f.t >= g.from && f.t <= g.to) : -1;
+  const perStop = new Map<number, number>();
+  for (const f of s.fixes) {
+    const k = stopOf(f);
+    if (k >= 0) perStop.set(k, (perStop.get(k) ?? 0) + 1);
+  }
+  const fixSigma = s.fixes.map((f) => f.sigma * Math.sqrt(perStop.get(stopOf(f)) ?? 1));
   for (let it = 0; it < c.smootherIterations; it++) {
     headings = segmentHeadings(s, weights, c);
     const events: SmootherEvent[] = [
@@ -1052,9 +1125,9 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
       ...s.steps.map((p): SmootherEvent => ({ kind: 'step', t: p.t, rel: p.rel, length: p.length, stairs: p.stairs,
         slope: p.slope === true, verticalUnknown: p.verticalUnknown === true })),
       ...s.walked.map((w): SmootherEvent => ({ kind: 'walked', t: w.t, distance: w.distance })),
-      ...s.fixes.map((f, i): SmootherEvent => ({ kind: 'fix', t: f.t, index: i, x: f.x, y: f.y, sigma: f.sigma, vehicle: f.vehicle })),
+      ...s.fixes.map((f, i): SmootherEvent => ({ kind: 'fix', t: f.t, index: i, x: f.x, y: f.y, sigma: fixSigma[i], vehicle: f.vehicle })),
     ].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
-    smoothed = smoothEvents(events, weights, it === 0 ? c.gpsGateChi2 : null, c);
+    smoothed = smoothEvents(events, weights, it === 0 ? c.gpsGateChi2 : null, c, still);
     const residual = new Array<number>(s.fixes.length).fill(0);
     for (const p of smoothed.points) if (p.event.kind === 'fix') residual[p.event.index] = Math.hypot(p.x[0] - p.event.x, p.x[1] - p.event.y);
     weights = s.fixes.map((f, i) => 1 / (1 + (residual[i] / (c.smootherCauchyScale * f.sigma)) ** 2));
@@ -1064,7 +1137,18 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   const anchors = indoorStairAnchors(s, smoothed!.points, c);
   if (anchors.length) {
     const events = [...lastEvents, ...anchors].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
-    smoothed = smoothEvents(events, [...weights, ...anchors.map(() => 1)], null, c);
+    smoothed = smoothEvents(events, [...weights, ...anchors.map(() => 1)], null, c, still);
+  }
+  const circle = circularCorridorAnchors(s.steps, headings, smoothed!.points,
+    s.startHeightMap?.circularAxis ?? null, tmForward(s.origin.latitude, s.origin.longitude), s.fixes.length + anchors.length, c);
+  s.circularCorridor = circle.summary;
+  if (circle.anchors.length) {
+    const events = [...lastEvents, ...anchors, ...circle.anchors].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
+    for (let it = 0; it < 2; it++) {
+      smoothed = smoothEvents(events, [...weights, ...anchors.map(() => 1), ...circle.anchors.map(() => 1)], null, c, still);
+      const residuals = finalResiduals(s, smoothed.points);
+      weights = s.fixes.map((f, i) => residuals[i] === null ? weights[i] : 1 / (1 + (residuals[i]! / (c.smootherCauchyScale * f.sigma)) ** 2));
+    }
   }
   const points = smoothed!.points;
   const accepted = weights.filter((w) => w >= 0.5).length;
@@ -1147,6 +1231,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   // 1 Hz outputs from the smoothed states (state of the latest event at or before each tick)
   const outputs: FusedOutput[] = [];
   s.fusionSequence = 0;
+  s.lastOutputXY = undefined;
   if (!points.length) return { outputs, events: [] };
   const t0 = points[0].t;
   const tEnd = points.at(-1)!.t;
@@ -1179,9 +1264,11 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     while (si < s.stationaryLog.length && s.stationaryLog[si].t <= tick) stationary = s.stationaryLog[si++].stationary;
     const p = points[k];
     const sigma = sigmaXY(p.P);
-    if (p.t <= tick && sigma <= c.maxOutputSigmaM) {
+    if (p.t <= tick && sigma <= c.maxOutputSigmaM && !(holdsStill(s, p.x, c, stationary) && !window.steps && tick !== tEnd)) {
+      s.lastOutputXY = [p.x[0], p.x[1]];
       const headed = window.steps - window.unheaded;
-      const source: PositionSource = window.fixUsed && headed ? 'FUSED' : window.fixUsed ? 'GPS_CORRECTED' : headed ? 'PDR_PREDICTED' : stationary ? 'STATIONARY_HOLD' : 'HELD';
+      const constrained = circle.summary.runs.some((run) => tick >= run.from && tick <= run.to);
+      const source: PositionSource = constrained ? 'MAP_CONSTRAINED' : window.fixUsed && headed ? 'FUSED' : window.fixUsed ? 'GPS_CORRECTED' : headed ? 'PDR_PREDICTED' : stationary ? 'STATIONARY_HOLD' : 'HELD';
       const z = s.zLog.length && s.zLog[zi].t <= tick ? s.zLog[zi].z : 0;
       outputs.push(
         output(s, tick, p.x, sigma, segKnown && lastRel !== null ? headingRadToDeg(lastRel + p.x[2]) : null, z, source, {
@@ -1220,6 +1307,7 @@ export function summarizeV4(s: FusionStateV4) {
   }
   return {
     startHeightSelection: s.startHeightSelection ?? null,
+    circularCorridor: s.circularCorridor,
     roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
     gpsAccepted: accepted,
     gpsRejected: rejected,

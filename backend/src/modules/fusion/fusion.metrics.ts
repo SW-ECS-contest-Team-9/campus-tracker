@@ -46,6 +46,7 @@ export interface FusionMetrics {
   terrain: AlgorithmSummary['terrain'] | null;
   startHeightSelection?: AlgorithmSummary['startHeightSelection'];
   roadHeightAnchors?: AlgorithmSummary['roadHeightAnchors'];
+  circularCorridor?: AlgorithmSummary['circularCorridor'];
   validation: FusionValidation;
 }
 
@@ -107,6 +108,7 @@ export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutp
     terrain: summary.terrain ?? null,
     startHeightSelection: summary.startHeightSelection ?? null,
     roadHeightAnchors: summary.roadHeightAnchors,
+    circularCorridor: summary.circularCorridor,
     validation: validateFusion(timeline, outputs.map((o) => ({ latitude: o.latitude, longitude: o.longitude, height: o.geomZ }))),
   };
 }

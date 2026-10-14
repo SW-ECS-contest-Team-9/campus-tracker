@@ -9,7 +9,7 @@
  * STATIONARY_HOLD(v2) user detected as stationary, XY held
  * HELD           (v2) nothing moved the position (e.g. walking but heading not anchored yet)
  */
-export type PositionSource = 'GPS_ANCHORED' | 'GPS_CORRECTED' | 'FUSED' | 'PDR_PREDICTED' | 'GPS_REANCHOR' | 'STATIONARY_HOLD' | 'HELD';
+export type PositionSource = 'GPS_ANCHORED' | 'GPS_CORRECTED' | 'FUSED' | 'PDR_PREDICTED' | 'GPS_REANCHOR' | 'STATIONARY_HOLD' | 'HELD' | 'MAP_CONSTRAINED';
 
 export type GpsRejectReason =
   | 'INVALID_ACCURACY'
