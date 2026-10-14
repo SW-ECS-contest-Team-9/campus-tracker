@@ -18,7 +18,7 @@
  *  - height:  barometer relative Z + a zero b(t). With the campus DEM (rev 2): b comes from ground contacts
  *             (walking outdoors = ground + phone height), smoothed as a slow random walk (weather drift);
  *             fallback = GPS heights consistent with the ground, then the GPS median (no DEM), then
- *             the valid GPS height with the smallest reported vertical error as a provisional datum.
+ *             a fixed DEM ground-level start + barometer, then the best vertical-accuracy GPS height.
  */
 import { localToWgs84 } from '../../geo/local-to-wgs84.js';
 import { wgs84ToLocal } from '../../geo/wgs84-to-local.js';
@@ -728,10 +728,36 @@ function gpsDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
   return best ? { b: best.b, sigma: Math.max(3, best.accuracy), source: 'GPS_FALLBACK', frame: 'ELLIPSOIDAL' } : null;
 }
 
-/** Realtime zero: the recent consistent ground contacts, else GPS. */
+/** Provisional zero without an outdoor contact: ground-level start, including inside buildings.
+ * Capture ONCE; resampling the zero as XY moves would cancel stair climbs or invent changes on slopes.
+ */
+function terrainFallback(s: FusionStateV4, x: Vec3, sigma: number, z: number, c: FusionConfigV4): DatumV4 | null {
+  if (!s.terrain || !s.origin) return null;
+  const ll = localToWgs84(s.origin, { x: x[0], y: x[1], z: 0 });
+  const ground = terrainModel.sampleLatLon(s.terrain, ll.latitude, ll.longitude);
+  if (!ground || !finite(ground.height) || !finite(ground.sigma) || !finite(sigma)) return null;
+  return {
+    b: ground.height + c.phoneHeightM - z,
+    sigma: Math.max(c.terrainFallbackMinSigmaM, Math.hypot(ground.sigma, sigma * ground.slope, c.phoneHeightSigmaM)),
+    source: 'TERRAIN_FALLBACK', frame: 'ORTHO',
+  };
+}
+
+/** Trusted GPS wins over provisional DEM; provisional DEM wins over untrusted GPS. */
+function fallbackDatum(s: FusionStateV4, dem: DatumV4 | null, c: FusionConfigV4): DatumV4 | null {
+  const gps = gpsDatum(s, c);
+  return gps?.source === 'GPS' ? gps : dem ?? gps;
+}
+
+/** Realtime zero: outdoor contacts, trusted GPS, fixed provisional DEM, then provisional GPS. */
 function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
   const kept = consistentContacts(s.contacts.slice(-600), c);
-  if (!kept) return gpsDatum(s, c);
+  if (!kept) {
+    if (!s.terrainFallbackDatum && s.z !== undefined) {
+      s.terrainFallbackDatum = terrainFallback(s, s.x, sigmaXY(s.P), s.z, c) ?? undefined;
+    }
+    return fallbackDatum(s, s.terrainFallbackDatum ?? null, c);
+  }
   const recent = kept.slice(-12);
   const b = median(recent.map((k) => k.offset))!;
   const v = recent.reduce((a, k) => a + k.variance, 0) / recent.length;
@@ -1036,12 +1062,20 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   }
   const kept = consistentContacts(contacts, c);
   const terrainDatum = kept ? smoothDatum(kept, c) : null;
-  const fallbackDatum = terrainDatum ? null : gpsDatum(s, c);
-  const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallbackDatum);
+  // Recompute the provisional start on the smoothed XY track, with its matching barometric Z.
+  let provisionalDem: DatumV4 | null = null;
+  if (!terrainDatum && s.zLog.length) {
+    for (const p of points) {
+      provisionalDem = terrainFallback(s, p.x, sigmaXY(p.P), zAt(p.t)!, c);
+      if (provisionalDem) break;
+    }
+  }
+  const fallback = terrainDatum ? null : fallbackDatum(s, provisionalDem, c);
+  const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallback);
   s.smoothed = {
-    datumSource: terrainDatum ? 'TERRAIN' : fallbackDatum?.source ?? 'NONE',
+    datumSource: terrainDatum ? 'TERRAIN' : fallback?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
-    datumSigma: terrainDatum ? terrainDatum.sigma : (fallbackDatum?.sigma ?? null),
+    datumSigma: terrainDatum ? terrainDatum.sigma : (fallback?.sigma ?? null),
     driftRangeM: terrainDatum ? terrainDatum.driftRange : null,
     gpsAccepted: accepted,
     gpsDownweighted: weights.length - accepted,

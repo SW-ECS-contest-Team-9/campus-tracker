@@ -35,6 +35,17 @@ test('height: provisional GPS Z is drawn at its absolute estimate, with uncertai
   assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 97, kind: 'ABSOLUTE' });
 });
 
+test('height: DEM + barometer fallback explains the assumed ground-level start and does not name a floor', () => {
+  const p = { ellipsoidalAltitude: 127, terrainHeight: 100, zDatumSource: 'TERRAIN_FALLBACK', zDatumSigma: 5 };
+  const h = describeFusedHeight(p);
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /시작 층 미확정/);
+  assert.match(h.datum, /기압 변화 누적/);
+  assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 104, kind: 'ABSOLUTE' });
+});
+
 test('height: a track is split where the datum appears, without a hole in the line', () => {
   const p = (e: number | null) => ({ ellipsoidalAltitude: e, terrainHeight: 90 });
   const runs = splitByAbsoluteHeight([p(null), p(null), p(100), p(101), p(null)]);

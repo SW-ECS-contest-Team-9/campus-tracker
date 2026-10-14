@@ -63,8 +63,10 @@ export function describeFusedHeight(p: FusedHeightInput): HeightSummary {
         ? `GPS 고도 기준 ±${m(p.zDatumSigma)} — 실외 지면 접촉 없음`
         : p.zDatumSource === 'GPS_FALLBACK'
           ? `임시 GPS 기준 ±${m(p.zDatumSigma)} — 신뢰 기준 미충족, 수직 오차가 가장 작은 샘플`
-          : '기준 미기록';
-    const provisional = p.zDatumSource === 'GPS_FALLBACK';
+          : p.zDatumSource === 'TERRAIN_FALLBACK'
+            ? `임시 지형·기압 기준 ±${m(p.zDatumSigma)} — 시작 위치의 지면층 가정, 이후 기압 변화 누적(시작 층 미확정)`
+            : '기준 미기록';
+    const provisional = p.zDatumSource === 'GPS_FALLBACK' || p.zDatumSource === 'TERRAIN_FALLBACK';
     return { kind: 'ABSOLUTE', status: provisional ? '절대 고도 임시 추정' : '절대 고도 추정', datum, floorAllowed: !provisional };
   }
   const projected = p.terrainHeight != null;

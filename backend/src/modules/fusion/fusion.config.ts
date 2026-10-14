@@ -619,6 +619,7 @@ export const fusionConfigV4 = {
   // absolute height from the terrain DEM: "walking outdoors = ground + phone height" (ground contacts)
   phoneHeightM: 1.0,
   phoneHeightSigmaM: 0.3,
+  terrainFallbackMinSigmaM: 5, // provisional ground-level start; the initial indoor floor is unknown
   contactMaxPositionSigmaM: 15,
   contactBuildingClearanceM: 3, // also at least half the position sigma away from any footprint
   contactMaxHeightSigmaM: 2.5, // DEM sigma + position sigma x slope (campus DEM sigma median 1.1-1.5 m)
