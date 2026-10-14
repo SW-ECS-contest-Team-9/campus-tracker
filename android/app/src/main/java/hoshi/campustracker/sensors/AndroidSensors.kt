@@ -10,11 +10,13 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
+import android.location.altitude.AltitudeConverter
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.provider.Settings
+import java.util.concurrent.atomic.AtomicBoolean
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -78,6 +80,36 @@ class AndroidLocationSource(
     private val locationManager = context.getSystemService(LocationManager::class.java)
     private var fusedCallback: LocationCallback? = null
     private var gpsListener: LocationListener? = null
+    private val mslConverter: AltitudeConverter? by lazy { if (Build.VERSION.SDK_INT >= 34) AltitudeConverter() else null }
+    private val mslWarmUpStarted = AtomicBoolean(false)
+
+    /**
+     * Fills mslAltitudeMeters from the on-device geoid model (API 34+) when the provider did not: fused fixes on a
+     * Galaxy S21 / Android 15 carried an ellipsoidal height but no MSL, so `altitude` was always null (§4.1).
+     * API 35+: non-blocking; the model is loaded once on a separate thread and fixes before that stay without MSL.
+     */
+    private fun addMslAltitude(location: Location) {
+        if (Build.VERSION.SDK_INT < 34 || !location.hasAltitude() || location.hasMslAltitude()) return
+        val converter = mslConverter ?: return
+        try {
+            if (Build.VERSION.SDK_INT >= 35) {
+                if (!converter.tryAddMslAltitudeToLocation(location) && mslWarmUpStarted.compareAndSet(false, true)) {
+                    val probe = Location(location)
+                    Thread({
+                        runCatching { converter.addMslAltitudeToLocation(context, probe) }
+                            .onFailure { L.w(TAG, "MSL geoid model load failed", it) }
+                    }, "CampusCollector.msl").start()
+                }
+            } else converter.addMslAltitudeToLocation(context, location)
+        } catch (e: Exception) {
+            L.w(TAG, "MSL altitude conversion failed", e)
+        }
+    }
+
+    private fun Location.read(): LocationReading? {
+        addMslAltitude(this)
+        return toReading(clock)
+    }
 
     @Volatile override var isActive: Boolean = false
         private set
@@ -101,7 +133,7 @@ class AndroidLocationSource(
                 val callback = object : LocationCallback() {
                     override fun onLocationResult(result: LocationResult) {
                         // All fixes, in order; nothing filtered (stale cached fixes too — the server decides).
-                        for (location in result.locations) location.toReading(clock)?.let(onLocation)
+                        for (location in result.locations) location.read()?.let(onLocation)
                     }
                 }
                 fusedCallback = callback
@@ -109,10 +141,10 @@ class AndroidLocationSource(
             } else {
                 val listener = object : LocationListener {
                     override fun onLocationChanged(location: Location) {
-                        location.toReading(clock)?.let(onLocation)
+                        location.read()?.let(onLocation)
                     }
                     override fun onLocationChanged(locations: MutableList<Location>) {
-                        for (location in locations) location.toReading(clock)?.let(onLocation)
+                        for (location in locations) location.read()?.let(onLocation)
                     }
                     override fun onProviderEnabled(provider: String) = Unit
                     override fun onProviderDisabled(provider: String) = Unit
