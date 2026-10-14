@@ -60,6 +60,9 @@ test('focus, setFloor, setMarkerImages, setMode', () => {
   assert.equal(parseCommand({ v: 1, type: 'setMarkerImages', ok: PNG }).ok, false);
   assert.ok(parseCommand({ v: 1, type: 'setMode', light: true }).ok);
   assert.equal(parseCommand({ v: 1, type: 'setMode', light: 1 }).ok, false);
+  assert.deepEqual(parseCommand({ v: 1, type: 'setMode', ui: 'min' }), { ok: true, command: { type: 'setMode', light: null, ui: 'min' } });
+  assert.equal(parseCommand({ v: 1, type: 'setMode', ui: 'tiny' }).ok, false);
+  assert.equal(parseCommand({ v: 1, type: 'setMode' }).ok, false);
 });
 
 test('그림 주소: data:image base64, http(s), 같은 출처 경로만', () => {

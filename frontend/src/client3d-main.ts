@@ -12,6 +12,7 @@ import { api, type SceneBuilding } from './api';
 import { initCampusMap, type CampusSceneLayer } from './campus-map';
 import { matchFloor, originAllowed, parseCommand, throttle, PROTOCOL_VERSION, type Command, type PageEvent, type Xyz } from './client3d-protocol';
 import { BuildingFollow } from './client3d-follow';
+import { routeMarkers } from './client3d-markers';
 import { LevelView } from './level-view-layer';
 import { baseBuildingId, buildingFloors, type Floor, type LvPlace, type LvRoad } from './level-view';
 import { SceneLayers, loadPublicLayerData } from './scene-layers';
@@ -27,7 +28,7 @@ const nativeView = () => (window as any).ReactNativeWebView as { postMessage: (s
 const query = new URLSearchParams(location.search);
 let light = query.get('light') === '1';
 /** ?ui=min: 페이지 자체의 층 판을 숨김(앱이 층 고르기를 직접 보여 줄 때) */
-const minimalUi = query.get('ui') === 'min';
+let minimalUi = query.get('ui') === 'min';
 
 type Unversioned<T> = T extends unknown ? Omit<T, 'v'> : never;
 function emit(event: Unversioned<PageEvent>) {
@@ -352,11 +353,10 @@ async function boot() {
     route.push(viewer.entities.add({ polyline: { positions: c.points.map((p) => cart(p)), width: 10,
       material: new C.PolylineOutlineMaterialProperty({ color, outlineColor: C.Color.WHITE, outlineWidth: 2.5 }),
       depthFailMaterial: new C.ColorMaterialProperty(color.withAlpha(0.6)) } }));
-    const end = (p: Xyz, css: string, text: string) => route.push(viewer.entities.add({ position: cart(p, 1), point: { pixelSize: 16, color: C.Color.fromCssColorString(css), outlineColor: C.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
-      label: { text, font: '700 12px system-ui, sans-serif', fillColor: C.Color.WHITE, showBackground: true, backgroundColor: C.Color.fromCssColorString(css), pixelOffset: new C.Cartesian2(0, -16), verticalOrigin: C.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY } }));
-    end(c.points[0], COLOR.confirmed, '출발');
-    end(c.points[c.points.length - 1], COLOR.primary, '도착');
-    for (const f of c.floorChanges) end(f.at, COLOR.change, f.label ?? '층 이동');
+    // 같은 자리 표지는 합치고(→ B1 · 도착), 가까운 표지는 이름표를 위로 한 칸씩(24 px) 쌓음
+    const css = { start: COLOR.confirmed, end: COLOR.primary, change: COLOR.change };
+    for (const m of routeMarkers(c.points, c.floorChanges)) route.push(viewer.entities.add({ position: cart(m.at, 1), point: { pixelSize: 16, color: C.Color.fromCssColorString(css[m.kind]), outlineColor: C.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
+      label: { text: m.text, font: '700 12px system-ui, sans-serif', fillColor: C.Color.WHITE, showBackground: true, backgroundColor: C.Color.fromCssColorString(css[m.kind]), pixelOffset: new C.Cartesian2(0, -16 - m.stack * 24), verticalOrigin: C.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY } }));
     // 경로 전체가 보이게(따라가기는 멈추고 "현재 위치로" 단추를 보임)
     const sphere = C.BoundingSphere.fromPoints(c.points.map((p) => cart(p, 0)));
     camera.flyToBoundingSphere(sphere, { duration: 0.9, offset: new C.HeadingPitchRange(camera.heading, C.Math.toRadians(CAMERA.pitchDeg), Math.max(120, sphere.radius * 2.6)) });
@@ -385,6 +385,11 @@ async function boot() {
       }
       case 'setMarkerImages': images.ok = c.ok; images.uncertain = c.uncertain; return;
       case 'setMode': {
+        if (c.ui !== null) {
+          minimalUi = c.ui === 'min';
+          renderFloorPanel();
+        }
+        if (c.light === null || c.light === light) return;
         light = c.light;
         layers.setStructuresVisible('structures', !light);
         scene.setShowLabels(!light);

@@ -16,7 +16,7 @@ export type Command =
   | { type: 'focus'; x: number; y: number; z: number | null; building: string | null; floor: FloorRef }
   | { type: 'setFloor'; building: string; floor: FloorRef; explode: boolean }
   | { type: 'setMarkerImages'; ok: string; uncertain: string }
-  | { type: 'setMode'; light: boolean };
+  | { type: 'setMode'; light: boolean | null; ui: 'min' | 'full' | null };
 
 export type PageEvent =
   | { v: 1; type: 'ready'; buildings: { id: string; name: string }[]; light: boolean }
@@ -113,8 +113,11 @@ export function parseCommand(raw: unknown): Parsed {
         need(imageUrl(data.ok) && imageUrl(data.uncertain), 'ok, uncertain: data:image 또는 http(s) 주소');
         return { ok: true, command: { type, ok: data.ok as string, uncertain: data.uncertain as string } };
       case 'setMode':
-        need(typeof data.light === 'boolean', 'light: true/false');
-        return { ok: true, command: { type, light: data.light as boolean } };
+        // light(가벼운 모드)·ui(min = 페이지 층 판 숨김) 중 하나 이상. 앱이 페이지 하나를 화면 사이에 다시 쓸 때 ui 를 바꿈.
+        need(data.light === undefined || typeof data.light === 'boolean', 'light: true/false');
+        need(data.ui === undefined || data.ui === 'min' || data.ui === 'full', "ui: 'min' | 'full'");
+        need(data.light !== undefined || data.ui !== undefined, 'light 또는 ui 필요');
+        return { ok: true, command: { type, light: (data.light as boolean | undefined) ?? null, ui: (data.ui as 'min' | 'full' | undefined) ?? null } };
       default:
         return { ok: false, error: `모르는 명령: ${String(type)}`, command: type };
     }
