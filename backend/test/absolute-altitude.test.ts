@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TelemetryBatchRequest } from '../src/modules/telemetry/telemetry.dto.js';
+import { IMPLAUSIBLE_TIMESTAMP, TelemetryBatchRequest } from '../src/modules/telemetry/telemetry.dto.js';
 import { LastSequences } from '../src/modules/sessions/session.dto.js';
 import { telemetryRepository } from '../src/modules/telemetry/telemetry.repository.js';
 import { sessionRepository } from '../src/modules/sessions/session.repository.js';
@@ -30,7 +30,8 @@ function indoorTerrain(): TerrainContext {
 }
 function rawHeight(seconds = 40): RawSamples {
   const raw = walk(seconds);
-  raw.locations = raw.locations.map((l) => ({ ...l, horizontalAccuracy: 25, verticalAccuracy: 30 }));
+  // the phone's sea level = the map's (N 23 m) unless a test says otherwise
+  raw.locations = raw.locations.map((l) => ({ ...l, altitude: l.ellipsoidalAltitude! - 23, horizontalAccuracy: 25, verticalAccuracy: 30 }));
   raw.absoluteAltitude = [1, 4, 7, 11, 15].map((sec, i) => ({ sequence: i, timestamp: iso(T0 + sec * 1000),
     altitude: 121 + (i % 2 ? 0.1 : 0), accuracy: 4, precision: 0.1, verticalReference: 'APPLE_MSL', segment: 'ABS-A' }));
   return raw;
@@ -107,6 +108,38 @@ test('flat indoor walk gets a provisional phone height without a 4m climb or dou
   assert.equal(state.smoothed!.datumSource, 'CM_ABSOLUTE');
   assert.ok(r.forward.some((p) => p.zDatumSource === 'NONE'));
   assert.ok(r.forward.some((p) => p.zDatumSource === 'CM_ABSOLUTE'));
+});
+
+test('APPLE_MSL is converted through the phone\'s measured geoid, not the map geoid (campus: 22.6 vs 23 m)', () => {
+  const raw = rawHeight();
+  raw.locations = raw.locations.map((l) => ({ ...l, altitude: l.ellipsoidalAltitude! - 22.6 }));
+  const r = run(raw);
+  const out = r.outputs.filter((p) => p.zDatumSource === 'CM_ABSOLUTE');
+  assert.ok(out.length > 20);
+  // ellipsoidal = Apple MSL + Apple geoid (121 + 22.6); the map geoid only converts to and from orthometric
+  assert.ok(out.every((p) => Math.abs(p.ellipsoidalAltitude! - 143.6) < 0.15));
+  const forward = r.forward.filter((p) => p.zDatumSource === 'CM_ABSOLUTE');
+  assert.ok(forward.length && forward.every((p) => Math.abs(p.ellipsoidalAltitude! - 143.6) < 0.15), 'fix before the anchor: no step');
+  const frame = FUSION_ALGORITHMS['fusion-v4'].summarize(r.state, r.events).absoluteAltitude!.verticalFrame;
+  assert.ok(Math.abs(frame.deviceGeoidM! - 22.6) < 1e-9);
+  assert.equal(frame.mapGeoidM, 23);
+  // no fix with both heights: Apple's sea level is taken as the map's (identity, as before)
+  const none = rawHeight();
+  none.locations = none.locations.map((l) => ({ ...l, altitude: null }));
+  assert.ok(run(none).outputs.filter((p) => p.zDatumSource === 'CM_ABSOLUTE').every((p) => Math.abs(p.ellipsoidalAltitude! - 144) < 0.15));
+});
+
+test('an absolute-altitude row with an implausible time is kept for the manifest but cannot reject the batch', () => {
+  const id = '11111111-1111-1111-1111-111111111111';
+  const future = new Date(Date.now() + 25 * 365 * 86_400_000).toISOString(); // old iOS clock mapping
+  const batch = TelemetryBatchRequest.parse({ batchId: id, sessionId: id,
+    locations: [{ sequence: 1, timestamp: iso(T0), latitude: LAT, longitude: LON }],
+    absoluteAltitude: [{ sequence: 1, timestamp: future, altitude: 150, accuracy: 4, precision: 0.5, verticalReference: 'APPLE_MSL' },
+      { sequence: 2, timestamp: iso(T0), altitude: 150, accuracy: 4, precision: 0.5, verticalReference: 'APPLE_MSL' }] });
+  assert.equal(batch.locations.length, 1);
+  assert.deepEqual(batch.absoluteAltitude!.map((a) => a.invalidReason ?? null), [IMPLAUSIBLE_TIMESTAMP, null]);
+  assert.throws(() => TelemetryBatchRequest.parse({ batchId: id, sessionId: id,
+    locations: [{ sequence: 1, timestamp: future, latitude: LAT, longitude: LON }] }), 'primary streams stay strict');
 });
 
 test('missing or inaccurate absolute height stays unknown for opted-in sessions; legacy results are preserved', () => {

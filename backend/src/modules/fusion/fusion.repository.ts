@@ -196,7 +196,7 @@ export const fusionRepository = {
       db.query(
         `SELECT sequence, "timestamp", altitude, accuracy, precision, vertical_reference AS "verticalReference",
                 invalid_reason AS "invalidReason", sensor_segment_id AS segment
-           FROM absolute_altitude_samples WHERE session_id = $1`, [sessionId],
+           FROM absolute_altitude_samples WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'`, [sessionId],
       ),
     ]);
     return { locations: locations.rows, motion: motion.rows, altimeter: altimeter.rows, pedometer: pedometer.rows, absoluteAltitude: absoluteAltitude.rows };

@@ -72,7 +72,7 @@ async function compare(sessionId: string) {
          SELECT 'locations' AS stream, "timestamp" AS ts, created_at AS rcv FROM location_samples WHERE session_id = $1
          UNION ALL SELECT 'motion', "timestamp", created_at FROM motion_samples WHERE session_id = $1
          UNION ALL SELECT 'altimeter', "timestamp", created_at FROM altimeter_samples WHERE session_id = $1
-         UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at FROM absolute_altitude_samples WHERE session_id = $1
+         UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at FROM absolute_altitude_samples WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'
          UNION ALL SELECT 'pedometer', "timestamp", created_at FROM pedometer_samples WHERE session_id = $1)
        SELECT stream, count(*)::int AS rows,
               round((percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM rcv - ts)))::numeric, 2)::float8 AS p50,

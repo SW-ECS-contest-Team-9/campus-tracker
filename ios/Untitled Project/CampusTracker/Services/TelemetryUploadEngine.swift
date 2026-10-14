@@ -141,6 +141,18 @@ final class TelemetryUploadEngine {
     /// Initial ledger load runs on the store queue; nothing is sent until it completes.
     private func reload() {
         store.async({ access in
+            // Batches an earlier build quarantined for its absolute-altitude clock are rebuilt and
+            // queued again before the ledger loads. A failed repair leaves them quarantined.
+            do {
+                let requeued = try access.repairAbsoluteAltitudeClock { batchID, sessionID, rows in
+                    let payload = try RawSampleDecoding.telemetryBatch(batchID: batchID, clientSessionID: sessionID,
+                                                                       rows: rows, createdAt: Date())
+                    return try TrackingJSONCodec.makeEncoder().encode(payload)
+                }
+                if !requeued.isEmpty { print("[UploadEngine] absolute-altitude clock repair requeued=\(requeued.count)") }
+            } catch {
+                print("[UploadEngine] absolute-altitude clock repair failed error=\(error)")
+            }
             try access.requireFeatureRehandshakeForHeldAbsoluteAltitude()
             return (try access.loadUploadLedger(), try access.sessionsWithHeldAbsoluteAltitude())
         }) { [weak self] result in

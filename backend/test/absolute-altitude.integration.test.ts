@@ -40,6 +40,16 @@ test('absolute altitude migration, raw idempotency, manifests and both replay lo
       assert.ok(raw.absoluteAltitude!.some((r) => r.invalidReason === 'NON_FINITE_ALTITUDE'));
       const batches = await fusionRunsRepository.loadArrivalBatches(session, client);
       assert.equal(batches.flatMap((b) => b.absoluteAltitude ?? []).length, 2);
+      // an implausible time (old iOS clock mapping) counts for the manifest but never reaches fusion or the stats
+      const late = TelemetryBatchRequest.parse({ batchId: randomUUID(), sessionId: session, absoluteAltitude: [
+        { sequence: 2, timestamp: new Date(Date.now() + 25 * 365 * 86_400_000).toISOString(), altitude: 150, accuracy: 4,
+          precision: 0.1, verticalReference: 'APPLE_MSL' }] }).absoluteAltitude!;
+      assert.equal(await telemetryRepository.insertAbsoluteAltitude(client, session, late), 1);
+      assert.equal((await sessionRepository.maxSequences(session, client)).absoluteAltitude, 2);
+      assert.equal((await fusionRepository.loadRawSamples(session, client)).absoluteAltitude!.length, 2);
+      assert.equal((await fusionRunsRepository.loadArrivalBatches(session, client)).flatMap((b) => b.absoluteAltitude ?? []).length, 2);
+      const stats = await sessionRepository.rawStats(session, client);
+      assert.equal(Number(stats.streams.find((r: { stream: string }) => r.stream === 'absoluteAltitude').count), 2);
       const gate = { batchId: randomUUID(), sessionId: session, clientCreatedAt: null,
         counts: { locations: 0, motion: 0, altimeter: 0, pedometer: 0, absoluteAltitude: 2 },
         captureSource: null, appState: null, minCapturedAt: null, maxCapturedAt: null };

@@ -36,7 +36,7 @@ Once the ACK lists the feature, the rows held so far are released and every late
 }
 ```
 
-`altitude`, `accuracy`, and `precision` are nullable because iOS preserves the observation and records `invalidReason` when Core Motion supplies a value that JSON cannot represent. Negative finite altitude is valid. `accuracy` is the estimated one-standard-deviation uncertainty; `precision` is display resolution and must not be treated as accuracy.
+`altitude`, `accuracy`, and `precision` are nullable because iOS preserves the observation and records `invalidReason` when Core Motion supplies a value that JSON cannot represent. Negative finite altitude is valid. `timestamp` is the measurement time. `CMAbsoluteAltitudeData.timestamp` is not on the boot-uptime clock of the other Core Motion items (devices report seconds since 2001-01-01), so `AbsoluteAltitudeClock` picks the clock that places it just before its callback and records it as `clockDomain` in the raw envelope. Rows written by earlier builds are repaired on launch and their quarantined batches queued again. `accuracy` is the estimated one-standard-deviation uncertainty; `precision` is display resolution and must not be treated as accuracy.
 
 The stream is independent from relative `altimeter` samples. The server must deduplicate by `(session_id, sequence)` and must not copy the latest absolute observation into relative-altitude rows.
 

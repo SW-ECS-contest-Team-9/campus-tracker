@@ -272,7 +272,7 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 
 ### iOS absoluteAltitudeV1 (선택 스트림)
 
-`session:start` 응답의 `supportedTelemetryFeatures`에 `absoluteAltitudeV1`이 포함되면 위 선택 배열을 전송할 수 있다. 새 관측은 독립 sequence·측정 시각·sensorSegmentId를 가지며, 상대 기압 샘플에 복사하지 않는다. 해수면 기준 `APPLE_MSL` 값과 추정 오차 `accuracy`, 표시 해상도 `precision`을 원본 그대로 보존한다. null 수치와 음의 고도를 허용하며, `invalidReason`이 있는 관측도 저장하되 기준 채택에서는 제외한다.
+`session:start` 응답의 `supportedTelemetryFeatures`에 `absoluteAltitudeV1`이 포함되면 위 선택 배열을 전송할 수 있다. 새 관측은 독립 sequence·측정 시각·sensorSegmentId를 가지며, 상대 기압 샘플에 복사하지 않는다. 해수면 기준 `APPLE_MSL` 값과 추정 오차 `accuracy`, 표시 해상도 `precision`을 원본 그대로 보존한다. null 수치와 음의 고도를 허용하며, `invalidReason`이 있는 관측도 저장하되 기준 채택에서는 제외한다. 이 배열의 `timestamp`가 비정상(2020년 이전 또는 하루 이상 미래)이면 배치를 거절하지 않고 그 행을 `TIMESTAMP_IMPLAUSIBLE`로 저장한다. 다른 스트림은 여전히 배치 단위로 거절한다.
 
 `session:finish`와 `session:syncComplete`의 `lastSequences.absoluteAltitude`는 마지막 보존 sequence이며, 빈 스트림은 -1이다. 서버가 광고한 스트림도 기존 스트림과 같은 저장·동기화 보장을 적용한다. 구버전의 필드 누락은 호환된다.
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AppState, CaptureSource, IsoDateTime, OptionalNumber, SensorSegmentId, SensorTimestamp, Uuid } from '../../common/dto.js';
+import { AppState, CaptureSource, IsoDateTime, isPlausibleSensorTime, OptionalNumber, SensorSegmentId, SensorTimestamp, Uuid } from '../../common/dto.js';
 
 // Per-array upper bound. A 20Hz motion stream is 1 200 samples/minute, so this allows ~15 min per batch.
 const MAX_SAMPLES = 20_000;
@@ -51,16 +51,23 @@ export const AltimeterSample = z.object({
 });
 export type AltimeterSample = z.infer<typeof AltimeterSample>;
 
+/**
+ * Stored for the manifest, never used: an absolute-altitude row whose time is implausible. iOS builds before
+ * the CMAbsoluteAltitudeData clock fix mapped its reference-date timestamp as boot uptime (~25 years ahead).
+ * The optional stream must not make the server reject the whole batch (location and motion included).
+ */
+export const IMPLAUSIBLE_TIMESTAMP = 'TIMESTAMP_IMPLAUSIBLE';
+
 export const AbsoluteAltitudeSample = z.object({
   ...SampleMeta,
   sequence: Sequence,
-  timestamp: SensorTimestamp,
+  timestamp: IsoDateTime,
   altitude: OptionalNumber,
   accuracy: OptionalNumber,
   precision: OptionalNumber,
   verticalReference: z.literal('APPLE_MSL'),
   invalidReason: z.string().max(200).nullish(),
-});
+}).transform((s) => (isPlausibleSensorTime(s.timestamp) ? s : { ...s, invalidReason: IMPLAUSIBLE_TIMESTAMP }));
 export type AbsoluteAltitudeSample = z.infer<typeof AbsoluteAltitudeSample>;
 
 export const PedometerSample = z.object({

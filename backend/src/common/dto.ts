@@ -11,13 +11,12 @@ const MAX_FUTURE_MS = Number(process.env.MAX_FUTURE_TIMESTAMP_MS ?? 86_400_000);
  * Sensor timestamp: ISO-8601 and physically plausible. Data arriving minutes or hours late is normal
  * (background / offline upload); clearly wrong clocks (before 2020, or more than a day in the future) are not.
  */
-export const SensorTimestamp = IsoDateTime.refine(
-  (v) => {
-    const t = Date.parse(v);
-    return Number.isFinite(t) && t >= MIN_SENSOR_TIME && t <= Date.now() + MAX_FUTURE_MS;
-  },
-  { message: 'timestamp is not plausible (before 2020 or too far in the future)' },
-);
+export function isPlausibleSensorTime(v: string): boolean {
+  const t = Date.parse(v);
+  return Number.isFinite(t) && t >= MIN_SENSOR_TIME && t <= Date.now() + MAX_FUTURE_MS;
+}
+export const SensorTimestamp = IsoDateTime.refine(isPlausibleSensorTime,
+  { message: 'timestamp is not plausible (before 2020 or too far in the future)' });
 
 // Optional background metadata (backward compatible: old clients send none).
 export const CaptureSource = z.string().trim().min(1).max(24).transform((v) => v.toUpperCase()); // LIVE | HISTORICAL_RECOVERY
