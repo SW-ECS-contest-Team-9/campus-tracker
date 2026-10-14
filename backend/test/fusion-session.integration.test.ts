@@ -152,6 +152,32 @@ test('ACTIVE forward state vs unpublished finalized snapshot; finish, lost ACK, 
     assert.deepEqual(of('SERVER_FINISH_RECEIVED').map((e) => e.metadata!.duplicate), [false, true]);
     assert.ok(of('SERVER_FINALIZE_COMPLETED').length >= 2);
     assert.equal(of('SERVER_FINALIZE_FAILED').length, 0);
+
+    // ---- manual interrupt from the preview: only for an ACTIVE session the phone has left behind ----
+    const b = (await sessionService.start(identity, { clientSessionId: randomUUID(), deviceId: 'fusion-test-phone', sensorCapabilities: {}, startedAt: iso(T0) } as any)).sessionId;
+    const toB = (from: number, to: number) => telemetryService.ingestBatch(identity, TelemetryBatchRequest.parse(upload(b, from, to)));
+    const statusB = () => one(`SELECT status, interrupted, ended_at, finalized_at, fusion_state FROM collection_sessions WHERE id = $1`, [b]);
+    await toB(0, 40);
+    const refused = (code: string) => (e: unknown) => e instanceof AppError && e.code === code;
+    await assert.rejects(sessionService.interruptManually(b), refused('INTERRUPT_RECENTLY_RECEIVED'), 'data just arrived: maybe only out of coverage');
+    await assert.rejects(sessionService.interruptManually(id), refused('INTERRUPT_NOT_ACTIVE'));
+    assert.equal((await statusB()).status, 'ACTIVE');
+    await pool.query(`UPDATE collection_sessions SET last_received_at = now() - interval '2 hours' WHERE id = $1`, [b]); // the phone went quiet
+    assert.equal(((await sessionService.get(b)) as any).manualInterruptBlock, null);
+    const interrupted = await sessionService.interruptManually(b) as any;
+    assert.deepEqual([interrupted.status, interrupted.interrupted, interrupted.endedAt], ['INTERRUPTED', true, null]);
+    await assert.rejects(sessionService.interruptManually(b), refused('INTERRUPT_NOT_ACTIVE'), 'a second click changes nothing');
+    await until('final replay after the manual interrupt', async () => (await statusB()).finalized_at !== null);
+    const runB = ((await sessionService.detail(b)) as any).finalization.lastPublishedRun;
+    assert.equal(runB.trigger, 'auto-finalize');
+    assert.equal((await fusionRunsRepository.get(runB.id)).metrics.replay.finalizeApplied, true, 'the smoothed result, not the forward one');
+    // the phone was only offline after all: its backlog is stored and finalized again, then its own finish closes the session
+    await toB(40, 80);
+    assert.equal((await one<{ n: number }>(`SELECT count(*)::int n FROM motion_samples WHERE session_id = $1`, [b])).n, 4000);
+    await until('final replay after the late backlog', async () => (await statusB()).finalized_at !== null);
+    const finishedB = await sessionService.finish(identity, { sessionId: b, endedAt: iso(T0 + 80_000) } as any);
+    assert.deepEqual([finishedB.status, finishedB.endedAt], ['FINISHED', iso(T0 + 80_000)]);
+    await until('trace of the manual interrupt', async () => (await sessionService.diagnosticEventList(b)).some((e) => e.eventType === 'SERVER_MANUAL_INTERRUPT'));
   } finally {
     await new Promise((r) => setTimeout(r, 600)); // let debounced work settle before the rows go away
     await pool.query('DELETE FROM collectors WHERE id = $1', [collector]).catch(() => undefined);

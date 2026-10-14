@@ -223,6 +223,7 @@ Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 | `GET /api/v1/sessions?collectorId=C03&status=ACTIVE&limit=50` | 최신순 `SessionView[]` (limit 1–500, 기본 50) |
 | `GET /api/v1/sessions/:sessionId` | `SessionView` |
 | `GET /api/v1/sessions/:sessionId/locations` | sequence 순 전체 point |
+| `POST /api/v1/sessions/:sessionId/interrupt` | 수동 인터럽트: ACTIVE → INTERRUPTED 후 최종 재처리. 허용 조건은 `SessionView.manualInterruptBlock === null` — ACTIVE이고, collector 소켓이 끊겨 있고, `syncState`가 `OFFLINE`(최근 수신 없음)일 때만. 아니면 409 `INTERRUPT_NOT_ACTIVE` / `INTERRUPT_COLLECTOR_CONNECTED` / `INTERRUPT_RECENTLY_RECEIVED`. 원시 데이터는 지우지 않고, 이후 올라오는 데이터는 늦은 업로드로 저장되어 다시 최종화된다. 폰에는 알리지 않는다. 추적 이벤트 `SERVER_MANUAL_INTERRUPT` |
 | `GET /api/v1/sessions/:sessionId/diagnostic-events` | 폰 수명주기 이벤트 + 서버 추적(`SERVER_*`, `source: "server"`)을 시각순으로. 서버 추적: `SERVER_FINISH_RECEIVED`(`duplicate`, `manifest`, `finalReplay`), `SERVER_SYNC_COMPLETE_RECEIVED`(`synchronized`, `behind`), `SERVER_FINALIZE_COMPLETED`(`runId`, `outputs`), `SERVER_FINALIZE_FAILED`(`message`). 분석용이며 fusion 입력이 아님 |
 | `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker |
 | `GET /api/v1/sessions/:sessionId/fused-positions?algorithmVersion=fusion-v1` | fusion 결과, timestamp/fusionSequence 순 (기본 version = realtime version). v3.1은 최초 앵커 전까지 위치 출력을 만들지 않으며 상태·판정 이력은 `fusion-events`에서 조회 |

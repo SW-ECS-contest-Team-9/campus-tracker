@@ -36,6 +36,18 @@ export function syncStateOf(view: Pick<SessionView, 'status' | 'finalizedAt' | '
   return 'OFFLINE';
 }
 
+/**
+ * Why a session may NOT be interrupted by hand, or null when it may. Allowed only for a session the phone has
+ * visibly left behind: still ACTIVE, the collector's socket is gone, and nothing was received for the delayed-upload
+ * window (a tunnel or elevator drops the socket for seconds; that is not a dead session).
+ */
+export function manualInterruptBlock(status: string, socketConnected: boolean, syncState: SyncState): 'NOT_ACTIVE' | 'COLLECTOR_CONNECTED' | 'RECENTLY_RECEIVED' | null {
+  if (status !== 'ACTIVE') return 'NOT_ACTIVE';
+  if (socketConnected) return 'COLLECTOR_CONNECTED';
+  if (syncState !== 'OFFLINE') return 'RECENTLY_RECEIVED';
+  return null;
+}
+
 /** Additive API fields; existing fields are unchanged. */
 function decorate(view: SessionView) {
   const connected = realtimeState.get(view.collectorId)?.socketConnected ?? false;
@@ -43,6 +55,8 @@ function decorate(view: SessionView) {
     ...view,
     collectionState: view.status,
     syncState: syncStateOf(view, connected),
+    /** null = the preview may interrupt this session by hand (POST /sessions/:id/interrupt) */
+    manualInterruptBlock: manualInterruptBlock(view.status, connected, syncStateOf(view, connected)),
     fusion: { version: REALTIME_FUSION_VERSION, state: view.fusionState, needsReprocess: view.needsReprocess },
   };
 }
@@ -284,6 +298,31 @@ export const sessionService = {
         pendingOnDevice: manifest === null ? null : manifest.synchronized ? 0 : 'SOME',
       },
     };
+  },
+
+  /**
+   * Preview: close a session the phone left ACTIVE (no finish request, socket gone, nothing received lately), so its
+   * final replay (smoother) runs. Nothing is deleted and nothing is refused afterwards: raw data the phone uploads
+   * later is stored as a late upload and finalization runs again; a later session:finish turns it into FINISHED.
+   * The phone is NOT told to stop — the conditions are what makes that acceptable.
+   */
+  async interruptManually(sessionId: string) {
+    const view = await this.get(sessionId);
+    if (view.manualInterruptBlock) {
+      const why = {
+        NOT_ACTIVE: `Session is ${view.status}, not ACTIVE`,
+        COLLECTOR_CONNECTED: `${view.collectorId} is connected: stop the collection on the phone instead`,
+        RECENTLY_RECEIVED: `Data arrived within the last ${Math.round(env.SYNC_DELAYED_WINDOW_MS / 1000)} s: the phone may only be out of coverage`,
+      }[view.manualInterruptBlock];
+      throw AppError.conflict(`INTERRUPT_${view.manualInterruptBlock}`, why);
+    }
+    if (!(await sessionRepository.interruptManually(sessionId))) throw AppError.conflict('INTERRUPT_NOT_ACTIVE', 'Session is no longer ACTIVE');
+    logger.info('session.interrupted_manually', { collectorId: view.collectorId, sessionId, lastReceivedAt: view.lastReceivedAt });
+    traceSession(sessionId, 'SERVER_MANUAL_INTERRUPT', { lastReceivedAt: view.lastReceivedAt, lastCapturedAt: view.lastCapturedAt, finalReplay: 'AFTER_UPLOAD_IDLE' });
+    previewBroadcast.collectorStatus(realtimeState.sessionEnded(view.collectorId, sessionId));
+    fusionService.sessionFinished(sessionId, view.collectorId);
+    await broadcastSession('finished', sessionId);
+    return this.get(sessionId);
   },
 
   /** Phone lifecycle events + server trace (SERVER_*), by time. */

@@ -56,6 +56,7 @@ const state = {
   /** From GET /api/v1/fusion/versions: the live (realtime) version and all versions available for comparison. */
   fusion: { active: 'fusion-v2', versions: [] as string[] },
   runs: new Map<string, FusionRun[]>(), // sessionId -> latest run per version
+  interruptResult: new Map<string, string>(), // sessionId -> message of the last manual interrupt
   sensorEvents: new Map<string, FusionSensorEvent[]>(), // `${sessionId}|${version}`
   reprocessing: new Set<string>(), // `${sessionId}|${version}`
   reprocessResult: new Map<string, string>(),
@@ -432,6 +433,13 @@ function offsetText(track: SessionTrack | undefined, raw: LocationPoint | null, 
   return `<b>${horizontalOffsetMeters(raw, f).toFixed(1)} m</b> <span class="${unusable ? 'warn-text' : 'muted'}">(raw ±${num(acc, 0)} m${unusable ? ', not a usable fix' : ''})</span> ${OFFSET_NOTE}`;
 }
 
+function interruptHint(block: string | null | undefined): string {
+  if (block === null) return '종료 요청 없이 남은 세션을 닫고 최종 평활화를 실행 (원시 데이터는 그대로, 폰은 멈추지 않음)';
+  if (block === 'COLLECTOR_CONNECTED') return '폰이 연결되어 있음: 폰에서 Stop으로 종료';
+  if (block === 'RECENTLY_RECEIVED') return '최근에 수신함: 잠시 끊긴 것일 수 있어 아직 불가';
+  return '세션 상세를 불러오는 중';
+}
+
 /** Fusion diagnostics rows shared by the collector and point views. */
 function fusedRows(f: FusedPosition) {
   // fusion-v1 stores no diagnostics (all null); v2+ always records the motion state and heading source.
@@ -666,7 +674,11 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
       })
       .join('')}
     <span class="muted">${esc(versions.map((v) => state.reprocessResult.get(`${s.sessionId}|${v}`)).filter(Boolean).join(' · ') || 'Recompute from raw data (raw is never modified)')}</span>
-  </div>`;
+  </div>
+  ${s.status === 'ACTIVE' ? `<div class="actions">
+    <button type="button" data-action="interrupt" data-session="${esc(s.sessionId)}" ${s.manualInterruptBlock === null ? '' : 'disabled'}>수동 인터럽트</button>
+    <span class="muted">${esc(state.interruptResult.get(s.sessionId) ?? interruptHint(s.manualInterruptBlock))}</span>
+  </div>` : ''}`;
 }
 
 /** A building of the campus 3D model: height and its basis, floors, base/roof, floor calibration. */
@@ -798,6 +810,23 @@ $('session-list').addEventListener('pointerdown', async (e) => {
   await ensureTrack(id, session.collectorId);
   applyVisibility();
   tracks.get(id)?.flyTo();
+});
+
+// Manual interrupt: only offered by the server for an ACTIVE session whose phone is gone (socket closed, nothing received lately)
+$('detail').addEventListener('pointerdown', async (e) => {
+  const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action="interrupt"]');
+  if (!btn || btn.hasAttribute('disabled')) return;
+  const id = btn.dataset.session!;
+  if (!window.confirm('이 세션을 INTERRUPTED로 닫고 최종 평활화를 실행합니다.\n폰은 멈추지 않습니다: 나중에 올라오는 데이터는 그대로 저장되고 결과가 다시 계산됩니다.\n계속할까요?')) return;
+  try {
+    upsertSession(await api.interruptSession(id));
+    state.interruptResult.set(id, '인터럽트됨 · 최종 재처리 대기 중');
+    window.setTimeout(() => void reloadTrack(id, true).then(() => loadRuns(id)), 12_000); // after the debounced final replay
+  } catch (err) {
+    state.interruptResult.set(id, `실패: ${(err as Error).message}`);
+    void loadRuns(id); // the reason usually is a changed state: refresh it
+  }
+  scheduleRender();
 });
 
 // Reprocess buttons (pointerdown: the detail panel is re-rendered every second)

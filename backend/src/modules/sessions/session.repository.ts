@@ -102,6 +102,18 @@ export const sessionRepository = {
   },
 
   /**
+   * Manual interrupt from the preview: ACTIVE -> INTERRUPTED, only if it is still ACTIVE (idempotent, race-safe).
+   * ended_at stays empty, like an interrupt by a newer session: a later session:finish from the phone still sets it.
+   */
+  async interruptManually(id: string, db: DbClient = pool): Promise<boolean> {
+    const { rowCount } = await db.query(
+      `UPDATE collection_sessions SET status = 'INTERRUPTED', interrupted = true, updated_at = now() WHERE id = $1 AND status = 'ACTIVE'`,
+      [id],
+    );
+    return (rowCount ?? 0) > 0;
+  },
+
+  /**
    * session:finish = the collector stopped capturing. Idempotent: the first endedAt / finish time wins.
    * Raw uploads may still arrive afterwards (they are accepted and trigger a final replay).
    */

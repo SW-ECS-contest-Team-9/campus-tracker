@@ -44,6 +44,8 @@ export interface Session {
   needsReprocess?: boolean;
   fusionState?: string | null;
   syncState?: 'LIVE' | 'DELAYED' | 'OFFLINE' | 'FINALIZED';
+  /** null = may be interrupted by hand; otherwise why not (NOT_ACTIVE / COLLECTOR_CONNECTED / RECENTLY_RECEIVED) */
+  manualInterruptBlock?: string | null;
   /** only in the session detail (GET /sessions/:id) */
   raw?: { syncManifest?: { synchronized?: boolean; comparedAt?: string; streams?: Record<string, { expected: number | null; server: number | null; synchronized: boolean }> } | null; batches?: number; outOfOrderBatches?: number } | null;
 }
@@ -422,6 +424,7 @@ export const api = {
     return get<Session[]>(`/api/v1/sessions?${q}`);
   },
   session: (id: string) => get<Session>(`/api/v1/sessions/${id}`),
+  interruptSession: (id: string) => send<Session>('POST', `/api/v1/sessions/${id}/interrupt`, {}),
   locations: (id: string) => get<LocationPoint[]>(`/api/v1/sessions/${id}/locations`),
   markers: (id: string) => get<Marker[]>(`/api/v1/sessions/${id}/markers`),
   fusedPositions: (id: string, algorithmVersion: string) =>
