@@ -60,16 +60,19 @@ async function compare(sessionId: string) {
     : null;
   const terrainContext = await terrain.context(terrainVersionId);
   const client = await pool.connect();
+  let absoluteAltitudeEnabled = false;
   let all: RawSamples, arrival: RawSamples[], delays: { stream: string; rows: number; p50: number; p95: number; max: number }[], batches: { n: number; ooo: number };
   try {
     await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     all = await fusionRepository.loadRawSamples(sessionId, client);
     arrival = await fusionRunsRepository.loadArrivalBatches(sessionId, client);
+    absoluteAltitudeEnabled = await sessionRepository.getAbsoluteAltitudeEnabled(sessionId, client);
     delays = (await client.query(
       `WITH s AS (
          SELECT 'locations' AS stream, "timestamp" AS ts, created_at AS rcv FROM location_samples WHERE session_id = $1
          UNION ALL SELECT 'motion', "timestamp", created_at FROM motion_samples WHERE session_id = $1
          UNION ALL SELECT 'altimeter', "timestamp", created_at FROM altimeter_samples WHERE session_id = $1
+         UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at FROM absolute_altitude_samples WHERE session_id = $1
          UNION ALL SELECT 'pedometer', "timestamp", created_at FROM pedometer_samples WHERE session_id = $1)
        SELECT stream, count(*)::int AS rows,
               round((percentile_cont(0.5) WITHIN GROUP (ORDER BY extract(epoch FROM rcv - ts)))::numeric, 2)::float8 AS p50,
@@ -88,8 +91,10 @@ async function compare(sessionId: string) {
   const timeline = annotate(raw);
   const arrivalBatches = arrival.map((b) => annotate(cutRawSamples(b, cutoff))).filter((b) => b.length);
 
-  const received = replayAsReceived(algo, arrivalBatches, env.FUSION_REORDER_WINDOW_MS);
-  const sensor = replayInMemory(algo, timeline, { finalize: true });
+  // same height policy as the session's runs: an opted-in session never assumes a ground-level start
+  const context = { strideCalibration: null, absoluteAltitudeEnabled };
+  const received = replayAsReceived(algo, arrivalBatches, env.FUSION_REORDER_WINDOW_MS, context);
+  const sensor = replayInMemory(algo, timeline, { finalize: true, context });
   const s = sensor.state as FusionStateV4;
   const fixWindow = s.fixes.map((f, i) => ({ f, w: s.smoothed?.fixWeights[i] ?? null, r: s.smoothed?.fixResiduals[i] ?? null })).filter(({ f }) => f.t >= from);
   const residuals = fixWindow.flatMap(({ r }) => (r === null ? [] : [r])).sort((a, b) => a - b);

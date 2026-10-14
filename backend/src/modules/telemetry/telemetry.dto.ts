@@ -91,7 +91,8 @@ export const TelemetryBatchRequest = z
   locations: z.array(LocationSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   motion: z.array(MotionSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   altimeter: z.array(AltimeterSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
-  absoluteAltitude: z.array(AbsoluteAltitudeSample).max(MAX_SAMPLES).optional(),
+  /** absoluteAltitudeV1: optional; absent (older apps) stays undefined so the stream is reported as not provided. */
+  absoluteAltitude: z.array(AbsoluteAltitudeSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? undefined),
   pedometer: z.array(PedometerSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   })
   .refine((b) => b.sessionId || b.clientSessionId, { message: 'sessionId or clientSessionId is required', path: ['sessionId'] });

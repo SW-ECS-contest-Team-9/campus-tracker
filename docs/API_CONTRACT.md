@@ -126,7 +126,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 - 같은 `clientSessionId` 재전송 → 기존 세션 반환 (idempotent).
 - `strideCalibration`은 선택 입력이다. 서버가 평지 보폭 요약을 검사해 세션 시작 시 고정하며 오류·누락·오래된 자료는 fallback 처리한다. 같은 `clientSessionId` 재전송은 최초 결정을 유지한다. 성공 ACK의 `strideCalibration.status/reason`은 `ACCEPTED` 또는 `FALLBACK` 판정이다. `ACCEPTED`는 모든 걸음에 적용됐다는 뜻이 아니다.
 - 같은 device의 다른 ACTIVE 세션은 `INTERRUPTED`로 바뀜 (앱 크래시 후 새 세션 대비).
-- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE" }`
+- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE", "resumed": false, "supportedTelemetryFeatures": ["absoluteAltitudeV1"] }`
+- `supportedTelemetryFeatures`는 서버가 저장하는 선택 스트림 목록이다. 새 세션과 재전송(`resumed: true`) 응답 모두 포함한다. 목록에 없는 선택 스트림은 보내지 않는다(구서버는 모르는 필드를 버리고 ACK만 성공시킨다).
 - 에러: `DEVICE_MISMATCH`(403), `SESSION_CONFLICT`(409, 다른 collector가 쓴 clientSessionId)
 
 ### `session:finish`

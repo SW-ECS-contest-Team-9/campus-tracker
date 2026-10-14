@@ -8,7 +8,8 @@
  * It follows the real iOS contract: REST login → /collector socket → session:start →
  * telemetry:batch every 2 s (1 Hz location, 20 Hz motion, altimeter, pedometer) → marker:create
  * every 15 s → collector:status every 5 s → session:finish. Each 5th batch is sent twice to
- * exercise batchId idempotency.
+ * exercise batchId idempotency. Core Motion absolute altitude (1 Hz, APPLE_MSL) is sent only when
+ * session:start advertises absoluteAltitudeV1, as the app does.
  */
 import { randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -57,14 +58,15 @@ async function main() {
   const clientSessionId = randomUUID();
   const start = await emitWithAck(socket, 'session:start', {
     clientSessionId, deviceId, platform: 'ios', deviceModel: 'Simulator', systemVersion: '18.0', appVersion: 'sim',
-    sensorCapabilities: { location: true, motion: true, altimeter: true, pedometer: true },
+    sensorCapabilities: { location: true, motion: true, altimeter: true, pedometer: true, absoluteAltitudeAvailable: true, absoluteAltitudeEnabled: true },
   });
   console.log('session:start', start);
   if (!start.ok) throw new Error('session:start failed');
   const sessionId: string = start.sessionId;
+  const sendAbsolute = Array.isArray(start.supportedTelemetryFeatures) && start.supportedTelemetryFeatures.includes('absoluteAltitudeV1');
 
   // 4. collect + send
-  let locSeq = 0, motionSeq = 0, altSeq = 0, steps = 0, batchNo = 0, markerNo = 0;
+  let locSeq = 0, motionSeq = 0, altSeq = 0, absSeq = -1, steps = 0, batchNo = 0, markerNo = 0;
   const startMs = Date.now();
   const endMs = startMs + Number(args.seconds) * 1000;
   const radius = 0.0012; // ~130 m loop
@@ -72,7 +74,7 @@ async function main() {
 
   const sendBatch = async () => {
     const now = Date.now();
-    const locations = [], motion = [], altimeter = [];
+    const locations = [], motion = [], altimeter = [], absoluteAltitude = [];
     for (let i = 0; i < 2; i++) {
       const t = now - (1 - i) * 1000;
       const a = phase + ((t - startMs) / 1000) * 0.03;
@@ -87,6 +89,10 @@ async function main() {
         speed: 1.3, speedAccuracy: 0.5, course, courseAccuracy: 10,
       });
       altimeter.push({ sequence: ++altSeq, timestamp: new Date(t).toISOString(), relativeAltitude: alt - 40, pressure: 101.3 - alt * 0.012 });
+      if (sendAbsolute) {
+        absoluteAltitude.push({ sequence: ++absSeq, timestamp: new Date(t + 300).toISOString(), altitude: alt + (Math.random() - 0.5),
+          accuracy: 4 + Math.random(), precision: 0.5, verticalReference: 'APPLE_MSL', sensorSegmentId: clientSessionId });
+      }
     }
     for (let i = 0; i < 40; i++) {
       const t = now - 2000 + i * 50;
@@ -101,7 +107,7 @@ async function main() {
     steps += 4;
     const batch = {
       batchId: randomUUID(), sessionId, clientSessionId, createdAt: new Date().toISOString(),
-      locations, motion, altimeter,
+      locations, motion, altimeter, ...(sendAbsolute ? { absoluteAltitude } : {}),
       pedometer: [{ timestamp: new Date(now).toISOString(), numberOfSteps: steps, distance: steps * 0.7, currentPace: 0.6, currentCadence: 2, floorsAscended: 0, floorsDescended: 0 }],
     };
     batchNo++;
@@ -135,7 +141,8 @@ async function main() {
   }
 
   // 5. session:finish (sent twice: must be idempotent)
-  const finishPayload = { sessionId, clientSessionId, endedAt: new Date().toISOString() };
+  const finishPayload = { sessionId, clientSessionId, endedAt: new Date().toISOString(),
+    lastSequences: { location: locSeq, motion: motionSeq, altimeter: altSeq, ...(sendAbsolute ? { absoluteAltitude: absSeq } : {}) } };
   console.log('session:finish', await emitWithAck(socket, 'session:finish', finishPayload));
   console.log('session:finish again', await emitWithAck(socket, 'session:finish', finishPayload));
   socket.close();

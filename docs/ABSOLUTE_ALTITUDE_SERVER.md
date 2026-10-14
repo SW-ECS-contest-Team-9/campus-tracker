@@ -65,4 +65,21 @@ npm run build
 
 - 백엔드·프론트 타입 검사와 프로덕션 빌드 통과.
 - 같은 층, 상대 상승, API 급변, 부정확·누락 데이터, 센서 재시작, 시각 대응, 입력 hash·cutoff, 도착순 재생, 구알고리즘 호환 및 표시의 회귀 검증을 추가.
-- DB 통합 검증은 `FUSION_TEST_DATABASE_URL`이 가리키는 이름이 `_test`로 끝나는 폐기 가능한 PostGIS DB에서만 실행한다. 로컬 Docker가 실행되지 않아 이번 환경에서는 DB 검증을 건너뛴다. 운영 DB로 대체 실행하지 않는다.
+- DB 통합 검증은 `FUSION_TEST_DATABASE_URL`이 가리키는 이름이 `_test`로 끝나는 폐기 가능한 PostGIS DB에서만 실행한다. 운영 DB로 대체 실행하지 않는다.
+
+```sh
+FUSION_TEST_DATABASE_URL=postgres://campus:campus@localhost:55432/campus_test \
+  JWT_SECRET=test node --import tsx --test test/absolute-altitude.integration.test.ts
+```
+
+### 2026-10-14 후속 점검
+
+일회용 `postgis/postgis:16-3.5` 컨테이너(`campus_test`)에서 migration 001–028 적용, 위 통합 검증, 실제 서버와 `npm run sim`(Socket.IO) 왕복을 확인했다. 시뮬레이터는 시작 응답이 `absoluteAltitudeV1`을 광고할 때만 1 Hz `APPLE_MSL` 관측을 보내고 finish에 `lastSequences.absoluteAltitude`를 포함한다. 이 점검에서 고친 결함:
+
+- `session:start` ACK에 `supportedTelemetryFeatures`가 빠지고 로그에만 기록되었다. iOS는 이 목록이 있어야 원본을 전송하므로 새 앱이 절대 고도를 영구 보류하는 상태였다. 새 세션·재전송 응답 모두에 포함한다.
+- `telemetry:batch`의 `absoluteAltitude: null`을 배치 전체 거절 대신 미제공으로 처리한다.
+- 새 정책에서 첫 상대 기압 샘플 이전 출력점이 어떤 연속 구간에도 속하지 않아 높이가 미확정으로 남았다. 이 시점의 상대 Z는 첫 샘플이 시작하는 0이므로 첫 구간으로 취급한다. 구간 사이 공백은 계속 미확정이다.
+- 높이 미확정 점의 `geomZ`(상대 Z)가 절대 높이와 함께 Z 범위 검증에 들어가 거짓 `CRITICAL_Z_DIVERGENCE`가 기록되었다. v4 출력에 절대 높이가 있으면 절대 높이가 있는 점만 비교한다.
+- `fusion:compare`는 세션의 `absoluteAltitudeEnabled`로 재생하고 새 스트림 수신 지연을 포함한다. `sessions:diagnose`는 새 스트림 수량을 출력한다.
+
+시뮬레이터 세션은 지형 context가 없는 테스트 DB라 `NO_VERTICAL_TRANSFORM`으로 거절되고 기존 GPS 기준을 유지했다. `CM_ABSOLUTE` 채택은 단위 검증으로만 확인했으며, 실기기 정확도는 여전히 새 수집으로 검증해야 한다.

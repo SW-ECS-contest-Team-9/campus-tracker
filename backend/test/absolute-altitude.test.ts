@@ -14,6 +14,7 @@ import { createFusionStateV4 } from '../src/modules/fusion/fusion-state-v4.js';
 import { processObservationV4, finalizeFusionV4 } from '../src/modules/fusion/fusion-v4.engine.js';
 import { replayAsReceived, replayInMemory, ReorderBuffer } from '../src/modules/fusion/fusion.pipeline.js';
 import { cutRawSamples, summarizeReplayInput } from '../src/modules/fusion/fusion.replay-input.js';
+import { computeFusionMetrics } from '../src/modules/fusion/fusion.metrics.js';
 import { tmForward } from '../src/geo/tm.js';
 import type { TerrainContext } from '../src/geo/terrain.js';
 import { walk, T0 } from './helpers/walk.js';
@@ -45,6 +46,7 @@ test('wire contract preserves optional absolute observations, null invalid value
   const id = '11111111-1111-1111-1111-111111111111';
   const base = { batchId: id, sessionId: id };
   assert.equal(TelemetryBatchRequest.parse(base).absoluteAltitude, undefined);
+  assert.equal(TelemetryBatchRequest.parse({ ...base, absoluteAltitude: null }).absoluteAltitude, undefined);
   const rows = [{ sequence: 0, timestamp: iso(T0), altitude: -3, accuracy: 4, precision: 0.1,
     verticalReference: 'APPLE_MSL', invalidReason: null },
   { sequence: 1, timestamp: iso(T0 + 1000), altitude: null, accuracy: null, precision: null,
@@ -142,6 +144,7 @@ test('an established trusted GPS reference takes precedence over the API fallbac
   raw.locations = raw.locations.map((l) => ({ ...l, ellipsoidalAltitude: 124, horizontalAccuracy: 5, verticalAccuracy: 3 }));
   const r = run(raw);
   assert.ok(r.outputs.length > 20);
+  // including the first output, before the first barometer sample: relative Z starts from that sample's zero
   assert.ok(r.outputs.every((p) => p.zDatumSource === 'GPS' && Math.abs(p.ellipsoidalAltitude! - 124) < 0.01));
 });
 
@@ -151,6 +154,9 @@ test('a relative sensor restart does not carry an old height reference through u
   const r = run(raw);
   assert.ok(r.outputs.some((p) => p.zDatumSource === 'CM_ABSOLUTE'));
   assert.ok(r.outputs.filter((p) => p.timestamp > T0 + 21_000).every((p) => p.zDatumSource === 'NONE'));
+  // unknown-height points keep relative Z in geomZ: the Z range check must not compare it with absolute heights
+  const metrics = computeFusionMetrics(buildTimeline(raw), r.outputs, FUSION_ALGORITHMS['fusion-v4'].summarize(r.state, r.events));
+  assert.deepEqual(metrics.validation.warnings.filter((w) => w.code.includes('Z_')), []);
   raw.absoluteAltitude!.push(...[22, 25, 28].map((sec, i) => ({ ...raw.absoluteAltitude![0], sequence: 100 + i, timestamp: iso(T0 + sec * 1000), altitude: 130 })));
   const recovered = run(raw);
   assert.ok(recovered.outputs.filter((p) => p.timestamp > T0 + 29_000).every((p) => Math.abs(p.ellipsoidalAltitude! - 153) < 0.01));
