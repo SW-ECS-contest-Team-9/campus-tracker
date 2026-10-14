@@ -14,6 +14,7 @@ import { spatial } from '../../geo/spatial.js';
 import { fusionRepository } from './fusion.repository.js';
 import type { FusedPositionEvent } from './fusion.dto.js';
 import { terrain } from '../../geo/terrain.js';
+import { loadStartHeightMap } from '../../geo/start-height-map.js';
 import { CAMPUS_FRAME } from '../../geo/campus-frame.js';
 import { codeRef } from '../../common/code-ref.js';
 import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
@@ -95,8 +96,11 @@ function sensorEventRows(version: string, events: unknown[]) {
 }
 
 function sessionInputHash(algo: FusionAlgorithm, context: FusionSessionContext): string | null {
-  if (algo.version !== 'fusion-v4' || (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false) return null;
-  return strideCalibrationHash(context.strideCalibration);
+  if (algo.version !== 'fusion-v4') return null;
+  const stride = (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false ? null : strideCalibrationHash(context.strideCalibration);
+  return context.startHeightMap
+    ? createHash('sha256').update(JSON.stringify({ stride, startHeightMap: context.startHeightMap })).digest('hex')
+    : stride;
 }
 
 export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null, inputHash: string | null = null): string {
@@ -262,11 +266,14 @@ export async function replaySession(sessionId: string, version: string, trigger:
   let lastT = -Infinity;
   let outcome: 'success' | 'failed' = 'failed';
   const terrainVersionId = algo.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
-  const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
+  const context: FusionSessionContext = {
+    strideCalibration: await sessionRepository.getStrideCalibration(sessionId),
+    startHeightMap: await loadStartHeightMap(algo.config, mapVersionId),
+  };
   const inputHash = sessionInputHash(algo, context);
   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
     ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId,
-      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), inputHash } } : {}) }
+      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), startHeightMap: context.startHeightMap ?? null, inputHash } } : {}) }
     : algo.config;
   const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId, inputHash), {
     revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
@@ -367,7 +374,11 @@ export const fusionService = {
   /** session:start (new session): fresh state, uninitialized until the first usable GPS fix. */
   sessionStarted(sessionId: string, collectorId: string, context: FusionSessionContext = { strideCalibration: null }) {
     void enqueue(sessionId, 'start', async () => {
-      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(context), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
+      if (!live.has(sessionId)) {
+        const algo = realtimeAlgo();
+        const startHeightMap = await loadStartHeightMap(algo.config, await spatial.sessionMapVersion(sessionId));
+        live.set(sessionId, { collectorId, state: algo.createState({ ...context, startHeightMap }), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
+      }
     });
   },
 
@@ -496,7 +507,7 @@ export const fusionService = {
       throw AppError.conflict('SPATIAL_MAP_UNAVAILABLE', `${version} requires a valid spatial map pinned to this session`);
     }
     const terrainVersionId = algo?.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
-    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
+    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId), startHeightMap: algo ? await loadStartHeightMap(algo.config, mapVersionId) : null };
     const inputHash = algo ? sessionInputHash(algo, context) : null;
     if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId, inputHash), inputHash))) {
       const run = (await fusionRepository.latestRuns(sessionId)).find((r) => r.algorithmVersion === version);

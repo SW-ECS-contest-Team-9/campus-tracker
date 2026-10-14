@@ -65,8 +65,12 @@ export function describeFusedHeight(p: FusedHeightInput): HeightSummary {
           ? `임시 GPS 기준 ±${m(p.zDatumSigma)} — 신뢰 기준 미충족, 수직 오차가 가장 작은 샘플`
           : p.zDatumSource === 'TERRAIN_FALLBACK'
             ? `임시 지형·기압 기준 ±${m(p.zDatumSigma)} — 시작 위치의 지면층 가정, 이후 기압 변화 누적(시작 층 미확정)`
-            : '기준 미기록';
-    const provisional = p.zDatumSource === 'GPS_FALLBACK' || p.zDatumSource === 'TERRAIN_FALLBACK';
+            : p.zDatumSource === 'MAP_START'
+              ? `지도 시작 기준 ±${m(p.zDatumSigma)} — 선택한 길·층별 고도와 기압 변화로 임시 추정`
+              : p.zDatumSource === 'ROAD_ANCHOR'
+                ? `길 통과 앵커 ±${m(p.zDatumSigma)} — 연속 보행과 길의 3D 고도로 기압 기준 보정`
+                : '기준 미기록';
+    const provisional = p.zDatumSource === 'GPS_FALLBACK' || p.zDatumSource === 'TERRAIN_FALLBACK' || p.zDatumSource === 'MAP_START' || p.zDatumSource === 'ROAD_ANCHOR';
     return { kind: 'ABSOLUTE', status: provisional ? '절대 고도 임시 추정' : '절대 고도 추정', datum, floorAllowed: !provisional };
   }
   const projected = p.terrainHeight != null;

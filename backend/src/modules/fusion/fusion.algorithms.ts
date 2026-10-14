@@ -18,8 +18,12 @@ import type { FusionEventV31 } from './fusion-v31.engine.js';
 import { createFusionStateV4, describeEventV4, finalizeFusionV4, flushFusionV4, processObservationV4, summarizeV4, type FusionEventV4 } from './fusion-v4.engine.js';
 import type { FusionStateV4 } from './fusion-state-v4.js';
 import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fusion.diagnostics.js';
+import type { StartHeightSelection } from '../../geo/start-height-map.js';
+import type { RoadHeightContact } from './fusion-road-height.js';
 
 export interface AlgorithmSummary {
+  startHeightSelection?: StartHeightSelection | null;
+  roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
   gpsAccepted: number;
   gpsRejected: number;
   rejectReasons: Record<string, number>;
@@ -192,11 +196,12 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 7: optional time-based step signal (stepTimeBased, off in the registered config) + heading-fit-pending diagnostics —
   //    outputs of the registered config are identical to rev 6.
   // 8: best vertical-accuracy GPS fallback; 9: fixed provisional DEM datum + barometric changes indoors.
-  revision: 9,
+  // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
+  revision: 11,
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,
-  createState: (context) => createFusionStateV4(cfg.healthStrideEnabled ? context : undefined),
+  createState: (context) => createFusionStateV4(context ? { ...context, strideCalibration: cfg.healthStrideEnabled ? context.strideCalibration : null } : undefined),
   process: (s, o) => processObservationV4(s, o, cfg),
   flush: (s) => flushFusionV4(s, cfg),
   finalize: (s) => finalizeFusionV4(s, cfg),

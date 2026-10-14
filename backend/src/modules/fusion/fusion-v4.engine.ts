@@ -25,6 +25,8 @@ import { wgs84ToLocal } from '../../geo/wgs84-to-local.js';
 import { headingRadToDeg, normalizeAngleRad } from '../../geo/angles.js';
 import { terrain as terrainModel } from '../../geo/terrain.js';
 import { tmForward } from '../../geo/tm.js';
+import { selectStartHeight } from '../../geo/start-height-map.js';
+import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
 import type { FusionConfigV4 } from './fusion.config.js';
 import { checkPedometerCounter, restartPedometerCounter } from './fusion.pedometer.js';
 import type { Observation } from './fusion.timeline.js';
@@ -319,6 +321,8 @@ function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4, 
   s.x = p.x;
   s.window.steps++;
   if (!s.headingKnown) s.window.unheadedSteps++;
+  const road = collectRoadHeight(s, s.roadHeightTracker, t, s.x, s.P, s.headingKnown && !verticalUnknown ? rel + s.x[2] : null, s.z, c);
+  if (road) s.roadHeightContacts.push(road);
   // a slope may be a garage ramp below the DEM surface: like stairs, it is not a ground contact
   if (s.terrain && s.headingKnown && !vertical && s.z !== undefined) {
     const k = groundContact(s, t, s.x, s.P, s.z, c);
@@ -746,13 +750,29 @@ function terrainFallback(s: FusionStateV4, x: Vec3, sigma: number, z: number, c:
 /** Trusted GPS wins over provisional DEM; provisional DEM wins over untrusted GPS. */
 function fallbackDatum(s: FusionStateV4, dem: DatumV4 | null, c: FusionConfigV4): DatumV4 | null {
   const gps = gpsDatum(s, c);
-  return gps?.source === 'GPS' ? gps : dem ?? gps;
+  return gps?.source === 'GPS' ? gps : s.mapStartDatum ?? dem ?? gps;
+}
+
+/** Evaluate start materials once; relative barometric movement then continues from this fixed zero. */
+function mapStartDatum(s: FusionStateV4, x: Vec3, sigma: number, z: number, c: FusionConfigV4): DatumV4 | undefined {
+  if (!s.startHeightMap || !s.terrain || !s.origin || (!c.startHeightRoadsEnabled && !c.startHeightFloorsEnabled)) return undefined;
+  const ll = localToWgs84(s.origin, { x: x[0], y: x[1], z: 0 });
+  const xy = tmForward(ll.latitude, ll.longitude);
+  const best = s.bestGpsDatum;
+  s.startHeightSelection = selectStartHeight(s.startHeightMap, xy.x, xy.y, sigma, c,
+    best ? { heightM: best.b + z - s.terrain.geoidSeparation, accuracy: best.accuracy } : null);
+  const selected = s.startHeightSelection.selected;
+  return selected ? { b: selected.phoneHeightM - z, sigma: c.startHeightMinSigmaM, source: 'MAP_START', frame: 'ORTHO' } : undefined;
 }
 
 /** Realtime zero: outdoor contacts, trusted GPS, fixed provisional DEM, then provisional GPS. */
 function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
+  if (c.roadHeightAnchorsEnabled && s.roadHeightContacts.length) {
+    return smoothDatum(s.roadHeightContacts.slice(-12), c, 'ROAD_ANCHOR').at(s.lastObservationT ?? s.roadHeightContacts.at(-1)!.t);
+  }
   const kept = consistentContacts(s.contacts.slice(-600), c);
   if (!kept) {
+    if (!s.startHeightSelection && s.z !== undefined) s.mapStartDatum = mapStartDatum(s, s.x, sigmaXY(s.P), s.z, c);
     if (!s.terrainFallbackDatum && s.z !== undefined) {
       s.terrainFallbackDatum = terrainFallback(s, s.x, sigmaXY(s.P), s.z, c) ?? undefined;
     }
@@ -765,7 +785,7 @@ function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
 }
 
 /** Replay: the zero as a slow random walk (barometric drift) through the contacts, RTS-smoothed. */
-function smoothDatum(kept: ContactV4[], c: FusionConfigV4) {
+function smoothDatum(kept: ContactV4[], c: FusionConfigV4, source: 'TERRAIN' | 'ROAD_ANCHOR' = 'TERRAIN') {
   const q = c.baroDriftMPerHour ** 2 / 3600; // m^2 per second
   const n = kept.length;
   const xf: number[] = [], pf: number[] = [], xp: number[] = [], pp: number[] = [];
@@ -793,12 +813,27 @@ function smoothDatum(kept: ContactV4[], c: FusionConfigV4) {
   const at = (t: number): DatumV4 => {
     let i = 0;
     while (i + 1 < n && kept[i + 1].t <= t) i++;
-    if (t <= kept[0].t) return { b: xs[0], sigma: Math.sqrt(ps[0] + (q * (kept[0].t - t)) / 1000), source: 'TERRAIN', frame: 'ORTHO' };
-    if (i === n - 1) return { b: xs[i], sigma: Math.sqrt(ps[i] + (q * (t - kept[i].t)) / 1000), source: 'TERRAIN', frame: 'ORTHO' };
+    if (t <= kept[0].t) return { b: xs[0], sigma: Math.sqrt(ps[0] + (q * (kept[0].t - t)) / 1000), source, frame: 'ORTHO' };
+    if (i === n - 1) return { b: xs[i], sigma: Math.sqrt(ps[i] + (q * (t - kept[i].t)) / 1000), source, frame: 'ORTHO' };
     const u = (t - kept[i].t) / Math.max(kept[i + 1].t - kept[i].t, 1);
-    return { b: xs[i] + u * (xs[i + 1] - xs[i]), sigma: Math.sqrt(ps[i] + u * (ps[i + 1] - ps[i])), source: 'TERRAIN', frame: 'ORTHO' };
+    return { b: xs[i] + u * (xs[i + 1] - xs[i]), sigma: Math.sqrt(ps[i] + u * (ps[i + 1] - ps[i])), source, frame: 'ORTHO' };
   };
   return { at, driftRange: Math.max(...xs) - Math.min(...xs), sigma: Math.sqrt(Math.min(...ps)) };
+}
+
+function collectRoadHeight(s: FusionStateV4, tracker: RoadHeightTracker, t: number, x: Vec3, P: Mat3,
+  heading: number | null, z: number | undefined, c: FusionConfigV4): RoadHeightContact | null {
+  if (!s.terrain || !s.origin || !s.startHeightMap || heading === null || z === undefined) {
+    return roadHeightContact(tracker, [], null, c);
+  }
+  const ll = localToWgs84(s.origin, { x: x[0], y: x[1], z: 0 });
+  const xy = tmForward(ll.latitude, ll.longitude);
+  const gps = gpsDatum(s, c);
+  const last = s.roadHeightContacts.at(-1);
+  const reference = last ? { heightM: last.offset + z, sigma: Math.sqrt(last.variance) }
+    : gps?.source === 'GPS' ? { heightM: gps.b + z - (gps.frame === 'ELLIPSOIDAL' ? s.terrain.geoidSeparation : 0), sigma: gps.sigma }
+      : null;
+  return roadHeightContact(tracker, s.startHeightMap.roads, { t, x: xy.x, y: xy.y, z, sigmaXY: sigmaXY(P), headingRad: heading }, c, reference);
 }
 
 function output(
@@ -1060,8 +1095,26 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
       if (k) contacts.push(k);
     }
   }
-  const kept = consistentContacts(contacts, c);
-  const terrainDatum = kept ? smoothDatum(kept, c) : null;
+  // Re-evaluate road traversal on the final XY track. Forward matches cannot survive a smoother
+  // that moves the walk off the road. Only actual step events with a known heading supply evidence.
+  const roadTracker: RoadHeightTracker = {};
+  s.roadHeightContacts = [];
+  if (c.roadHeightAnchorsEnabled) {
+    let known = false;
+    for (const p of points) {
+      if (p.event.kind === 'segment') { known = p.event.theta !== null; roadTracker.run = undefined; }
+      if (p.event.kind !== 'step') continue;
+      const z = zAt(p.t);
+      const road = collectRoadHeight(s, roadTracker, p.t, p.x, p.P,
+        known && !p.event.verticalUnknown ? p.event.rel + p.x[2] : null, z ?? undefined, c);
+      if (road) s.roadHeightContacts.push(road);
+    }
+  }
+  const roadAnchored = s.roadHeightContacts.length > 0;
+  const kept = roadAnchored ? s.roadHeightContacts : consistentContacts(contacts, c);
+  const terrainDatum = kept ? smoothDatum(kept, c, roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : null;
+  // Replay uses the first smoothed position and the same saved map snapshot, not later floors.
+  if (s.zLog.length && points.length) s.mapStartDatum = mapStartDatum(s, points[0].x, sigmaXY(points[0].P), zAt(points[0].t)!, c);
   // Recompute the provisional start on the smoothed XY track, with its matching barometric Z.
   let provisionalDem: DatumV4 | null = null;
   if (!terrainDatum && s.zLog.length) {
@@ -1073,7 +1126,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   const fallback = terrainDatum ? null : fallbackDatum(s, provisionalDem, c);
   const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallback);
   s.smoothed = {
-    datumSource: terrainDatum ? 'TERRAIN' : fallback?.source ?? 'NONE',
+    datumSource: terrainDatum ? (roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : fallback?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
     datumSigma: terrainDatum ? terrainDatum.sigma : (fallback?.sigma ?? null),
     driftRangeM: terrainDatum ? terrainDatum.driftRange : null,
@@ -1166,6 +1219,8 @@ export function summarizeV4(s: FusionStateV4) {
     if (s.smoothed.gpsDownweighted) reasons.ROBUST_DOWNWEIGHTED = s.smoothed.gpsDownweighted;
   }
   return {
+    startHeightSelection: s.startHeightSelection ?? null,
+    roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
     gpsAccepted: accepted,
     gpsRejected: rejected,
     rejectReasons: reasons,

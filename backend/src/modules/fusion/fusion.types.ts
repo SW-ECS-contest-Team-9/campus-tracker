@@ -75,7 +75,7 @@ export interface FusedOutput {
   // ---- v4 rev 2: absolute height ----
   terrainHeight?: number | null; // DEM orthometric height under the position
   heightAboveGround?: number | null; // orthometric height - terrain height
-  zDatumSource?: 'TERRAIN' | 'GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'NONE' | null;
+  zDatumSource?: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'NONE' | null;
   zDatumSigma?: number | null;
 }
 

@@ -271,13 +271,18 @@ export class Lab {
     const f = a.forward[i];
     const fin = a.final[Math.max(0, indexAt(a.final, this.t))];
     const correction = fin && a.forward !== a.final ? Math.hypot(fin.x - f.x, fin.y - f.y) : null;
+    const start = a.run.metrics?.startHeightSelection;
+    const roadAnchors = a.run.metrics?.roadHeightAnchors;
+    const startReason = start ? { SELECTED: '후보 선택(신뢰 고도 기준이 있으면 그 기준 우선)', NO_CANDIDATE: '근처 후보 없음', AMBIGUOUS: '여러 높이 후보: 기준에 반영하지 않음', POSITION_UNCERTAIN: '수평 위치 불확실: 기준에 반영하지 않음' }[start.reason] : '';
     return `<table>
       <tr><th>source</th><td>${esc(f.source)}${f.stationary ? ' · stationary' : ''}</td></tr>
       <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${f.heading === null ? '<span class="warn-text">방향 미확정</span>' : num(f.heading, 0, '°')}</td></tr>
       <tr><th>GPS</th><td>${f.gpsUsed === null ? '–' : f.gpsUsed ? 'used' : 'rejected'}${f.gpsSequence ? ` #${f.gpsSequence}` : ''}</td></tr>
       <tr><th>height</th><td>${f.h === null ? `<span class="warn-text">절대 고도 미확정</span> (기준 ${esc(f.zDatumSource ?? 'NONE')}) · 지도에는 지면에 투영해 표시` : `${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · above ground ${num(f.heightAboveGround, 1, ' m')}`}</td></tr>
       <tr><th>상대 Z</th><td>${num(f.zRel, 1, ' m')} <span class="muted">(기압, 세션 시작 기준 · 센서 재시작 구간은 이어 붙임)</span></td></tr>
+      ${start ? `<tr><th>시작 높이 재료</th><td>${esc(startReason)}${start.selected ? ` · ${esc(start.selected.kind)} ${esc(start.selected.id)} · ${num(start.selected.phoneHeightM, 1, ' m MSL')}` : ''}<br><span class="muted">${start.candidates.map((c) => `${esc(c.id)} (${num(c.phoneHeightM, 1, ' m')}, 층 ${esc(c.levelId ?? '–')})`).join(' / ') || '후보 없음'}</span></td></tr>` : ''}
       <tr><th>building</th><td>${esc(f.buildingName ?? '–')}</td></tr>
+      ${roadAnchors ? `<tr><th>길 통과 Z 앵커</th><td>${roadAnchors.count}개 · ${roadAnchors.roadIds.map(esc).join(', ') || '통과 조건을 만족한 길 없음'}</td></tr>` : ''}
       <tr><th>smoother moved</th><td>${correction === null ? '–' : `${correction.toFixed(1)} m (realtime → final)`}</td></tr>
     </table>`;
   }
@@ -593,6 +598,17 @@ export class Lab {
       const raw = line.slice(i + 1).trim();
       overrides[line.slice(0, i).trim()] = raw === 'true' ? true : raw === 'false' ? false : Number.isFinite(Number(raw)) && raw !== '' ? Number(raw) : raw;
     }
+    if (val('lab-version') === 'fusion-v4') {
+      for (const [id, key] of [['lab-start-roads', 'startHeightRoadsEnabled'], ['lab-start-floors', 'startHeightFloorsEnabled'], ['lab-start-drafts', 'startHeightIncludeDrafts'], ['lab-road-anchors', 'roadHeightAnchorsEnabled'], ['lab-road-anchor-drafts', 'roadHeightAnchorIncludeDrafts']]) {
+        if (this.el.querySelector<HTMLInputElement>(`#${id}`)?.checked) overrides[key] = true;
+      }
+      if (val('lab-start-building').trim()) overrides.startHeightBuildingId = val('lab-start-building').trim();
+      if (val('lab-start-level').trim()) overrides.startHeightLevelId = val('lab-start-level').trim();
+      if (val('lab-road-anchor-level').trim()) overrides.roadHeightAnchorLevelId = val('lab-road-anchor-level').trim();
+    }
+    const algorithmVersion = val('lab-version');
+    const variant = val('lab-variant') || null;
+    const mode = val('lab-mode') as 'SENSOR_TIME' | 'AS_RECEIVED';
     const cutoffText = val('lab-cutoff').trim();
     const cutoff = cutoffText ? new Date(cutoffText) : null;
     if (cutoff && !Number.isFinite(cutoff.getTime())) {
@@ -606,10 +622,10 @@ export class Lab {
     this.render();
     try {
       const r = await api.replay(this.sessionId, {
-        algorithmVersion: val('lab-version'), variant: val('lab-variant') || null, overrides: Object.keys(overrides).length ? overrides : null,
-        mode: val('lab-mode') as 'SENSOR_TIME' | 'AS_RECEIVED',
+        algorithmVersion, variant, overrides: Object.keys(overrides).length ? overrides : null,
+        mode,
         ...(cutoff ? { cutoff: cutoff.toISOString() } : {}),
-        ...(val('lab-mode') === 'SENSOR_TIME' && !finalize ? { finalize: false } : {}),
+        ...(mode === 'SENSOR_TIME' && !finalize ? { finalize: false } : {}),
       });
       this.message = `run ${r.runId.slice(0, 8)}: ${r.outputs} positions in ${r.durationMs} ms`;
       this.runs = await api.runs(this.sessionId);
@@ -696,6 +712,16 @@ export class Lab {
           <input id="lab-cutoff" placeholder="cutoff 센서 시각 (선택, ISO 예: 2026-10-13T13:06:02.238Z)" title="이 시각까지 캡처된 원시 데이터만 사용: 두 세션을 같은 구간으로 비교" />
           <label class="small"><input id="lab-finalize" type="checkbox" checked /> 평활화(FINAL)까지 실행 — 끄면 시간순 전방만</label>
           <textarea id="lab-overrides" rows="2" placeholder="파라미터 변경 (선택) 예: gpsGateChi2=9"></textarea>
+          <label class="small"><input id="lab-start-roads" type="checkbox" /> v4 시작 높이에 그려진 길의 3D 고도 활용</label>
+          <label class="small"><input id="lab-start-floors" type="checkbox" /> v4 시작 높이에 건물 층별 고도(지도·보정) 활용</label>
+          <label class="small"><input id="lab-start-drafts" type="checkbox" /> DRAFT 길도 후보에 포함</label>
+          <input id="lab-start-building" placeholder="시작 건물 ID (선택, 후보 제한)" />
+          <input id="lab-start-level" placeholder="시작 층 ID (선택: 길 level ID / 지도 층 이름 / 보정 층 입구=0…)" />
+          <div class="small muted">여러 높이가 겹치면 층 ID나 정확한 GPS로 구분될 때만 사용합니다. 건물 층수만 있고 층별 고도가 없으면 층 높이를 만들지 않습니다.</div>
+          <label class="small"><input id="lab-road-anchors" type="checkbox" /> v4 그려진 길의 연속 통과를 Z 앵커로 활용</label>
+          <label class="small"><input id="lab-road-anchor-drafts" type="checkbox" /> 길 통과 앵커에 DRAFT도 포함</label>
+          <input id="lab-road-anchor-level" placeholder="길 통과 앵커 층 ID (선택, 여러 층이 겹친 길의 후보 제한)" />
+          <div class="small muted">보행 방향·거리·연속 통과·기압 변화가 일치해야 앵커를 생성합니다. 여러 높이의 길을 구분하지 못하면 보정을 보류합니다.</div>
           <button data-action="replay" ${this.busy ? 'disabled' : ''}>Replay 실행</button>
         </div>
         <div class="small muted">결과는 실행 스냅샷으로만 저장됩니다(게시 안 함). 기존 결과는 지워지지 않습니다.</div>

@@ -268,6 +268,12 @@ export interface CollectorSummary {
 
 
 // ---- Lab (docs/MOBILITY_MAP_PLAN.md): run snapshots, qc-v1, routes, canonical paths, validation ----
+export interface StartHeightSelection {
+  reason: 'SELECTED' | 'NO_CANDIDATE' | 'AMBIGUOUS' | 'POSITION_UNCERTAIN';
+  candidates: { id: string; kind: 'ROAD' | 'FLOOR'; buildingId: string | null; levelId: string | null; phoneHeightM: number }[];
+  selected: StartHeightSelection['candidates'][number] | null;
+}
+
 export interface LabRun {
   id: string;
   sessionId: string;
@@ -284,7 +290,7 @@ export interface LabRun {
   startedAt: string;
   completedAt: string | null;
   outputCount: number | null;
-  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown } | null;
+  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown; startHeightSelection?: StartHeightSelection | null; roadHeightAnchors?: { count: number; roadIds: string[] } } | null;
   error: string | null;
 }
 export interface RunPosition {

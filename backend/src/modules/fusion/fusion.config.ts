@@ -620,6 +620,30 @@ export const fusionConfigV4 = {
   phoneHeightM: 1.0,
   phoneHeightSigmaM: 0.3,
   terrainFallbackMinSigmaM: 5, // provisional ground-level start; the initial indoor floor is unknown
+  startHeightRoadsEnabled: false,
+  startHeightFloorsEnabled: false,
+  startHeightIncludeDrafts: false,
+  startHeightBuildingId: '', // optional restriction to one building
+  startHeightLevelId: '', // road level_id or calibrated relativeFloor (0 = entrance level)
+  startHeightRoadRadiusM: 10,
+  startHeightMaxPositionSigmaM: 15,
+  startHeightAmbiguityM: 0.75,
+  startHeightGpsMaxSigmaM: 5,
+  startHeightMinSigmaM: 3,
+  roadHeightAnchorsEnabled: false,
+  roadHeightAnchorIncludeDrafts: false,
+  roadHeightAnchorLevelId: '', // optional level restriction for stacked roads
+  roadHeightAnchorRadiusM: 3,
+  roadHeightAnchorMaxPositionSigmaM: 8,
+  roadHeightAnchorMaxHeadingDeg: 25,
+  roadHeightAnchorMinSpanMs: 3000,
+  roadHeightAnchorMinTravelM: 4,
+  roadHeightAnchorMinSamples: 6,
+  roadHeightAnchorMaxGapMs: 2000,
+  roadHeightAnchorMaxSpeedMps: 4,
+  roadHeightAnchorMaxBaroResidualM: 1.5,
+  roadHeightAnchorIntervalMs: 5000,
+  roadHeightAnchorSigmaM: 2, // author-supplied map height is not an independent survey
   contactMaxPositionSigmaM: 15,
   contactBuildingClearanceM: 3, // also at least half the position sigma away from any footprint
   contactMaxHeightSigmaM: 2.5, // DEM sigma + position sigma x slope (campus DEM sigma median 1.1-1.5 m)

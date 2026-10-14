@@ -46,6 +46,20 @@ test('height: DEM + barometer fallback explains the assumed ground-level start a
   assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 104, kind: 'ABSOLUTE' });
 });
 
+test('height: mapped start height remains a provisional estimate', () => {
+  const h = describeFusedHeight({ ellipsoidalAltitude: 130, zDatumSource: 'MAP_START', zDatumSigma: 3 });
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /길·층별 고도/);
+});
+
+test('height: road passage correction reports its source without treating drawn road height as a surveyed floor', () => {
+  const h = describeFusedHeight({ ellipsoidalAltitude: 134, zDatumSource: 'ROAD_ANCHOR', zDatumSigma: 2 });
+  assert.match(h.datum, /길 통과 앵커/);
+  assert.equal(h.floorAllowed, false);
+});
+
 test('height: a track is split where the datum appears, without a hole in the line', () => {
   const p = (e: number | null) => ({ ellipsoidalAltitude: e, terrainHeight: 90 });
   const runs = splitByAbsoluteHeight([p(null), p(null), p(100), p(101), p(null)]);

@@ -3,6 +3,9 @@ import type { LocalOrigin } from '../../geo/wgs84.js';
 import { createPedometerCounter, type PedometerCounter } from './fusion.pedometer.js';
 import { diag3, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
 import type { StrideCalibration } from './fusion.stride.js';
+import type { FusionSessionContext } from './fusion.stride.js';
+import type { StartHeightMap, StartHeightSelection } from '../../geo/start-height-map.js';
+import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
 
 /**
  * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
@@ -28,7 +31,7 @@ export interface HeadingSegmentV4 { id: number; startT: number; reason: string; 
 /** Ground contact: orthometric zero offset b = DEM + phone height - barometric Z, at time t. */
 export interface ContactV4 { t: number; offset: number; variance: number }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
@@ -133,6 +136,11 @@ export interface FusionStateV4 {
   bestGpsDatum?: { b: number; accuracy: number };
   /** Fixed provisional zero: assume the first usable DEM position is at ground level. */
   terrainFallbackDatum?: DatumV4;
+  startHeightMap?: StartHeightMap | null;
+  startHeightSelection?: StartHeightSelection;
+  mapStartDatum?: DatumV4;
+  roadHeightTracker: RoadHeightTracker;
+  roadHeightContacts: RoadHeightContact[];
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];
@@ -181,8 +189,9 @@ export const emptyWindowV4 = (): FusionStateV4['window'] => ({
   gpsUsed: null, gpsReason: null, gpsSeq: null, gpsAccuracy: null, innovation: null, steps: 0, unheadedSteps: 0, anchored: false, reanchored: false,
 });
 
-export function createFusionStateV4(context?: { strideCalibration: StrideCalibration | null }): FusionStateV4 {
+export function createFusionStateV4(context?: FusionSessionContext): FusionStateV4 {
   return {
+    startHeightMap: context?.startHeightMap,
     ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
     ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),
     strideLevelSteps: 0,
@@ -213,6 +222,8 @@ export function createFusionStateV4(context?: { strideCalibration: StrideCalibra
     zLog: [],
     datumSamples: [],
     contacts: [],
+    roadHeightTracker: {},
+    roadHeightContacts: [],
     gpsOffsets: [],
     segments: [],
     steps: [],

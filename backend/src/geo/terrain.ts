@@ -131,7 +131,7 @@ export const terrain = {
   },
 
   /** Building containing the point (or null) and the distance to the nearest footprint edge, meters. */
-  buildingAt(ctx: TerrainContext, x: number, y: number): { building: TerrainBuilding | null; distance: number } {
+  buildingAt(ctx: Pick<TerrainContext, 'buildings'>, x: number, y: number): { building: TerrainBuilding | null; distance: number } {
     let best = Infinity;
     let inside: TerrainBuilding | null = null;
     for (const b of ctx.buildings) {

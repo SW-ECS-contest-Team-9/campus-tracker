@@ -7,6 +7,9 @@ import { createFusionStateV4, type FusionStateV4 } from '../src/modules/fusion/f
 import { fusionConfigV4 as cfg } from '../src/modules/fusion/fusion.config.js';
 import { localToWgs84 } from '../src/geo/local-to-wgs84.js';
 import type { FusedOutput } from '../src/modules/fusion/fusion.types.js';
+import { tmForward } from '../src/geo/tm.js';
+import type { TerrainContext } from '../src/geo/terrain.js';
+import type { StartHeightMap } from '../src/geo/start-height-map.js';
 
 const ORIGIN = { latitude: 37.6158, longitude: 127.0118, height: 0 };
 const T0 = Date.parse('2026-10-02T06:00:00.000Z');
@@ -145,6 +148,48 @@ test('a trusted GPS datum replaces provisional Z', () => {
   assert.equal(outputs[0].zDatumSource, 'GPS_FALLBACK');
   assert.equal(outputs[1].zDatumSource, 'GPS');
   assert.equal(outputs[1].ellipsoidalAltitude, 101);
+});
+
+test('confirmed mapped road passage corrects indoor Z retrospectively, preserves later barometric climb, and leaves XY independent', () => {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  const terrain: TerrainContext = { versionId: 't',
+    grid: { originX: xy.x - 200, originY: xy.y - 200, resolution: 2, width: 250, height: 250 },
+    heights: new Float32Array(62500).fill(100), sigma: new Float32Array(62500).fill(1), modified: new Uint8Array(62500), geoidSeparation: 23,
+    buildings: [{ buildingId: 'b', name: 'indoor', groundFloors: 5, undergroundFloors: 1, heightM: 20, floorLabels: [],
+      polygons: [[[[xy.x - 150, xy.y - 150], [xy.x + 150, xy.y - 150], [xy.x + 150, xy.y + 150], [xy.x - 150, xy.y + 150], [xy.x - 150, xy.y - 150]]]] }],
+  };
+  const map: StartHeightMap = { mapVersionId: 'm', floors: [], roads: [{ id: 'indoor-road', buildingId: 'b', levelId: 'L2', status: 'APPROVED', revision: 1,
+    coordinates: [[xy.x, xy.y, 110], [xy.x, xy.y + 120, 110]] }] };
+  const { obs } = simulate([{ durationS: 60, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 90, walking: true, vzMps: 0.1, slope: true }], { gpsSigma: 1, gpsAccuracy: 3 });
+  const finals: FusedOutput[][] = [];
+  for (const enabled of [false, true]) {
+    const c = { ...cfg, roadHeightAnchorsEnabled: enabled };
+    const s = createFusionStateV4({ strideCalibration: null, startHeightMap: map });
+    const live: FusedOutput[] = [];
+    for (const o of obs) live.push(...processObservationV4(s, { ...o, terrainContext: terrain }, c).outputs);
+    if (enabled) {
+      assert.ok(s.roadHeightContacts.length > 0);
+      assert.ok(live.some((p) => p.zDatumSource === 'ROAD_ANCHOR'));
+    }
+    const fin = finalizeFusionV4(s, c).outputs;
+    finals.push(fin);
+    assert.ok(fin.length > 0);
+    assert.ok(fin.every((p) => p.zDatumSource === (enabled ? 'ROAD_ANCHOR' : 'TERRAIN_FALLBACK')));
+    if (enabled) {
+      assert.ok(s.roadHeightContacts.length > 0);
+      assert.ok(fin.every((p) => Math.abs(p.ellipsoidalAltitude! - p.z - 134) < 0.1));
+      assert.ok(fin.at(-1)!.ellipsoidalAltitude! - fin[0].ellipsoidalAltitude! > 1.5);
+      // A cached forward match is not evidence if the final path does not pass that road.
+      s.startHeightMap = { ...map, roads: map.roads.map((r) => ({ ...r,
+        coordinates: r.coordinates.map(([x, y, z]): [number, number, number] => [x - 30, y, z]),
+      })) };
+      const invalidated = finalizeFusionV4(s, c).outputs;
+      assert.equal(s.roadHeightContacts.length, 0);
+      assert.ok(invalidated.length > 0);
+      assert.ok(invalidated.every((p) => p.zDatumSource === 'TERRAIN_FALLBACK'));
+    }
+  }
+  assert.deepEqual(finals[0].map((p) => [p.timestamp, p.x, p.y]), finals[1].map((p) => [p.timestamp, p.x, p.y]));
 });
 
 test('steps are detected from 50 Hz vertical acceleration (2 steps/s for 60 s)', () => {
