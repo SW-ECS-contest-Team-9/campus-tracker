@@ -107,3 +107,64 @@ final class ActiveCollectionStore {
         }
     }
 }
+
+/// Durable high-water mark per sensor stream, separate from `ActiveCollectionState` (which is
+/// debounced to disk every ~1s and so can lose the last second of sequence advances on a crash).
+/// `ensureLeased` writes synchronously, but only once per `leaseBlockSize` sequences, so a crash
+/// can never cause a *resumed* session to reuse a sequence number an earlier process already
+/// issued — it can only skip ahead by up to one block.
+struct SequenceLease: Codable {
+    var location = 0
+    var motion = 0
+    var altimeter = 0
+    var pedometer = 0
+}
+
+final class SequenceLeaseStore {
+    private let leaseBlockSize: Int
+    private let directory: URL
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+
+    /// `directoryOverride` exists so tests can point this at an isolated temporary directory
+    /// instead of the app's real Application Support folder.
+    init(fileManager: FileManager = .default, leaseBlockSize: Int = 200, directoryOverride: URL? = nil) {
+        self.leaseBlockSize = leaseBlockSize
+        if let directoryOverride {
+            directory = directoryOverride
+        } else {
+            let support = (try? fileManager.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )) ?? fileManager.temporaryDirectory
+            directory = support.appendingPathComponent("CampusCollector", isDirectory: true).appendingPathComponent("sequence_leases", isDirectory: true)
+        }
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+
+    private func url(for sessionId: UUID) -> URL { directory.appendingPathComponent("\(sessionId.uuidString).json") }
+
+    func load(sessionId: UUID) -> SequenceLease {
+        guard let data = try? Data(contentsOf: url(for: sessionId)),
+              let lease = try? decoder.decode(SequenceLease.self, from: data) else {
+            return SequenceLease()
+        }
+        return lease
+    }
+
+    /// Call with the sequence number about to be issued for `stream`, before using it. Advances
+    /// and durably persists the lease boundary the moment the counter would reach it.
+    func ensureLeased(sessionId: UUID, stream: WritableKeyPath<SequenceLease, Int>, nextSequence: Int) {
+        var lease = load(sessionId: sessionId)
+        guard nextSequence >= lease[keyPath: stream] else { return }
+        lease[keyPath: stream] = nextSequence + leaseBlockSize
+        guard let data = try? encoder.encode(lease) else { return }
+        try? data.write(to: url(for: sessionId), options: .atomic)
+    }
+
+    func clear(sessionId: UUID) {
+        try? FileManager.default.removeItem(at: url(for: sessionId))
+    }
+}

@@ -88,6 +88,65 @@ function errors(s: FusionStateV4, outputs: FusedOutput[], truth: { t: number; x:
 }
 const rms = (v: number[]) => Math.sqrt(v.reduce((a, b) => a + b * b, 0) / v.length);
 
+test('provisional Z uses the best vertical accuracy, preserves barometric rise, and survives replay', () => {
+  const gps = (t: number, height: number, accuracy: number): Observation => ({
+    kind: 'gps', t: T0 + t, seq: t, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: height, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1,
+  });
+  const { s, outputs } = run([
+    { kind: 'altimeter', t: T0, seq: 0, relativeAltitude: 10 },
+    gps(0, 100, 40),
+    { kind: 'altimeter', t: T0 + 1000, seq: 1, relativeAltitude: 12 },
+    gps(2000, 110, 25),
+    gps(3000, 150, 35),
+    { kind: 'altimeter', t: T0 + 4000, seq: 2, relativeAltitude: 13 },
+    gps(5000, 150, 35),
+  ]);
+  assert.equal(outputs[0].ellipsoidalAltitude, 100);
+  assert.equal(outputs[0].zDatumSource, 'GPS_FALLBACK');
+  assert.equal(outputs[0].zDatumSigma, 40);
+  const last = outputs.at(-1)!;
+  assert.equal(last.ellipsoidalAltitude, 111); // best fix at Z=2, then one more meter
+  assert.equal(last.z, 3);
+  assert.equal(last.zDatumSigma, 25);
+  const replay = finalizeFusionV4(s, cfg).outputs;
+  assert.ok(replay.length > 0);
+  assert.ok(replay.every((o) => o.zDatumSource === 'GPS_FALLBACK' && o.zDatumSigma === 25));
+  assert.equal(s.smoothed!.datumSource, 'GPS_FALLBACK');
+  assert.equal(replay.at(-1)!.ellipsoidalAltitude, 111);
+});
+
+test('provisional Z ignores invalid/pre-session heights and does not require horizontal acceptance', () => {
+  const s = createFusionStateV4();
+  const gps = (t: number, height: number | null, accuracy: number | null, extra = {}) => processObservationV4(s, {
+    kind: 'gps', t: T0 + t, seq: t, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: height, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1, ...extra,
+  }, cfg);
+  for (const [i, accuracy] of [null, -1, 0, NaN, Infinity].entries()) {
+    const out = gps(i * 1000, 100, accuracy).outputs.at(-1)!;
+    assert.equal(out.ellipsoidalAltitude, null);
+    assert.equal(out.zDatumSource, 'NONE');
+  }
+  gps(5000, null, 1);
+  gps(6000, NaN, 1);
+  gps(7000, 999, 1, { preSession: true });
+  assert.equal(s.bestGpsDatum, undefined);
+  const out = gps(8000, 120, 25, { horizontalAccuracy: cfg.gpsMaxAccuracyM + 1 }).outputs.at(-1)!;
+  assert.equal(out.gpsUsed, false);
+  assert.equal(out.ellipsoidalAltitude, 120);
+  assert.equal(out.zDatumSource, 'GPS_FALLBACK');
+});
+
+test('a trusted GPS datum replaces provisional Z', () => {
+  const { outputs } = run([30, 8].map((accuracy, i): Observation => ({
+    kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: 100 + i, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1,
+  })));
+  assert.equal(outputs[0].zDatumSource, 'GPS_FALLBACK');
+  assert.equal(outputs[1].zDatumSource, 'GPS');
+  assert.equal(outputs[1].ellipsoidalAltitude, 101);
+});
+
 test('steps are detected from 50 Hz vertical acceleration (2 steps/s for 60 s)', () => {
   const { obs } = simulate([{ durationS: 60, headingDeg: 0, walking: true }]);
   const { s } = run(obs);

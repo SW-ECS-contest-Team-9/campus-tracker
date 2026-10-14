@@ -36,6 +36,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>ARKit 기반 이동 경로(VIO)를 수집하기 위해 카메라를 사용합니다. 영상은 저장되거나 전송되지 않으며, 카메라 pose 값만 서버로 전송됩니다.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>건강 앱의 걷기 보폭을 이용해 이동거리 추정의 초기값을 보정합니다. 개별 건강 기록 대신 보폭 요약이 추적 서버로 전송됩니다. 연결하지 않아도 기록할 수 있습니다.</string>
 	<key>NSLocalNetworkUsageDescription</key>

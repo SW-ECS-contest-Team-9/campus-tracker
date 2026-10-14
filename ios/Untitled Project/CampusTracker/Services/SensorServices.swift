@@ -44,10 +44,15 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.pausesLocationUpdatesAutomatically = true
     }
 
+    /// `profile`/`distanceFilter` are accepted (and still recorded in `sensorCapabilities` as the
+    /// requested values) but no longer change what's actually applied: collection always runs at
+    /// `kCLLocationAccuracyBestForNavigation` with no distance filter, regardless of profile. A
+    /// lower accuracy or a non-zero filter must never ship for a collection session — not from a
+    /// profile choice, not from a resumed/crash-recovered session carrying an old profile value.
     func start(profile: LocationCollectionProfile, distanceFilter: CLLocationDistance) {
         manager.activityType = .fitness
-        manager.desiredAccuracy = profile.desiredAccuracy
-        manager.distanceFilter = distanceFilter
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        manager.distanceFilter = kCLDistanceFilterNone
         manager.pausesLocationUpdatesAutomatically = false
         manager.allowsBackgroundLocationUpdates = true
         manager.showsBackgroundLocationIndicator = true
@@ -70,6 +75,21 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         guard manager.authorizationStatus == .authorizedWhenInUse else { return }
         manager.requestAlwaysAuthorization()
     }
+
+    /// Proactive, ahead-of-Start permission request — separate from `start()`'s own fallback
+    /// request so the system prompt appears when the app opens, not when the user taps Start.
+    func requestWhenInUseAuthorizationIfNeeded() {
+        guard manager.authorizationStatus == .notDetermined else { return }
+        manager.requestWhenInUseAuthorization()
+    }
+
+    // A one-session "Precise Location" upgrade via `requestTemporaryFullAccuracyAuthorization(withPurposeKey:)`
+    // is intentionally NOT implemented here: it requires an `NSLocationTemporaryUsageDescriptionDictionary`
+    // entry in Info.plist (a single dictionary keyed by purpose string), which the available
+    // Info.plist tooling in this environment cannot express (its `dictionaryArray` option writes
+    // an array of dicts, not a dict — the wrong shape, which would make the call fail/crash at
+    // runtime). Until that Info.plist key is added directly in Xcode, reduced accuracy is only
+    // surfaced as a warning with a link to Settings (see `CollectionCoordinator`/`ContentView`).
 
     func stop() {
         manager.stopUpdatingLocation()
@@ -233,7 +253,12 @@ enum SensorCapabilityDetector {
         locationAuthorization: String? = nil,
         locationAccuracyAuthorization: String? = nil,
         backgroundLocationUpdates: Bool? = nil,
-        pausesLocationUpdatesAutomatically: Bool? = nil
+        pausesLocationUpdatesAutomatically: Bool? = nil,
+        locationDesiredAccuracy: String? = nil,
+        locationDistanceFilterMeters: Double? = nil,
+        locationActivityType: String? = nil,
+        locationRequestedProfile: String? = nil,
+        arkitEnabled: Bool? = nil
     ) -> SensorCapabilities {
         SensorCapabilities(
             locationAvailable: CLLocationManager.locationServicesEnabled(),
@@ -249,7 +274,12 @@ enum SensorCapabilityDetector {
             locationAuthorization: locationAuthorization,
             locationAccuracyAuthorization: locationAccuracyAuthorization,
             backgroundLocationUpdates: backgroundLocationUpdates,
-            pausesLocationUpdatesAutomatically: pausesLocationUpdatesAutomatically
+            pausesLocationUpdatesAutomatically: pausesLocationUpdatesAutomatically,
+            locationDesiredAccuracy: locationDesiredAccuracy,
+            locationDistanceFilterMeters: locationDistanceFilterMeters,
+            locationActivityType: locationActivityType,
+            locationRequestedProfile: locationRequestedProfile,
+            arkitEnabled: arkitEnabled
         )
     }
 }

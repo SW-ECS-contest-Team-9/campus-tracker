@@ -16,6 +16,16 @@ nonisolated struct SensorCapabilities: Codable, Sendable {
     var locationAccuracyAuthorization: String?
     var backgroundLocationUpdates: Bool?
     var pausesLocationUpdatesAutomatically: Bool?
+    /// Actually-applied location request settings (always BestForNavigation / no distance filter
+    /// during collection — see `LocationService.start`), recorded here so the server can confirm
+    /// every session used the same request regardless of what `locationRequestedProfile` asked for.
+    var locationDesiredAccuracy: String?
+    var locationDistanceFilterMeters: Double?
+    var locationActivityType: String?
+    /// The profile the user picked, which no longer affects `locationDesiredAccuracy` above —
+    /// kept only so a session can still show what was selected in the (now informational) UI.
+    var locationRequestedProfile: String?
+    var arkitEnabled: Bool?
 
     var pedometerAvailable: Bool {
         stepCountingAvailable || distanceAvailable || floorCountingAvailable || paceAvailable || cadenceAvailable

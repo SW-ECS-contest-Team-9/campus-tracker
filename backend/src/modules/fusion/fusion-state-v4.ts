@@ -28,12 +28,12 @@ export interface HeadingSegmentV4 { id: number; startT: number; reason: string; 
 /** Ground contact: orthometric zero offset b = DEM + phone height - barometric Z, at time t. */
 export interface ContactV4 { t: number; offset: number; variance: number }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'GPS'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'GPS' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
 export interface SmoothedSummaryV4 {
-  datumSource: 'TERRAIN' | 'GPS' | 'NONE';
+  datumSource: DatumV4['source'] | 'NONE';
   contacts: number;
   datumSigma: number | null;
   driftRangeM: number | null;
@@ -129,6 +129,8 @@ export interface FusionStateV4 {
   altWindow: { t: number; z: number }[];
   zLog: { t: number; z: number }[];
   datumSamples: number[];
+  /** Best reported vertical accuracy, used provisionally only when no trusted datum exists. */
+  bestGpsDatum?: { b: number; accuracy: number };
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];

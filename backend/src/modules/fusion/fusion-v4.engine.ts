@@ -17,7 +17,8 @@
  *             RTS backward pass, re-weights GPS by robust residuals (3 iterations). This is the stored result.
  *  - height:  barometer relative Z + a zero b(t). With the campus DEM (rev 2): b comes from ground contacts
  *             (walking outdoors = ground + phone height), smoothed as a slow random walk (weather drift);
- *             fallback = GPS heights consistent with the ground, then the GPS median (no DEM).
+ *             fallback = GPS heights consistent with the ground, then the GPS median (no DEM), then
+ *             the valid GPS height with the smallest reported vertical error as a provisional datum.
  */
 import { localToWgs84 } from '../../geo/local-to-wgs84.js';
 import { wgs84ToLocal } from '../../geo/wgs84-to-local.js';
@@ -606,6 +607,12 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
   if (o.preSession) return rejectGps(s, o, 'PRE_SESSION', r);
   const acc = o.horizontalAccuracy;
   if (!finite(acc) || acc <= 0 || !Number.isFinite(o.latitude) || !Number.isFinite(o.longitude)) return rejectGps(s, o, 'INVALID_ACCURACY', r);
+  // Vertical quality is independent of the horizontal acceptance gate. Keep the barometric offset
+  // at capture time, so choosing a later, better fix does not erase the climb since the start.
+  if (finite(o.ellipsoidalAltitude) && finite(o.verticalAccuracy) && o.verticalAccuracy > 0
+    && (!s.bestGpsDatum || o.verticalAccuracy < s.bestGpsDatum.accuracy)) {
+    s.bestGpsDatum = { b: o.ellipsoidalAltitude - (s.z ?? 0), accuracy: o.verticalAccuracy };
+  }
   if (acc > c.gpsMaxAccuracyM) return rejectGps(s, o, 'UNUSABLE_ACCURACY', r);
   const sigma = Math.max(acc, c.gpsSigmaFloorM);
   if (finite(o.ellipsoidalAltitude) && finite(o.verticalAccuracy) && o.verticalAccuracy > 0 && o.verticalAccuracy <= c.datumMaxVerticalAccuracyM) {
@@ -711,10 +718,14 @@ function consistentContacts(contacts: ContactV4[], c: FusionConfigV4): ContactV4
 function gpsDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
   const values = s.terrain ? s.gpsOffsets : s.datumSamples;
   const m = median(values);
-  if (m === null) return null;
-  const mad = median(values.map((v) => Math.abs(v - m)))!;
-  if (s.terrain && (values.length < c.gpsDatumMinSamples || mad > c.gpsDatumMaxMadM)) return null;
-  return { b: m, sigma: Math.max(3, (1.4826 * mad) / Math.sqrt(values.length)), source: 'GPS', frame: s.terrain ? 'ORTHO' : 'ELLIPSOIDAL' };
+  if (m !== null) {
+    const mad = median(values.map((v) => Math.abs(v - m)))!;
+    if (!s.terrain || (values.length >= c.gpsDatumMinSamples && mad <= c.gpsDatumMaxMadM)) {
+      return { b: m, sigma: Math.max(3, (1.4826 * mad) / Math.sqrt(values.length)), source: 'GPS', frame: s.terrain ? 'ORTHO' : 'ELLIPSOIDAL' };
+    }
+  }
+  const best = s.bestGpsDatum;
+  return best ? { b: best.b, sigma: Math.max(3, best.accuracy), source: 'GPS_FALLBACK', frame: 'ELLIPSOIDAL' } : null;
 }
 
 /** Realtime zero: the recent consistent ground contacts, else GPS. */
@@ -782,6 +793,7 @@ function output(
     ortho = z + datum.b;
     ellipsoidal = s.terrain ? ortho + s.terrain.geoidSeparation : null;
   } else if (datum) ellipsoidal = z + datum.b;
+  if (ortho === null && ellipsoidal !== null && s.terrain) ortho = ellipsoidal - s.terrain.geoidSeparation;
   let terrainHeight: number | null = null;
   let building: { buildingId: string; name: string | null } | null = null;
   if (s.terrain) {
@@ -1027,7 +1039,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   const fallbackDatum = terrainDatum ? null : gpsDatum(s, c);
   const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallbackDatum);
   s.smoothed = {
-    datumSource: terrainDatum ? 'TERRAIN' : fallbackDatum ? 'GPS' : 'NONE',
+    datumSource: terrainDatum ? 'TERRAIN' : fallbackDatum?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
     datumSigma: terrainDatum ? terrainDatum.sigma : (fallbackDatum?.sigma ?? null),
     driftRangeM: terrainDatum ? terrainDatum.driftRange : null,

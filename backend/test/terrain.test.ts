@@ -112,8 +112,25 @@ test('v4 + terrain: GPS heights far from the ground are not used as the zero', (
   const ctx = slopeTerrain();
   const s = createFusionStateV4();
   // standing still: no ground contacts; the GPS ellipsoidal height 150 m is ~27 m above ground + phone (H = 126.6)
-  for (const o of walk(ctx, 1).filter((x) => x.kind === 'gps' || x.kind === 'altimeter')) processObservationV4(s, o, cfg);
+  for (const o of walk(ctx, 4).filter((x) => x.kind === 'gps' || x.kind === 'altimeter')) processObservationV4(s, o, cfg);
   assert.equal(s.gpsOffsets.length, 0);
+  assert.equal(s.bestGpsDatum?.accuracy, 30); // kept separately as a provisional fallback
+});
+
+test('v4 + terrain: provisional GPS Z is available immediately, then yields to consistent ground-compatible GPS', () => {
+  const s = createFusionStateV4();
+  const ctx = slopeTerrain();
+  for (let i = 0; i < 4; i++) {
+    const h = i === 0 ? 150 : 100 + cfg.phoneHeightM + ctx.geoidSeparation;
+    const out = processObservationV4(s, {
+      kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+      altitude: null, ellipsoidalAltitude: h, horizontalAccuracy: 8, verticalAccuracy: i === 0 ? 30 : 8,
+      speed: -1, course: -1, terrainContext: ctx,
+    }, cfg).outputs.at(-1)!;
+    assert.equal(out.ellipsoidalAltitude, h);
+    assert.equal(out.zDatumSource, i < 3 ? 'GPS_FALLBACK' : 'GPS');
+    assert.ok(Math.abs(out.heightAboveGround! - (h - ctx.geoidSeparation - out.terrainHeight!)) < 1e-6);
+  }
 });
 
 test('terrain.buildingAt: inside a footprint and distance to the nearest edge', () => {

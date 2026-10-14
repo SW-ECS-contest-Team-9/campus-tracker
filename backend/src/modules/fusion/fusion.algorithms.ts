@@ -191,7 +191,7 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   //    confirmed stair classification is separated from barometric vertical-motion detection.
   // 7: optional time-based step signal (stepTimeBased, off in the registered config) + heading-fit-pending diagnostics —
   //    outputs of the registered config are identical to rev 6.
-  revision: 7,
+  revision: 8, // provisional absolute Z from the best vertical-accuracy GPS fix when no trusted datum exists
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

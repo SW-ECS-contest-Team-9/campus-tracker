@@ -24,6 +24,17 @@ test('height: no datum => "미확정", no floor, and the relative Z is not prese
   assert.match(relativeAltitudeLabel('fusion-v2.1'), /원시/);
 });
 
+test('height: provisional GPS Z is drawn at its absolute estimate, with uncertainty and no floor claim', () => {
+  const p = { ellipsoidalAltitude: 120, terrainHeight: 90, zDatumSource: 'GPS_FALLBACK', zDatumSigma: 25 };
+  const h = describeFusedHeight(p);
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /25.0 m/);
+  assert.match(h.datum, /수직 오차가 가장 작은/);
+  assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 97, kind: 'ABSOLUTE' });
+});
+
 test('height: a track is split where the datum appears, without a hole in the line', () => {
   const p = (e: number | null) => ({ ellipsoidalAltitude: e, terrainHeight: 90 });
   const runs = splitByAbsoluteHeight([p(null), p(null), p(100), p(101), p(null)]);

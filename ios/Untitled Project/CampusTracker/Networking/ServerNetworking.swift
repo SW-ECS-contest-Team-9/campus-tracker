@@ -34,6 +34,11 @@ struct ServerConfiguration: Codable, Equatable {
         return components.url
     }
 
+    /// Identifies "which server" a queued upload belongs to, independent of login state. Used to
+    /// hold local data recorded against a server the app is no longer pointed at, rather than
+    /// silently uploading it to whatever server is configured now (see `UploadOwner`).
+    var ownerKey: String { "\(scheme.rawValue)://\(host.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()):\(port)" }
+
     var validationError: String? {
         let trimmedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedHost.isEmpty else { return "Enter a server address." }
@@ -201,8 +206,18 @@ enum WebSocketConnectionState: Equatable {
     }
 }
 
+/// The transport surface `TelemetrySyncCoordinator` actually depends on, extracted so tests can
+/// drive the sync/queue state machine with a mock transport instead of a real WebSocket.
+protocol CollectorSocket: AnyObject {
+    var state: WebSocketConnectionState { get }
+    var onConnected: (() -> Void)? { get set }
+    var onDisconnected: (() -> Void)? { get set }
+    var onTextMessage: ((String) -> Void)? { get set }
+    func send(text: String, completion: @escaping (Error?) -> Void)
+}
+
 /// Standard RFC 6455 WebSocket transport using Foundation only.
-final class RawWebSocketConnectionManager: NSObject, ObservableObject {
+final class RawWebSocketConnectionManager: NSObject, ObservableObject, CollectorSocket {
     @Published private(set) var state: WebSocketConnectionState = .disconnected
 
     var onConnected: (() -> Void)?

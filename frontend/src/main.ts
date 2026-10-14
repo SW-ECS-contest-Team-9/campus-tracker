@@ -468,7 +468,7 @@ function fusedRows(f: FusedPosition) {
           row('Ground (DEM, MSL)', num(f.terrainHeight, 1, ' m')),
           row('Above ground', f.heightAboveGround != null ? `<b>${f.heightAboveGround.toFixed(1)} m</b>` : '– (절대 고도 없음)'),
           row('Building (지도상 위치)', esc(f.buildingName ?? '– (outside footprints)')),
-          row('Floor (calibrated)', height.floorAllowed ? esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)') : '– (절대 고도 미확정: 층을 정할 수 없음)'),
+          row('Floor (calibrated)', height.floorAllowed ? esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)') : '– (절대 고도 미확정 또는 임시 기준: 층을 정할 수 없음)'),
         ]
       : []),
     row(esc(relativeAltitudeLabel(f.algorithmVersion)), num(f.relativeAltitude ?? null, 2, ' m')),
