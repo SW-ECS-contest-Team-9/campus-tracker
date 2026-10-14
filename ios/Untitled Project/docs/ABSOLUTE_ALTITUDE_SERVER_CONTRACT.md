@@ -13,6 +13,8 @@ The iOS collector stores absolute-altitude observations locally regardless of se
 
 An absent array or absent feature means “do not transmit.” Existing telemetry streams continue to upload. The client keeps the absolute-altitude raw rows unbatched and forces a new session handshake after restart while held rows remain.
 
+Once the ACK lists the feature, the rows held so far are released and every later regular batch carries the absolute-altitude rows together with the other streams, so the server's realtime fusion receives them while the session is still collecting (not only after `session:finish`). The decision lives in memory: after a relaunch, re-activating a recording session repeats `session:start` before new batches may carry the stream.
+
 ## Telemetry batch
 
 `telemetry:batch.payload` may contain this optional array:

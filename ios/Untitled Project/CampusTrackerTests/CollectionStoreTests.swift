@@ -169,6 +169,30 @@ struct CollectionCoreTests {
         #expect(relativeSample.relativeAltitude == 2.5)
     }
 
+    @Test func confirmedAbsoluteAltitudeRidesInRegularBatchesWhileRecording() async throws {
+        var configuration = CollectionCoreConfiguration()
+        configuration.batchInterval = 0.05
+        let (core, store, _) = core("CoreAbsoluteAltitudeUpload", configuration: configuration)
+        let session = TestFixture.session()
+        let contexts = try await begin(core, session, streams: [.altimeter, .absoluteAltitude])
+        core.enableAbsoluteAltitudeUpload(sessionID: session.id)
+        let relative = AltimeterCapture(nativeTimestamp: 101, relativeAltitude: 0.5, pressure: 100.2)
+        let absolute = AbsoluteAltitudeCapture(nativeTimestamp: 101.2, altitude: 151.25, accuracy: 4.5, precision: 0.5)
+        core.submit(TestFixture.captured(.altimeter(relative)), context: contexts[.altimeter]!)
+        core.submit(TestFixture.captured(.absoluteAltitude(absolute)), context: contexts[.absoluteAltitude]!)
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        core.waitUntilIdleForTesting()
+        // batched by the recording timer, not held until the session ends
+        let rows = try store.sync { try $0.rawRows(sessionID: session.id) }
+        #expect(rows.count == 2)
+        #expect(rows.allSatisfy { $0.batchID != nil })
+        #expect(Set(rows.compactMap(\.batchID)).count == 1, "same batch as the relative altimeter sample")
+        #expect(try store.sync { try $0.heldAbsoluteAltitudeCount(sessionID: session.id.uuidString) } == 0)
+        let result = try await awaitCore { core.beginStop(reason: "user_stop", completion: $0) }.get()
+        #expect(result.manifest.absoluteAltitude == 1)
+        #expect(try store.sync { try $0.heldAbsoluteAltitudeCount(sessionID: session.id.uuidString) } == 0)
+    }
+
     @Test func stopDrainsEveryAdmittedCallbackAndRejectsLateOnes() async throws {
         let (core, store, _) = core("CoreStop")
         let session = TestFixture.session()

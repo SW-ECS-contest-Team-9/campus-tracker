@@ -390,3 +390,29 @@ struct UploadEngineFairnessTests {
         #expect(engine.arkitBacklog(sessionID: session.id).count == 8)
     }
 }
+
+// MARK: - absoluteAltitudeV1 feature handshake
+
+@MainActor
+private final class SupportedSessions { var ids: [UUID] = [] }
+
+@MainActor
+struct AbsoluteAltitudeFeatureTests {
+    @Test func confirmedFeatureEnablesLiveUploadAndAResumedSessionAsksAgain() async throws {
+        let (socket, engine, _, session) = try await connectedEngine() // ACK without the feature (older server)
+        let confirmed = SupportedSessions()
+        engine.onAbsoluteAltitudeSupported = { confirmed.ids.append($0) }
+        // A resumed run after relaunch: the earlier decision is unknown, so the handshake repeats.
+        engine.activate(sessionID: session.id)
+        await waitUntil { socket.count("session:start") == 2 }
+        #expect(socket.count("session:start") == 2)
+        socket.ack(type: "session:start", ok: true,
+                   data: ["sessionId": "server-session-1", "supportedTelemetryFeatures": ["absoluteAltitudeV1"]])
+        await waitUntil { confirmed.ids == [session.id] }
+        #expect(confirmed.ids == [session.id])
+        // Once confirmed, activating the same session again does not repeat the handshake.
+        engine.activate(sessionID: session.id)
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        #expect(socket.count("session:start") == 2)
+    }
+}
