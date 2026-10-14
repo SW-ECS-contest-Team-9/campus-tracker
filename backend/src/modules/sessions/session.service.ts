@@ -80,6 +80,9 @@ function ownedOrThrow(identity: CollectorIdentity, session: SessionRow | null): 
   return session;
 }
 
+/** Optional telemetry streams this server stores (session:start ack). An app must not send a stream the server would drop. */
+export const SUPPORTED_TELEMETRY_FEATURES = ['absoluteAltitudeV1'] as const;
+
 export const sessionService = {
   /**
    * Loads a session owned by the authenticated collector, by server sessionId or by clientSessionId alone
@@ -148,7 +151,6 @@ export const sessionService = {
       collectorId: identity.collectorId,
       sessionId: session.id,
       clientSessionId: session.client_session_id,
-      supportedTelemetryFeatures: ['absoluteAltitudeV1'],
       status: session.status,
       startedAt: session.started_at,
       interrupted,
@@ -176,6 +178,8 @@ export const sessionService = {
       status: session.status,
       collectionState: session.status,
       resumed: !created,
+      // New and resumed sessions alike: the phone holds optional streams back until the server confirms them.
+      supportedTelemetryFeatures: [...SUPPORTED_TELEMETRY_FEATURES],
       strideCalibration: {
         status: session.stride_calibration_status,
         reason: session.stride_calibration_reason,

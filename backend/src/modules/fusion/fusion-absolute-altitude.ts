@@ -51,7 +51,10 @@ export function relativeHeightRunAt(tracker: AbsoluteAltitudeTracker, t: number)
     const r = tracker.runs[i];
     if (t >= r.from && (i === tracker.runs.length - 1 || t <= r.through)) return r;
   }
-  return undefined;
+  // Before the first barometer sample relative Z is the zero that sample starts from, as in the legacy policy.
+  // Only a gap between two runs is unknown movement.
+  const first = tracker.runs[0];
+  return first && t < first.from ? first : undefined;
 }
 
 export interface AbsoluteAltitudeDecision { reason: string; seq: number; runFrom: number | null; b?: number; sigma?: number }
