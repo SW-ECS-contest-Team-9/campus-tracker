@@ -149,6 +149,10 @@ nonisolated final class CollectionCore: @unchecked Sendable {
     private let lateDrops = CaptureDropCounter()
     private var eventHandler: (@Sendable (CollectionCoreEvent) -> Void)?
     private var run: ActiveRun?
+    /// Sessions whose server confirmed `absoluteAltitudeV1`. Their absolute-altitude rows ride in
+    /// the regular batches with the other streams, so realtime fusion sees them while collecting.
+    /// Without the confirmation the rows stay local (an older server would silently drop them).
+    private var absoluteAltitudeUploadSessions: Set<UUID> = []
     private let encoder = TrackingJSONCodec.makeEncoder()
     private let decoder = TrackingJSONCodec.makeDecoder()
 
@@ -291,6 +295,12 @@ nonisolated final class CollectionCore: @unchecked Sendable {
         }
     }
 
+    /// The server advertised `absoluteAltitudeV1` for this session (latest session:start ACK).
+    /// Applies to the next batch; rows held until now are released by the upload engine.
+    func enableAbsoluteAltitudeUpload(sessionID: UUID) {
+        queue.async { self.absoluteAltitudeUploadSessions.insert(sessionID) }
+    }
+
     /// App-state and power diagnostics owned by the MainActor, merged into the durable snapshot
     /// on the next commit.
     func updateHostDiagnostics(_ update: @escaping @Sendable (inout CollectionDiagnostics) -> Void) {
@@ -404,9 +414,10 @@ nonisolated final class CollectionCore: @unchecked Sendable {
                     snapshot.apply(intent)
                     try self.store.sync { try $0.persistStopIntent(intent, snapshot: snapshot) }
                 }
+                let includeAbsolute = self.absoluteAltitudeUploadSessions.contains(sessionID)
                 let batches = try self.store.sync { access in
                     try access.createTelemetryBatches(sessionID: sessionID, maximumSamples: self.configuration.batchCount,
-                                                      minimumSamples: 1) { batchID, rows in
+                                                      minimumSamples: 1, includeAbsoluteAltitude: includeAbsolute) { batchID, rows in
                         try self.encodeBatch(batchID: batchID, sessionID: sessionID, rows: rows)
                     }
                 }
@@ -862,9 +873,11 @@ nonisolated final class CollectionCore: @unchecked Sendable {
     private func createBatches(_ run: ActiveRun, minimum: Int) throws -> [UploadItemRecord] {
         dispatchPrecondition(condition: .onQueue(queue))
         let sessionID = run.sessionID
+        let includeAbsolute = absoluteAltitudeUploadSessions.contains(sessionID)
         let (items, remaining) = try store.sync { access -> ([UploadItemRecord], Int) in
             let items = try access.createTelemetryBatches(sessionID: sessionID, maximumSamples: configuration.batchCount,
-                                                          minimumSamples: minimum) { batchID, rows in
+                                                          minimumSamples: minimum,
+                                                          includeAbsoluteAltitude: includeAbsolute) { batchID, rows in
                 try self.encodeBatch(batchID: batchID, sessionID: sessionID, rows: rows)
             }
             return (items, try access.unbatchedTelemetryCount(sessionID: sessionID))

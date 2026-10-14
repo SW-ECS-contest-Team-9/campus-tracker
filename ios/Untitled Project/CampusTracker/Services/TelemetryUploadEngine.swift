@@ -65,6 +65,8 @@ final class TelemetryUploadEngine {
     var onHeldCountChanged: ((Int) -> Void)?
     var onUnsynchronizedCountChanged: ((Int) -> Void)?
     var onServerSessionStarted: ((UUID, String) -> Void)?
+    /// The latest session:start ACK lists `absoluteAltitudeV1`: new batches may carry that stream.
+    var onAbsoluteAltitudeSupported: ((UUID) -> Void)?
     var onStorageError: ((String) -> Void)?
 
     static let sessionRestartCodes: Set<String> = ["SESSION_NOT_FOUND", "SESSION_NOT_STARTED"]
@@ -180,6 +182,9 @@ final class TelemetryUploadEngine {
     /// Marks the live capture session (reconnect re-handshake + periodic collector status).
     func activate(sessionID: UUID) {
         activeSessionID = sessionID.uuidString
+        // After a process restart the feature decision is gone with the old process: ask again,
+        // otherwise a resumed session keeps every absolute-altitude row local until it finishes.
+        if !absoluteAltitudeSupportedSessions.contains(sessionID.uuidString), requireHandshake(sessionID.uuidString) { synchronize() }
         statusTimer?.invalidate()
         statusTimer = Timer.scheduledTimer(withTimeInterval: Self.statusIntervalSeconds, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.sendStatus() }
@@ -441,6 +446,7 @@ final class TelemetryUploadEngine {
                     if let uuid = UUID(uuidString: id) { self.onServerSessionStarted?(uuid, response.sessionId) }
                     if response.supportedTelemetryFeatures?.contains("absoluteAltitudeV1") == true {
                         self.absoluteAltitudeSupportedSessions.insert(id)
+                        if let uuid = UUID(uuidString: id) { self.onAbsoluteAltitudeSupported?(uuid) }
                         self.releaseAbsoluteAltitude(sessionID: id)
                     }
                     if id == self.activeSessionID { self.sendStatus() }
@@ -724,12 +730,18 @@ final class TelemetryUploadEngine {
         connectionGeneration &+= 1
         // A reconnect repeats session:start with the same clientSessionId so the server can
         // restore (rather than replace) the active session.
-        if let id = activeSessionID, sessions[id]?.serverSessionID != nil {
-            sessions[id]?.serverSessionID = nil
-            store.async({ try $0.setServerSessionID(nil, sessionID: id) }) { _ in }
-            print("[UploadEngine] reconnect handshake required clientSessionId=\(id)")
-        }
+        if let id = activeSessionID { requireHandshake(id) }
         synchronize()
+    }
+
+    /// The next pump sends session:start again (idempotent on the server) before this session's items.
+    @discardableResult
+    private func requireHandshake(_ id: String) -> Bool {
+        guard sessions[id]?.serverSessionID != nil else { return false }
+        sessions[id]?.serverSessionID = nil
+        store.async({ try $0.setServerSessionID(nil, sessionID: id) }) { _ in }
+        print("[UploadEngine] handshake required clientSessionId=\(id)")
+        return true
     }
 
     private func handleDisconnected() {

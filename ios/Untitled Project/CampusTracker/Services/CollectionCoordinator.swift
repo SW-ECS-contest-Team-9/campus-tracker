@@ -152,6 +152,9 @@ final class CollectionCoordinator: NSObject, ObservableObject {
             session.serverSessionId = serverSessionID
             self?.activeSession = session
         }
+        engine.onAbsoluteAltitudeSupported = { [weak self] localSessionID in
+            self?.core.enableAbsoluteAltitudeUpload(sessionID: localSessionID)
+        }
         uploadEngine = engine
         if let id = activeSession?.id { engine.activate(sessionID: id) }
     }
