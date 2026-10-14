@@ -32,7 +32,7 @@ import type { FusionConfigV4 } from './fusion.config.js';
 import { checkPedometerCounter, restartPedometerCounter } from './fusion.pedometer.js';
 import type { Observation } from './fusion.timeline.js';
 import type { FusedOutput, GpsRejectReason, PositionSource } from './fusion.types.js';
-import { createFusionStateV4, emptyWindowV4, type ContactV4, type DatumV4, type FusionStateV4 } from './fusion-state-v4.js';
+import { createFusionStateV4, emptyWindowV4, type ContactV4, type DatumV4, type FusionStateV4, type GpsHeightV4 } from './fusion-state-v4.js';
 import {
   applyPrediction,
   diag3,
@@ -326,7 +326,7 @@ function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4, 
   if (road) s.roadHeightContacts.push(road);
   // a slope may be a garage ramp below the DEM surface: like stairs, it is not a ground contact
   if (s.terrain && s.headingKnown && !vertical && s.z !== undefined) {
-    const k = groundContact(s, t, s.x, s.P, s.z, c);
+    const k = groundContact(s, t, s.x, s.P, s.z, c, undefined, c.provisionalDatumsEnabled ? s.looseContacts : undefined);
     if (k) s.contacts.push(k);
   }
 }
@@ -659,8 +659,13 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
     if (s.vehicleRun >= c.vehicleMinFixes) s.vehicle = true;
   }
   advance(s, o.t, c);
+  recordGpsHeight(s, o, s.x, c);
   if (c.stationaryHoldEnabled && s.stationary) return stationaryGps(s, o, p.x, p.y, sigma, c, r);
-  const u = gpsUpdate(s.x, s.P, p.x, p.y, sigma * sigma);
+  let u = gpsUpdate(s.x, s.P, p.x, p.y, sigma * sigma);
+  if (c.gpsAdaptiveSigmaEnabled) {
+    const scale = forwardGpsScale(s, u.d2, c);
+    if (scale > 1) u = gpsUpdate(s.x, s.P, p.x, p.y, (sigma * scale) ** 2);
+  }
   const innovation = Math.hypot(p.x - s.x[0], p.y - s.x[1]);
   const used = u.d2 <= c.gpsGateChi2;
   s.fixes.push({ t: o.t, seq: o.seq, x: p.x, y: p.y, accuracy: acc, sigma, vehicle: s.vehicle, forwardUsed: used });
@@ -709,24 +714,65 @@ function stationaryGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }
   if (s.counters.headingFits !== fits) s.stop = { x: s.x, P: s.P, fixes: [] };
 }
 
+/**
+ * rev 14: how much worse than reported the GPS around each fix is. iPhones report 14.2 m for most fixes whatever
+ * the real error, so the reported accuracy cannot tell a good stretch from a bad one; the residuals against the
+ * smoothed walk can. Median residual / sigma of the fixes within the window, relative to what good stretches
+ * show, clamped to [1, max]: a bad stretch weighs less and the steps carry the track through it.
+ */
+function localGpsScale(fixes: FusionStateV4['fixes'], residual: number[], c: FusionConfigV4): number[] {
+  const ratio = fixes.map((f, i) => residual[i] / f.sigma);
+  let lo = 0;
+  let hi = 0;
+  return fixes.map((f) => {
+    while (fixes[lo].t < f.t - c.gpsAdaptiveWindowMs) lo++;
+    while (hi < fixes.length && fixes[hi].t <= f.t + c.gpsAdaptiveWindowMs) hi++;
+    if (hi - lo < c.gpsAdaptiveMinFixes) return 1;
+    return Math.min(c.gpsAdaptiveMaxScale, Math.max(1, median(ratio.slice(lo, hi))! / c.gpsAdaptiveExpectedRatio));
+  });
+}
+
+/** Forward: the same scale from the recent normalized innovations (chi-square 2 dof: median 1.386). */
+function forwardGpsScale(s: FusionStateV4, d2: number, c: FusionConfigV4): number {
+  const scale = s.gpsNis.length >= c.gpsAdaptiveMinFixes
+    ? Math.min(c.gpsAdaptiveMaxScale, Math.max(1, Math.sqrt(median(s.gpsNis)! / 1.386)))
+    : 1;
+  s.gpsNis.push(d2);
+  if (s.gpsNis.length > c.gpsAdaptiveForwardFixes) s.gpsNis.shift();
+  return scale;
+}
+
 // ---------------------------------------------------------------------------------------------
 // outputs
 // ---------------------------------------------------------------------------------------------
 
 /** Ground contact: a trustworthy outdoor walking step gives b = DEM + phone height - barometric Z. */
-function groundContact(s: FusionStateV4, t: number, x: Vec3, P: Mat3, z: number, c: FusionConfigV4): ContactV4 | null {
+function groundContact(s: FusionStateV4, t: number, x: Vec3, P: Mat3, z: number, c: FusionConfigV4,
+  why?: Record<string, number>, loose?: ContactV4[]): ContactV4 | null {
   const ctx = s.terrain;
   if (!ctx || !s.origin) return null;
+  const no = (reason: string) => {
+    if (why) why[reason] = (why[reason] ?? 0) + 1;
+    return null;
+  };
   const sxy = sigmaXY(P);
-  if (!(sxy <= c.contactMaxPositionSigmaM)) return null;
+  if (!(sxy <= c.contactMaxPositionSigmaM)) return no('POSITION_SIGMA');
   const ll = localToWgs84(s.origin, { x: x[0], y: x[1], z: 0 });
   const g = tmForward(ll.latitude, ll.longitude);
   const ground = terrainModel.sampleXY(ctx, g.x, g.y);
-  if (!ground || ground.modified) return null;
+  if (!ground) return no('NO_DEM');
   const near = terrainModel.buildingAt(ctx, g.x, g.y);
-  if (near.building || near.distance < Math.max(c.contactBuildingClearanceM, sxy / 2)) return null;
+  if (near.building) return no('INSIDE_BUILDING');
+  if (near.distance < Math.max(c.contactBuildingClearanceM, sxy / 2)) return no('NEAR_BUILDING');
   const heightSigma = ground.sigma + sxy * ground.slope;
-  if (heightSigma > c.contactMaxHeightSigmaM) return null;
+  if (ground.modified || heightSigma > c.contactMaxHeightSigmaM) {
+    // rev 14: still outdoors on the ground, only less exactly: a wide contact for the provisional datum
+    if (loose && heightSigma <= c.looseContactMaxHeightSigmaM) {
+      const extra = ground.modified ? c.looseContactExtraSigmaM : 0;
+      loose.push({ t, offset: ground.height + c.phoneHeightM - z, variance: heightSigma ** 2 + c.phoneHeightSigmaM ** 2 + extra ** 2 });
+    }
+    return no(ground.modified ? 'MODIFIED_GROUND' : 'HEIGHT_SIGMA');
+  }
   return { t, offset: ground.height + c.phoneHeightM - z, variance: heightSigma ** 2 + c.phoneHeightSigmaM ** 2 };
 }
 
@@ -792,9 +838,9 @@ function terrainFallback(s: FusionStateV4, x: Vec3, sigma: number, z: number, c:
 }
 
 /** Trusted GPS wins over provisional DEM; provisional DEM wins over untrusted GPS. */
-function fallbackDatum(s: FusionStateV4, dem: DatumV4 | null, c: FusionConfigV4): DatumV4 | null {
+function fallbackDatum(s: FusionStateV4, dem: DatumV4 | null, c: FusionConfigV4, provisional: DatumV4 | null = null): DatumV4 | null {
   const gps = gpsDatum(s, c);
-  return gps?.source === 'GPS' ? gps : s.mapStartDatum ?? dem ?? gps;
+  return gps?.source === 'GPS' ? gps : s.mapStartDatum ?? provisional ?? dem ?? gps;
 }
 
 /** Evaluate start materials once; relative barometric movement then continues from this fixed zero. */
@@ -810,6 +856,79 @@ function mapStartDatum(s: FusionStateV4, x: Vec3, sigma: number, z: number, c: F
 }
 
 /** Realtime zero: outdoor contacts, trusted GPS, fixed provisional DEM, then provisional GPS. */
+/** Ground height and footprint under a local position (rev 14 GPS height plausibility). */
+function groundUnder(s: FusionStateV4, x: Vec3): { ground: number | null; inside: boolean } {
+  if (!s.terrain || !s.origin) return { ground: null, inside: false };
+  const ll = localToWgs84(s.origin, { x: x[0], y: x[1], z: 0 });
+  const g = tmForward(ll.latitude, ll.longitude);
+  const sample = terrainModel.sampleXY(s.terrain, g.x, g.y);
+  return { ground: sample && finite(sample.height) ? sample.height : null, inside: terrainModel.buildingAt(s.terrain, g.x, g.y).building !== null };
+}
+
+function recordGpsHeight(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, x: Vec3, c: FusionConfigV4) {
+  if (!c.provisionalDatumsEnabled || !s.terrain || s.z === undefined) return;
+  // iPhone: verticalAccuracy <= 0 means "no altitude" and the ellipsoidal height is then 0
+  if (!finite(o.ellipsoidalAltitude) || !finite(o.verticalAccuracy) || o.verticalAccuracy <= 0) return;
+  s.gpsHeights.push({ t: o.t, H: o.ellipsoidalAltitude - s.terrain.geoidSeparation, hacc: o.horizontalAccuracy!, z: s.z, ...groundUnder(s, x) });
+}
+
+/** Median of the values left after three passes of trimming at max(3 robust sigma, minTrim). */
+function robustCentre<T>(items: T[], value: (v: T) => number, minTrimM: number) {
+  let keep = items;
+  for (let i = 0; i < 3 && keep.length; i++) {
+    const m = median(keep.map(value))!;
+    const mad = median(keep.map((v) => Math.abs(value(v) - m)))!;
+    keep = keep.filter((v) => Math.abs(value(v) - m) <= Math.max(3 * 1.4826 * mad, minTrimM));
+  }
+  if (!keep.length) return null;
+  const m = median(keep.map(value))!;
+  return { keep, m, mad: median(keep.map((v) => Math.abs(value(v) - m)))! };
+}
+
+/** Wide ground contacts (modified ground): one offset when enough of them agree over a long enough walk. */
+function looseDatum(contacts: ContactV4[], c: FusionConfigV4): DatumV4 | null {
+  const thinned = thinContacts(contacts, c);
+  if (thinned.length < c.looseContactMinCount) return null;
+  const r = robustCentre(thinned, (k) => k.offset, 4);
+  if (!r || r.keep.length < c.looseContactMinCount || r.mad > c.looseContactMaxMadM) return null;
+  const ts = r.keep.map((k) => k.t);
+  if (Math.max(...ts) - Math.min(...ts) < c.looseContactMinSpanMs) return null;
+  return { b: r.m, sigma: Math.hypot(c.looseDatumMinSigmaM, 1.4826 * r.mad), source: 'TERRAIN_LOOSE', frame: 'ORTHO' };
+}
+
+/**
+ * GPS height - barometric Z is the datum itself and must stay constant: heights that are physically impossible
+ * for where the phone is (under the road, far above open ground) go first, then the ones that disagree with the
+ * rest. The survivors must be a large share and must have followed the barometer through a real climb.
+ */
+function baroGpsDatum(heights: GpsHeightV4[], c: FusionConfigV4): DatumV4 | null {
+  if (!heights.length) return null;
+  const plausible = heights.filter((h) => h.ground !== null && h.hacc <= c.baroGpsMaxAccuracyM
+    && h.H >= h.ground - (h.inside ? c.baroGpsBelowGroundInsideM : c.baroGpsBelowGroundM)
+    && h.H <= h.ground + c.phoneHeightM + (h.inside ? c.baroGpsAboveGroundInsideM : c.baroGpsAboveGroundM));
+  const r = robustCentre(plausible, (h) => h.H - h.z, 4);
+  if (!r || r.keep.length < c.baroGpsMinFixes || r.keep.length < c.baroGpsMinFraction * heights.length) return null;
+  const zs = r.keep.map((h) => h.z);
+  if (Math.max(...zs) - Math.min(...zs) < c.baroGpsMinZSpanM) return null;
+  return { b: r.m, sigma: Math.hypot(c.baroGpsMinSigmaM, 1.4826 * r.mad), source: 'GPS_BARO', frame: 'ORTHO' };
+}
+
+/** Both provisional datums: combined when they agree, otherwise the ground one (GPS heights can be biased). */
+function provisionalDatum(loose: DatumV4 | null, baro: DatumV4 | null): DatumV4 | null {
+  if (!loose || !baro) return loose ?? baro;
+  if (Math.abs(loose.b - baro.b) > 2 * Math.hypot(loose.sigma, baro.sigma)) return loose;
+  const wl = 1 / loose.sigma ** 2;
+  const wb = 1 / baro.sigma ** 2;
+  return { b: (loose.b * wl + baro.b * wb) / (wl + wb), sigma: Math.max(1.5, 1 / Math.sqrt(wl + wb)), source: 'TERRAIN_GPS', frame: 'ORTHO' };
+}
+
+function forwardProvisional(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
+  if (!c.provisionalDatumsEnabled) return null;
+  const key = `${s.looseContacts.length}/${s.gpsHeights.length}`;
+  if (s.provisionalCache?.key !== key) s.provisionalCache = { key, datum: provisionalDatum(looseDatum(s.looseContacts, c), baroGpsDatum(s.gpsHeights, c)) };
+  return s.provisionalCache.datum;
+}
+
 function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
   if (c.roadHeightAnchorsEnabled && s.roadHeightContacts.length) {
     return smoothDatum(s.roadHeightContacts.slice(-12), c, 'ROAD_ANCHOR').at(s.lastObservationT ?? s.roadHeightContacts.at(-1)!.t);
@@ -820,7 +939,7 @@ function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
     if (!s.terrainFallbackDatum && s.z !== undefined) {
       s.terrainFallbackDatum = terrainFallback(s, s.x, sigmaXY(s.P), s.z, c) ?? undefined;
     }
-    return fallbackDatum(s, s.terrainFallbackDatum ?? null, c);
+    return fallbackDatum(s, s.terrainFallbackDatum ?? null, c, forwardProvisional(s, c));
   }
   const recent = kept.slice(-12);
   const b = median(recent.map((k) => k.offset))!;
@@ -1117,7 +1236,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     const k = stopOf(f);
     if (k >= 0) perStop.set(k, (perStop.get(k) ?? 0) + 1);
   }
-  const fixSigma = s.fixes.map((f) => f.sigma * Math.sqrt(perStop.get(stopOf(f)) ?? 1));
+  const stopSigma = s.fixes.map((f) => f.sigma * Math.sqrt(perStop.get(stopOf(f)) ?? 1));
+  let fixSigma = stopSigma;
   for (let it = 0; it < c.smootherIterations; it++) {
     headings = segmentHeadings(s, weights, c);
     const events: SmootherEvent[] = [
@@ -1131,6 +1251,10 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     const residual = new Array<number>(s.fixes.length).fill(0);
     for (const p of smoothed.points) if (p.event.kind === 'fix') residual[p.event.index] = Math.hypot(p.x[0] - p.event.x, p.x[1] - p.event.y);
     weights = s.fixes.map((f, i) => 1 / (1 + (residual[i] / (c.smootherCauchyScale * f.sigma)) ** 2));
+    if (c.gpsAdaptiveSigmaEnabled) {
+      const scale = localGpsScale(s.fixes, residual, c);
+      fixSigma = stopSigma.map((v, i) => v * scale[i]);
+    }
     lastEvents = events;
   }
   // indoor stairs: the stair run went outside the building it starts and ends in -> soft anchors just inside, re-smooth
@@ -1168,14 +1292,18 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     return log[lo].z + ((log[hi].z - log[lo].z) * (t - log[lo].t)) / Math.max(log[hi].t - log[lo].t, 1);
   };
   const contacts: ContactV4[] = [];
+  const looseContacts: ContactV4[] = [];
+  const contactRejects: Record<string, number> = {};
   if (s.terrain) {
     let known = false;
     for (const p of points) {
       if (p.event.kind === 'segment') known = p.event.theta !== null;
-      if (p.event.kind !== 'step' || !known || p.event.stairs || p.event.slope || p.event.verticalUnknown) continue;
+      if (p.event.kind !== 'step') continue;
+      if (!known) { contactRejects.NO_HEADING = (contactRejects.NO_HEADING ?? 0) + 1; continue; }
+      if (p.event.stairs || p.event.slope || p.event.verticalUnknown) { contactRejects.VERTICAL_STEP = (contactRejects.VERTICAL_STEP ?? 0) + 1; continue; }
       const z = zAt(p.t);
       if (z === null) continue;
-      const k = groundContact(s, p.t, p.x, p.P, z, c);
+      const k = groundContact(s, p.t, p.x, p.P, z, c, contactRejects, c.provisionalDatumsEnabled ? looseContacts : undefined);
       if (k) contacts.push(k);
     }
   }
@@ -1207,11 +1335,23 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
       if (provisionalDem) break;
     }
   }
-  const fallback = terrainDatum ? null : fallbackDatum(s, provisionalDem, c);
+  // provisional datums on the smoothed track: ground and footprint under each GPS height re-read at the final XY
+  let provisional: DatumV4 | null = null;
+  if (!terrainDatum && c.provisionalDatumsEnabled && points.length) {
+    let k = 0;
+    const heights = s.gpsHeights.map((h) => {
+      while (k + 1 < points.length && points[k + 1].t <= h.t) k++;
+      return { ...h, z: zAt(h.t) ?? h.z, ...groundUnder(s, points[k].x) };
+    });
+    provisional = provisionalDatum(looseDatum(looseContacts, c), baroGpsDatum(heights, c));
+  }
+  const fallback = terrainDatum ? null : fallbackDatum(s, provisionalDem, c, provisional);
   const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallback);
   s.smoothed = {
     datumSource: terrainDatum ? (roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : fallback?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
+    contactCandidates: contacts.length,
+    contactRejects,
     datumSigma: terrainDatum ? terrainDatum.sigma : (fallback?.sigma ?? null),
     driftRangeM: terrainDatum ? terrainDatum.driftRange : null,
     gpsAccepted: accepted,

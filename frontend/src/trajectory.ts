@@ -30,11 +30,23 @@ export function heightOf(p: { altitude: number | null; ellipsoidalAltitude: numb
   return { h: 0, source: 'none' };
 }
 
+/**
+ * Raw GPS dots and line: drawn at the fused height of the same moment ('fused', default) or at the phone's own GPS
+ * height ('phone'). iPhone GPS heights sat 30-55 m under the terrain for minutes (vertical accuracy reported 3 m)
+ * while the barometer moved, so drawn at their own height the raw dots disappeared under the ground.
+ */
+export type RawHeightMode = 'fused' | 'phone';
+let rawHeightMode: RawHeightMode = 'fused';
+export const setRawHeightMode = (mode: RawHeightMode) => {
+  rawHeightMode = mode;
+};
+/** Fused points farther than this in time from a raw fix do not lend it their height. */
+const RAW_HEIGHT_MAX_GAP_MS = 120_000;
+
 function toCartesian(p: { longitude: number; latitude: number }, h: number) {
   // Always (longitude, latitude, height) — never swap.
   return Cesium().Cartesian3.fromDegrees(p.longitude, p.latitude, h);
 }
-const rawCartesian = (p: LocationPoint) => toCartesian(p, heightOf(p).h);
 /** "entrance floor +N" for a building + ellipsoidal height, from the building calibration (set by main.ts). */
 let floorLabel: (building: string | null | undefined, ellipsoidal: number | null | undefined) => string | null = () => null;
 export const setFloorLabel = (fn: typeof floorLabel) => {
@@ -202,7 +214,7 @@ export class SessionTrack {
       if (last && byCapture(p, last) < 0) outOfOrder = true;
       const dot = this.rawDots.add({
         id: { kind: 'raw', sessionId: this.sessionId, seq: p.sequence } satisfies PickId,
-        position: rawCartesian(p),
+        position: this.rawPosition(p),
         pixelSize: 6,
         color: C.Color.fromCssColorString(accuracyColor(p.horizontalAccuracy)).withAlpha(0.85),
         outlineColor: C.Color.BLACK.withAlpha(0.5),
@@ -214,7 +226,7 @@ export class SessionTrack {
     }
     if (added === 0) return 0;
     if (outOfOrder) this.points.sort(byCapture);
-    this.rawLine.polyline.positions = this.points.map(rawCartesian);
+    this.rawLine.polyline.positions = this.points.map((q) => this.rawPosition(q));
     for (const v of this.fusedLayers.keys()) this.redrawFused(v);
     this.applyGpsDecisions();
     return added;
@@ -222,6 +234,37 @@ export class SessionTrack {
 
   fused(version: string): FusedPosition[] {
     return this.fusedLayers.get(version)?.list ?? [];
+  }
+
+  /** Drawing height of a raw fix (see RawHeightMode): the nearest live fused point in time, else its own. */
+  rawHeight(p: LocationPoint): number {
+    const own = heightOf(p).h;
+    const list = rawHeightMode === 'fused' ? this.fusedLayers.get(this.liveVersion)?.list : undefined;
+    if (!list?.length) return own;
+    const t = Date.parse(p.timestamp);
+    let lo = 0;
+    let hi = list.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (Date.parse(list[mid].timestamp) <= t) lo = mid;
+      else hi = mid;
+    }
+    const near = [list[lo], list[hi]].reduce((a, b) => (Math.abs(Date.parse(b.timestamp) - t) < Math.abs(Date.parse(a.timestamp) - t) ? b : a));
+    if (Math.abs(Date.parse(near.timestamp) - t) > RAW_HEIGHT_MAX_GAP_MS) return own;
+    return fusedDisplayHeight(near, own, sceneHeight).h;
+  }
+
+  private rawPosition(p: LocationPoint) {
+    return toCartesian(p, this.rawHeight(p));
+  }
+
+  /** Raw dots and line again (the live fused track or the raw height mode changed). */
+  redrawRaw() {
+    for (const p of this.points) {
+      const dot = this.rawDotBySeq.get(p.sequence);
+      if (dot) dot.position = this.rawPosition(p);
+    }
+    this.rawLine.polyline.positions = this.points.map((q) => this.rawPosition(q));
   }
 
   setSpatialGpsDecisions(decisions: SpatialGpsDecision[], version = 'fusion-v3') {
@@ -276,7 +319,10 @@ export class SessionTrack {
     if (added) {
       l.list.sort((a, b) => a.fusionSequence - b.fusionSequence);
       this.redrawFused(version);
-      if (version === this.liveVersion) this.applyGpsDecisions();
+      if (version === this.liveVersion) {
+        this.applyGpsDecisions();
+        if (rawHeightMode === 'fused') this.redrawRaw();
+      }
     }
     return added;
   }
@@ -288,7 +334,10 @@ export class SessionTrack {
     l.seqs.clear();
     this.addFused(version, list);
     this.redrawFused(version);
-    if (version === this.liveVersion) this.applyGpsDecisions();
+    if (version === this.liveVersion) {
+      this.applyGpsDecisions();
+      if (rawHeightMode === 'fused') this.redrawRaw();
+    }
   }
 
   private fallbackHeight() {
@@ -458,7 +507,7 @@ export class SessionTrack {
   flyTo() {
     const C = Cesium();
     const h = this.fallbackHeight();
-    const positions = this.points.map(rawCartesian);
+    const positions = this.points.map((p) => this.rawPosition(p));
     for (const [version, l] of this.fusedLayers) if (this.versionVisible(version)) positions.push(...l.list.map((f) => fusedCartesian(f, h)));
     for (const e of this.markers.values()) positions.push(e.position.getValue(C.JulianDate.now()));
     if (positions.length === 0) return;
@@ -548,13 +597,17 @@ export class CollectorVisualization {
     // "latest" = newest sensor time: a recovered backlog point must not move the live marker backwards
     if (this.latestRaw && this.latestRaw.sessionId === p.sessionId && byCapture(p, this.latestRaw) <= 0) return;
     this.latestRaw = p;
-    const { h, source } = heightOf(p);
-    this.raw.position = rawCartesian(p);
+    const { h: own, source } = heightOf(p);
+    const f = this.latestFused;
+    const h = rawHeightMode === 'fused' && f && f.sessionId === p.sessionId && Math.abs(Date.parse(f.timestamp) - Date.parse(p.timestamp)) <= RAW_HEIGHT_MAX_GAP_MS
+      ? fusedDisplayHeight(f, own, sceneHeight).h
+      : own;
+    this.raw.position = toCartesian(p, h);
     const r = p.horizontalAccuracy != null && p.horizontalAccuracy > 0 ? p.horizontalAccuracy : 0;
     this.raw.ellipse.semiMajorAxis = Math.max(r, 0.1);
     this.raw.ellipse.semiMinorAxis = Math.max(r, 0.1);
     this.raw.ellipse.height = h;
-    this.raw.label.text = `${this.collectorId} raw  ${h.toFixed(1)} m${source === 'msl' ? ' MSL' : source === 'none' ? ' (no alt)' : ''}  ±${r.toFixed(1)} m`;
+    this.raw.label.text = `${this.collectorId} raw  ${own.toFixed(1)} m${source === 'msl' ? ' MSL' : source === 'none' ? ' (no alt)' : ''}${h !== own ? ' (융합 높이에 표시)' : ''}  ±${r.toFixed(1)} m`;
     this.apply();
   }
 

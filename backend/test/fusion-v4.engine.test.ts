@@ -192,6 +192,49 @@ test('confirmed mapped road passage corrects indoor Z retrospectively, preserves
   assert.deepEqual(finals[0].map((p) => [p.timestamp, p.x, p.y]), finals[1].map((p) => [p.timestamp, p.x, p.y]));
 });
 
+/** Flat 100 m DEM around ORIGIN whose cells are all modified (campus roads): no strict ground contact anywhere. */
+function roadTerrain(): TerrainContext {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  return { versionId: 't', grid: { originX: xy.x - 300, originY: xy.y - 300, resolution: 2, width: 300, height: 300 },
+    heights: new Float32Array(90000).fill(100), sigma: new Float32Array(90000).fill(1), modified: new Uint8Array(90000).fill(1),
+    geoidSeparation: 23, buildings: [] };
+}
+// 6 m down a stair from an upper entrance, then 100 s on the road: outdoors the phone is at 101 m (ellipsoidal 124)
+const ENTRANCE_WALK: Leg[] = [{ durationS: 60, headingDeg: 0, walking: true, vzMps: -0.1 }, { durationS: 100, headingDeg: 90, walking: true }];
+
+test('rev 14: walking on modified ground gives a loose ground datum instead of "the start is on the ground"', () => {
+  const terrain = roadTerrain();
+  const { obs } = simulate(ENTRANCE_WALK, { gpsSigma: 3, gpsAccuracy: 8 }); // GPS heights 90 + z: 40 m under the road
+  const finals = [false, true].map((enabled) => {
+    const c = { ...cfg, provisionalDatumsEnabled: enabled };
+    const s = createFusionStateV4();
+    for (const o of obs) processObservationV4(s, { ...o, terrainContext: terrain }, c);
+    return { s, out: finalizeFusionV4(s, c).outputs };
+  });
+  const road = (o: FusedOutput) => o.timestamp > T0 + 80_000;
+  assert.equal(finals[0].s.smoothed!.datumSource, 'TERRAIN_FALLBACK');
+  assert.ok(finals[0].out.filter(road).every((o) => o.ellipsoidalAltitude! < 120), 'rev 13 sank 6 m under the road');
+  assert.equal(finals[1].s.smoothed!.datumSource, 'TERRAIN_LOOSE'); // the GPS heights are impossible (under the road)
+  for (const o of finals[1].out.filter(road)) assert.ok(Math.abs(o.ellipsoidalAltitude! - 124) < 1.5, `${o.ellipsoidalAltitude}`);
+});
+
+test('rev 14: GPS heights that follow the barometer join the ground datum; heights stuck at one value do not', () => {
+  const terrain = roadTerrain();
+  const { obs } = simulate(ENTRANCE_WALK, { gpsSigma: 3, gpsAccuracy: 8 });
+  let n = 0;
+  const withHeights = obs.map((o) => {
+    if (o.kind !== 'gps') return o;
+    // true ellipsoidal height = 130 + z (+-1 m); every third fix is stuck at 112 with a 3 m vertical accuracy
+    const stuck = n++ % 3 === 0;
+    return { ...o, ellipsoidalAltitude: stuck ? 112 : o.ellipsoidalAltitude! + 40 + Math.sin(n), verticalAccuracy: stuck ? 3 : 10 };
+  });
+  const s = createFusionStateV4();
+  for (const o of withHeights) processObservationV4(s, { ...o, terrainContext: terrain }, cfg);
+  const out = finalizeFusionV4(s, cfg).outputs;
+  assert.equal(s.smoothed!.datumSource, 'TERRAIN_GPS');
+  for (const o of out.filter((p) => p.timestamp > T0 + 80_000)) assert.ok(Math.abs(o.ellipsoidalAltitude! - 124) < 1.5, `${o.ellipsoidalAltitude}`);
+});
+
 test('steps are detected from 50 Hz vertical acceleration (2 steps/s for 60 s)', () => {
   const { obs } = simulate([{ durationS: 60, headingDeg: 0, walking: true }]);
   const { s } = run(obs);

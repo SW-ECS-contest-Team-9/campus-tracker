@@ -33,14 +33,18 @@ export interface FixV4 {
 export interface HeadingSegmentV4 { id: number; startT: number; reason: string; firstStep: number }
 /** Ground contact: orthometric zero offset b = DEM + phone height - barometric Z, at time t. */
 export interface ContactV4 { t: number; offset: number; variance: number }
+export interface GpsHeightV4 { t: number; H: number; hacc: number; z: number; ground: number | null; inside: boolean }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
 export interface SmoothedSummaryV4 {
   datumSource: DatumV4['source'] | 'NONE';
   contacts: number;
+  /** rev 14: step-level ground contact candidates before the agreement check, and why the other steps were not */
+  contactCandidates?: number;
+  contactRejects?: Record<string, number>;
   datumSigma: number | null;
   driftRangeM: number | null;
   gpsAccepted: number;
@@ -152,6 +156,13 @@ export interface FusionStateV4 {
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];
+  /** rev 14: outdoor steps on modified DEM cells (roads, plazas) or steeper ground: wide ground contacts */
+  looseContacts: ContactV4[];
+  /** rev 14: GPS heights (orthometric) with the barometric Z and the ground under the position at that time */
+  gpsHeights: GpsHeightV4[];
+  provisionalCache?: { key: string; datum: DatumV4 | null };
+  /** rev 14: normalized innovations (reported sigma) of the recent fixes, for the adaptive GPS sigma */
+  gpsNis: number[];
   gpsOffsets: number[];
   datum?: DatumV4;
 
@@ -233,6 +244,9 @@ export function createFusionStateV4(context?: FusionSessionContext): FusionState
     zLog: [],
     datumSamples: [],
     contacts: [],
+    looseContacts: [],
+    gpsHeights: [],
+    gpsNis: [],
     roadHeightTracker: {},
     roadHeightContacts: [],
     gpsOffsets: [],

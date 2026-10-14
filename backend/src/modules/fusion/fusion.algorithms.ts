@@ -200,7 +200,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 8: best vertical-accuracy GPS fallback; 9: fixed provisional DEM datum + barometric changes indoors.
   // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
   // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
-  revision: 13, // motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes
+  // 13: motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes.
+  revision: 14, // provisional Z datums: loose ground contacts on modified ground + barometer-consistent GPS heights
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

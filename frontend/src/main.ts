@@ -34,6 +34,7 @@ import {
   describeFloor,
   setFloorLabel,
   setGeoidSeparation,
+  setRawHeightMode,
   SessionTrack,
   SpatialMapOverlay,
   accuracyColor,
@@ -383,6 +384,10 @@ function scheduleRender() {
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const num = (v: number | null | undefined, digits = 1, unit = '') => (v == null ? '–' : `${v.toFixed(digits)}${unit}`);
+/** Phone MSL altitude; Android fixes without one (no MSL from the provider) show ellipsoidal − geoid, marked as computed. */
+const mslText = (p: { altitude: number | null; ellipsoidalAltitude: number | null } | null | undefined) =>
+  p?.altitude != null || p?.ellipsoidalAltitude == null ? num(p?.altitude, 1, ' m')
+    : `${sceneHeight(p.ellipsoidalAltitude).toFixed(1)} m <span class="tag">계산: 타원체고 − 지오이드</span>`;
 function ago(iso: string | null) {
   if (!iso) return '–';
   const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
@@ -586,7 +591,7 @@ function renderCollectorDetail(el: HTMLElement, collectorId: string) {
     ${row('Session', `${esc(c.activeSessionId?.slice(0, 8) ?? '–')} ${c.collecting ? '(collecting)' : ''}`)}
     ${section('Raw GPS')}
     ${row('Lon / Lat', l ? `${l.longitude.toFixed(6)}, ${l.latitude.toFixed(6)}` : '–')}
-    ${row('Altitude (MSL)', num(l?.altitude, 1, ' m'))}
+    ${row('Altitude (MSL)', mslText(l))}
     ${row('Ellipsoidal', num(l?.ellipsoidalAltitude, 1, ' m'))}
     ${row('Map height', hs ? `${hs.h.toFixed(1)} m <span class="tag ${hs.source === 'none' ? 'warn' : ''}">${hs.source === 'msl' ? 'MSL' : hs.source === 'ellipsoidal' ? 'ellipsoidal − geoid' : 'no altitude'}</span>` : '–')}
     ${row('H / V accuracy', l ? `${dot(accuracyColor(l.horizontalAccuracy))}${num(l.horizontalAccuracy, 1, ' m')} / ${num(l.verticalAccuracy, 1, ' m')}` : '–')}
@@ -755,7 +760,7 @@ function renderPointDetail(el: HTMLElement, pick: PickId) {
     ${row('Time', time(p.timestamp))}
     ${row('Lon / Lat', `${p.longitude.toFixed(6)}, ${p.latitude.toFixed(6)}`)}
     ${row('H / V accuracy', `${dot(accuracyColor(p.horizontalAccuracy))}${num(p.horizontalAccuracy, 1, ' m')} / ${num(p.verticalAccuracy, 1, ' m')}`)}
-    ${row('Altitude / Ellipsoidal', `${num(p.altitude, 1, ' m')} / ${num(p.ellipsoidalAltitude, 1, ' m')}`)}
+    ${row('Altitude (MSL) / Ellipsoidal', `${mslText(p)} / ${num(p.ellipsoidalAltitude, 1, ' m')}`)}
     ${section(`Decision by ${esc(state.fusion.active)}`)}
     ${row(
       'GPS',
@@ -878,6 +883,11 @@ for (const key of ['rawPoints', 'rawTrajectory', 'fusedPosition', 'fusedTrajecto
     applyVisibility();
   });
 }
+
+$<HTMLInputElement>('raw-phone-height').addEventListener('change', (e) => {
+  setRawHeightMode((e.target as HTMLInputElement).checked ? 'phone' : 'fused');
+  for (const track of tracks.values()) track.redrawRaw();
+});
 
 /** One checkbox per fusion version; the live version is on by default, others load on demand for comparison. */
 function renderVersionToggles() {

@@ -677,6 +677,35 @@ export const fusionConfigV4 = {
   gpsDatumMaxAccuracyM: 15,
   gpsDatumMinSamples: 3,
   gpsDatumMaxMadM: 3,
+  // rev 14: provisional datums when no strict ground contact exists. On the 2026-10-14 walks every outdoor step
+  // was on modified DEM cells (campus roads), so iPhones fell back to "the start is on the ground" and sat
+  // 16-20 m under the terrain (the start was an upper entrance). Replayed against paired Android/terrain datums:
+  // loose ground contacts -3.5..+2 m, barometer-consistent GPS heights -3.3..+0.7 m.
+  provisionalDatumsEnabled: true,
+  looseContactExtraSigmaM: 3, // modified ground: cut / fill and kerbs vs the DEM surface
+  looseContactMaxHeightSigmaM: 6,
+  looseContactMinCount: 6, // thinned (5 s apart)
+  looseContactMinSpanMs: 30_000,
+  looseContactMaxMadM: 3,
+  looseDatumMinSigmaM: 2,
+  // GPS height - barometric Z is constant while the phone moves, if the GPS height is real. iPhone heights stuck
+  // at one value for minutes indoors (vertical accuracy 3 m, 40-55 m too low) while the barometer moved 20 m.
+  baroGpsMaxAccuracyM: 50,
+  baroGpsBelowGroundM: 6, // outdoors: no deeper under the DEM than a road cut
+  baroGpsBelowGroundInsideM: 12, // inside a footprint: basements
+  baroGpsAboveGroundM: 8,
+  baroGpsAboveGroundInsideM: 60, // upper floors
+  baroGpsMinFixes: 10,
+  baroGpsMinFraction: 0.3, // of the session's GPS heights: a small consistent cluster is a stuck value
+  baroGpsMinZSpanM: 4, // the kept heights must have followed the barometer through a real height change
+  baroGpsMinSigmaM: 3,
+  // rev 14: GPS sigma scaled up where the fixes disagree with the walk more than good stretches do
+  gpsAdaptiveSigmaEnabled: false, // off: on the paired 10-13 walk it moved the iPhone track further from the Android one (p90 53 -> 72 m)
+  gpsAdaptiveWindowMs: 30_000, // replay: fixes within +-30 s
+  gpsAdaptiveForwardFixes: 10, // live: the last 10 fixes
+  gpsAdaptiveMinFixes: 5,
+  gpsAdaptiveExpectedRatio: 0.6, // median residual / sigma on good stretches (paired Android walks 0.33-0.79)
+  gpsAdaptiveMaxScale: 4,
   // indoor stairs: a barometric stair run between two moments inside the same building stays inside it
   indoorStairContextMs: 10_000,
   indoorStairRunGapMs: 4000,

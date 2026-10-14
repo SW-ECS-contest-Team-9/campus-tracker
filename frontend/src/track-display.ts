@@ -65,12 +65,18 @@ export function describeFusedHeight(p: FusedHeightInput): HeightSummary {
           ? `임시 GPS 기준 ±${m(p.zDatumSigma)} — 신뢰 기준 미충족, 수직 오차가 가장 작은 샘플`
           : p.zDatumSource === 'TERRAIN_FALLBACK'
             ? `임시 지형·기압 기준 ±${m(p.zDatumSigma)} — 시작 위치의 지면층 가정, 이후 기압 변화 누적(시작 층 미확정)`
+            : p.zDatumSource === 'TERRAIN_GPS'
+              ? `실외 보행(가공 지면) + 기압 일관 GPS 고도 결합 ±${m(p.zDatumSigma)} — 엄격한 지면 접촉 없음`
+              : p.zDatumSource === 'TERRAIN_LOOSE'
+                ? `실외 보행 기준(도로·광장 등 가공 지면 포함) ±${m(p.zDatumSigma)} — 엄격한 지면 접촉 없음`
+                : p.zDatumSource === 'GPS_BARO'
+                  ? `기압 변화와 일관된 GPS 고도 ±${m(p.zDatumSigma)} — 지면 기준 없음`
             : p.zDatumSource === 'MAP_START'
               ? `지도 시작 기준 ±${m(p.zDatumSigma)} — 선택한 길·층별 고도와 기압 변화로 임시 추정`
               : p.zDatumSource === 'ROAD_ANCHOR'
                 ? `길 통과 앵커 ±${m(p.zDatumSigma)} — 연속 보행과 길의 3D 고도로 기압 기준 보정`
                 : '기준 미기록';
-    const provisional = p.zDatumSource === 'GPS_FALLBACK' || p.zDatumSource === 'TERRAIN_FALLBACK' || p.zDatumSource === 'MAP_START' || p.zDatumSource === 'ROAD_ANCHOR';
+    const provisional = ['GPS_FALLBACK', 'TERRAIN_FALLBACK', 'MAP_START', 'ROAD_ANCHOR', 'TERRAIN_LOOSE', 'GPS_BARO', 'TERRAIN_GPS'].includes(p.zDatumSource ?? '');
     return { kind: 'ABSOLUTE', status: provisional ? '절대 고도 임시 추정' : '절대 고도 추정', datum, floorAllowed: !provisional };
   }
   const projected = p.terrainHeight != null;
