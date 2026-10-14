@@ -85,6 +85,8 @@ final class TelemetryUploadEngine {
     private var activeSessionID: String?
     private var statusTimer: Timer?
     private var sampleCounts = SampleCounts()
+    private var sessionsWithHeldAbsoluteAltitude: Set<String> = []
+    private var absoluteAltitudeSupportedSessions: Set<String> = []
     private var connectionGeneration: UInt64 = 0
     private var scheduler = UploadScheduler()
     private var preferFinishingLane = true
@@ -136,10 +138,14 @@ final class TelemetryUploadEngine {
 
     /// Initial ledger load runs on the store queue; nothing is sent until it completes.
     private func reload() {
-        store.async({ try $0.loadUploadLedger() }) { [weak self] result in
+        store.async({ access in
+            try access.requireFeatureRehandshakeForHeldAbsoluteAltitude()
+            return (try access.loadUploadLedger(), try access.sessionsWithHeldAbsoluteAltitude())
+        }) { [weak self] result in
             guard let self else { return }
             switch result {
-            case let .success(snapshot):
+            case let .success((snapshot, heldSessions)):
+                self.sessionsWithHeldAbsoluteAltitude = heldSessions
                 for session in snapshot.sessions { self.sessions[session.sessionID] = session }
                 self.merge(snapshot.items)
                 self.isLoaded = true
@@ -213,7 +219,20 @@ final class TelemetryUploadEngine {
     func ingest(_ committed: [UploadItemRecord]) {
         merge(committed)
         notifyCount()
-        synchronize()
+        let finishingSessions = Set(committed.filter { $0.kind == .finish }.map(\.sessionID))
+        guard !finishingSessions.isEmpty else { return synchronize() }
+        store.async({ access in
+            Set(try finishingSessions.filter { try access.heldAbsoluteAltitudeCount(sessionID: $0) > 0 })
+        }) { [weak self] result in
+            guard let self else { return }
+            if case let .success(held) = result {
+                self.sessionsWithHeldAbsoluteAltitude.formUnion(held)
+                for sessionID in held where self.absoluteAltitudeSupportedSessions.contains(sessionID) {
+                    self.releaseAbsoluteAltitude(sessionID: sessionID)
+                }
+            }
+            self.synchronize()
+        }
     }
 
     func update(sampleCounts: SampleCounts) {
@@ -370,6 +389,7 @@ final class TelemetryUploadEngine {
             case .marker, .diagnostic: laneClass = .aux
             case .arkit: laneClass = .arkit
             case .finish:
+                if sessionsWithHeldAbsoluteAltitude.contains(item.sessionID) { continue }
                 // Finish is eligible only after every earlier required item of its own session
                 // (other sessions' backlog is not part of this barrier).
                 let blocked = pendingBySession[item.sessionID]?.contains { $0.kind != .finish && $0.enqueueOrder < item.enqueueOrder } ?? false
@@ -419,6 +439,10 @@ final class TelemetryUploadEngine {
                 self.sessions[id]?.startQuarantined = false
                 self.commitLedger({ try $0.setServerSessionID(response.sessionId, sessionID: id) }) {
                     if let uuid = UUID(uuidString: id) { self.onServerSessionStarted?(uuid, response.sessionId) }
+                    if response.supportedTelemetryFeatures?.contains("absoluteAltitudeV1") == true {
+                        self.absoluteAltitudeSupportedSessions.insert(id)
+                        self.releaseAbsoluteAltitude(sessionID: id)
+                    }
                     if id == self.activeSessionID { self.sendStatus() }
                 }
             case let .ack(false, error, _):
@@ -434,6 +458,28 @@ final class TelemetryUploadEngine {
                 self.sessions[id]?.startQuarantined = true
                 self.commitLedger({ try $0.setStartQuarantined(true, sessionID: id) })
             }
+        }
+    }
+
+    private func releaseAbsoluteAltitude(sessionID: String) {
+        guard let id = UUID(uuidString: sessionID) else { return }
+        store.async({ access in
+            try access.createTelemetryBatches(sessionID: id, maximumSamples: 64, minimumSamples: 1,
+                                              includeAbsoluteAltitude: true) { batchID, rows in
+                let payload = try RawSampleDecoding.telemetryBatch(batchID: batchID, clientSessionID: sessionID,
+                                                                   rows: rows, createdAt: Date())
+                return try TrackingJSONCodec.makeEncoder().encode(payload)
+            }
+        }) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(items):
+                self.sessionsWithHeldAbsoluteAltitude.remove(sessionID)
+                self.merge(items)
+            case let .failure(error): self.onStorageError?("ABSOLUTE_ALTITUDE_RELEASE_FAILED: \(error)")
+            }
+            self.notifyCount()
+            self.synchronize()
         }
     }
 

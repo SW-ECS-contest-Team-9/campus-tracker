@@ -1,8 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { describeFusedHeight, describeHeading, fusedDisplayHeight, publishedStage, relativeAltitudeLabel, runStage, sessionStateLines, splitByAbsoluteHeight } from '../src/track-display.ts';
+import { canDrawFusedHeightIn3D, describeFusedHeight, describeHeading, fusedDisplayHeight, publishedStage, relativeAltitudeLabel, runStage, sessionStateLines, splitByAbsoluteHeight, splitByDrawableHeight } from '../src/track-display.ts';
 
 const scene = (e: number) => e - 23.4;
+
+test('Core Motion height remains provisional, and an unknown indoor height is not drawn on a guessed floor', () => {
+  const point = { ellipsoidalAltitude: 144, zDatumSource: 'CM_ABSOLUTE', zDatumSigma: 5, buildingName: '북악관' };
+  const h = describeFusedHeight(point);
+  assert.match(h.datum, /아이폰 절대 고도/);
+  assert.match(h.status, /임시/);
+  assert.equal(h.floorAllowed, false);
+  assert.equal(canDrawFusedHeightIn3D(point), true);
+  assert.equal(canDrawFusedHeightIn3D({ ...point, ellipsoidalAltitude: null }), false);
+  assert.equal(canDrawFusedHeightIn3D({ ellipsoidalAltitude: null, buildingName: null }), true);
+  const unknown = { ...point, ellipsoidalAltitude: null };
+  const groups = splitByDrawableHeight([point, point, unknown, point, point]);
+  assert.deepEqual(groups.map((g) => g.points.length), [2, 2]);
+  assert.ok(groups.every((g) => g.absolute && g.points.every((p) => p.ellipsoidalAltitude !== null)));
+});
 
 test('height: only a point with a vertical datum is an absolute height; the rest is a drawing height', () => {
   assert.deepEqual(fusedDisplayHeight({ ellipsoidalAltitude: 123.4, terrainHeight: 90 }, 0, scene), { h: 100, kind: 'ABSOLUTE' });

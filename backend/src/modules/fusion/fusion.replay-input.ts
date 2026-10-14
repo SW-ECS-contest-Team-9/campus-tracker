@@ -13,13 +13,14 @@ const round = (v: number, d = 2) => Math.round(v * 10 ** d) / 10 ** d;
 export function cutRawSamples<T extends RawSamples>(raw: T, cutoff: number | null): T {
   if (cutoff === null) return raw;
   const keep = <S extends { timestamp: string | Date }>(rows: S[]) => rows.filter((r) => ms(r.timestamp) <= cutoff);
-  return { ...raw, locations: keep(raw.locations), motion: keep(raw.motion), altimeter: keep(raw.altimeter), pedometer: keep(raw.pedometer) };
+  return { ...raw, locations: keep(raw.locations), motion: keep(raw.motion), altimeter: keep(raw.altimeter), pedometer: keep(raw.pedometer),
+    ...(raw.absoluteAltitude ? { absoluteAltitude: keep(raw.absoluteAltitude) } : {}) };
 }
 
 export interface ReplayInputSummary {
   /** sensor-time cutoff of the run (ISO), null = all raw rows of the snapshot */
   cutoff: string | null;
-  counts: { locations: number; motion: number; altimeter: number; pedometer: number };
+  counts: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number };
   firstSensorAt: string | null;
   lastSensorAt: string | null;
   /** sha256 over (stream, sequence, sensor time, values fusion reads) in sensor-time order: same hash = same fusion input */
@@ -43,6 +44,8 @@ export function summarizeReplayInput(raw: RawSamples, cutoff: number | null): Re
   for (const l of raw.locations) add('L', ms(l.timestamp), l.sequence, [l.latitude, l.longitude, l.altitude, l.ellipsoidalAltitude, l.horizontalAccuracy, l.verticalAccuracy, l.speed, l.course]);
   for (const m of raw.motion) add('M', ms(m.timestamp), m.sequence, [m.yaw, m.ax, m.ay, m.az, m.gx, m.gy, m.gz, m.segment]);
   for (const a of raw.altimeter) add('A', ms(a.timestamp), a.sequence, [a.relativeAltitude, a.segment]);
+  for (const a of raw.absoluteAltitude ?? []) add('AA', ms(a.timestamp), a.sequence,
+    [a.altitude, a.accuracy, a.precision, a.verticalReference, a.invalidReason, a.segment]);
   for (const p of raw.pedometer) add('P', ms(p.timestamp), '', [p.numberOfSteps, p.distance, p.segment]);
   lines.sort();
   const hash = createHash('sha256');
@@ -50,7 +53,8 @@ export function summarizeReplayInput(raw: RawSamples, cutoff: number | null): Re
   const iso = (v: number) => (Number.isFinite(v) ? new Date(v).toISOString() : null);
   return {
     cutoff: cutoff === null ? null : new Date(cutoff).toISOString(),
-    counts: { locations: raw.locations.length, motion: raw.motion.length, altimeter: raw.altimeter.length, pedometer: raw.pedometer.length },
+    counts: { locations: raw.locations.length, motion: raw.motion.length, altimeter: raw.altimeter.length, pedometer: raw.pedometer.length,
+      ...(raw.absoluteAltitude?.length ? { absoluteAltitude: raw.absoluteAltitude.length } : {}) },
     firstSensorAt: iso(first),
     lastSensorAt: iso(last),
     hash: hash.digest('hex').slice(0, 24),
@@ -71,6 +75,8 @@ export interface TrackStats {
   headingSources: Record<string, number>;
   /** outputs with an absolute height (a vertical datum was found) */
   absoluteHeightOutputs: number;
+  provisionalHeightOutputs: number;
+  trustedHeightOutputs: number;
   firstAbsoluteHeightAt: string | null;
   zDatumSources: Record<string, number>;
   /** range of the engine's relative Z (barometric, continued over sensor restarts), null without a barometer */
@@ -87,6 +93,8 @@ export function trackStats(outputs: FusedOutput[]): TrackStats {
   let path = 0, jump = 0, unknown = 0, unknownMs = 0, absolute = 0;
   let firstHeading: number | null = null, firstAbsolute: number | null = null;
   let zMin = Infinity, zMax = -Infinity;
+  let provisional = 0;
+  const provisionalSources = new Set(['CM_ABSOLUTE', 'GPS_FALLBACK', 'TERRAIN_FALLBACK', 'MAP_START', 'ROAD_ANCHOR', 'TERRAIN_LOOSE', 'GPS_BARO', 'TERRAIN_GPS']);
   outputs.forEach((o, i) => {
     const prev = outputs[i - 1];
     if (prev) {
@@ -100,6 +108,7 @@ export function trackStats(outputs: FusedOutput[]): TrackStats {
     } else firstHeading ??= o.timestamp;
     if (o.ellipsoidalAltitude !== null) {
       absolute++;
+      if (provisionalSources.has(o.zDatumSource ?? '')) provisional++;
       firstAbsolute ??= o.timestamp;
     }
     count(headingSources, o.headingSource ?? 'UNKNOWN');
@@ -116,6 +125,7 @@ export function trackStats(outputs: FusedOutput[]): TrackStats {
     pathLengthM: round(path, 1), maxJumpM: round(jump, 1),
     headingUnknownOutputs: unknown, headingUnknownSeconds: round(unknownMs / 1000, 1), firstHeadingAt: iso(firstHeading), headingSources,
     absoluteHeightOutputs: absolute, firstAbsoluteHeightAt: iso(firstAbsolute), zDatumSources,
+    provisionalHeightOutputs: provisional, trustedHeightOutputs: absolute - provisional,
     relativeZRangeM: zMax >= zMin ? round(zMax - zMin) : null, sources,
   };
 }
@@ -144,7 +154,8 @@ export interface InputStats {
   /** intervals longer than gapMs between consecutive motion samples of the whole stream (including segment changes) */
   motionGaps: { at: string; ms: number; segmentChanged: boolean }[];
   /** server receive time - sensor time, per stream; denominator = rows of that stream with a receive time */
-  receiveDelayS: Record<'locations' | 'motion' | 'altimeter' | 'pedometer', { rows: number; p50: number | null; p95: number | null; max: number | null } | null>;
+  receiveDelayS: Record<'locations' | 'motion' | 'altimeter' | 'pedometer', { rows: number; p50: number | null; p95: number | null; max: number | null } | null>
+    & { absoluteAltitude?: { rows: number; p50: number | null; p95: number | null; max: number | null } | null };
   gps: {
     fixes: number;
     preSession: number;
@@ -189,7 +200,7 @@ export function inputStats(
   const delay = (stream: keyof RawSamples) => {
     const received = opts.receivedAt?.[stream];
     if (!received) return null;
-    const rows = raw[stream] as { timestamp: string | Date }[];
+    const rows = (raw[stream] ?? []) as { timestamp: string | Date }[];
     const d: number[] = [];
     rows.forEach((r, i) => {
       const at = received[i];
@@ -203,7 +214,8 @@ export function inputStats(
   const acc = raw.locations.map((l) => l.horizontalAccuracy).filter((v): v is number => typeof v === 'number' && v > 0).sort((a, b) => a - b);
   return {
     motionSamples: motion.length, gapMs, segments, motionGaps,
-    receiveDelayS: { locations: delay('locations'), motion: delay('motion'), altimeter: delay('altimeter'), pedometer: delay('pedometer') },
+    receiveDelayS: { locations: delay('locations'), motion: delay('motion'), altimeter: delay('altimeter'), pedometer: delay('pedometer'),
+      ...(raw.absoluteAltitude?.length ? { absoluteAltitude: delay('absoluteAltitude') } : {}) },
     gps: {
       fixes: raw.locations.length,
       preSession: raw.locations.filter((l) => ms(l.timestamp) < pre).length,

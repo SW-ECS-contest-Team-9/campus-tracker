@@ -1,7 +1,7 @@
 // Lab mode (docs/MOBILITY_MAP_PLAN.md 4.11): replay run snapshots in time (1x / 5x / 20x / Instant), compare two
 // runs, define routes, find their passes and show canonical path + confidence corridor + validation errors.
 // Everything here only READS results the backend computed (replays are deterministic; the speed is playback).
-import { runStage, STAGE_LABEL } from './track-display';
+import { canDrawFusedHeightIn3D, describeFusedHeight, runStage, splitByDrawableHeight, STAGE_LABEL } from './track-display';
 import {
   api,
   type CanonicalPath,
@@ -271,6 +271,7 @@ export class Lab {
     const f = a.forward[i];
     const fin = a.final[Math.max(0, indexAt(a.final, this.t))];
     const correction = fin && a.forward !== a.final ? Math.hypot(fin.x - f.x, fin.y - f.y) : null;
+    const height = describeFusedHeight({ ellipsoidalAltitude: f.h, zDatumSource: f.zDatumSource, zDatumSigma: f.zDatumSigma });
     const start = a.run.metrics?.startHeightSelection;
     const roadAnchors = a.run.metrics?.roadHeightAnchors;
     const circle = a.run.metrics?.circularCorridor;
@@ -279,7 +280,7 @@ export class Lab {
       <tr><th>source</th><td>${esc(f.source)}${f.stationary ? ' · stationary' : ''}</td></tr>
       <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${f.heading === null ? '<span class="warn-text">방향 미확정</span>' : num(f.heading, 0, '°')}</td></tr>
       <tr><th>GPS</th><td>${f.gpsUsed === null ? '–' : f.gpsUsed ? 'used' : 'rejected'}${f.gpsSequence ? ` #${f.gpsSequence}` : ''}</td></tr>
-      <tr><th>height</th><td>${f.h === null ? `<span class="warn-text">절대 고도 미확정</span> (기준 ${esc(f.zDatumSource ?? 'NONE')}) · 지도에는 지면에 투영해 표시` : `${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · above ground ${num(f.heightAboveGround, 1, ' m')}`}</td></tr>
+      <tr><th>height</th><td>${f.h === null ? `<span class="warn-text">절대 고도 미확정</span> (기준 ${esc(f.zDatumSource ?? 'NONE')}) · 실내 3D 높이는 표시 보류` : `${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · ${esc(height.status)} · ${esc(height.datum)} · above ground ${num(f.heightAboveGround, 1, ' m')}`}</td></tr>
       <tr><th>상대 Z</th><td>${num(f.zRel, 1, ' m')} <span class="muted">(기압, 세션 시작 기준 · 센서 재시작 구간은 이어 붙임)</span></td></tr>
       ${start ? `<tr><th>시작 높이 재료</th><td>${esc(startReason)}${start.selected ? ` · ${esc(start.selected.kind)} ${esc(start.selected.id)} · ${num(start.selected.phoneHeightM, 1, ' m MSL')}` : ''}<br><span class="muted">${start.candidates.map((c) => `${esc(c.id)} (${num(c.phoneHeightM, 1, ' m')}, 층 ${esc(c.levelId ?? '–')})`).join(' / ') || '후보 없음'}</span></td></tr>` : ''}
       <tr><th>building</th><td>${esc(f.buildingName ?? '–')}</td></tr>
@@ -343,6 +344,11 @@ export class Lab {
     });
   }
 
+  private heightRuns(positions: RunPosition[]) {
+    return splitByDrawableHeight(positions.map((point) => ({ point, ellipsoidalAltitude: point.h, buildingName: point.buildingName })))
+      .map((group) => ({ absolute: group.absolute, points: group.points.map((p) => p.point) }));
+  }
+
   private drawRuns() {
     const v = this.viewer();
     if (!v) return;
@@ -356,28 +362,40 @@ export class Lab {
     const a = this.a;
     if (a) {
       // realtime-equivalent track grows with the playback time; the final (smoothed) track is drawn whole
-      const fwdGround = a.forward.some((p) => p.h == null);
-      const cart = a.forward.map((p) => C.Cartesian3.fromDegrees(p.longitude, p.latitude, fwdGround ? 0 : p.h! + 0.3));
-      this.runEntities.push(v.entities.add({
-        polyline: {
-          positions: new C.CallbackProperty(() => cart.slice(0, Math.max(indexAt(a.forward, this.t) + 1, 0)), false),
-          width: 3, clampToGround: fwdGround, material: C.Color.fromCssColorString('#f472b6'),
-        },
-        show: this.layers.forward,
-      }));
-      this.runEntities.at(-1).labRole = 'forward';
-      this.runEntities.push(v.entities.add({
-        position: new C.CallbackProperty(() => cart[Math.max(indexAt(a.forward, this.t), 0)], false),
-        point: { pixelSize: 12, color: C.Color.fromCssColorString('#f472b6'), outlineColor: C.Color.WHITE, outlineWidth: 2,
-          heightReference: fwdGround ? C.HeightReference.CLAMP_TO_GROUND : C.HeightReference.NONE, disableDepthTestDistance: Number.POSITIVE_INFINITY },
-        show: this.layers.forward,
-      }));
-      this.runEntities.at(-1).labRole = 'forward';
-      if (a.final !== a.forward && a.final.length) {
-        const e = this.line(a.final, '#fde047', 3);
-        e.show = this.layers.final;
-        e.labRole = 'final';
+      for (const group of this.heightRuns(a.forward)) {
+        const ground = !group.absolute;
+        const cart = group.points.map((p) => C.Cartesian3.fromDegrees(p.longitude, p.latitude, ground ? 0 : p.h! + 0.3));
+        const e = v.entities.add({
+          polyline: {
+            positions: new C.CallbackProperty(() => cart.slice(0, Math.max(indexAt(group.points, this.t) + 1, 0)), false),
+            width: 3, clampToGround: ground, material: C.Color.fromCssColorString('#f472b6'),
+          },
+          show: this.layers.forward,
+        });
+        e.labRole = 'forward';
         this.runEntities.push(e);
+      }
+      const current = () => a.forward[indexAt(a.forward, this.t)];
+      const marker = v.entities.add({
+        position: new C.CallbackProperty(() => {
+          const p = current();
+          return p && canDrawFusedHeightIn3D({ ellipsoidalAltitude: p.h, buildingName: p.buildingName })
+            ? C.Cartesian3.fromDegrees(p.longitude, p.latitude, (p.h ?? 0) + (p.h == null ? 0 : 0.3)) : undefined;
+        }, false),
+        point: { pixelSize: 12, color: C.Color.fromCssColorString('#f472b6'), outlineColor: C.Color.WHITE, outlineWidth: 2,
+          heightReference: new C.CallbackProperty(() => current()?.h == null ? C.HeightReference.CLAMP_TO_GROUND : C.HeightReference.NONE, false),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY },
+        show: this.layers.forward,
+      });
+      marker.labRole = 'forward';
+      this.runEntities.push(marker);
+      if (a.final !== a.forward && a.final.length) {
+        for (const group of this.heightRuns(a.final)) {
+          const e = this.line(group.points, '#fde047', 3);
+          e.show = this.layers.final;
+          e.labRole = 'final';
+          this.runEntities.push(e);
+        }
       }
       this.gpsPoints = v.scene.primitives.add(new C.PointPrimitiveCollection());
       for (const p of a.gps) {
@@ -392,10 +410,12 @@ export class Lab {
       }
     }
     if (this.b?.final.length) {
-      const e = this.line(this.b.final, '#22d3ee', 3, { dashed: true });
-      e.show = this.layers.compare;
-      e.labRole = 'compare';
-      this.runEntities.push(e);
+      for (const group of this.heightRuns(this.b.final)) {
+        const e = this.line(group.points, '#22d3ee', 3, { dashed: true });
+        e.show = this.layers.compare;
+        e.labRole = 'compare';
+        this.runEntities.push(e);
+      }
     }
     this.updatePlayback();
   }

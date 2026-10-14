@@ -627,6 +627,20 @@ export const fusionConfigV4 = {
   phoneHeightM: 1.0,
   phoneHeightSigmaM: 0.3,
   terrainFallbackMinSigmaM: 5, // provisional ground-level start; the initial indoor floor is unknown
+  // New sessions opt in through sensorCapabilities.absoluteAltitudeEnabled or an actual observation.
+  // off/shadow preserve the legacy output policy; fallback never invents a ground-level start for opted-in sessions.
+  absoluteAltitudeMode: 'fallback' as 'off' | 'shadow' | 'fallback',
+  absoluteAltitudeMaxAccuracyM: 8,
+  absoluteAltitudeWindowMs: 30_000,
+  absoluteAltitudeMinSamples: 3,
+  absoluteAltitudeMinSpanMs: 5000,
+  absoluteAltitudeMaxRelativeAgeMs: 1500,
+  absoluteAltitudeMaxAlignmentErrorM: 1,
+  absoluteAltitudeMaxMadM: 2,
+  absoluteAltitudeMaxOffsetRangeM: 6,
+  absoluteAltitudeMinSigmaM: 5,
+  absoluteAltitudeDatumOffsetM: 0, // Apple MSL -> map orthometric: provisional identity, not a surveyed conversion
+  absoluteAltitudeDatumSigmaM: 3,
   startHeightRoadsEnabled: false,
   startHeightFloorsEnabled: false,
   startHeightIncludeDrafts: false,

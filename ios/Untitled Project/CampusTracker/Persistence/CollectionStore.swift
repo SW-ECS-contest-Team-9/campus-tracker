@@ -423,8 +423,10 @@ nonisolated struct CollectionStoreAccess {
             guard let row = rows[stream], row.recordedCount > 0, row.lastRecorded > 0 else { return -1 }
             return row.lastRecorded
         }
+        let absoluteAltitude = last("absoluteAltitude")
         return LastSequencesPayload(location: last("location"), motion: last("motion"),
-                                    altimeter: last("altimeter"), pedometer: last("pedometer"))
+                                    altimeter: last("altimeter"), pedometer: last("pedometer"),
+                                    absoluteAltitude: absoluteAltitude >= 0 ? absoluteAltitude : nil)
     }
 
     // MARK: Raw commit
@@ -478,8 +480,32 @@ nonisolated struct CollectionStoreAccess {
     // MARK: Telemetry batches
 
     func unbatchedTelemetryCount(sessionID: UUID) throws -> Int {
-        try db.queryOne("SELECT COUNT(*) FROM raw_samples WHERE session_id = ? AND batch_id IS NULL",
-                        [.text(sessionID.uuidString)]) { $0.int(0) } ?? 0
+        try db.queryOne("SELECT COUNT(*) FROM raw_samples WHERE session_id = ? AND batch_id IS NULL AND stream != ?",
+                        [.text(sessionID.uuidString), .text(CaptureStream.absoluteAltitude.rawValue)]) { $0.int(0) } ?? 0
+    }
+
+    func heldAbsoluteAltitudeCount(sessionID: String) throws -> Int {
+        try db.queryOne("SELECT COUNT(*) FROM raw_samples WHERE session_id = ? AND batch_id IS NULL AND stream = ?",
+                        [.text(sessionID), .text(CaptureStream.absoluteAltitude.rawValue)]) { $0.int(0) } ?? 0
+    }
+
+    func sessionsWithHeldAbsoluteAltitude() throws -> Set<String> {
+        Set(try db.query("""
+            SELECT DISTINCT session_id FROM raw_samples WHERE stream = ? AND batch_id IS NULL
+            """, [.text(CaptureStream.absoluteAltitude.rawValue)]) { $0.text(0) ?? "" })
+    }
+
+    /// A feature decision is scoped to the latest session:start response. After process restart,
+    /// force a fresh handshake for sessions that still have locally-held absolute altitude rows.
+    func requireFeatureRehandshakeForHeldAbsoluteAltitude() throws {
+        try db.run("""
+            UPDATE sessions SET server_session_id = NULL
+            WHERE EXISTS (
+              SELECT 1 FROM raw_samples
+              WHERE raw_samples.session_id = sessions.session_id
+                AND raw_samples.stream = ? AND raw_samples.batch_id IS NULL
+            )
+            """, [.text(CaptureStream.absoluteAltitude.rawValue)])
     }
 
     /// Creates batches of at most `maximumSamples` durable, not-yet-batched raw rows, one
@@ -487,15 +513,26 @@ nonisolated struct CollectionStoreAccess {
     /// Stops when fewer than `minimumSamples` unbatched rows remain.
     func createTelemetryBatches(sessionID: UUID, maximumSamples: Int, minimumSamples: Int,
                                 build: (_ batchID: String, _ rows: [RawRow]) throws -> Data) throws -> [UploadItemRecord] {
+        try createTelemetryBatches(sessionID: sessionID, maximumSamples: maximumSamples,
+                                   minimumSamples: minimumSamples, includeAbsoluteAltitude: false, build: build)
+    }
+
+    func createTelemetryBatches(sessionID: UUID, maximumSamples: Int, minimumSamples: Int,
+                                includeAbsoluteAltitude: Bool,
+                                build: (_ batchID: String, _ rows: [RawRow]) throws -> Data) throws -> [UploadItemRecord] {
         var created: [UploadItemRecord] = []
         let id = sessionID.uuidString
         while true {
             let item: UploadItemRecord? = try db.transaction {
                 try inject(.batchCommit)
+                let streamClause = includeAbsoluteAltitude ? "" : " AND stream != ?"
+                var values: [SQLiteValue] = [.text(id)]
+                if !includeAbsoluteAltitude { values.append(.text(CaptureStream.absoluteAltitude.rawValue)) }
+                values.append(.int(maximumSamples))
                 let rows = try db.query("""
                     SELECT rowid, stream, sequence, measured_at_ms, payload_json FROM raw_samples
-                    WHERE session_id = ? AND batch_id IS NULL ORDER BY rowid LIMIT ?
-                    """, [.text(id), .int(maximumSamples)]) { row in
+                    WHERE session_id = ? AND batch_id IS NULL\(streamClause) ORDER BY rowid LIMIT ?
+                    """, values) { row in
                     (row.int64(0), RawRow(stream: row.text(1) ?? "", sequence: row.int(2),
                                           measuredAtMs: row.int64(3), payload: row.blob(4) ?? Data(), batchID: nil))
                 }

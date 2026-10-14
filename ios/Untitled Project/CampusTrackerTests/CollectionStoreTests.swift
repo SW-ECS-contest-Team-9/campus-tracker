@@ -60,6 +60,31 @@ struct CollectionStoreTests {
         #expect(try store.sync { try $0.createTelemetryBatches(sessionID: session.id, maximumSamples: 64, minimumSamples: 1, build: build) }.isEmpty)
     }
 
+    @Test func absoluteAltitudeRowsStayLocalUntilFeatureIsEnabled() throws {
+        let store = CollectionStore(directory: TestFixture.tempDirectory("StoreAbsoluteAltitudeGate"))
+        let session = TestFixture.session()
+        try TestFixture.seed(store, session: session)
+        _ = try store.sync { try $0.commitRaw(sessionID: session.id, records: [
+            raw("motion", 1), raw(CaptureStream.absoluteAltitude.rawValue, 1)
+        ], snapshot: nil) }
+        let ordinary = try store.sync {
+            try $0.createTelemetryBatches(sessionID: session.id, maximumSamples: 64, minimumSamples: 1) {
+                _, rows in Data(rows.map(\.stream).joined(separator: ",").utf8)
+            }
+        }
+        #expect(ordinary.count == 1)
+        #expect(String(decoding: ordinary[0].payload, as: UTF8.self) == "motion")
+        #expect(try store.sync { try $0.heldAbsoluteAltitudeCount(sessionID: session.id.uuidString) } == 1)
+        let released = try store.sync {
+            try $0.createTelemetryBatches(sessionID: session.id, maximumSamples: 64, minimumSamples: 1,
+                                          includeAbsoluteAltitude: true) {
+                _, rows in Data(rows.map(\.stream).joined(separator: ",").utf8)
+            }
+        }
+        #expect(released.count == 1)
+        #expect(String(decoding: released[0].payload, as: UTF8.self) == "absoluteAltitude")
+    }
+
     @Test func corruptDatabaseIsReportedAndNotReplacedWithAnEmptyOne() async throws {
         let directory = TestFixture.tempDirectory("StoreCorrupt")
         let file = directory.appendingPathComponent(CollectionStore.databaseFileName)
@@ -119,6 +144,29 @@ struct CollectionCoreTests {
         #expect(rows.first?.measuredAtMs == 1_700_000_001_000, "measuredAt = anchor + (native - uptime)")
         let leases = try store.sync { try $0.leases(sessionID: session.id) }
         #expect(leases["motion"] == StreamLeaseRow(reservedExclusive: 201, lastRecorded: 40, recordedCount: 40))
+    }
+
+    @Test func absoluteAltitudeUsesItsOwnClockSequenceAndRawStream() async throws {
+        let (core, store, _) = core("CoreAbsoluteAltitude")
+        let session = TestFixture.session()
+        let contexts = try await begin(core, session, streams: [.altimeter, .absoluteAltitude])
+        let relative = AltimeterCapture(nativeTimestamp: 101, relativeAltitude: 2.5, pressure: 100.2)
+        let absolute = AbsoluteAltitudeCapture(nativeTimestamp: 102, altitude: 151.25, accuracy: 4.5, precision: 0.5)
+        core.submit(TestFixture.captured(.altimeter(relative)), context: contexts[.altimeter]!)
+        core.submit(TestFixture.captured(.absoluteAltitude(absolute)), context: contexts[.absoluteAltitude]!)
+        let result = try await awaitCore { core.beginStop(reason: "user_stop", completion: $0) }.get()
+        let rows = try store.sync { try $0.rawRows(sessionID: session.id, stream: "absoluteAltitude") }
+        #expect(rows.count == 1)
+        let sample = try RawSampleDecoding.decode(AbsoluteAltitudeSample.self, from: rows[0].payload)
+        #expect(sample.timestamp == Date(timeIntervalSince1970: 1_700_000_002))
+        #expect(sample.altitude == 151.25)
+        #expect(sample.verticalReference == "APPLE_MSL")
+        #expect(result.manifest.altimeter == 1)
+        #expect(result.manifest.absoluteAltitude == 1)
+        #expect(try store.sync { try $0.heldAbsoluteAltitudeCount(sessionID: session.id.uuidString) } == 1)
+        let relativeRows = try store.sync { try $0.rawRows(sessionID: session.id, stream: "altimeter") }
+        let relativeSample = try RawSampleDecoding.decode(AltimeterSample.self, from: relativeRows[0].payload)
+        #expect(relativeSample.relativeAltitude == 2.5)
     }
 
     @Test func stopDrainsEveryAdmittedCallbackAndRejectsLateOnes() async throws {

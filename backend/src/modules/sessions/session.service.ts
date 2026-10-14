@@ -148,6 +148,7 @@ export const sessionService = {
       collectorId: identity.collectorId,
       sessionId: session.id,
       clientSessionId: session.client_session_id,
+      supportedTelemetryFeatures: ['absoluteAltitudeV1'],
       status: session.status,
       startedAt: session.started_at,
       interrupted,
@@ -162,6 +163,7 @@ export const sessionService = {
       if (created) {
         fusionService.sessionStarted(session.id, identity.collectorId, {
           strideCalibration: session.stride_calibration_status === 'ACCEPTED' ? session.stride_calibration : null,
+          absoluteAltitudeEnabled: req.sensorCapabilities.absoluteAltitudeEnabled === true,
         });
         await broadcastSession('started', session.id);
       }
@@ -221,7 +223,8 @@ export const sessionService = {
   async compareManifest(sessionId: string, expected: SyncCompleteRequest['lastSequences']) {
     const server = await sessionRepository.maxSequences(sessionId);
     const streams: Record<string, { expected: number | null; server: number | null; synchronized: boolean }> = {};
-    for (const key of ['location', 'motion', 'altimeter', 'pedometer'] as const) {
+    for (const key of ['location', 'motion', 'altimeter', 'pedometer', 'absoluteAltitude'] as const) {
+      if (key === 'absoluteAltitude' && expected[key] == null) continue;
       const exp = expected[key] ?? null;
       // pedometer: compare by max client sequence when sent, else by row count - 1 (0-based)
       const have = key === 'pedometer' ? (server.pedometer ?? (server.pedometer_count > 0 ? server.pedometer_count - 1 : null)) : server[key];

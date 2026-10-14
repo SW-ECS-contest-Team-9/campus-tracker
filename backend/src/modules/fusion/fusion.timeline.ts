@@ -25,6 +25,8 @@ type SensorObservation =
     }
   | { kind: 'pedometer'; t: number; seq: number; distance: number | null; steps: number | null; segment?: string | null } // cumulative values
   | { kind: 'altimeter'; t: number; seq: number; relativeAltitude: number | null; segment?: string | null } // cumulative per segment, meters
+  | { kind: 'absoluteAltitude'; t: number; seq: number; altitude: number | null; accuracy: number | null;
+      precision: number | null; verticalReference: string; invalidReason?: string | null; segment?: string | null }
   | {
       kind: 'gps';
       t: number;
@@ -54,7 +56,7 @@ export type Observation = SensorObservation & {
  * Same timestamp => motion, pedometer, altimeter, then GPS: predict first, correct last, so a fix taken at
  * time t corrects the prediction made up to t. Then by per-sensor sequence. Fully deterministic.
  */
-const KIND_ORDER: Record<Observation['kind'], number> = { motion: 0, pedometer: 1, altimeter: 2, gps: 3 };
+const KIND_ORDER: Record<Observation['kind'], number> = { motion: 0, pedometer: 1, altimeter: 2, absoluteAltitude: 3, gps: 4 };
 
 export function compareObservations(a: Observation, b: Observation): number {
   return a.t - b.t || KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.seq - b.seq;
@@ -78,6 +80,8 @@ export interface RawSamples {
     rx?: number | null; ry?: number | null; rz?: number | null; gx?: number | null; gy?: number | null; gz?: number | null;
     roll?: number | null; pitch?: number | null; segment?: string | null }[];
   altimeter: { sequence: number; timestamp: string | Date; relativeAltitude?: number | null; segment?: string | null }[];
+  absoluteAltitude?: { sequence: number; timestamp: string | Date; altitude?: number | null; accuracy?: number | null;
+    precision?: number | null; verticalReference: string; invalidReason?: string | null; segment?: string | null }[];
   pedometer: { timestamp: string | Date; distance?: number | null; numberOfSteps?: number | null; segment?: string | null }[];
 }
 
@@ -103,6 +107,9 @@ export function buildTimeline(s: RawSamples, opts: { sessionStartedAt?: string |
     obs.push({ kind: 'pedometer', t: ms(p.timestamp), seq: i, distance: n(p.distance), steps: n(p.numberOfSteps), segment: n(p.segment) }),
   );
   for (const a of s.altimeter) obs.push({ kind: 'altimeter', t: ms(a.timestamp), seq: a.sequence, relativeAltitude: n(a.relativeAltitude), segment: n(a.segment) });
+  for (const a of s.absoluteAltitude ?? []) obs.push({ kind: 'absoluteAltitude', t: ms(a.timestamp), seq: a.sequence,
+    altitude: n(a.altitude), accuracy: n(a.accuracy), precision: n(a.precision), verticalReference: a.verticalReference,
+    invalidReason: n(a.invalidReason), segment: n(a.segment) });
   for (const l of s.locations) {
     obs.push({
       kind: 'gps',

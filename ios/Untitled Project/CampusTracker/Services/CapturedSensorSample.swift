@@ -3,7 +3,7 @@ import Foundation
 /// The capture streams that go through a `TrackingCaptureIngress`. Markers are user commands,
 /// not sensor callbacks, and are submitted to `CollectionCore` directly.
 nonisolated enum CaptureStream: String, CaseIterable, Codable, Sendable {
-    case location, motion, altimeter, pedometer, arkit
+    case location, motion, altimeter, absoluteAltitude, pedometer, arkit
 }
 
 // Immutable copies made inside the sensor callback. No Core Location / Core Motion / ARKit
@@ -42,6 +42,13 @@ nonisolated struct AltimeterCapture: Sendable {
     let pressure: Double
 }
 
+nonisolated struct AbsoluteAltitudeCapture: Sendable {
+    let nativeTimestamp: TimeInterval
+    let altitude: Double
+    let accuracy: Double
+    let precision: Double
+}
+
 nonisolated struct PedometerCapture: Sendable {
     let endDate: Date
     let numberOfSteps: Int?
@@ -57,6 +64,7 @@ nonisolated enum CapturedPayload: Sendable {
     case location(LocationCapture)
     case motion(MotionCapture)
     case altimeter(AltimeterCapture)
+    case absoluteAltitude(AbsoluteAltitudeCapture)
     case pedometer(PedometerCapture)
     case arkit(ARKitPoseSample)
 
@@ -65,6 +73,7 @@ nonisolated enum CapturedPayload: Sendable {
         case .location: return .location
         case .motion: return .motion
         case .altimeter: return .altimeter
+        case .absoluteAltitude: return .absoluteAltitude
         case .pedometer: return .pedometer
         case .arkit: return .arkit
         }
@@ -129,19 +138,22 @@ nonisolated enum RawSampleDecoding {
         var locations: [LocationPayload] = []
         var motion: [MotionPayload] = []
         var altimeter: [AltimeterPayload] = []
+        var absoluteAltitude: [AbsoluteAltitudePayload] = []
         var pedometer: [PedometerPayload] = []
         for row in rows {
             switch row.stream {
             case CaptureStream.location.rawValue: locations.append(LocationPayload(try decode(LocationSample.self, from: row.payload)))
             case CaptureStream.motion.rawValue: motion.append(MotionPayload(try decode(MotionSample.self, from: row.payload)))
             case CaptureStream.altimeter.rawValue: altimeter.append(AltimeterPayload(try decode(AltimeterSample.self, from: row.payload)))
+            case CaptureStream.absoluteAltitude.rawValue: absoluteAltitude.append(AbsoluteAltitudePayload(try decode(AbsoluteAltitudeSample.self, from: row.payload)))
             case CaptureStream.pedometer.rawValue: pedometer.append(PedometerPayload(try decode(PedometerSample.self, from: row.payload)))
             default:
                 throw CollectionStoreError.invalidState("unbatchable raw stream \(row.stream)")
             }
         }
         return TelemetryBatchPayload(batchId: batchID, sessionId: nil, clientSessionId: clientSessionID, createdAt: createdAt,
-                                     locations: locations, motion: motion, altimeter: altimeter, pedometer: pedometer)
+                                     locations: locations, motion: motion, altimeter: altimeter,
+                                     absoluteAltitude: absoluteAltitude, pedometer: pedometer)
     }
 }
 

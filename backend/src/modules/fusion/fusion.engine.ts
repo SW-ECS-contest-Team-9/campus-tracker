@@ -92,6 +92,7 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
  * Observations must be fed in compareObservations order; older ones are skipped (counted in the state).
  */
 export function processObservation(state: FusionState, obs: Observation, c: FusionConfig): StepResult {
+  if (obs.kind === 'absoluteAltitude') return { outputs: [], events: [] };
   const result: StepResult = { outputs: [], events: [] };
 
   if (state.lastObservationT !== undefined && obs.t < state.lastObservationT) {

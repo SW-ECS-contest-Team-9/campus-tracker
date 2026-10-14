@@ -253,6 +253,41 @@ final class AltimeterService {
     }
 }
 
+final class AbsoluteAltitudeService {
+    private let altimeter = CMAltimeter()
+    private let queue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "CampusCollector.absolute-altitude"
+        queue.maxConcurrentOperationCount = 1
+        queue.qualityOfService = .utility
+        return queue
+    }()
+    private(set) var isActive = false
+    var onError: (@Sendable (String, Int) -> Void)?
+
+    func start(handler: @escaping @Sendable (AbsoluteAltitudeCapture) -> Void) {
+        let authorization = CMAltimeter.authorizationStatus()
+        guard CMAltimeter.isAbsoluteAltitudeAvailable(), authorization != .denied,
+              authorization != .restricted, !isActive else { return }
+        isActive = true
+        altimeter.startAbsoluteAltitudeUpdates(to: queue) { [weak self] data, error in
+            if let error {
+                let value = error as NSError
+                self?.onError?(value.domain, value.code)
+                return
+            }
+            guard let data else { return }
+            handler(AbsoluteAltitudeCapture(nativeTimestamp: data.timestamp, altitude: data.altitude,
+                                             accuracy: data.accuracy, precision: data.precision))
+        }
+    }
+
+    func stop() {
+        altimeter.stopAbsoluteAltitudeUpdates()
+        isActive = false
+    }
+}
+
 final class PedometerService {
     private let pedometer = CMPedometer()
     private(set) var isActive = false
@@ -312,6 +347,11 @@ final class PedometerService {
 }
 
 enum SensorCapabilityDetector {
+    private static var absoluteAltitudeEnabled: Bool {
+        let authorization = CMAltimeter.authorizationStatus()
+        return CMAltimeter.isAbsoluteAltitudeAvailable() && authorization != .denied && authorization != .restricted
+    }
+
     static func detect(
         attitudeReferenceFrame: String? = nil,
         motionUpdateHz: Int? = nil,
@@ -331,6 +371,8 @@ enum SensorCapabilityDetector {
             locationAvailable: CLLocationManager.locationServicesEnabled(),
             deviceMotionAvailable: CMMotionManager().isDeviceMotionAvailable,
             altimeterAvailable: CMAltimeter.isRelativeAltitudeAvailable(),
+            absoluteAltitudeAvailable: CMAltimeter.isAbsoluteAltitudeAvailable(),
+            absoluteAltitudeEnabled: absoluteAltitudeEnabled,
             stepCountingAvailable: CMPedometer.isStepCountingAvailable(),
             distanceAvailable: CMPedometer.isDistanceAvailable(),
             floorCountingAvailable: CMPedometer.isFloorCountingAvailable(),

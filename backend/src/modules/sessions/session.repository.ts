@@ -42,6 +42,11 @@ const SESSION_VIEW_SELECT = `
     JOIN devices d    ON d.id = s.device_id`;
 
 export const sessionRepository = {
+  async getAbsoluteAltitudeEnabled(id: string, db: DbClient = pool): Promise<boolean> {
+    const { rows } = await db.query<{ enabled: boolean }>(
+      `SELECT sensor_capabilities->'absoluteAltitudeEnabled' = 'true'::jsonb AS enabled FROM collection_sessions WHERE id=$1`, [id]);
+    return rows[0]?.enabled === true;
+  },
   async getStrideCalibration(id: string, db: DbClient = pool): Promise<StrideCalibration | null> {
     const { rows } = await db.query<{ stride_calibration: StrideCalibration | null; stride_calibration_status: string }>(
       'SELECT stride_calibration, stride_calibration_status FROM collection_sessions WHERE id = $1', [id],
@@ -189,10 +194,11 @@ export const sessionRepository = {
 
   /** Highest client sequence stored per stream (pedometer: max sequence if the client sends one, else count). */
   async maxSequences(id: string, db: DbClient = pool) {
-    const { rows } = await db.query<{ location: number | null; motion: number | null; altimeter: number | null; pedometer: number | null; pedometer_count: number }>(
+    const { rows } = await db.query<{ location: number | null; motion: number | null; altimeter: number | null; absoluteAltitude: number | null; pedometer: number | null; pedometer_count: number }>(
       `SELECT (SELECT max(sequence) FROM location_samples WHERE session_id = $1) AS location,
               (SELECT max(sequence) FROM motion_samples WHERE session_id = $1) AS motion,
               (SELECT max(sequence) FROM altimeter_samples WHERE session_id = $1) AS altimeter,
+              (SELECT max(sequence) FROM absolute_altitude_samples WHERE session_id = $1) AS "absoluteAltitude",
               (SELECT max(sequence) FROM pedometer_samples WHERE session_id = $1) AS pedometer,
               (SELECT count(*) FROM pedometer_samples WHERE session_id = $1) AS pedometer_count`,
       [id],
@@ -250,6 +256,7 @@ export const sessionRepository = {
            SELECT 'location' AS stream, "timestamp" AS ts, created_at AS rcv, capture_source AS src, sensor_segment_id AS seg FROM location_samples WHERE session_id = $1
            UNION ALL SELECT 'motion', "timestamp", created_at, capture_source, sensor_segment_id FROM motion_samples WHERE session_id = $1
            UNION ALL SELECT 'altimeter', "timestamp", created_at, capture_source, sensor_segment_id FROM altimeter_samples WHERE session_id = $1
+           UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at, capture_source, sensor_segment_id FROM absolute_altitude_samples WHERE session_id = $1
            UNION ALL SELECT 'pedometer', "timestamp", created_at, capture_source, sensor_segment_id FROM pedometer_samples WHERE session_id = $1)
          SELECT stream, count(*) AS count,
                 count(*) FILTER (WHERE src = 'LIVE') AS live,

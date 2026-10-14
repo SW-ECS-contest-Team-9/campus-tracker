@@ -35,6 +35,7 @@ nonisolated struct SessionStartPayload: Codable, Sendable {
 
 nonisolated struct SessionStartResponse: Decodable {
     let sessionId: String
+    let supportedTelemetryFeatures: [String]?
     // Decoded as plain strings (see StrideCalibrationAck) so a future status/reason value this
     // build doesn't know about still decodes instead of failing the whole ACK. Absent on old
     // servers, which is also just `nil` here, not an error.
@@ -165,6 +166,32 @@ nonisolated struct AltimeterPayload: Codable, Sendable {
     }
 }
 
+nonisolated struct AbsoluteAltitudePayload: Codable, Sendable {
+    let sequence: Int
+    let timestamp: Date
+    let altitude: Double?
+    let accuracy: Double?
+    let precision: Double?
+    let verticalReference: String
+    let sensorSegmentId: String
+    let captureSource: String
+    let appState: String
+    let invalidReason: String?
+
+    init(_ sample: AbsoluteAltitudeSample) {
+        sequence = sample.sequence
+        timestamp = sample.timestamp
+        altitude = sample.altitude?.finiteOrNil
+        accuracy = sample.accuracy?.finiteOrNil
+        precision = sample.precision?.finiteOrNil
+        verticalReference = sample.verticalReference
+        sensorSegmentId = sample.sensorSegmentId
+        captureSource = sample.captureSource.rawValue
+        appState = sample.appState.rawValue.uppercased()
+        invalidReason = sample.invalidReason
+    }
+}
+
 nonisolated struct PedometerPayload: Codable, Sendable {
     let sequence: Int
     let timestamp: Date
@@ -201,10 +228,27 @@ nonisolated struct TelemetryBatchPayload: Codable, Identifiable, Sendable {
     let locations: [LocationPayload]
     let motion: [MotionPayload]
     let altimeter: [AltimeterPayload]
+    let absoluteAltitude: [AbsoluteAltitudePayload]?
     let pedometer: [PedometerPayload]
 
     var id: String { batchId }
-    var sampleCount: Int { locations.count + motion.count + altimeter.count + pedometer.count }
+    var sampleCount: Int { locations.count + motion.count + altimeter.count + (absoluteAltitude?.count ?? 0) + pedometer.count }
+
+    init(batchId: String, sessionId: String?, clientSessionId: String, createdAt: Date,
+         locations: [LocationPayload], motion: [MotionPayload], altimeter: [AltimeterPayload],
+         pedometer: [PedometerPayload]) {
+        self.init(batchId: batchId, sessionId: sessionId, clientSessionId: clientSessionId,
+                  createdAt: createdAt, locations: locations, motion: motion, altimeter: altimeter,
+                  absoluteAltitude: nil, pedometer: pedometer)
+    }
+
+    init(batchId: String, sessionId: String?, clientSessionId: String, createdAt: Date,
+         locations: [LocationPayload], motion: [MotionPayload], altimeter: [AltimeterPayload],
+         absoluteAltitude: [AbsoluteAltitudePayload]?, pedometer: [PedometerPayload]) {
+        self.batchId = batchId; self.sessionId = sessionId; self.clientSessionId = clientSessionId
+        self.createdAt = createdAt; self.locations = locations; self.motion = motion
+        self.altimeter = altimeter; self.absoluteAltitude = absoluteAltitude; self.pedometer = pedometer
+    }
 }
 
 nonisolated struct MarkerPayload: Codable, Identifiable, Sendable {
@@ -243,6 +287,17 @@ nonisolated struct LastSequencesPayload: Codable, Equatable, Sendable {
     let motion: Int
     let altimeter: Int
     let pedometer: Int
+    var absoluteAltitude: Int? = nil
+
+    init(location: Int, motion: Int, altimeter: Int, pedometer: Int) {
+        self.init(location: location, motion: motion, altimeter: altimeter,
+                  pedometer: pedometer, absoluteAltitude: nil)
+    }
+
+    init(location: Int, motion: Int, altimeter: Int, pedometer: Int, absoluteAltitude: Int?) {
+        self.location = location; self.motion = motion; self.altimeter = altimeter
+        self.pedometer = pedometer; self.absoluteAltitude = absoluteAltitude
+    }
 }
 
 nonisolated struct FinishPayload: Codable, Identifiable, Sendable {

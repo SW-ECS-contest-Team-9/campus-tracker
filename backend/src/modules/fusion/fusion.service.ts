@@ -98,8 +98,9 @@ function sensorEventRows(version: string, events: unknown[]) {
 function sessionInputHash(algo: FusionAlgorithm, context: FusionSessionContext): string | null {
   if (algo.version !== 'fusion-v4') return null;
   const stride = (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false ? null : strideCalibrationHash(context.strideCalibration);
-  return context.startHeightMap
-    ? createHash('sha256').update(JSON.stringify({ stride, startHeightMap: context.startHeightMap })).digest('hex')
+  return context.startHeightMap || context.absoluteAltitudeEnabled
+    ? createHash('sha256').update(JSON.stringify({ stride, startHeightMap: context.startHeightMap,
+      ...(context.absoluteAltitudeEnabled ? { absoluteAltitudeEnabled: true } : {}) })).digest('hex')
     : stride;
 }
 
@@ -268,12 +269,14 @@ export async function replaySession(sessionId: string, version: string, trigger:
   const terrainVersionId = algo.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
   const context: FusionSessionContext = {
     strideCalibration: await sessionRepository.getStrideCalibration(sessionId),
+    absoluteAltitudeEnabled: await sessionRepository.getAbsoluteAltitudeEnabled(sessionId),
     startHeightMap: await loadStartHeightMap(algo.config, mapVersionId),
   };
   const inputHash = sessionInputHash(algo, context);
   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
     ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId,
-      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), startHeightMap: context.startHeightMap ?? null, inputHash } } : {}) }
+      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), startHeightMap: context.startHeightMap ?? null,
+        absoluteAltitudeEnabled: context.absoluteAltitudeEnabled ?? false, inputHash } } : {}) }
     : algo.config;
   const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId, inputHash), {
     revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
@@ -319,7 +322,8 @@ export async function replaySession(sessionId: string, version: string, trigger:
     });
     const summary = algo.summarize(state, events);
     const metrics = computeFusionMetrics(timeline, outputs, summary);
-    const rawCounts = { locations: raw.locations.length, motion: raw.motion.length, altimeter: raw.altimeter.length, pedometer: raw.pedometer.length };
+    const rawCounts = { locations: raw.locations.length, motion: raw.motion.length, altimeter: raw.altimeter.length,
+      pedometer: raw.pedometer.length, absoluteAltitude: raw.absoluteAltitude?.length ?? 0 };
     await fusionRepository.completeRun(runId, {
       raw: rawCounts,
       outputs: outputs.length,
@@ -507,7 +511,8 @@ export const fusionService = {
       throw AppError.conflict('SPATIAL_MAP_UNAVAILABLE', `${version} requires a valid spatial map pinned to this session`);
     }
     const terrainVersionId = algo?.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
-    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId), startHeightMap: algo ? await loadStartHeightMap(algo.config, mapVersionId) : null };
+    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId),
+      absoluteAltitudeEnabled: await sessionRepository.getAbsoluteAltitudeEnabled(sessionId), startHeightMap: algo ? await loadStartHeightMap(algo.config, mapVersionId) : null };
     const inputHash = algo ? sessionInputHash(algo, context) : null;
     if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId, inputHash), inputHash))) {
       const run = (await fusionRepository.latestRuns(sessionId)).find((r) => r.algorithmVersion === version);

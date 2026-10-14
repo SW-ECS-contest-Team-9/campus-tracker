@@ -166,7 +166,7 @@ export const fusionRepository = {
 
   /** Everything fusion needs from the raw tables (read-only), in the shape buildTimeline expects. */
   async loadRawSamples(sessionId: string, db: DbClient = pool): Promise<RawSamples> {
-    const [locations, motion, altimeter, pedometer] = await Promise.all([
+    const [locations, motion, altimeter, pedometer, absoluteAltitude] = await Promise.all([
       db.query(
         `SELECT sequence, "timestamp", latitude, longitude, altitude, ellipsoidal_altitude AS "ellipsoidalAltitude",
                 horizontal_accuracy AS "horizontalAccuracy", vertical_accuracy AS "verticalAccuracy", speed, course
@@ -193,8 +193,13 @@ export const fusionRepository = {
           WHERE session_id = $1 ORDER BY "timestamp", id`,
         [sessionId],
       ),
+      db.query(
+        `SELECT sequence, "timestamp", altitude, accuracy, precision, vertical_reference AS "verticalReference",
+                invalid_reason AS "invalidReason", sensor_segment_id AS segment
+           FROM absolute_altitude_samples WHERE session_id = $1`, [sessionId],
+      ),
     ]);
-    return { locations: locations.rows, motion: motion.rows, altimeter: altimeter.rows, pedometer: pedometer.rows };
+    return { locations: locations.rows, motion: motion.rows, altimeter: altimeter.rows, pedometer: pedometer.rows, absoluteAltitude: absoluteAltitude.rows };
   },
 
   // ---- fusion_runs (reprocessing history) ----
@@ -220,7 +225,7 @@ export const fusionRepository = {
   async completeRun(
     id: string,
     r: {
-      raw: { locations: number; motion: number; altimeter: number; pedometer: number };
+      raw: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number };
       outputs: number;
       accepted: number;
       rejected: number;
@@ -235,11 +240,11 @@ export const fusionRepository = {
       `UPDATE fusion_runs SET status = 'COMPLETED', completed_at = now(),
               raw_location_count = $2, raw_motion_count = $3, raw_altimeter_count = $4, raw_pedometer_count = $5,
               output_count = $6, gps_accepted_count = $7, gps_rejected_count = $8, metrics = $9,
-              reanchor_count = $10, divergence_count = $11, warnings = $12
+              reanchor_count = $10, divergence_count = $11, warnings = $12, raw_absolute_altitude_count = $13
         WHERE id = $1`,
       [
         id, r.raw.locations, r.raw.motion, r.raw.altimeter, r.raw.pedometer, r.outputs, r.accepted, r.rejected,
-        JSON.stringify(r.metrics), r.reanchors, r.divergences, JSON.stringify(r.warnings),
+        JSON.stringify(r.metrics), r.reanchors, r.divergences, JSON.stringify(r.warnings), r.raw.absoluteAltitude ?? 0,
       ],
     );
   },

@@ -35,6 +35,7 @@ export const LastSequences = z.object({
   location: z.number().int().min(-1).nullish(),
   motion: z.number().int().min(-1).nullish(),
   altimeter: z.number().int().min(-1).nullish(),
+  absoluteAltitude: z.number().int().min(-1).nullish(),
   pedometer: z.number().int().min(-1).nullish(),
 });
 /** Background diagnostics (all optional, merged into collection_sessions.diagnostics). */

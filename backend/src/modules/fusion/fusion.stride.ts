@@ -97,4 +97,4 @@ export function strideCalibrationConfig(calibration: StrideCalibration | null) {
   } : null;
 }
 
-export type FusionSessionContext = { strideCalibration: StrideCalibration | null; startHeightMap?: StartHeightMap | null };
+export type FusionSessionContext = { strideCalibration: StrideCalibration | null; startHeightMap?: StartHeightMap | null; absoluteAltitudeEnabled?: boolean };

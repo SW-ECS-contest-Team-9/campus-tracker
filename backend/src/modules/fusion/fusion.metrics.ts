@@ -47,6 +47,7 @@ export interface FusionMetrics {
   startHeightSelection?: AlgorithmSummary['startHeightSelection'];
   roadHeightAnchors?: AlgorithmSummary['roadHeightAnchors'];
   circularCorridor?: AlgorithmSummary['circularCorridor'];
+  absoluteAltitude?: AlgorithmSummary['absoluteAltitude'];
   validation: FusionValidation;
 }
 
@@ -106,6 +107,7 @@ export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutp
       healthStrideBlend: summary.healthStrideBlend ?? null,
     },
     terrain: summary.terrain ?? null,
+    absoluteAltitude: summary.absoluteAltitude,
     startHeightSelection: summary.startHeightSelection ?? null,
     roadHeightAnchors: summary.roadHeightAnchors,
     circularCorridor: summary.circularCorridor,

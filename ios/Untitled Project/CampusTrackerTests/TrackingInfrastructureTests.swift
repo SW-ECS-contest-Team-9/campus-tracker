@@ -124,7 +124,7 @@ struct CoordinatorRecoveryRegressionTests {
         second.resumeInterruptedCollection(serverKey: "test")
         await waitUntil { second.captureState == .recording }
         #expect(second.sensorRunClockIdentityForTesting != nil)
-        #expect(anchorIndex == 3, "motion, altimeter and ARKit each get a fresh anchor for the new run")
+        #expect(anchorIndex == 4, "motion, relative altitude, absolute altitude and ARKit each get a fresh anchor for the new run")
         second.ingestSyntheticMotionForTesting(nativeTimestamp: 101)
         second.waitForCaptureIdleForTesting()
         try? await Task.sleep(nanoseconds: 400_000_000)

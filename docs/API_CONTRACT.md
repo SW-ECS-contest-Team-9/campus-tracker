@@ -153,6 +153,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
     "attitude":         { "roll": 0.1, "pitch": 0.2, "yaw": 1.5 }
   }],
   "altimeter": [{ "sequence": 12, "timestamp": "...", "relativeAltitude": 1.25, "pressure": 100.9 }],
+  "absoluteAltitude": [{ "sequence": 1, "timestamp": "...", "altitude": 150.2, "accuracy": 4.8,
+                         "precision": 0.5, "verticalReference": "APPLE_MSL", "invalidReason": null }],
   "pedometer": [{ "timestamp": "...", "numberOfSteps": 120, "distance": 84.2, "currentPace": 0.6,
                   "currentCadence": 1.9, "floorsAscended": 0, "floorsDescended": 0 }]
 }
@@ -266,3 +268,11 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 ## ARKit VIO (schemaVersion 1)
 
 기존 Collector 연결에 `arkit.pose` / `arkit:pose` 이벤트가 추가되었습니다. 일반 WebSocket은 기존 `requestId/type/payload` envelope를 유지하고, Socket.IO는 동일 pose 객체를 이벤트 payload로 전송합니다. payload의 `type`은 `arkit.pose`, 시각은 Unix epoch milliseconds입니다. 기존 telemetry 계약은 유지됩니다. 필수 필드·ACK·제한·세션 초기화·REST 계약은 [ARKit VIO 서버 통합](ARKIT_VIO_SERVER.md#websocket-계약-v1)을 참조하세요.
+
+### iOS absoluteAltitudeV1 (선택 스트림)
+
+`session:start` 응답의 `supportedTelemetryFeatures`에 `absoluteAltitudeV1`이 포함되면 위 선택 배열을 전송할 수 있다. 새 관측은 독립 sequence·측정 시각·sensorSegmentId를 가지며, 상대 기압 샘플에 복사하지 않는다. 해수면 기준 `APPLE_MSL` 값과 추정 오차 `accuracy`, 표시 해상도 `precision`을 원본 그대로 보존한다. null 수치와 음의 고도를 허용하며, `invalidReason`이 있는 관측도 저장하되 기준 채택에서는 제외한다.
+
+`session:finish`와 `session:syncComplete`의 `lastSequences.absoluteAltitude`는 마지막 보존 sequence이며, 빈 스트림은 -1이다. 서버가 광고한 스트림도 기존 스트림과 같은 저장·동기화 보장을 적용한다. 구버전의 필드 누락은 호환된다.
+
+`fusion-v4` revision 15는 `sensorCapabilities.absoluteAltitudeEnabled=true`인 세션 또는 실제 새 관측이 있는 세션에 새 정책을 적용한다. 기본 `absoluteAltitudeMode=fallback`에서 검증한 값은 `zDatumSource=CM_ABSOLUTE`로 기록하고 상대 Z와 함께 추적한다. 검증된 기준이 없으면 지면층을 가정하지 않고 절대 높이를 null로 둔다. 이전 앱·기록은 기존 정책을 유지한다. `CM_ABSOLUTE`는 잠정 추정이며 층 확정의 근거가 아니다. 세부 조건과 배포 순서는 [서버 적용 문서](ABSOLUTE_ALTITUDE_SERVER.md)를 따른다.

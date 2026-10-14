@@ -17,6 +17,7 @@ export interface FusedHeightInput {
   zDatumSigma?: number | null;
   relativeAltitude?: number | null;
   heightAboveGround?: number | null;
+  buildingName?: string | null;
 }
 
 /** Height a fused point is DRAWN at and what that height means. sceneHeight: ellipsoidal -> scene (MSL). */
@@ -27,6 +28,9 @@ export function fusedDisplayHeight(p: FusedHeightInput, fallbackH: number, scene
 }
 
 export const hasAbsoluteHeight = (p: FusedHeightInput) => p.ellipsoidalAltitude != null;
+
+/** Indoor points without a datum belong in the horizontal preview, not on a guessed 3D floor. */
+export const canDrawFusedHeightIn3D = (p: FusedHeightInput) => hasAbsoluteHeight(p) || !p.buildingName;
 
 /**
  * Consecutive points with the same height kind (absolute vs not), each run starting with the last point of the
@@ -41,6 +45,18 @@ export function splitByAbsoluteHeight<T extends FusedHeightInput>(points: T[]): 
     else runs.push({ absolute, points: last ? [last.points.at(-1)!, p] : [p] });
   }
   return runs;
+}
+
+/** Never bridge an unlocated indoor height, including the copied boundary point between height kinds. */
+export function splitByDrawableHeight<T extends FusedHeightInput>(points: T[]): { absolute: boolean; points: T[] }[] {
+  const groups: T[][] = [];
+  let visible: T[] = [];
+  for (const p of points) {
+    if (canDrawFusedHeightIn3D(p)) visible.push(p);
+    else if (visible.length) { groups.push(visible); visible = []; }
+  }
+  if (visible.length) groups.push(visible);
+  return groups.flatMap((g) => splitByAbsoluteHeight(g));
 }
 
 export interface HeightSummary {
@@ -75,8 +91,10 @@ export function describeFusedHeight(p: FusedHeightInput): HeightSummary {
               ? `지도 시작 기준 ±${m(p.zDatumSigma)} — 선택한 길·층별 고도와 기압 변화로 임시 추정`
               : p.zDatumSource === 'ROAD_ANCHOR'
                 ? `길 통과 앵커 ±${m(p.zDatumSigma)} — 연속 보행과 길의 3D 고도로 기압 기준 보정`
-                : '기준 미기록';
-    const provisional = ['GPS_FALLBACK', 'TERRAIN_FALLBACK', 'MAP_START', 'ROAD_ANCHOR', 'TERRAIN_LOOSE', 'GPS_BARO', 'TERRAIN_GPS'].includes(p.zDatumSource ?? '');
+                : p.zDatumSource === 'CM_ABSOLUTE'
+                  ? `아이폰 절대 고도 기반 임시 추정 ±${m(p.zDatumSigma)} — 시작 층 미확정`
+                  : '기준 미기록';
+    const provisional = ['GPS_FALLBACK', 'TERRAIN_FALLBACK', 'MAP_START', 'ROAD_ANCHOR', 'TERRAIN_LOOSE', 'GPS_BARO', 'TERRAIN_GPS', 'CM_ABSOLUTE'].includes(p.zDatumSource ?? '');
     return { kind: 'ABSOLUTE', status: provisional ? '절대 고도 임시 추정' : '절대 고도 추정', datum, floorAllowed: !provisional };
   }
   const projected = p.terrainHeight != null;

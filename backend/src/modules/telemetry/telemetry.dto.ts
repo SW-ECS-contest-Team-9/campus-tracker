@@ -51,6 +51,18 @@ export const AltimeterSample = z.object({
 });
 export type AltimeterSample = z.infer<typeof AltimeterSample>;
 
+export const AbsoluteAltitudeSample = z.object({
+  ...SampleMeta,
+  sequence: Sequence,
+  timestamp: SensorTimestamp,
+  altitude: OptionalNumber,
+  accuracy: OptionalNumber,
+  precision: OptionalNumber,
+  verticalReference: z.literal('APPLE_MSL'),
+  invalidReason: z.string().max(200).nullish(),
+});
+export type AbsoluteAltitudeSample = z.infer<typeof AbsoluteAltitudeSample>;
+
 export const PedometerSample = z.object({
   ...SampleMeta,
   /** optional client sequence (dedupe key stays (session, timestamp)) */
@@ -79,6 +91,7 @@ export const TelemetryBatchRequest = z
   locations: z.array(LocationSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   motion: z.array(MotionSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   altimeter: z.array(AltimeterSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
+  absoluteAltitude: z.array(AbsoluteAltitudeSample).max(MAX_SAMPLES).optional(),
   pedometer: z.array(PedometerSample).max(MAX_SAMPLES).nullish().transform((v) => v ?? []),
   })
   .refine((b) => b.sessionId || b.clientSessionId, { message: 'sessionId or clientSessionId is required', path: ['sessionId'] });

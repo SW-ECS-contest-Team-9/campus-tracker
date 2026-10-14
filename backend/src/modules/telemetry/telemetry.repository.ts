@@ -1,5 +1,5 @@
 import type { PoolClient } from 'pg';
-import type { AltimeterSample, LocationSample, MotionSample, PedometerSample } from './telemetry.dto.js';
+import type { AbsoluteAltitudeSample, AltimeterSample, LocationSample, MotionSample, PedometerSample } from './telemetry.dto.js';
 
 // All sample inserts use INSERT ... SELECT FROM unnest($1::type[], $2::type[], ...):
 // one statement per table per batch, with a constant number of bind parameters
@@ -27,7 +27,7 @@ export const telemetryRepository = {
       batchId: string;
       sessionId: string;
       clientCreatedAt: string | null;
-      counts: { locations: number; motion: number; altimeter: number; pedometer: number };
+      counts: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number };
       captureSource: string | null;
       appState: string | null;
       minCapturedAt: string | null;
@@ -36,13 +36,13 @@ export const telemetryRepository = {
   ): Promise<{ received_at: Date } | null> {
     const { rows } = await db.query<{ received_at: Date }>(
       `INSERT INTO received_batches (batch_id, session_id, client_created_at, location_count, motion_count, altimeter_count, pedometer_count,
-                                     capture_source, app_state, min_captured_at, max_captured_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                                     capture_source, app_state, min_captured_at, max_captured_at, absolute_altitude_count)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        ON CONFLICT (batch_id) DO NOTHING
        RETURNING received_at`,
       [
         data.batchId, data.sessionId, data.clientCreatedAt, data.counts.locations, data.counts.motion, data.counts.altimeter, data.counts.pedometer,
-        data.captureSource, data.appState, data.minCapturedAt, data.maxCapturedAt,
+        data.captureSource, data.appState, data.minCapturedAt, data.maxCapturedAt, data.counts.absoluteAltitude ?? 0,
       ],
     );
     return rows[0] ?? null;
@@ -162,6 +162,22 @@ export const telemetryRepository = {
         samples.map((s) => n(s.pressure)),
         ...meta(samples),
       ],
+    );
+    return rowCount ?? 0;
+  },
+
+  async insertAbsoluteAltitude(db: PoolClient, sessionId: string, samples: AbsoluteAltitudeSample[]): Promise<number> {
+    if (!samples.length) return 0;
+    const { rowCount } = await db.query(
+      `INSERT INTO absolute_altitude_samples
+         (session_id, sequence, "timestamp", altitude, accuracy, precision, vertical_reference, invalid_reason,
+          capture_source, app_state, sensor_segment_id)
+       SELECT $1, t.* FROM unnest($2::bigint[], $3::timestamptz[], $4::float8[], $5::float8[], $6::float8[],
+                                  $7::text[], $8::text[], $9::text[], $10::text[], $11::text[]) AS t
+       ON CONFLICT (session_id, sequence) DO NOTHING`,
+      [sessionId, samples.map((s) => s.sequence), samples.map((s) => s.timestamp), samples.map((s) => n(s.altitude)),
+        samples.map((s) => n(s.accuracy)), samples.map((s) => n(s.precision)), samples.map((s) => s.verticalReference),
+        samples.map((s) => n(s.invalidReason)), ...meta(samples)],
     );
     return rowCount ?? 0;
   },

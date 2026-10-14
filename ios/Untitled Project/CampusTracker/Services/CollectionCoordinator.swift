@@ -50,6 +50,7 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     private let locationService = LocationService()
     private let motionService = MotionService()
     private let altimeterService = AltimeterService()
+    private let absoluteAltitudeService = AbsoluteAltitudeService()
     private let pedometerService = PedometerService()
     private let arkitTrackingService = ARKitTrackingService()
     private let clockFactory: () throws -> TrackingClockAnchor
@@ -71,6 +72,7 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     var isLocationActive: Bool { locationService.isActive }
     var isMotionActive: Bool { motionService.isActive }
     var isAltimeterActive: Bool { altimeterService.isActive }
+    var isAbsoluteAltitudeActive: Bool { absoluteAltitudeService.isActive }
     var isPedometerActive: Bool { pedometerService.isActive }
     var isArkitActive: Bool { arkitTrackingService.isActive }
     var lastLocationTimestamp: Date? { runtimeState?.lastLocationTimestamp }
@@ -127,7 +129,8 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     private func prepareSensorRunClocks() throws -> SensorRunClocks {
         // All three anchors are built and validated before any is used; a failure leaves nothing
         // half-initialized.
-        let clocks = SensorRunClocks(motion: try clockFactory(), altimeter: try clockFactory(), arkit: try clockFactory())
+        let clocks = SensorRunClocks(motion: try clockFactory(), altimeter: try clockFactory(),
+                                     absoluteAltitude: try clockFactory(), arkit: try clockFactory())
         lastPreparedClocks = clocks
         return clocks
     }
@@ -279,6 +282,7 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         if capabilities.locationAvailable { streams.insert(.location) }
         if capabilities.deviceMotionAvailable { streams.insert(.motion) }
         if capabilities.altimeterAvailable { streams.insert(.altimeter) }
+        if capabilities.absoluteAltitudeEnabled == true { streams.insert(.absoluteAltitude) }
         if capabilities.pedometerAvailable { streams.insert(.pedometer) }
         if arkit { streams.insert(.arkit) }
         return streams
@@ -382,6 +386,7 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         locationService.stop()
         motionService.stop()
         altimeterService.stop()
+        absoluteAltitudeService.stop()
         pedometerService.stop()
         arkitTrackingService.stop()
         arkitEnabledSetting = false
@@ -605,6 +610,12 @@ final class CollectionCoordinator: NSObject, ObservableObject {
                 core.submit(.now(.altimeter(capture), appState: box.value), context: context)
             }
             started(.altimeter, altimeterService.isActive)
+        }
+        if let context = contexts[.absoluteAltitude] {
+            absoluteAltitudeService.start { capture in
+                core.submit(.now(.absoluteAltitude(capture), appState: box.value), context: context)
+            }
+            started(.absoluteAltitude, absoluteAltitudeService.isActive)
         }
         if let context = contexts[.pedometer] {
             pedometerService.start(capabilities: capabilities, from: sessionStart, handler: { capture in

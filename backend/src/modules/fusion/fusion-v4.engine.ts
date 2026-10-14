@@ -28,6 +28,8 @@ import { tmForward } from '../../geo/tm.js';
 import { selectStartHeight } from '../../geo/start-height-map.js';
 import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
 import { circularCorridorAnchors } from './fusion-circular-corridor.js';
+import { absoluteAltitudeDatum, observeAbsoluteAltitude, relativeHeightRunAt, relativeHeightSample,
+  type AbsoluteAltitudeDecision, type RelativeHeightRun } from './fusion-absolute-altitude.js';
 import type { FusionConfigV4 } from './fusion.config.js';
 import { checkPedometerCounter, restartPedometerCounter } from './fusion.pedometer.js';
 import type { Observation } from './fusion.timeline.js';
@@ -51,6 +53,7 @@ import {
 } from './fusion-v4.smoother.js';
 
 export type FusionEventV4 =
+  | ({ type: 'absolute-altitude'; t: number } & AbsoluteAltitudeDecision)
   | { type: 'initialized'; t: number; accuracy: number }
   | { type: 'gps'; t: number; seq: number; used: boolean; reason: string | null; accuracy: number | null; innovation: number | null }
   | { type: 'heading-segment'; t: number; reason: string }
@@ -525,12 +528,14 @@ function applyAltimeter(s: FusionStateV4, o: Extract<Observation, { kind: 'altim
   if (!finite(o.relativeAltitude)) return;
   const segChanged = s.lastAltSegment !== undefined && (o.segment ?? null) !== s.lastAltSegment;
   const gap = s.lastAltT === undefined ? 0 : o.t - s.lastAltT;
+  const restarted = segChanged || gap > c.altimeterContinuityMs;
   if (s.z === undefined) s.zOffset = -o.relativeAltitude;
   else if (segChanged || (o.segment == null && gap > c.altimeterContinuityMs)) {
     s.zOffset = s.z - o.relativeAltitude; // sensor restarted: Z continues, the unknown change during the gap is lost
     s.counters.altimeterRebases++;
   } else if (Math.abs(o.relativeAltitude + s.zOffset! - s.z) > c.altimeterMaxSpeedMps * Math.max(gap / 1000, 1)) return; // glitch
   s.z = o.relativeAltitude + s.zOffset!;
+  relativeHeightSample(s.absoluteAltitude, o.t, restarted);
   s.lastAltT = o.t;
   s.lastAltSegment = o.segment ?? null;
   s.altWindow.push({ t: o.t, z: s.z });
@@ -627,6 +632,8 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
   const sigma = Math.max(acc, c.gpsSigmaFloorM);
   if (finite(o.ellipsoidalAltitude) && finite(o.verticalAccuracy) && o.verticalAccuracy > 0 && o.verticalAccuracy <= c.datumMaxVerticalAccuracyM) {
     s.datumSamples.push(o.ellipsoidalAltitude - (s.z ?? 0));
+    const run = relativeHeightRunAt(s.absoluteAltitude, o.t);
+    if (run) run.gpsEllipsoidalOffsets.push(o.ellipsoidalAltitude - (s.z ?? 0));
     if (s.terrain) {
       // orthometric GPS height, only when it agrees with "on the ground" (indoor GPS heights were off by -31..+16 m)
       // ...and only on flat, unmodified ground with a good horizontal fix: on the campus slopes a 20 m position error
@@ -634,7 +641,10 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
       const ground = terrainModel.sampleLatLon(s.terrain, o.latitude, o.longitude);
       const H = o.ellipsoidalAltitude - s.terrain.geoidSeparation;
       if (ground && !ground.modified && (acc ?? Infinity) <= c.gpsDatumMaxAccuracyM && (acc ?? 0) * ground.slope <= 2
-        && Math.abs(H - (ground.height + c.phoneHeightM)) <= c.gpsDatumGateM) s.gpsOffsets.push(H - (s.z ?? 0));
+        && Math.abs(H - (ground.height + c.phoneHeightM)) <= c.gpsDatumGateM) {
+        s.gpsOffsets.push(H - (s.z ?? 0));
+        if (run) run.gpsOffsets.push(H - (s.z ?? 0));
+      }
     }
   }
   if (!s.initialized) {
@@ -843,6 +853,38 @@ function fallbackDatum(s: FusionStateV4, dem: DatumV4 | null, c: FusionConfigV4,
   return gps?.source === 'GPS' ? gps : s.mapStartDatum ?? provisional ?? dem ?? gps;
 }
 
+const absoluteHeightPolicy = (s: FusionStateV4, c: FusionConfigV4) =>
+  c.absoluteAltitudeMode === 'fallback' && s.absoluteAltitude.enabled;
+
+/** Restrict every height reference to one continuous relative-altitude run. No zero is assumed indoors. */
+function scopedDatum(s: FusionStateV4, t: number, c: FusionConfigV4, retrospective = false,
+  contacts = s.contacts, loose = s.looseContacts, heights = s.gpsHeights): DatumV4 | null {
+  const run = relativeHeightRunAt(s.absoluteAltitude, t);
+  if (!run) return null;
+  return scopedDatumSelector(s, run, c, retrospective, contacts, loose, heights)(t);
+}
+
+function scopedDatumSelector(s: FusionStateV4, run: RelativeHeightRun, c: FusionConfigV4, retrospective: boolean,
+  contacts: ContactV4[], loose: ContactV4[], heights: GpsHeightV4[]): (t: number) => DatumV4 | null {
+  const inside = (k: { t: number }) => relativeHeightRunAt(s.absoluteAltitude, k.t) === run;
+  const roads = c.roadHeightAnchorsEnabled ? s.roadHeightContacts.filter(inside) : [];
+  const kept = roads.length ? roads : consistentContacts(contacts.filter(inside), c);
+  if (kept?.length) return smoothDatum(kept, c, roads.length ? 'ROAD_ANCHOR' : 'TERRAIN').at;
+  const values = s.terrain ? run.gpsOffsets : run.gpsEllipsoidalOffsets;
+  if (values.length >= (s.terrain ? c.gpsDatumMinSamples : 1)) {
+    const b = median(values)!, mad = median(values.map((v) => Math.abs(v - b)))!;
+    if (!s.terrain || mad <= c.gpsDatumMaxMadM) {
+      const datum: DatumV4 = { b, sigma: Math.max(3, 1.4826 * mad / Math.sqrt(values.length)),
+        source: 'GPS', frame: s.terrain ? 'ORTHO' : 'ELLIPSOIDAL' };
+      return () => datum;
+    }
+  }
+  const map = run === s.absoluteAltitude.runs[0] ? s.mapStartDatum : null;
+  const provisional = c.provisionalDatumsEnabled
+    ? provisionalDatum(looseDatum(loose.filter(inside), c), baroGpsDatum(heights.filter(inside), c)) : null;
+  return (t) => map ?? provisional ?? absoluteAltitudeDatum(s.absoluteAltitude, t, c, retrospective);
+}
+
 /** Evaluate start materials once; relative barometric movement then continues from this fixed zero. */
 function mapStartDatum(s: FusionStateV4, x: Vec3, sigma: number, z: number, c: FusionConfigV4): DatumV4 | undefined {
   if (!s.startHeightMap || !s.terrain || !s.origin || (!c.startHeightRoadsEnabled && !c.startHeightFloorsEnabled)) return undefined;
@@ -930,6 +972,10 @@ function forwardProvisional(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null
 }
 
 function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
+  if (absoluteHeightPolicy(s, c)) {
+    if (!s.startHeightSelection && s.z !== undefined) s.mapStartDatum = mapStartDatum(s, s.x, sigmaXY(s.P), s.z, c);
+    return scopedDatum(s, s.lastObservationT ?? 0, c);
+  }
   if (c.roadHeightAnchorsEnabled && s.roadHeightContacts.length) {
     return smoothDatum(s.roadHeightContacts.slice(-12), c, 'ROAD_ANCHOR').at(s.lastObservationT ?? s.roadHeightContacts.at(-1)!.t);
   }
@@ -1083,6 +1129,20 @@ function makeLiveOutput(s: FusionStateV4, t: number, c: FusionConfigV4): FusedOu
 
 export function processObservationV4(s: FusionStateV4, o: Observation, c: FusionConfigV4): StepResultV4 {
   const r: StepResultV4 = { outputs: [], events: [] };
+  if (o.kind === 'absoluteAltitude') {
+    if (c.absoluteAltitudeMode === 'off') return r;
+    s.absoluteAltitude.enabled = true;
+    if (s.lastObservationT !== undefined && o.t < s.lastObservationT) {
+      s.skippedLateObservations++;
+      return r;
+    }
+    const terrain = s.terrain ?? o.terrainContext;
+    const decision = observeAbsoluteAltitude(s.absoluteAltitude, o,
+      s.lastAltT === undefined || s.z === undefined ? null : { t: s.lastAltT, z: s.z, speed: verticalSpeed(s, o.t, c) },
+      terrain != null && finite(terrain.geoidSeparation), c);
+    r.events.push({ type: 'absolute-altitude', t: o.t, ...decision });
+    return r; // do not advance XY, stationary time, lastObservationT, or the position output schedule
+  }
   if (s.terrain === undefined && o.terrainContext !== undefined) s.terrain = o.terrainContext;
   if (s.lastObservationT !== undefined && o.t < s.lastObservationT) {
     s.skippedLateObservations++;
@@ -1337,22 +1397,37 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   }
   // provisional datums on the smoothed track: ground and footprint under each GPS height re-read at the final XY
   let provisional: DatumV4 | null = null;
-  if (!terrainDatum && c.provisionalDatumsEnabled && points.length) {
+  let heightsForScoped = s.gpsHeights;
+  if ((!terrainDatum || absoluteHeightPolicy(s, c)) && c.provisionalDatumsEnabled && points.length) {
     let k = 0;
     const heights = s.gpsHeights.map((h) => {
       while (k + 1 < points.length && points[k + 1].t <= h.t) k++;
       return { ...h, z: zAt(h.t) ?? h.z, ...groundUnder(s, points[k].x) };
     });
+    heightsForScoped = heights;
     provisional = provisionalDatum(looseDatum(looseContacts, c), baroGpsDatum(heights, c));
   }
   const fallback = terrainDatum ? null : fallbackDatum(s, provisionalDem, c, provisional);
-  const datumAt = (t: number): DatumV4 | null => (terrainDatum ? terrainDatum.at(t) : fallback);
+  const scopedSelectors = new Map<RelativeHeightRun, (t: number) => DatumV4 | null>();
+  const datumAt = (t: number): DatumV4 | null => {
+    if (!absoluteHeightPolicy(s, c)) return terrainDatum ? terrainDatum.at(t) : fallback;
+    const run = relativeHeightRunAt(s.absoluteAltitude, t);
+    if (!run) return null;
+    let select = scopedSelectors.get(run);
+    if (!select) {
+      select = scopedDatumSelector(s, run, c, true, contacts, looseContacts, heightsForScoped);
+      scopedSelectors.set(run, select);
+    }
+    return select(t);
+  };
+  const representativeDatum = datumAt(points.at(-1)?.t ?? 0);
   s.smoothed = {
-    datumSource: terrainDatum ? (roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : fallback?.source ?? 'NONE',
+    datumSource: absoluteHeightPolicy(s, c) ? representativeDatum?.source ?? 'NONE'
+      : terrainDatum ? (roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : fallback?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
     contactCandidates: contacts.length,
     contactRejects,
-    datumSigma: terrainDatum ? terrainDatum.sigma : (fallback?.sigma ?? null),
+    datumSigma: absoluteHeightPolicy(s, c) ? representativeDatum?.sigma ?? null : terrainDatum ? terrainDatum.sigma : (fallback?.sigma ?? null),
     driftRangeM: terrainDatum ? terrainDatum.driftRange : null,
     gpsAccepted: accepted,
     gpsDownweighted: weights.length - accepted,
@@ -1447,6 +1522,8 @@ export function summarizeV4(s: FusionStateV4) {
   }
   return {
     startHeightSelection: s.startHeightSelection ?? null,
+    absoluteAltitude: { enabled: s.absoluteAltitude.enabled, accepted: s.absoluteAltitude.accepted,
+      reasons: s.absoluteAltitude.rejected, runs: s.absoluteAltitude.runs.map((a) => ({ from: a.from, through: a.through, anchor: a.anchor ?? null })) },
     circularCorridor: s.circularCorridor,
     roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
     gpsAccepted: accepted,

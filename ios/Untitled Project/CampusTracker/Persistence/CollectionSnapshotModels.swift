@@ -42,6 +42,7 @@ nonisolated struct CollectionDiagnostics: Codable, Sendable {
     var locationGaps = SensorGapSummary()
     var motionGaps = SensorGapSummary()
     var altimeterGaps = SensorGapSummary()
+    var absoluteAltitudeGaps: SensorGapSummary? = nil
     var pedometerGaps = SensorGapSummary()
     var pendingUploadPeakCount = 0
     var lowPowerModeObserved = false
@@ -63,6 +64,7 @@ nonisolated struct PendingStopState: Codable, Equatable, Sendable {
     let motionSequence: Int
     let altimeterSequence: Int
     let pedometerSequence: Int
+    var absoluteAltitudeSequence: Int? = nil
 }
 
 /// The durable per-session capture snapshot. Since the SQLite migration this lives in
@@ -76,11 +78,13 @@ nonisolated struct ActiveCollectionState: Codable, Sendable {
     var motionSequence: Int
     var altimeterSequence: Int
     var pedometerSequence: Int
+    var absoluteAltitudeSequence: Int? = nil
     var lastPersistedAt: Date
     var lastLocationTimestamp: Date?
     var lastMotionTimestamp: Date?
     var lastAltimeterTimestamp: Date?
     var lastPedometerTimestamp: Date?
+    var lastAbsoluteAltitudeTimestamp: Date? = nil
     var diagnostics: CollectionDiagnostics
     var pendingStop: PendingStopState? = nil
 }
@@ -92,4 +96,5 @@ nonisolated struct SequenceLease: Codable, Sendable {
     var motion = 0
     var altimeter = 0
     var pedometer = 0
+    var absoluteAltitude: Int? = nil
 }

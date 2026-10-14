@@ -21,8 +21,11 @@ import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fus
 import type { StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact } from './fusion-road-height.js';
 import type { CircularSummary } from './fusion-circular-corridor.js';
+import { validateAbsoluteAltitudeConfig } from './fusion-absolute-altitude.js';
 
 export interface AlgorithmSummary {
+  absoluteAltitude?: { enabled: boolean; accepted: number; reasons: Record<string, number>;
+    runs: { from: number; through: number; anchor: { t: number; seq: number; b: number; sigma: number } | null }[] };
   startHeightSelection?: StartHeightSelection | null;
   roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
   circularCorridor?: CircularSummary;
@@ -189,7 +192,9 @@ const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
   diagnostics: (_s, events) => diagnosticsFromEvents(events),
 };
 
-const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => ({
+const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => {
+  validateAbsoluteAltitudeConfig(cfg);
+  return {
   version: 'fusion-v4',
   // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors;
   // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3;
@@ -201,7 +206,7 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
   // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
   // 13: motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes.
-  revision: 14, // provisional Z datums: loose ground contacts on modified ground + barometer-consistent GPS heights
+  revision: 15, // optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,
@@ -214,7 +219,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   describeEvent: describeEventV4,
   diagnostics: diagnosticsV4,
   withConfig: (c) => makeV4(c as FusionConfigV4),
-});
+  };
+};
 const fusionV4 = makeV4(fusionConfigV4);
 
 export const FUSION_ALGORITHMS: Record<string, FusionAlgorithm> = {

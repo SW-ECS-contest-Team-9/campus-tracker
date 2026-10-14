@@ -5,7 +5,20 @@ import Foundation
 nonisolated struct SensorRunClocks: Sendable {
     let motion: TrackingClockAnchor
     let altimeter: TrackingClockAnchor
+    let absoluteAltitude: TrackingClockAnchor
     let arkit: TrackingClockAnchor
+
+    init(motion: TrackingClockAnchor, altimeter: TrackingClockAnchor, arkit: TrackingClockAnchor) {
+        self.init(motion: motion, altimeter: altimeter, absoluteAltitude: altimeter, arkit: arkit)
+    }
+
+    init(motion: TrackingClockAnchor, altimeter: TrackingClockAnchor,
+         absoluteAltitude: TrackingClockAnchor, arkit: TrackingClockAnchor) {
+        self.motion = motion
+        self.altimeter = altimeter
+        self.absoluteAltitude = absoluteAltitude
+        self.arkit = arkit
+    }
 }
 
 nonisolated struct CollectionCoreConfiguration: Sendable {
@@ -110,6 +123,7 @@ nonisolated extension SampleCounts {
         case "location": location += amount
         case "motion": motion += amount
         case "altimeter": altimeter += amount
+        case "absoluteAltitude": absoluteAltitude += amount
         case "pedometer": pedometer += amount
         case "marker": marker += amount
         default: break
@@ -214,7 +228,9 @@ nonisolated final class CollectionCore: @unchecked Sendable {
                                     walkingFrame: request.walkingFrame)
                 // Recovery rule: never reuse a sequence any earlier process could have issued.
                 let snapshotSequences = ["location": snapshot.locationSequence, "motion": snapshot.motionSequence,
-                                         "altimeter": snapshot.altimeterSequence, "pedometer": snapshot.pedometerSequence]
+                                         "altimeter": snapshot.altimeterSequence,
+                                         "absoluteAltitude": snapshot.absoluteAltitudeSequence ?? 0,
+                                         "pedometer": snapshot.pedometerSequence]
                 run.durable = SampleCounts()
                 for (stream, lease) in leases {
                     let lastIssued = max(snapshotSequences[stream] ?? 0, lease.lastRecorded, lease.reservedExclusive - 1, 0)
@@ -412,7 +428,8 @@ nonisolated final class CollectionCore: @unchecked Sendable {
         final.apply(intent)
         final.pendingStop = PendingStopState(endedAt: intent.endedAt, reason: intent.reason,
                                              locationSequence: manifest.location, motionSequence: manifest.motion,
-                                             altimeterSequence: manifest.altimeter, pedometerSequence: manifest.pedometer)
+                                             altimeterSequence: manifest.altimeter, pedometerSequence: manifest.pedometer,
+                                             absoluteAltitudeSequence: manifest.absoluteAltitude)
         let finish = FinishPayload(clientSessionId: sessionID.uuidString, sessionId: nil, endedAt: intent.endedAt,
                                    lastSequences: manifest, interrupted: intent.interrupted)
         let draft = UploadItemDraft(kind: .finish, itemID: sessionID.uuidString, payload: try encoder.encode(finish))
@@ -483,6 +500,7 @@ nonisolated final class CollectionCore: @unchecked Sendable {
             case let .location(value): try processLocation(value, captured: captured, context: context, run: run)
             case let .motion(value): try processMotion(value, captured: captured, context: context, run: run)
             case let .altimeter(value): try processAltimeter(value, captured: captured, context: context, run: run)
+            case let .absoluteAltitude(value): try processAbsoluteAltitude(value, captured: captured, context: context, run: run)
             case let .pedometer(value): try processPedometer(value, captured: captured, context: context, run: run)
             case let .arkit(value): try processArkit(value, captured: captured, context: context, run: run)
             }
@@ -656,6 +674,37 @@ nonisolated final class CollectionCore: @unchecked Sendable {
         run.snapshot.lastAltimeterTimestamp = measuredAt
         run.snapshot.altimeterSequence = sequence
         run.latestRelativeAltitude = value.relativeAltitude
+    }
+
+    private func processAbsoluteAltitude(_ value: AbsoluteAltitudeCapture, captured: CapturedSample,
+                                         context: TrackingCaptureContext, run: ActiveRun) throws {
+        guard value.nativeTimestamp.isFinite, value.nativeTimestamp >= 0,
+              let clock = run.clocks?.absoluteAltitude,
+              let measuredAt = try? clock.map(nativeTimestamp: value.nativeTimestamp) else {
+            return rejectInvalid(.absoluteAltitude, run: run)
+        }
+        observeClock(stream: .absoluteAltitude, native: value.nativeTimestamp, measuredAt: measuredAt,
+                     captured: captured, clock: clock, run: run)
+        let sequence = try issue(run, stream: CaptureStream.absoluteAltitude.rawValue)
+        let altitude = value.altitude.finiteOrNil
+        let accuracy = value.accuracy.finiteOrNil
+        let precision = value.precision.finiteOrNil
+        let invalidReason: String? = altitude == nil ? "NON_FINITE_ALTITUDE" :
+            (accuracy == nil ? "NON_FINITE_ACCURACY" : (precision == nil ? "NON_FINITE_PRECISION" : nil))
+        let sample = AbsoluteAltitudeSample(
+            id: UUID(), sessionId: run.sessionID, sequence: sequence, timestamp: measuredAt,
+            altitude: altitude, accuracy: accuracy, precision: precision, verticalReference: "APPLE_MSL",
+            sensorSegmentId: context.streamSegmentID.uuidString, captureSource: .live,
+            appState: captured.appState, invalidReason: invalidReason)
+        let envelope = RawSampleEnvelope(capture: metadata(captured, context: context, native: value.nativeTimestamp,
+            systemTime: nil, clock: clock, stream: .absoluteAltitude, run: run), sample: sample)
+        try append(run, stream: CaptureStream.absoluteAltitude.rawValue, sequence: sequence,
+                   measuredAt: measuredAt, payload: encoder.encode(envelope))
+        var gaps = run.snapshot.diagnostics.absoluteAltitudeGaps ?? SensorGapSummary()
+        gaps.record(previous: run.snapshot.lastAbsoluteAltitudeTimestamp, current: measuredAt, expectedInterval: 1)
+        run.snapshot.diagnostics.absoluteAltitudeGaps = gaps
+        run.snapshot.lastAbsoluteAltitudeTimestamp = measuredAt
+        run.snapshot.absoluteAltitudeSequence = sequence
     }
 
     private func processPedometer(_ value: PedometerCapture, captured: CapturedSample,
@@ -971,6 +1020,7 @@ nonisolated extension ActiveCollectionState {
         session.endedAt = intent.endedAt
         pendingStop = PendingStopState(endedAt: intent.endedAt, reason: intent.reason,
                                        locationSequence: locationSequence, motionSequence: motionSequence,
-                                       altimeterSequence: altimeterSequence, pedometerSequence: pedometerSequence)
+                                       altimeterSequence: altimeterSequence, pedometerSequence: pedometerSequence,
+                                       absoluteAltitudeSequence: absoluteAltitudeSequence)
     }
 }

@@ -5,7 +5,7 @@
 // with a white outline. Raw sample dots are colored by GPS accuracy instead.
 import type { FusedPosition, LocationPoint, Marker, SpatialGpsDecision, SpatialMap } from './api';
 import type { Viewer } from './vworld';
-import { describeFusedHeight, fusedDisplayHeight, hasAbsoluteHeight, splitByAbsoluteHeight } from './track-display';
+import { canDrawFusedHeightIn3D, describeFusedHeight, fusedDisplayHeight, hasAbsoluteHeight, splitByDrawableHeight } from './track-display';
 
 const Cesium = () => (window as any).Cesium;
 
@@ -386,7 +386,7 @@ export class SessionTrack {
     let mainUsed = false;
     l.line.polyline.positions = [];
     for (const [segmentId, segment] of segments) {
-      for (const run of splitByAbsoluteHeight(segment)) {
+      for (const run of splitByDrawableHeight(segment)) {
         if (run.points.length < 2) continue;
         const positions = run.points.map((f) => fusedCartesian(f, h));
         if (run.absolute && segmentId === currentSegmentId && !mainUsed) {
@@ -398,6 +398,7 @@ export class SessionTrack {
     for (const line of l.additionalLines) line.show = l.line.show;
     l.dots.removeAll();
     for (const f of l.list) {
+      if (!canDrawFusedHeightIn3D(f)) continue;
       l.dots.add({
         id: { kind: 'fused', sessionId: this.sessionId, version, seq: f.fusionSequence } satisfies PickId,
         position: fusedCartesian(f, h),

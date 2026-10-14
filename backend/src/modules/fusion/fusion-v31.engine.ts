@@ -436,6 +436,7 @@ function makeOutput(s: FusionStateV31, t: number): FusedOutput | null {
 }
 
 export function processObservationV31(s: FusionStateV31, o: Observation): StepResultV31 {
+  if (o.kind === 'absoluteAltitude') return { outputs: [], events: [] };
   const result: StepResultV31 = { outputs: [], events: [] };
   if (o.spatialContext !== undefined) { s.context = o.spatialContext; s.mapVersionId = o.spatialContext?.mapVersionId ?? null; }
   if (s.lastObservationT === undefined) {

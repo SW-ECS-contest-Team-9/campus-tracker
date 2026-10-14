@@ -4,6 +4,7 @@ import { createPedometerCounter, type PedometerCounter } from './fusion.pedomete
 import { diag3, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
 import type { StrideCalibration } from './fusion.stride.js';
 import type { FusionSessionContext } from './fusion.stride.js';
+import { createAbsoluteAltitudeTracker } from './fusion-absolute-altitude.js';
 import type { StartHeightMap, StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
 import type { CircularSummary } from './fusion-circular-corridor.js';
@@ -35,7 +36,7 @@ export interface HeadingSegmentV4 { id: number; startT: number; reason: string; 
 export interface ContactV4 { t: number; offset: number; variance: number }
 export interface GpsHeightV4 { t: number; H: number; hacc: number; z: number; ground: number | null; inside: boolean }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
@@ -63,6 +64,7 @@ export interface SmoothedSummaryV4 {
 }
 
 export interface FusionStateV4 {
+  absoluteAltitude: import('./fusion-absolute-altitude.js').AbsoluteAltitudeTracker;
   healthStrideCalibration?: StrideCalibration;
   strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
   healthStrideBlend?: number;
@@ -212,6 +214,7 @@ export const emptyWindowV4 = (): FusionStateV4['window'] => ({
 
 export function createFusionStateV4(context?: FusionSessionContext): FusionStateV4 {
   return {
+    absoluteAltitude: createAbsoluteAltitudeTracker(context?.absoluteAltitudeEnabled === true),
     startHeightMap: context?.startHeightMap,
     ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
     ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),

@@ -5,6 +5,8 @@ nonisolated struct SensorCapabilities: Codable, Sendable {
     let locationAvailable: Bool
     let deviceMotionAvailable: Bool
     let altimeterAvailable: Bool
+    var absoluteAltitudeAvailable: Bool? = nil
+    var absoluteAltitudeEnabled: Bool? = nil
     let stepCountingAvailable: Bool
     let distanceAvailable: Bool
     let floorCountingAvailable: Bool
@@ -87,8 +89,27 @@ nonisolated struct SampleCounts: Codable, Equatable, Sendable {
     var location = 0
     var motion = 0
     var altimeter = 0
+    var absoluteAltitude = 0
     var pedometer = 0
     var marker = 0
+
+    enum CodingKeys: String, CodingKey { case location, motion, altimeter, absoluteAltitude, pedometer, marker }
+
+    init(location: Int = 0, motion: Int = 0, altimeter: Int = 0, absoluteAltitude: Int = 0,
+         pedometer: Int = 0, marker: Int = 0) {
+        self.location = location; self.motion = motion; self.altimeter = altimeter
+        self.absoluteAltitude = absoluteAltitude; self.pedometer = pedometer; self.marker = marker
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(location: try c.decodeIfPresent(Int.self, forKey: .location) ?? 0,
+                  motion: try c.decodeIfPresent(Int.self, forKey: .motion) ?? 0,
+                  altimeter: try c.decodeIfPresent(Int.self, forKey: .altimeter) ?? 0,
+                  absoluteAltitude: try c.decodeIfPresent(Int.self, forKey: .absoluteAltitude) ?? 0,
+                  pedometer: try c.decodeIfPresent(Int.self, forKey: .pedometer) ?? 0,
+                  marker: try c.decodeIfPresent(Int.self, forKey: .marker) ?? 0)
+    }
 }
 
 nonisolated struct CollectionSession: Codable, Identifiable, Sendable {
@@ -259,6 +280,21 @@ nonisolated struct AltimeterSample: Codable, Sendable {
     let pressure: Double
     let appState: CollectorAppState
     let sensorSegmentId: String
+}
+
+nonisolated struct AbsoluteAltitudeSample: Codable, Sendable {
+    let id: UUID
+    let sessionId: UUID
+    let sequence: Int
+    let timestamp: Date
+    let altitude: Double?
+    let accuracy: Double?
+    let precision: Double?
+    let verticalReference: String
+    let sensorSegmentId: String
+    let captureSource: SensorCaptureSource
+    let appState: CollectorAppState
+    let invalidReason: String?
 }
 
 nonisolated enum SensorCaptureSource: String, Codable, Sendable {
