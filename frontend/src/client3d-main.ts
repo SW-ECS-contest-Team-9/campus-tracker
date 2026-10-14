@@ -26,6 +26,8 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getEleme
 const nativeView = () => (window as any).ReactNativeWebView as { postMessage: (s: string) => void } | undefined;
 const query = new URLSearchParams(location.search);
 let light = query.get('light') === '1';
+/** ?ui=min: 페이지 자체의 층 판을 숨김(앱이 층 고르기를 직접 보여 줄 때) */
+const minimalUi = query.get('ui') === 'min';
 
 type Unversioned<T> = T extends unknown ? Omit<T, 'v'> : never;
 function emit(event: Unversioned<PageEvent>) {
@@ -209,7 +211,7 @@ async function boot() {
       $('c3d-floors-list').innerHTML = '';
       return;
     }
-    panel.hidden = !floorState;
+    panel.hidden = !floorState || minimalUi;
     if (!floorState) return;
     const { building, floors, index, explode } = floorState;
     $('c3d-floors-title').textContent = nameOf(building);
@@ -355,6 +357,10 @@ async function boot() {
     end(c.points[0], COLOR.confirmed, '출발');
     end(c.points[c.points.length - 1], COLOR.primary, '도착');
     for (const f of c.floorChanges) end(f.at, COLOR.change, f.label ?? '층 이동');
+    // 경로 전체가 보이게(따라가기는 멈추고 "현재 위치로" 단추를 보임)
+    const sphere = C.BoundingSphere.fromPoints(c.points.map((p) => cart(p, 0)));
+    camera.flyToBoundingSphere(sphere, { duration: 0.9, offset: new C.HeadingPitchRange(camera.heading, C.Math.toRadians(CAMERA.pitchDeg), Math.max(120, sphere.radius * 2.6)) });
+    setFollowing(false);
   }
 
   // ---------- 메시지 ----------
