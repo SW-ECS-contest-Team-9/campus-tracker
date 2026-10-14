@@ -1,6 +1,8 @@
 import './styles.css';
+import { ArkitPreview } from './arkit';
 import {
   api,
+  API_BASE_URL,
   DELETE_CONFIRM_TEXT,
   type CollectorState,
   type CarriagewayRoad,
@@ -42,6 +44,7 @@ import {
   type LayerVisibility,
   type PickId,
 } from './trajectory';
+import { describeFusedHeight, describeHeading, fusedDisplayHeight, publishedStage, relativeAltitudeLabel, sessionStateLines, STAGE_LABEL } from './track-display';
 
 // ---------------- state ----------------
 type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | { kind: 'building'; id: string } | { kind: 'mobility'; pick: MobilityPick } | { kind: 'structure'; id: string } | null;
@@ -61,6 +64,7 @@ const state = {
   sessions: [] as Session[],
 };
 
+const arkitPreview = new ArkitPreview(document.getElementById('arkit-panel')!, API_BASE_URL);
 let viewer: Viewer | null = null;
 const lab = new Lab(document.getElementById('lab-panel')!, () => viewer);
 let spatialMapOverlay: SpatialMapOverlay | null = null;
@@ -122,6 +126,7 @@ function ensureTrack(sessionId: string, collectorId: string): Promise<void> {
   }
   let load = trackLoads.get(sessionId);
   if (!load) {
+    void arkitPreview.load(sessionId);
     load = reloadTrack(sessionId);
     trackLoads.set(sessionId, load);
   }
@@ -198,6 +203,8 @@ function liftedTracks(): LvTrack[] {
 }
 
 function applyVisibility() {
+  const selected = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
+  arkitPreview.setVisible(state.mode === 'live' ? liveSessionIds : new Set(state.mode === 'history' && selected ? [selected] : []));
   for (const [id, track] of tracks) {
     track.setLayers(state.layers);
     const selectedSession = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
@@ -210,7 +217,9 @@ function applyVisibility() {
 
 async function loadRuns(sessionId: string) {
   try {
-    state.runs.set(sessionId, (await api.fusionSummary(sessionId)).runs);
+    const [summary, detail] = await Promise.all([api.fusionSummary(sessionId), api.session(sessionId)]);
+    state.runs.set(sessionId, summary.runs);
+    upsertSession(detail); // the detail carries the sync manifest and receive bookkeeping
   } catch (err) {
     console.error(err);
   }
@@ -248,12 +257,19 @@ async function onReconnect() {
   void mobilityLayer?.reload().catch(() => undefined); // QGIS edits made while disconnected
   void reloadSceneLayers().catch(() => undefined); // roads edited while disconnected
   await loadInitial();
+  await Promise.all([...tracks.keys()].map(id => arkitPreview.load(id)));
   await Promise.all([...tracks.keys()].map((id) => reloadTrack(id, true)));
 }
 
 // ---------------- realtime handlers ----------------
 function startRealtime() {
   connectPreview({
+    onArkitPose(event) {
+      arkitPreview.pose(event);
+      if (state.mode === 'live' && !liveSessionIds.has(event.sessionId)) { liveSessionIds.add(event.sessionId); applyVisibility(); }
+      scheduleRender();
+    },
+    onArkitUpdated({sessionId}) { if(tracks.has(sessionId) || liveSessionIds.has(sessionId)) void arkitPreview.load(sessionId).then(scheduleRender); },
     onConnectionChange(connected) {
       state.connected = connected;
       scheduleRender();
@@ -422,6 +438,9 @@ function fusedRows(f: FusedPosition) {
   const hasDiagnostics = f.stationary != null || f.headingSource != null;
   const hasV21 = f.reanchored != null || f.gpsQuality != null || f.divergenceDetected != null;
   const na = `<span class="muted">not recorded by ${esc(f.algorithmVersion)}</span>`;
+  const height = describeFusedHeight(f);
+  const shown = fusedDisplayHeight(f, 0, sceneHeight);
+  const heading = describeHeading(f);
   const gps = !hasDiagnostics
     ? na
     : f.gpsUsed == null
@@ -433,32 +452,27 @@ function fusedRows(f: FusedPosition) {
     row('Algorithm', esc(f.algorithmVersion)),
     row('Time', `${time(f.timestamp)} (${ago(f.timestamp)})`),
     row('Lon / Lat', `${f.longitude.toFixed(6)}, ${f.latitude.toFixed(6)}`),
-    row('Ellipsoidal', num(f.ellipsoidalAltitude, 1, ' m')),
+    row('절대 고도 (타원체)', height.kind === 'ABSOLUTE' ? num(f.ellipsoidalAltitude, 1, ' m') : `<span class="tag warn">미확정</span> ${esc(height.status)}`),
     ...(f.zDatumSource != null
       ? [
-          row(
-            'Height reference',
-            f.zDatumSource === 'TERRAIN'
-              ? `<span class="tag active">TERRAIN</span> ground contacts ±${num(f.zDatumSigma, 1, ' m')}`
-              : f.zDatumSource === 'GPS'
-                ? `<span class="tag warn">GPS</span> ±${num(f.zDatumSigma, 1, ' m')} (no outdoor ground contact)`
-                : '<span class="tag warn">NONE</span> no ground contact or consistent GPS height — drawn on the terrain',
-          ),
+          row('절대 고도 기준', `<span class="tag ${f.zDatumSource === 'TERRAIN' ? 'active' : 'warn'}">${esc(f.zDatumSource)}</span> ${esc(height.datum)}`),
+          row('표시용 높이', `${shown.h.toFixed(1)} m MSL${shown.kind === 'ABSOLUTE' ? '' : shown.kind === 'GROUND_PROJECTED' ? ' — 지면(DEM)+1 m 에 투영한 그리기용 값, 층·높이 추정 아님' : ' — 임시 그리기용 값'}`),
           row('Ground (DEM, MSL)', num(f.terrainHeight, 1, ' m')),
-          row('Above ground', f.heightAboveGround != null ? `<b>${f.heightAboveGround.toFixed(1)} m</b>` : '–'),
-          row('Building', esc(f.buildingName ?? '– (outside footprints)')),
-          row('Floor (calibrated)', esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)')),
+          row('Above ground', f.heightAboveGround != null ? `<b>${f.heightAboveGround.toFixed(1)} m</b>` : '– (절대 고도 없음)'),
+          row('Building (지도상 위치)', esc(f.buildingName ?? '– (outside footprints)')),
+          row('Floor (calibrated)', height.floorAllowed ? esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)') : '– (절대 고도 미확정: 층을 정할 수 없음)'),
         ]
       : []),
+    row(esc(relativeAltitudeLabel(f.algorithmVersion)), num(f.relativeAltitude ?? null, 2, ' m')),
     row('Position source', `<span class="tag">${esc(f.source)}</span>`),
     row('Motion state', !hasDiagnostics ? na : f.stationary ? '<b>STATIONARY</b>' : 'MOVING'),
-    row('Heading', f.heading != null ? `${f.heading.toFixed(1)}°` : '– (not anchored yet)'),
+    row('Heading', heading.known ? esc(heading.text) : `<span class="tag warn">UNKNOWN</span> ${esc(heading.text)}`),
     row('Heading source', hasDiagnostics ? esc(f.headingSource ?? '–') : na),
     row('GPS', `${gps}${f.gpsRejectReason ? ` <b>${esc(f.gpsRejectReason)}</b>` : ''}`),
-    row('GPS H accuracy', f.gpsHorizontalAccuracy != null ? `${dot(accuracyColor(f.gpsHorizontalAccuracy))}${num(f.gpsHorizontalAccuracy, 1, ' m')}` : '–'),
-    row('Innovation', num(f.innovationDistance, 1, ' m')),
+    row('GPS 보고 정확도 (폰의 주장)', f.gpsHorizontalAccuracy != null ? `${dot(accuracyColor(f.gpsHorizontalAccuracy))}${num(f.gpsHorizontalAccuracy, 1, ' m')}` : '–'),
+    row('GPS와의 차이 (innovation, 오차 아님)', num(f.innovationDistance, 1, ' m')),
     row('Uncertainty (heuristic)', num(f.horizontalUncertainty, 1, ' m')),
-    row('Confidence H / V / all', `${f.horizontalConfidence.toFixed(2)} / ${f.verticalConfidence.toFixed(2)} / <b>${f.overallConfidence.toFixed(2)}</b>`),
+    row('내부 confidence H / V / all (정확도 아님)', `${f.horizontalConfidence.toFixed(2)} / ${f.verticalConfidence.toFixed(2)} / <b>${f.overallConfidence.toFixed(2)}</b>`),
     ...(hasV21
       ? [
           row('Local X / Y / Z', `${num(f.localX, 1)} / ${num(f.localY, 1)} / ${num(f.localZ, 1)} m`),
@@ -471,7 +485,6 @@ function fusedRows(f: FusedPosition) {
                 ? `<span class="tag active">applied</span>${f.pdrRejectReason ? ` ${esc(f.pdrRejectReason)}` : ''}`
                 : `<span class="tag warn">not applied</span> <b>${esc(f.pdrRejectReason ?? '')}</b>`,
           ),
-          row('Relative altitude (raw)', num(f.relativeAltitude, 2, ' m')),
           row('Re-anchored', f.reanchored ? `<span class="tag warn">yes</span> <b>${esc(f.reanchorReason ?? '')}</b>` : 'no'),
           row('Divergence detected', f.divergenceDetected ? '<span class="tag warn">yes — state reset to GPS evidence</span>' : 'no'),
         ]
@@ -488,6 +501,7 @@ function setHtml(id: string, html: string) {
 }
 
 function render() {
+  arkitPreview.render(state.connected);
   spaceViews?.level.tracksChanged(); // F10: what is lifted follows the sessions and layers shown
   const status = $('socket-status');
   status.textContent = state.connected ? 'live' : 'disconnected';
@@ -524,7 +538,7 @@ function render() {
         return `<li data-session="${esc(s.sessionId)}" class="${sel ? 'selected' : ''}">
           ${dot(collectorColor(s.collectorId))}
           <b>${esc(s.collectorId)}</b>
-          <span class="tag ${s.status.toLowerCase()}">${s.status}</span>
+          <span class="tag ${s.status.toLowerCase()}">${s.status}</span>${s.status === 'ACTIVE' && (s.syncState === 'OFFLINE' || s.syncState === 'DELAYED') ? '<span class="tag warn" title="종료된 것이 아님: 종료 요청을 받지 못했고 최근 수신이 없음">최근 수신 없음</span>' : ''}
           <span class="muted right">${new Date(s.startedAt).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           <div class="sub muted">${s.locationCount} pts · ${s.markerCount} markers · ${esc(s.sessionId.slice(0, 8))}</div>
         </li>`;
@@ -600,6 +614,10 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
     if (event.eventType === 'position-suppressed') return `위치 출력 보류 · ${String(d.reason ?? '')} · 오차 ${Number(d.uncertaintyM ?? 0).toFixed(1)} m`;
     return event.eventType;
   };
+  const liveRun = runs.find((r) => r.algorithmVersion === state.fusion.active && r.status === 'COMPLETED') ?? null;
+  const lastFused = track?.fused(state.fusion.active).at(-1);
+  const stage = publishedStage(s, liveRun ? { mode: 'SENSOR_TIME', trigger: liveRun.trigger, metrics: liveRun.metrics } : null,
+    !!(liveRun?.completedAt && lastFused && s.lastReceivedAt && Date.parse(s.lastReceivedAt) > Date.parse(liveRun.completedAt)));
   const m = (v: string) => runs.find((r) => r.algorithmVersion === v)?.metrics ?? null;
   const cell = (v: string, f: (x: NonNullable<FusionRun['metrics']>) => string) => {
     const x = m(v);
@@ -610,6 +628,8 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
     ${row('Session', esc(s.sessionId))}
     ${row('Collector', `${dot(collectorColor(s.collectorId))}${esc(s.collectorId)} · ${esc(s.device.deviceModel ?? '?')} iOS ${esc(s.device.systemVersion ?? '?')} · app ${esc(s.device.appVersion ?? '?')}`)}
     ${row('Status', `<span class="tag ${s.status.toLowerCase()}">${s.status}</span>`)}
+    ${sessionStateLines(s, Date.now()).map((l) => row(esc(l.label), `<span class="${l.tone === 'ok' ? 'ok-text' : l.tone === 'warn' ? 'warn-text' : 'muted'}">${esc(l.text)}</span>`)).join('')}
+    ${row('표시 중인 융합 결과', `<span class="tag">${esc(STAGE_LABEL[stage.stage])}</span> <span class="muted">${esc(stage.note)}</span>`)}
     ${row('Started / Ended', `${time(s.startedAt)} / ${time(s.endedAt)}`)}
     ${row('Raw locations', `${s.locationCount}${track ? ` (on map ${pts.length})` : ''} · markers ${s.markerCount}`)}
     ${row('Last usable raw → fusion', offsetText(track, lastRaw, null))}
@@ -858,6 +878,7 @@ function removeCollectorLocally(collectorId: string, sessionIds: string[]) {
   for (const s of state.sessions) if (s.collectorId === collectorId) removed.add(s.sessionId);
   state.sessions = state.sessions.filter((s) => !removed.has(s.sessionId));
   for (const id of removed) {
+    arkitPreview.remove(id);
     tracks.get(id)?.destroy();
     tracks.delete(id);
     trackLoads.delete(id);
@@ -1093,6 +1114,7 @@ async function boot() {
   start
     .then((v) => {
       viewer = v;
+      arkitPreview.setViewer(v);
       if (import.meta.env.DEV) (window as any).__previewViewer = v; // debugging in the browser console
       enablePicking(v);
       mobilityLayer = new MobilityLayer(v);
@@ -1129,3 +1151,5 @@ async function boot() {
 }
 
 void boot();
+
+setInterval(() => { arkitPreview.tick(); scheduleRender(); }, 1000);

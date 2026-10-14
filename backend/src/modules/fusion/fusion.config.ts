@@ -547,6 +547,14 @@ export const fusionConfigV4 = {
   stepMaxIntervalS: 1.3,
   stepConfirmPeaks: 3, // periodic peaks in a row before they count as walking (phone handling is not periodic)
   motionGapMs: 2000, // longer motion gap => new heading segment
+  // rev 7: the step signal on the sensor's own time base. false = the rev 6 behaviour (every sample is assumed to be
+  // 20 ms after the previous one: a 20 Hz stream moved the 3 Hz low-pass to 1.2 Hz and lost every step).
+  // true = the signal is resampled onto a fixed stepResampleHz grid from the sample timestamps, so the filter,
+  // its priming and the peak test do not depend on the rate; gravity smoothing and the stationary window use time too.
+  // Off in the registered config until paired replays of real 50 Hz sessions agree (variant override: stepTimeBased=true).
+  stepTimeBased: false,
+  stepResampleHz: 50,
+  stepMaxSampleGapMs: 160, // wider spacing (< ~6 Hz) cannot carry a 3 Hz step signal: the filter restarts after it
   // stride: CMPedometer distance per detected step (level and slope walking), flat-ground default until calibrated
   defaultStrideM: 0.72,
   strideMinM: 0.35,

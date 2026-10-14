@@ -1,7 +1,10 @@
+import type { ArPoseEvent } from './arkit';
 import { io } from 'socket.io-client';
 import { API_BASE_URL, type CollectorState, type FusedUpdate, type LocationUpdate, type Marker, type Session } from './api';
 
 export interface PreviewHandlers {
+  onArkitPose(event: ArPoseEvent): void;
+  onArkitUpdated(event: { sessionId: string }): void;
   onConnectionChange(connected: boolean): void;
   /** Called on every (re)connect after the first one: reload REST state. */
   onReconnect(): void;
@@ -40,6 +43,8 @@ export function connectPreview(h: PreviewHandlers) {
   socket.on('collector:removed', h.onCollectorRemoved);
   socket.on('session:started', h.onSessionStarted);
   socket.on('session:finished', h.onSessionFinished);
+  socket.on('arkit:pose', h.onArkitPose);
+  socket.on('arkit:updated', h.onArkitUpdated);
   socket.on('location:update', h.onLocation);
   socket.on('marker:created', h.onMarker);
   socket.on('position:fused', h.onFused);

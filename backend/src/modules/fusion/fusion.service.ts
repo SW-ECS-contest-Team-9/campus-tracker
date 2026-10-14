@@ -18,6 +18,7 @@ import { CAMPUS_FRAME } from '../../geo/campus-frame.js';
 import { codeRef } from '../../common/code-ref.js';
 import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
 import { fusionRunsRepository, type ReplayMode } from './fusion-runs.repository.js';
+import { trackStats, type ReplayInputSummary, type TrackStats } from './fusion.replay-input.js';
 import { qcService } from '../qc/qc.service.js';
 import { strideCalibrationConfig, strideCalibrationHash, type FusionSessionContext } from './fusion.stride.js';
 
@@ -54,6 +55,12 @@ function runLimited<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 const realtimeAlgo = () => FUSION_ALGORITHMS[REALTIME_FUSION_VERSION];
+
+/** Lifecycle trace next to the phone's diagnostic events (best effort; see sessionRepository.insertServerEvent). */
+function trace(sessionId: string, eventType: `SERVER_${string}`, metadata: Record<string, unknown>) {
+  void sessionRepository.insertServerEvent(sessionId, eventType, metadata)
+    .catch((e) => logger.warn('session.trace_failed', { sessionId, eventType, message: e instanceof Error ? e.message : String(e) }));
+}
 
 function spatialGpsDecisions(events: unknown[]): SpatialGpsDecision[] {
   const decisions: SpatialGpsDecision[] = [];
@@ -181,6 +188,38 @@ export interface ReplayOptions {
    * Default: true for a plain SENSOR_TIME replay of the registered config, false otherwise.
    */
   publish?: boolean;
+  /**
+   * Experiments only: sensor-time cutoff (inclusive). The run sees the raw rows captured up to here, so two sessions
+   * (or an ACTIVE one and a finished one) can be compared over the same span. A published replay always uses all rows.
+   */
+  cutoff?: Date | null;
+  /**
+   * Experiments only (SENSOR_TIME): false = stop after the forward pass (no smoother), as a published replay of an
+   * ACTIVE session does. Default true: FORWARD and FINAL stages are both stored in the snapshot.
+   */
+  finalize?: boolean;
+}
+
+/** What a run actually did, stored in fusion_runs.metrics.replay (Lab: which stage is which). */
+export interface ReplayRecord {
+  mode: ReplayMode;
+  /** SENSOR_TIME: one timeline sorted by sensor time. ARRIVAL_BATCHES: committed batches in arrival order through the realtime reorder window. */
+  ordering: 'SENSOR_TIME' | 'ARRIVAL_BATCHES';
+  reorderWindowMs: number | null;
+  published: boolean;
+  /** the session was ACTIVE and this published run handed its state to realtime: forward only, last tick not flushed */
+  continuesLive: boolean;
+  finalizeRequested: boolean;
+  /** the smoother (finalize step) really ran: the FINAL stage is a smoothed track, not the forward one */
+  finalizeApplied: boolean;
+  sessionStatusAtRun: string;
+  input: ReplayInputSummary;
+  revision: number;
+  spatialMapVersionId: string | null;
+  terrainVersionId: string | null;
+  stages: { forward: TrackStats; final: TrackStats | null };
+  /** AS_RECEIVED: what arriving late cost the realtime-equivalent result */
+  asReceived: { batches: number; outOfOrderBatches: number; skippedLateObservations: number } | null;
 }
 
 /**
@@ -203,9 +242,10 @@ export async function replaySession(sessionId: string, version: string, trigger:
   const mode: ReplayMode = opts.mode ?? 'SENSOR_TIME';
   const isVariant = Boolean(opts.variant) || Boolean(opts.overrides && Object.keys(opts.overrides).length);
   const publish = opts.publish ?? (!isVariant && mode === 'SENSOR_TIME');
-  if (publish && (isVariant || mode !== 'SENSOR_TIME')) {
-    throw AppError.badRequest('NOT_PUBLISHABLE', 'Only a SENSOR_TIME replay of the registered config can be published');
+  if (publish && (isVariant || mode !== 'SENSOR_TIME' || opts.cutoff || opts.finalize === false)) {
+    throw AppError.badRequest('NOT_PUBLISHABLE', 'Only a SENSOR_TIME replay of the registered config over all raw data can be published');
   }
+  if (opts.cutoff && !Number.isFinite(opts.cutoff.getTime())) throw AppError.badRequest('INVALID_CUTOFF', 'cutoff is not a valid time');
   const session = await sessionRepository.findView(sessionId);
   if (!session) throw AppError.notFound('SESSION_NOT_FOUND', 'Session not found');
   const tracksState = publish && version === REALTIME_FUSION_VERSION;
@@ -232,19 +272,31 @@ export async function replaySession(sessionId: string, version: string, trigger:
     revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
   });
   try {
-    const inputs = await loadReplayInputs(sessionId, algo);
+    const inputs = await loadReplayInputs(sessionId, algo, { cutoff: opts.cutoff ?? null, arrival: mode === 'AS_RECEIVED' });
     const { raw, timeline, terrainContext } = inputs;
     lastT = timeline.at(-1)?.t ?? -Infinity;
     let r: ReplayResult;
+    let asReceived: ReplayRecord['asReceived'] = null;
+    // forward pass through to the end of the input (flush), then the smoother when the version has one
+    const complete = !continuesLive;
+    const finalizeRequested = mode === 'SENSOR_TIME' && complete && opts.finalize !== false;
     if (mode === 'AS_RECEIVED') {
-      const spatialContext = await spatial.context(mapVersionId);
-      const batches = (await fusionRunsRepository.loadArrivalBatches(sessionId))
-        .map((b) => withTerrain(spatial.annotate(buildTimeline(b, { sessionStartedAt: session.startedAt }), spatialContext), terrainContext));
-      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS, context);
+      const a = replayAsReceived(algo, inputs.arrival!.batches, env.FUSION_REORDER_WINDOW_MS, context);
+      asReceived = { batches: inputs.arrival!.batches.length, outOfOrderBatches: inputs.arrival!.outOfOrderBatches, skippedLateObservations: a.skippedLate };
+      r = a;
     } else {
-      r = replayInMemory(algo, timeline, { finalize: !continuesLive, context });
+      r = replayInMemory(algo, timeline, { finalize: complete, smooth: finalizeRequested, context });
     }
     const { state, outputs, events } = r;
+    const finalizeApplied = finalizeRequested && Boolean(algo.finalize);
+    const replay: ReplayRecord = {
+      mode, ordering: mode === 'AS_RECEIVED' ? 'ARRIVAL_BATCHES' : 'SENSOR_TIME',
+      reorderWindowMs: mode === 'AS_RECEIVED' ? env.FUSION_REORDER_WINDOW_MS : null,
+      published: publish, continuesLive, finalizeRequested, finalizeApplied, sessionStatusAtRun: session.status,
+      input: inputs.input, revision: algo.revision, spatialMapVersionId: mapVersionId, terrainVersionId,
+      stages: { forward: trackStats(r.forward), final: finalizeApplied ? trackStats(outputs) : null },
+      asReceived,
+    };
     const history = sensorEventRows(version, events);
     await withTransaction(async (client) => {
       if (publish) {
@@ -268,12 +320,12 @@ export async function replaySession(sessionId: string, version: string, trigger:
       rejected: summary.gpsRejected,
       reanchors: summary.reanchors ?? null,
       divergences: summary.divergences ?? null,
-      metrics,
+      metrics: { ...metrics, replay },
       warnings: metrics.validation.warnings,
     });
     if (publish) for (const w of metrics.validation.warnings) logger.warn('fusion.validation', { sessionId, version, ...w });
     outcome = 'success';
-    return { session, state, outputs, events, metrics, runId, continuesLive, lastT, observations: timeline.length, rawCounts, durationMs: Date.now() - started, published: publish };
+    return { session, state, outputs, events, metrics, replay, runId, continuesLive, lastT, observations: timeline.length, rawCounts, durationMs: Date.now() - started, published: publish };
   } catch (err) {
     await fusionRepository.failRun(runId, err instanceof Error ? err.message : String(err)).catch(() => undefined);
     throw err;
@@ -389,7 +441,8 @@ export const fusionService = {
           const session = await sessionRepository.findById(sessionId);
           if (!session || session.status === 'ACTIVE') return; // still collecting: realtime keeps going
           try {
-            await reprocessNow(sessionId, REALTIME_FUSION_VERSION, 'auto-finalize');
+            const done = await reprocessNow(sessionId, REALTIME_FUSION_VERSION, 'auto-finalize');
+            trace(sessionId, 'SERVER_FINALIZE_COMPLETED', { runId: done.runId, outputs: done.outputs, rawCounts: done.rawCounts });
             // raw GPS quality decisions (qc-v1) for the Lab / mobility map; never blocks or fails finalization
             await qcService.run(sessionId).catch((e) => logger.warn('qc.failed', { sessionId, message: e instanceof Error ? e.message : String(e) }));
           } catch (err) {
@@ -397,6 +450,8 @@ export const fusionService = {
               this.finalizeSoon(sessionId); // a CLI / API replay holds the lock: try again later
               return;
             }
+            // the session stays FAILED / needs_reprocess: the next late batch or server start runs it again
+            trace(sessionId, 'SERVER_FINALIZE_FAILED', { message: err instanceof Error ? err.message : String(err) });
             throw err;
           }
           live.delete(sessionId);

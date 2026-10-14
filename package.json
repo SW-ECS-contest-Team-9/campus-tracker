@@ -27,6 +27,7 @@
     "fusion:reprocess": "npm run fusion:reprocess -w backend --",
     "fusion:diagnose": "npm run fusion:diagnose -w backend --",
     "fusion:replay": "npm run fusion:replay -w backend --",
+    "fusion:compare": "npm run -s fusion:compare -w backend --",
     "fusion:prune": "npm run fusion:prune -w backend --",
     "fusion:golden": "npm run fusion:golden -w backend --",
     "qc:run": "npm run qc:run -w backend --",
@@ -44,7 +45,8 @@
     "terrain:import": "npm run terrain:import -w backend --",
     "buildings:calibrate": "npm run buildings:calibrate -w backend --",
     "deploy:sync": "npm run -s deploy:sync -w backend --",
-    "deploy:manifest": "npm run -s deploy:manifest -w backend --"
+    "deploy:manifest": "npm run -s deploy:manifest -w backend --",
+    "test": "npm test -w backend && npm test -w frontend"
   },
   "devDependencies": {
     "concurrently": "^9.2.4"

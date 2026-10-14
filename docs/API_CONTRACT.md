@@ -223,6 +223,7 @@ Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 | `GET /api/v1/sessions?collectorId=C03&status=ACTIVE&limit=50` | 최신순 `SessionView[]` (limit 1–500, 기본 50) |
 | `GET /api/v1/sessions/:sessionId` | `SessionView` |
 | `GET /api/v1/sessions/:sessionId/locations` | sequence 순 전체 point |
+| `GET /api/v1/sessions/:sessionId/diagnostic-events` | 폰 수명주기 이벤트 + 서버 추적(`SERVER_*`, `source: "server"`)을 시각순으로. 서버 추적: `SERVER_FINISH_RECEIVED`(`duplicate`, `manifest`, `finalReplay`), `SERVER_SYNC_COMPLETE_RECEIVED`(`synchronized`, `behind`), `SERVER_FINALIZE_COMPLETED`(`runId`, `outputs`), `SERVER_FINALIZE_FAILED`(`message`). 분석용이며 fusion 입력이 아님 |
 | `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker |
 | `GET /api/v1/sessions/:sessionId/fused-positions?algorithmVersion=fusion-v1` | fusion 결과, timestamp/fusionSequence 순 (기본 version = realtime version). v3.1은 최초 앵커 전까지 위치 출력을 만들지 않으며 상태·판정 이력은 `fusion-events`에서 조회 |
 | `GET /api/v1/sessions/:sessionId/fusion` | 저장된 version별 개수/기간, version별 최신 `fusion_runs`(metrics 포함), realtime state 요약 |
@@ -236,6 +237,21 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 
 `SessionView`: `sessionId, clientSessionId, collectorId, device{deviceId, clientDeviceId, platform, deviceModel, systemVersion, appVersion}, startedAt, endedAt, status, sensorCapabilities, locationCount, markerCount, lastLocationAt`
 
+**세션 상세(`GET /sessions/:sessionId`)의 `finalization`**: `finishRequestedAt`, `manifestReceived`, `manifestSynchronized`(manifest 없으면 null), `finalReplayScheduled`, `fusionState`, `needsReprocess`, `finalizedAt`, `lastPublishedRun{id,status,trigger,completedAt,error}`, `pendingOnDevice`(`0` / `"SOME"` / manifest가 없으면 `null` — 서버는 폰의 미전송 개수를 알 수 없으며 0으로 추정하지 않음). ACTIVE는 무수신 시간으로 종료되지 않는다(`collectionState`와 `syncState`는 별개).
+
+**fusion-v4의 `relativeAltitude`**: 원시 `CMAltimeter.relativeAltitude`가 아니라 엔진의 상대 Z(`localZ`와 같은 값)다. 세션 첫 기압 샘플을 0으로 두고, 센서 구간이 바뀌면(재시작) 직전 값에 이어 붙인다 — 공백 동안의 실제 높이 변화는 알 수 없다(`metrics.altimeterRebases`가 그 횟수). `ellipsoidalAltitude`가 null이고 `zDatumSource`가 `NONE`이면 절대 고도는 미확정이며, 프리뷰는 그 점을 지면(DEM+1 m)에 투영해 그리기만 한다(층 표시 없음).
+
+## Lab replay (비공개 실험 run)
+
+`POST /api/v1/sessions/:sessionId/replays` body `{ algorithmVersion, mode: "SENSOR_TIME" | "AS_RECEIVED", publish?: false, variant?, overrides?, cutoff?, finalize? }`
+
+- `cutoff`(ISO, 선택): 이 센서 시각까지 캡처된 원시 행만 입력으로 쓴다(포함). 서로 다른 세션, 또는 ACTIVE 세션과 종료된 세션을 같은 구간으로 비교할 때 사용.
+- `finalize`(선택, SENSOR_TIME): `false`면 시간순 전방만 계산(평활화 없음). 기본은 전방(FORWARD)과 평활화(FINAL) 두 단계를 모두 스냅샷에 저장.
+- `cutoff` 또는 `finalize:false`가 있는 run은 게시할 수 없다(`NOT_PUBLISHABLE`). 실험 run은 `fused_positions`, 세션 상태, 실시간 상태, CLEAN/DIRTY를 바꾸지 않는다.
+- 한 run의 입력은 하나의 DB 스냅샷(repeatable read)에서 읽는다: 실행 중 도착한 배치는 통째로 포함되거나 통째로 빠진다.
+- 응답과 `fusion_runs.metrics.replay`: `mode`, `ordering`(`SENSOR_TIME` / `ARRIVAL_BATCHES`), `reorderWindowMs`, `published`, `continuesLive`(ACTIVE 세션의 게시 재처리: 전방만, 마지막 구간 flush 안 함), `finalizeRequested`, `finalizeApplied`, `sessionStatusAtRun`, `input{cutoff, counts, firstSensorAt, lastSensorAt, hash}`(같은 hash = 같은 fusion 입력, 도착 순서와 무관), `revision`, `spatialMapVersionId`, `terrainVersionId`, `stages{forward, final}`(경로 길이·최대 점프·방향 미확정 시간·절대 고도 출력 수 등), `asReceived{batches, outOfOrderBatches, skippedLateObservations}`.
+- 읽기 전용 비교(아무것도 쓰지 않음): `npm run fusion:compare -- --session=<id> --session=<id> --cutoff=<iso> [--from=<iso>] [--set stepTimeBased=true]`.
+
 # 공간 지도와 fusion-v3 / fusion-v3.1
 
 - `GET /api/v1/spatial/map`은 활성 지도 버전, 캠퍼스 다각형, 건물 다각형을 WGS84 경도·위도 좌표로 돌려줍니다. 선택 지도는 세션에 고정되므로 `?mapVersionId=<id>`로 과거 버전을 조회할 수 있습니다.
@@ -244,3 +260,8 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 - `fusion-v3` 결과에는 `spatialMapVersionId`, `spatialStatus`, `spatialSegmentId`, `buildingId`, `buildingName`, `buildingMatchStatus` 진단 필드가 포함됩니다. 건물 필드는 위치 보정에 영향을 주지 않습니다.
 - `fusion-v3.1`도 지도 버전을 고정하고 캠퍼스 출력 필터를 적용합니다. 고정밀 GPS 관측 묶음이 없으면 절대 위경도 출력은 만들지 않고 추적 상태와 센서 이력을 저장합니다. 기압 높이는 상대값이며 `ellipsoidalAltitude`와 층수를 대신하지 않습니다.
 - v3를 켜려면 먼저 DB migration과 `npm run spatial:import`를 실행한 뒤 세션별로 v3를 재처리합니다. 실시간 기본 알고리즘 전환은 대표 경로 비교가 끝난 뒤 `ACTIVE_FUSION_VERSION=fusion-v3`로 설정합니다.
+
+
+## ARKit VIO (schemaVersion 1)
+
+기존 Collector 연결에 `arkit.pose` / `arkit:pose` 이벤트가 추가되었습니다. 일반 WebSocket은 기존 `requestId/type/payload` envelope를 유지하고, Socket.IO는 동일 pose 객체를 이벤트 payload로 전송합니다. payload의 `type`은 `arkit.pose`, 시각은 Unix epoch milliseconds입니다. 기존 telemetry 계약은 유지됩니다. 필수 필드·ACK·제한·세션 초기화·REST 계약은 [ARKit VIO 서버 통합](ARKIT_VIO_SERVER.md#websocket-계약-v1)을 참조하세요.

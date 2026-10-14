@@ -54,6 +54,12 @@ async function broadcastSession(kind: 'started' | 'finished', sessionId: string)
   else previewBroadcast.sessionFinished(decorate(view));
 }
 
+/** Lifecycle trace (finish / syncComplete / final replay): best effort, never part of the ACK's success. */
+export function traceSession(sessionId: string, eventType: `SERVER_${string}`, metadata: Record<string, unknown> = {}) {
+  void sessionRepository.insertServerEvent(sessionId, eventType, metadata)
+    .catch((e) => logger.warn('session.trace_failed', { sessionId, eventType, message: e instanceof Error ? e.message : String(e) }));
+}
+
 function ownedOrThrow(identity: CollectorIdentity, session: SessionRow | null): SessionRow {
   if (!session) throw AppError.notFound('SESSION_NOT_FOUND', 'Session not found');
   if (session.collector_id !== identity.collectorDatabaseId) throw AppError.forbidden('SESSION_FORBIDDEN', 'Session belongs to another collector');
@@ -177,6 +183,12 @@ export const sessionService = {
       logger.info('session.finish_duplicate', { collectorId: identity.collectorId, sessionId: session.id });
     }
     if (sync?.synchronized) fusionService.finalizeSoon(session.id, 0);
+    // after the state change is stored: the ACK below reports what is already durable
+    traceSession(session.id, 'SERVER_FINISH_RECEIVED', {
+      duplicate: !changed, interrupted: req.interrupted ?? false, endedAt: row.ended_at?.toISOString() ?? null,
+      manifest: sync ? { synchronized: sync.synchronized } : null,
+      finalReplay: sync?.synchronized ? 'NOW' : changed ? 'AFTER_UPLOAD_IDLE' : 'UNCHANGED',
+    });
 
     return {
       ok: true as const,
@@ -213,6 +225,12 @@ export const sessionService = {
     const sync = await this.compareManifest(session.id, req.lastSequences);
     logger.info('session.sync_complete', { collectorId: identity.collectorId, sessionId: session.id, synchronized: sync.synchronized });
     if (sync.synchronized && session.status !== 'ACTIVE') fusionService.finalizeSoon(session.id, 0);
+    traceSession(session.id, 'SERVER_SYNC_COMPLETE_RECEIVED', {
+      synchronized: sync.synchronized, status: session.status,
+      behind: Object.fromEntries(Object.entries(sync.streams).filter(([, v]) => !v.synchronized).map(([k, v]) => [k, { expected: v.expected, server: v.server }])),
+      // syncComplete before finish never finalizes: the session is still collecting
+      finalReplay: sync.synchronized && session.status !== 'ACTIVE' ? 'NOW' : session.status === 'ACTIVE' ? 'WAITS_FOR_FINISH' : 'WAITS_FOR_MISSING_DATA',
+    });
     return { ok: true as const, sessionId: session.id, collectionState: session.status, ...sync };
   },
 
@@ -243,7 +261,35 @@ export const sessionService = {
   /** Detail: state + raw statistics (counts, live vs recovered, capture/receive ranges, receive delay, gaps). */
   async detail(sessionId: string) {
     const view = await this.get(sessionId);
-    return { ...view, raw: await sessionRepository.rawStats(sessionId) };
+    const [raw, fusion] = await Promise.all([sessionRepository.rawStats(sessionId), fusionService.summary(sessionId)]);
+    const run = fusion.runs.find((r: { algorithmVersion: string }) => r.algorithmVersion === REALTIME_FUSION_VERSION) as
+      | { id: string; status: string; trigger: string; completedAt: Date | null; error: string | null } | undefined;
+    const manifest = raw.syncManifest as { synchronized?: boolean; comparedAt?: string } | null;
+    return {
+      ...view,
+      raw,
+      /** One place to follow a session from "stop" to the final result. Unknown stays null — never assumed. */
+      finalization: {
+        finishRequestedAt: view.finishRequestedAt,
+        manifestReceived: manifest !== null,
+        manifestSynchronized: manifest?.synchronized ?? null,
+        manifestComparedAt: manifest?.comparedAt ?? null,
+        /** the debounced final replay is scheduled in this server process (lost on restart, recovered at start-up) */
+        finalReplayScheduled: fusion.finalizePending,
+        fusionState: view.fusionState,
+        needsReprocess: view.needsReprocess,
+        finalizedAt: view.finalizedAt,
+        lastPublishedRun: run ? { id: run.id, status: run.status, trigger: run.trigger, completedAt: run.completedAt, error: run.error } : null,
+        /** the server cannot see the phone's upload queue; without a manifest this is unknown, not zero */
+        pendingOnDevice: manifest === null ? null : manifest.synchronized ? 0 : 'SOME',
+      },
+    };
+  },
+
+  /** Phone lifecycle events + server trace (SERVER_*), by time. */
+  async diagnosticEventList(sessionId: string) {
+    await this.get(sessionId);
+    return sessionRepository.listDiagnosticEvents(sessionId);
   },
 
   /**

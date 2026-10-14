@@ -118,13 +118,15 @@ test('smoothed replay follows the true L-shaped walk better than the raw GPS', (
   }
 });
 
-test('stairs: barometer descent while stepping uses the stair tread, not the flat stride', () => {
-  // one straight flight (3.6 m): shorter than a storey and a half, so not a slope
+test('short straight descent: neither stairs nor slope is confirmed, so the walking stride is kept (rev 6)', () => {
+  // one straight flight (3.6 m): under slopeMinClimbM, and no foldback, so the barometer alone decides nothing.
+  // Height change by itself no longer shortens the step to the stair tread (docs/STAIR_SLOPE_STRIDE_PLAN.md).
   const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 12, headingDeg: 0, walking: true, vzMps: -0.3 }]);
   const { s } = run(obs);
-  const stairs = s.steps.filter((p) => p.stairs);
-  assert.ok(stairs.length >= 18, `stair steps ${stairs.length}`);
-  assert.ok(stairs.every((p) => p.length === cfg.stairTreadM));
+  const unknown = s.steps.filter((p) => p.verticalUnknown);
+  assert.ok(unknown.length >= 18, `vertical-unknown steps ${unknown.length}`);
+  assert.ok(unknown.every((p) => p.length > cfg.stairTreadM), 'walking stride, not the stair tread');
+  assert.equal(s.steps.filter((p) => p.stairs).length, 0);
   assert.equal(s.steps.filter((p) => p.slope).length, 0);
 });
 

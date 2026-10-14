@@ -34,6 +34,31 @@ export interface Session {
   locationCount: number;
   markerCount: number;
   lastLocationAt: string | null;
+  // collection / sync / fusion state (separate concepts; see track-display.ts sessionStateLines)
+  interrupted?: boolean;
+  finishRequestedAt?: string | null;
+  finalizedAt?: string | null;
+  lastCapturedAt?: string | null;
+  lastReceivedAt?: string | null;
+  outOfOrderBatches?: number;
+  needsReprocess?: boolean;
+  fusionState?: string | null;
+  syncState?: 'LIVE' | 'DELAYED' | 'OFFLINE' | 'FINALIZED';
+  /** only in the session detail (GET /sessions/:id) */
+  raw?: { syncManifest?: { synchronized?: boolean; comparedAt?: string; streams?: Record<string, { expected: number | null; server: number | null; synchronized: boolean }> } | null; batches?: number; outOfOrderBatches?: number } | null;
+}
+
+/** What a replay did (fusion_runs.metrics.replay, rev 7+): its input boundary and which stages it stored. */
+export interface ReplayRecord {
+  mode: 'SENSOR_TIME' | 'AS_RECEIVED';
+  ordering: 'SENSOR_TIME' | 'ARRIVAL_BATCHES';
+  published: boolean;
+  continuesLive: boolean;
+  finalizeRequested: boolean;
+  finalizeApplied: boolean;
+  sessionStatusAtRun: string;
+  input: { cutoff: string | null; counts: { locations: number; motion: number; altimeter: number; pedometer: number }; firstSensorAt: string | null; lastSensorAt: string | null; hash: string };
+  asReceived: { batches: number; outOfOrderBatches: number; skippedLateObservations: number } | null;
 }
 
 /** Building level calibration from a field session (buildings:calibrate). Heights are orthometric (Incheon MSL). */
@@ -164,6 +189,9 @@ export interface FusionRun {
     sensorTracking?: { trackingStatus: string; headingStatus: string; fallbackStepDistanceM: number; horizontalUncertaintyM: number | null } | null;
     reanchors?: number | null;
     divergences?: number | null;
+    /** v4, smoothed runs only: the vertical datum summary */
+    terrain?: unknown;
+    replay?: ReplayRecord | null;
     validation?: {
       durationS: number;
       pedometerPathM: number;
@@ -254,7 +282,7 @@ export interface LabRun {
   startedAt: string;
   completedAt: string | null;
   outputCount: number | null;
-  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] } } | null;
+  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown } | null;
   error: string | null;
 }
 export interface RunPosition {
@@ -427,7 +455,7 @@ export const api = {
     return { ...meta, heights: new Float32Array(await res.arrayBuffer()) };
   },
   // Lab
-  replay: (sessionId: string, body: { algorithmVersion: string; variant?: string | null; overrides?: Record<string, unknown> | null; mode: 'SENSOR_TIME' | 'AS_RECEIVED'; publish?: boolean }) =>
+  replay: (sessionId: string, body: { algorithmVersion: string; variant?: string | null; overrides?: Record<string, unknown> | null; mode: 'SENSOR_TIME' | 'AS_RECEIVED'; publish?: boolean; cutoff?: string | null; finalize?: boolean }) =>
     send<{ runId: string; outputs: number; durationMs: number }>('POST', `/api/v1/sessions/${sessionId}/replays`, body),
   runs: (sessionId: string) => get<LabRun[]>(`/api/v1/sessions/${sessionId}/runs`),
   run: (runId: string) => get<LabRun>(`/api/v1/runs/${runId}`),

@@ -1,6 +1,7 @@
 // Lab mode (docs/MOBILITY_MAP_PLAN.md 4.11): replay run snapshots in time (1x / 5x / 20x / Instant), compare two
 // runs, define routes, find their passes and show canonical path + confidence corridor + validation errors.
 // Everything here only READS results the backend computed (replays are deterministic; the speed is playback).
+import { runStage, STAGE_LABEL } from './track-display';
 import {
   api,
   type CanonicalPath,
@@ -272,9 +273,10 @@ export class Lab {
     const correction = fin && a.forward !== a.final ? Math.hypot(fin.x - f.x, fin.y - f.y) : null;
     return `<table>
       <tr><th>source</th><td>${esc(f.source)}${f.stationary ? ' · stationary' : ''}</td></tr>
-      <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${num(f.heading, 0, '°')}</td></tr>
+      <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${f.heading === null ? '<span class="warn-text">방향 미확정</span>' : num(f.heading, 0, '°')}</td></tr>
       <tr><th>GPS</th><td>${f.gpsUsed === null ? '–' : f.gpsUsed ? 'used' : 'rejected'}${f.gpsSequence ? ` #${f.gpsSequence}` : ''}</td></tr>
-      <tr><th>height</th><td>${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · above ground ${num(f.heightAboveGround, 1, ' m')}</td></tr>
+      <tr><th>height</th><td>${f.h === null ? `<span class="warn-text">절대 고도 미확정</span> (기준 ${esc(f.zDatumSource ?? 'NONE')}) · 지도에는 지면에 투영해 표시` : `${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · above ground ${num(f.heightAboveGround, 1, ' m')}`}</td></tr>
+      <tr><th>상대 Z</th><td>${num(f.zRel, 1, ' m')} <span class="muted">(기압, 세션 시작 기준 · 센서 재시작 구간은 이어 붙임)</span></td></tr>
       <tr><th>building</th><td>${esc(f.buildingName ?? '–')}</td></tr>
       <tr><th>smoother moved</th><td>${correction === null ? '–' : `${correction.toFixed(1)} m (realtime → final)`}</td></tr>
     </table>`;
@@ -591,6 +593,14 @@ export class Lab {
       const raw = line.slice(i + 1).trim();
       overrides[line.slice(0, i).trim()] = raw === 'true' ? true : raw === 'false' ? false : Number.isFinite(Number(raw)) && raw !== '' ? Number(raw) : raw;
     }
+    const cutoffText = val('lab-cutoff').trim();
+    const cutoff = cutoffText ? new Date(cutoffText) : null;
+    if (cutoff && !Number.isFinite(cutoff.getTime())) {
+      this.message = 'cutoff: ISO 시각으로 입력하세요';
+      this.render();
+      return;
+    }
+    const finalize = this.el.querySelector<HTMLInputElement>('#lab-finalize')?.checked ?? true;
     this.busy = 'replaying…';
     this.message = '';
     this.render();
@@ -598,6 +608,8 @@ export class Lab {
       const r = await api.replay(this.sessionId, {
         algorithmVersion: val('lab-version'), variant: val('lab-variant') || null, overrides: Object.keys(overrides).length ? overrides : null,
         mode: val('lab-mode') as 'SENSOR_TIME' | 'AS_RECEIVED',
+        ...(cutoff ? { cutoff: cutoff.toISOString() } : {}),
+        ...(val('lab-mode') === 'SENSOR_TIME' && !finalize ? { finalize: false } : {}),
       });
       this.message = `run ${r.runId.slice(0, 8)}: ${r.outputs} positions in ${r.durationMs} ms`;
       this.runs = await api.runs(this.sessionId);
@@ -645,14 +657,19 @@ export class Lab {
       .join('');
     const runs = this.runs
       .map((r) => {
-        const label = `${r.algorithmVersion.replace('fusion-', '')}${r.revision ? ` r${r.revision}` : ''}${r.variant ? ` · ${esc(r.variant)}` : ''}${r.mode === 'AS_RECEIVED' ? ' · as-received' : ''}`;
+        const label = `${r.algorithmVersion.replace('fusion-', '')}${r.revision ? ` r${r.revision}` : ''}${r.variant ? ` · ${esc(r.variant)}` : ''}`;
+        const rep = r.metrics?.replay ?? null;
+        const stage = STAGE_LABEL[runStage(r)];
+        const cut = rep?.input.cutoff ? ` · cutoff ${new Date(rep.input.cutoff).toLocaleTimeString()}` : '';
+        const input = rep ? ` · 입력 ${rep.input.counts.motion} motion / ${rep.input.counts.locations} GPS · #${esc(rep.input.hash.slice(0, 8))}` : '';
+        const lost = rep?.asReceived ? ` · 늦게 와서 건너뜀 ${rep.asReceived.skippedLateObservations} (역순 배치 ${rep.asReceived.outOfOrderBatches}/${rep.asReceived.batches})` : '';
         const warn = r.metrics?.validation?.warnings.map((w) => w.code).join(', ');
         return `<li class="${this.a?.run.id === r.id ? 'selected' : ''}">
           <span data-action="load-run" data-run="${r.id}" class="lab-link"><b>${label}</b></span>
-          ${r.published ? '<span class="tag">published</span>' : ''}${r.pinned ? '<span class="tag">📌</span>' : ''}
+          <span class="tag">${esc(stage)}</span>${r.published ? '<span class="tag">published</span>' : ''}${r.pinned ? '<span class="tag">📌</span>' : ''}
           <span class="muted right">${new Date(r.startedAt).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           <div class="sub muted">${r.outputCount ?? '–'} pts · path ${num(r.metrics?.fusedPathLengthM, 0, ' m')} · GPS ${r.metrics?.gpsAccepted ?? '–'}/${r.metrics?.gpsRejected ?? '–'}
-            ${r.overrides ? ` · ${esc(JSON.stringify(r.overrides))}` : ''}${warn ? ` · <span class="warn-text">${esc(warn)}</span>` : ''}
+            ${esc(cut)}${input}${lost}${r.overrides ? ` · ${esc(JSON.stringify(r.overrides))}` : ''}${warn ? ` · <span class="warn-text">${esc(warn)}</span>` : ''}
             · <span class="lab-link" data-action="compare-run" data-run="${r.id}">${this.b?.run.id === r.id ? '비교 해제' : '비교(B)'}</span>
             · <span class="lab-link" data-action="pin-run" data-run="${r.id}">${r.pinned ? 'unpin' : 'pin'}</span></div>
         </li>`;
@@ -676,6 +693,8 @@ export class Lab {
           <select id="lab-version">${this.versions.map((v) => `<option ${v === 'fusion-v4' ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
           <select id="lab-mode"><option value="SENSOR_TIME">센서 시각순 (정식)</option><option value="AS_RECEIVED">수신 순서 (실시간 재현)</option></select>
           <input id="lab-variant" placeholder="변형 이름 (선택)" maxlength="48" />
+          <input id="lab-cutoff" placeholder="cutoff 센서 시각 (선택, ISO 예: 2026-10-13T13:06:02.238Z)" title="이 시각까지 캡처된 원시 데이터만 사용: 두 세션을 같은 구간으로 비교" />
+          <label class="small"><input id="lab-finalize" type="checkbox" checked /> 평활화(FINAL)까지 실행 — 끄면 시간순 전방만</label>
           <textarea id="lab-overrides" rows="2" placeholder="파라미터 변경 (선택) 예: gpsGateChi2=9"></textarea>
           <button data-action="replay" ${this.busy ? 'disabled' : ''}>Replay 실행</button>
         </div>
@@ -697,6 +716,7 @@ export class Lab {
         </div>
         <div class="small muted">GPS 색: <span style="color:#22c55e">채택</span> · <span style="color:#ef4444">실시간 거부</span> · <span style="color:#f97316">스무더 가중치↓</span> · <span style="color:#64748b">qc-v1 제외</span></div>
         <div id="lab-now" class="detail"></div>
+        ${relativeZChart(a.forward, a.final !== a.forward ? a.final : null)}
       </section>
       <section><h3>사건 <span class="muted">걸음 ${steps} · 계단 ${stairs}</span></h3><ul class="list lab-events">${events || '<li class="muted">없음</li>'}</ul></section>` : ''}`;
   }
@@ -783,6 +803,31 @@ export class Lab {
       </table><div class="small muted">회차 간 일관성 지표입니다. 같은 장소에서 모든 회차가 같은 쪽으로 틀리는 편향은 앵커로만 드러납니다.</div></section>` : ''}
       ${point}${create}`;
   }
+}
+
+/**
+ * Relative barometric Z over time (the engine's value, continuous over sensor restarts). The band under the curve
+ * marks where an absolute height existed; without it the curve is a height CHANGE only — no floor is implied.
+ */
+function relativeZChart(forward: RunPosition[], final: RunPosition[] | null): string {
+  const pts = forward.filter((p) => p.zRel !== null);
+  if (pts.length < 2) return '<div class="small muted">상대 Z 없음 (기압 데이터 없음)</div>';
+  const W = 320, H = 90, pad = 4;
+  const t0 = pts[0].t, t1 = pts.at(-1)!.t;
+  const zs = pts.map((p) => p.zRel!);
+  const zMin = Math.min(...zs), zMax = Math.max(...zs);
+  const x = (t: number) => pad + ((t - t0) / Math.max(t1 - t0, 1)) * (W - 2 * pad);
+  const y = (z: number) => H - 14 - ((z - zMin) / Math.max(zMax - zMin, 0.5)) * (H - 22);
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.zRel!).toFixed(1)}`).join('');
+  const band = (list: RunPosition[], yy: number, color: string) => list.filter((p) => p.h !== null && p.t >= t0 && p.t <= t1)
+    .map((p) => `<rect x="${x(p.t).toFixed(1)}" y="${yy}" width="1.2" height="3" fill="${color}"/>`).join('');
+  const abs = (list: RunPosition[]) => `${list.filter((p) => p.h !== null).length}/${list.length}`;
+  return `<div class="small muted">상대 Z (기압) ${zMin.toFixed(1)} … ${zMax.toFixed(1)} m · 범위 ${(zMax - zMin).toFixed(1)} m — 높이 변화만 나타냄(시작 높이·층 미정)</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="background:#0f172a;border-radius:4px">
+      <path d="${path}" fill="none" stroke="#93c5fd" stroke-width="1.2"/>
+      ${band(forward, H - 9, '#f472b6')}${final ? band(final, H - 5, '#fde047') : ''}
+    </svg>
+    <div class="small muted">아래 띠 = 절대 고도 기준이 있던 시점: <span style="color:#f472b6">전방 ${abs(forward)}</span>${final ? ` · <span style="color:#fde047">최종 ${abs(final)}</span>` : ''}</div>`;
 }
 
 function eventText(e: RunEvent): string {

@@ -76,6 +76,10 @@ export interface FusionStateV4 {
   rel: number;
   relInitialized: boolean;
   bq: { x1: number; x2: number; y1: number; y2: number; primed: number };
+  /** stepTimeBased: last raw step-signal sample and the next grid time to interpolate at */
+  resample?: { t: number; v: number; rel: number; next: number };
+  /** last reported reason the current segment's heading fit failed (one event per change, diagnostics only) */
+  headingFitFailure?: string;
   f1?: { v: number; t: number; rel: number };
   f2?: number;
   lastPeakT?: number;

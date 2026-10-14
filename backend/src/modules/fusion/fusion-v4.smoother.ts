@@ -107,8 +107,22 @@ export interface HeadingFit { theta: number; sigma: number; tx: number; ty: numb
  * fixes with a robust (Cauchy) cost, so a few bad indoor fixes cannot pull it. Returns null when the walk is
  * too short / straight-line evidence too weak, or when two clearly different headings fit about equally well.
  */
-export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4): HeadingFit | null {
-  if (steps.length < c.headingFitMinSteps || fixes.length < c.headingFitMinFixes) return null;
+/** Why a fit was not possible (diagnostics only; the first failing condition in the order the fit checks them). */
+export interface HeadingFitFailure {
+  reason: 'TOO_FEW_STEPS' | 'TOO_FEW_FIXES' | 'EXTENT_TOO_SMALL' | 'AMBIGUOUS';
+  steps: number;
+  fixes: number;
+  extentM: number | null;
+  costGap: number | null;
+}
+
+export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4, why?: { failure?: HeadingFitFailure }): HeadingFit | null {
+  const fail = (reason: HeadingFitFailure['reason'], extentM: number | null = null, costGap: number | null = null) => {
+    if (why) why.failure = { reason, steps: steps.length, fixes: fixes.length, extentM, costGap };
+    return null;
+  };
+  if (steps.length < c.headingFitMinSteps) return fail('TOO_FEW_STEPS');
+  if (fixes.length < c.headingFitMinFixes) return fail('TOO_FEW_FIXES');
   // shape in the "rel" frame
   const ux = [0];
   const uy = [0];
@@ -131,7 +145,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
   const cx = fx.reduce((a, b) => a + b, 0) / fx.length;
   const cy = fy.reduce((a, b) => a + b, 0) / fy.length;
   const extent = Math.max(...fx.map((x, i) => Math.hypot(x - cx, fy[i] - cy)));
-  if (extent < c.headingFitMinExtentM) return null;
+  if (extent < c.headingFitMinExtentM) return fail('EXTENT_TOO_SMALL', extent);
 
   const evaluate = (theta: number) => {
     const cs = Math.cos(theta), sn = Math.sin(theta);
@@ -176,7 +190,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
     const d = Math.min(Math.abs(k - best), n - Math.abs(k - best));
     if (d >= amb) alt = Math.min(alt, costs[k]);
   }
-  if (alt - costs[best] < c.headingFitMinCostGap) return null;
+  if (alt - costs[best] < c.headingFitMinCostGap) return fail('AMBIGUOUS', extent, alt - costs[best]);
   // curvature => 1-sigma (cost ~ chi^2 near the minimum)
   const c0 = costs[best], cp = costs[(best + 1) % n], cm = costs[(best - 1 + n) % n];
   const d2 = Math.max(cp + cm - 2 * c0, 1e-6);

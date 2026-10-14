@@ -189,7 +189,9 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3;
   // 5: long straight ramps retain a calibrated stride; 6: Health stride prior + uncertain vertical movement uses stride,
   //    confirmed stair classification is separated from barometric vertical-motion detection.
-  revision: 6,
+  // 7: optional time-based step signal (stepTimeBased, off in the registered config) + heading-fit-pending diagnostics —
+  //    outputs of the registered config are identical to rev 6.
+  revision: 7,
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

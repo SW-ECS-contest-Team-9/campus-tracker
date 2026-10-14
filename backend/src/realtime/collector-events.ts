@@ -1,3 +1,4 @@
+import { arkitService } from '../modules/arkit/arkit.service.js';
 import type { CollectorIdentity } from '../common/auth/jwt.js';
 import { toErrorBody, type ErrorBody } from '../common/errors/app-error.js';
 import { logger } from '../common/logger.js';
@@ -12,6 +13,7 @@ import { markerController } from '../modules/markers/marker.controller.js';
 type Handler = (identity: CollectorIdentity, payload: unknown) => unknown | Promise<unknown>;
 
 export const COLLECTOR_EVENTS = [
+  'arkit:pose',
   'session:start',
   'session:finish',
   'session:syncComplete',
@@ -30,9 +32,14 @@ export function normalizeEventName(name: string): string {
 // Resolved at call time (not module load): the controllers sit in an import cycle with the gateways.
 function handlerFor(event: string): Handler | undefined {
   switch (event) {
+    case 'arkit:pose': return arkitService.ingest;
     case 'session:start': return sessionController.start;
     case 'session:finish': return sessionController.finish;
-    case 'telemetry:batch': return telemetryController.batch;
+    case 'telemetry:batch': return async (identity, payload) => {
+      const ack = await telemetryController.batch(identity, payload);
+      void arkitService.telemetryCommitted(identity, payload);
+      return ack;
+    };
     case 'marker:create': return markerController.create;
     case 'collector:status': return collectorController.status;
     case 'session:syncComplete': return sessionController.syncComplete;

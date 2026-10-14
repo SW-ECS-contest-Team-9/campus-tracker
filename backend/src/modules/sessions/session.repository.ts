@@ -208,6 +208,28 @@ export const sessionRepository = {
     return rowCount ?? 0;
   },
 
+  /**
+   * Server-side lifecycle trace in the same table as the phone's events (event_type SERVER_*, metadata.source =
+   * 'server', client_timestamp = server time): finish / syncComplete received, final replay completed / failed.
+   * Analysis only; a failure to write it must never fail the request that caused it.
+   */
+  async insertServerEvent(sessionId: string, eventType: `SERVER_${string}`, metadata: Record<string, unknown> = {}, db: DbClient = pool) {
+    await db.query(
+      `INSERT INTO collection_diagnostic_events (session_id, event_type, client_timestamp, metadata) VALUES ($1, $2, now(), $3::jsonb)`,
+      [sessionId, eventType, JSON.stringify({ ...metadata, source: 'server' })],
+    );
+  },
+
+  /** Phone lifecycle events and the server trace of one session, by event time (read-only; analysis). */
+  async listDiagnosticEvents(sessionId: string, db: DbClient = pool) {
+    const { rows } = await db.query<{ eventType: string; clientTimestamp: Date; receivedAt: Date; metadata: Record<string, unknown> | null }>(
+      `SELECT event_type AS "eventType", client_timestamp AS "clientTimestamp", received_at AS "receivedAt", metadata
+         FROM collection_diagnostic_events WHERE session_id = $1 ORDER BY client_timestamp, id`,
+      [sessionId],
+    );
+    return rows.map((r) => ({ ...r, source: r.eventType.startsWith('SERVER_') ? ('server' as const) : ('client' as const) }));
+  },
+
   /** Raw statistics for the session detail (counts, live vs recovered, capture/receive ranges, gaps, segments). */
   async rawStats(id: string, db: DbClient = pool) {
     const [streams, gaps, extra] = await Promise.all([

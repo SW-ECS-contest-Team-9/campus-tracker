@@ -40,6 +40,7 @@ import {
   predictUnheaded,
   sigmaXY,
   smoothEvents,
+  type HeadingFitFailure,
   type Mat3,
   type SmootherEvent,
   type Vec3,
@@ -50,6 +51,8 @@ export type FusionEventV4 =
   | { type: 'gps'; t: number; seq: number; used: boolean; reason: string | null; accuracy: number | null; innovation: number | null }
   | { type: 'heading-segment'; t: number; reason: string }
   | { type: 'heading'; t: number; source: 'GPS_SHAPE_FIT' | 'CONTINUITY'; headingOffsetDeg: number; sigmaDeg: number }
+  /** diagnostics: the segment has no heading yet and the shape fit failed for this reason (emitted when the reason changes) */
+  | { type: 'heading-fit-pending'; t: number; segment: number; reason: string; steps: number; fixes: number; extentM: number | null; costGap: number | null }
   | { type: 'reanchor'; t: number; shift: number }
   | { type: 'smoothed'; t: number; iterations: number; steps: number; fixes: number; gpsAccepted: number; gpsDownweighted: number; segments: number; segmentsWithHeading: number };
 
@@ -64,9 +67,9 @@ const median = (v: number[]) => {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
 
-// 2nd-order Butterworth low-pass for the step signal (50 Hz CMDeviceMotion)
-function biquad(c: FusionConfigV4) {
-  const K = Math.tan((Math.PI * c.stepLowPassHz) / 50);
+// 2nd-order Butterworth low-pass for the step signal, designed for sampleHz (rev 6: always 50, whatever the phone sent)
+function biquad(c: FusionConfigV4, sampleHz = 50) {
+  const K = Math.tan((Math.PI * c.stepLowPassHz) / sampleHz);
   const q = Math.SQRT1_2;
   const norm = 1 / (1 + K / q + K * K);
   const b0 = K * K * norm;
@@ -173,6 +176,7 @@ function reclassifySteps(s: FusionStateV4, from: number, toMode: 'stairs' | 'slo
 
 function startSegment(s: FusionStateV4, t: number, reason: string, r: StepResultV4, c: FusionConfigV4) {
   s.segments.push({ id: s.segments.length, startT: t, reason, firstStep: s.steps.length });
+  s.headingFitFailure = undefined;
   r.events.push({ type: 'heading-segment', t, reason });
   if (s.segments.length === 1) return;
   // the walking direction is assumed to continue across the change (phone pocketed, sensor restarted)
@@ -184,10 +188,16 @@ function startSegment(s: FusionStateV4, t: number, reason: string, r: StepResult
   s.headingSource = 'UNKNOWN';
 }
 
-function resetStepDetector(s: FusionStateV4) {
+/** Filter memory only (stepTimeBased: samples too far apart). Walking state and yaw tracking continue. */
+function resetStepFilter(s: FusionStateV4) {
   s.bq = { x1: 0, x2: 0, y1: 0, y2: 0, primed: 0 };
   s.f1 = undefined;
   s.f2 = undefined;
+  s.resample = undefined;
+}
+
+function resetStepDetector(s: FusionStateV4) {
+  resetStepFilter(s);
   s.pending = [];
   s.walking = false;
   s.lastPeakT = undefined;
@@ -356,7 +366,8 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
   const g: Vec3 | null = finite(o.gx) && finite(o.gy) && finite(o.gz) ? [o.gx, o.gy, o.gz] : null;
   const gNorm = g ? Math.hypot(g[0], g[1], g[2]) : 0;
   if (g && gNorm > 0.5) {
-    const a = 0.05;
+    // rev 6: 5 % per sample (0.39 s at 50 Hz, 2 s at 10 Hz); time based: the same 0.39 s at any rate
+    const a = c.stepTimeBased ? 1 - Math.exp(-Math.max(gap, 0) / GRAVITY_SMOOTH_MS) : 0.05;
     s.gSmooth = s.gSmooth ? [s.gSmooth[0] + a * (g[0] - s.gSmooth[0]), s.gSmooth[1] + a * (g[1] - s.gSmooth[1]), s.gSmooth[2] + a * (g[2] - s.gSmooth[2])] : g;
     if (!s.gRef) s.gRef = s.gSmooth;
     else {
@@ -379,7 +390,11 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
     s.accelWindow.push({ t: o.t, m2: o.ax * o.ax + o.ay * o.ay + o.az * o.az });
     while (s.accelWindow.length && s.accelWindow[0].t < o.t - c.stationaryWindowMs) s.accelWindow.shift();
     const rms = Math.sqrt(s.accelWindow.reduce((sum, v) => sum + v.m2, 0) / s.accelWindow.length);
-    const stationary = s.accelWindow.length >= 20 && rms <= c.stationaryAccelRmsG && (s.lastStepT === undefined || o.t - s.lastStepT >= c.stationaryWindowMs);
+    // rev 6: 20 samples (0.38 s at 50 Hz; never reached below 10 Hz); time based: the same span at any rate
+    const filled = c.stepTimeBased
+      ? s.accelWindow.length >= 4 && o.t - s.accelWindow[0].t >= STATIONARY_MIN_SPAN_MS
+      : s.accelWindow.length >= 20;
+    const stationary = filled && rms <= c.stationaryAccelRmsG && (s.lastStepT === undefined || o.t - s.lastStepT >= c.stationaryWindowMs);
     if (stationary !== s.stationary) {
       s.stationary = stationary;
       s.stationaryLog.push({ t: o.t, stationary });
@@ -389,7 +404,32 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
   // step detection on the low-passed vertical user acceleration (+ = up)
   if (!g || gNorm <= 0.5 || !finite(o.ax) || !finite(o.ay) || !finite(o.az)) return;
   const v = -(o.ax * g[0] + o.ay * g[1] + o.az * g[2]) / gNorm;
-  const f = biquad(c);
+  if (!c.stepTimeBased) return stepSample(s, v, o.t, s.rel, 50, c, r);
+  // Time based: linear interpolation onto a fixed grid, so 10 / 20 / 50 Hz and jittered streams see the same filter.
+  const grid = 1000 / c.stepResampleHz;
+  const last = s.resample;
+  const dt = last ? o.t - last.t : 0;
+  if (last && dt <= 0) return; // same timestamp twice: nothing new on the time axis
+  if (!last || dt > c.stepMaxSampleGapMs) {
+    // first sample of a run, or the stream was too sparse to carry the step band: start the filter again here
+    if (last) resetStepFilter(s);
+    s.resample = { t: o.t, v, rel: s.rel, next: o.t + grid };
+    return stepSample(s, v, o.t, s.rel, c.stepResampleHz, c, r);
+  }
+  let next = last.next;
+  for (; next <= o.t; next += grid) {
+    const u = (next - last.t) / dt;
+    stepSample(s, last.v + u * (v - last.v), next, last.rel + u * (s.rel - last.rel), c.stepResampleHz, c, r);
+  }
+  s.resample = { t: o.t, v, rel: s.rel, next };
+}
+
+const GRAVITY_SMOOTH_MS = -20 / Math.log(0.95);
+const STATIONARY_MIN_SPAN_MS = 380;
+
+/** One sample of the step signal at a known rate: low-pass, then a local maximum above the threshold is a step peak. */
+function stepSample(s: FusionStateV4, v: number, t: number, rel: number, sampleHz: number, c: FusionConfigV4, r: StepResultV4) {
+  const f = biquad(c, sampleHz);
   const b = s.bq;
   const y = f.b0 * v + f.b1 * b.x1 + f.b2 * b.x2 - f.a1 * b.y1 - f.a2 * b.y2;
   b.x2 = b.x1;
@@ -399,7 +439,7 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion' 
   b.primed++;
   if (b.primed > 10 && s.f1 && s.f2 !== undefined && s.f1.v > s.f2 && s.f1.v >= y && s.f1.v > c.stepPeakThresholdG) onPeak(s, s.f1.t, s.f1.rel, c, r);
   s.f2 = s.f1?.v;
-  s.f1 = { v: y, t: o.t, rel: s.rel };
+  s.f1 = { v: y, t, rel };
 }
 
 /** Starts the next stride sample at this pedometer reading. */
@@ -540,8 +580,17 @@ function tryHeadingFit(s: FusionStateV4, t: number, c: FusionConfigV4, r: StepRe
   if (!seg) return;
   const steps = s.steps.slice(seg.firstStep);
   const fixes = s.fixes.filter((f) => f.t >= seg.startT).map((f) => ({ t: f.t, x: f.x, y: f.y, sigma: f.sigma }));
-  const fit = fitHeading(steps, fixes, c);
-  if (!fit) return;
+  const why: { failure?: HeadingFitFailure } = {};
+  const fit = fitHeading(steps, fixes, c, why);
+  if (!fit) {
+    const f = why.failure;
+    if (f && !s.headingKnown && s.headingFitFailure !== f.reason) {
+      s.headingFitFailure = f.reason;
+      r.events.push({ type: 'heading-fit-pending', t, segment: seg.id, reason: f.reason, steps: f.steps, fixes: f.fixes, extentM: f.extentM, costGap: f.costGap });
+    }
+    return;
+  }
+  s.headingFitFailure = undefined;
   s.x = [fit.endX, fit.endY, fit.theta];
   s.reckonedFrom = s.steps.length;
   const pos = Math.max(fit.medianResidual, c.positionSigmaFloorM) ** 2;
