@@ -81,6 +81,7 @@ private struct CollectionView: View {
     @AppStorage("locationDistanceFilter") private var locationDistanceFilter = 0.0
     @AppStorage("arkitEnabled") private var arkitEnabled = false
     @AppStorage("arkitPoseRate") private var arkitPoseRate = ARKitPoseRate.hz10.rawValue
+    @AppStorage("walkingFrameEnabled") private var walkingFrameEnabled = false
     @State private var showDeniedPermissionAlert = false
 
     var body: some View {
@@ -92,6 +93,7 @@ private struct CollectionView: View {
                 statusSection
                 readingsSection
                 arkitSection
+                walkingFrameSection
                 diagnosticsSection
                 markerSection
             }
@@ -134,7 +136,8 @@ private struct CollectionView: View {
                             distanceFilter: locationDistanceFilter,
                             healthStride: healthStride,
                             arkitEnabled: arkitEnabled,
-                            arkitRate: ARKitPoseRate(rawValue: arkitPoseRate) ?? .hz10
+                            arkitRate: ARKitPoseRate(rawValue: arkitPoseRate) ?? .hz10,
+                            walkingFrameEnabled: walkingFrameEnabled
                         )
                     } else {
                         print("[Start] stopping local collection")
@@ -154,6 +157,36 @@ private struct CollectionView: View {
         }
     }
 
+    private var captureStateText: String {
+        switch coordinator.captureState {
+        case .idle: return coordinator.activeSession == nil ? "Ready" : "Recording"
+        case .starting: return "Starting…"
+        case .recording: return "Recording"
+        case .stopping: return "Stopping — saving…"
+        case .storageFailure: return "Storage failure — tap Stop to retry"
+        }
+    }
+
+    private var walkingFrameSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Experimental walking frame")
+                .font(.headline)
+            if !walkingFrameEnabled {
+                Text("Disabled for this session")
+                    .foregroundColor(.secondary)
+            } else if let snapshot = coordinator.walkingFrameSnapshot {
+                Text("State: \(snapshot.status.rawValue)")
+                Text(String(format: "Signal confidence: %.2f (internal metric)", snapshot.confidence))
+                Text(snapshot.directionResolved ? "Direction sign: externally resolved" : "Direction sign: unresolved (180° ambiguity)")
+                Text("Magnetic calibration: \(coordinator.magneticCalibrationQuality.rawValue)")
+            } else {
+                Text("Waiting for enough motion data…")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .font(.caption)
+    }
+
     private var interruptedCollectionSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Interrupted Collection Found")
@@ -165,6 +198,10 @@ private struct CollectionView: View {
                 Text("Started: \(recovered.session.startedAt.formatted())")
                 Text("Last sample: \((recovered.lastMotionTimestamp ?? recovered.lastLocationTimestamp)?.formatted() ?? "—")")
             }
+            if coordinator.interruptedCollection?.pendingStop != nil {
+                Text("Stop was already requested; only finishing is allowed.")
+                    .font(.caption)
+            }
             HStack {
                 Button("Resume") {
                     coordinator.resumeInterruptedCollection(
@@ -174,6 +211,7 @@ private struct CollectionView: View {
                     )
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(coordinator.interruptedCollection?.pendingStop != nil)
                 Button("Finish as Interrupted", role: .destructive) {
                     coordinator.finishInterruptedCollection(serverKey: authentication.configuration?.ownerKey ?? "")
                 }
@@ -186,9 +224,14 @@ private struct CollectionView: View {
 
     private var statusSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(coordinator.activeSession == nil ? "Ready" : "Recording")
+            Text(captureStateText)
                 .font(.title2)
                 .foregroundColor(coordinator.activeSession == nil ? .primary : .red)
+            if let error = coordinator.captureStorageError {
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
             Text("Collector: \(authentication.authenticatedCollector?.collectorId ?? "—")")
             Text("Session: \(coordinator.activeSession?.id.uuidString ?? "—")")
                 .font(.caption)
@@ -275,9 +318,12 @@ private struct CollectionView: View {
                     .lineLimit(1)
                 Text("Poses collected: \(coordinator.arkitPoseCount)")
                 Text("Last pose: \(age(coordinator.arkitLastPoseAt))")
-                if coordinator.arkitBufferOverflowed {
-                    Text("Upload buffer overflowed — oldest poses were dropped")
+                if coordinator.arkitBackpressurePaused {
+                    // Capture was paused instead of dropping stored poses; uploads keep draining.
+                    Text("ARKit paused: upload backlog too large (stored poses kept)")
                         .foregroundColor(.orange)
+                    Button("Resume ARKit") { coordinator.resumeArkitAfterBackpressure() }
+                        .buttonStyle(.bordered)
                 }
                 if let error = coordinator.arkitError {
                     Text("Error: \(error)")
@@ -411,6 +457,7 @@ private struct SettingsView: View {
     @AppStorage("motionSamplingRate") private var motionSamplingRate = MotionSamplingRate.hz50.rawValue
     @AppStorage("arkitEnabled") private var arkitEnabled = false
     @AppStorage("arkitPoseRate") private var arkitPoseRate = ARKitPoseRate.hz10.rawValue
+    @AppStorage("walkingFrameEnabled") private var walkingFrameEnabled = false
 
     var body: some View {
         Form {
@@ -437,9 +484,20 @@ private struct SettingsView: View {
             }
             locationPermissionSection
             arkitSection
+            walkingFrameSettingsSection
             healthStrideSection
         }
         .navigationTitle("Settings")
+    }
+
+    private var walkingFrameSettingsSection: some View {
+        Section(header: Text("Experimental Walking Frame")) {
+            Toggle("Estimate unsigned walking axis", isOn: $walkingFrameEnabled)
+                .disabled(coordinator.activeSession != nil)
+            Text("Uses a gyro/gravity-relative frame and short-window PCA. It can report an unsigned axis and signal quality, not an exact heading or position. Changes apply to the next session.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
     }
 
     private var locationPermissionSection: some View {

@@ -30,6 +30,12 @@ struct WalkingFrameMathTests {
         let restored = rotation.inverse.rotated(rotated)
         #expect(abs(restored.x - 1) < 1e-9)
         #expect(abs(restored.y) < 1e-9)
+        let xRotation = QuaternionD.rotationVector(Vector3D(x: .pi / 2, y: 0, z: 0))
+        let xResult = xRotation.rotated(Vector3D(x: 0, y: 1, z: 0))
+        #expect(abs(xResult.z - 1) < 1e-9)
+        let yRotation = QuaternionD.rotationVector(Vector3D(x: 0, y: .pi / 2, z: 0))
+        let yResult = yRotation.rotated(Vector3D(x: 0, y: 0, z: 1))
+        #expect(abs(yResult.x - 1) < 1e-9)
     }
 
     @Test func gravityProjectionRemovesOnlyVerticalComponent() {
@@ -120,6 +126,20 @@ struct WalkingFrameEstimatorBehaviorTests {
         #expect(afterGap != afterRegression)
         _ = estimator.process(input(timestamp: 2.02, acceleration: .zero, segment: "new-segment"))
         #expect(estimator.frameId != afterGap)
+    }
+
+    @Test func syntheticUTurnKeepsBothAxisSignsAndDoesNotForceForwardDirection() {
+        var estimator = WalkingFrameEstimator(configuration: testConfiguration())
+        var last: WalkingFrameSnapshot?
+        for index in 0..<180 {
+            let time = Double(index) * 0.02
+            let sign = index < 90 ? 1.0 : -1.0
+            let acceleration = Vector3D(x: sign * 0.2 * sin(2 * .pi * 1.8 * time), y: 0, z: 0)
+            last = estimator.process(input(timestamp: time, acceleration: acceleration)) ?? last
+        }
+        #expect(last?.status == .axisEstimated)
+        #expect(last?.directionResolved == false)
+        #expect(last?.ambiguity == "AXIS_180")
     }
 }
 

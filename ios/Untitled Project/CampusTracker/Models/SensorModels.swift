@@ -26,6 +26,11 @@ nonisolated struct SensorCapabilities: Codable, Sendable {
     /// kept only so a session can still show what was selected in the (now informational) UI.
     var locationRequestedProfile: String?
     var arkitEnabled: Bool?
+    var walkingFrameEnabled: Bool? = nil
+    var walkingFrameAlgorithmVersion: String? = nil
+    var walkingFrameSchemaVersion: Int? = nil
+    var walkingFrameWindowSeconds: Double? = nil
+    var walkingFrameUpdateIntervalSeconds: Double? = nil
 
     var pedometerAvailable: Bool {
         stepCountingAvailable || distanceAvailable || floorCountingAvailable || paceAvailable || cadenceAvailable
@@ -64,7 +69,7 @@ nonisolated struct StrideCalibrationAck: Codable, Sendable, Equatable {
     let reason: String?
 }
 
-struct DeviceInfo: Codable {
+nonisolated struct DeviceInfo: Codable, Sendable {
     let deviceId: UUID
     let deviceModel: String
     let systemName: String
@@ -73,12 +78,12 @@ struct DeviceInfo: Codable {
     let sensorCapabilities: SensorCapabilities
 }
 
-enum CollectionStatus: String, Codable {
+nonisolated enum CollectionStatus: String, Codable, Sendable {
     case recording
     case completed
 }
 
-struct SampleCounts: Codable {
+nonisolated struct SampleCounts: Codable, Equatable, Sendable {
     var location = 0
     var motion = 0
     var altimeter = 0
@@ -86,7 +91,7 @@ struct SampleCounts: Codable {
     var marker = 0
 }
 
-nonisolated struct CollectionSession: Codable, Identifiable {
+nonisolated struct CollectionSession: Codable, Identifiable, Sendable {
     let id: UUID
     let collectorId: String
     let deviceId: UUID
@@ -155,7 +160,7 @@ nonisolated struct CollectionSession: Codable, Identifiable {
     }
 }
 
-struct LocationSample: Codable {
+nonisolated struct LocationSample: Codable, Sendable {
     let id: UUID
     let sessionId: UUID
     let sequence: Int
@@ -175,7 +180,7 @@ struct LocationSample: Codable {
     let sensorSegmentId: String
 }
 
-struct MotionSample: Codable {
+nonisolated struct MotionSample: Codable, Sendable {
     let id: UUID
     let sessionId: UUID
     let sequence: Int
@@ -192,11 +197,60 @@ struct MotionSample: Codable {
     let attitudeRoll: Double
     let attitudePitch: Double
     let attitudeYaw: Double
+    let attitudeQuaternion: QuaternionD?
+    let magneticField: CalibratedMagneticFieldSample?
+    /// Present only when the estimator produced a new snapshot at this sample timestamp. It is not
+    /// repeated on intervening 50 Hz samples as if each were an independent observation.
+    let walkingFrame: WalkingFrameSnapshot?
     let appState: CollectorAppState
     let sensorSegmentId: String
+
+    init(id: UUID, sessionId: UUID, sequence: Int, timestamp: Date,
+         userAccelerationX: Double, userAccelerationY: Double, userAccelerationZ: Double,
+         rotationRateX: Double, rotationRateY: Double, rotationRateZ: Double,
+         gravityX: Double, gravityY: Double, gravityZ: Double,
+         attitudeRoll: Double, attitudePitch: Double, attitudeYaw: Double,
+         attitudeQuaternion: QuaternionD? = nil,
+         magneticField: CalibratedMagneticFieldSample? = nil,
+         walkingFrame: WalkingFrameSnapshot? = nil,
+         appState: CollectorAppState, sensorSegmentId: String) {
+        self.id = id; self.sessionId = sessionId; self.sequence = sequence; self.timestamp = timestamp
+        self.userAccelerationX = userAccelerationX; self.userAccelerationY = userAccelerationY; self.userAccelerationZ = userAccelerationZ
+        self.rotationRateX = rotationRateX; self.rotationRateY = rotationRateY; self.rotationRateZ = rotationRateZ
+        self.gravityX = gravityX; self.gravityY = gravityY; self.gravityZ = gravityZ
+        self.attitudeRoll = attitudeRoll; self.attitudePitch = attitudePitch; self.attitudeYaw = attitudeYaw
+        self.attitudeQuaternion = attitudeQuaternion; self.magneticField = magneticField; self.walkingFrame = walkingFrame
+        self.appState = appState; self.sensorSegmentId = sensorSegmentId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, sessionId, sequence, timestamp, userAccelerationX, userAccelerationY, userAccelerationZ
+        case rotationRateX, rotationRateY, rotationRateZ, gravityX, gravityY, gravityZ
+        case attitudeRoll, attitudePitch, attitudeYaw, attitudeQuaternion, magneticField, walkingFrame
+        case appState, sensorSegmentId
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id); sessionId = try c.decode(UUID.self, forKey: .sessionId)
+        sequence = try c.decode(Int.self, forKey: .sequence); timestamp = try c.decode(Date.self, forKey: .timestamp)
+        userAccelerationX = try c.decode(Double.self, forKey: .userAccelerationX)
+        userAccelerationY = try c.decode(Double.self, forKey: .userAccelerationY)
+        userAccelerationZ = try c.decode(Double.self, forKey: .userAccelerationZ)
+        rotationRateX = try c.decode(Double.self, forKey: .rotationRateX)
+        rotationRateY = try c.decode(Double.self, forKey: .rotationRateY)
+        rotationRateZ = try c.decode(Double.self, forKey: .rotationRateZ)
+        gravityX = try c.decode(Double.self, forKey: .gravityX); gravityY = try c.decode(Double.self, forKey: .gravityY); gravityZ = try c.decode(Double.self, forKey: .gravityZ)
+        attitudeRoll = try c.decode(Double.self, forKey: .attitudeRoll); attitudePitch = try c.decode(Double.self, forKey: .attitudePitch); attitudeYaw = try c.decode(Double.self, forKey: .attitudeYaw)
+        attitudeQuaternion = try c.decodeIfPresent(QuaternionD.self, forKey: .attitudeQuaternion)
+        magneticField = try c.decodeIfPresent(CalibratedMagneticFieldSample.self, forKey: .magneticField)
+        walkingFrame = try c.decodeIfPresent(WalkingFrameSnapshot.self, forKey: .walkingFrame)
+        appState = try c.decode(CollectorAppState.self, forKey: .appState)
+        sensorSegmentId = try c.decode(String.self, forKey: .sensorSegmentId)
+    }
 }
 
-struct AltimeterSample: Codable {
+nonisolated struct AltimeterSample: Codable, Sendable {
     let id: UUID
     let sessionId: UUID
     let sequence: Int
@@ -207,12 +261,12 @@ struct AltimeterSample: Codable {
     let sensorSegmentId: String
 }
 
-enum SensorCaptureSource: String, Codable {
+nonisolated enum SensorCaptureSource: String, Codable, Sendable {
     case live = "LIVE"
     case historicalRecovery = "HISTORICAL_RECOVERY"
 }
 
-struct PedometerSample: Codable {
+nonisolated struct PedometerSample: Codable, Sendable {
     let id: UUID
     let sessionId: UUID
     let sequence: Int
@@ -228,7 +282,7 @@ struct PedometerSample: Codable {
     let sensorSegmentId: String
 }
 
-enum EventMarkerType: String, Codable, CaseIterable, Identifiable {
+nonisolated enum EventMarkerType: String, Codable, CaseIterable, Identifiable, Sendable {
     case entrance, intersection, stairStart, stairEnd, rampStart, rampEnd, elevator, stop, custom
     var id: String { rawValue }
     var title: String {
@@ -246,7 +300,7 @@ enum EventMarkerType: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct EventMarker: Codable {
+nonisolated struct EventMarker: Codable, Sendable {
     let id: UUID
     let sessionId: UUID
     let timestamp: Date
@@ -259,14 +313,14 @@ struct EventMarker: Codable {
     let verticalAccuracy: Double?
 }
 
-enum MotionSamplingRate: Int, Codable, CaseIterable, Identifiable {
+nonisolated enum MotionSamplingRate: Int, Codable, CaseIterable, Identifiable, Sendable {
     case hz10 = 10, hz20 = 20, hz50 = 50
     var id: Int { rawValue }
     var interval: TimeInterval { 1.0 / Double(rawValue) }
     var label: String { "\(rawValue) Hz" }
 }
 
-enum LocationCollectionProfile: String, Codable, CaseIterable, Identifiable {
+nonisolated enum LocationCollectionProfile: String, Codable, CaseIterable, Identifiable, Sendable {
     case highAccuracy, balanced, batterySaving
     var id: String { rawValue }
     var title: String {

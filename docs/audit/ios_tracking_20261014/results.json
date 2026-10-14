@@ -1,0 +1,22 @@
+{
+  "review_date_kst": "2026-10-14",
+  "head": "a5d6c2ae8dc6e8e16f8d2815cdbe790662d4840e",
+  "source_is_worktree_not_clean_head": true,
+  "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)\nTarget: arm64-apple-macosx27.0.0",
+  "source_sha256": {
+    "ios/Untitled Project/CampusTracker/Services/CollectionCoordinator.swift": "25a0e6839a713900a44f810d884f57bbaabfd02c235bedc8a85970dc2adcce45",
+    "ios/Untitled Project/CampusTracker/Services/WalkingFrameEstimator.swift": "6cb142be9e47793237b88e3f9971c0211817debbb3f383ab1027e78c544c3adc",
+    "ios/Untitled Project/CampusTracker/Persistence/SensorDataRepository.swift": "3092b25e89ebe95c765e80977fd5272cfc3f2ff03f76a9f4462d87e40bf86174"
+  },
+  "scope": "Host-side pure Swift probes; no iOS build, device sensors, network, or production DB.",
+  "output": [
+    "clock_delayed_first_callback_s=3.0",
+    "clock_later_sample_shift_s=3.0",
+    "motion_minus_walking_estimated_at_s=40.0",
+    "export_20ms_apart_equal=true",
+    "export_example={\"timestamp\":\"2023-11-14T22:13:20Z\"}",
+    "walking_hz=10 max_samples=26 axis_estimated=0/81",
+    "walking_hz=20 max_samples=51 axis_estimated=0/82",
+    "walking_hz=50 max_samples=126 axis_estimated=88/95"
+  ]
+}

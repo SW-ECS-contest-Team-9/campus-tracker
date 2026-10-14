@@ -1,0 +1,24 @@
+{
+  "scope": "Host-side Foundation reference checks; no iOS app build or device accuracy claim.",
+  "compiler_flags": [
+    "-swift-version",
+    "5",
+    "-default-isolation",
+    "MainActor",
+    "-strict-concurrency=complete",
+    "-warnings-as-errors"
+  ],
+  "source_sha256": {
+    "TrackingCorrectionReference.swift": "c01ca3d95c12f0f090cca97f58c30c475d1466e86673d7299fca0a77c833496d",
+    "ReferenceChecks.swift": "482c1580abe21d89a97fcb9856472e0e8adcaedc6ced87f209419c6de1786d57"
+  },
+  "output": [
+    "PASS clock: callback latency does not change mapping; derived timestamp shares verified offset",
+    "PASS JSON: 20 ms timestamps remain distinct; old whole-second strings decode",
+    "PASS sequence: failed reservation issues nothing; recovery skips the entire old reservation",
+    "PASS rate: regular 10/20/50 Hz windows qualify; sparse or duplicate input does not",
+    "PASS ingress: stop follows all admitted samples; closed generations cannot enter a new run",
+    "PASS concurrent ingress: 1000 concurrent admissions execute in ordinal order before the stop barrier",
+    "PASS dispatch: backoff, single-flight, generation and owner guards"
+  ]
+}

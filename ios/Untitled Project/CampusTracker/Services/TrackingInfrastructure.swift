@@ -134,6 +134,46 @@ nonisolated final class TrackingCaptureIngress: @unchecked Sendable {
         active = nil
         processorQueue.async { onDrained(boundary) }
     }
+
+    /// Closes whatever context is open (if any). The drain barrier is enqueued under the same lock
+    /// as admissions, so it runs after every callback admitted before this call.
+    @discardableResult
+    func closeIfOpen(onDrained: @escaping @Sendable (TrackingStopBoundary) -> Void) -> TrackingCaptureContext? {
+        lock.lock(); defer { lock.unlock() }
+        guard let context = active else { return nil }
+        let boundary = TrackingStopBoundary(context: context, lastAdmissionOrdinal: ordinal,
+                                            cutoffUptime: ProcessInfo.processInfo.systemUptime)
+        active = nil
+        processorQueue.async { onDrained(boundary) }
+        return context
+    }
+
+    var openContext: TrackingCaptureContext? {
+        lock.lock(); defer { lock.unlock() }
+        return active
+    }
+}
+
+/// Lock-protected per-stream counters for callbacks rejected at the ingress (closed or previous
+/// generation). They are never attributed to a new session; only counted.
+nonisolated final class CaptureDropCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var counts: [String: Int] = [:]
+
+    func increment(_ key: String) {
+        lock.lock(); defer { lock.unlock() }
+        counts[key, default: 0] += 1
+    }
+
+    func snapshot() -> [String: Int] {
+        lock.lock(); defer { lock.unlock() }
+        return counts
+    }
+
+    func reset() {
+        lock.lock(); defer { lock.unlock() }
+        counts.removeAll()
+    }
 }
 
 nonisolated struct TrackingWindowEligibility: Equatable, Sendable {

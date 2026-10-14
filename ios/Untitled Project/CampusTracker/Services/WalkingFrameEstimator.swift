@@ -122,6 +122,12 @@ nonisolated struct WalkingFrameSnapshot: Codable, Equatable, Sendable {
     let poseChangeRadians: Double
     let sampleCount: Int
     let expiresAtSensorTimestamp: TimeInterval
+    /// Wall-clock mapping added by CollectionCoordinator using the same boot-time conversion as
+    /// the owning MotionSample. The standalone estimator intentionally remains clock-agnostic.
+    var estimatedAt: Date? = nil
+    var windowStart: Date? = nil
+    var windowEnd: Date? = nil
+    var expiresAt: Date? = nil
 }
 
 nonisolated struct WalkingFrameInput: Sendable {
@@ -138,18 +144,20 @@ nonisolated struct WalkingFrameEstimatorConfiguration: Codable, Equatable, Senda
     static let algorithmVersion = "gravity_gyro_pca_v1"
     var windowDuration: TimeInterval = 2.5
     var updateInterval: TimeInterval = 0.2
+    var nominalSamplingHz = 50
     var minimumSamples = 75
     var minimumHorizontalEnergyG2 = 0.0015
     var minimumEigenvalueRatio = 1.8
     var minimumPeriodicity = 0.08
-    var poseTransitionAngleRadians = 25 * .pi / 180
+    var poseTransitionAngleRadians = 25 * Double.pi / 180
     var poseTransitionHoldDuration: TimeInterval = 0.8
     var maximumSampleGap: TimeInterval = 0.25
     var staleAfter: TimeInterval = 1.0
     var gravityCorrectionGain = 0.015
     /// Broad diagnostic range only. Local building steel and device bias can legitimately exceed
     /// it; crossing it lowers quality but does not assert a hardware fault or disturbance.
-    var plausibleMagneticMagnitudeMicrotesla: ClosedRange<Double> = 20...100
+    var plausibleMagneticMagnitudeMinimumMicrotesla = 20.0
+    var plausibleMagneticMagnitudeMaximumMicrotesla = 100.0
 }
 
 /// Sequential, timestamp-driven estimator. It never integrates acceleration into velocity or
@@ -167,7 +175,7 @@ nonisolated struct WalkingFrameEstimator: Sendable {
     private var samples: [Sample] = []
     private var referenceFromDevice = QuaternionD.identity
     private var previousTimestamp: TimeInterval?
-    private var previousAttitude: QuaternionD?
+    private var attitudeBaseline: QuaternionD?
     private var previousAxisReference: Vector3D?
     private var lastEstimateTimestamp: TimeInterval?
     private var transitionUntil: TimeInterval?
@@ -182,7 +190,7 @@ nonisolated struct WalkingFrameEstimator: Sendable {
         samples.removeAll(keepingCapacity: true)
         referenceFromDevice = .identity
         previousTimestamp = nil
-        previousAttitude = nil
+        attitudeBaseline = nil
         previousAxisReference = nil
         lastEstimateTimestamp = nil
         transitionUntil = nil
@@ -217,19 +225,21 @@ nonisolated struct WalkingFrameEstimator: Sendable {
         }
         self.previousTimestamp = input.sensorTimestamp
 
-        let attitudeChange = previousAttitude.map { ($0.inverse * input.attitudeQuaternion).angle } ?? 0
-        previousAttitude = input.attitudeQuaternion
+        let attitudeChange = attitudeBaseline.map { ($0.inverse * input.attitudeQuaternion).angle } ?? 0
+        if attitudeBaseline == nil { attitudeBaseline = input.attitudeQuaternion }
         if attitudeChange >= configuration.poseTransitionAngleRadians {
             samples.removeAll(keepingCapacity: true)
             previousAxisReference = nil
             transitionUntil = input.sensorTimestamp + configuration.poseTransitionHoldDuration
+            attitudeBaseline = input.attitudeQuaternion
         }
 
         latestMagneticQuality = assessedMagneticQuality(input.magneticField)
         let horizontalDevice = input.userAcceleration - upDevice * input.userAcceleration.dot(upDevice)
         let horizontalReference = referenceFromDevice.rotated(horizontalDevice)
         samples.append(Sample(timestamp: input.sensorTimestamp, horizontalReference: horizontalReference))
-        samples.removeAll { input.sensorTimestamp - $0.timestamp > configuration.windowDuration }
+        let cutoff = input.sensorTimestamp - configuration.windowDuration
+        samples.removeAll { $0.timestamp < cutoff }
 
         guard lastEstimateTimestamp == nil || input.sensorTimestamp - (lastEstimateTimestamp ?? 0) >= configuration.updateInterval else { return nil }
         lastEstimateTimestamp = input.sensorTimestamp
@@ -241,7 +251,9 @@ nonisolated struct WalkingFrameEstimator: Sendable {
     private mutating func estimate(at timestamp: TimeInterval, currentUpDevice: Vector3D, poseChange: Double) -> WalkingFrameSnapshot {
         let start = samples.first?.timestamp ?? timestamp
         let inTransition = (transitionUntil ?? -.infinity) > timestamp
-        guard !inTransition, samples.count >= configuration.minimumSamples else {
+        let eligibility = (try? TrackingRatePolicy(nominalHz: configuration.nominalSamplingHz))?
+            .evaluate(originalTimestamps: samples.map(\.timestamp))
+        guard !inTransition, eligibility?.eligible == true else {
             return snapshot(timestamp: timestamp, start: start, status: inTransition ? .poseTransition : .unknown,
                             axis: nil, confidence: 0, ratio: nil, energy: 0, periodicity: 0,
                             consistency: nil, poseChange: poseChange)
@@ -356,7 +368,7 @@ nonisolated struct WalkingFrameEstimator: Sendable {
 
     private func assessedMagneticQuality(_ field: CalibratedMagneticFieldSample?) -> MagneticCalibrationQuality {
         guard let field, field.magnitude.isFinite else { return .unavailable }
-        guard configuration.plausibleMagneticMagnitudeMicrotesla.contains(field.magnitude) else { return .low }
+        guard configuration.plausibleMagneticMagnitudeMinimumMicrotesla...configuration.plausibleMagneticMagnitudeMaximumMicrotesla ~= field.magnitude else { return .low }
         return field.accuracy
     }
 }
