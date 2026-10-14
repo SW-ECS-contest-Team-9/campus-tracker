@@ -2,12 +2,20 @@ import type { FusionConfigV4 } from './fusion.config.js';
 import type { Observation } from './fusion.timeline.js';
 import type { DatumV4 } from './fusion-state-v4.js';
 
+const finite = (v: number | null | undefined): v is number => typeof v === 'number' && Number.isFinite(v);
+const median = (values: number[]) => {
+  const a = [...values].sort((x, y) => x - y), i = a.length >> 1;
+  return a.length % 2 ? a[i] : (a[i - 1] + a[i]) / 2;
+};
+
+/** `b` is in the APPLE_MSL frame (Apple sea-level height − relative Z); conversion happens when the datum is used. */
 export interface AbsoluteCandidate { t: number; seq: number; b: number; accuracy: number; alignmentM: number }
 export interface RelativeHeightRun {
   from: number;
   through: number;
   candidates: AbsoluteCandidate[];
-  anchor?: { t: number; seq: number; b: number; sigma: number };
+  /** appleGeoid: the session's Apple geoid height known when the anchor was set (null = not yet measured) */
+  anchor?: { t: number; seq: number; b: number; sigma: number; appleGeoid: number | null };
   gpsOffsets: number[];
   gpsEllipsoidalOffsets: number[];
 }
@@ -18,10 +26,28 @@ export interface AbsoluteAltitudeTracker {
   segment?: string | null;
   accepted: number;
   rejected: Record<string, number>;
+  /**
+   * ellipsoidalAltitude − altitude of this phone's own location fixes: the geoid height of the sea level the
+   * phone reports. Apple's sea level is not the map's (campus: 22.6 m vs the map's 23.377 m), so APPLE_MSL is
+   * converted through this, not through the map geoid. Android fixes never meet an absolute observation.
+   */
+  geoidSamples: number[];
 }
 export const createAbsoluteAltitudeTracker = (enabled = false): AbsoluteAltitudeTracker => ({
-  enabled, runs: [], accepted: 0, rejected: {},
+  enabled, runs: [], accepted: 0, rejected: {}, geoidSamples: [],
 });
+
+/** Device geoid height measured in this session (median of its fixes), null before the first fix with both heights. */
+export function deviceGeoid(tracker: AbsoluteAltitudeTracker): number | null {
+  return tracker.geoidSamples.length ? median(tracker.geoidSamples) : null;
+}
+
+/** A location fix carrying both heights (verticalAccuracy <= 0: iOS has no altitude and reports 0 for both). */
+export function observeDeviceGeoid(tracker: AbsoluteAltitudeTracker, o: { altitude: number | null;
+  ellipsoidalAltitude: number | null; verticalAccuracy: number | null }) {
+  if (!finite(o.altitude) || !finite(o.ellipsoidalAltitude) || !finite(o.verticalAccuracy) || o.verticalAccuracy <= 0) return;
+  tracker.geoidSamples.push(o.ellipsoidalAltitude - o.altitude);
+}
 
 export function validateAbsoluteAltitudeConfig(c: FusionConfigV4) {
   if (!['off', 'shadow', 'fallback'].includes(c.absoluteAltitudeMode)) throw new Error('Invalid absoluteAltitudeMode');
@@ -34,11 +60,6 @@ export function validateAbsoluteAltitudeConfig(c: FusionConfigV4) {
     || c.absoluteAltitudeMinSpanMs > c.absoluteAltitudeWindowMs) throw new Error('Invalid absolute altitude candidate window');
 }
 
-const finite = (v: number | null | undefined): v is number => typeof v === 'number' && Number.isFinite(v);
-const median = (values: number[]) => {
-  const a = [...values].sort((x, y) => x - y), i = a.length >> 1;
-  return a.length % 2 ? a[i] : (a[i - 1] + a[i]) / 2;
-};
 
 /** Relative Z may continue numerically over a restart, but its absolute reference cannot cross an unknown gap. */
 export function relativeHeightSample(tracker: AbsoluteAltitudeTracker, t: number, restarted: boolean) {
@@ -82,7 +103,7 @@ export function observeAbsoluteAltitude(tracker: AbsoluteAltitudeTracker,
     || o.t - relative.t > c.absoluteAltitudeMaxRelativeAgeMs) return decision('NO_RELATIVE_MATCH');
   const alignmentM = Math.abs(relative.speed) * (o.t - relative.t) / 1000;
   if (alignmentM > c.absoluteAltitudeMaxAlignmentErrorM) return decision('TIME_ALIGNMENT_UNCERTAIN');
-  const b = o.altitude + c.absoluteAltitudeDatumOffsetM - relative.z;
+  const b = o.altitude - relative.z; // APPLE_MSL frame
   const sigma = Math.max(c.absoluteAltitudeMinSigmaM, Math.hypot(o.accuracy, alignmentM, c.absoluteAltitudeDatumSigmaM));
   if (run.anchor && Math.abs(b - run.anchor.b) > c.absoluteAltitudeMaxOffsetRangeM) {
     run.candidates = [];
@@ -99,17 +120,25 @@ export function observeAbsoluteAltitude(tracker: AbsoluteAltitudeTracker,
   if (mad > c.absoluteAltitudeMaxMadM || Math.max(...rows.map((a) => a.b)) - Math.min(...rows.map((a) => a.b)) > c.absoluteAltitudeMaxOffsetRangeM) {
     return decision('OFFSET_UNSTABLE');
   }
-  run.anchor = { t: o.t, seq: o.seq, b: centre,
+  run.anchor = { t: o.t, seq: o.seq, b: centre, appleGeoid: deviceGeoid(tracker),
     sigma: Math.max(sigma, c.absoluteAltitudeMinSigmaM, Math.hypot(Math.max(...rows.map((a) => a.accuracy)),
       Math.max(...rows.map((a) => a.alignmentM)), 1.4826 * mad, c.absoluteAltitudeDatumSigmaM)) };
   tracker.accepted++;
   return { reason: 'ACCEPTED', seq: o.seq, runFrom: run.from, b: centre, sigma: run.anchor.sigma };
 }
 
+/**
+ * APPLE_MSL -> map orthometric height: H = MSL + N_device − N_map + absoluteAltitudeDatumOffsetM.
+ * N_device is the session's measured geoid height (forward: as known when the anchor was set, so the track
+ * never steps; replay: the whole session's median). Without one, Apple's sea level is taken as the map's.
+ * The phone height is already in the observation (no +phoneHeightM); the output adds N_map once more.
+ */
 export function absoluteAltitudeDatum(tracker: AbsoluteAltitudeTracker, t: number, c: FusionConfigV4,
-  retrospective = false): DatumV4 | null {
+  mapGeoid: number | null | undefined, retrospective = false): DatumV4 | null {
   const run = relativeHeightRunAt(tracker, t), a = run?.anchor;
-  if (!a || (!retrospective && t < a.t)) return null;
+  if (!a || !finite(mapGeoid) || (!retrospective && t < a.t)) return null;
+  const geoid = (retrospective ? deviceGeoid(tracker) : a.appleGeoid) ?? mapGeoid;
   const drift = c.baroDriftMPerHour * Math.abs(t - a.t) / 3_600_000;
-  return { b: a.b, sigma: Math.hypot(a.sigma, drift), source: 'CM_ABSOLUTE', frame: 'ORTHO' };
+  return { b: a.b + geoid - mapGeoid + c.absoluteAltitudeDatumOffsetM, sigma: Math.hypot(a.sigma, drift),
+    source: 'CM_ABSOLUTE', frame: 'ORTHO' };
 }

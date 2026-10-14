@@ -554,6 +554,71 @@ nonisolated struct CollectionStoreAccess {
         return created
     }
 
+    // MARK: Absolute-altitude clock repair
+
+    /// Builds before `AbsoluteAltitudeClock` mapped `CMAbsoluteAltitudeData.timestamp` as boot
+    /// uptime, which put those rows ~25 years ahead; the server rejected every batch carrying them
+    /// (quarantined, location and motion included). The raw envelope kept the native value and the
+    /// callback time, so the measurement time is recomputed, and each pending or quarantined batch
+    /// that carries a repaired row is rebuilt from its raw rows and queued again. Rows whose clock
+    /// was already right stay untouched. Returns the items that are pending again.
+    @discardableResult
+    func repairAbsoluteAltitudeClock(
+        build: (_ batchID: String, _ sessionID: String, _ rows: [RawRow]) throws -> Data
+    ) throws -> [UploadItemRecord] {
+        let marker = "%\"clockDomain\":\"\(AbsoluteAltitudeClock.bootUptime)\"%"
+        let candidates = try db.query("""
+            SELECT rowid, session_id, payload_json, batch_id FROM raw_samples
+            WHERE stream = ? AND CAST(payload_json AS TEXT) LIKE ?
+            """, [.text(CaptureStream.absoluteAltitude.rawValue), .text(marker)]) { row in
+            (rowID: row.int64(0), sessionID: row.text(1) ?? "", payload: row.blob(2) ?? Data(), batchID: row.text(3))
+        }
+        guard !candidates.isEmpty else { return [] }
+        return try db.transaction {
+            try inject(.ledgerUpdate)
+            var batches: [String: String] = [:]
+            for candidate in candidates {
+                guard let envelope = try? decoder.decode(RawSampleEnvelope<AbsoluteAltitudeSample>.self, from: candidate.payload),
+                      let native = envelope.capture.nativeTimestamp,
+                      let resolved = AbsoluteAltitudeClock.resolve(native: native, callbackEpoch: envelope.capture.callbackEpoch,
+                                                                   bootMapped: envelope.sample.timestamp),
+                      resolved.domain != AbsoluteAltitudeClock.bootUptime else { continue }
+                let old = envelope.sample
+                let sample = AbsoluteAltitudeSample(
+                    id: old.id, sessionId: old.sessionId, sequence: old.sequence, timestamp: resolved.date,
+                    altitude: old.altitude, accuracy: old.accuracy, precision: old.precision,
+                    verticalReference: old.verticalReference, sensorSegmentId: old.sensorSegmentId,
+                    captureSource: old.captureSource, appState: old.appState, invalidReason: old.invalidReason)
+                var capture = envelope.capture
+                capture.clockDomain = resolved.domain
+                try db.run("UPDATE raw_samples SET payload_json = ?, measured_at_ms = ? WHERE rowid = ?",
+                           [.blob(try encoder.encode(RawSampleEnvelope(capture: capture, sample: sample))),
+                            .integer(epochMilliseconds(resolved.date)), .integer(candidate.rowID)])
+                if let batchID = candidate.batchID { batches[batchID] = candidate.sessionID }
+            }
+            var requeued: [UploadItemRecord] = []
+            for (batchID, sessionID) in batches {
+                guard let existing = try item(kind: .telemetry, itemID: batchID),
+                      existing.state == .pending || existing.state == .quarantined else { continue }
+                let rows = try db.query("""
+                    SELECT stream, sequence, measured_at_ms, payload_json, batch_id FROM raw_samples
+                    WHERE session_id = ? AND batch_id = ? ORDER BY rowid
+                    """, [.text(sessionID), .text(batchID)]) { row in
+                    RawRow(stream: row.text(0) ?? "", sequence: row.int(1), measuredAtMs: row.int64(2),
+                           payload: row.blob(3) ?? Data(), batchID: row.text(4))
+                }
+                let payload = try build(batchID, sessionID, rows)
+                try db.run("""
+                    UPDATE upload_items SET payload_json = ?, state = ?, error_json = NULL, restart_retried = 0
+                    WHERE kind = ? AND item_id = ?
+                    """, [.blob(payload), .text(UploadItemState.pending.rawValue),
+                          .text(UploadKind.telemetry.rawValue), .text(batchID)])
+                if let updated = try item(kind: .telemetry, itemID: batchID) { requeued.append(updated) }
+            }
+            return requeued
+        }
+    }
+
     // MARK: Stop / finalization
 
     func persistStopIntent(_ intent: StopIntent, snapshot: ActiveCollectionState) throws {

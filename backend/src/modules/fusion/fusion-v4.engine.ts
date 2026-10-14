@@ -28,7 +28,7 @@ import { tmForward } from '../../geo/tm.js';
 import { selectStartHeight } from '../../geo/start-height-map.js';
 import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
 import { circularCorridorAnchors } from './fusion-circular-corridor.js';
-import { absoluteAltitudeDatum, observeAbsoluteAltitude, relativeHeightRunAt, relativeHeightSample,
+import { absoluteAltitudeDatum, deviceGeoid, observeAbsoluteAltitude, observeDeviceGeoid, relativeHeightRunAt, relativeHeightSample,
   type AbsoluteAltitudeDecision, type RelativeHeightRun } from './fusion-absolute-altitude.js';
 import type { FusionConfigV4 } from './fusion.config.js';
 import { checkPedometerCounter, restartPedometerCounter } from './fusion.pedometer.js';
@@ -622,6 +622,8 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
   if (o.preSession) return rejectGps(s, o, 'PRE_SESSION', r);
   const acc = o.horizontalAccuracy;
   if (!finite(acc) || acc <= 0 || !Number.isFinite(o.latitude) || !Number.isFinite(o.longitude)) return rejectGps(s, o, 'INVALID_ACCURACY', r);
+  // The phone's own sea level vs the ellipsoid: a property of its geoid model, not of the fix quality.
+  observeDeviceGeoid(s.absoluteAltitude, o);
   // Vertical quality is independent of the horizontal acceptance gate. Keep the barometric offset
   // at capture time, so choosing a later, better fix does not erase the climb since the start.
   if (finite(o.ellipsoidalAltitude) && finite(o.verticalAccuracy) && o.verticalAccuracy > 0
@@ -882,7 +884,7 @@ function scopedDatumSelector(s: FusionStateV4, run: RelativeHeightRun, c: Fusion
   const map = run === s.absoluteAltitude.runs[0] ? s.mapStartDatum : null;
   const provisional = c.provisionalDatumsEnabled
     ? provisionalDatum(looseDatum(loose.filter(inside), c), baroGpsDatum(heights.filter(inside), c)) : null;
-  return (t) => map ?? provisional ?? absoluteAltitudeDatum(s.absoluteAltitude, t, c, retrospective);
+  return (t) => map ?? provisional ?? absoluteAltitudeDatum(s.absoluteAltitude, t, c, s.terrain?.geoidSeparation, retrospective);
 }
 
 /** Evaluate start materials once; relative barometric movement then continues from this fixed zero. */
@@ -1523,7 +1525,9 @@ export function summarizeV4(s: FusionStateV4) {
   return {
     startHeightSelection: s.startHeightSelection ?? null,
     absoluteAltitude: { enabled: s.absoluteAltitude.enabled, accepted: s.absoluteAltitude.accepted,
-      reasons: s.absoluteAltitude.rejected, runs: s.absoluteAltitude.runs.map((a) => ({ from: a.from, through: a.through, anchor: a.anchor ?? null })) },
+      reasons: s.absoluteAltitude.rejected, runs: s.absoluteAltitude.runs.map((a) => ({ from: a.from, through: a.through, anchor: a.anchor ?? null })),
+      verticalFrame: { deviceGeoidM: deviceGeoid(s.absoluteAltitude), deviceGeoidFixes: s.absoluteAltitude.geoidSamples.length,
+        mapGeoidM: s.terrain?.geoidSeparation ?? null } },
     circularCorridor: s.circularCorridor,
     roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
     gpsAccepted: accepted,

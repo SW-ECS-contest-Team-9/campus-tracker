@@ -25,7 +25,8 @@ import { validateAbsoluteAltitudeConfig } from './fusion-absolute-altitude.js';
 
 export interface AlgorithmSummary {
   absoluteAltitude?: { enabled: boolean; accepted: number; reasons: Record<string, number>;
-    runs: { from: number; through: number; anchor: { t: number; seq: number; b: number; sigma: number } | null }[] };
+    runs: { from: number; through: number; anchor: { t: number; seq: number; b: number; sigma: number; appleGeoid: number | null } | null }[];
+    verticalFrame: { deviceGeoidM: number | null; deviceGeoidFixes: number; mapGeoidM: number | null } };
   startHeightSelection?: StartHeightSelection | null;
   roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
   circularCorridor?: CircularSummary;
@@ -206,7 +207,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
   // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
   // 13: motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes.
-  revision: 15, // optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start
+  // 15: optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start.
+  revision: 16, // APPLE_MSL -> map height through the session's measured device geoid, not the map geoid
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

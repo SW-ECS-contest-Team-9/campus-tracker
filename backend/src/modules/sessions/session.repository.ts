@@ -256,7 +256,8 @@ export const sessionRepository = {
            SELECT 'location' AS stream, "timestamp" AS ts, created_at AS rcv, capture_source AS src, sensor_segment_id AS seg FROM location_samples WHERE session_id = $1
            UNION ALL SELECT 'motion', "timestamp", created_at, capture_source, sensor_segment_id FROM motion_samples WHERE session_id = $1
            UNION ALL SELECT 'altimeter', "timestamp", created_at, capture_source, sensor_segment_id FROM altimeter_samples WHERE session_id = $1
-           UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at, capture_source, sensor_segment_id FROM absolute_altitude_samples WHERE session_id = $1
+           UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at, capture_source, sensor_segment_id FROM absolute_altitude_samples
+             WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'
            UNION ALL SELECT 'pedometer', "timestamp", created_at, capture_source, sensor_segment_id FROM pedometer_samples WHERE session_id = $1)
          SELECT stream, count(*) AS count,
                 count(*) FILTER (WHERE src = 'LIVE') AS live,

@@ -284,3 +284,28 @@ struct CollectionEndToEndTests {
 }
 
 private enum CoordinatorFixtureError: Error { case clock }
+
+struct AbsoluteAltitudeClockTests {
+    @Test func referenceDateTimestampsAreNotMappedAsUptime() {
+        let callback = Date(timeIntervalSince1970: 1_791_000_000)
+        let native = callback.addingTimeInterval(-1.5).timeIntervalSinceReferenceDate
+        // The uptime mapping of a reference-date value lands decades ahead.
+        let bootMapped = callback.addingTimeInterval(native - 40_000)
+        let resolved = AbsoluteAltitudeClock.resolve(native: native, callbackEpoch: callback, bootMapped: bootMapped)
+        #expect(resolved?.domain == AbsoluteAltitudeClock.referenceDate)
+        #expect(abs((resolved?.date.timeIntervalSince(callback) ?? 0) + 1.5) < 0.001)
+    }
+
+    @Test func bootUptimeTimestampsKeepTheAnchorMapping() {
+        let mapped = Date(timeIntervalSince1970: 1_700_000_002)
+        let resolved = AbsoluteAltitudeClock.resolve(native: 102, callbackEpoch: Date(timeIntervalSince1970: 1_700_000_001),
+                                                     bootMapped: mapped)
+        #expect(resolved == AbsoluteAltitudeClock.Resolution(date: mapped, domain: AbsoluteAltitudeClock.bootUptime))
+    }
+
+    @Test func aTimestampNoClockExplainsIsRejected() {
+        #expect(AbsoluteAltitudeClock.resolve(native: 5, callbackEpoch: Date(timeIntervalSince1970: 1_700_000_000),
+                                              bootMapped: nil) == nil)
+        #expect(AbsoluteAltitudeClock.resolve(native: .nan, callbackEpoch: Date(), bootMapped: nil) == nil)
+    }
+}

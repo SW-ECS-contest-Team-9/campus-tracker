@@ -85,6 +85,52 @@ struct CollectionStoreTests {
         #expect(String(decoding: released[0].payload, as: UTF8.self) == "absoluteAltitude")
     }
 
+    @Test func repairRequeuesBatchesAnOlderBuildQuarantinedForTheAbsoluteAltitudeClock() throws {
+        let store = CollectionStore(directory: TestFixture.tempDirectory("StoreAbsoluteAltitudeRepair"))
+        let session = TestFixture.session()
+        try TestFixture.seed(store, session: session)
+        let callback = Date(timeIntervalSince1970: 1_791_000_000)
+        let truth = callback.addingTimeInterval(-2)
+        let native = truth.timeIntervalSinceReferenceDate
+        let wrong = callback.addingTimeInterval(native) // the old uptime mapping: decades ahead
+        let sample = AbsoluteAltitudeSample(
+            id: UUID(), sessionId: session.id, sequence: 1, timestamp: wrong, altitude: 150, accuracy: 4, precision: 0.5,
+            verticalReference: "APPLE_MSL", sensorSegmentId: UUID().uuidString, captureSource: .live,
+            appState: .foreground, invalidReason: nil)
+        var capture = CaptureMetadata(sessionID: session.id, segmentID: UUID(), generation: UUID(), nativeTimestamp: native,
+                                      measuredEpochFromSystem: nil, callbackUptime: 50, callbackEpoch: callback,
+                                      appStateAtCapture: .foreground)
+        capture.clockDomain = AbsoluteAltitudeClock.bootUptime
+        let payload = try TrackingJSONCodec.makeEncoder().encode(RawSampleEnvelope(capture: capture, sample: sample))
+        _ = try store.sync { try $0.commitRaw(sessionID: session.id, records: [
+            raw("motion", 1),
+            RawRecordDraft(stream: CaptureStream.absoluteAltitude.rawValue, sequence: 1,
+                           measuredAtMs: epochMilliseconds(wrong), payload: payload, uploadItem: nil)
+        ], snapshot: nil) }
+        let batch = try store.sync {
+            try $0.createTelemetryBatches(sessionID: session.id, maximumSamples: 64, minimumSamples: 1,
+                                          includeAbsoluteAltitude: true) { _, _ in Data("rejected".utf8) }
+        }
+        #expect(batch.count == 1)
+        try store.sync {
+            try $0.quarantine(batch[0].key, error: AckError(code: "VALIDATION_ERROR", message: "timestamp is not plausible",
+                                                            status: 400, retryable: false))
+        }
+
+        let requeued = try store.sync {
+            try $0.repairAbsoluteAltitudeClock { _, _, rows in Data(rows.map(\.stream).joined(separator: ",").utf8) }
+        }
+        #expect(requeued.map(\.itemID) == [batch[0].itemID])
+        #expect(requeued.first?.state == .pending)
+        #expect(requeued.first.map { String(decoding: $0.payload, as: UTF8.self) } == "motion,absoluteAltitude",
+                "the whole batch is rebuilt, location and motion rows included")
+        let row = try #require(try store.sync { try $0.rawRows(sessionID: session.id, stream: "absoluteAltitude") }.first)
+        #expect(row.measuredAtMs == epochMilliseconds(truth))
+        let repaired = try RawSampleDecoding.decode(AbsoluteAltitudeSample.self, from: row.payload)
+        #expect(abs(repaired.timestamp.timeIntervalSince(truth)) < 0.001)
+        #expect(try store.sync { try $0.repairAbsoluteAltitudeClock { _, _, _ in Data() } }.isEmpty, "runs once")
+    }
+
     @Test func corruptDatabaseIsReportedAndNotReplacedWithAnEmptyOne() async throws {
         let directory = TestFixture.tempDirectory("StoreCorrupt")
         let file = directory.appendingPathComponent(CollectionStore.databaseFileName)
@@ -191,6 +237,24 @@ struct CollectionCoreTests {
         let result = try await awaitCore { core.beginStop(reason: "user_stop", completion: $0) }.get()
         #expect(result.manifest.absoluteAltitude == 1)
         #expect(try store.sync { try $0.heldAbsoluteAltitudeCount(sessionID: session.id.uuidString) } == 0)
+    }
+
+    @Test func absoluteAltitudeOnTheReferenceDateClockKeepsItsRealTime() async throws {
+        let (core, store, _) = core("CoreAbsoluteAltitudeClock")
+        let session = TestFixture.session()
+        let contexts = try await begin(core, session, streams: [.absoluteAltitude])
+        let measured = Date(timeIntervalSince1970: 1_700_000_000.5)
+        let absolute = AbsoluteAltitudeCapture(nativeTimestamp: measured.timeIntervalSinceReferenceDate,
+                                               altitude: 151.25, accuracy: 4.5, precision: 0.5)
+        core.submit(TestFixture.captured(.absoluteAltitude(absolute)), context: contexts[.absoluteAltitude]!)
+        _ = try await awaitCore { core.beginStop(reason: "user_stop", completion: $0) }.get()
+        let rows = try store.sync { try $0.rawRows(sessionID: session.id, stream: "absoluteAltitude") }
+        #expect(rows.count == 1)
+        #expect(rows.first?.measuredAtMs == epochMilliseconds(measured))
+        let envelope = try TrackingJSONCodec.makeDecoder().decode(RawSampleEnvelope<AbsoluteAltitudeSample>.self,
+                                                                  from: try #require(rows.first).payload)
+        #expect(envelope.capture.clockDomain == AbsoluteAltitudeClock.referenceDate)
+        #expect(abs(envelope.sample.timestamp.timeIntervalSince(measured)) < 0.001)
     }
 
     @Test func stopDrainsEveryAdmittedCallbackAndRejectsLateOnes() async throws {

@@ -184,7 +184,7 @@ export const fusionRunsRepository = {
                   FROM pedometer_samples WHERE session_id = $1 ORDER BY "timestamp", id`, [sessionId]),
       db.query(`SELECT created_at::text AS b, sequence, "timestamp", altitude, accuracy, precision,
                        vertical_reference AS "verticalReference", invalid_reason AS "invalidReason", sensor_segment_id AS segment
-                  FROM absolute_altitude_samples WHERE session_id = $1`, [sessionId]),
+                  FROM absolute_altitude_samples WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'`, [sessionId]),
     ]);
     const batches = new Map<string, RawSamples>();
     const get = (b: string) => {

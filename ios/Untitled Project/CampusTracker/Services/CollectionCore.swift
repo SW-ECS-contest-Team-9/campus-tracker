@@ -544,9 +544,10 @@ nonisolated final class CollectionCore: @unchecked Sendable {
     /// Records delivery residual and native dt. A residual >= threshold on the first sample is
     /// flagged `CLOCK_MAPPING_UNCERTAIN`; the mapping/offset is NOT changed.
     private func observeClock(stream: CaptureStream, native: Double, measuredAt: Date, captured: CapturedSample,
-                              clock: TrackingClockAnchor, run: ActiveRun) {
+                              clock: TrackingClockAnchor, run: ActiveRun,
+                              domain: String = AbsoluteAltitudeClock.bootUptime) {
         var diagnostics = run.snapshot.diagnostics.clock?[stream.rawValue] ?? ClockStreamDiagnostics(
-            domain: "BOOT_UPTIME", quality: "nominal", mappingVersion: clock.mappingVersion,
+            domain: domain, quality: "nominal", mappingVersion: clock.mappingVersion,
             verifiedOffsetSeconds: clock.verifiedOffsetSeconds)
         let residual = captured.callbackEpoch.timeIntervalSince(measuredAt)
         if diagnostics.firstResidualSeconds == nil {
@@ -691,11 +692,14 @@ nonisolated final class CollectionCore: @unchecked Sendable {
                                          context: TrackingCaptureContext, run: ActiveRun) throws {
         guard value.nativeTimestamp.isFinite, value.nativeTimestamp >= 0,
               let clock = run.clocks?.absoluteAltitude,
-              let measuredAt = try? clock.map(nativeTimestamp: value.nativeTimestamp) else {
+              let resolved = AbsoluteAltitudeClock.resolve(
+                  native: value.nativeTimestamp, callbackEpoch: captured.callbackEpoch,
+                  bootMapped: try? clock.map(nativeTimestamp: value.nativeTimestamp)) else {
             return rejectInvalid(.absoluteAltitude, run: run)
         }
+        let measuredAt = resolved.date
         observeClock(stream: .absoluteAltitude, native: value.nativeTimestamp, measuredAt: measuredAt,
-                     captured: captured, clock: clock, run: run)
+                     captured: captured, clock: clock, run: run, domain: resolved.domain)
         let sequence = try issue(run, stream: CaptureStream.absoluteAltitude.rawValue)
         let altitude = value.altitude.finiteOrNil
         let accuracy = value.accuracy.finiteOrNil
@@ -707,8 +711,10 @@ nonisolated final class CollectionCore: @unchecked Sendable {
             altitude: altitude, accuracy: accuracy, precision: precision, verticalReference: "APPLE_MSL",
             sensorSegmentId: context.streamSegmentID.uuidString, captureSource: .live,
             appState: captured.appState, invalidReason: invalidReason)
-        let envelope = RawSampleEnvelope(capture: metadata(captured, context: context, native: value.nativeTimestamp,
-            systemTime: nil, clock: clock, stream: .absoluteAltitude, run: run), sample: sample)
+        var capture = metadata(captured, context: context, native: value.nativeTimestamp,
+                               systemTime: nil, clock: clock, stream: .absoluteAltitude, run: run)
+        capture.clockDomain = resolved.domain
+        let envelope = RawSampleEnvelope(capture: capture, sample: sample)
         try append(run, stream: CaptureStream.absoluteAltitude.rawValue, sequence: sequence,
                    measuredAt: measuredAt, payload: encoder.encode(envelope))
         var gaps = run.snapshot.diagnostics.absoluteAltitudeGaps ?? SensorGapSummary()

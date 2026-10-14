@@ -54,6 +54,40 @@ nonisolated struct TrackingClockAnchor: Codable, Equatable, Sendable {
     }
 }
 
+/// `CMAbsoluteAltitudeData.timestamp` is not on the boot-uptime clock the other Core Motion items
+/// use: devices report values such as 7.3e8 s, seconds since 2001-01-01 (Date's reference date).
+/// Mapped as uptime that becomes a time ~25 years ahead, which the server rejects for the whole
+/// batch. Each plausible clock is tried; the one consistent with the callback time wins.
+nonisolated enum AbsoluteAltitudeClock {
+    struct Resolution: Equatable, Sendable {
+        let date: Date
+        let domain: String
+    }
+
+    static let bootUptime = "BOOT_UPTIME"
+    static let referenceDate = "REFERENCE_DATE"
+    static let unixEpoch = "UNIX_EPOCH"
+    /// A measurement is delivered after it was taken (Core Motion holds altitude for seconds,
+    /// a suspended app for longer), never noticeably before.
+    static let maximumDeliveryDelaySeconds: TimeInterval = 3600
+    static let maximumLeadSeconds: TimeInterval = 5
+
+    /// `bootMapped` is the uptime-anchor mapping of `native` (nil when it could not be mapped).
+    /// Nil when no clock places the measurement near its callback.
+    static func resolve(native: TimeInterval, callbackEpoch: Date, bootMapped: Date?) -> Resolution? {
+        guard native.isFinite, native >= 0 else { return nil }
+        var candidates: [Resolution] = []
+        if let bootMapped { candidates.append(Resolution(date: bootMapped, domain: bootUptime)) }
+        candidates.append(Resolution(date: Date(timeIntervalSinceReferenceDate: native), domain: referenceDate))
+        candidates.append(Resolution(date: Date(timeIntervalSince1970: native), domain: unixEpoch))
+        let plausible = candidates.filter { candidate in
+            let delay = callbackEpoch.timeIntervalSince(candidate.date)
+            return delay >= -maximumLeadSeconds && delay <= maximumDeliveryDelaySeconds
+        }
+        return plausible.min { abs(callbackEpoch.timeIntervalSince($0.date)) < abs(callbackEpoch.timeIntervalSince($1.date)) }
+    }
+}
+
 nonisolated enum TrackingJSONCodec {
     static func makeEncoder() -> JSONEncoder {
         let encoder = JSONEncoder()

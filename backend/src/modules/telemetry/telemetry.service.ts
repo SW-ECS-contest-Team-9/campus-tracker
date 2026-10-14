@@ -10,7 +10,7 @@ import { sessionRepository } from '../sessions/session.repository.js';
 import { fusionService } from '../fusion/fusion.service.js';
 import { preSessionCutoff } from '../fusion/fusion.timeline.js';
 import { telemetryRepository } from './telemetry.repository.js';
-import type { TelemetryBatchAck, TelemetryBatchRequest } from './telemetry.dto.js';
+import { IMPLAUSIBLE_TIMESTAMP, type TelemetryBatchAck, type TelemetryBatchRequest } from './telemetry.dto.js';
 
 /**
  * Oldest / newest sensor timestamp in a batch (all streams). Sensor time is authoritative, not arrival time.
@@ -30,7 +30,7 @@ function captureRange(b: TelemetryBatchRequest, sessionStartedAt: Date): { min: 
   for (const s of b.locations) visit(s.timestamp);
   for (const s of b.motion) visit(s.timestamp);
   for (const s of b.altimeter) visit(s.timestamp);
-  for (const s of b.absoluteAltitude ?? []) visit(s.timestamp);
+  for (const s of b.absoluteAltitude ?? []) if (s.invalidReason !== IMPLAUSIBLE_TIMESTAMP) visit(s.timestamp);
   for (const s of b.pedometer) visit(s.timestamp);
   const iso = (v: number | null) => (v === null ? null : new Date(v).toISOString());
   return { min: iso(min), max: iso(max), orderMin: iso(orderMin) };
@@ -142,7 +142,8 @@ export const telemetryService = {
             segment: m.sensorSegmentId ?? null,
           })),
           altimeter: altimeter.map((a) => ({ ...a, segment: a.sensorSegmentId ?? null })),
-          absoluteAltitude: absoluteAltitude.map((a) => ({ ...a, segment: a.sensorSegmentId ?? null })),
+          absoluteAltitude: absoluteAltitude.filter((a) => a.invalidReason !== IMPLAUSIBLE_TIMESTAMP)
+            .map((a) => ({ ...a, segment: a.sensorSegmentId ?? null })),
           pedometer: pedometer.map((p) => ({ ...p, segment: p.sensorSegmentId ?? null })),
         });
       } else {

@@ -35,7 +35,35 @@
 
 위 수치는 실험 시작값이며 실기기 정확도를 보장하지 않는다. `precision`을 정확도로 취급하거나 표본 수만으로 불확실도를 줄이지 않는다. 채택 후 큰 불일치는 `DATUM_CONFLICT`로 기록하고 기존 기준을 유지한다. 새로운 절대 높이 기준은 상대 센서가 재시작된 구간에서 다시 획득한다.
 
-높이는 잠정적인 Apple 해수면 기준이다. `absoluteAltitudeDatumOffsetM` 기본값 0과 `absoluteAltitudeDatumSigmaM` 기본값 3으로 지도 기준과의 차이를 명시한다. 휴대폰 높이 1m를 재가산하지 않으며, 지도 지오이드고를 한 번 더해 타원체고로 출력한다. 변환용 지형 context가 없으면 새 API의 좌표 출력 사용은 보류한다.
+### 수직 기준 (revision 16)
+
+플랫폼마다 기본으로 주는 고도의 기준이 다르다. 서버의 기준 축은 WGS84 타원체고이고, 지도 표고는 타원체고 − 지도 지오이드고 `N_map`(지형 context, 캠퍼스 23.377 m)이다.
+
+| 입력 | iOS | Android | 서버 사용 |
+|---|---|---|---|
+| GPS `ellipsoidalAltitude` | `CLLocation.ellipsoidalAltitude` | `Location.getAltitude()`(원래 타원체고) | 그대로 사용 |
+| GPS `altitude` | `CLLocation.altitude`(Apple 해수면, 캠퍼스에서 타원체고 − 22.6 m) | API 34 이상 `AltitudeConverter`(EGM2008), 아니면 null | 높이 계산에 쓰지 않음. 같은 휴대폰의 지오이드고 측정에만 사용 |
+| 상대 기압 | CMAltimeter | 1초 평균 기압 → 표준대기 고도 차 | 같은 방식으로 처리 |
+| 절대 고도 | `CMAbsoluteAltitudeData`(`APPLE_MSL`) | 없음 | 아래 변환 |
+
+`APPLE_MSL`은 지도 표고와 같지 않다. 서버는 같은 세션 위치 fix의 `ellipsoidalAltitude − altitude` 중앙값으로 그 휴대폰의 지오이드고 `N_device`를 구한다. 정확도와 상관없이 두 값이 모두 있고 `verticalAccuracy > 0`인 fix를 쓴다. 기준 오프셋은 Apple 해수면 좌표계(`altitude − 상대 Z`)로 고정하고, 사용할 때 변환한다.
+
+```text
+지도 표고 = Apple 해수면 고도 + N_device − N_map + absoluteAltitudeDatumOffsetM
+출력 타원체고 = 지도 표고 + N_map = Apple 해수면 고도 + N_device (+ 교정값)
+```
+
+- 실시간·전방은 기준 채택 시점까지 측정된 `N_device`를 고정해 궤적에 단차를 만들지 않는다. FINAL은 세션 전체 중앙값을 쓴다.
+- `N_device`가 없으면(위치 fix에 두 고도가 없음) 예전처럼 Apple 해수면을 지도 표고와 같다고 본다.
+- 휴대폰 높이 1m는 재가산하지 않는다. `absoluteAltitudeDatumSigmaM` 3m는 Apple 해수면과 실제 표고의 미검증 차이를 그대로 반영한다.
+- 이 변환은 Apple 절대 고도가 `CLLocation.altitude`와 같은 해수면을 쓴다는 가정에 기댄다. 실외에서 두 값을 비교해 확인한다.
+- run metrics `absoluteAltitude.verticalFrame`에 `deviceGeoidM`, `deviceGeoidFixes`, `mapGeoidM`을 기록한다.
+
+변환용 지형 context가 없으면 새 API의 좌표 출력 사용은 보류한다.
+
+### 비정상 타임스탬프
+
+iOS 빌드 중 절대 고도 클록 수정 전 빌드는 `CMAbsoluteAltitudeData.timestamp`(2001-01-01 기준 초)를 부팅 경과 시간으로 변환해 약 25년 뒤 시각을 보냈다. 서버가 배치 전체를 거절해 앱에서는 위치·모션까지 Quarantined가 되었다. 이제 이 선택 스트림의 시각이 비정상(2020년 이전, 하루 이상 미래)이면 배치는 받고 그 행만 `invalid_reason = TIMESTAMP_IMPLAUSIBLE`로 저장한다. sequence 동기화에는 포함하고, 융합·수집 시각 범위·원시 통계에서는 제외한다. 다른 스트림의 시각 검사는 그대로다.
 
 `off`는 새 API 관측을 추정에 사용하지 않는다. `shadow`는 후보 진단만 남기고 기존 결과를 유지한다. 실험 API의 overrides로 모드를 선택할 수 있다. 새 관측은 위치 출력·XY 예측·정지 시간의 시계를 진행시키지 않는다.
 
