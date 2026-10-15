@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.ui.AppRoot
 import hoshi.campustracker.ui.CollectActions
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -46,14 +47,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private val actions = object : CollectActions {
-        override fun start() = withPermissions {
+        override fun start(anchor: CollectionAnchor) = withPermissions {
             val owner = graph.auth.currentOwner ?: run { startMessage = "Sign in before starting a collection."; return@withPermissions }
             val settings = graph.settings.currentBlocking()
-            graph.coordinator.startSession(owner.collectorId, owner, settings.motionRate, settings.locationProfile, settings.distanceFilter)
+            graph.coordinator.startSession(owner.collectorId, owner, settings.motionRate, settings.locationProfile, settings.distanceFilter, anchor)
         }
 
-        override fun stop() {
-            graph.coordinator.stopSession()
+        override fun stop(anchor: CollectionAnchor) {
+            graph.coordinator.stopSession(anchor)
         }
 
         override fun resume() = withPermissions {

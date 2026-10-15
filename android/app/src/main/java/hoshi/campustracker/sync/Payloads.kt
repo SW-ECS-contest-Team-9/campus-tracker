@@ -88,6 +88,13 @@ data class MarkerPayload(
     val ellipsoidalAltitude: Double? = null,
     val horizontalAccuracy: Double? = null,
     val verticalAccuracy: Double? = null,
+    // collection anchor (server markers/marker-anchor.ts): omitted when null
+    val nodeId: String? = null,
+    val buildingId: String? = null,
+    val floor: String? = null,
+    val direction: String? = null,
+    val fromFloor: String? = null,
+    val toFloor: String? = null,
 )
 
 @Serializable

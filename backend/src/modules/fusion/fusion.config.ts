@@ -725,5 +725,9 @@ export const fusionConfigV4 = {
   indoorStairRunGapMs: 4000,
   indoorStairMarginM: 2.5,
   indoorStairSigmaM: 1.0,
+  // rev 17: collection anchors (markers naming a network node), replay only
+  markerAnchorsEnabled: true,
+  markerAnchorSigmaXYM: 2, // the collector presses near the node, and most indoor node positions are estimates
+  markerAnchorHeightSigmaM: 1, // node floor heights are mostly estimated (not surveyed)
 };
 export type FusionConfigV4 = typeof fusionConfigV4;

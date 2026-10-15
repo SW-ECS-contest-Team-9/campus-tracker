@@ -74,8 +74,9 @@ class AppGraph(app: Application) {
     val socket = RawWebSocketManager(http, socketScope)
     private val queue = RoomUploadQueueStore(UploadQueueDatabase.open(app).dao())
     val sync = TelemetrySyncCoordinator(queue, socket, syncScope, clock::nowMs)
+    val api = CollectorApi(http)
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val auth = AuthenticationManager(settings, KeystoreTokenStore(app), CollectorApi(http), socket, sync, device, Dispatchers.IO.limitedParallelism(1))
+    val auth = AuthenticationManager(settings, KeystoreTokenStore(app), api, socket, sync, device, Dispatchers.IO.limitedParallelism(1))
 
     private val corrector = SensorTimestampCorrector(clock)
     private val location = AndroidLocationSource(app, collectionHandler, clock)

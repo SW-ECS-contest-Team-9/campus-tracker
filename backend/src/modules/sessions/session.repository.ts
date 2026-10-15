@@ -33,6 +33,10 @@ const SESSION_VIEW_SELECT = `
          s.sensor_capabilities AS "sensorCapabilities",
          (SELECT count(*) FROM location_samples l WHERE l.session_id = s.id) AS "locationCount",
          (SELECT count(*) FROM event_markers m WHERE m.session_id = s.id)    AS "markerCount",
+         (SELECT COALESCE(json_agg(json_build_object('type', m.type, 'timestamp', m."timestamp", 'nodeId', m.node_id,
+                   'buildingId', m.building_id, 'floor', m.floor, 'direction', m.direction, 'fromFloor', m.from_floor,
+                   'toFloor', m.to_floor) ORDER BY m."timestamp"), '[]'::json)
+            FROM event_markers m WHERE m.session_id = s.id) AS "anchorMarkers",
          (SELECT max(l."timestamp") FROM location_samples l WHERE l.session_id = s.id) AS "lastLocationAt",
          s.interrupted, s.created_at AS "createdAt", s.finish_requested_at AS "finishRequestedAt", s.finalized_at AS "finalizedAt",
          s.last_captured_at AS "lastCapturedAt", s.last_received_at AS "lastReceivedAt",

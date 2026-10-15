@@ -319,7 +319,9 @@ nonisolated struct PedometerSample: Codable, Sendable {
 }
 
 nonisolated enum EventMarkerType: String, Codable, CaseIterable, Identifiable, Sendable {
-    case entrance, intersection, stairStart, stairEnd, rampStart, rampEnd, elevator, stop, custom
+    // `elevator` stays decodable for markers recorded by older builds; new ones use board/exit.
+    case entrance, intersection, stairStart, stairEnd, rampStart, rampEnd, elevatorBoard, elevatorExit, stop, custom
+    case elevator, sessionStart, sessionEnd
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -329,9 +331,84 @@ nonisolated enum EventMarkerType: String, Codable, CaseIterable, Identifiable, S
         case .stairEnd: return "Stair End"
         case .rampStart: return "Ramp Start"
         case .rampEnd: return "Ramp End"
+        case .elevatorBoard: return "Elevator Board"
+        case .elevatorExit: return "Elevator Exit"
         case .elevator: return "Elevator"
         case .stop: return "Stop"
         case .custom: return "Custom"
+        case .sessionStart: return "Start"
+        case .sessionEnd: return "End"
+        }
+    }
+    /// The marker buttons; Start/Stop record sessionStart/sessionEnd themselves.
+    static var buttons: [EventMarkerType] {
+        [.entrance, .intersection, .stairStart, .stairEnd, .rampStart, .rampEnd, .elevatorBoard, .elevatorExit, .stop, .custom]
+    }
+}
+
+/// Where the collector really was when a marker was pressed (server `markers/marker-anchor.ts`):
+/// ground truth for the location-correction training and a height fix point for fusion.
+nonisolated struct CollectionAnchor: Codable, Equatable, Sendable {
+    static let outdoor = "outdoor"
+    var nodeId: String? = nil
+    /// campus building id, or `CollectionAnchor.outdoor`
+    var buildingId: String? = nil
+    var floor: String? = nil
+    /// stairs and ramps: "up" / "down"
+    var direction: String? = nil
+    var fromFloor: String? = nil
+    var toFloor: String? = nil
+    /// shown in the picker only
+    var nodeLabel: String? = nil
+}
+
+nonisolated enum AnchorNeeds: Sendable { case none, place, stairs, elevator, ramp }
+
+nonisolated enum AnchorRules {
+    /// B6 … B1, 1F … 15F (no 0F), the server's floor-name rule.
+    static let floors: [String] = (1...6).reversed().map { "B\($0)" } + (1...15).map { "\($0)F" }
+    static let verticalReminderMeters = 3.0
+
+    static func isFloor(_ value: String?) -> Bool {
+        guard let value else { return false }
+        return value.range(of: "^(B[1-9]|[1-9][0-9]?F)$", options: .regularExpression) != nil
+    }
+
+    static func floorNumber(_ name: String?) -> Int? {
+        guard isFloor(name), let name else { return nil }
+        if name.hasPrefix("B") { return Int(name.dropFirst()).map { -$0 } }
+        return Int(name.dropLast())
+    }
+
+    static func direction(from: String?, to: String?) -> String? {
+        guard let a = floorNumber(from), let b = floorNumber(to), a != b else { return nil }
+        return b > a ? "up" : "down"
+    }
+
+    static func needs(_ type: EventMarkerType) -> AnchorNeeds {
+        switch type {
+        case .sessionStart, .sessionEnd, .entrance: return .place
+        case .stairStart, .stairEnd: return .stairs
+        case .elevatorBoard, .elevatorExit: return .elevator
+        case .rampStart, .rampEnd: return .ramp
+        default: return .none
+        }
+    }
+
+    /// A place needs building + floor and a node when that floor has any (a floor without indoor
+    /// nodes takes building + floor only); outside always a node; an entrance is on a building floor.
+    static func isComplete(_ type: EventMarkerType, _ a: CollectionAnchor, nodesOnOffer: Bool) -> Bool {
+        let directed = a.direction == "up" || a.direction == "down"
+        switch needs(type) {
+        case .none: return true
+        case .place:
+            guard let building = a.buildingId else { return false }
+            if building == CollectionAnchor.outdoor { return type != .entrance && a.nodeId != nil }
+            guard isFloor(a.floor) else { return false }
+            return a.nodeId != nil || !nodesOnOffer
+        case .stairs: return directed && isFloor(a.fromFloor) && isFloor(a.toFloor)
+        case .elevator: return isFloor(a.fromFloor) && isFloor(a.toFloor)
+        case .ramp: return directed
         }
     }
 }
@@ -347,6 +424,8 @@ nonisolated struct EventMarker: Codable, Sendable {
     let altitude: Double?
     let horizontalAccuracy: Double?
     let verticalAccuracy: Double?
+    /// collection anchor; absent in markers recorded by older builds
+    var anchor: CollectionAnchor? = nil
 }
 
 nonisolated enum MotionSamplingRate: Int, Codable, CaseIterable, Identifiable, Sendable {

@@ -20,6 +20,7 @@ import type { FusionStateV4 } from './fusion-state-v4.js';
 import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fusion.diagnostics.js';
 import type { StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact } from './fusion-road-height.js';
+import type { MarkerHeightContact } from './fusion-marker-anchor.js';
 import type { CircularSummary } from './fusion-circular-corridor.js';
 import { validateAbsoluteAltitudeConfig } from './fusion-absolute-altitude.js';
 
@@ -29,6 +30,7 @@ export interface AlgorithmSummary {
     verticalFrame: { deviceGeoidM: number | null; deviceGeoidFixes: number; mapGeoidM: number | null } };
   startHeightSelection?: StartHeightSelection | null;
   roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
+  markerAnchors?: { count: number; heightContacts: MarkerHeightContact[] };
   circularCorridor?: CircularSummary;
   gpsAccepted: number;
   gpsRejected: number;
@@ -208,7 +210,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
   // 13: motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes.
   // 15: optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start.
-  revision: 16, // APPLE_MSL -> map height through the session's measured device geoid, not the map geoid
+  // 16: APPLE_MSL -> map height through the session's measured device geoid, not the map geoid.
+  revision: 17, // collection anchors naming a network node: soft XY fix + height-zero observation in the replay
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

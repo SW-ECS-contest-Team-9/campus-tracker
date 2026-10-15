@@ -27,6 +27,7 @@ import { terrain as terrainModel } from '../../geo/terrain.js';
 import { tmForward } from '../../geo/tm.js';
 import { selectStartHeight } from '../../geo/start-height-map.js';
 import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
+import { markerFixEvents, markerHeightContacts } from './fusion-marker-anchor.js';
 import { circularCorridorAnchors } from './fusion-circular-corridor.js';
 import { absoluteAltitudeDatum, deviceGeoid, observeAbsoluteAltitude, observeDeviceGeoid, relativeHeightRunAt, relativeHeightSample,
   type AbsoluteAltitudeDecision, type RelativeHeightRun } from './fusion-absolute-altitude.js';
@@ -869,9 +870,11 @@ function scopedDatum(s: FusionStateV4, t: number, c: FusionConfigV4, retrospecti
 function scopedDatumSelector(s: FusionStateV4, run: RelativeHeightRun, c: FusionConfigV4, retrospective: boolean,
   contacts: ContactV4[], loose: ContactV4[], heights: GpsHeightV4[]): (t: number) => DatumV4 | null {
   const inside = (k: { t: number }) => relativeHeightRunAt(s.absoluteAltitude, k.t) === run;
+  const markers = c.markerAnchorsEnabled ? (s.markerHeightContacts ?? []).filter(inside) : [];
   const roads = c.roadHeightAnchorsEnabled ? s.roadHeightContacts.filter(inside) : [];
-  const kept = roads.length ? roads : consistentContacts(contacts.filter(inside), c);
-  if (kept?.length) return smoothDatum(kept, c, roads.length ? 'ROAD_ANCHOR' : 'TERRAIN').at;
+  const ground = roads.length ? roads : consistentContacts(contacts.filter(inside), c);
+  const kept = markers.length ? withMarkerContacts(markers, ground) : ground;
+  if (kept?.length) return smoothDatum(kept, c, markers.length ? 'MARKER_ANCHOR' : roads.length ? 'ROAD_ANCHOR' : 'TERRAIN').at;
   const values = s.terrain ? run.gpsOffsets : run.gpsEllipsoidalOffsets;
   if (values.length >= (s.terrain ? c.gpsDatumMinSamples : 1)) {
     const b = median(values)!, mad = median(values.map((v) => Math.abs(v - b)))!;
@@ -995,8 +998,13 @@ function forwardDatum(s: FusionStateV4, c: FusionConfigV4): DatumV4 | null {
   return { b, sigma: Math.sqrt(v / recent.length + 0.2 ** 2), source: 'TERRAIN', frame: 'ORTHO' };
 }
 
+/** Node anchor contacts merged in time order with the road or ground contacts that would otherwise set the zero. */
+function withMarkerContacts(markers: ContactV4[], others: ContactV4[] | null): ContactV4[] {
+  return [...markers, ...(others ?? [])].sort((a, b) => a.t - b.t);
+}
+
 /** Replay: the zero as a slow random walk (barometric drift) through the contacts, RTS-smoothed. */
-function smoothDatum(kept: ContactV4[], c: FusionConfigV4, source: 'TERRAIN' | 'ROAD_ANCHOR' = 'TERRAIN') {
+function smoothDatum(kept: ContactV4[], c: FusionConfigV4, source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' = 'TERRAIN') {
   const q = c.baroDriftMPerHour ** 2 / 3600; // m^2 per second
   const n = kept.length;
   const xf: number[] = [], pf: number[] = [], xp: number[] = [], pp: number[] = [];
@@ -1195,7 +1203,7 @@ export function flushFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4
  * indoor stairs: steps of the run outside (or within the margin of) the outline get a soft anchor just inside it.
  * Outdoor stairs (e.g. up to an entrance from the road) start outside and are left alone.
  */
-function indoorStairAnchors(s: FusionStateV4, points: { t: number; x: Vec3; event: SmootherEvent }[], c: FusionConfigV4): SmootherEvent[] {
+function indoorStairAnchors(s: FusionStateV4, points: { t: number; x: Vec3; event: SmootherEvent }[], c: FusionConfigV4, startIndex = s.fixes.length): SmootherEvent[] {
   const ctx = s.terrain;
   if (!ctx || !s.origin) return [];
   const grid = (x: Vec3) => {
@@ -1210,7 +1218,7 @@ function indoorStairAnchors(s: FusionStateV4, points: { t: number; x: Vec3; even
     else runs.push([i]);
   });
   const anchors: SmootherEvent[] = [];
-  let index = s.fixes.length;
+  let index = startIndex;
   for (const run of runs) {
     const start = points[run[0]].t;
     const end = points[run.at(-1)!].t;
@@ -1319,9 +1327,16 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
     }
     lastEvents = events;
   }
+  // rev 17: collection anchors that name a node: the collector stood there -> soft fixes at the node, re-smooth
+  const markerFixes = c.markerAnchorsEnabled && s.markerAnchors?.length ? markerFixEvents(s.markerAnchors, s.origin, s.fixes.length, c) : [];
+  if (markerFixes.length) {
+    const events = [...lastEvents, ...markerFixes].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
+    smoothed = smoothEvents(events, [...weights, ...markerFixes.map(() => 1)], null, c, still);
+  }
   // indoor stairs: the stair run went outside the building it starts and ends in -> soft anchors just inside, re-smooth
-  const anchors = indoorStairAnchors(s, smoothed!.points, c);
-  if (anchors.length) {
+  const stairAnchors = indoorStairAnchors(s, smoothed!.points, c, s.fixes.length + markerFixes.length);
+  const anchors = [...markerFixes, ...stairAnchors];
+  if (stairAnchors.length) {
     const events = [...lastEvents, ...anchors].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
     smoothed = smoothEvents(events, [...weights, ...anchors.map(() => 1)], null, c, still);
   }
@@ -1384,9 +1399,14 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
       if (road) s.roadHeightContacts.push(road);
     }
   }
+  // rev 17: node anchors observe the zero directly (node floor + phone height - barometric Z) and join the other contacts
+  s.markerHeightContacts = c.markerAnchorsEnabled && s.markerAnchors?.length ? markerHeightContacts(s.markerAnchors, zAt, c) : [];
+  const markerAnchored = s.markerHeightContacts.length > 0;
   const roadAnchored = s.roadHeightContacts.length > 0;
-  const kept = roadAnchored ? s.roadHeightContacts : consistentContacts(contacts, c);
-  const terrainDatum = kept ? smoothDatum(kept, c, roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : null;
+  const groundKept = roadAnchored ? s.roadHeightContacts : consistentContacts(contacts, c);
+  const kept = markerAnchored ? withMarkerContacts(s.markerHeightContacts, groundKept) : groundKept;
+  const keptSource = markerAnchored ? 'MARKER_ANCHOR' : roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN';
+  const terrainDatum = kept?.length ? smoothDatum(kept, c, keptSource) : null;
   // Replay uses the first smoothed position and the same saved map snapshot, not later floors.
   if (s.zLog.length && points.length) s.mapStartDatum = mapStartDatum(s, points[0].x, sigmaXY(points[0].P), zAt(points[0].t)!, c);
   // Recompute the provisional start on the smoothed XY track, with its matching barometric Z.
@@ -1425,7 +1445,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   const representativeDatum = datumAt(points.at(-1)?.t ?? 0);
   s.smoothed = {
     datumSource: absoluteHeightPolicy(s, c) ? representativeDatum?.source ?? 'NONE'
-      : terrainDatum ? (roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN') : fallback?.source ?? 'NONE',
+      : terrainDatum ? keptSource : fallback?.source ?? 'NONE',
     contacts: kept?.length ?? 0,
     contactCandidates: contacts.length,
     contactRejects,
@@ -1530,6 +1550,7 @@ export function summarizeV4(s: FusionStateV4) {
         mapGeoidM: s.terrain?.geoidSeparation ?? null } },
     circularCorridor: s.circularCorridor,
     roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
+    markerAnchors: { count: s.markerAnchors?.length ?? 0, heightContacts: s.markerHeightContacts },
     gpsAccepted: accepted,
     gpsRejected: rejected,
     rejectReasons: reasons,

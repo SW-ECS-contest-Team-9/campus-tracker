@@ -264,6 +264,13 @@ nonisolated struct MarkerPayload: Codable, Identifiable, Sendable {
     var ellipsoidalAltitude: Double? = nil
     let horizontalAccuracy: Double?
     let verticalAccuracy: Double?
+    // collection anchor (server markers/marker-anchor.ts); omitted when nil
+    var nodeId: String? = nil
+    var buildingId: String? = nil
+    var floor: String? = nil
+    var direction: String? = nil
+    var fromFloor: String? = nil
+    var toFloor: String? = nil
 
     var id: String { markerId }
 
@@ -279,6 +286,12 @@ nonisolated struct MarkerPayload: Codable, Identifiable, Sendable {
         altitude = marker.altitude?.finiteOrNil
         horizontalAccuracy = marker.horizontalAccuracy?.finiteOrNil
         verticalAccuracy = marker.verticalAccuracy?.finiteOrNil
+        nodeId = marker.anchor?.nodeId
+        buildingId = marker.anchor?.buildingId
+        floor = marker.anchor?.floor
+        direction = marker.anchor?.direction
+        fromFloor = marker.anchor?.fromFloor
+        toFloor = marker.anchor?.toFloor
     }
 }
 

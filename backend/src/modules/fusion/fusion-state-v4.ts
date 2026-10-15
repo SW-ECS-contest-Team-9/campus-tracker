@@ -7,6 +7,7 @@ import type { FusionSessionContext } from './fusion.stride.js';
 import { createAbsoluteAltitudeTracker } from './fusion-absolute-altitude.js';
 import type { StartHeightMap, StartHeightSelection } from '../../geo/start-height-map.js';
 import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
+import type { MarkerAnchorInput, MarkerHeightContact } from './fusion-marker-anchor.js';
 import type { CircularSummary } from './fusion-circular-corridor.js';
 
 /**
@@ -36,7 +37,7 @@ export interface HeadingSegmentV4 { id: number; startT: number; reason: string; 
 export interface ContactV4 { t: number; offset: number; variance: number }
 export interface GpsHeightV4 { t: number; H: number; hacc: number; z: number; ground: number | null; inside: boolean }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
@@ -154,6 +155,9 @@ export interface FusionStateV4 {
   mapStartDatum?: DatumV4;
   roadHeightTracker: RoadHeightTracker;
   roadHeightContacts: RoadHeightContact[];
+  /** rev 17: collection anchors naming a node (replay input) and the height contacts the final replay made of them */
+  markerAnchors?: MarkerAnchorInput[];
+  markerHeightContacts: MarkerHeightContact[];
   circularCorridor?: CircularSummary;
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
@@ -216,6 +220,8 @@ export function createFusionStateV4(context?: FusionSessionContext): FusionState
   return {
     absoluteAltitude: createAbsoluteAltitudeTracker(context?.absoluteAltitudeEnabled === true),
     startHeightMap: context?.startHeightMap,
+    ...(context?.markerAnchors?.length ? { markerAnchors: context.markerAnchors } : {}),
+    markerHeightContacts: [],
     ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
     ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),
     strideLevelSteps: 0,

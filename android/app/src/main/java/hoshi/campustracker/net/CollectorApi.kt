@@ -35,6 +35,24 @@ data class LoginResponse(
     val socketNamespace: String? = null,
 )
 
+/** `GET /api/v1/mobility/nodes`: the buildings and the network nodes to pick for a collection anchor (no auth). */
+@Serializable
+data class AnchorBuilding(val buildingId: String, val buildingName: String, val nodeCount: Int = 0, val floorsWithNodes: List<String> = emptyList())
+
+@Serializable
+data class AnchorNode(
+    val nodeId: String,
+    val buildingId: String,
+    /** null: the map does not say which floor */
+    val floor: String? = null,
+    val label: String,
+    val heightM: Double? = null,
+    val distanceM: Double? = null,
+)
+
+@Serializable
+data class AnchorNodesResponse(val buildings: List<AnchorBuilding> = emptyList(), val nodes: List<AnchorNode> = emptyList())
+
 /** HTTP-level failures with the iOS user messages (§3.2). */
 sealed class ApiError(message: String) : Exception(message) {
     class Http(val status: Int, val code: String?, serverMessage: String?) : ApiError(messageFor(status)) {
@@ -85,6 +103,26 @@ class CollectorApi(private val baseClient: OkHttpClient) {
             AppJson.decodeFromString(LoginResponse.serializer(), text)
         } catch (e: Exception) {
             L.w("CollectorApi", "login response unreadable", e)
+            throw ApiError.Unreadable()
+        }
+    }
+
+    /** `GET /api/v1/mobility/nodes` filtered by building and floor, nearest first. Blocking; call off the main thread. */
+    fun anchorNodes(configuration: ServerConfiguration, buildingId: String?, floor: String?, latitude: Double?, longitude: Double?): AnchorNodesResponse {
+        val url = configuration.url("/api/v1/mobility/nodes").newBuilder().apply {
+            buildingId?.let { addQueryParameter("buildingId", it) }
+            floor?.let { addQueryParameter("floor", it) }
+            if (latitude != null && longitude != null) {
+                addQueryParameter("latitude", latitude.toString())
+                addQueryParameter("longitude", longitude.toString())
+            }
+            addQueryParameter("limit", "40")
+        }.build()
+        val text = execute(healthClient, Request.Builder().url(url).get().build())
+        return try {
+            AppJson.decodeFromString(AnchorNodesResponse.serializer(), text)
+        } catch (e: Exception) {
+            L.w("CollectorApi", "anchor nodes unreadable", e)
             throw ApiError.Unreadable()
         }
     }

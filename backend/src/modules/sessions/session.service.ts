@@ -1,3 +1,4 @@
+import { trainingLabel } from '../markers/marker-anchor.js';
 import { withTransaction } from '../../config/database.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../common/errors/app-error.js';
@@ -49,10 +50,12 @@ export function manualInterruptBlock(status: string, socketConnected: boolean, s
 }
 
 /** Additive API fields; existing fields are unchanged. */
-function decorate(view: SessionView) {
+function decorate({ anchorMarkers, ...view }: SessionView) {
   const connected = realtimeState.get(view.collectorId)?.socketConnected ?? false;
   return {
     ...view,
+    /** "학습용 유효": the session has start/end anchors and paired stair/elevator anchors (markers/marker-anchor.ts) */
+    trainingLabel: trainingLabel(anchorMarkers ?? []),
     collectionState: view.status,
     syncState: syncStateOf(view, connected),
     /** null = the preview may interrupt this session by hand (POST /sessions/:id/interrupt) */

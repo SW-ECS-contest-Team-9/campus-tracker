@@ -84,6 +84,15 @@ export interface Marker {
   ellipsoidalAltitude: number | null;
   horizontalAccuracy: number | null;
   verticalAccuracy: number | null;
+  /** collection anchor (absent or null on markers of older apps) */
+  nodeId?: string | null;
+  buildingId?: string | null;
+  floor?: string | null;
+  direction?: 'up' | 'down' | null;
+  fromFloor?: string | null;
+  toFloor?: string | null;
+  /** the named node, EPSG:5186 with the MSL floor height */
+  node?: { x: number; y: number; z: number; current: boolean } | null;
   /** fusion-v4 estimate at the marker time: drawn at this height instead of the phone altitude */
   fused?: { algorithmVersion: string; latitude: number; longitude: number; ellipsoidalAltitude: number | null; heightAboveGround: number | null; zDatumSource: string | null; buildingName: string | null } | null;
 }

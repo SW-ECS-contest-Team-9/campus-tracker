@@ -106,16 +106,20 @@ enum class LocationCollectionProfile(val title: String, val intervalMs: Long) {
     }
 }
 
-enum class EventMarkerType(val wire: String, val title: String) {
+/** button = false: recorded by Start/Stop themselves (the collection anchors at both ends). */
+enum class EventMarkerType(val wire: String, val title: String, val button: Boolean = true) {
     entrance("entrance", "Entrance"),
     intersection("intersection", "Intersection"),
     stairStart("stairStart", "Stair Start"),
     stairEnd("stairEnd", "Stair End"),
     rampStart("rampStart", "Ramp Start"),
     rampEnd("rampEnd", "Ramp End"),
-    elevator("elevator", "Elevator"),
+    elevatorBoard("elevatorBoard", "Elevator Board"),
+    elevatorExit("elevatorExit", "Elevator Exit"),
     stop("stop", "Stop"),
     custom("custom", "Custom"),
+    sessionStart("sessionStart", "Start", button = false),
+    sessionEnd("sessionEnd", "End", button = false),
 }
 
 enum class CollectorAppState(val wire: String) { FOREGROUND("FOREGROUND"), INACTIVE("INACTIVE"), BACKGROUND("BACKGROUND") }

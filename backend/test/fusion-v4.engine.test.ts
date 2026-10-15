@@ -369,3 +369,43 @@ test('replay is deterministic', () => {
   const b = finalizeFusionV4(run(obs).s, cfg).outputs;
   assert.deepEqual(a, b);
 });
+
+test('rev 17: collection anchors naming a node set the absolute height and pull the track to the node', () => {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  const terrain: TerrainContext = { versionId: 't',
+    grid: { originX: xy.x - 200, originY: xy.y - 200, resolution: 2, width: 250, height: 250 },
+    heights: new Float32Array(62500).fill(100), sigma: new Float32Array(62500).fill(1), modified: new Uint8Array(62500), geoidSeparation: 23,
+    buildings: [{ buildingId: 'b', name: 'indoor', groundFloors: 5, undergroundFloors: 1, heightM: 20, floorLabels: [],
+      polygons: [[[[xy.x - 150, xy.y - 150], [xy.x + 150, xy.y - 150], [xy.x + 150, xy.y + 150], [xy.x - 150, xy.y + 150], [xy.x - 150, xy.y - 150]]]] }],
+  };
+  const { obs, truth } = simulate([{ durationS: 60, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 90, walking: true, vzMps: 0.1, slope: true }],
+    { gpsSigma: 1, gpsAccuracy: 3 });
+  // every GPS fix 12 m east of the truth (indoor multipath): only the anchors know better
+  const biased = obs.map((o) => o.kind === 'gps' ? { ...o, longitude: o.longitude + 12 / (6371008.8 * Math.cos(ORIGIN.latitude * Math.PI / 180)) * 180 / Math.PI } : o);
+  const at = (t: number) => truth.reduce((best, p) => (Math.abs(p.t - t) < Math.abs(best.t - t) ? p : best));
+  // the node floor is at 110 m (MSL) at the start; the end node is 2 m higher (the ramp climbed 2 m)
+  const anchors = [{ t: T0 + 2_000, z: 110 }, { t: T0 + 30_000, z: 110 }, { t: T0 + 58_000, z: 110 }, { t: T0 + 79_000, z: 112 }].map((a, i) => {
+    const p = at(a.t);
+    const ll = localToWgs84(ORIGIN, { x: p.x, y: p.y, z: 0 });
+    const g = tmForward(ll.latitude, ll.longitude);
+    return { markerId: `m${i}`, t: a.t, type: i === 0 ? 'sessionStart' : 'entrance', nodeId: `n${i}`, x: g.x, y: g.y, z: a.z };
+  });
+  const finish = (markerAnchors: typeof anchors | null) => {
+    const s = createFusionStateV4({ strideCalibration: null, markerAnchors });
+    for (const o of biased) processObservationV4(s, { ...o, terrainContext: terrain }, cfg);
+    return { s, out: finalizeFusionV4(s, cfg).outputs };
+  };
+  const without = finish(null);
+  const withAnchors = finish(anchors);
+  assert.equal(without.s.smoothed!.datumSource, 'TERRAIN_FALLBACK');
+  assert.equal(withAnchors.s.smoothed!.datumSource, 'MARKER_ANCHOR');
+  assert.equal(withAnchors.s.markerHeightContacts.length, 4);
+  assert.ok(withAnchors.out.every((p) => p.zDatumSource === 'MARKER_ANCHOR'));
+  // floor 110 + phone 1 + geoid 23 at the start
+  const first = withAnchors.out[0];
+  assert.ok(Math.abs(first.ellipsoidalAltitude! - 134) < 0.5, `${first.ellipsoidalAltitude}`);
+  const near = (r: ReturnType<typeof finish>) => errors(r.s, r.out.filter((o) => anchors.some((a) => Math.abs(o.timestamp - a.t) < 1000)), truth);
+  const before = rms(near(without));
+  const after = rms(near(withAnchors));
+  assert.ok(after < before - 2, `rms at the anchors ${before.toFixed(1)} -> ${after.toFixed(1)} m`);
+});

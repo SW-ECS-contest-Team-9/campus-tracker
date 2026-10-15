@@ -3,6 +3,7 @@ package hoshi.campustracker.collection
 import hoshi.campustracker.core.L
 import hoshi.campustracker.model.CollectorAppState
 import hoshi.campustracker.model.DeviceInfo
+import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.MotionSamplingRate
@@ -175,6 +176,33 @@ class CollectionCoordinatorTest {
         assertEquals("true", finish["interrupted"]!!.jsonPrimitive.content)
         assertTrue(finish.str("endedAt")!! >= hoshi.campustracker.core.Iso.format(lastSampleAt))
         assertEquals(-1L, finish["lastSequences"]!!.jsonObject["location"]!!.jsonPrimitive.long)
+    }
+
+    @Test
+    fun startAndStopRecordTheirAnchorsAndStairsMoveTheCurrentFloor() = runTest {
+        val p = Process(this, tmp.newFolder())
+        val start = CollectionAnchor(nodeId = "n1", buildingId = "북악관", floor = "3F")
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0, start)
+        p.executor.runAll()
+        assertEquals(CollectionAnchor(buildingId = "북악관", floor = "3F"), p.coordinator.ui.value.lastPlace)
+        p.coordinator.addMarker(EventMarkerType.stairStart, CollectionAnchor(direction = "up", fromFloor = "3F", toFloor = "4F"))
+        p.executor.runAll()
+        assertEquals(EventMarkerType.stairStart, p.coordinator.ui.value.openVertical)
+        p.coordinator.addMarker(EventMarkerType.stairEnd, CollectionAnchor(direction = "up", fromFloor = "3F", toFloor = "4F"))
+        p.executor.runAll()
+        assertNull(p.coordinator.ui.value.openVertical)
+        assertEquals("4F", p.coordinator.ui.value.lastPlace?.floor)
+        p.coordinator.stopSession(CollectionAnchor(buildingId = CollectionAnchor.OUTDOOR, nodeId = "n9"))
+        p.executor.runAll(); runCurrent()
+        val markers = queue.allItems().filter { it.kind == ItemKind.marker }.map { Json.parseToJsonElement(it.payload).jsonObject }
+        assertEquals(listOf("sessionStart", "stairStart", "stairEnd", "sessionEnd"), markers.map { it.str("type") })
+        assertEquals("n1", markers[0].str("nodeId"))
+        assertEquals("3F", markers[0].str("floor"))
+        assertEquals("up", markers[1].str("direction"))
+        assertEquals("outdoor", markers[3].str("buildingId"))
+        // the end marker is queued before the finish
+        val kinds = queue.allItems().map { it.kind }
+        assertTrue(kinds.lastIndexOf(ItemKind.marker) < kinds.indexOf(ItemKind.finish))
     }
 
     @Test
