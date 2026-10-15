@@ -284,3 +284,13 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 `session:finish`와 `session:syncComplete`의 `lastSequences.absoluteAltitude`는 마지막 보존 sequence이며, 빈 스트림은 -1이다. 서버가 광고한 스트림도 기존 스트림과 같은 저장·동기화 보장을 적용한다. 구버전의 필드 누락은 호환된다.
 
 `fusion-v4` revision 15는 `sensorCapabilities.absoluteAltitudeEnabled=true`인 세션 또는 실제 새 관측이 있는 세션에 새 정책을 적용한다. 기본 `absoluteAltitudeMode=fallback`에서 검증한 값은 `zDatumSource=CM_ABSOLUTE`로 기록하고 상대 Z와 함께 추적한다. 검증된 기준이 없으면 지면층을 가정하지 않고 절대 높이를 null로 둔다. 이전 앱·기록은 기존 정책을 유지한다. `CM_ABSOLUTE`는 잠정 추정이며 층 확정의 근거가 아니다. 세부 조건과 배포 순서는 [서버 적용 문서](ABSOLUTE_ALTITUDE_SERVER.md)를 따른다.
+
+
+## BLE iBeacon (beaconObservationsV1)
+
+`session:start` 응답의 `supportedTelemetryFeatures`에 `beaconObservationsV1`이 있으면 같은 연결로 `beacon.observations.v1`
+(Socket.IO는 `beacon.observations.v1` / `beacon:observations.v1`)을 보낼 수 있다. 없으면 보내지 않고 휴대폰에 보관한다.
+기존 메시지·ACK·`lastSequences` manifest는 바뀌지 않았다(비콘은 manifest에 들어가지 않는다). 비콘 설정은
+`GET /api/v1/positioning/beacon-config`(collector 토큰, ETag), 레지스트리 관리는 `/api/v1/positioning/admin/*`.
+`fused_positions`/`position:fused`에 `floorLabel`, `floorBuildingId`, `floorSource`, `floorConfidence`, `beaconUpdates`(fusion-v4 rev 18,
+없으면 null)와 `source` 값 `BEACON_CORRECTED`·`BEACON_ANCHORED`가 추가되었다. 상세: [BLE 비콘 위치추정](BEACON_POSITIONING.md).
