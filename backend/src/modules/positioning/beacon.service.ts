@@ -7,9 +7,11 @@ import { logger } from '../../common/logger.js';
 import { tmInverse } from '../../geo/tm.js';
 import { sessionService } from '../sessions/session.service.js';
 import { fusionService } from '../fusion/fusion.service.js';
+import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
 import { BEACON_RSSI_DEFAULTS } from './beacon-calibration.js';
 import {
-  AnchorCreate, AnchorUpdate, BeaconCreate, BeaconObservationBatch, BeaconUpdate, CalibrationUpsert, beaconKey, checkObservation,
+  AnchorCreate, AnchorUpdate, BeaconCreate, BeaconObservationBatch, BeaconUpdate, CalibrationUpsert, DiscoveredQuery, SurveyUuidCreate,
+  beaconKey, checkObservation,
   type BeaconRowRejection,
 } from './beacon.dto.js';
 import { beaconRepository, type BeaconView } from './beacon.repository.js';
@@ -155,8 +157,9 @@ export const beaconService = {
    * revision; the ETag also covers the server switches so turning a feature off reaches cached apps.
    */
   async config() {
-    const [{ revision, updatedAt }, beacons, calibrations] = await Promise.all([
+    const [{ revision, updatedAt }, beacons, calibrations, survey] = await Promise.all([
       beaconRepository.revision(), beaconRepository.listBeacons({ includeDisabled: false }), beaconRepository.calibrations(),
+      beaconRepository.surveyUuids(),
     ]);
     const features = beaconFeatures();
     const visible = env.BEACON_POSITIONING === 'on' ? beacons.filter((b) => !b.anchor || b.anchor.status === 'ACTIVE') : [];
@@ -170,7 +173,9 @@ export const beaconService = {
         note: 'position.z = mounting height above MSL; floorHeightM = floor surface above MSL' },
       cachePolicy: { maxAgeSeconds: env.BEACON_CONFIG_MAX_AGE_S, staleMaxSeconds: env.BEACON_CONFIG_STALE_MAX_S },
       features,
-      proximityUuids: [...new Set(visible.map((b) => b.uuid.toLowerCase()))].sort(),
+      // registered beacons' UUIDs + survey UUIDs (new major/minor values of those are collected for registration)
+      proximityUuids: env.BEACON_POSITIONING === 'on'
+        ? [...new Set([...visible.map((b) => b.uuid.toLowerCase()), ...survey.map((u) => u.uuid.toLowerCase())])].sort() : [],
       rssiDefaults: BEACON_RSSI_DEFAULTS,
       defaultCalibrations: calibrations.filter((c) => c.beaconId === null),
       beacons: visible.map((b) => ({
@@ -241,6 +246,28 @@ export const beaconService = {
     });
     logger.info('beacon.registry.anchor_updated', { actor, anchorId, fields: Object.keys(u) });
     return (await beaconRepository.findAnchor(anchorId))!;
+  },
+
+  async addSurveyUuid(input: unknown, actor: string) {
+    const u = SurveyUuidCreate.parse(input);
+    await withTransaction(async (db) => {
+      await beaconRepository.addSurveyUuid(db, u.uuid, u.label ?? null, actor);
+      await beaconRepository.bump(db);
+    });
+    return { surveyUuids: await beaconRepository.surveyUuids() };
+  },
+
+  async removeSurveyUuid(uuid: string) {
+    await withTransaction(async (db) => {
+      if (!(await beaconRepository.removeSurveyUuid(db, uuid))) throw AppError.notFound('SURVEY_UUID_NOT_FOUND', 'Survey UUID not found');
+      await beaconRepository.bump(db);
+    });
+    return { surveyUuids: await beaconRepository.surveyUuids() };
+  },
+
+  discovered(query: unknown) {
+    const q = DiscoveredQuery.parse(query);
+    return beaconRepository.discovered(q.sinceHours, q.limit, REALTIME_FUSION_VERSION);
   },
 
   async upsertCalibration(input: unknown, actor: string) {

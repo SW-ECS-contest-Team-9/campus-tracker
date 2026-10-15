@@ -1,0 +1,68 @@
+:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; color: #17211d; background: #e7ebe5; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; } /* the layout classes below set display */
+body { margin: 0; background: #e7ebe5; }
+button, input, select { font: inherit; }
+button { border: 1px solid #ced6cf; border-radius: 8px; background: #fff; color: #23332c; padding: 7px 10px; cursor: pointer; }
+button:hover:not(:disabled) { background: #f1f7f2; border-color: #88a295; }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: #126346; border-color: #126346; color: #fff; }
+button.primary:hover:not(:disabled) { background: #0e5139; }
+input, select { padding: 7px 8px; border: 1px solid #ccd6ce; border-radius: 7px; background: #fff; color: #1f2b24; min-width: 0; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.muted { color: #77837b; }
+
+.bp-header { display: flex; align-items: center; gap: 12px; padding: 0 16px; height: 52px; background: #183d31; color: #fff; }
+.bp-header .spacer { flex: 1; }
+.bp-header > * { white-space: nowrap; }
+.bp-header button { border-color: #59776b; background: #234c3d; color: #fff; }
+.bp-brand, .bp-nav { color: #d5e6dd; text-decoration: none; }
+.bp-brand { font-weight: 750; color: #fff; }
+.bp-banner { margin: 12px 16px 0; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.bp-banner.error { background: #fff0e4; border: 1px solid #f0a770; color: #9c380c; }
+.bp-banner.info { background: #eaf2fc; border: 1px solid #b7c9db; color: #173e72; }
+
+.bp-main { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr); gap: 16px; padding: 16px; max-width: 1280px; margin: 0 auto; }
+.bp-card { background: #f9fbf9; border: 1px solid #d8dfd8; border-radius: 12px; padding: 16px; min-width: 0; }
+.bp-card.wide { grid-column: 1 / -1; }
+.bp-card h2 { font-size: 15px; margin: 0 0 12px; color: #23332c; }
+.bp-card h3 { font-size: 13px; margin: 16px 0 8px; color: #40574b; }
+.bp-hint { color: #526157; font-size: 13px; line-height: 1.5; margin: 0 0 10px; }
+.bp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+.bp-row > input { flex: 1; }
+.bp-status { font-size: 13px; color: #40574b; min-height: 1.4em; margin: 6px 0; }
+.bp-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.bp-tabs button.active { background: #126346; border-color: #126346; color: #fff; }
+
+.bp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.bp-list > li > button { width: 100%; display: grid; gap: 2px; text-align: left; padding: 8px 10px; font-size: 13px; }
+.bp-list > li.registered > button { background: #eef2ee; }
+.bp-list .tag { justify-self: start; margin-top: 2px; font-size: 11px; color: #126346; font-weight: 650; }
+.bp-list.compact > li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.bp-list.compact button { padding: 3px 8px; font-size: 12px; }
+
+fieldset { border: 1px solid #dfe6e0; border-radius: 10px; margin: 0 0 12px; padding: 8px 12px 4px; }
+legend { font-size: 12px; color: #40574b; padding: 0 4px; }
+.bf-field { display: grid; gap: 4px; margin: 6px 0; font-size: 12px; color: #526157; }
+.bf-field input { width: 100%; }
+.bf-inline { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #40574b; }
+.bf-error { color: #b4330b; font-size: 11px; min-height: 0; }
+.bf-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bf-grid3 { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; }
+
+.bp-table-wrap { overflow-x: auto; }
+.bp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+.bp-table th, .bp-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid #e3e9e4; white-space: nowrap; }
+.bp-table th { font-size: 12px; color: #526157; font-weight: 650; }
+.bp-table tr.disabled td { color: #8a958e; }
+
+.bp-login { position: fixed; inset: 0; background: #183d31cc; display: grid; place-items: center; padding: 16px; }
+.bp-login .bp-card { width: min(420px, 100%); display: grid; gap: 10px; }
+
+@media (max-width: 760px) {
+  .bp-main { grid-template-columns: 1fr; padding: 12px; }
+  .bf-grid3 { grid-template-columns: 1fr 1fr; }
+  .bp-header { gap: 8px; padding: 0 12px; }
+  .bp-nav, #bp-user { display: none; }
+  .bp-header button { padding: 5px 8px; }
+}

@@ -42,12 +42,14 @@ const FUSION_SELECT = `SELECT o.observation_id::text AS "observationId", o.obser
     ST_X(a.geom)::float8 AS "anchorX", ST_Y(a.geom)::float8 AS "anchorY", ST_Z(a.geom)::float8 AS "anchorZ",
     a.building_id AS "buildingId", a.floor, a.floor_height_m AS "floorHeightM", a.horizontal_accuracy_m AS "anchorHorizontalAccuracyM"
   FROM positioning.beacon_observations o
-  JOIN positioning.beacon_devices b ON b.id = o.beacon_id AND b.enabled
+  -- by identity, not by the beacon_id resolved at ingest: a beacon registered after a survey walk applies to that walk too
+  JOIN positioning.beacon_devices b ON b.protocol = o.protocol AND b.uuid = o.uuid AND b.major = o.major AND b.minor = o.minor AND b.enabled
   JOIN positioning.spatial_anchors a ON a.id = b.anchor_id AND a.status = 'ACTIVE'`;
 
 /**
  * Only observations of beacons that are enabled and anchored NOW: a beacon disabled later (moved, spoofed,
- * broken) drops out of every later replay; anchor corrections apply to replays too (the replay input hash changes).
+ * broken) drops out of every later replay, one registered later joins it; anchor corrections apply to replays too
+ * (the replay input hash changes).
  */
 export async function loadFusionBeacons(sessionId: string, db: DbClient = pool, observationIds?: string[]): Promise<BeaconRawSample[]> {
   const { rows } = observationIds

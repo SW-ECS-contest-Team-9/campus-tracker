@@ -257,6 +257,63 @@ export const beaconRepository = {
       [[...seen.keys()], [...seen.values()]]);
   },
 
+  async surveyUuids(db: DbClient = pool): Promise<{ uuid: string; label: string | null; createdBy: string | null; createdAt: string }[]> {
+    const { rows } = await db.query(`SELECT uuid::text AS uuid, label, created_by AS "createdBy", created_at AS "createdAt"
+      FROM positioning.survey_uuids ORDER BY created_at`);
+    return rows.map((r) => ({ ...r, createdAt: iso(r.createdAt)! }));
+  },
+
+  async addSurveyUuid(db: PoolClient, uuid: string, label: string | null, actor: string): Promise<boolean> {
+    const { rowCount } = await db.query(`INSERT INTO positioning.survey_uuids (uuid, label, created_by) VALUES ($1, $2, $3)
+      ON CONFLICT (uuid) DO UPDATE SET label = EXCLUDED.label`, [uuid.toLowerCase(), label, actor]);
+    return (rowCount ?? 0) > 0;
+  },
+
+  async removeSurveyUuid(db: PoolClient, uuid: string): Promise<boolean> {
+    const { rowCount } = await db.query('DELETE FROM positioning.survey_uuids WHERE uuid = $1', [uuid.toLowerCase()]);
+    return (rowCount ?? 0) > 0;
+  },
+
+  /**
+   * Identifiers the apps heard that are not registered (yet), newest first, with where the phone was when the signal
+   * was strongest: the fused position of that session within 10 s of that observation (a starting point for the anchor,
+   * not a survey: the beacon is somewhere within a few metres of it).
+   */
+  async discovered(sinceHours: number, limit: number, fusionVersion: string, db: DbClient = pool) {
+    const { rows } = await db.query(
+      `WITH obs AS (
+         SELECT o.uuid::text AS uuid, o.major, o.minor, o.session_id, o.observed_at, o.rssi_dbm, o.platform, o.measured_power_dbm
+           FROM positioning.beacon_observations o
+          WHERE o.resolution = 'UNREGISTERED' AND o.observed_at > now() - make_interval(hours => $1::int)
+            AND NOT EXISTS (SELECT 1 FROM positioning.beacon_devices b
+                             WHERE b.protocol = 'IBEACON' AND b.uuid = o.uuid AND b.major = o.major AND b.minor = o.minor)),
+       agg AS (
+         SELECT uuid, major, minor, count(*)::int AS observations, count(DISTINCT session_id)::int AS sessions,
+                max(rssi_dbm)::int AS "maxRssiDbm", min(observed_at) AS "firstSeenAt", max(observed_at) AS "lastSeenAt",
+                max(measured_power_dbm)::int AS "measuredPowerDbm", array_agg(DISTINCT platform) AS platforms
+           FROM obs GROUP BY uuid, major, minor),
+       best AS (
+         SELECT DISTINCT ON (uuid, major, minor) uuid, major, minor, session_id, observed_at
+           FROM obs ORDER BY uuid, major, minor, rssi_dbm DESC, observed_at DESC)
+       SELECT a.*, best.observed_at AS "strongestAt", p.latitude, p.longitude, p.horizontal_uncertainty AS "horizontalUncertaintyM",
+              p.floor_label AS floor, p.building_id AS "buildingId"
+         FROM agg a JOIN best USING (uuid, major, minor)
+         LEFT JOIN LATERAL (
+           SELECT f.latitude, f.longitude, f.horizontal_uncertainty, f.floor_label, f.building_id FROM fused_positions f
+            WHERE f.session_id = best.session_id AND f.algorithm_version = $3
+              AND f."timestamp" BETWEEN best.observed_at - interval '10 seconds' AND best.observed_at + interval '10 seconds'
+            ORDER BY abs(extract(epoch FROM f."timestamp" - best.observed_at)) LIMIT 1) p ON true
+        ORDER BY a."lastSeenAt" DESC LIMIT $2`,
+      [sinceHours, limit, fusionVersion]);
+    return rows.map((r) => ({
+      uuid: r.uuid, major: r.major, minor: r.minor, observations: r.observations, sessions: r.sessions, maxRssiDbm: r.maxRssiDbm,
+      measuredPowerDbm: r.measuredPowerDbm, platforms: r.platforms, firstSeenAt: iso(r.firstSeenAt), lastSeenAt: iso(r.lastSeenAt),
+      suggestedPosition: r.latitude == null ? null : {
+        latitude: r.latitude, longitude: r.longitude, horizontalUncertaintyM: r.horizontalUncertaintyM, floor: r.floor ?? null,
+        buildingId: r.buildingId ?? null, at: iso(r.strongestAt) },
+    }));
+  },
+
   /** Raw rows of a session for the API (paged by id). */
   async sessionObservations(sessionId: string, afterId: number, limit: number, db: DbClient = pool) {
     const { rows } = await db.query(

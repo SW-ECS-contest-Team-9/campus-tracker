@@ -75,6 +75,13 @@ admin.post('/anchors', async (req, res) => res.status(201).json(await beaconServ
 admin.patch('/anchors/:anchorId', async (req, res) =>
   res.json(await beaconService.updateAnchor(id(req.params.anchorId, 'ANCHOR_NOT_FOUND'), req.body, actor(res))));
 
+admin.get('/discovered', async (req, res) => res.json({ discovered: await beaconService.discovered(req.query) }));
+admin.get('/survey-uuids', async (_req, res) => res.json({ surveyUuids: await beaconRepository.surveyUuids() }));
+admin.post('/survey-uuids', async (req, res) => res.status(201).json(await beaconService.addSurveyUuid(req.body, actor(res))));
+admin.delete('/survey-uuids/:uuid', async (req, res) => res.json(await beaconService.removeSurveyUuid(id(req.params.uuid, 'SURVEY_UUID_NOT_FOUND'))));
+/** Who may register beacons: lets the registration page explain a 403 before the user fills the form. */
+admin.get('/me', (_req, res) => res.json({ collectorId: actor(res), admin: true }));
+
 admin.get('/calibrations', async (_req, res) => res.json({ calibrations: await beaconRepository.calibrations() }));
 admin.put('/calibrations', async (req, res) => res.json(await beaconService.upsertCalibration(req.body, actor(res))));
 
