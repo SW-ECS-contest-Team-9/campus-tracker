@@ -14,7 +14,9 @@ import androidx.room.RoomDatabase
 import androidx.room.Update
 
 enum class ItemKind(val wireType: String) {
-    batch("telemetry:batch"), marker("marker:create"), finish("session:finish"), diagnostic("diagnostic:event")
+    batch("telemetry:batch"), marker("marker:create"), finish("session:finish"), diagnostic("diagnostic:event"),
+    /** beacon.observations.v1: sent only to servers that advertise beaconObservationsV1; held (never dropped) otherwise. */
+    beacon("beacon.observations.v1"),
 }
 
 object ItemState {

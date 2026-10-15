@@ -82,6 +82,7 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
     val upload by graph.sync.status.collectAsStateWithLifecycle()
     val configuration by graph.auth.configuration.collectAsStateWithLifecycle()
     val settings by graph.settings.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
+    val beaconUi by graph.beacons.ui.collectAsStateWithLifecycle()
     val savedCollectorId by graph.auth.savedCollectorId.collectAsStateWithLifecycle()
     val reload: () -> Unit = { scope.launch { sessions = withContext(Dispatchers.IO) { graph.coordinator.loadSessions() } } }
     // the marker whose anchor is being picked (Start and Stop open it with sessionStart / sessionEnd)
@@ -170,6 +171,9 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                         onMotionRate = { scope.launch { graph.settings.saveSampling(motionRate = it) } },
                         onProfile = { scope.launch { graph.settings.saveSampling(profile = it) } },
                         onDistanceFilter = { scope.launch { graph.settings.saveSampling(distanceFilter = it) } },
+                        beacon = beaconUi,
+                        onBeaconScanning = { scope.launch { graph.settings.saveBeacon(scanning = it) } },
+                        onBeaconUpload = { scope.launch { graph.settings.saveBeacon(upload = it) } },
                     )
                 }
             }

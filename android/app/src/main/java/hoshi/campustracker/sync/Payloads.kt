@@ -147,7 +147,43 @@ data class CollectorStatusPayload(
 data class StrideCalibrationAck(val status: String? = null, val reason: String? = null)
 
 @Serializable
-data class SessionStartAckData(val sessionId: String? = null, val strideCalibration: StrideCalibrationAck? = null)
+data class SessionStartAckData(
+    val sessionId: String? = null,
+    val strideCalibration: StrideCalibrationAck? = null,
+    /** optional streams the server stores; `beaconObservationsV1` = beacon.observations.v1 may be sent for this session */
+    val supportedTelemetryFeatures: List<String>? = null,
+)
+
+/** One row of `beacon.observations.v1` (docs/BEACON_POSITIONING.md). */
+@Serializable
+data class BeaconObservationPayload(
+    val observationId: String,
+    val protocol: String = "IBEACON",
+    val uuid: String,
+    val major: Int,
+    val minor: Int,
+    val rssiDbm: Int,
+    val observedAt: String,
+    val measuredPowerDbm: Int? = null,
+    val proximity: String? = null,
+    val platformEstimatedDistanceMeters: Double? = null,
+    val observationTimeUncertaintyMs: Double? = null,
+    val rssiAggregation: String? = null,
+    val sampleCount: Int? = null,
+)
+
+/** `beacon.observations.v1` payload; sessionId is filled in at send time like the other items. */
+@Serializable
+data class BeaconObservationBatchPayload(
+    val type: String = "beacon.observations.v1",
+    val schemaVersion: Int = 1,
+    val batchId: String,
+    val clientSessionId: String,
+    val platform: String = "android",
+    val deviceModel: String? = null,
+    val createdAt: String,
+    val observations: List<BeaconObservationPayload>,
+)
 
 @Serializable
 data class AckError(

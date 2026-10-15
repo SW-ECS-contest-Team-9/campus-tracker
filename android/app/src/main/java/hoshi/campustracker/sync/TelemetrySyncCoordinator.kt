@@ -58,7 +58,19 @@ class TelemetrySyncCoordinator(
         const val RETRY_DELAY_MS = 2_000L
         private val SESSION_RESTART_CODES = setOf("SESSION_NOT_FOUND", "SESSION_NOT_STARTED")
         private val ITEM_KINDS = listOf(ItemKind.batch, ItemKind.marker, ItemKind.finish, ItemKind.diagnostic)
+        const val BEACON_FEATURE = "beaconObservationsV1"
+        /** beacon rows per item: a few seconds of advertisements in a busy hallway */
+        const val BEACON_FLUSH_THRESHOLD = 200
     }
+
+    /** beacon batches are optional data: counted apart so a server without the feature never shows them as "pending" */
+    private val beaconSupported = mutableSetOf<String>()
+    private val beaconHandshakeAsked = mutableSetOf<String>()
+    private val beacons = ArrayList<BeaconObservationPayload>()
+    /** device model for beacon batches (calibration groups) */
+    var deviceModel: String? = null
+    /** local / remote upload switch: false = beacon batches stay queued on the phone */
+    @Volatile var beaconUploadEnabled: Boolean = true
 
     /** Called on the sync thread when `session:start` is acknowledged. */
     var onServerSessionStarted: ((clientSessionId: String, serverSessionId: String) -> Unit)? = null
@@ -146,6 +158,15 @@ class TelemetrySyncCoordinator(
     fun appendAltimeter(sample: AltimeterPayload) = scope.launch { altimeter += sample; flushIfNeeded() }
     fun appendPedometer(sample: PedometerPayload) = scope.launch { pedometer += sample; flushIfNeeded() }
 
+    /** Raw beacon observation of the active session (durable once its batch is queued, within ~1 s). */
+    fun appendBeacon(sample: BeaconObservationPayload) = scope.launch {
+        beacons += sample
+        if (beacons.size >= BEACON_FLUSH_THRESHOLD) flushBeacons()
+    }
+
+    /** Beacon batches waiting for upload (or held for a server without beacon support). */
+    fun pendingBeaconBatches(): Int = store.countPending(listOf(ItemKind.beacon))
+
     /** [needsLocation]: no fix yet in this process; held until [fillMarkerLocations] (§12-5). */
     fun appendMarker(marker: MarkerPayload, needsLocation: Boolean) = scope.launch {
         val json = encode(MarkerPayload.serializer(), marker, "marker:create", marker.markerId) ?: return@launch
@@ -189,7 +210,23 @@ class TelemetrySyncCoordinator(
         if (locations.size + motion.size + altimeter.size + pedometer.size >= FLUSH_THRESHOLD) flushBatch()
     }
 
+    private fun flushBeacons() {
+        val sessionId = activeClientSessionId
+        if (beacons.isEmpty()) return
+        if (sessionId == null) {
+            beacons.clear()
+            return
+        }
+        val batch = BeaconObservationBatchPayload(batchId = newId(), clientSessionId = sessionId, deviceModel = deviceModel,
+            createdAt = Iso.format(nowMs()), observations = beacons.toList())
+        beacons.clear()
+        val json = encode(BeaconObservationBatchPayload.serializer(), batch, "beacon.observations.v1", batch.batchId) ?: return
+        store.insert(QueueItem(kind = ItemKind.beacon, itemId = batch.batchId, clientSessionId = sessionId, payload = json))
+        pump()
+    }
+
     private fun flushBatch() {
+        flushBeacons()
         val sessionId = activeClientSessionId
         if (locations.isEmpty() && motion.isEmpty() && altimeter.isEmpty() && pedometer.isEmpty()) return
         if (sessionId == null) {
@@ -209,7 +246,7 @@ class TelemetrySyncCoordinator(
     }
 
     private fun clearBuffers() {
-        locations.clear(); motion.clear(); altimeter.clear(); pedometer.clear()
+        locations.clear(); motion.clear(); altimeter.clear(); pedometer.clear(); beacons.clear()
     }
 
     private fun startTimers() {
@@ -277,6 +314,19 @@ class TelemetrySyncCoordinator(
             val item = store.oldestPending(kind, byId.keys).firstOrNull { !it.needsLocation } ?: continue
             sendItem(item, byId.getValue(item.clientSessionId))
             return
+        }
+        // 6. beacon batches, only for sessions whose session:start ACK listed beaconObservationsV1 in this process.
+        if (!beaconUploadEnabled) return
+        val withBeacons = store.oldestPending(ItemKind.beacon, byId.keys, limit = 200).map { it.clientSessionId }.distinct()
+        // A session whose support is unknown (restart; started before the server had the feature) asks once more:
+        // session:start is idempotent and its ACK carries the current feature list.
+        withBeacons.firstOrNull { it !in beaconSupported && beaconHandshakeAsked.add(it) }?.let { id ->
+            store.setServerSessionId(id, null)
+            sendStart(byId.getValue(id))
+            return
+        }
+        store.oldestPending(ItemKind.beacon, byId.keys.filter { it in beaconSupported }).firstOrNull()?.let {
+            sendItem(it, byId.getValue(it.clientSessionId))
         }
     }
 
@@ -395,7 +445,8 @@ class TelemetrySyncCoordinator(
                 return
             }
             store.setServerSessionId(clientSessionId, serverId)
-            L.i(TAG, "session:start ACK serverSessionId=$serverId stride=${ack.strideCalibration?.status}/${ack.strideCalibration?.reason}")
+            if (ack.supportedTelemetryFeatures?.contains(BEACON_FEATURE) == true) beaconSupported += clientSessionId else beaconSupported -= clientSessionId
+            L.i(TAG, "session:start ACK serverSessionId=$serverId stride=${ack.strideCalibration?.status}/${ack.strideCalibration?.reason} beacons=${clientSessionId in beaconSupported}")
             onServerSessionStarted?.invoke(clientSessionId, serverId)
             if (clientSessionId == activeClientSessionId) sendStatus()
             pump()
@@ -422,6 +473,14 @@ class TelemetrySyncCoordinator(
             return
         }
         val code = error?.code
+        if (item.kind == ItemKind.beacon && (code == "BEACON_DISABLED" || code == "UNKNOWN_TYPE")) {
+            // the server turned beacon positioning off (or never had it): keep the raw rows, stop sending them here
+            L.w(TAG, "beacon batch held item=${item.itemId} code=$code")
+            beaconSupported -= item.clientSessionId
+            store.update(item.copy(lastErrorCode = code))
+            pump()
+            return
+        }
         if (code in SESSION_RESTART_CODES) {
             if (!item.sessionRetried) {
                 L.w(TAG, "$code for item=${item.itemId}; re-sending session:start then retrying once")
