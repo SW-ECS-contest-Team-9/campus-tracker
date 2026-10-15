@@ -114,6 +114,13 @@ class JsonContractTest {
             json("""{"markerId":"m","clientSessionId":"c","timestamp":"2026-10-07T06:03:10.250Z","type":"stairStart","latitude":37.6105,"longitude":127.0102}"""),
             json(AppJson.encodeToString(MarkerPayload.serializer(), marker)),
         )
+        // collection anchor fields: sent only when set (older servers ignore them)
+        val anchored = marker.copy(nodeId = "n", buildingId = "북악관", floor = "3F", direction = "up", fromFloor = "3F", toFloor = "4F")
+        assertEquals(
+            json("""{"markerId":"m","clientSessionId":"c","timestamp":"2026-10-07T06:03:10.250Z","type":"stairStart","latitude":37.6105,"longitude":127.0102,
+              "nodeId":"n","buildingId":"북악관","floor":"3F","direction":"up","fromFloor":"3F","toFloor":"4F"}"""),
+            json(AppJson.encodeToString(MarkerPayload.serializer(), anchored)),
+        )
         val diag = DiagnosticEventPayload("c", listOf(DiagnosticEventItem("e", "SENSOR_STARTED", "2026-10-07T06:00:00.050Z", mapOf("sensor" to "motion"))))
         assertEquals(
             json("""{"clientSessionId":"c","events":[{"eventId":"e","eventType":"SENSOR_STARTED","clientTimestamp":"2026-10-07T06:00:00.050Z","metadata":{"sensor":"motion"}}]}"""),

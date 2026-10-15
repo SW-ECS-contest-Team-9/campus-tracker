@@ -29,15 +29,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hoshi.campustracker.AppGraph
 import hoshi.campustracker.auth.AppSettings
 import hoshi.campustracker.auth.AuthState
+import hoshi.campustracker.model.AnchorNeeds
+import hoshi.campustracker.model.AnchorRules
+import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.CollectionSession
+import hoshi.campustracker.model.EventMarkerType
+import hoshi.campustracker.net.AnchorNodesResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Callbacks that need the Activity (runtime permissions). */
 interface CollectActions {
-    fun start()
-    fun stop()
+    /** [anchor]: the start/end collection anchor the collector picked (node, building, floor) */
+    fun start(anchor: CollectionAnchor)
+    fun stop(anchor: CollectionAnchor)
     fun resume()
     fun finishInterrupted()
 }
@@ -78,6 +84,31 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
     val settings by graph.settings.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
     val savedCollectorId by graph.auth.savedCollectorId.collectAsStateWithLifecycle()
     val reload: () -> Unit = { scope.launch { sessions = withContext(Dispatchers.IO) { graph.coordinator.loadSessions() } } }
+    // the marker whose anchor is being picked (Start and Stop open it with sessionStart / sessionEnd)
+    var anchorFor by remember { mutableStateOf<EventMarkerType?>(null) }
+    val loadNodes: suspend (String?, String?) -> AnchorNodesResponse = { building, floor ->
+        val server = configuration ?: throw IllegalStateException("No server configured.")
+        val at = ui.latestLocation
+        withContext(Dispatchers.IO) { graph.api.anchorNodes(server, building, floor, at?.latitude, at?.longitude) }
+    }
+    anchorFor?.let { type ->
+        AnchorDialog(
+            type = type,
+            initial = if (type == EventMarkerType.stairEnd || type == EventMarkerType.elevatorExit || type == EventMarkerType.rampEnd) {
+                ui.openVerticalAnchor ?: ui.lastPlace
+            } else ui.lastPlace,
+            loadNodes = loadNodes,
+            onConfirm = { anchor ->
+                anchorFor = null
+                when (type) {
+                    EventMarkerType.sessionStart -> actions.start(anchor)
+                    EventMarkerType.sessionEnd -> actions.stop(anchor)
+                    else -> graph.coordinator.addMarker(type, anchor)
+                }
+            },
+            onDismiss = { anchorFor = null },
+        )
+    }
 
     LaunchedEffect(tab) { if (tab == Tab.Sessions) reload() }
 
@@ -88,7 +119,7 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                 actions = {
                     when (tab) {
                         Tab.Collect -> TextButton(
-                            onClick = { if (ui.activeSession == null) actions.start() else actions.stop() },
+                            onClick = { anchorFor = if (ui.activeSession == null) EventMarkerType.sessionStart else EventMarkerType.sessionEnd },
                             enabled = !ui.starting,
                         ) { Text(if (ui.activeSession == null) "Start" else "Stop") }
                         Tab.Sessions -> TextButton(onClick = reload) { Text("Refresh") }
@@ -125,7 +156,7 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                     ),
                     onResume = actions::resume,
                     onFinishInterrupted = actions::finishInterrupted,
-                    onMarker = { graph.coordinator.addMarker(it) },
+                    onMarker = { type -> if (AnchorRules.needs(type) == AnchorNeeds.NONE) graph.coordinator.addMarker(type) else anchorFor = type },
                 )
                 Tab.Sessions -> SessionsScreen(sessions)
                 Tab.Settings -> if (showServerSettings) {
