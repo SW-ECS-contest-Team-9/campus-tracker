@@ -15,6 +15,7 @@ import hoshi.campustracker.auth.KeystoreTokenStore
 import hoshi.campustracker.auth.SettingsStore
 import hoshi.campustracker.collection.AndroidCollectionPlatform
 import hoshi.campustracker.collection.AppStateTracker
+import hoshi.campustracker.collection.BeaconCollectionController
 import hoshi.campustracker.collection.CollectionCoordinator
 import hoshi.campustracker.collection.HandlerExecutor
 import hoshi.campustracker.collection.PermissionHistory
@@ -29,6 +30,13 @@ import hoshi.campustracker.sensors.AndroidAltimeterSource
 import hoshi.campustracker.sensors.AndroidLocationSource
 import hoshi.campustracker.sensors.AndroidMotionSource
 import hoshi.campustracker.sensors.AndroidPedometerSource
+import hoshi.campustracker.auth.AuthState
+import hoshi.campustracker.core.AppJson
+import hoshi.campustracker.positioning.AndroidBleBeaconScanner
+import hoshi.campustracker.positioning.BeaconRegistryCache
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import hoshi.campustracker.sync.RoomUploadQueueStore
 import hoshi.campustracker.sync.TelemetrySyncCoordinator
 import hoshi.campustracker.sync.UploadQueueDatabase
@@ -99,7 +107,30 @@ class AppGraph(app: Application) {
         appState = { appState.current },
     )
 
+    /** BLE beacons (docs/BEACON_POSITIONING.md): own thread, never on the collection or upload path. */
+    private val beaconScope = CoroutineScope(SupervisorJob() + Executors.newSingleThreadExecutor { Thread(it, "CampusCollector.beacon") }.asCoroutineDispatcher())
+    val beacons = BeaconCollectionController(
+        scanner = AndroidBleBeaconScanner(app, clock, collectionHandler),
+        cache = BeaconRegistryCache(File(root, "beacon-config.json"), clock::nowMs, AppJson),
+        sync = sync,
+        scope = beaconScope,
+        nowMs = clock::nowMs,
+    )
+
     init {
+        sync.deviceModel = device.deviceModel
+        beaconScope.launch {
+            data class Inputs(val session: String?, val scanning: Boolean, val upload: Boolean, val serverKey: String?, val signedIn: Boolean)
+            combine(coordinator.ui, settings.settings, auth.state, auth.configuration) { ui, s, a, server ->
+                Inputs(ui.activeSession?.id, s.beaconScanningEnabled, s.beaconUploadEnabled, server?.serverKey, a is AuthState.Authenticated)
+            }.distinctUntilChanged().collect { i ->
+                val server = auth.configuration.value
+                val fetch: ((String?) -> Triple<Int, String?, String?>)? = if (i.signedIn && server != null) {
+                    { etag -> api.beaconConfig(server, auth.accessToken() ?: error("signed out"), etag) }
+                } else null
+                beacons.update(i.session, i.scanning, i.upload, i.serverKey, fetch)
+            }
+        }
         sync.onServerSessionStarted = { local, server -> coordinator.onServerSessionStarted(local, server) }
         appState.install()
         ContextCompat.registerReceiver(

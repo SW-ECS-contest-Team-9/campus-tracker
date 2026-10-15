@@ -23,6 +23,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.ui.AppRoot
 import hoshi.campustracker.ui.CollectActions
+import hoshi.campustracker.positioning.BeaconPermissions
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -100,10 +101,14 @@ class MainActivity : ComponentActivity() {
             add(Manifest.permission.ACCESS_COARSE_LOCATION)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(Manifest.permission.ACTIVITY_RECOGNITION)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
+            // beacon positioning (optional; collection starts without it)
+            if (graph.settings.currentBlocking().beaconScanningEnabled) addAll(BeaconPermissions.required().filterNot { it in this })
         }
         val missing = wanted.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
         // Already-decided optional permissions are not asked again on every Start.
-        val ask = missing.filter { it.startsWith("android.permission.ACCESS_") || !graph.permissionHistory.locationRequested }
+        val ask = missing.filter {
+            it.startsWith("android.permission.ACCESS_") || it == BeaconPermissions.BLUETOOTH_SCAN || !graph.permissionHistory.locationRequested
+        }
         if (ask.isEmpty()) {
             if (hasLocation()) action() else startMessage = "Location permission is required to start collection."
             return

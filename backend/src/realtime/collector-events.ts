@@ -6,6 +6,7 @@ import { collectorController } from '../modules/collectors/collector.controller.
 import { sessionController } from '../modules/sessions/session.controller.js';
 import { telemetryController } from '../modules/telemetry/telemetry.controller.js';
 import { markerController } from '../modules/markers/marker.controller.js';
+import { beaconService } from '../modules/positioning/beacon.service.js';
 
 // Collector events shared by both transports (Socket.IO /collector and raw WebSocket /ws/collector).
 // Each handler validates its DTO, runs the service (DB COMMIT included) and returns the ACK body.
@@ -14,6 +15,7 @@ type Handler = (identity: CollectorIdentity, payload: unknown) => unknown | Prom
 
 export const COLLECTOR_EVENTS = [
   'arkit:pose',
+  'beacon:observations.v1',
   'session:start',
   'session:finish',
   'session:syncComplete',
@@ -33,6 +35,8 @@ export function normalizeEventName(name: string): string {
 function handlerFor(event: string): Handler | undefined {
   switch (event) {
     case 'arkit:pose': return arkitService.ingest;
+    // beacon.observations.v1 (raw) / beacon:observations.v1 (normalized): docs/BEACON_POSITIONING.md
+    case 'beacon:observations.v1': return (identity, payload) => beaconService.ingest(identity, payload);
     case 'session:start': return sessionController.start;
     case 'session:finish': return sessionController.finish;
     case 'telemetry:batch': return async (identity, payload) => {

@@ -21,7 +21,8 @@ export function runObservations(algo: FusionAlgorithm, state: unknown, observati
   const outputs: FusedOutput[] = [];
   const events: unknown[] = [];
   for (const o of observations) {
-    if (o.kind === 'absoluteAltitude' && algo.version !== 'fusion-v4') continue;
+    // optional streams only fusion-v4 understands (older engines would read them as GPS)
+    if ((o.kind === 'absoluteAltitude' || o.kind === 'beacon') && algo.version !== 'fusion-v4') continue;
     const r = algo.process(state, o);
     outputs.push(...r.outputs);
     events.push(...r.events);
@@ -50,7 +51,8 @@ export class ReorderBuffer {
     this.buffer.push(...incoming);
     this.buffer.sort(compareObservations);
     // Auxiliary height reports must not release primary sensors early or alter their output schedule.
-    for (const o of incoming) if (o.kind !== 'absoluteAltitude') this.maxSeenT = Math.max(this.maxSeenT, o.t);
+    // ...nor beacons, which arrive in their own messages, often ahead of the telemetry batch with the motion samples
+    for (const o of incoming) if (o.kind !== 'absoluteAltitude' && o.kind !== 'beacon') this.maxSeenT = Math.max(this.maxSeenT, o.t);
     const releaseUntil = this.maxSeenT - this.windowMs;
     let n = 0;
     while (n < this.buffer.length && this.buffer[n].t <= releaseUntil) n++;

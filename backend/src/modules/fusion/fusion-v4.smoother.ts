@@ -1,6 +1,7 @@
 // fusion-v4 building blocks (pure): 3x3 Kalman algebra, heading-offset fit, forward filter + RTS smoother.
 // State vector: [x (East m), y (North m), theta (rad)]; walking direction = rel + theta, rel = -CMAttitude.yaw.
 import type { FusionConfigV4 } from './fusion.config.js';
+import { beaconUpdate, type BeaconRangeMeasurement } from './fusion-beacon.js';
 
 export type Vec3 = [number, number, number];
 export type Mat3 = number[]; // row-major 3x3
@@ -217,7 +218,9 @@ export type SmootherEvent =
   | { kind: 'segment'; t: number; theta: number | null; thetaVar: number }
   | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean }
   | { kind: 'walked'; t: number; distance: number } // pedometer distance while motion was missing
-  | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean };
+  | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean }
+  /** rev 18: a beacon range / proximity measurement; anchor (ax, ay) in local ENU */
+  | { kind: 'range'; t: number; ax: number; ay: number; m: BeaconRangeMeasurement };
 
 export interface SmoothedPoint { t: number; x: Vec3; P: Mat3; event: SmootherEvent }
 
@@ -235,6 +238,7 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
   const Pp: Mat3[] = new Array(n);
   const Fs: Mat3[] = new Array(n);
   const gated = new Set<number>();
+  let rangeGated = 0;
   let x: Vec3 = [0, 0, 0];
   let P = diag3(1e8, 1e8, 1);
   let lastT = events[0]?.t ?? 0;
@@ -280,6 +284,10 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
     Fs[k] = F;
     let xu = pred.x;
     let Pu = Pk;
+    if (e.kind === 'range') {
+      const u = beaconUpdate(xu, Pu, e.m, { x: e.ax, y: e.ay }, c);
+      if (u.applied) { xu = u.x; Pu = u.P; } else if (u.reason === 'INNOVATION_GATED') rangeGated++;
+    }
     if (e.kind === 'fix') {
       if (e.vehicle) vehicle = true;
       const w = weights[e.index] ?? 1;
@@ -312,5 +320,5 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
     sx[k] = [xs[k][0] + corr[0], xs[k][1] + corr[1], xs[k][2] + corr[2]];
     sP[k] = sym(add3(Ps[k], mul3(mul3(C, sub3(sP[k + 1], Pp[k + 1])), tr3(C))));
   }
-  return { points: events.map((event, k): SmoothedPoint => ({ t: event.t, x: sx[k], P: sP[k], event })), gated };
+  return { points: events.map((event, k): SmoothedPoint => ({ t: event.t, x: sx[k], P: sP[k], event })), gated, rangeGated };
 }

@@ -127,6 +127,36 @@ class CollectorApi(private val baseClient: OkHttpClient) {
         }
     }
 
+    /**
+     * `GET /api/v1/positioning/beacon-config` with If-None-Match. Returns (status, etag, body): 304 = cached copy still
+     * current. Blocking; call off the main thread. Network errors throw like the other calls.
+     */
+    fun beaconConfig(configuration: ServerConfiguration, accessToken: String, etag: String?): Triple<Int, String?, String?> {
+        val request = Request.Builder().url(configuration.url("/api/v1/positioning/beacon-config"))
+            .header("Authorization", "Bearer $accessToken")
+            .apply { if (etag != null) header("If-None-Match", etag) }
+            .get().build()
+        try {
+            loginClient.newCall(request).execute().use { response ->
+                if (response.code == 304) return Triple(304, etag, null)
+                val text = response.body.string()
+                if (!response.isSuccessful) {
+                    val (code, message) = ApiError.parseErrorBody(text)
+                    throw ApiError.Http(response.code, code, message)
+                }
+                return Triple(response.code, response.header("ETag"), text)
+            }
+        } catch (e: ApiError) {
+            throw e
+        } catch (e: SocketTimeoutException) {
+            throw ApiError.Timeout()
+        } catch (e: InterruptedIOException) {
+            throw ApiError.Timeout()
+        } catch (e: IOException) {
+            throw ApiError.CannotConnect()
+        }
+    }
+
     private fun execute(client: OkHttpClient, request: Request): String {
         try {
             client.newCall(request).execute().use { response ->
