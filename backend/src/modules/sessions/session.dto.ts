@@ -1,3 +1,4 @@
+import type { AnchorFields } from '../markers/marker-anchor.js';
 import { z } from 'zod';
 import { IsoDateTime, OptionalString, SensorTimestamp, Uuid } from '../../common/dto.js';
 
@@ -105,6 +106,8 @@ export interface SessionView {
   sensorCapabilities: Record<string, unknown>;
   locationCount: number;
   markerCount: number;
+  /** compact marker list for the training label (decorate() replaces it with trainingLabel) */
+  anchorMarkers?: AnchorFields[];
   lastLocationAt: Date | null;
   // ---- collection / sync / fusion state (separate concepts) ----
   interrupted: boolean;

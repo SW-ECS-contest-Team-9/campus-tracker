@@ -1,3 +1,4 @@
+import type { MarkerAnchorInput } from './fusion-marker-anchor.js';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { StartHeightMap } from '../../geo/start-height-map.js';
@@ -97,4 +98,6 @@ export function strideCalibrationConfig(calibration: StrideCalibration | null) {
   } : null;
 }
 
-export type FusionSessionContext = { strideCalibration: StrideCalibration | null; startHeightMap?: StartHeightMap | null; absoluteAltitudeEnabled?: boolean };
+export type FusionSessionContext = { strideCalibration: StrideCalibration | null; startHeightMap?: StartHeightMap | null; absoluteAltitudeEnabled?: boolean;
+  /** fusion-v4 rev 17: markers naming a network node (replay only; markers/marker.repository.ts nodeAnchors) */
+  markerAnchors?: MarkerAnchorInput[] | null };

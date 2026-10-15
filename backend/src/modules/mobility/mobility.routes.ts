@@ -2,6 +2,8 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { pool } from '../../config/database.js';
+import { FLOOR_NAME } from '../markers/marker-anchor.js';
+import { anchorBuildings, loadAnchorNodes, pickAnchorNodes } from './anchor-nodes.js';
 
 export const mobilityRoutes = Router();
 
@@ -63,6 +65,26 @@ mobilityRoutes.get('/mobility/places', async (_req, res) => {
   );
   res.setHeader('Cache-Control', 'no-cache');
   res.json({ places: rows });
+});
+
+// GET /api/v1/mobility/nodes?buildingId=&floor=&latitude=&longitude=&limit=&includeUnknownFloor= — the nodes a collector
+// can pick for a collection anchor (markers/marker-anchor.ts), nearest first, plus the buildings for the picker.
+// buildingId "outdoor" = nodes outside every building. With a floor, the nodes whose floor the data does not know follow
+// the ones on that floor (most indoor roads have no levelId yet); includeUnknownFloor=false leaves them out.
+const AnchorNodesQuery = z.object({
+  buildingId: z.string().trim().min(1).max(24).optional(),
+  floor: z.string().trim().toUpperCase().regex(FLOOR_NAME).optional(),
+  latitude: z.coerce.number().min(-90).max(90).optional(),
+  longitude: z.coerce.number().min(-180).max(180).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(50),
+  includeUnknownFloor: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+}).refine((q) => (q.latitude === undefined) === (q.longitude === undefined), { message: 'latitude and longitude go together', path: ['latitude'] });
+
+mobilityRoutes.get('/mobility/nodes', async (req, res) => {
+  const q = AnchorNodesQuery.parse(req.query);
+  const { nodes, footprints } = await loadAnchorNodes(q.latitude !== undefined ? { latitude: q.latitude, longitude: q.longitude! } : null);
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ buildings: anchorBuildings(nodes, footprints), nodes: pickAnchorNodes(nodes, q) });
 });
 
 // GET /api/v1/mobility/edits?limit=50 — latest QGIS edits (audit log)

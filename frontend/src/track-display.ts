@@ -89,6 +89,8 @@ export function describeFusedHeight(p: FusedHeightInput): HeightSummary {
                   ? `기압 변화와 일관된 GPS 고도 ±${m(p.zDatumSigma)} — 지면 기준 없음`
             : p.zDatumSource === 'MAP_START'
               ? `지도 시작 기준 ±${m(p.zDatumSigma)} — 선택한 길·층별 고도와 기압 변화로 임시 추정`
+              : p.zDatumSource === 'MARKER_ANCHOR'
+                ? `수집 기준점(노드) ±${m(p.zDatumSigma)} — 누른 노드의 바닥 높이와 기압 변화로 고정`
               : p.zDatumSource === 'ROAD_ANCHOR'
                 ? `길 통과 앵커 ±${m(p.zDatumSigma)} — 연속 보행과 길의 3D 고도로 기압 기준 보정`
                 : p.zDatumSource === 'CM_ABSOLUTE'

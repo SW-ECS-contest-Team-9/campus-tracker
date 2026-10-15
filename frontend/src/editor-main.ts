@@ -15,6 +15,8 @@ import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import { declutter as keepTags, textWidth } from './label-layout';
 import { TRACK, shortName, type LvTrack, type TrackPoint } from './level-view';
 import { heightOf } from './trajectory';
+import { anchorLabel, isAnchor } from './anchor-label';
+import type { Marker } from './api';
 import { isUnderground } from './road-surface';
 import { LABELS, MAP_LINE_SCALE, bindViewStyleControls, onViewStyle, viewStyle, viewStyleControls } from './view-style';
 
@@ -125,6 +127,7 @@ root.innerHTML = `
         </section>
         <section class="editor-section"><h2>점 참고 / 스냅</h2>
           <label class="editor-field">수집 세션<select id="fusion-session"><option value="">세션 선택</option></select></label>
+          <div id="session-anchors" class="editor-hint"></div>
           <label class="editor-field">Fusion 실행<select id="fusion-run"><option value="">실행 선택</option></select></label>
           <label class="inline-check"><input id="fusion-overlay" type="checkbox" checked> 궤적 표시</label>
           <label class="inline-check"><input id="fusion-snap" type="checkbox"> 최근접 Fusion 점 스냅</label>
@@ -318,6 +321,9 @@ let lastFollowTarget: any = null;
 let snapPoints: RunPoint[] = [];
 /** F10: the raw location samples of the chosen session (read only), drawn on what the lifted view shows; not drawn on the editing map. */
 let sessionRaw: { sessionId: string; points: TrackPoint[] } = { sessionId: '', points: [] };
+/** The chosen session's markers (collection anchors drawn at their node, others at the snapped/phone position). */
+let sessionMarkers: Marker[] = [];
+let sessionList: { sessionId: string; trainingLabel?: { valid: boolean; problems: string[]; anchors: number; nodeAnchors: number } }[] = [];
 let lockedSnapTarget: SnapTarget | null = null;
 let activeSnapTarget: SnapTarget | null = null;
 let lockedSnapEntity: any = null;
@@ -1681,8 +1687,9 @@ async function deleteSelection() {
 async function loadSessions() {
   try {
     const sessions = await request<any[]>('/api/v1/sessions?limit=500');
+    sessionList = sessions;
     const select = $('fusion-session');
-    select.innerHTML = '<option value="">세션 선택</option>' + sessions.map((s) => `<option value="${esc(s.sessionId)}">${esc(s.collectorId)} · ${new Date(s.startedAt).toLocaleString()}</option>`).join('');
+    select.innerHTML = '<option value="">세션 선택</option>' + sessions.map((s) => `<option value="${esc(s.sessionId)}">${esc(s.collectorId)} · ${new Date(s.startedAt).toLocaleString()}${s.trainingLabel?.valid ? ' · 학습용' : ''}</option>`).join('');
   } catch (err) { say(`수집 세션 목록을 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
   spaceViews?.level.tracksChanged();
 }
@@ -1700,6 +1707,45 @@ async function loadSessionRaw(sessionId: string) {
   } catch (err) { say(`세션 원본 위치를 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
   spaceViews?.level.tracksChanged();
 }
+const ANCHOR_PROBLEM: Record<string, string> = {
+  START_MISSING: '시작 기준점 없음', START_INCOMPLETE: '시작 기준점에 건물·층(바깥이면 노드) 없음', END_MISSING: '끝 기준점 없음',
+  END_INCOMPLETE: '끝 기준점에 건물·층(바깥이면 노드) 없음', STAIR_UNPAIRED: '계단 시작·끝 짝 안 맞음', STAIR_INCOMPLETE: '계단 방향·층 없음',
+  ELEVATOR_UNPAIRED: '승강기 탑승·하차 짝 안 맞음', ELEVATOR_INCOMPLETE: '승강기 층 없음', ENTRANCE_INCOMPLETE: '출입구 건물·층 없음', RAMP_INCOMPLETE: '경사로 방향 없음',
+};
+/** The chosen session's markers: drawn with the run, and the session's training label under the picker. */
+async function loadSessionMarkers(sessionId: string) {
+  sessionMarkers = [];
+  const label = sessionList.find((s) => s.sessionId === sessionId)?.trainingLabel;
+  $('session-anchors').textContent = !sessionId || !label ? '' : label.valid
+    ? `학습용 유효 · 기준점 ${label.anchors}개 (노드 ${label.nodeAnchors}개)`
+    : `학습용 아님: ${label.problems.map((p) => ANCHOR_PROBLEM[p] ?? p).join(', ')}`;
+  drawFusionOverlay();
+  if (!sessionId) return;
+  try {
+    const list = await request<Marker[]>(`/api/v1/sessions/${sessionId}/markers`);
+    if (sessionId !== $('fusion-session').value) return;
+    sessionMarkers = list;
+  } catch (err) { say(`세션 기준점을 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
+  drawFusionOverlay();
+}
+/** Markers on the map: anchors at their node (bright), the rest at the fused (else phone) position. */
+function drawSessionMarkers() {
+  for (const m of sessionMarkers) {
+    const anchor = isAnchor(m);
+    const at = m.node ? null : tmForward(m.fused?.latitude ?? m.latitude, m.fused?.longitude ?? m.longitude);
+    const x = m.node?.x ?? at!.x, y = m.node?.y ?? at!.y;
+    // node: floor height + phone height; otherwise the ground plus the fused height above it (when known)
+    const ground = terrainAt(x, y) ?? 0;
+    const z = m.node ? m.node.z + 1 : ground + (m.fused?.heightAboveGround ?? 0);
+    const css = anchor ? (m.node ? '#f59e0b' : '#facc15') : '#94a3b8';
+    const e = viewer.entities.add({ position: drawPoint([x, y, z]),
+      point: { pixelSize: anchor ? 14 : 9, color: cssColor(css), outlineColor: C.Color.BLACK, outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY },
+      label: { text: anchorLabel(m), font: 'bold 12px system-ui', pixelOffset: new C.Cartesian2(0, -20), fillColor: C.Color.BLACK,
+        showBackground: true, backgroundColor: cssColor(css).withAlpha(0.9), backgroundPadding: new C.Cartesian2(5, 3),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY } });
+    (e as any).__fusion = true; entities.push(e);
+  }
+}
 /** F10: what the lifted view draws of the chosen session and run ("궤적 표시" switches both off). */
 function liftedTracks(): LvTrack[] {
   if (!$<HTMLInputElement>('fusion-overlay').checked) return [];
@@ -1712,6 +1758,7 @@ async function loadRuns(sessionId: string) {
   $('fusion-run').innerHTML = '<option value="">Fusion 실행 선택</option>'; snapPoints = [];
   refreshSnapSources(); drawFusionOverlay();
   void loadSessionRaw(sessionId);
+  void loadSessionMarkers(sessionId);
   if (!sessionId) return;
   const runs = await request<any[]>(`/api/v1/sessions/${sessionId}/runs`);
   if (sessionId !== $('fusion-session').value) return;
@@ -1732,7 +1779,9 @@ function drawFusionOverlay() {
   spaceViews?.level.tracksChanged(); // F10: what is lifted shows the same run
   for (const e of entities.filter((e) => (e as any).__fusion)) viewer.entities.remove(e);
   entities = entities.filter((e) => !(e as any).__fusion);
-  if (!$<HTMLInputElement>('fusion-overlay').checked || !snapPoints.length) return;
+  if (!$<HTMLInputElement>('fusion-overlay').checked) return;
+  drawSessionMarkers();
+  if (!snapPoints.length) return;
   const pts = snapPoints.map((p) => {
     const x = p.x + ORIGIN.x, y = p.y + ORIGIN.y;
     const z = p.h ?? terrainAt(x, y) ?? 0;

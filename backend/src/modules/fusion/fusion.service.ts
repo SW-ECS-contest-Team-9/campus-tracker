@@ -15,6 +15,7 @@ import { fusionRepository } from './fusion.repository.js';
 import type { FusedPositionEvent } from './fusion.dto.js';
 import { terrain } from '../../geo/terrain.js';
 import { loadStartHeightMap } from '../../geo/start-height-map.js';
+import { markerRepository } from '../markers/marker.repository.js';
 import { CAMPUS_FRAME } from '../../geo/campus-frame.js';
 import { codeRef } from '../../common/code-ref.js';
 import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
@@ -95,12 +96,19 @@ function sensorEventRows(version: string, events: unknown[]) {
   });
 }
 
+/** fusion-v4: the session's markers that name a node (collection anchors), the replay's position/height fix points. */
+async function markerAnchorsFor(algo: FusionAlgorithm, sessionId: string) {
+  if (algo.version !== 'fusion-v4') return null;
+  return (await markerRepository.nodeAnchors(sessionId)).map(({ markerId, t, type, nodeId, x, y, z }) => ({ markerId, t, type, nodeId, x, y, z }));
+}
+
 function sessionInputHash(algo: FusionAlgorithm, context: FusionSessionContext): string | null {
   if (algo.version !== 'fusion-v4') return null;
   const stride = (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false ? null : strideCalibrationHash(context.strideCalibration);
-  return context.startHeightMap || context.absoluteAltitudeEnabled
+  return context.startHeightMap || context.absoluteAltitudeEnabled || context.markerAnchors?.length
     ? createHash('sha256').update(JSON.stringify({ stride, startHeightMap: context.startHeightMap,
-      ...(context.absoluteAltitudeEnabled ? { absoluteAltitudeEnabled: true } : {}) })).digest('hex')
+      ...(context.absoluteAltitudeEnabled ? { absoluteAltitudeEnabled: true } : {}),
+      ...(context.markerAnchors?.length ? { markerAnchors: context.markerAnchors } : {}) })).digest('hex')
     : stride;
 }
 
@@ -271,12 +279,13 @@ export async function replaySession(sessionId: string, version: string, trigger:
     strideCalibration: await sessionRepository.getStrideCalibration(sessionId),
     absoluteAltitudeEnabled: await sessionRepository.getAbsoluteAltitudeEnabled(sessionId),
     startHeightMap: await loadStartHeightMap(algo.config, mapVersionId),
+    markerAnchors: await markerAnchorsFor(algo, sessionId),
   };
   const inputHash = sessionInputHash(algo, context);
   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
     ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId,
       ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), startHeightMap: context.startHeightMap ?? null,
-        absoluteAltitudeEnabled: context.absoluteAltitudeEnabled ?? false, inputHash } } : {}) }
+        absoluteAltitudeEnabled: context.absoluteAltitudeEnabled ?? false, markerAnchors: context.markerAnchors ?? [], inputHash } } : {}) }
     : algo.config;
   const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId, inputHash), {
     revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
@@ -512,7 +521,8 @@ export const fusionService = {
     }
     const terrainVersionId = algo?.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
     const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId),
-      absoluteAltitudeEnabled: await sessionRepository.getAbsoluteAltitudeEnabled(sessionId), startHeightMap: algo ? await loadStartHeightMap(algo.config, mapVersionId) : null };
+      absoluteAltitudeEnabled: await sessionRepository.getAbsoluteAltitudeEnabled(sessionId), startHeightMap: algo ? await loadStartHeightMap(algo.config, mapVersionId) : null,
+      markerAnchors: algo ? await markerAnchorsFor(algo, sessionId) : null };
     const inputHash = algo ? sessionInputHash(algo, context) : null;
     if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId, inputHash), inputHash))) {
       const run = (await fusionRepository.latestRuns(sessionId)).find((r) => r.algorithmVersion === version);

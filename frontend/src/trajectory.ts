@@ -3,6 +3,7 @@
 //
 // Visual language: collector color = identity. Raw = same color, thin + translucent. Fused = same color, thick + solid
 // with a white outline. Raw sample dots are colored by GPS accuracy instead.
+import { anchorLabel } from './anchor-label';
 import type { FusedPosition, LocationPoint, Marker, SpatialGpsDecision, SpatialMap } from './api';
 import type { Viewer } from './vworld';
 import { canDrawFusedHeightIn3D, describeFusedHeight, fusedDisplayHeight, hasAbsoluteHeight, splitByDrawableHeight } from './track-display';
@@ -463,7 +464,7 @@ export class SessionTrack {
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
       label: {
-        text: `${m.type}${m.note ? `: ${m.note}` : ''}\n${heightText}`,
+        text: `${anchorLabel(m)}${m.note ? `: ${m.note}` : ''}\n${heightText}`,
         font: '13px sans-serif',
         fillColor: C.Color.WHITE,
         outlineColor: C.Color.BLACK,
