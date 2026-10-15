@@ -44,6 +44,13 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     @Published private(set) var magneticCalibrationQuality: MagneticCalibrationQuality = .unavailable
     @Published private(set) var captureStorageError: String?
     @Published private(set) var uploadStorageError: String?
+    /// Collection anchors: the session's current place (prefills the pickers), the open vertical
+    /// marker (stairStart / elevatorBoard / rampStart without its end) and its anchor.
+    @Published private(set) var lastPlace: CollectionAnchor?
+    @Published private(set) var openVertical: EventMarkerType?
+    @Published private(set) var openVerticalAnchor: CollectionAnchor?
+    /// relative altitude at the last vertical anchor (start, stair/elevator/ramp end, entrance)
+    @Published private(set) var verticalReference: Double?
 
     let store: CollectionStore
     private let core: CollectionCore
@@ -69,6 +76,12 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     private var uploadPeak = 0
 
     var isBackgroundCollectionEnabled: Bool { activeSession != nil && locationService.isActive }
+    /// The barometer moved more than 3 m since the last vertical anchor and no stairs/elevator
+    /// marker is open: the collector probably changed floors without marking it.
+    var verticalReminder: Bool {
+        guard activeSession != nil, openVertical == nil, let reference = verticalReference, let altitude = latestRelativeAltitude else { return false }
+        return abs(altitude - reference) > AnchorRules.verticalReminderMeters
+    }
     var isLocationActive: Bool { locationService.isActive }
     var isMotionActive: Bool { motionService.isActive }
     var isAltimeterActive: Bool { altimeterService.isActive }
@@ -188,7 +201,8 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         healthStride: HealthStrideService? = nil,
         arkitEnabled: Bool = false,
         arkitRate: ARKitPoseRate = .hz10,
-        walkingFrameEnabled: Bool = false
+        walkingFrameEnabled: Bool = false,
+        startAnchor: CollectionAnchor? = nil
     ) {
         guard activeSession == nil, captureState == .idle else {
             print("[Start] blocked: capture state \(captureState.rawValue)")
@@ -272,6 +286,8 @@ final class CollectionCoordinator: NSObject, ObservableObject {
             case let .success(info):
                 self.didOpenRun(info, attitudeFrame: attitudeFrame, recoverPedometer: false)
                 print("[Diagnostics] SESSION_STARTED session=\(info.snapshot.session.id.uuidString)")
+                // the place picked before Start, at the moment Start was pressed
+                if let startAnchor { self.addMarker(type: .sessionStart, anchor: startAnchor, at: startedAt) }
             case let .failure(error):
                 // Same session is never re-created under a new UUID automatically.
                 self.captureState = .idle
@@ -297,6 +313,10 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         latestLocation = nil
         latestRelativeAltitude = nil
         latestStepCount = nil
+        lastPlace = nil
+        openVertical = nil
+        openVerticalAnchor = nil
+        verticalReference = nil
         walkingFrameSnapshot = nil
         magneticCalibrationQuality = .unavailable
         arkitTrackingState = .notAvailable
@@ -333,8 +353,11 @@ final class CollectionCoordinator: NSObject, ObservableObject {
 
     // MARK: Stop
 
-    func stopSession() {
+    /// `endAnchor`: where the collector stands at the end; recorded before the stop so the
+    /// sessionEnd marker is committed ahead of the finish item.
+    func stopSession(endAnchor: CollectionAnchor? = nil) {
         guard let session = activeSession else { return }
+        if captureState == .recording, let endAnchor { addMarker(type: .sessionEnd, anchor: endAnchor) }
         switch captureState {
         case .stopping, .starting, .idle:
             return
@@ -467,14 +490,37 @@ final class CollectionCoordinator: NSObject, ObservableObject {
 
     // MARK: Markers, app state, history
 
-    func addMarker(type: EventMarkerType, note: String? = nil) {
+    func addMarker(type: EventMarkerType, note: String? = nil, anchor: CollectionAnchor? = nil, at timestamp: Date = Date()) {
         guard let session = activeSession, captureState == .recording else { return }
         let location = locationService.lastLocation
         core.addMarker(EventMarker(
-            id: UUID(), sessionId: session.id, timestamp: Date(), type: type, note: note,
+            id: UUID(), sessionId: session.id, timestamp: timestamp, type: type, note: note,
             latitude: location?.coordinate.latitude, longitude: location?.coordinate.longitude,
             altitude: location?.altitude, horizontalAccuracy: location?.horizontalAccuracy,
-            verticalAccuracy: location?.verticalAccuracy))
+            verticalAccuracy: location?.verticalAccuracy, anchor: anchor))
+        noteAnchor(type: type, anchor: anchor)
+    }
+
+    /// Keeps the current place for the pickers and the barometric reference for the reminder.
+    private func noteAnchor(type: EventMarkerType, anchor: CollectionAnchor?) {
+        switch type {
+        case .stairStart, .elevatorBoard, .rampStart:
+            openVertical = type
+            openVerticalAnchor = anchor
+        case .stairEnd, .elevatorExit, .rampEnd:
+            openVertical = nil
+            openVerticalAnchor = nil
+            verticalReference = latestRelativeAltitude
+            if let floor = anchor?.toFloor, var place = lastPlace {
+                place.floor = floor; place.nodeId = nil; place.nodeLabel = nil
+                lastPlace = place
+            }
+        case .sessionStart, .entrance:
+            verticalReference = latestRelativeAltitude
+        default:
+            break
+        }
+        if let building = anchor?.buildingId { lastPlace = CollectionAnchor(buildingId: building, floor: anchor?.floor) }
     }
 
     func requestAlwaysLocationAuthorization() {
@@ -727,6 +773,7 @@ final class CollectionCoordinator: NSObject, ObservableObject {
             durableCounts = snapshot.durableCounts
             latestLocation = snapshot.latestLocation ?? latestLocation
             latestRelativeAltitude = snapshot.latestRelativeAltitude ?? latestRelativeAltitude
+            if verticalReference == nil { verticalReference = latestRelativeAltitude }
             latestStepCount = snapshot.latestStepCount ?? latestStepCount
             arkitPoseCount = snapshot.arkitPoseCount
             arkitLastPoseAt = snapshot.arkitLastPoseAt

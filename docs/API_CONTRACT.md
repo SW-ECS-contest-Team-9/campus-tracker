@@ -180,6 +180,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
   "altitude": 82.4, "ellipsoidalAltitude": 105.7, "horizontalAccuracy": 3.1, "verticalAccuracy": 5.2 }
 ```
 - `type`: `entrance | intersection | stairStart | stairEnd | rampStart | rampEnd | elevator | stop | custom` (그 외 문자열도 저장됨, 최대 32자)
+- **수집 기준점** (모두 선택, 예전 앱은 안 보냄): `nodeId`(mobility 노드 UUID), `buildingId`(건물 ID, 바깥이면 `"outdoor"`), `floor`, `direction`(`up`·`down`), `fromFloor`, `toFloor`. 층 이름은 `1F`…`15F`, `B1`…`B9`(소문자도 받아 대문자로 저장, 그 외 형식은 400). 기준점 종류: `sessionStart`(시작 버튼 전 노드·건물·층), `sessionEnd`(끝 버튼 때), `stairStart`/`stairEnd`(방향·출발 층·도착 층), `elevatorBoard`/`elevatorExit`(탄 층·내린 층), `entrance`(입구 노드·건물·층), `rampStart`/`rampEnd`(방향). 실내 노드가 없는 층은 건물+층만 보낸다. 바깥은 노드가 필수다.
+- `nodeId`가 있으면 서버가 그 시각의 노드 위치를 함께 저장한다(나중에 노드가 지워져도 Fusion이 씀). 세션이 끝난 뒤 도착한 노드 기준점은 최종 재처리를 다시 예약한다.
 - `markerId` 재전송 → `{ "ok": true, "markerId": "...", "duplicate": true }`
 - ACK `{ "ok": true, "markerId": "...", "duplicate": false }`
 
@@ -203,7 +205,7 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 | `fusion:reprocessed` | `{ sessionId, collectorId, algorithmVersion, count }` — 해당 version 결과가 통째로 재계산됨, REST로 다시 받을 것 |
 | `fusion:sensor-events` | `{ sessionId, collectorId, algorithmVersion, events }` — fusion-v3.1의 앵커·추적 상태·센서 품질 판정 |
 | `location:update` | `{ collectorId, sessionId, sequence, longitude, latitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy, timestamp }` — 새로 저장된 point마다 1개 |
-| `marker:created` | `{ collectorId, markerId, sessionId, timestamp, type, note, latitude, longitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy }` |
+| `marker:created` | `{ collectorId, markerId, sessionId, timestamp, type, note, latitude, longitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy, nodeId, buildingId, floor, direction, fromFloor, toFloor }` |
 
 Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 
@@ -228,7 +230,8 @@ Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 | `GET /api/v1/sessions/:sessionId/locations` | sequence 순 전체 point |
 | `POST /api/v1/sessions/:sessionId/interrupt` | 수동 인터럽트: ACTIVE → INTERRUPTED 후 최종 재처리. 허용 조건은 `SessionView.manualInterruptBlock === null` — ACTIVE이고, collector 소켓이 끊겨 있고, `syncState`가 `OFFLINE`(최근 수신 없음)일 때만. 아니면 409 `INTERRUPT_NOT_ACTIVE` / `INTERRUPT_COLLECTOR_CONNECTED` / `INTERRUPT_RECENTLY_RECEIVED`. 원시 데이터는 지우지 않고, 이후 올라오는 데이터는 늦은 업로드로 저장되어 다시 최종화된다. 폰에는 알리지 않는다. 추적 이벤트 `SERVER_MANUAL_INTERRUPT` |
 | `GET /api/v1/sessions/:sessionId/diagnostic-events` | 폰 수명주기 이벤트 + 서버 추적(`SERVER_*`, `source: "server"`)을 시각순으로. 서버 추적: `SERVER_FINISH_RECEIVED`(`duplicate`, `manifest`, `finalReplay`), `SERVER_SYNC_COMPLETE_RECEIVED`(`synchronized`, `behind`), `SERVER_FINALIZE_COMPLETED`(`runId`, `outputs`), `SERVER_FINALIZE_FAILED`(`message`). 분석용이며 fusion 입력이 아님 |
-| `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker |
+| `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker. 기준점 칸과 `node{x, y, z, current}`(EPSG:5186, 바닥 MSL 높이, `current=false`는 지금은 없는 노드의 저장 당시 위치), `fused`(fusion-v4 궤적에 맞춘 위치·높이) 포함 |
+| `GET /api/v1/mobility/nodes?buildingId=&floor=&latitude=&longitude=&limit=50&includeUnknownFloor=true` | 기준점으로 고를 노드(인증 없음). `{ buildings: [{ buildingId, buildingName, nodeCount, floorsWithNodes }], nodes: [{ nodeId, kind, buildingId, floor, structures, label, latitude, longitude, heightM, distanceM }] }`. 건물은 길의 `building_id` → 노드가 든 건물 윤곽 → `outdoor` 순. 층은 노드·길의 `levelId`에서 읽고(`3층`→`3F`), 모르면 `null`. 층을 주면 그 층 노드 먼저, 다음에 층 모르는 노드(끄려면 `includeUnknownFloor=false`), 각각 가까운 순 |
 | `GET /api/v1/sessions/:sessionId/fused-positions?algorithmVersion=fusion-v1` | fusion 결과, timestamp/fusionSequence 순 (기본 version = realtime version). v3.1은 최초 앵커 전까지 위치 출력을 만들지 않으며 상태·판정 이력은 `fusion-events`에서 조회 |
 | `GET /api/v1/sessions/:sessionId/fusion` | 저장된 version별 개수/기간, version별 최신 `fusion_runs`(metrics 포함), realtime state 요약 |
 | `GET /api/v1/sessions/:sessionId/fusion-events?algorithmVersion=fusion-v3.1` | 센서 추적 상태 변화, GPS 앵커 판정, 재획득 사유 등 위치 출력이 없어도 남는 진단 이력 |
@@ -239,9 +242,13 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 
 **fusion-v2.1 추가 진단 필드**: `localX/localY/localZ`(m), `gpsQuality`(`EXCELLENT`·`GOOD`·`MARGINAL`·`POOR`·`UNUSABLE`), `pdrApplied`, `pdrRejectReason`(`NO_HEADING`·`NOT_INITIALIZED`·`NEGATIVE_DELTA`·`NOT_FINITE`·`OVERSPEED_CLAMPED`), `relativeAltitude`, `reanchored`, `reanchorReason`(`GPS_CLUSTER`·`GPS_TRACK`·`DIVERGENCE`), `divergenceDetected`. v2.1의 `headingSource`: `UNKNOWN`·`GPS_COURSE`·`GPS_TWO_POINT`·`YAW_DELTA`, `gpsRejectReason`에 `UNUSABLE_ACCURACY` 추가.
 
-`SessionView`: `sessionId, clientSessionId, collectorId, device{deviceId, clientDeviceId, platform, deviceModel, systemVersion, appVersion}, startedAt, endedAt, status, sensorCapabilities, locationCount, markerCount, lastLocationAt`
+`SessionView`: `sessionId, clientSessionId, collectorId, device{deviceId, clientDeviceId, platform, deviceModel, systemVersion, appVersion}, startedAt, endedAt, status, sensorCapabilities, locationCount, markerCount, lastLocationAt, trainingLabel`
+
+**`trainingLabel`(학습용 유효)**: `{ valid, problems[], anchors, nodeAnchors }`. `valid`는 시작·끝 기준점(건물+층, 바깥이면 노드)이 있고 계단·승강기 기준점이 시작·끝 짝으로 방향·층을 갖출 때 true. `problems`: `START_MISSING`·`START_INCOMPLETE`·`END_MISSING`·`END_INCOMPLETE`·`STAIR_UNPAIRED`·`STAIR_INCOMPLETE`·`ELEVATOR_UNPAIRED`·`ELEVATOR_INCOMPLETE`·`ENTRANCE_INCOMPLETE`·`RAMP_INCOMPLETE`. 예전 앱 세션은 `START_MISSING`으로 나온다(거부하지 않음).
 
 **세션 상세(`GET /sessions/:sessionId`)의 `finalization`**: `finishRequestedAt`, `manifestReceived`, `manifestSynchronized`(manifest 없으면 null), `finalReplayScheduled`, `fusionState`, `needsReprocess`, `finalizedAt`, `lastPublishedRun{id,status,trigger,completedAt,error}`, `pendingOnDevice`(`0` / `"SOME"` / manifest가 없으면 `null` — 서버는 폰의 미전송 개수를 알 수 없으며 0으로 추정하지 않음). ACTIVE는 무수신 시간으로 종료되지 않는다(`collectionState`와 `syncState`는 별개).
+
+**fusion-v4 rev 17 수집 기준점**: 최종 재처리에서 `nodeId`가 있는 marker마다 노드 위치를 부드러운 XY 고정점(σ 2 m)으로 넣고, `노드 바닥 높이 + 휴대폰 높이 1 m − 그 시각 기압 Z`를 높이 영점 관측(σ 1 m)으로 넣는다. 다른 지면·길 접촉과 함께 평활되며, 그런 세션의 `zDatumSource`는 `MARKER_ANCHOR`다. 실시간 경로에는 쓰지 않는다. 끄려면 `markerAnchorsEnabled=false`. run metrics의 `markerAnchors{count, heightContacts}`.
 
 **fusion-v4의 `relativeAltitude`**: 원시 `CMAltimeter.relativeAltitude`가 아니라 엔진의 상대 Z(`localZ`와 같은 값)다. 세션 첫 기압 샘플을 0으로 두고, 센서 구간이 바뀌면(재시작) 직전 값에 이어 붙인다 — 공백 동안의 실제 높이 변화는 알 수 없다(`metrics.altimeterRebases`가 그 횟수). `ellipsoidalAltitude`가 null이고 `zDatumSource`가 `NONE`이면 절대 고도는 미확정이며, 프리뷰는 그 점을 지면(DEM+1 m)에 투영해 그리기만 한다(층 표시 없음).
 

@@ -372,3 +372,54 @@ extension RawWebSocketConnectionManager: URLSessionWebSocketDelegate {
         }
     }
 }
+
+// MARK: Collection anchor nodes
+
+/// `GET /api/v1/mobility/nodes`: buildings and the network nodes to pick for a collection anchor (no auth).
+struct AnchorBuilding: Codable, Identifiable, Equatable {
+    let buildingId: String
+    let buildingName: String
+    var nodeCount: Int? = nil
+    var floorsWithNodes: [String]? = nil
+    var id: String { buildingId }
+}
+
+struct AnchorNode: Codable, Identifiable, Equatable {
+    let nodeId: String
+    let buildingId: String
+    /// nil: the map does not say which floor
+    var floor: String? = nil
+    let label: String
+    var heightM: Double? = nil
+    var distanceM: Double? = nil
+    var id: String { nodeId }
+}
+
+struct AnchorNodesResponse: Codable, Equatable {
+    var buildings: [AnchorBuilding] = []
+    var nodes: [AnchorNode] = []
+}
+
+enum AnchorNodeAPI {
+    static func fetch(configuration: ServerConfiguration, buildingId: String?, floor: String?,
+                      latitude: Double?, longitude: Double?, client: APIClient = HTTPAPIClient()) async throws -> AnchorNodesResponse {
+        guard let base = configuration.baseURL, var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
+            throw APIClientError.invalidURL
+        }
+        components.path = "/api/v1/mobility/nodes"
+        var query = [URLQueryItem(name: "limit", value: "40")]
+        if let buildingId { query.append(URLQueryItem(name: "buildingId", value: buildingId)) }
+        if let floor { query.append(URLQueryItem(name: "floor", value: floor)) }
+        if let latitude, let longitude {
+            query.append(URLQueryItem(name: "latitude", value: String(latitude)))
+            query.append(URLQueryItem(name: "longitude", value: String(longitude)))
+        }
+        components.queryItems = query
+        guard let url = components.url else { throw APIClientError.invalidURL }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+        let data = try await client.send(request)
+        do { return try JSONDecoder().decode(AnchorNodesResponse.self, from: data) }
+        catch { throw APIClientError.decodingFailed }
+    }
+}

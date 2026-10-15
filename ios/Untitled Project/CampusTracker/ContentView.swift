@@ -83,6 +83,8 @@ private struct CollectionView: View {
     @AppStorage("arkitPoseRate") private var arkitPoseRate = ARKitPoseRate.hz10.rawValue
     @AppStorage("walkingFrameEnabled") private var walkingFrameEnabled = false
     @State private var showDeniedPermissionAlert = false
+    /// the marker whose collection anchor is being picked (Start/Stop use sessionStart/sessionEnd)
+    @State private var anchorFor: AnchorRequest?
 
     var body: some View {
         ScrollView {
@@ -95,17 +97,35 @@ private struct CollectionView: View {
                 arkitSection
                 walkingFrameSection
                 diagnosticsSection
+                if coordinator.verticalReminder { verticalReminderSection }
                 markerSection
             }
             .padding()
         }
         .navigationTitle("Collection")
+        .sheet(item: $anchorFor) { request in
+            AnchorPickerView(
+                type: request.type,
+                initial: [EventMarkerType.stairEnd, .elevatorExit, .rampEnd].contains(request.type)
+                    ? (coordinator.openVerticalAnchor ?? coordinator.lastPlace) : coordinator.lastPlace,
+                configuration: authentication.configuration,
+                location: coordinator.latestLocation.map { (latitude: $0.latitude, longitude: $0.longitude) },
+                onConfirm: { anchor in
+                    anchorFor = nil
+                    switch request.type {
+                    case .sessionStart: startCollection(anchor: anchor)
+                    case .sessionEnd: coordinator.stopSession(endAnchor: anchor)
+                    default: coordinator.addMarker(type: request.type, anchor: anchor)
+                    }
+                },
+                onCancel: { anchorFor = nil })
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(coordinator.activeSession == nil ? "Start" : "Stop") {
                     print("[Start] tapped activeSession=\(coordinator.activeSession != nil)")
                     if coordinator.activeSession == nil {
-                        guard let collector = authentication.authenticatedCollector else {
+                        guard authentication.authenticatedCollector != nil else {
                             print("[Start] blocked: no authenticated collector")
                             return
                         }
@@ -127,21 +147,11 @@ private struct CollectionView: View {
                             showDeniedPermissionAlert = true
                             return
                         }
-                        print("[Start] authenticated collector=\(collector.collectorId); starting local collection")
-                        coordinator.startSession(
-                            collectorId: collector.collectorId,
-                            serverKey: authentication.configuration?.ownerKey ?? "",
-                            motionRate: MotionSamplingRate(rawValue: motionSamplingRate) ?? .hz50,
-                            locationProfile: LocationCollectionProfile(rawValue: locationProfile) ?? .highAccuracy,
-                            distanceFilter: locationDistanceFilter,
-                            healthStride: healthStride,
-                            arkitEnabled: arkitEnabled,
-                            arkitRate: ARKitPoseRate(rawValue: arkitPoseRate) ?? .hz10,
-                            walkingFrameEnabled: walkingFrameEnabled
-                        )
+                        // the start anchor (building → floor → node) comes first; Start in the sheet begins collection
+                        anchorFor = AnchorRequest(type: .sessionStart)
                     } else {
-                        print("[Start] stopping local collection")
-                        coordinator.stopSession()
+                        print("[Start] asking for the end anchor")
+                        anchorFor = AnchorRequest(type: .sessionEnd)
                     }
                 }
             }
@@ -155,6 +165,34 @@ private struct CollectionView: View {
         } message: {
             Text("수집을 시작하려면 위치 권한이 필요합니다. 설정 앱에서 위치 권한을 허용한 뒤 다시 시도하세요.")
         }
+    }
+
+    private func startCollection(anchor: CollectionAnchor) {
+        guard let collector = authentication.authenticatedCollector else { return }
+        print("[Start] authenticated collector=\(collector.collectorId); starting local collection")
+        coordinator.startSession(
+            collectorId: collector.collectorId,
+            serverKey: authentication.configuration?.ownerKey ?? "",
+            motionRate: MotionSamplingRate(rawValue: motionSamplingRate) ?? .hz50,
+            locationProfile: LocationCollectionProfile(rawValue: locationProfile) ?? .highAccuracy,
+            distanceFilter: locationDistanceFilter,
+            healthStride: healthStride,
+            arkitEnabled: arkitEnabled,
+            arkitRate: ARKitPoseRate(rawValue: arkitPoseRate) ?? .hz10,
+            walkingFrameEnabled: walkingFrameEnabled,
+            startAnchor: anchor
+        )
+    }
+
+    private var verticalReminderSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Did you change floors?").font(.headline)
+            Text("The barometer moved more than 3 m since the last stairs/elevator marker. Mark the stairs or elevator you took.")
+                .font(.subheadline)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var captureStateText: String {
@@ -375,10 +413,17 @@ private struct CollectionView: View {
     private var markerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Markers").font(.headline)
+            if let place = coordinator.lastPlace {
+                Text("Now: \(place.buildingId == CollectionAnchor.outdoor ? "outside" : [place.buildingId, place.floor].compactMap { $0 }.joined(separator: " "))")
+                    .font(.caption)
+            }
+            if let open = coordinator.openVertical {
+                Text("Open: \(open.title) — press its end marker when you arrive").font(.caption).foregroundColor(.orange)
+            }
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                ForEach(EventMarkerType.allCases) { type in
+                ForEach(EventMarkerType.buttons) { type in
                     Button(type.title) {
-                        coordinator.addMarker(type: type)
+                        if AnchorRules.needs(type) == .none { coordinator.addMarker(type: type) } else { anchorFor = AnchorRequest(type: type) }
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(coordinator.activeSession == nil)
@@ -791,4 +836,10 @@ private struct ServerSettingsView: View {
         }
         message = "Saved. If server or collector changed, sign in again."
     }
+}
+
+/// Sheet item for the anchor picker.
+private struct AnchorRequest: Identifiable {
+    let type: EventMarkerType
+    var id: String { type.rawValue }
 }
