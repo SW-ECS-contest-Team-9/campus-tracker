@@ -376,7 +376,8 @@ nonisolated enum AnchorRules {
 
     static func floorNumber(_ name: String?) -> Int? {
         guard isFloor(name), let name else { return nil }
-        return name.hasPrefix("B") ? -(Int(name.dropFirst()) ?? 0) : Int(name.dropLast())
+        if name.hasPrefix("B") { return Int(name.dropFirst()).map { -$0 } }
+        return Int(name.dropLast())
     }
 
     static func direction(from: String?, to: String?) -> String? {
