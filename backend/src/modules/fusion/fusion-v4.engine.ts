@@ -24,11 +24,13 @@ import { localToWgs84 } from '../../geo/local-to-wgs84.js';
 import { wgs84ToLocal } from '../../geo/wgs84-to-local.js';
 import { headingRadToDeg, normalizeAngleRad } from '../../geo/angles.js';
 import { terrain as terrainModel } from '../../geo/terrain.js';
-import { tmForward } from '../../geo/tm.js';
+import { tmForward, tmInverse as tmInverseGrid } from '../../geo/tm.js';
 import { selectStartHeight } from '../../geo/start-height-map.js';
 import { roadHeightContact, type RoadHeightContact, type RoadHeightTracker } from './fusion-road-height.js';
 import { markerFixEvents, markerHeightContacts } from './fusion-marker-anchor.js';
 import { circularCorridorAnchors } from './fusion-circular-corridor.js';
+import { anchorLocal, beaconUpdate, createBeaconTracker, filterBeacon, floorHeightContact, rejectBeacon, updateFloor, voteFloor,
+  type BeaconRejectReason, type FloorEvent, type FloorTracker } from './fusion-beacon.js';
 import { absoluteAltitudeDatum, deviceGeoid, observeAbsoluteAltitude, observeDeviceGeoid, relativeHeightRunAt, relativeHeightSample,
   type AbsoluteAltitudeDecision, type RelativeHeightRun } from './fusion-absolute-altitude.js';
 import type { FusionConfigV4 } from './fusion.config.js';
@@ -62,6 +64,10 @@ export type FusionEventV4 =
   /** diagnostics: the segment has no heading yet and the shape fit failed for this reason (emitted when the reason changes) */
   | { type: 'heading-fit-pending'; t: number; segment: number; reason: string; steps: number; fixes: number; extentM: number | null; costGap: number | null }
   | { type: 'reanchor'; t: number; shift: number }
+  /** rev 18: one filtered beacon measurement and what the forward filter did with it */
+  | { type: 'beacon'; t: number; beaconId: string; applied: boolean; mode: 'RANGE' | 'PROXIMITY' | null; reason: BeaconRejectReason | null;
+      rangeM: number; d2: number | null; initialized?: boolean }
+  | FloorEvent
   | { type: 'smoothed'; t: number; iterations: number; steps: number; fixes: number; gpsAccepted: number; gpsDownweighted: number; segments: number; segmentsWithHeading: number };
 
 export interface StepResultV4 { outputs: FusedOutput[]; events: FusionEventV4[] }
@@ -544,6 +550,82 @@ function applyAltimeter(s: FusionStateV4, o: Extract<Observation, { kind: 'altim
   s.zLog.push({ t: o.t, z: s.z });
 }
 
+// ---------------------------------------------------------------------------------------------
+// rev 18: BLE beacons (fusion-beacon.ts)
+// ---------------------------------------------------------------------------------------------
+
+/** Stairs / slope / unresolved vertical steps in the last 30 s: IMU evidence that the phone changed level. */
+function recentVerticalSteps(s: FusionStateV4, t: number): boolean {
+  for (let i = s.steps.length - 1; i >= 0 && s.steps[i].t >= t - 30_000; i--) {
+    const p = s.steps[i];
+    if (p.stairs || p.slope || p.verticalUnknown) return true;
+  }
+  return false;
+}
+
+function applyBeacon(s: FusionStateV4, o: Extract<Observation, { kind: 'beacon' }>, c: FusionConfigV4, r: StepResultV4) {
+  const tr = (s.beacon ??= createBeaconTracker());
+  const m = filterBeacon(tr, o.t, o, c);
+  if (!m) return;
+  const ft = tr.floor;
+  if (c.beaconFloorEstimationEnabled) {
+    voteFloor(ft, m, c);
+    const ev = updateFloor(ft, o.t, s.z, recentVerticalSteps(s, o.t), c);
+    if (ev) r.events.push(ev);
+    if (c.beaconFloorCorrectionEnabled) floorHeightContact(ft, o.t, s.z, c);
+  }
+  const event = (applied: boolean, mode: 'RANGE' | 'PROXIMITY' | null, reason: BeaconRejectReason | null, d2: number | null, initialized?: boolean) =>
+    r.events.push({ type: 'beacon', t: o.t, beaconId: o.beaconId, applied, mode, reason, rangeM: m.range, d2, ...(initialized ? { initialized } : {}) });
+  // inter-floor leakage: a beacon of another floor of the same building does not move XY once the floor is confirmed
+  if (c.beaconFloorMismatchRejected && ft.floor && m.floor && ft.buildingId === m.buildingId && m.floor !== ft.floor
+    && (ft.confidence ?? 0) >= c.beaconFloorMinShare) {
+    rejectBeacon(tr, 'FLOOR_MISMATCH');
+    return event(false, null, 'FLOOR_MISMATCH', null);
+  }
+  tr.measurements.push(m);
+  if (!s.initialized) {
+    if (!(c.beaconInitializationEnabled && m.proximity)) {
+      rejectBeacon(tr, 'NOT_INITIALIZED');
+      return event(false, null, 'NOT_INITIALIZED', null);
+    }
+    // no GPS yet and the phone is right next to a surveyed anchor: start the local frame there, with an honest sigma
+    const ll = tmInverseGrid(m.gridX, m.gridY);
+    const sigma = Math.max(m.upperRange, c.beaconInitMinSigmaM);
+    s.origin = { latitude: ll.latitude, longitude: ll.longitude, height: 0 };
+    s.initialized = true;
+    s.x = [0, 0, s.x[2]];
+    s.P = diag3(sigma * sigma, sigma * sigma, s.headingKnown ? s.P[8] : 1);
+    s.lastEventT = o.t;
+    s.window.beaconAnchored = true;
+    tr.counters.applied++;
+    tr.windowUpdates++;
+    return event(true, 'PROXIMITY', null, null, true);
+  }
+  advance(s, o.t, c);
+  const u = beaconUpdate(s.x, s.P, m, anchorLocal(s.origin!, m), c);
+  if (!u.applied) {
+    rejectBeacon(tr, u.reason!);
+    return event(false, u.mode, u.reason, u.d2);
+  }
+  s.x = u.x;
+  s.P = u.P;
+  s.reckonedFrom = s.steps.length;
+  tr.counters.applied++;
+  if (u.mode === 'PROXIMITY') tr.counters.proximity++;
+  tr.windowUpdates++;
+  event(true, u.mode, null, u.d2);
+}
+
+/** Floor in effect at time t from the forward floor decisions (null before the first confirmation). */
+function floorAt(ft: FloorTracker | undefined, t: number): Partial<FusedOutput> {
+  if (!ft) return {};
+  let last: FloorTracker['changes'][number] | undefined;
+  for (const ch of ft.changes) { if (ch.t <= t) last = ch; else break; }
+  return last
+    ? { floorLabel: last.to, floorBuildingId: last.buildingId, floorSource: last.source as FusedOutput['floorSource'], floorConfidence: last.confidence }
+    : { floorLabel: null, floorBuildingId: null, floorSource: null, floorConfidence: null };
+}
+
 function rejectGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, reason: GpsRejectReason, r: StepResultV4, innovation: number | null = null) {
   s.counters.gpsRejected++;
   s.counters.reasons[reason] = (s.counters.reasons[reason] ?? 0) + 1;
@@ -1004,7 +1086,7 @@ function withMarkerContacts(markers: ContactV4[], others: ContactV4[] | null): C
 }
 
 /** Replay: the zero as a slow random walk (barometric drift) through the contacts, RTS-smoothed. */
-function smoothDatum(kept: ContactV4[], c: FusionConfigV4, source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' = 'TERRAIN') {
+function smoothDatum(kept: ContactV4[], c: FusionConfigV4, source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'BEACON_FLOOR' = 'TERRAIN') {
   const q = c.baroDriftMPerHour ** 2 / 3600; // m^2 per second
   const n = kept.length;
   const xf: number[] = [], pf: number[] = [], xp: number[] = [], pp: number[] = [];
@@ -1116,7 +1198,10 @@ function output(
 function makeLiveOutput(s: FusionStateV4, t: number, c: FusionConfigV4): FusedOutput {
   const w = s.window;
   const headed = w.steps - w.unheadedSteps;
-  const source: PositionSource = w.anchored ? 'GPS_ANCHORED' : w.reanchored ? 'GPS_REANCHOR' : w.gpsUsed && headed ? 'FUSED' : w.gpsUsed ? 'GPS_CORRECTED' : headed ? 'PDR_PREDICTED' : s.stationary ? 'STATIONARY_HOLD' : 'HELD';
+  const beaconUpdates = s.beacon ? s.beacon.windowUpdates : null;
+  const source: PositionSource = w.anchored ? 'GPS_ANCHORED' : w.beaconAnchored ? 'BEACON_ANCHORED' : w.reanchored ? 'GPS_REANCHOR'
+    : (w.gpsUsed || beaconUpdates) && headed ? 'FUSED' : w.gpsUsed ? 'GPS_CORRECTED' : beaconUpdates ? 'BEACON_CORRECTED'
+      : headed ? 'PDR_PREDICTED' : s.stationary ? 'STATIONARY_HOLD' : 'HELD';
   const out = output(s, t, s.x, sigmaXY(s.P), s.headingKnown ? headingRadToDeg(s.rel + s.x[2]) : null, s.z ?? 0, source, {
     gpsHorizontalAccuracy: w.gpsAccuracy,
     gpsUsed: w.gpsUsed,
@@ -1128,8 +1213,11 @@ function makeLiveOutput(s: FusionStateV4, t: number, c: FusionConfigV4): FusedOu
     pdrApplied: w.steps ? headed > 0 : null,
     pdrRejectReason: w.unheadedSteps ? 'NO_HEADING' : null,
     reanchored: w.reanchored,
+    ...(s.beacon ? { beaconUpdates, floorLabel: s.beacon.floor.floor, floorBuildingId: s.beacon.floor.buildingId,
+      floorSource: s.beacon.floor.source, floorConfidence: s.beacon.floor.confidence } : {}),
   }, forwardDatum(s, c));
   s.window = emptyWindowV4();
+  if (s.beacon) s.beacon.windowUpdates = 0;
   return out;
 }
 
@@ -1153,20 +1241,23 @@ export function processObservationV4(s: FusionStateV4, o: Observation, c: Fusion
     r.events.push({ type: 'absolute-altitude', t: o.t, ...decision });
     return r; // do not advance XY, stationary time, lastObservationT, or the position output schedule
   }
+  if (o.kind === 'beacon' && !c.beaconFusionEnabled) return r; // off: as if the beacon never arrived (rev 17 result)
   if (s.terrain === undefined && o.terrainContext !== undefined) s.terrain = o.terrainContext;
   if (s.lastObservationT !== undefined && o.t < s.lastObservationT) {
     s.skippedLateObservations++;
+    if (o.kind === 'beacon') rejectBeacon(s.beacon ??= createBeaconTracker(), 'STALE');
     return r;
   }
   if (s.lastObservationT !== undefined && s.stationary) s.counters.stationaryMs += o.t - s.lastObservationT;
   if (o.kind === 'motion') applyMotion(s, o, c, r);
   else if (o.kind === 'pedometer') applyPedometer(s, o, c);
   else if (o.kind === 'altimeter') applyAltimeter(s, o, c);
+  else if (o.kind === 'beacon') applyBeacon(s, o, c, r);
   else applyGps(s, o, c, r);
   s.lastObservationT = o.t;
   if (s.initialized && (s.nextOutputAt === undefined || o.t >= s.nextOutputAt)) {
     s.nextOutputAt = (Math.floor(o.t / c.outputIntervalMs) + 1) * c.outputIntervalMs;
-    if (holdsStill(s, s.x, c) && !s.window.anchored && !s.window.reanchored) s.window = emptyWindowV4();
+    if (holdsStill(s, s.x, c) && !s.window.anchored && !s.window.reanchored && !s.window.beaconAnchored) s.window = emptyWindowV4();
     else {
       r.outputs.push(makeLiveOutput(s, o.t, c));
       s.lastOutputXY = [s.x[0], s.x[1]];
@@ -1194,7 +1285,7 @@ function stillIntervals(s: FusionStateV4, end: number) {
 export function flushFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4 {
   if (!s.initialized || s.lastObservationT === undefined) return { outputs: [], events: [] };
   const w = s.window;
-  const pending = w.steps || w.gpsUsed !== null || w.anchored || w.reanchored;
+  const pending = w.steps || w.gpsUsed !== null || w.anchored || w.reanchored || w.beaconAnchored || (s.beacon?.windowUpdates ?? 0) > 0;
   return { outputs: pending ? [makeLiveOutput(s, s.lastObservationT, c)] : [], events: [] };
 }
 
@@ -1280,7 +1371,16 @@ function segmentHeadings(s: FusionStateV4, weights: number[], c: FusionConfigV4)
   return result;
 }
 
-const KIND_RANK: Record<SmootherEvent['kind'], number> = { segment: 0, step: 1, walked: 2, fix: 3 };
+const KIND_RANK: Record<SmootherEvent['kind'], number> = { segment: 0, step: 1, walked: 2, fix: 3, range: 4 };
+
+/** rev 18: the forward pass's filtered beacon measurements as smoother events (same local frame as the fixes). */
+function beaconRangeEvents(s: FusionStateV4, c: FusionConfigV4): SmootherEvent[] {
+  if (!c.beaconFusionEnabled || !s.beacon?.measurements.length || !s.origin) return [];
+  return s.beacon.measurements.map((m): SmootherEvent => {
+    const a = anchorLocal(s.origin!, m);
+    return { kind: 'range', t: m.t, ax: a.x, ay: a.y, m };
+  });
+}
 
 /**
  * Replay only: the authoritative trajectory. Uses future fixes too (RTS smoother), so a correction is spread
@@ -1308,6 +1408,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   }
   const stopSigma = s.fixes.map((f) => f.sigma * Math.sqrt(perStop.get(stopOf(f)) ?? 1));
   let fixSigma = stopSigma;
+  const ranges = beaconRangeEvents(s, c);
   for (let it = 0; it < c.smootherIterations; it++) {
     headings = segmentHeadings(s, weights, c);
     const events: SmootherEvent[] = [
@@ -1316,6 +1417,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
         slope: p.slope === true, verticalUnknown: p.verticalUnknown === true })),
       ...s.walked.map((w): SmootherEvent => ({ kind: 'walked', t: w.t, distance: w.distance })),
       ...s.fixes.map((f, i): SmootherEvent => ({ kind: 'fix', t: f.t, index: i, x: f.x, y: f.y, sigma: fixSigma[i], vehicle: f.vehicle })),
+      ...ranges,
     ].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
     smoothed = smoothEvents(events, weights, it === 0 ? c.gpsGateChi2 : null, c, still);
     const residual = new Array<number>(s.fixes.length).fill(0);
@@ -1401,11 +1503,13 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   }
   // rev 17: node anchors observe the zero directly (node floor + phone height - barometric Z) and join the other contacts
   s.markerHeightContacts = c.markerAnchorsEnabled && s.markerAnchors?.length ? markerHeightContacts(s.markerAnchors, zAt, c) : [];
-  const markerAnchored = s.markerHeightContacts.length > 0;
+  const beaconFloorContacts = c.beaconFusionEnabled && c.beaconFloorCorrectionEnabled
+    ? (s.beacon?.floor.heightContacts ?? []).map(({ t, offset, variance }) => ({ t, offset, variance })) : [];
+  const markerAnchored = s.markerHeightContacts.length > 0 || beaconFloorContacts.length > 0;
   const roadAnchored = s.roadHeightContacts.length > 0;
   const groundKept = roadAnchored ? s.roadHeightContacts : consistentContacts(contacts, c);
-  const kept = markerAnchored ? withMarkerContacts(s.markerHeightContacts, groundKept) : groundKept;
-  const keptSource = markerAnchored ? 'MARKER_ANCHOR' : roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN';
+  const kept = markerAnchored ? withMarkerContacts([...s.markerHeightContacts, ...beaconFloorContacts], groundKept) : groundKept;
+  const keptSource = s.markerHeightContacts.length ? 'MARKER_ANCHOR' : beaconFloorContacts.length ? 'BEACON_FLOOR' : roadAnchored ? 'ROAD_ANCHOR' : 'TERRAIN';
   const terrainDatum = kept?.length ? smoothDatum(kept, c, keptSource) : null;
   // Replay uses the first smoothed position and the same saved map snapshot, not later floors.
   if (s.zLog.length && points.length) s.mapStartDatum = mapStartDatum(s, points[0].x, sigmaXY(points[0].P), zAt(points[0].t)!, c);
@@ -1478,7 +1582,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
   let segKnown = false;
   let lastRel: number | null = null;
   let stationary = false;
-  let window = { steps: 0, unheaded: 0, fixUsed: null as boolean | null, fix: null as (typeof s.fixes)[number] | null, residual: null as number | null };
+  let window = { steps: 0, unheaded: 0, fixUsed: null as boolean | null, fix: null as (typeof s.fixes)[number] | null, residual: null as number | null, ranges: 0 };
   for (let t = Math.ceil(t0 / c.outputIntervalMs) * c.outputIntervalMs; t <= tEnd + c.outputIntervalMs; t += c.outputIntervalMs) {
     const tick = Math.min(t, tEnd);
     while (k + 1 < points.length && points[k + 1].t <= tick) {
@@ -1489,6 +1593,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
         lastRel = e.rel;
         window.steps++;
         if (!segKnown) window.unheaded++;
+      } else if (e.kind === 'range') {
+        window.ranges++;
       } else if (e.kind === 'fix' && e.index < s.fixes.length) {
         const used = weights[e.index] >= 0.5;
         window.fixUsed = window.fixUsed === true || used;
@@ -1505,7 +1611,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
       s.lastOutputXY = [p.x[0], p.x[1]];
       const headed = window.steps - window.unheaded;
       const constrained = circle.summary.runs.some((run) => tick >= run.from && tick <= run.to);
-      const source: PositionSource = constrained ? 'MAP_CONSTRAINED' : window.fixUsed && headed ? 'FUSED' : window.fixUsed ? 'GPS_CORRECTED' : headed ? 'PDR_PREDICTED' : stationary ? 'STATIONARY_HOLD' : 'HELD';
+      const source: PositionSource = constrained ? 'MAP_CONSTRAINED' : (window.fixUsed || window.ranges) && headed ? 'FUSED'
+        : window.fixUsed ? 'GPS_CORRECTED' : window.ranges ? 'BEACON_CORRECTED' : headed ? 'PDR_PREDICTED' : stationary ? 'STATIONARY_HOLD' : 'HELD';
       const z = s.zLog.length && s.zLog[zi].t <= tick ? s.zLog[zi].z : 0;
       outputs.push(
         output(s, tick, p.x, sigma, segKnown && lastRel !== null ? headingRadToDeg(lastRel + p.x[2]) : null, z, source, {
@@ -1518,10 +1625,11 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
           headingSource: segKnown ? 'GPS_SHAPE_FIT' : 'UNKNOWN',
           pdrApplied: window.steps ? headed > 0 : null,
           pdrRejectReason: window.unheaded ? 'NO_HEADING' : null,
+          ...(ranges.length ? { beaconUpdates: window.ranges, ...floorAt(s.beacon?.floor, tick) } : {}),
         }, datumAt(tick)),
       );
     }
-    window = { steps: 0, unheaded: 0, fixUsed: null, fix: null, residual: null };
+    window = { steps: 0, unheaded: 0, fixUsed: null, fix: null, residual: null, ranges: 0 };
     if (tick === tEnd) break;
   }
   return {
@@ -1551,6 +1659,9 @@ export function summarizeV4(s: FusionStateV4) {
     circularCorridor: s.circularCorridor,
     roadHeightAnchors: { count: s.roadHeightContacts.length, roadIds: [...new Set(s.roadHeightContacts.map((k) => k.roadId))], contacts: s.roadHeightContacts },
     markerAnchors: { count: s.markerAnchors?.length ?? 0, heightContacts: s.markerHeightContacts },
+    ...(s.beacon ? { beacons: { ...s.beacon.counters, beacons: Object.keys(s.beacon.channels).length,
+      floorChanges: s.beacon.floor.changes, floorHeightContacts: s.beacon.floor.heightContacts.length,
+      finalFloor: { floor: s.beacon.floor.floor, buildingId: s.beacon.floor.buildingId, source: s.beacon.floor.source } } } : {}),
     gpsAccepted: accepted,
     gpsRejected: rejected,
     rejectReasons: reasons,

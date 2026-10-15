@@ -1,0 +1,79 @@
+{
+  "description": "iBeacon manufacturer specific data (bytes AFTER the 2-byte company id 0x004C), shared by Android parser tests and documentation",
+  "cases": [
+    {
+      "name": "valid",
+      "manufacturerId": 76,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e000010002c5",
+      "expected": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 1,
+        "minor": 2,
+        "measuredPower": -59
+      }
+    },
+    {
+      "name": "big-endian major/minor",
+      "manufacturerId": 76,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e01234abcdbf",
+      "expected": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 4660,
+        "minor": 43981,
+        "measuredPower": -65
+      }
+    },
+    {
+      "name": "max values",
+      "manufacturerId": 76,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e0ffffffffff",
+      "expected": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 65535,
+        "minor": 65535,
+        "measuredPower": -1
+      }
+    },
+    {
+      "name": "trailing byte tolerated",
+      "manufacturerId": 76,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e000070008ba00",
+      "expected": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 7,
+        "minor": 8,
+        "measuredPower": -70
+      }
+    },
+    {
+      "name": "wrong company id",
+      "manufacturerId": 89,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e000010002c5",
+      "expected": null
+    },
+    {
+      "name": "wrong type",
+      "manufacturerId": 76,
+      "data": "1015e2c56db5dffb48d2b060d0f5a71096e000010002c5",
+      "expected": null
+    },
+    {
+      "name": "wrong length byte",
+      "manufacturerId": 76,
+      "data": "0214e2c56db5dffb48d2b060d0f5a71096e000010002c5",
+      "expected": null
+    },
+    {
+      "name": "truncated",
+      "manufacturerId": 76,
+      "data": "0215e2c56db5dffb48d2b060d0f5a71096e00001",
+      "expected": null
+    },
+    {
+      "name": "empty",
+      "manufacturerId": 76,
+      "data": "",
+      "expected": null
+    }
+  ]
+}

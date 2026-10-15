@@ -177,6 +177,11 @@ export function toFusedEvent(collectorId: string, sessionId: string, version: st
     heightAboveGround: o.heightAboveGround ?? null,
     zDatumSource: o.zDatumSource ?? null,
     zDatumSigma: o.zDatumSigma ?? null,
+    floorLabel: o.floorLabel ?? null,
+    floorBuildingId: o.floorBuildingId ?? null,
+    floorSource: o.floorSource ?? null,
+    floorConfidence: o.floorConfidence ?? null,
+    beaconUpdates: o.beaconUpdates ?? null,
   };
 }
 

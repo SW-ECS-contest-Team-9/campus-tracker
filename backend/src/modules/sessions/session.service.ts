@@ -11,6 +11,7 @@ import { sessionRepository, type SessionRow } from './session.repository.js';
 import { fusionService } from '../fusion/fusion.service.js';
 import { evaluateStrideCalibration } from '../fusion/fusion.stride.js';
 import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
+import { BEACON_FEATURE } from '../positioning/beacon.dto.js';
 import type {
   DiagnosticEventsRequest,
   ListSessionsQuery,
@@ -85,6 +86,10 @@ function ownedOrThrow(identity: CollectorIdentity, session: SessionRow | null): 
 
 /** Optional telemetry streams this server stores (session:start ack). An app must not send a stream the server would drop. */
 export const SUPPORTED_TELEMETRY_FEATURES = ['absoluteAltitudeV1'] as const;
+/** Advertised features: beaconObservationsV1 only while BEACON_POSITIONING=on (apps hold beacon rows otherwise). */
+export function supportedTelemetryFeatures(): string[] {
+  return [...SUPPORTED_TELEMETRY_FEATURES, ...(env.BEACON_POSITIONING === 'on' ? [BEACON_FEATURE] : [])];
+}
 
 export const sessionService = {
   /**
@@ -182,7 +187,7 @@ export const sessionService = {
       collectionState: session.status,
       resumed: !created,
       // New and resumed sessions alike: the phone holds optional streams back until the server confirms them.
-      supportedTelemetryFeatures: [...SUPPORTED_TELEMETRY_FEATURES],
+      supportedTelemetryFeatures: supportedTelemetryFeatures(),
       strideCalibration: {
         status: session.stride_calibration_status,
         reason: session.stride_calibration_reason,

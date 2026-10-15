@@ -729,5 +729,42 @@ export const fusionConfigV4 = {
   markerAnchorsEnabled: true,
   markerAnchorSigmaXYM: 2, // the collector presses near the node, and most indoor node positions are estimates
   markerAnchorHeightSigmaM: 1, // node floor heights are mostly estimated (not surveyed)
+  // rev 18: registered BLE beacons (docs/BEACON_POSITIONING.md). A beacon is a log-distance RANGE likelihood in the
+  // same EKF (forward) and RTS smoother (replay), never a position fix: RSSI says "about this far from the anchor".
+  beaconFusionEnabled: true, // false = beacons are ignored (the result equals rev 17 for every session)
+  beaconWindowMs: 3000, // per-beacon RSSI window (Android: single advertisements; iOS: ~1 s Core Location aggregates)
+  beaconUpdateIntervalMs: 1000, // at most one range update per beacon per interval (window samples are correlated)
+  beaconMaxAgeMs: 4000, // a window sample older than this (vs. the newest observation of any sensor) is dropped
+  beaconMinRssiDbm: -100, // weaker: too little range information, mostly multipath
+  beaconMaxRssiDbm: -20,
+  beaconOutlierMinDb: 8, // window outlier: |rssi - median| > max(this, 3 x 1.4826 MAD)
+  beaconMaxEffectiveSamples: 3, // the window median counts as at most this many independent RSSI samples
+  beaconMinRangeM: 0.5,
+  beaconMaxRangeM: 25, // farther model ranges carry almost no position information at 6 dB sigma
+  beaconDefaultMountAboveFloorM: 2.5, // anchor height above its floor when floorHeightM is unknown
+  beaconGateChi2: 10.83, // 1 dof, p = 0.001: larger normalized innovations are rejected (outlier / spoofing / floor leak)
+  beaconRobustChi2: 3.84, // 1 dof, p = 0.05: above it the variance is inflated by d2 / this (Huber-like)
+  beaconMaxShiftM: 3, // one update may move the position at most this far (variance inflated to keep the gain below it)
+  beaconMaxPriorSigmaM: 30, // a wider prior cannot be linearized around: no range update (proximity only)
+  beaconProximityMaxRangeM: 3, // upper 2-sigma HORIZONTAL range below this: a proximity observation (region around the anchor)
+  beaconProximitySigmaFloorM: 2, // proximity region 1-sigma never below this
+  beaconProximityGateChi2: 13.82, // 2 dof, p = 0.001
+  beaconProximityRobustChi2: 5.99, // 2 dof, p = 0.05
+  beaconInitializationEnabled: true, // no GPS yet: a proximity observation may start the local frame at the anchor
+  beaconInitMinSigmaM: 4,
+  beaconFloorMismatchRejected: true, // a beacon on another floor than the confirmed floor does not update XY
+  // floor estimation (beacon floor votes + barometer + stairs); diagnostics + optional Z datum
+  beaconFloorEstimationEnabled: true,
+  beaconFloorCorrectionEnabled: false, // true: a confirmed beacon floor also observes the height zero (like a node anchor)
+  beaconFloorVoteMaxRangeM: 8,
+  beaconFloorWindowMs: 6000,
+  beaconFloorMinShare: 0.6,
+  beaconFloorConfirmMs: 3000, // first floor: the same leading floor for this long
+  beaconFloorChangeMs: 5000, // a change: the new floor leads for this long ...
+  beaconFloorChangeMinDzFraction: 0.5, // ... and the barometer moved at least this share of the floor height that way
+  beaconFloorHeightDefaultM: 3.6, // when the anchors do not give both floor heights
+  beaconFloorNoBaroChangeMs: 15_000, // no barometer: a change needs this long and share >= 0.8
+  beaconFloorBaroOnlyFraction: 0.8, // no beacons: the barometer alone moves the floor by whole storeys (|dz| >= this x storey, within 0.3 storey of a whole number)
+  beaconFloorHeightSigmaM: 1.5, // height-zero observation of a confirmed beacon floor (beaconFloorCorrectionEnabled)
 };
 export type FusionConfigV4 = typeof fusionConfigV4;

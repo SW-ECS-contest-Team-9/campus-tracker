@@ -9,6 +9,7 @@ import type { StartHeightMap, StartHeightSelection } from '../../geo/start-heigh
 import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
 import type { MarkerAnchorInput, MarkerHeightContact } from './fusion-marker-anchor.js';
 import type { CircularSummary } from './fusion-circular-corridor.js';
+import type { BeaconTracker } from './fusion-beacon.js';
 
 /**
  * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
@@ -37,7 +38,7 @@ export interface HeadingSegmentV4 { id: number; startT: number; reason: string; 
 export interface ContactV4 { t: number; offset: number; variance: number }
 export interface GpsHeightV4 { t: number; H: number; hacc: number; z: number; ground: number | null; inside: boolean }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'BEACON_FLOOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
@@ -159,6 +160,8 @@ export interface FusionStateV4 {
   markerAnchors?: MarkerAnchorInput[];
   markerHeightContacts: MarkerHeightContact[];
   circularCorridor?: CircularSummary;
+  /** rev 18: registered BLE beacons (created on the first beacon observation; absent = rev 17 behaviour) */
+  beacon?: BeaconTracker;
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];
@@ -195,6 +198,8 @@ export interface FusionStateV4 {
     unheadedSteps: number;
     anchored: boolean;
     reanchored: boolean;
+    /** rev 18: the local frame started at a beacon in this window */
+    beaconAnchored?: boolean;
   };
   lastObservationT?: number;
   skippedLateObservations: number;

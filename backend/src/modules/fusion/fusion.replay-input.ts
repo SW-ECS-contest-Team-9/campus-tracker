@@ -14,13 +14,13 @@ export function cutRawSamples<T extends RawSamples>(raw: T, cutoff: number | nul
   if (cutoff === null) return raw;
   const keep = <S extends { timestamp: string | Date }>(rows: S[]) => rows.filter((r) => ms(r.timestamp) <= cutoff);
   return { ...raw, locations: keep(raw.locations), motion: keep(raw.motion), altimeter: keep(raw.altimeter), pedometer: keep(raw.pedometer),
-    ...(raw.absoluteAltitude ? { absoluteAltitude: keep(raw.absoluteAltitude) } : {}) };
+    ...(raw.absoluteAltitude ? { absoluteAltitude: keep(raw.absoluteAltitude) } : {}), ...(raw.beacons ? { beacons: keep(raw.beacons) } : {}) };
 }
 
 export interface ReplayInputSummary {
   /** sensor-time cutoff of the run (ISO), null = all raw rows of the snapshot */
   cutoff: string | null;
-  counts: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number };
+  counts: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number; beacons?: number };
   firstSensorAt: string | null;
   lastSensorAt: string | null;
   /** sha256 over (stream, sequence, sensor time, values fusion reads) in sensor-time order: same hash = same fusion input */
@@ -47,6 +47,9 @@ export function summarizeReplayInput(raw: RawSamples, cutoff: number | null): Re
   for (const a of raw.absoluteAltitude ?? []) add('AA', ms(a.timestamp), a.sequence,
     [a.altitude, a.accuracy, a.precision, a.verticalReference, a.invalidReason, a.segment]);
   for (const p of raw.pedometer) add('P', ms(p.timestamp), '', [p.numberOfSteps, p.distance, p.segment]);
+  // beacons with the anchor and RSSI model they were resolved to: moving an anchor or recalibrating changes the input
+  for (const b of raw.beacons ?? []) add('B', ms(b.timestamp), b.observationId, [b.beaconId, b.rssi, b.platform, b.anchorX, b.anchorY, b.anchorZ,
+    b.floor, b.floorHeightM, b.anchorHorizontalAccuracyM, b.measuredPower1m, b.pathLossExponent, b.rssiVariance, b.sampleCount]);
   lines.sort();
   const hash = createHash('sha256');
   for (const line of lines) hash.update(line).update('\n');
@@ -54,7 +57,8 @@ export function summarizeReplayInput(raw: RawSamples, cutoff: number | null): Re
   return {
     cutoff: cutoff === null ? null : new Date(cutoff).toISOString(),
     counts: { locations: raw.locations.length, motion: raw.motion.length, altimeter: raw.altimeter.length, pedometer: raw.pedometer.length,
-      ...(raw.absoluteAltitude?.length ? { absoluteAltitude: raw.absoluteAltitude.length } : {}) },
+      ...(raw.absoluteAltitude?.length ? { absoluteAltitude: raw.absoluteAltitude.length } : {}),
+      ...(raw.beacons?.length ? { beacons: raw.beacons.length } : {}) },
     firstSensorAt: iso(first),
     lastSensorAt: iso(last),
     hash: hash.digest('hex').slice(0, 24),

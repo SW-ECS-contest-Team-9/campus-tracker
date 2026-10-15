@@ -86,7 +86,7 @@ test('a resumed session advertises absoluteAltitudeV1, so an older handshake can
   }));
   const ack = await sessionService.start(identity, { clientSessionId: 'client', deviceId: 'phone', sensorCapabilities: {}, startedAt: iso(T0) });
   assert.equal(ack.resumed, true);
-  assert.deepEqual(ack.supportedTelemetryFeatures, ['absoluteAltitudeV1']);
+  assert.deepEqual(ack.supportedTelemetryFeatures, ['absoluteAltitudeV1', 'beaconObservationsV1']); // additive: beaconObservationsV1 while BEACON_POSITIONING=on
 });
 
 test('invalid candidate windows and mode overrides fail before replay', () => {

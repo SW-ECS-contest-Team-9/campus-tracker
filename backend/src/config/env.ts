@@ -41,6 +41,19 @@ const EnvSchema = z.object({
    * report only (apply with `npm run deploy:sync`), on = apply automatically, off = do not compare. */
   DEPLOY_RECONCILE: z.enum(['on', 'dry-run', 'off']).default('dry-run'),
   PUBLIC_BASE_URL: z.url().optional().or(z.literal('').transform(() => undefined)),
+  /** BLE beacon positioning (docs/BEACON_POSITIONING.md). off = not advertised in session:start, uploads refused
+   * (BEACON_DISABLED, not retryable: the apps hold the rows), config API answers with every feature off. */
+  BEACON_POSITIONING: z.enum(['on', 'off']).default('on'),
+  /** Remote switches handed to the apps in the beacon config (the apps also need their own local setting on). */
+  BEACON_CLIENT_SCANNING: z.stringbool().default(true),
+  BEACON_CLIENT_UPLOAD: z.stringbool().default(true),
+  BEACON_CLIENT_FUSION: z.stringbool().default(true),
+  BEACON_CLIENT_FLOOR_CORRECTION: z.stringbool().default(false),
+  /** Collector IDs (comma separated) allowed to change the beacon registry. Empty = registry is read-only. */
+  POSITIONING_ADMIN_COLLECTORS: z.string().default(''),
+  /** Beacon config cache: the apps re-validate after maxAge, and may keep positioning with it offline for staleMax. */
+  BEACON_CONFIG_MAX_AGE_S: z.coerce.number().int().min(0).default(3600),
+  BEACON_CONFIG_STALE_MAX_S: z.coerce.number().int().min(0).default(14 * 86_400),
 });
 
 const parsed = EnvSchema.safeParse(process.env);
@@ -52,6 +65,7 @@ if (!parsed.success) {
 export const env = {
   ...parsed.data,
   corsOrigins: parsed.data.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean),
+  positioningAdmins: new Set(parsed.data.POSITIONING_ADMIN_COLLECTORS.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean)),
 };
 
 if (env.JWT_SECRET === 'change-me') {

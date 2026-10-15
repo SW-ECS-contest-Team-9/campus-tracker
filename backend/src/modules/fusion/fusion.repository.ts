@@ -3,6 +3,7 @@ import { pool, type DbClient } from '../../config/database.js';
 import type { RawSamples } from './fusion.timeline.js';
 import type { FusedOutput, SpatialGpsDecision } from './fusion.types.js';
 import type { FusedPositionView } from './fusion.dto.js';
+import { loadFusionBeacons } from '../positioning/beacon-fusion-input.js';
 
 const VIEW_COLUMNS = `
   fusion_sequence AS "fusionSequence", "timestamp", longitude, latitude,
@@ -20,7 +21,8 @@ const VIEW_COLUMNS = `
   spatial_status AS "spatialStatus", building_id AS "buildingId", building_name AS "buildingName",
   building_match_status AS "buildingMatchStatus", spatial_segment_id AS "spatialSegmentId",
   terrain_height AS "terrainHeight", height_above_ground AS "heightAboveGround", z_datum_source AS "zDatumSource",
-  z_datum_sigma AS "zDatumSigma"`;
+  z_datum_sigma AS "zDatumSigma", floor_label AS "floorLabel", floor_building_id AS "floorBuildingId",
+  floor_source AS "floorSource", floor_confidence AS "floorConfidence", beacon_updates AS "beaconUpdates"`;
 
 export const fusionRepository = {
   /** Batch insert (one statement). Existing (session, version, sequence) rows are kept. Returns inserted sequences. */
@@ -36,26 +38,30 @@ export const fusionRepository = {
          gps_used, gps_reject_reason, gps_sequence, innovation_distance, stationary, heading_source, horizontal_uncertainty,
          gps_quality, pdr_applied, pdr_reject_reason, relative_altitude, reanchored, reanchor_reason, divergence_detected,
          spatial_map_version_id, spatial_status, building_id, building_name, building_match_status, spatial_segment_id,
-         terrain_height, height_above_ground, z_datum_source, z_datum_sigma)
+         terrain_height, height_above_ground, z_datum_source, z_datum_sigma,
+         floor_label, floor_building_id, floor_source, floor_confidence, beacon_updates)
        SELECT $1, $2, t.seq, to_timestamp(t.ts / 1000.0), t.lat, t.lon, t.ell, t.x, t.y, t.z, t.heading, t.hc, t.vc, t.oc,
               t.hacc, t.vacc, t.src,
               ST_SetSRID(ST_MakePoint(t.lon, t.lat, t.gz), 4326),  -- X = lon, Y = lat, Z = ellipsoidal (or state) height
               t.gps_used, t.reason, t.gps_seq, t.innovation, t.stationary, t.heading_source, t.uncertainty,
               t.gps_quality, t.pdr_applied, t.pdr_reason, t.rel_alt, t.reanchored, t.reanchor_reason, t.divergence,
               t.map_version_id, t.spatial_status, t.building_id, t.building_name, t.building_match_status, t.spatial_segment_id,
-              t.terrain_height, t.hag, t.z_source, t.z_sigma
+              t.terrain_height, t.hag, t.z_source, t.z_sigma,
+              t.floor_label, t.floor_building, t.floor_source, t.floor_confidence, t.beacon_updates
          FROM unnest($3::bigint[], $4::float8[], $5::float8[], $6::float8[], $7::float8[], $8::float8[], $9::float8[],
                      $10::float8[], $11::float8[], $12::float8[], $13::float8[], $14::float8[], $15::float8[],
                      $16::float8[], $17::text[], $18::float8[],
                      $19::boolean[], $20::text[], $21::bigint[], $22::float8[], $23::boolean[], $24::text[], $25::float8[],
                      $26::text[], $27::boolean[], $28::text[], $29::float8[], $30::boolean[], $31::text[], $32::boolean[],
                      $33::text[], $34::text[], $35::text[], $36::text[], $37::text[], $38::int[],
-                     $39::float8[], $40::float8[], $41::text[], $42::float8[])
+                     $39::float8[], $40::float8[], $41::text[], $42::float8[],
+                     $43::text[], $44::text[], $45::text[], $46::float8[], $47::int[])
               AS t(seq, ts, lat, lon, ell, x, y, z, heading, hc, vc, oc, hacc, vacc, src, gz,
                    gps_used, reason, gps_seq, innovation, stationary, heading_source, uncertainty,
                    gps_quality, pdr_applied, pdr_reason, rel_alt, reanchored, reanchor_reason, divergence,
                    map_version_id, spatial_status, building_id, building_name, building_match_status, spatial_segment_id,
-                   terrain_height, hag, z_source, z_sigma)
+                   terrain_height, hag, z_source, z_sigma,
+                   floor_label, floor_building, floor_source, floor_confidence, beacon_updates)
        ON CONFLICT (session_id, algorithm_version, fusion_sequence) DO NOTHING
        RETURNING fusion_sequence`,
       [
@@ -70,6 +76,7 @@ export const fusionRepository = {
         opt('buildingId'), opt('buildingName'), opt('buildingMatchStatus'),
         opt('spatialSegmentId'),
         opt('terrainHeight'), opt('heightAboveGround'), opt('zDatumSource'), opt('zDatumSigma'),
+        opt('floorLabel'), opt('floorBuildingId'), opt('floorSource'), opt('floorConfidence'), opt('beaconUpdates'),
       ],
     );
     return rows.map((r) => r.fusion_sequence);
@@ -166,7 +173,7 @@ export const fusionRepository = {
 
   /** Everything fusion needs from the raw tables (read-only), in the shape buildTimeline expects. */
   async loadRawSamples(sessionId: string, db: DbClient = pool): Promise<RawSamples> {
-    const [locations, motion, altimeter, pedometer, absoluteAltitude] = await Promise.all([
+    const [locations, motion, altimeter, pedometer, absoluteAltitude, beacons] = await Promise.all([
       db.query(
         `SELECT sequence, "timestamp", latitude, longitude, altitude, ellipsoidal_altitude AS "ellipsoidalAltitude",
                 horizontal_accuracy AS "horizontalAccuracy", vertical_accuracy AS "verticalAccuracy", speed, course
@@ -198,8 +205,11 @@ export const fusionRepository = {
                 invalid_reason AS "invalidReason", sensor_segment_id AS segment
            FROM absolute_altitude_samples WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'`, [sessionId],
       ),
+      // registered, enabled, anchored beacons only, resolved against the registry as it is now (docs/BEACON_POSITIONING.md)
+      loadFusionBeacons(sessionId, db),
     ]);
-    return { locations: locations.rows, motion: motion.rows, altimeter: altimeter.rows, pedometer: pedometer.rows, absoluteAltitude: absoluteAltitude.rows };
+    return { locations: locations.rows, motion: motion.rows, altimeter: altimeter.rows, pedometer: pedometer.rows, absoluteAltitude: absoluteAltitude.rows,
+      ...(beacons.length ? { beacons } : {}) };
   },
 
   // ---- fusion_runs (reprocessing history) ----
