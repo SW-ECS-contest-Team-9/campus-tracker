@@ -89,6 +89,12 @@ final class TelemetryUploadEngine {
     private var sampleCounts = SampleCounts()
     private var sessionsWithHeldAbsoluteAltitude: Set<String> = []
     private var absoluteAltitudeSupportedSessions: Set<String> = []
+    /// Sessions whose latest session:start ACK (in this process) listed `beaconObservationsV1`.
+    private var beaconSupportedSessions: Set<String> = []
+    /// Sessions already re-handshaken once in this process to learn whether the server stores beacons.
+    private var beaconHandshakeAsked: Set<String> = []
+    /// Local switch (Settings): false keeps beacon batches queued on the phone.
+    var beaconUploadEnabled = true { didSet { if beaconUploadEnabled != oldValue { synchronize() } } }
     private var connectionGeneration: UInt64 = 0
     private var scheduler = UploadScheduler()
     private var preferFinishingLane = true
@@ -236,6 +242,11 @@ final class TelemetryUploadEngine {
     func ingest(_ committed: [UploadItemRecord]) {
         merge(committed)
         notifyCount()
+        // Beacon rows of a session whose server support is unknown in this process (restart, resume): ask once.
+        for id in Set(committed.filter { $0.kind == .beacon }.map(\.sessionID))
+        where !beaconSupportedSessions.contains(id) && beaconHandshakeAsked.insert(id).inserted {
+            _ = requireHandshake(id)
+        }
         let finishingSessions = Set(committed.filter { $0.kind == .finish }.map(\.sessionID))
         guard !finishingSessions.isEmpty else { return synchronize() }
         store.async({ access in
@@ -300,7 +311,7 @@ final class TelemetryUploadEngine {
     private var countSummary: (sendable: Int, held: Int) {
         var sendable = 0
         var held = 0
-        for item in items where item.state == .pending || item.state == .heldOrphaned {
+        for item in items where (item.state == .pending || item.state == .heldOrphaned) && item.kind != .beacon {
             if item.state == .pending, let owner, sessions[item.sessionID]?.owner == owner { sendable += 1 } else { held += 1 }
         }
         for session in sessions.values where awaitingSyncComplete(session) {
@@ -405,11 +416,14 @@ final class TelemetryUploadEngine {
             case .telemetry: laneClass = .telemetry
             case .marker, .diagnostic: laneClass = .aux
             case .arkit: laneClass = .arkit
+            case .beacon:
+                guard beaconUploadEnabled, beaconSupportedSessions.contains(item.sessionID) else { continue }
+                laneClass = .aux
             case .finish:
                 if sessionsWithHeldAbsoluteAltitude.contains(item.sessionID) { continue }
                 // Finish is eligible only after every earlier required item of its own session
-                // (other sessions' backlog is not part of this barrier).
-                let blocked = pendingBySession[item.sessionID]?.contains { $0.kind != .finish && $0.enqueueOrder < item.enqueueOrder } ?? false
+                // (other sessions' backlog is not part of this barrier). Beacon batches are optional data.
+                let blocked = pendingBySession[item.sessionID]?.contains { $0.kind != .finish && $0.kind != .beacon && $0.enqueueOrder < item.enqueueOrder } ?? false
                 if blocked { continue }
                 laneClass = .finish
             }
@@ -425,7 +439,9 @@ final class TelemetryUploadEngine {
         for id in lane {
             guard let session = sessions[id], awaitingSyncComplete(session), let manifest = session.finishAck,
                   session.serverSessionID != nil else { continue }
-            let remaining = items.contains { $0.sessionID == id && ($0.state == .pending || $0.state == .quarantined) }
+            // Beacon batches count only where the server stores them (they are sent first); elsewhere they stay local.
+            let remaining = items.contains { $0.sessionID == id && ($0.state == .pending || $0.state == .quarantined)
+                && ($0.kind != .beacon || (beaconSupportedSessions.contains(id) && beaconUploadEnabled)) }
             guard !remaining else { continue }
             sendSyncComplete(id, serverSessionID: session.serverSessionID, manifest: manifest, owner: owner)
             return true
@@ -456,6 +472,11 @@ final class TelemetryUploadEngine {
                 self.sessions[id]?.startQuarantined = false
                 self.commitLedger({ try $0.setServerSessionID(response.sessionId, sessionID: id) }) {
                     if let uuid = UUID(uuidString: id) { self.onServerSessionStarted?(uuid, response.sessionId) }
+                    if response.supportedTelemetryFeatures?.contains("beaconObservationsV1") == true {
+                        self.beaconSupportedSessions.insert(id)
+                    } else {
+                        self.beaconSupportedSessions.remove(id)
+                    }
                     if response.supportedTelemetryFeatures?.contains("absoluteAltitudeV1") == true {
                         self.absoluteAltitudeSupportedSessions.insert(id)
                         if let uuid = UUID(uuidString: id) { self.onAbsoluteAltitudeSupported?(uuid) }
@@ -585,6 +606,12 @@ final class TelemetryUploadEngine {
     /// One re-handshake retry for a session-restart error, bounded backoff for anything else
     /// retryable, quarantine (held with its error, never auto-retried) for a permanent rejection.
     private func handleItemFailure(error: AckError?, key: UploadItemKey, sessionID: String) {
+        if key.kind == .beacon, let code = error?.code, code == "BEACON_DISABLED" || code == "UNKNOWN_TYPE" {
+            // The server turned beacon positioning off: keep the rows, stop sending them to it.
+            print("[UploadEngine] beacon batch held item=\(key.itemID) code=\(code)")
+            beaconSupportedSessions.remove(sessionID)
+            return synchronize()
+        }
         if let code = error?.code, Self.sessionRestartCodes.contains(code) {
             let alreadyRetried = items.first { $0.key == key }?.restartRetried ?? true
             guard !alreadyRetried else { return quarantine(key, error: error ?? AckError(code: code, message: nil, status: nil, retryable: false)) }

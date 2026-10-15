@@ -411,6 +411,9 @@ nonisolated enum UploadKind: String, Codable, CaseIterable, Sendable {
     case arkit
     case diagnostic
     case finish
+    /// `beacon.observations.v1` (docs/BEACON_POSITIONING.md): optional, sent only to servers that advertise
+    /// `beaconObservationsV1`; held (never quarantined) otherwise. Not part of the finish manifest.
+    case beacon
 
     var messageType: String {
         switch self {
@@ -419,8 +422,22 @@ nonisolated enum UploadKind: String, Codable, CaseIterable, Sendable {
         case .arkit: return "arkit:pose"
         case .diagnostic: return "diagnostic:event"
         case .finish: return "session:finish"
+        case .beacon: return "beacon.observations.v1"
         }
     }
+}
+
+/// `beacon.observations.v1` payload. The stored payload has no server session id; it is injected at send time.
+nonisolated struct BeaconObservationBatchPayload: Codable, Sendable {
+    var type = "beacon.observations.v1"
+    var schemaVersion = 1
+    let batchId: String
+    var sessionId: String?
+    let clientSessionId: String
+    var platform = "ios"
+    let deviceModel: String?
+    let createdAt: Date
+    let observations: [BeaconObservation]
 }
 
 nonisolated enum TelemetryWireEncoding {
@@ -452,6 +469,10 @@ nonisolated enum TelemetryWireEncoding {
                 payload: DiagnosticEventPayload(clientSessionId: clientSessionId, events: [value])))
         case .finish:
             var value = try decoder.decode(FinishPayload.self, from: payload)
+            value.sessionId = serverSessionId
+            data = try encoder.encode(WebSocketRequest(requestId: requestId, type: kind.messageType, payload: value))
+        case .beacon:
+            var value = try decoder.decode(BeaconObservationBatchPayload.self, from: payload)
             value.sessionId = serverSessionId
             data = try encoder.encode(WebSocketRequest(requestId: requestId, type: kind.messageType, payload: value))
         }

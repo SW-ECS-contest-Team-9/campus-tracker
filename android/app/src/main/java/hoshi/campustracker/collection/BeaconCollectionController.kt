@@ -72,7 +72,6 @@ class BeaconCollectionController(
 
     private var registry: BeaconRegistry? = null
     private var scanningUuids: Set<String>? = null
-    @Suppress("unused") private var uploading = false
     private var activeSessionId: String? = null
 
     init {
@@ -98,8 +97,8 @@ class BeaconCollectionController(
         val freshness = cache.freshness(cached)
         val plan = BeaconCollectionPolicy.decide(activeSessionId != null, localScanning, localUpload, cached, freshness)
         registry = cached?.let { BeaconRegistry(it.config) }
-        uploading = plan.upload
-        sync.beaconUploadEnabled = plan.upload || !plan.scan // when not scanning, earlier held rows may still go out
+        // while scanning: the plan (local + remote switch); otherwise held batches of earlier sessions follow the local switch
+        sync.beaconUploadEnabled = if (plan.scan) plan.upload else localUpload
         _ui.value = _ui.value.copy(plan = plan, configVersion = cached?.config?.configVersion, configFreshness = freshness)
         if (!plan.scan) {
             if (scanningUuids != null) scanner.stop()

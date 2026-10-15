@@ -24,6 +24,7 @@ struct ContentView: View {
         }
         .onAppear {
             coordinator.bind(webSocket: authentication.webSocket)
+            coordinator.beaconRecorder.bind(coordinator: coordinator, authentication: authentication)
             updateUploadOwner()
             // Settled before Start is ever reachable, not during session start (§P0 permission gating).
             coordinator.requestLocationAuthorizationIfNeeded()
@@ -503,6 +504,8 @@ private struct SettingsView: View {
     @AppStorage("arkitEnabled") private var arkitEnabled = false
     @AppStorage("arkitPoseRate") private var arkitPoseRate = ARKitPoseRate.hz10.rawValue
     @AppStorage("walkingFrameEnabled") private var walkingFrameEnabled = false
+    @AppStorage(BeaconCollectionRecorder.scanningKey) private var beaconScanningEnabled = false
+    @AppStorage(BeaconCollectionRecorder.uploadKey) private var beaconUploadEnabled = true
 
     var body: some View {
         Form {
@@ -529,6 +532,7 @@ private struct SettingsView: View {
             }
             locationPermissionSection
             arkitSection
+            BeaconSettingsSection(recorder: coordinator.beaconRecorder, scanning: $beaconScanningEnabled, upload: $beaconUploadEnabled)
             walkingFrameSettingsSection
             healthStrideSection
         }
@@ -842,4 +846,31 @@ private struct ServerSettingsView: View {
 private struct AnchorRequest: Identifiable {
     let type: EventMarkerType
     var id: String { type.rawValue }
+}
+
+
+/// BLE beacon switches and status (docs/BEACON_POSITIONING.md).
+private struct BeaconSettingsSection: View {
+    @ObservedObject var recorder: BeaconCollectionRecorder
+    @Binding var scanning: Bool
+    @Binding var upload: Bool
+
+    var body: some View {
+        Section(header: Text("비콘 (BLE)")) {
+            Toggle("등록된 iBeacon 수집", isOn: $scanning)
+                .onChange(of: scanning) { _ in recorder.settingsChanged() }
+            Toggle("비콘 관측값 업로드", isOn: $upload)
+                .disabled(!scanning)
+                .onChange(of: upload) { _ in recorder.settingsChanged() }
+            Text("상태: \(String(describing: recorder.scannerState)) · \(recorder.plan?.reason ?? "—") · 설정 v\(recorder.configVersion.map { "\($0)" } ?? "—") (\(recorder.configFreshness.rawValue))")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("관측 \(recorder.observationCount) (등록 \(recorder.registeredCount))\(recorder.lastError.map { " · \($0)" } ?? "")")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("정확한 위치 권한이 필요합니다. 백그라운드에서는 연속 수집이 보장되지 않으며, 비콘이 없어도 GPS·모션 수집은 그대로 진행됩니다.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
 }

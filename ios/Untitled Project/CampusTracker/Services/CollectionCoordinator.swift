@@ -65,6 +65,8 @@ final class CollectionCoordinator: NSObject, ObservableObject {
     private let startsHardwareSensors: Bool
     private let appStateBox = CaptureAppStateBox()
     private var uploadEngine: TelemetryUploadEngine?
+    /// BLE beacon collection (separate from the sensor capture path; see BeaconCollectionRecorder).
+    private(set) lazy var beaconRecorder = BeaconCollectionRecorder(store: store)
     private var contexts: [CaptureStream: TrackingCaptureContext] = [:]
     private var lastPreparedClocks: SensorRunClocks?
     private var runtimeState: ActiveCollectionState?
@@ -170,6 +172,16 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         }
         uploadEngine = engine
         if let id = activeSession?.id { engine.activate(sessionID: id) }
+    }
+
+    /// BLE beacons (docs/BEACON_POSITIONING.md): batches committed by `BeaconCollectionRecorder` join the same ledger.
+    func ingestUploadItems(_ items: [UploadItemRecord]) {
+        uploadEngine?.ingest(items)
+    }
+
+    /// Local + remote beacon upload switch: off keeps beacon batches on the phone.
+    func setBeaconUploadEnabled(_ enabled: Bool) {
+        uploadEngine?.beaconUploadEnabled = enabled
     }
 
     private func updatePendingCount(_ count: Int) {

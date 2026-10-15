@@ -150,7 +150,9 @@ nonisolated func epochMilliseconds(_ date: Date) -> Int64 {
 /// `queue` itself) or `async` (completion delivered on the main queue).
 nonisolated final class CollectionStore: @unchecked Sendable {
     static let databaseFileName = "collection-v2.sqlite"
-    static let schemaVersion = 1
+    /// 1: sessions, leases, ledger, raw samples. 2: beacon_observations + beacon_config_cache (additive; a v1 file is
+    /// upgraded in place in one transaction, nothing existing is rewritten).
+    static let schemaVersion = 2
 
     let queue = DispatchQueue(label: "CampusCollector.collection-store", qos: .utility)
     let directory: URL
@@ -207,6 +209,13 @@ nonisolated final class CollectionStore: @unchecked Sendable {
             return
         }
         try db.transaction {
+            if version < 1 { try createVersion1(db) }
+            if version < 2 { try createVersion2(db) }
+            try db.setUserVersion(schemaVersion)
+        }
+    }
+
+    private static func createVersion1(_ db: SQLiteDatabase) throws {
             try db.execute("""
             CREATE TABLE IF NOT EXISTS sessions (
               session_id TEXT PRIMARY KEY,
@@ -272,8 +281,32 @@ nonisolated final class CollectionStore: @unchecked Sendable {
               imported_at_ms INTEGER NOT NULL
             );
             """)
-            try db.setUserVersion(schemaVersion)
-        }
+    }
+
+    /// BLE beacons: raw observations (kept even while the server lacks the feature) and the registry cache.
+    /// A batch row set and its `beacon` upload item are written in one transaction (`commitBeaconBatch`).
+    private static func createVersion2(_ db: SQLiteDatabase) throws {
+        try db.execute("""
+        CREATE TABLE IF NOT EXISTS beacon_observations (
+          session_id TEXT NOT NULL REFERENCES sessions(session_id),
+          observation_id TEXT NOT NULL,
+          observed_at_ms INTEGER NOT NULL,
+          uuid TEXT NOT NULL,
+          major INTEGER NOT NULL,
+          minor INTEGER NOT NULL,
+          rssi_dbm INTEGER NOT NULL,
+          payload_json BLOB NOT NULL,
+          batch_id TEXT,
+          PRIMARY KEY (session_id, observation_id)
+        );
+        CREATE INDEX IF NOT EXISTS beacon_by_batch ON beacon_observations(session_id, batch_id);
+        CREATE TABLE IF NOT EXISTS beacon_config_cache (
+          server_key TEXT PRIMARY KEY,
+          etag TEXT,
+          fetched_at_ms INTEGER NOT NULL,
+          config_json BLOB NOT NULL
+        );
+        """)
     }
 
     private func access() throws -> CollectionStoreAccess {
@@ -872,9 +905,51 @@ nonisolated struct CollectionStoreAccess {
         return Dictionary(rows, uniquingKeysWith: { first, _ in first })
     }
 
+    // MARK: Beacons
+
+    /// Raw beacon rows + their `beacon` upload item in ONE transaction: either both are durable or neither.
+    /// Re-committing the same observation ids is a no-op for the rows (the item is keyed by batchId).
+    @discardableResult
+    func commitBeaconBatch(sessionID: UUID, batchID: String, observations: [BeaconObservation], payload: Data) throws -> UploadItemRecord {
+        try db.transaction {
+            try inject(.uploadInsert)
+            let id = sessionID.uuidString
+            for o in observations {
+                try db.run("""
+                    INSERT OR IGNORE INTO beacon_observations (session_id, observation_id, observed_at_ms, uuid, major, minor, rssi_dbm, payload_json, batch_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, [.text(id), .text(o.observationId), .integer(epochMilliseconds(o.observedAt)), .text(o.uuid), .int(o.major), .int(o.minor),
+                          .int(o.rssiDbm), .blob(try encoder.encode(o)), .text(batchID)])
+            }
+            return try insertItem(sessionID: id, draft: UploadItemDraft(kind: .beacon, itemID: batchID, payload: payload),
+                                  state: .pending, createdAtMs: epochMilliseconds(Date()))
+        }
+    }
+
+    func beaconObservations(sessionID: UUID) throws -> [BeaconObservation] {
+        try db.query("SELECT payload_json FROM beacon_observations WHERE session_id = ? ORDER BY observed_at_ms, observation_id",
+                     [.text(sessionID.uuidString)]) { try decoder.decode(BeaconObservation.self, from: $0.blob(0) ?? Data()) }
+    }
+
+    func loadBeaconConfig(serverKey: String) throws -> CachedBeaconConfig? {
+        try db.queryOne("SELECT etag, fetched_at_ms, config_json FROM beacon_config_cache WHERE server_key = ?", [.text(serverKey)]) { row in
+            CachedBeaconConfig(config: try JSONDecoder().decode(BeaconConfig.self, from: row.blob(2) ?? Data()), etag: row.text(0),
+                               fetchedAt: Date(timeIntervalSince1970: Double(row.int64(1)) / 1_000), serverKey: serverKey)
+        }
+    }
+
+    func saveBeaconConfig(_ cached: CachedBeaconConfig) throws {
+        try db.run("""
+            INSERT INTO beacon_config_cache (server_key, etag, fetched_at_ms, config_json) VALUES (?, ?, ?, ?)
+            ON CONFLICT(server_key) DO UPDATE SET etag = excluded.etag, fetched_at_ms = excluded.fetched_at_ms, config_json = excluded.config_json
+            """, [.text(cached.serverKey), .optionalText(cached.etag), .integer(epochMilliseconds(cached.fetchedAt)),
+                  .blob(try JSONEncoder().encode(cached.config))])
+    }
+
     func count(_ table: String) throws -> Int {
         // Table names come only from this file's literals, never from caller data.
-        precondition(["sessions", "upload_items", "raw_samples", "sequence_leases", "migrations", "capture_audit"].contains(table))
+        precondition(["sessions", "upload_items", "raw_samples", "sequence_leases", "migrations", "capture_audit",
+                      "beacon_observations", "beacon_config_cache"].contains(table))
         return try db.queryOne("SELECT COUNT(*) FROM \(table)") { $0.int(0) } ?? 0
     }
 }
