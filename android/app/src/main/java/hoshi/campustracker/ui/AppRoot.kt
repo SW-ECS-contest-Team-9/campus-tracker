@@ -74,6 +74,7 @@ fun AppRoot(graph: AppGraph, actions: CollectActions, locationPermission: String
 private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermission: String, startMessage: String?) {
     var tab by rememberSaveable { mutableStateOf(Tab.Collect) }
     var showServerSettings by rememberSaveable { mutableStateOf(false) }
+    var showBeaconRegistration by rememberSaveable { mutableStateOf(false) }
     var sessions by remember { mutableStateOf<List<CollectionSession>>(emptyList()) }
     val scope = rememberCoroutineScope()
     val ui by graph.coordinator.ui.collectAsStateWithLifecycle()
@@ -162,6 +163,8 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                 Tab.Sessions -> SessionsScreen(sessions)
                 Tab.Settings -> if (showServerSettings) {
                     ServerSettingsScreen(graph.auth, configuration, savedCollectorId) { showServerSettings = false }
+                } else if (showBeaconRegistration) {
+                    BeaconRegistrationScreen(graph.beaconRegistration) { showBeaconRegistration = false }
                 } else {
                     SettingsScreen(
                         auth = graph.auth,
@@ -174,6 +177,7 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                         beacon = beaconUi,
                         onBeaconScanning = { scope.launch { graph.settings.saveBeacon(scanning = it) } },
                         onBeaconUpload = { scope.launch { graph.settings.saveBeacon(upload = it) } },
+                        onOpenBeaconRegistration = { showBeaconRegistration = true },
                     )
                 }
             }

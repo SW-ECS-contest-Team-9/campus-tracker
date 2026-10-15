@@ -42,7 +42,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 const admin = <T>(path: string, init?: RequestInit) => request<T>(`/api/v1/positioning/admin${path}`, init);
 
-const FORM_FIELDS: (keyof BeaconForm)[] = ['uuid', 'major', 'minor', 'measuredPowerDbm', 'label', 'buildingId', 'floor', 'floorHeightM',
+const FORM_FIELDS: (keyof BeaconForm)[] = ['uuid', 'major', 'minor', 'measuredPowerDbm', 'label', 'buildingId', 'floor', 'floorHeightM', 'mountAboveFloorM',
   'latitude', 'longitude', 'x', 'y', 'z', 'horizontalAccuracyM'];
 
 const field = (key: keyof BeaconForm, label: string, attrs = '') =>
@@ -99,7 +99,7 @@ $('beacons-root').innerHTML = `
             <button id="use-location" type="button">현재 위치 사용</button></div>
           <div id="pos-wgs84" class="bf-grid2">${field('latitude', '위도', 'inputmode="decimal"')}${field('longitude', '경도', 'inputmode="decimal"')}</div>
           <div id="pos-grid" class="bf-grid2" hidden>${field('x', 'X (m)', 'inputmode="decimal"')}${field('y', 'Y (m)', 'inputmode="decimal"')}</div>
-          <div class="bf-grid2">${field('z', '설치 높이(해발 m)', 'inputmode="decimal"')}${field('horizontalAccuracyM', '위치 정확도(m)', 'inputmode="decimal" placeholder="1"')}</div>
+          <div class="bf-grid3">${field('mountAboveFloorM', '바닥에서 높이(m)', 'inputmode="decimal" placeholder="2.5"')}${field('z', '설치 높이(해발 m, 비우면 계산)', 'inputmode="decimal"')}${field('horizontalAccuracyM', '위치 정확도(m)', 'inputmode="decimal" placeholder="1"')}</div>
         </fieldset>
         <div class="bp-row"><button type="submit" class="primary">등록</button><button id="form-reset" type="button">비우기</button></div>
         <div id="form-result" class="bp-status"></div>

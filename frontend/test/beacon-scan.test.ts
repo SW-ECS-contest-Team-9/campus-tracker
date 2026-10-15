@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { HeardBeacons, buildCreateRequest, emptyForm, normalizeUuid, parseIBeacon, scanSupport } from '../src/beacon-scan.ts';
+import { HeardBeacons, buildCreateRequest, normalizeUuid, parseIBeacon, scanSupport, type BeaconForm } from '../src/beacon-scan.ts';
 
 const packets = JSON.parse(fs.readFileSync(new URL('../../fixtures/beacon/ibeacon-packets.json', import.meta.url), 'utf8')).cases as
   { name: string; manufacturerId: number; data: string; expected: { uuid: string; major: number; minor: number; measuredPower: number } | null }[];
@@ -50,17 +50,14 @@ test('scan support explains why the browser cannot scan', () => {
   assert.equal(scanSupport({ isSecureContext: true, bluetooth: { requestLEScan: () => 0 } }).ok, true);
 });
 
-test('registration form: UUID normalization, ranges, both coordinate forms, beacon without anchor', () => {
-  assert.equal(normalizeUuid('{E2C56DB5DFFB48D2B060D0F5A71096E0}'), 'e2c56db5-dffb-48d2-b060-d0f5a71096e0');
+const registration = JSON.parse(fs.readFileSync(new URL('../../fixtures/beacon/registration-cases.json', import.meta.url), 'utf8')).cases as
+  { name: string; form: BeaconForm; body?: object; errors?: string[] }[];
+
+test('registration form: shared cases (same as Android and iOS)', () => {
+  for (const c of registration) {
+    const r = buildCreateRequest(c.form);
+    if (c.body) assert.deepEqual(r, { body: c.body }, c.name);
+    else assert.deepEqual(Object.keys((r as { errors: object }).errors).sort(), c.errors, c.name);
+  }
   assert.equal(normalizeUuid('xyz'), null);
-  const base = { ...emptyForm(), uuid: 'E2C56DB5DFFB48D2B060D0F5A71096E0', major: '1', minor: '2' };
-  assert.deepEqual(buildCreateRequest(base), { body: { uuid: 'e2c56db5-dffb-48d2-b060-d0f5a71096e0', major: 1, minor: 2 } });
-  const geo = buildCreateRequest({ ...base, measuredPowerDbm: '-59', label: ' hall ', buildingId: 'B07', floor: '3f', floorHeightM: '148.2',
-    latitude: '37.6105', longitude: '126.9971', z: '150.7', horizontalAccuracyM: '1.5' });
-  assert.deepEqual(geo, { body: { uuid: 'e2c56db5-dffb-48d2-b060-d0f5a71096e0', major: 1, minor: 2, measuredPowerDbm: -59, label: 'hall',
-    anchor: { buildingId: 'B07', floor: '3F', floorHeightM: 148.2, position: { latitude: 37.6105, longitude: 126.9971, z: 150.7 }, horizontalAccuracyM: 1.5 } } });
-  const grid = buildCreateRequest({ ...base, buildingId: 'outdoor', positionMode: 'grid', x: '201100', y: '557250', z: '60' });
-  assert.deepEqual((grid as { body: { anchor: { position: unknown } } }).body.anchor.position, { x: 201100, y: 557250, z: 60 });
-  const bad = buildCreateRequest({ ...base, uuid: '12', major: '70000', minor: '-1', measuredPowerDbm: '5.5', latitude: '10', floor: '0F' });
-  assert.deepEqual(Object.keys((bad as { errors: object }).errors).sort(), ['buildingId', 'floor', 'latitude', 'longitude', 'major', 'measuredPowerDbm', 'minor', 'uuid', 'z']);
 });

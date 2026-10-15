@@ -851,6 +851,8 @@ private struct AnchorRequest: Identifiable {
 
 /// BLE beacon switches and status (docs/BEACON_POSITIONING.md).
 private struct BeaconSettingsSection: View {
+    @EnvironmentObject private var authentication: AuthenticationManager
+    @EnvironmentObject private var coordinator: CollectionCoordinator
     @ObservedObject var recorder: BeaconCollectionRecorder
     @Binding var scanning: Bool
     @Binding var upload: Bool
@@ -871,6 +873,7 @@ private struct BeaconSettingsSection: View {
             Text("정확한 위치 권한이 필요합니다. 백그라운드에서는 연속 수집이 보장되지 않으며, 비콘이 없어도 GPS·모션 수집은 그대로 진행됩니다.")
                 .font(.caption)
                 .foregroundColor(.secondary)
+            NavigationLink("비콘 등록", destination: BeaconRegistrationView(authentication: authentication, coordinator: coordinator))
         }
     }
 }

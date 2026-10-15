@@ -15,6 +15,7 @@ import hoshi.campustracker.positioning.ConfigRefresh
 import hoshi.campustracker.sync.BeaconObservationPayload
 import hoshi.campustracker.sync.TelemetrySyncCoordinator
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -71,6 +72,10 @@ class BeaconCollectionController(
     val ui: StateFlow<BeaconUiState> = _ui
 
     private var registry: BeaconRegistry? = null
+    private var lastUpdate: ((Boolean) -> Unit)? = null
+
+    /** The registry changed (a beacon was registered from this phone): re-download the config now, not after maxAge. */
+    fun refreshConfig() = scope.launch { lastUpdate?.invoke(true) }
     private var scanningUuids: Set<String>? = null
     private var activeSessionId: String? = null
 
@@ -83,11 +88,12 @@ class BeaconCollectionController(
      * Called on session start/stop, switch changes and login.
      */
     fun update(activeSessionId: String?, localScanning: Boolean, localUpload: Boolean, serverKey: String?,
-        fetch: ((String?) -> Triple<Int, String?, String?>)?) = scope.launch {
+        fetch: ((String?) -> Triple<Int, String?, String?>)?, force: Boolean = false): Job = scope.launch {
+        lastUpdate = { f -> update(activeSessionId, localScanning, localUpload, serverKey, fetch, f) }
         this@BeaconCollectionController.activeSessionId = activeSessionId
         var cached = serverKey?.let(cache::load)
         if (serverKey != null && fetch != null && activeSessionId != null && localScanning) {
-            when (val r = configSync.refresh(serverKey, { etag -> fetch(etag) })) {
+            when (val r = configSync.refresh(serverKey, { etag -> fetch(etag) }, force)) {
                 is ConfigRefresh.Updated -> { cached = r.cached; _ui.value = _ui.value.copy(lastRefreshError = null) }
                 is ConfigRefresh.NotModified -> { cached = r.cached; _ui.value = _ui.value.copy(lastRefreshError = null) }
                 is ConfigRefresh.Skipped -> cached = r.cached

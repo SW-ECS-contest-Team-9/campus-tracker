@@ -56,7 +56,10 @@ final class BeaconCollectionRecorder: ObservableObject {
     /// Re-evaluates after a settings change.
     func settingsChanged() { sessionChanged(sessionID, force: true) }
 
-    private func sessionChanged(_ id: UUID?, force: Bool = false) {
+    /// The registry changed (a beacon was registered from this phone): re-download the config now, not after maxAge.
+    func registryChanged() { sessionChanged(sessionID, force: true, refreshConfig: true) }
+
+    private func sessionChanged(_ id: UUID?, force: Bool = false, refreshConfig: Bool = false) {
         guard force || id != sessionID else { return }
         if id != sessionID { flush() }
         sessionID = id
@@ -75,7 +78,7 @@ final class BeaconCollectionRecorder: ObservableObject {
         Task.detached {
             // SQLite and the network stay off the main thread.
             let cache = BeaconConfigCache(storage: storage)
-            let refreshed = await cache.refresh(serverKey: serverKey, now: Date()) { etag in
+            let refreshed = await cache.refresh(serverKey: serverKey, now: Date(), force: refreshConfig) { etag in
                 try await Self.fetchConfig(url: configURL, token: token, etag: etag)
             }
             let freshness = cache.freshness(refreshed.cached, now: Date())

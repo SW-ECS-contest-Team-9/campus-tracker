@@ -1,0 +1,222 @@
+{
+  "description": "Beacon registration form -> POST /api/v1/positioning/admin/beacons body (or the fields in error). Shared by the web page, Android and iOS. Empty string = not entered; z may be derived as floorHeightM + mountAboveFloorM.",
+  "cases": [
+    {
+      "name": "identifier only (no anchor)",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "",
+        "label": "",
+        "buildingId": "",
+        "floor": "",
+        "floorHeightM": "",
+        "mountAboveFloorM": "",
+        "positionMode": "wgs84",
+        "latitude": "",
+        "longitude": "",
+        "x": "",
+        "y": "",
+        "z": "",
+        "horizontalAccuracyM": ""
+      },
+      "body": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 1,
+        "minor": 2
+      }
+    },
+    {
+      "name": "wgs84 anchor with all fields",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "-59",
+        "label": " hall ",
+        "buildingId": "B07",
+        "floor": "3f",
+        "floorHeightM": "148.2",
+        "mountAboveFloorM": "",
+        "positionMode": "wgs84",
+        "latitude": "37.6105",
+        "longitude": "126.9971",
+        "x": "",
+        "y": "",
+        "z": "150.7",
+        "horizontalAccuracyM": "1.5"
+      },
+      "body": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 1,
+        "minor": 2,
+        "measuredPowerDbm": -59,
+        "label": "hall",
+        "anchor": {
+          "buildingId": "B07",
+          "floor": "3F",
+          "floorHeightM": 148.2,
+          "position": {
+            "latitude": 37.6105,
+            "longitude": 126.9971,
+            "z": 150.7
+          },
+          "horizontalAccuracyM": 1.5
+        }
+      }
+    },
+    {
+      "name": "height from floor + mount above floor",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "",
+        "label": "",
+        "buildingId": "B07",
+        "floor": "B1",
+        "floorHeightM": "100",
+        "mountAboveFloorM": "2.5",
+        "positionMode": "wgs84",
+        "latitude": "37.6",
+        "longitude": "127",
+        "x": "",
+        "y": "",
+        "z": "",
+        "horizontalAccuracyM": ""
+      },
+      "body": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 1,
+        "minor": 2,
+        "anchor": {
+          "buildingId": "B07",
+          "floor": "B1",
+          "floorHeightM": 100,
+          "position": {
+            "latitude": 37.6,
+            "longitude": 127,
+            "z": 102.5
+          }
+        }
+      }
+    },
+    {
+      "name": "grid position",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "",
+        "label": "",
+        "buildingId": "outdoor",
+        "floor": "",
+        "floorHeightM": "",
+        "mountAboveFloorM": "",
+        "positionMode": "grid",
+        "latitude": "",
+        "longitude": "",
+        "x": "201100",
+        "y": "557250",
+        "z": "60",
+        "horizontalAccuracyM": ""
+      },
+      "body": {
+        "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+        "major": 1,
+        "minor": 2,
+        "anchor": {
+          "buildingId": "outdoor",
+          "position": {
+            "x": 201100,
+            "y": 557250,
+            "z": 60
+          }
+        }
+      }
+    },
+    {
+      "name": "every error",
+      "form": {
+        "uuid": "12",
+        "major": "70000",
+        "minor": "-1",
+        "measuredPowerDbm": "5.5",
+        "label": "",
+        "buildingId": "",
+        "floor": "0F",
+        "floorHeightM": "",
+        "mountAboveFloorM": "",
+        "positionMode": "wgs84",
+        "latitude": "10",
+        "longitude": "",
+        "x": "",
+        "y": "",
+        "z": "",
+        "horizontalAccuracyM": ""
+      },
+      "errors": [
+        "buildingId",
+        "floor",
+        "latitude",
+        "longitude",
+        "major",
+        "measuredPowerDbm",
+        "minor",
+        "uuid",
+        "z"
+      ]
+    },
+    {
+      "name": "mount without floor height still needs z",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "",
+        "label": "",
+        "buildingId": "B07",
+        "floor": "",
+        "floorHeightM": "",
+        "mountAboveFloorM": "2.5",
+        "positionMode": "wgs84",
+        "latitude": "37.6",
+        "longitude": "127",
+        "x": "",
+        "y": "",
+        "z": "",
+        "horizontalAccuracyM": ""
+      },
+      "errors": [
+        "z"
+      ]
+    },
+    {
+      "name": "bad accuracy and grid ranges",
+      "form": {
+        "uuid": "{E2C56DB5DFFB48D2B060D0F5A71096E0}",
+        "major": "1",
+        "minor": "2",
+        "measuredPowerDbm": "",
+        "label": "",
+        "buildingId": "B07",
+        "floor": "",
+        "floorHeightM": "",
+        "mountAboveFloorM": "",
+        "positionMode": "grid",
+        "latitude": "",
+        "longitude": "",
+        "x": "5",
+        "y": "900000",
+        "z": "1",
+        "horizontalAccuracyM": "0"
+      },
+      "errors": [
+        "horizontalAccuracyM",
+        "x",
+        "y"
+      ]
+    }
+  ]
+}

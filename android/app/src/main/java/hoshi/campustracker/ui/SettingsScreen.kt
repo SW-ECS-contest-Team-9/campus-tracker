@@ -47,6 +47,7 @@ fun SettingsScreen(
     beacon: BeaconUiState = BeaconUiState(),
     onBeaconScanning: (Boolean) -> Unit = {},
     onBeaconUpload: (Boolean) -> Unit = {},
+    onOpenBeaconRegistration: () -> Unit = {},
 ) {
     Column(Modifier.verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Heading("Account")
@@ -90,6 +91,7 @@ fun SettingsScreen(
         Caption("Scanner: ${beacon.scanner.javaClass.simpleName} · plan: ${beacon.plan?.reason ?: "—"} · config v${beacon.configVersion ?: "—"} (${beacon.configFreshness})")
         Caption("Observations: ${beacon.observations} (registered ${beacon.registeredObservations})${beacon.lastRefreshError?.let { " · config refresh failed: $it" } ?: ""}")
         Caption("Needs Bluetooth on, location on and the Nearby devices permission (asked on Start). GPS / motion collection never depends on it.")
+        TextButton(onClick = onOpenBeaconRegistration) { Text("비콘 등록 ›") }
     }
 }
 

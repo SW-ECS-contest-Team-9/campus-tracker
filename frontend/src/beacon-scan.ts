@@ -76,6 +76,8 @@ export function scanSupport(env: { isSecureContext: boolean; bluetooth?: { reque
 export interface BeaconForm {
   uuid: string; major: string; minor: string; measuredPowerDbm: string; label: string;
   buildingId: string; floor: string; floorHeightM: string;
+  /** mounting height above the floor (m): with floorHeightM gives z when z is left empty */
+  mountAboveFloorM: string;
   positionMode: 'wgs84' | 'grid';
   latitude: string; longitude: string; x: string; y: string; z: string;
   horizontalAccuracyM: string;
@@ -114,8 +116,10 @@ export function buildCreateRequest(f: BeaconForm): { body: Record<string, unknow
     if (floor && !FLOOR_RE.test(floor)) errors.floor = '1F…99F 또는 B1…B9';
     const floorHeight = num(f.floorHeightM);
     if (floorHeight !== null && !Number.isFinite(floorHeight)) errors.floorHeightM = '숫자';
-    const z = num(f.z);
-    if (z === null || !Number.isFinite(z)) errors.z = '설치 높이(해발 m)를 넣으세요';
+    const mount = num(f.mountAboveFloorM);
+    let z = num(f.z);
+    if (z === null && floorHeight !== null && mount !== null && Number.isFinite(floorHeight + mount)) z = Math.round((floorHeight + mount) * 1000) / 1000;
+    if (z === null || !Number.isFinite(z)) errors.z = '설치 높이(해발 m) 또는 층 바닥 높이 + 바닥에서 높이를 넣으세요';
     let position: Record<string, number> | undefined;
     if (f.positionMode === 'wgs84') {
       const lat = num(f.latitude), lon = num(f.longitude);
@@ -145,6 +149,6 @@ export function buildCreateRequest(f: BeaconForm): { body: Record<string, unknow
 }
 
 export const emptyForm = (): BeaconForm => ({
-  uuid: '', major: '', minor: '', measuredPowerDbm: '', label: '', buildingId: '', floor: '', floorHeightM: '',
+  uuid: '', major: '', minor: '', measuredPowerDbm: '', label: '', buildingId: '', floor: '', floorHeightM: '', mountAboveFloorM: '',
   positionMode: 'wgs84', latitude: '', longitude: '', x: '', y: '', z: '', horizontalAccuracyM: '',
 });
