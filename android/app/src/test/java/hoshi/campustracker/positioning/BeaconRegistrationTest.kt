@@ -2,6 +2,7 @@ package hoshi.campustracker.positioning
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
@@ -27,6 +28,7 @@ class BeaconRegistrationTest {
     /** JSON equality with numbers compared numerically (148.2 == 148.2, 1 == 1.0). */
     private fun same(a: JsonElement, b: JsonElement): Boolean = when {
         a is JsonObject && b is JsonObject -> a.keys == b.keys && a.keys.all { same(a[it]!!, b[it]!!) }
+        a is JsonNull || b is JsonNull -> a == b
         a is JsonPrimitive && b is JsonPrimitive && !a.isString && !b.isString && a.booleanOrNull == null && b.booleanOrNull == null ->
             a.doubleOrNull == b.doubleOrNull
         else -> a == b
@@ -50,6 +52,34 @@ class BeaconRegistrationTest {
                 val expected = c["errors"]!!.jsonArray.map { it.jsonPrimitive.content }.sorted()
                 assertEquals(name, expected, (r as RegistrationRequest.Errors).fields.keys.sorted())
             }
+        }
+    }
+
+    @Test
+    fun sharedEditCases() {
+        val fx = fixture()
+        val cases = fx["editCases"]!!.jsonArray.map { it.jsonObject }
+        assertTrue(cases.size >= 3)
+        for (c in cases) {
+            val name = c["name"]!!.jsonPrimitive.content
+            val form = Json { ignoreUnknownKeys = true }.decodeFromJsonElement(FormDto.serializer(), c["form"]!!).toForm()
+            val r = BeaconRegistration.buildEdit(form)
+            val body = c["body"]
+            if (body != null) {
+                if (r !is RegistrationRequest.Body) fail("$name: expected body, got $r")
+                assertTrue("$name: ${(r as RegistrationRequest.Body).json} != $body", same(r.json, body))
+            } else {
+                if (r !is RegistrationRequest.Errors) fail("$name: expected errors, got $r")
+                assertEquals(name, c["errors"]!!.jsonArray.map { it.jsonPrimitive.content }.sorted(), (r as RegistrationRequest.Errors).fields.keys.sorted())
+            }
+        }
+        val json = Json { ignoreUnknownKeys = true }
+        for (c in fx["beaconToForm"]!!.jsonArray.map { it.jsonObject }) {
+            val beacon = json.decodeFromJsonElement(AdminBeacon.serializer(), c["beacon"]!!)
+            val expected = json.decodeFromJsonElement(FormDto.serializer(), c["form"]!!).toForm()
+            assertEquals(c["name"]!!.jsonPrimitive.content, expected, BeaconRegistration.formFrom(beacon))
+            // the opened form saves without errors
+            assertTrue(BeaconRegistration.buildEdit(expected) is RegistrationRequest.Body)
         }
     }
 

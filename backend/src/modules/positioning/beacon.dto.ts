@@ -131,9 +131,11 @@ export type BeaconCreate = z.infer<typeof BeaconCreate>;
 export const BeaconUpdate = z.object({
   measuredPowerDbm: z.number().int().min(-127).max(20).nullish(),
   anchorId: Uuid.nullable().optional(),
+  /** replace the placement: the beacon's own anchor is rewritten in place, a shared one is left alone (new anchor) */
+  anchor: AnchorCreate.optional(),
   enabled: z.boolean().optional(),
   label: z.string().trim().max(200).nullish(),
-}).strict();
+}).strict().refine((b) => !(b.anchorId !== undefined && b.anchor), { message: 'give anchorId or anchor, not both', path: ['anchor'] });
 export type BeaconUpdate = z.infer<typeof BeaconUpdate>;
 
 export const CalibrationUpsert = z.object({
@@ -147,6 +149,11 @@ export const CalibrationUpsert = z.object({
   sampleCount: z.number().int().min(0).default(0),
 }).strict();
 export type CalibrationUpsert = z.infer<typeof CalibrationUpsert>;
+
+export const BeaconDeleteQuery = z.object({
+  /** true = remove the row (observations keep their identifier and become unregistered); default = disable */
+  permanent: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+}).passthrough();
 
 export const BeaconListQuery = z.object({
   includeDisabled: z.stringbool().default(false),

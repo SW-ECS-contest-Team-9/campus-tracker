@@ -165,8 +165,15 @@ class CollectorApi(private val baseClient: OkHttpClient) {
 
     /** Beacon registry admin API: POST a JSON body. Blocking. Errors carry the server code (BEACON_EXISTS, ...). */
     fun positioningAdminPost(configuration: ServerConfiguration, accessToken: String, path: String, json: String): String =
-        execute(loginClient, Request.Builder().url(configuration.url("/api/v1/positioning/admin$path"))
-            .header("Authorization", "Bearer $accessToken").post(json.toRequestBody("application/json".toMediaType())).build())
+        positioningAdminSend(configuration, accessToken, "POST", path, json)
+
+    /** Beacon registry admin API: any method (PATCH / DELETE), optional JSON body. Blocking. */
+    fun positioningAdminSend(configuration: ServerConfiguration, accessToken: String, method: String, path: String, json: String? = null,
+        query: Map<String, String> = emptyMap()): String {
+        val url = configuration.url("/api/v1/positioning/admin$path").newBuilder().apply { query.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
+        return execute(loginClient, Request.Builder().url(url).header("Authorization", "Bearer $accessToken")
+            .method(method, json?.toRequestBody("application/json".toMediaType())).build())
+    }
 
     private fun execute(client: OkHttpClient, request: Request): String {
         try {

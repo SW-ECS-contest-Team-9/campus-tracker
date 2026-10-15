@@ -91,7 +91,7 @@ fun SettingsScreen(
         Caption("Scanner: ${beacon.scanner.javaClass.simpleName} · plan: ${beacon.plan?.reason ?: "—"} · config v${beacon.configVersion ?: "—"} (${beacon.configFreshness})")
         Caption("Observations: ${beacon.observations} (registered ${beacon.registeredObservations})${beacon.lastRefreshError?.let { " · config refresh failed: $it" } ?: ""}")
         Caption("Needs Bluetooth on, location on and the Nearby devices permission (asked on Start). GPS / motion collection never depends on it.")
-        TextButton(onClick = onOpenBeaconRegistration) { Text("비콘 등록 ›") }
+        TextButton(onClick = onOpenBeaconRegistration) { Text("비콘 등록·수정·삭제 ›") }
     }
 }
 

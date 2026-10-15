@@ -48,6 +48,57 @@ nonisolated struct BeaconCreateRequest: Codable, Sendable, Equatable {
     var anchor: Anchor?
 }
 
+/// A registered beacon as the admin API lists it (`GET /admin/beacons`). Placement is EPSG:5186 only.
+nonisolated struct AdminBeacon: Codable, Sendable, Equatable, Identifiable {
+    struct Anchor: Codable, Sendable, Equatable {
+        struct Position: Codable, Sendable, Equatable { var x: Double; var y: Double; var z: Double }
+        var anchorId: String
+        var buildingId: String
+        var floor: String?
+        var floorHeightM: Double?
+        var position: Position
+        var horizontalAccuracyM: Double?
+    }
+    var beaconId: String
+    var uuid: String
+    var major: Int
+    var minor: Int
+    var measuredPowerDbm: Int?
+    var enabled: Bool
+    var label: String?
+    var lastObservedAt: String?
+    var anchor: Anchor?
+    var id: String { beaconId }
+    var key: String { beaconKey(uuid: uuid, major: major, minor: minor) }
+}
+
+/// `PATCH /api/v1/positioning/admin/beacons/:id` body. Cleared fields are sent as JSON null.
+nonisolated enum BeaconPatch: Encodable, Sendable, Equatable {
+    /// the edit form: identity is fixed; nil power / label clear them; no anchor unlinks the placement (anchorId null)
+    case edit(measuredPowerDbm: Int?, label: String?, anchor: BeaconCreateRequest.Anchor?)
+    /// disable (leaves the config and fusion, history kept) or enable again
+    case enabled(Bool)
+
+    private enum Key: String, CodingKey { case measuredPowerDbm, label, anchor, anchorId, enabled }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: Key.self)
+        switch self {
+        case let .edit(power, label, anchor):
+            try c.encode(power, forKey: .measuredPowerDbm)
+            try c.encode(label, forKey: .label)
+            if let anchor { try c.encode(anchor, forKey: .anchor) } else { try c.encodeNil(forKey: .anchorId) }
+        case let .enabled(on):
+            try c.encode(on, forKey: .enabled)
+        }
+    }
+}
+
+nonisolated enum BeaconEditResult: Sendable, Equatable {
+    case body(BeaconPatch)
+    case errors([String: String])
+}
+
 nonisolated enum BeaconRegistrationResult: Sendable, Equatable {
     case body(BeaconCreateRequest)
     /// field name -> message (shown under the field)
@@ -71,6 +122,36 @@ nonisolated enum BeaconRegistration {
     }
 
     private static func isInteger(_ d: Double) -> Bool { d.isFinite && d == d.rounded() }
+
+    /// 201100.0 -> "201100", 148.2 -> "148.2"
+    private static func plain(_ d: Double) -> String {
+        d == d.rounded() && abs(d) < 1e15 ? String(Int64(d)) : String(d)
+    }
+
+    /// The edit form of a registered beacon; the stored placement is EPSG:5186, so grid mode.
+    static func form(from b: AdminBeacon) -> BeaconRegistrationForm {
+        var f = BeaconRegistrationForm(uuid: b.uuid.uppercased(), major: String(b.major), minor: String(b.minor),
+                                       measuredPowerDbm: b.measuredPowerDbm.map(String.init) ?? "", label: b.label ?? "")
+        if let a = b.anchor {
+            f.buildingId = a.buildingId
+            f.floor = a.floor ?? ""
+            f.floorHeightM = a.floorHeightM.map(plain) ?? ""
+            f.positionMode = "grid"
+            f.x = plain(a.position.x)
+            f.y = plain(a.position.y)
+            f.z = plain(a.position.z)
+            f.horizontalAccuracyM = a.horizontalAccuracyM.map(plain) ?? ""
+        }
+        return f
+    }
+
+    /// The edit form -> PATCH body: same checks as a new beacon; identity is not sent (fixed).
+    static func buildEdit(_ f: BeaconRegistrationForm) -> BeaconEditResult {
+        switch build(f) {
+        case let .errors(e): return .errors(e)
+        case let .body(r): return .body(.edit(measuredPowerDbm: r.measuredPowerDbm, label: r.label, anchor: r.anchor))
+        }
+    }
 
     static func build(_ f: BeaconRegistrationForm) -> BeaconRegistrationResult {
         var errors: [String: String] = [:]

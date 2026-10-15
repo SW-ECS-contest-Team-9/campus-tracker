@@ -135,6 +135,37 @@ export const beaconRepository = {
     return (rowCount ?? 0) > 0;
   },
 
+  /** beacons linked to an anchor (an anchor may be shared) */
+  async anchorUsers(db: DbClient, anchorId: string): Promise<number> {
+    const { rows } = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM positioning.beacon_devices WHERE anchor_id = $1', [anchorId]);
+    return rows[0].n;
+  },
+
+  /** replace every placement field of an anchor (an edit from the registration screens) */
+  async replaceAnchor(db: PoolClient, anchorId: string, a: AnchorCreate, actor: string): Promise<void> {
+    await db.query(
+      `UPDATE positioning.spatial_anchors SET building_id = $2, floor = $3, floor_height_m = $4, geom = ST_SetSRID(ST_MakePoint($5, $6, $7), 5186),
+         horizontal_accuracy_m = $8, vertical_accuracy_m = $9, label = COALESCE($10, label), updated_by = $11, updated_at = now()
+       WHERE id = $1`,
+      [anchorId, a.buildingId, a.floor ?? null, a.floorHeightM ?? null, a.position.x, a.position.y, a.position.z,
+        a.horizontalAccuracyM, a.verticalAccuracyM, a.label ?? null, actor]);
+  },
+
+  /**
+   * Permanent delete. Observations keep their identifier (fusion joins by identifier) and read as unregistered again;
+   * per-beacon calibrations go; the anchor goes too when no other beacon uses it.
+   */
+  async deleteBeacon(db: PoolClient, beaconId: string): Promise<boolean> {
+    const { rows } = await db.query<{ anchor_id: string | null }>('SELECT anchor_id FROM positioning.beacon_devices WHERE id = $1 FOR UPDATE', [beaconId]);
+    if (!rows[0]) return false;
+    await db.query(`UPDATE positioning.beacon_observations SET beacon_id = NULL, resolution = 'UNREGISTERED' WHERE beacon_id = $1`, [beaconId]);
+    await db.query('DELETE FROM positioning.beacon_calibrations WHERE beacon_id = $1', [beaconId]);
+    await db.query('DELETE FROM positioning.beacon_devices WHERE id = $1', [beaconId]);
+    const anchorId = rows[0].anchor_id;
+    if (anchorId && (await this.anchorUsers(db, anchorId)) === 0) await db.query('DELETE FROM positioning.spatial_anchors WHERE id = $1', [anchorId]);
+    return true;
+  },
+
   async insertBeacon(db: PoolClient, b: BeaconCreate, anchorId: string | null, actor: string): Promise<string | null> {
     const { rows } = await db.query<{ id: string }>(
       `INSERT INTO positioning.beacon_devices (anchor_id, protocol, uuid, major, minor, measured_power_dbm, enabled, label, created_by, updated_by,

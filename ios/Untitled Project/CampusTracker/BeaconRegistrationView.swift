@@ -4,6 +4,8 @@ import UIKit
 /// Beacon registration (docs/BEACON_POSITIONING.md §5.4): nearby beacon search, manual entry, current location.
 struct BeaconRegistrationView: View {
     @StateObject private var model: BeaconRegistrationModel
+    @State private var confirmDelete = false
+    @State private var showAllRegistered = false
 
     init(authentication: AuthenticationManager, coordinator: CollectionCoordinator) {
         _model = StateObject(wrappedValue: BeaconRegistrationModel(
@@ -24,6 +26,7 @@ struct BeaconRegistrationView: View {
                 Section { ProgressView("권한 확인 중…") }
             case .allowed:
                 searchSection
+                registeredSection
                 identitySection
                 placementSection
                 submitSection
@@ -34,7 +37,7 @@ struct BeaconRegistrationView: View {
                 }
             }
         }
-        .navigationTitle("비콘 등록")
+        .navigationTitle("비콘 등록·관리")
         .task { await model.open() }
         .onDisappear { model.close() }
     }
@@ -63,26 +66,53 @@ struct BeaconRegistrationView: View {
             if let state = scannerMessage { Text(state).font(.caption).foregroundColor(.secondary) }
             if model.scanning && model.heard.isEmpty { Text("검색 중…").font(.caption).foregroundColor(.secondary) }
             ForEach(model.heard) { b in
-                Button { model.pick(b) } label: {
+                // a registered one opens for editing, an unregistered one fills the new-beacon form
+                Button { if b.registered { model.edit(heard: b) } else { model.pick(b) } } label: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(b.uuid.uppercased()).font(.system(.caption2, design: .monospaced))
                         Text("Major \(b.major) · Minor \(b.minor)")
-                        Text("\(b.lastRssi.map(String.init) ?? "—") dBm (최대 \(b.maxRssi.map(String.init) ?? "—")) · \(b.count)회 · \(b.registered ? "등록됨" : "눌러서 채우기")")
+                        Text("\(b.lastRssi.map(String.init) ?? "—") dBm (최대 \(b.maxRssi.map(String.init) ?? "—")) · \(b.count)회 · \(b.registered ? "등록됨 · 눌러서 수정" : "눌러서 채우기")")
                             .font(.caption).foregroundColor(.secondary)
                     }
                 }
-                .disabled(b.registered)
+            }
+        }
+    }
+
+    private var registeredSection: some View {
+        Section(header: Text("등록된 비콘 (\(model.registered.count))"), footer: Text("눌러서 수정·사용 중지·삭제")) {
+            if model.registered.isEmpty { Text("아직 없습니다.").foregroundColor(.secondary) }
+            ForEach(showAllRegistered ? model.registered : Array(model.registered.prefix(5))) { b in
+                Button { model.startEdit(b) } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(b.label ?? "이름 없음") · Major \(b.major) · Minor \(b.minor)\(b.enabled ? "" : " · 사용 중지")")
+                            .foregroundColor(b.enabled ? .primary : .secondary)
+                        Text("\(b.uuid.uppercased()) · \(b.anchor.map { "\($0.buildingId) \($0.floor ?? "")" } ?? "위치 없음")")
+                            .font(.caption2).foregroundColor(.secondary)
+                    }
+                }
+                .listRowBackground(b.beaconId == model.editing?.beaconId ? Color.accentColor.opacity(0.15) : nil)
+            }
+            if model.registered.count > 5 {
+                Button(showAllRegistered ? "접기" : "모두 보기 (\(model.registered.count))") { showAllRegistered.toggle() }
             }
         }
     }
 
     private var identitySection: some View {
-        Section(header: Text("등록 정보")) {
-            field("UUID", $model.form.uuid, "uuid", keyboard: .asciiCapable)
-            HStack {
-                field("Major", $model.form.major, "major", keyboard: .numberPad)
-                field("Minor", $model.form.minor, "minor", keyboard: .numberPad)
+        Section(header: Text(model.editing == nil ? "새 비콘 등록" : "비콘 수정\(model.editing?.enabled == false ? " (사용 중지됨)" : "")"),
+                footer: Text(model.editing == nil ? "" : "UUID·Major·Minor는 바꿀 수 없습니다(다르면 삭제 후 새로 등록).")) {
+            if model.editing != nil {
+                Button("새 비콘 등록으로") { model.cancelEdit() }
             }
+            Group {
+                field("UUID", $model.form.uuid, "uuid", keyboard: .asciiCapable)
+                HStack {
+                    field("Major", $model.form.major, "major", keyboard: .numberPad)
+                    field("Minor", $model.form.minor, "minor", keyboard: .numberPad)
+                }
+            }
+            .disabled(model.editing != nil)
             field("1 m 송신 세기(dBm, 비우면 기본값)", $model.form.measuredPowerDbm, "measuredPowerDbm", keyboard: .numbersAndPunctuation)
             field("이름", $model.form.label, nil)
         }
@@ -129,15 +159,31 @@ struct BeaconRegistrationView: View {
     }
 
     private var submitSection: some View {
-        Section {
-            HStack {
-                Button(model.submitting ? "등록 중…" : "등록") { Task { await model.submit() } }
-                    .disabled(model.submitting)
-                Spacer()
-                Button("비우기", role: .destructive) { model.clearForm() }
+        Section(footer: Text(model.editing == nil ? "" : "사용 중지: 설정·위치 계산에서 빠지고 기록은 남습니다. 삭제: 등록을 지우며, 그동안 모은 관측은 미등록으로 남아 다시 등록하면 쓰입니다.")) {
+            if let editing = model.editing {
+                HStack {
+                    Button(model.submitting ? "저장 중…" : "저장") { Task { await model.submit() } }
+                    Spacer()
+                    Button(editing.enabled ? "사용 중지" : "다시 사용") { Task { await model.setEnabled(!editing.enabled) } }
+                    Spacer()
+                    Button("삭제", role: .destructive) { confirmDelete = true }
+                }
+                .buttonStyle(.borderless)
+                .disabled(model.submitting)
+            } else {
+                HStack {
+                    Button(model.submitting ? "등록 중…" : "등록") { Task { await model.submit() } }
+                        .disabled(model.submitting)
+                    Spacer()
+                    Button("비우기", role: .destructive) { model.clearForm() }
+                }
+                .buttonStyle(.borderless)
             }
-            .buttonStyle(.borderless)
             if let message = model.message { Text(message).font(.callout) }
+        }
+        .confirmationDialog("이 비콘을 삭제할까요? 되돌릴 수 없습니다.", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("삭제", role: .destructive) { Task { await model.delete() } }
+            Button("취소", role: .cancel) {}
         }
     }
 

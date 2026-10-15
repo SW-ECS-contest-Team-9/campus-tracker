@@ -1,5 +1,7 @@
 package hoshi.campustracker.positioning
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -31,6 +33,32 @@ data class BeaconRegistrationForm(
     val horizontalAccuracyM: String = "",
 )
 
+/** A registered beacon as the admin API lists it (`GET /admin/beacons`). Placement is EPSG:5186 only. */
+@Serializable
+data class AdminBeacon(
+    val beaconId: String,
+    val uuid: String,
+    val major: Int,
+    val minor: Int,
+    val measuredPowerDbm: Int? = null,
+    val enabled: Boolean = true,
+    val label: String? = null,
+    val lastObservedAt: String? = null,
+    val anchor: AdminAnchor? = null,
+) {
+    val key: String get() = beaconKey(uuid, major, minor)
+}
+
+@Serializable
+data class AdminAnchor(
+    val anchorId: String,
+    val buildingId: String,
+    val floor: String? = null,
+    val floorHeightM: Double? = null,
+    val position: AnchorPosition,
+    val horizontalAccuracyM: Double? = null,
+)
+
 sealed class RegistrationRequest {
     /** `POST /api/v1/positioning/admin/beacons` body */
     data class Body(val json: JsonObject) : RegistrationRequest()
@@ -50,6 +78,36 @@ object BeaconRegistration {
 
     private fun num(v: String): Double? = v.trim().takeIf { it.isNotEmpty() }?.let { it.toDoubleOrNull() ?: Double.NaN }
     private fun isInt(d: Double) = d.isFinite() && d == Math.rint(d)
+
+    /** 201100.0 -> "201100", 148.2 -> "148.2" */
+    private fun plain(d: Double): String = d.toBigDecimal().stripTrailingZeros().toPlainString()
+
+    /** The edit form of a registered beacon; the stored placement is EPSG:5186, so grid mode. */
+    fun formFrom(b: AdminBeacon): BeaconRegistrationForm {
+        val a = b.anchor
+        return BeaconRegistrationForm(
+            uuid = b.uuid.uppercase(Locale.ROOT), major = b.major.toString(), minor = b.minor.toString(),
+            measuredPowerDbm = b.measuredPowerDbm?.toString() ?: "", label = b.label ?: "",
+            buildingId = a?.buildingId ?: "", floor = a?.floor ?: "", floorHeightM = a?.floorHeightM?.let(::plain) ?: "",
+            positionMode = if (a != null) "grid" else "wgs84",
+            x = a?.position?.x?.let(::plain) ?: "", y = a?.position?.y?.let(::plain) ?: "", z = a?.position?.z?.let(::plain) ?: "",
+            horizontalAccuracyM = a?.horizontalAccuracyM?.let(::plain) ?: "",
+        )
+    }
+
+    /**
+     * `PATCH /admin/beacons/:id` body from the edit form: same checks as a new beacon; identity is not sent (fixed);
+     * empty power / label clear them; no placement unlinks the anchor.
+     */
+    fun buildEdit(f: BeaconRegistrationForm): RegistrationRequest = when (val r = build(f)) {
+        is RegistrationRequest.Errors -> r
+        is RegistrationRequest.Body -> RegistrationRequest.Body(buildJsonObject {
+            put("measuredPowerDbm", r.json["measuredPowerDbm"] ?: JsonNull)
+            put("label", r.json["label"] ?: JsonNull)
+            val anchor = r.json["anchor"]
+            if (anchor != null) put("anchor", anchor) else put("anchorId", JsonNull)
+        })
+    }
 
     fun build(f: BeaconRegistrationForm): RegistrationRequest {
         val errors = linkedMapOf<String, String>()

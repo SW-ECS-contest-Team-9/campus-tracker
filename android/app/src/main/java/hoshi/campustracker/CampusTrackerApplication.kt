@@ -11,6 +11,7 @@ import android.os.HandlerThread
 import android.os.PowerManager
 import androidx.core.content.ContextCompat
 import hoshi.campustracker.auth.AuthenticationManager
+import hoshi.campustracker.positioning.AdminBeacon
 import hoshi.campustracker.auth.KeystoreTokenStore
 import hoshi.campustracker.auth.SettingsStore
 import hoshi.campustracker.collection.AndroidCollectionPlatform
@@ -23,9 +24,8 @@ import hoshi.campustracker.net.AnchorBuilding
 import hoshi.campustracker.net.ApiError
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import android.location.LocationManager
@@ -139,16 +139,19 @@ class AppGraph(app: Application) {
         private fun server() = auth.configuration.value ?: throw ApiError.CannotConnect()
         private fun token() = auth.accessToken() ?: throw ApiError.Http(401, "TOKEN_REQUIRED", null)
         override fun canRegister(): Boolean { api.positioningAdminGet(server(), token(), "/me"); return true }
-        override fun registeredKeys(): Set<String> {
+        override fun beacons(): List<AdminBeacon> {
             val body = AppJson.parseToJsonElement(api.positioningAdminGet(server(), token(), "/beacons", mapOf("includeDisabled" to "true"))).jsonObject
-            return body["beacons"]!!.jsonArray.map { it.jsonObject }.map {
-                hoshi.campustracker.positioning.beaconKey(it["uuid"]!!.jsonPrimitive.content, it["major"]!!.jsonPrimitive.int, it["minor"]!!.jsonPrimitive.int)
-            }.toSet()
+            return AppJson.decodeFromJsonElement(ListSerializer(AdminBeacon.serializer()), body["beacons"]!!)
         }
         override fun register(body: JsonObject): String {
             val b = AppJson.parseToJsonElement(api.positioningAdminPost(server(), token(), "/beacons", body.toString())).jsonObject
             val label = (b["label"] as? kotlinx.serialization.json.JsonPrimitive)?.takeIf { it.isString }?.content
             return listOfNotNull(label, "${b["uuid"]!!.jsonPrimitive.content} / ${b["major"]} / ${b["minor"]}").joinToString(" · ")
+        }
+        override fun update(beaconId: String, body: JsonObject): AdminBeacon =
+            AppJson.decodeFromString(AdminBeacon.serializer(), api.positioningAdminSend(server(), token(), "PATCH", "/beacons/$beaconId", body.toString()))
+        override fun delete(beaconId: String) {
+            api.positioningAdminSend(server(), token(), "DELETE", "/beacons/$beaconId", query = mapOf("permanent" to "true"))
         }
         override fun buildings(): List<AnchorBuilding> = api.anchorNodes(server(), null, null, null, null).buildings
     }

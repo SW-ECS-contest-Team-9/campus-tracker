@@ -2,13 +2,19 @@ package hoshi.campustracker.collection
 
 import hoshi.campustracker.net.AnchorBuilding
 import hoshi.campustracker.net.ApiError
+import hoshi.campustracker.positioning.AdminAnchor
+import hoshi.campustracker.positioning.AdminBeacon
+import hoshi.campustracker.positioning.AnchorPosition
 import hoshi.campustracker.positioning.BeaconObservationListener
 import hoshi.campustracker.positioning.BeaconScannerState
 import hoshi.campustracker.positioning.IBeaconFrame
 import hoshi.campustracker.positioning.beaconKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.double
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
@@ -36,16 +42,42 @@ private class FakeSurveyScanner : SurveyScanner {
 
 private class FakeBackend(
     var allowed: Boolean = true,
-    val keys: MutableSet<String> = mutableSetOf(),
+    keys: Set<String> = emptySet(),
     var failWith: Exception? = null,
 ) : RegistrationBackend {
     val posted = mutableListOf<JsonObject>()
+    val patches = mutableListOf<Pair<String, JsonObject>>()
+    val beacons = keys.mapIndexed { i, k ->
+        val (_, uuid, major, minor) = k.split(":")
+        AdminBeacon("b$i", uuid, major.toInt(), minor.toInt())
+    }.toMutableList()
     override fun canRegister(): Boolean = allowed
-    override fun registeredKeys(): Set<String> = keys.toSet()
+    override fun beacons(): List<AdminBeacon> = beacons.toList()
     override fun register(body: JsonObject): String {
         failWith?.let { throw it }
         posted += body
+        beacons += AdminBeacon("b${beacons.size}", body["uuid"]!!.jsonPrimitive.content, body["major"]!!.jsonPrimitive.content.toInt(),
+            body["minor"]!!.jsonPrimitive.content.toInt())
         return "ok"
+    }
+    override fun update(beaconId: String, body: JsonObject): AdminBeacon {
+        failWith?.let { throw it }
+        patches += beaconId to body
+        val i = beacons.indexOfFirst { it.beaconId == beaconId }
+        if (i < 0) throw ApiError.Http(404, "BEACON_NOT_FOUND", null)
+        val b = beacons[i]
+        val label = body["label"]?.let { if (it is JsonNull) null else it.jsonPrimitive.content } ?: if ("label" in body) null else b.label
+        val updated = b.copy(label = label, enabled = body["enabled"]?.jsonPrimitive?.boolean ?: b.enabled,
+            anchor = body["anchor"]?.jsonObject?.let { a ->
+                val p = a["position"]!!.jsonObject
+                AdminAnchor("a$i", a["buildingId"]!!.jsonPrimitive.content, position = AnchorPosition(p["x"]!!.jsonPrimitive.double,
+                    p["y"]!!.jsonPrimitive.double, p["z"]!!.jsonPrimitive.double))
+            } ?: if ("anchorId" in body) null else b.anchor)
+        beacons[i] = updated
+        return updated
+    }
+    override fun delete(beaconId: String) {
+        if (!beacons.removeIf { it.beaconId == beaconId }) throw ApiError.Http(404, "BEACON_NOT_FOUND", null)
     }
     override fun buildings() = listOf(AnchorBuilding("B07", "Library"))
 }
@@ -71,7 +103,7 @@ class BeaconRegistrationControllerTest {
 
     @Test
     fun scanPickLocateSubmit() {
-        val backend = FakeBackend(keys = mutableSetOf(beaconKey(uuid, 1, 1)))
+        val backend = FakeBackend(keys = setOf(beaconKey(uuid, 1, 1)))
         val scanner = FakeSurveyScanner()
         var refreshed = 0
         val c = controller(backend, scanner, GeoFix(37.6105, 126.9971, 4.0)) { refreshed++ }
@@ -135,5 +167,72 @@ class BeaconRegistrationControllerTest {
         c.useCurrentLocation()
         assertEquals("37.1", c.ui.value.form.latitude)
         assertTrue(c.ui.value.message!!.contains("위치를 읽지 못했습니다"))
+    }
+
+    @Test
+    fun editDisableDelete() {
+        val backend = FakeBackend(keys = setOf(beaconKey(uuid, 1, 1), beaconKey(uuid, 1, 2)))
+        var refreshed = 0
+        val c = controller(backend) { refreshed++ }
+        c.open()
+        assertEquals(2, c.ui.value.registered.size)
+        val target = c.ui.value.registered.first { it.minor == 2 }
+
+        c.startEdit(target)
+        assertEquals(target, c.ui.value.editing)
+        assertEquals("2", c.ui.value.form.minor)
+        // save: label + grid placement; identity is not sent
+        c.edit { it.copy(label = "hall door", buildingId = "B07", positionMode = "grid", x = "201100", y = "557250", z = "154.5") }
+        c.submit()
+        val (id, body) = backend.patches.last()
+        assertEquals(target.beaconId, id)
+        assertFalse("uuid" in body)
+        assertEquals("hall door", c.ui.value.editing?.label)
+        assertEquals("201100", c.ui.value.form.x)
+        assertEquals(1, refreshed)
+        assertEquals("hall door", c.ui.value.registered.first { it.minor == 2 }.label)
+        // invalid edit: field errors, nothing sent
+        c.edit { it.copy(floor = "5G") }
+        c.submit()
+        assertTrue("floor" in c.ui.value.errors)
+        assertEquals(1, backend.patches.size)
+        c.edit { it.copy(floor = "") }
+
+        c.setEnabled(false)
+        assertEquals(false, c.ui.value.editing?.enabled)
+        assertEquals(false, backend.patches.last().second["enabled"]!!.jsonPrimitive.boolean)
+        assertEquals(2, refreshed)
+
+        c.delete()
+        assertNull(c.ui.value.editing)
+        assertEquals(listOf(1), c.ui.value.registered.map { it.minor })
+        assertEquals("", c.ui.value.form.uuid)
+        assertTrue(c.ui.value.message!!.startsWith("삭제했습니다"))
+        assertEquals(3, refreshed)
+    }
+
+    @Test
+    fun editOfABeaconDeletedElsewhereReturnsToNew() {
+        val backend = FakeBackend(keys = setOf(beaconKey(uuid, 1, 1)))
+        val c = controller(backend)
+        c.open()
+        c.startEdit(c.ui.value.registered.single())
+        backend.beacons.clear()
+        c.submit()
+        assertEquals("이미 삭제된 비콘입니다.", c.ui.value.message)
+        assertNull(c.ui.value.editing)
+        assertTrue(c.ui.value.registered.isEmpty())
+    }
+
+    @Test
+    fun pickLeavesEditMode() {
+        val backend = FakeBackend(keys = setOf(beaconKey(uuid, 1, 1)))
+        val c = controller(backend)
+        c.open()
+        c.startEdit(c.ui.value.registered.single())
+        c.record(IBeaconFrame(uuid, 1, 5, -60), -50)
+        c.pick(c.ui.value.heard.first { it.minor == 5 })
+        assertNull(c.ui.value.editing)
+        assertEquals("5", c.ui.value.form.minor)
     }
 }

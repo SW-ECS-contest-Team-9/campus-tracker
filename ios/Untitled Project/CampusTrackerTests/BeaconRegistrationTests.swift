@@ -16,6 +16,7 @@ private func sameJSON(_ a: Any, _ b: Any) -> Bool {
     if let a = a as? [String: Any], let b = b as? [String: Any] {
         return Set(a.keys) == Set(b.keys) && a.keys.allSatisfy { sameJSON(a[$0]!, b[$0]!) }
     }
+    if a is NSNull || b is NSNull { return a is NSNull && b is NSNull }
     if let a = a as? String, let b = b as? String { return a == b }
     if let a = a as? NSNumber, let b = b as? NSNumber { return a.doubleValue == b.doubleValue }
     return false
@@ -42,6 +43,35 @@ struct BeaconRegistrationFormTests {
                 #expect(fields.keys.sorted() == c.errors, "\(c.name)")
             }
         }
+    }
+
+    private struct EditCases: Decodable {
+        struct ToForm: Decodable { let name: String; let beacon: AdminBeacon; let form: BeaconRegistrationForm }
+        let editCases: [Case]
+        let beaconToForm: [ToForm]
+    }
+
+    @Test func sharedEditCases() throws {
+        let data = try registrationFixture()
+        let fx = try JSONDecoder().decode(EditCases.self, from: data)
+        let raw = try #require((try JSONSerialization.jsonObject(with: data) as? [String: Any])?["editCases"] as? [[String: Any]])
+        #expect(fx.editCases.count >= 3)
+        for (c, r) in zip(fx.editCases, raw) {
+            switch BeaconRegistration.buildEdit(c.form) {
+            case let .body(patch):
+                let expected = try #require(r["body"], "\(c.name): expected errors")
+                let got = try JSONSerialization.jsonObject(with: JSONEncoder().encode(patch))
+                #expect(sameJSON(got, expected), "\(c.name)")
+            case let .errors(fields):
+                #expect(fields.keys.sorted() == c.errors, "\(c.name)")
+            }
+        }
+        for c in fx.beaconToForm {
+            #expect(BeaconRegistration.form(from: c.beacon) == c.form, "\(c.name)")
+            if case .errors = BeaconRegistration.buildEdit(c.form) { Issue.record("\(c.name): opened form does not save") }
+        }
+        let enable = try JSONSerialization.jsonObject(with: JSONEncoder().encode(BeaconPatch.enabled(false)))
+        #expect(sameJSON(enable, ["enabled": false]))
     }
 
     @Test func uuidNormalization() {
@@ -78,15 +108,40 @@ private final class FakeRegistrationScanner: BeaconScanning {
 private final class FakeRegistrationBackend: BeaconRegistrationBackend {
     var accessError: Error?
     var registerError: Error?
-    var registered = [RegisteredBeaconIdentity(uuid: testUUID, major: 1, minor: 1)]
+    var registered = [AdminBeacon(beaconId: "b0", uuid: testUUID, major: 1, minor: 1, enabled: true)]
     var posted: [BeaconCreateRequest] = []
+    var patches: [(String, BeaconPatch)] = []
     func checkAccess() async throws { if let accessError { throw accessError } }
-    func registeredBeacons() async throws -> [RegisteredBeaconIdentity] { registered }
+    func beacons() async throws -> [AdminBeacon] { registered }
     func surveyUUIDs() async throws -> [String] { ["11111111-2222-3333-4444-555555555555"] }
     func register(_ request: BeaconCreateRequest) async throws -> String {
         if let registerError { throw registerError }
         posted.append(request)
+        registered.append(AdminBeacon(beaconId: "b\(registered.count)", uuid: request.uuid, major: request.major, minor: request.minor, enabled: true))
         return "ok"
+    }
+    func update(_ beaconId: String, _ patch: BeaconPatch) async throws -> AdminBeacon {
+        patches.append((beaconId, patch))
+        guard let i = registered.firstIndex(where: { $0.beaconId == beaconId }) else {
+            throw BeaconAdminError(status: 404, code: "BEACON_NOT_FOUND", message: nil)
+        }
+        switch patch {
+        case let .enabled(on): registered[i].enabled = on
+        case let .edit(power, label, anchor):
+            registered[i].measuredPowerDbm = power
+            registered[i].label = label
+            registered[i].anchor = anchor.flatMap { a in
+                a.position.flatMap { p in p.x.map { x in
+                    AdminBeacon.Anchor(anchorId: "a\(i)", buildingId: a.buildingId, floor: a.floor, floorHeightM: a.floorHeightM,
+                                       position: .init(x: x, y: p.y ?? 0, z: p.z), horizontalAccuracyM: a.horizontalAccuracyM)
+                } }
+            }
+        }
+        return registered[i]
+    }
+    func delete(_ beaconId: String) async throws {
+        guard registered.contains(where: { $0.beaconId == beaconId }) else { throw BeaconAdminError(status: 404, code: "BEACON_NOT_FOUND", message: nil) }
+        registered.removeAll { $0.beaconId == beaconId }
     }
     func buildings() async throws -> [AnchorBuilding] { [AnchorBuilding(buildingId: "B07", buildingName: "Library")] }
 }
@@ -165,5 +220,61 @@ struct BeaconRegistrationModelTests {
         model.form = BeaconRegistrationForm(uuid: testUUID, major: "1", minor: "2")
         await model.submit()
         #expect(model.message?.contains("이미 등록") == true)
+    }
+
+    @Test func editDisableDelete() async {
+        let backend = FakeRegistrationBackend()
+        backend.registered.append(AdminBeacon(beaconId: "b1", uuid: testUUID, major: 1, minor: 2, enabled: true))
+        var refreshed = 0
+        let model = BeaconRegistrationModel(backend: backend, scanner: FakeRegistrationScanner(), onRegistered: { refreshed += 1 })
+        await model.open()
+        #expect(model.registered.count == 2)
+        let target = model.registered[1]
+        model.startEdit(target)
+        #expect(model.editing == target && model.form.minor == "2")
+
+        model.form.label = "hall door"
+        model.form.buildingId = "B07"
+        model.form.positionMode = "grid"
+        model.form.x = "201100"
+        model.form.y = "557250"
+        model.form.z = "154.5"
+        await model.submit()
+        #expect(backend.patches.last?.0 == "b1")
+        #expect(model.editing?.label == "hall door")
+        #expect(model.form.x == "201100" && model.form.positionMode == "grid")
+        #expect(model.registered[1].label == "hall door")
+        #expect(refreshed == 1)
+
+        model.form.floor = "5G" // invalid: field errors, nothing sent
+        await model.submit()
+        #expect(model.errors["floor"] != nil && backend.patches.count == 1)
+        model.form.floor = ""
+
+        await model.setEnabled(false)
+        #expect(model.editing?.enabled == false && backend.patches.last?.1 == .enabled(false))
+
+        await model.delete()
+        #expect(model.editing == nil && model.form == BeaconRegistrationForm())
+        #expect(model.registered.map(\.minor) == [1])
+        #expect(model.message?.hasPrefix("삭제했습니다") == true)
+        #expect(refreshed == 3)
+    }
+
+    @Test func heardRegisteredBeaconOpensForEditingAndPickLeavesIt() async {
+        let backend = FakeRegistrationBackend()
+        let model = BeaconRegistrationModel(backend: backend, scanner: FakeRegistrationScanner())
+        await model.open()
+        model.record([observation(minor: 1, rssi: -50), observation(minor: 5, rssi: -60)])
+        model.edit(heard: model.heard.first { $0.minor == 1 }!)
+        #expect(model.editing?.beaconId == "b0")
+        model.pick(model.heard.first { $0.minor == 5 }!)
+        #expect(model.editing == nil && model.form.minor == "5")
+        // a beacon deleted elsewhere: saving reports it and returns to a new registration
+        model.startEdit(model.registered[0])
+        backend.registered.removeAll()
+        await model.submit()
+        #expect(model.message == "이미 삭제된 비콘입니다.")
+        #expect(model.editing == nil && model.registered.isEmpty)
     }
 }

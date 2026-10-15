@@ -210,7 +210,15 @@ export const beaconService = {
     const u = BeaconUpdate.parse(input);
     await withTransaction(async (db) => {
       if (u.anchorId && !(await beaconRepository.findAnchor(u.anchorId, db))) throw AppError.notFound('ANCHOR_NOT_FOUND', 'Spatial anchor not found');
-      if (!(await beaconRepository.updateBeacon(db, beaconId, u, actor))) throw AppError.notFound('BEACON_NOT_FOUND', 'Beacon not found');
+      const { anchor, ...fields } = u;
+      if (anchor) {
+        const current = await beaconRepository.findBeacon(beaconId, db);
+        if (!current) throw AppError.notFound('BEACON_NOT_FOUND', 'Beacon not found');
+        const own = current.anchor && (await beaconRepository.anchorUsers(db, current.anchor.anchorId)) === 1;
+        if (own) await beaconRepository.replaceAnchor(db, current.anchor!.anchorId, anchor, actor);
+        else fields.anchorId = await beaconRepository.insertAnchor(db, anchor, actor);
+      }
+      if (!(await beaconRepository.updateBeacon(db, beaconId, fields, actor))) throw AppError.notFound('BEACON_NOT_FOUND', 'Beacon not found');
       await beaconRepository.bump(db);
     });
     logger.info('beacon.registry.updated', { actor, beaconId, fields: Object.keys(u) });
@@ -220,6 +228,15 @@ export const beaconService = {
   /** Soft delete: the row and every observation referencing it stay; the beacon leaves the config and fusion. */
   disableBeacon(beaconId: string, actor: string) {
     return this.updateBeacon(beaconId, { enabled: false }, actor);
+  },
+
+  async deleteBeacon(beaconId: string, actor: string) {
+    await withTransaction(async (db) => {
+      if (!(await beaconRepository.deleteBeacon(db, beaconId))) throw AppError.notFound('BEACON_NOT_FOUND', 'Beacon not found');
+      await beaconRepository.bump(db);
+    });
+    logger.info('beacon.registry.deleted', { actor, beaconId });
+    return { beaconId, deleted: true };
   },
 
   async getBeacon(beaconId: string) {

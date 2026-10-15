@@ -9,22 +9,20 @@ struct BeaconAdminError: Error, Equatable {
     let message: String?
 }
 
-struct RegisteredBeaconIdentity: Codable, Equatable {
-    let uuid: String
-    let major: Int
-    let minor: Int
-}
-
 /// Server side of registration: `/api/v1/positioning/admin/*` with this collector's token (POSITIONING_ADMIN_COLLECTORS).
 protocol BeaconRegistrationBackend: AnyObject {
     /// succeeds when this account may register; throws BeaconAdminError 403 / 401 otherwise
     func checkAccess() async throws
     /// every registered beacon, enabled or not
-    func registeredBeacons() async throws -> [RegisteredBeaconIdentity]
+    func beacons() async throws -> [AdminBeacon]
     /// UUIDs added on the web page for surveying beacons not registered yet
     func surveyUUIDs() async throws -> [String]
     /// returns a short description of the created beacon
     func register(_ request: BeaconCreateRequest) async throws -> String
+    /// PATCH /admin/beacons/:id
+    func update(_ beaconId: String, _ patch: BeaconPatch) async throws -> AdminBeacon
+    /// DELETE /admin/beacons/:id?permanent=true
+    func delete(_ beaconId: String) async throws
     func buildings() async throws -> [AnchorBuilding]
 }
 
@@ -66,8 +64,8 @@ final class HTTPBeaconRegistrationBackend: BeaconRegistrationBackend {
 
     func checkAccess() async throws { _ = try await call("GET", "/me") }
 
-    func registeredBeacons() async throws -> [RegisteredBeaconIdentity] {
-        struct Response: Decodable { let beacons: [RegisteredBeaconIdentity] }
+    func beacons() async throws -> [AdminBeacon] {
+        struct Response: Decodable { let beacons: [AdminBeacon] }
         return try JSONDecoder().decode(Response.self, from: try await call("GET", "/beacons?includeDisabled=true")).beacons
     }
 
@@ -83,6 +81,12 @@ final class HTTPBeaconRegistrationBackend: BeaconRegistrationBackend {
         let b = try JSONDecoder().decode(Created.self, from: data)
         return [b.label, "\(b.uuid) / \(b.major) / \(b.minor)"].compactMap { $0 }.joined(separator: " · ")
     }
+
+    func update(_ beaconId: String, _ patch: BeaconPatch) async throws -> AdminBeacon {
+        try JSONDecoder().decode(AdminBeacon.self, from: try await call("PATCH", "/beacons/\(beaconId)", body: try JSONEncoder().encode(patch)))
+    }
+
+    func delete(_ beaconId: String) async throws { _ = try await call("DELETE", "/beacons/\(beaconId)?permanent=true") }
 
     func buildings() async throws -> [AnchorBuilding] {
         guard let configuration = configuration() else { return [] }
@@ -118,6 +122,10 @@ final class BeaconRegistrationModel: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var searchUUIDs: [String] = []
     /// a UUID typed on this screen to add to the search
     @Published var extraUUID = ""
+    /// registered beacons (the edit list)
+    @Published private(set) var registered: [AdminBeacon] = []
+    /// the beacon being edited; nil = registering a new one
+    @Published private(set) var editing: AdminBeacon?
 
     private let backend: BeaconRegistrationBackend
     private let scanner: BeaconScanning
@@ -126,6 +134,7 @@ final class BeaconRegistrationModel: NSObject, ObservableObject, CLLocationManag
     private let now: () -> Date
     private var registeredKeys: Set<String> = []
     private var known: [String] = []
+    private var surveyUUIDs: [String] = []
     private var heardRows = HeardBeacons()
     private var locationManager: CLLocationManager?
     private var locationWaiters: [CheckedContinuation<BeaconGeoFix?, Never>] = []
@@ -156,15 +165,18 @@ final class BeaconRegistrationModel: NSObject, ObservableObject, CLLocationManag
             access = .unreachable
         }
         guard access == .allowed else { return }
-        var uuids: [String] = []
-        if let beacons = try? await backend.registeredBeacons() {
-            registeredKeys = Set(beacons.map { beaconKey(uuid: $0.uuid, major: $0.major, minor: $0.minor) })
-            uuids += beacons.map(\.uuid)
-        }
-        uuids += (try? await backend.surveyUUIDs()) ?? []
-        known = uuids
+        if let beacons = try? await backend.beacons() { setRegistered(beacons) }
+        surveyUUIDs = (try? await backend.surveyUUIDs()) ?? []
+        known = registered.map(\.uuid) + surveyUUIDs
         updateSearchUUIDs()
         buildings = (try? await backend.buildings()) ?? []
+        heard = heardRows.list { registeredKeys.contains($0) }
+    }
+
+    private func setRegistered(_ beacons: [AdminBeacon]) {
+        registered = beacons
+        registeredKeys = Set(beacons.map(\.key))
+        known = beacons.map(\.uuid) + surveyUUIDs
         heard = heardRows.list { registeredKeys.contains($0) }
     }
 
@@ -208,6 +220,7 @@ final class BeaconRegistrationModel: NSObject, ObservableObject, CLLocationManag
 
     /// Tap on a heard beacon: identifier into the form (iOS does not report the advertised 1 m power; the rest is kept).
     func pick(_ b: HeardBeacon) {
+        editing = nil
         form.uuid = b.uuid.uppercased()
         form.major = String(b.major)
         form.minor = String(b.minor)
@@ -230,34 +243,98 @@ final class BeaconRegistrationModel: NSObject, ObservableObject, CLLocationManag
         message = "현재 위치 ±\(fix.accuracy.map { String(Int($0)) } ?? "?") m (실내 GPS는 수십 m 틀릴 수 있습니다)"
     }
 
+    /// Register (new) or save (editing).
     func submit() async {
+        if let editing {
+            switch BeaconRegistration.buildEdit(form) {
+            case let .errors(fields):
+                errors = fields
+                message = "입력을 확인하세요."
+            case let .body(patch):
+                await change {
+                    let saved = try await self.backend.update(editing.beaconId, patch)
+                    self.editing = saved
+                    self.form = BeaconRegistration.form(from: saved)
+                    return "저장했습니다."
+                }
+            }
+            return
+        }
         switch BeaconRegistration.build(form) {
         case let .errors(fields):
             errors = fields
             message = "입력을 확인하세요."
         case let .body(request):
-            errors = [:]
-            submitting = true
-            message = nil
-            do {
-                let created = try await backend.register(request)
-                registeredKeys.insert(beaconKey(uuid: request.uuid, major: request.major, minor: request.minor))
-                if !known.contains(request.uuid) { known.append(request.uuid) }
-                onRegistered()
-                message = "등록했습니다: \(created)"
-            } catch let e as BeaconAdminError {
-                switch e.code {
-                case "BEACON_EXISTS": message = "이미 등록된 UUID·Major·Minor입니다."
-                case "POSITIONING_ADMIN_REQUIRED": message = "이 계정은 비콘 등록 권한이 없습니다."
-                case "VALIDATION_ERROR": message = "서버가 입력을 거절했습니다: \(e.message ?? "")"
-                default: message = e.message ?? "HTTP \(e.status)"
-                }
-            } catch {
-                message = "서버에 연결하지 못했습니다: \(error.localizedDescription)"
-            }
-            submitting = false
-            heard = heardRows.list { registeredKeys.contains($0) }
+            await change { "등록했습니다: \(try await self.backend.register(request))" }
         }
+    }
+
+    /// Open a registered beacon for editing (its form replaces the current one).
+    func startEdit(_ b: AdminBeacon) {
+        editing = b
+        form = BeaconRegistration.form(from: b)
+        errors = [:]
+        message = nil
+    }
+
+    /// A heard beacon that is registered: open it for editing.
+    func edit(heard b: HeardBeacon) {
+        if let match = registered.first(where: { $0.key == b.key }) { startEdit(match) }
+    }
+
+    /// Back to registering a new beacon.
+    func cancelEdit() {
+        editing = nil
+        clearForm()
+    }
+
+    /// Disable (leaves the config and fusion, history kept) or enable again.
+    func setEnabled(_ enabled: Bool) async {
+        guard let editing else { return }
+        await change {
+            self.editing = try await self.backend.update(editing.beaconId, .enabled(enabled))
+            return enabled ? "다시 사용합니다." : "사용 중지했습니다(기록은 남습니다)."
+        }
+    }
+
+    /// Permanent delete: observations keep their identifier and show as unregistered again.
+    func delete() async {
+        guard let editing else { return }
+        await change {
+            try await self.backend.delete(editing.beaconId)
+            self.editing = nil
+            self.form = BeaconRegistrationForm()
+            return "삭제했습니다: \(editing.label ?? "\(editing.major) / \(editing.minor)")"
+        }
+    }
+
+    /// One registry change: busy flag, server error -> message, then the list and the collector config refresh.
+    private func change(_ action: () async throws -> String) async {
+        errors = [:]
+        submitting = true
+        message = nil
+        var changed = false
+        do {
+            message = try await action()
+            changed = true
+        } catch let e as BeaconAdminError {
+            switch e.code {
+            case "BEACON_EXISTS": message = "이미 등록된 UUID·Major·Minor입니다. 목록에서 골라 수정하세요."
+            case "BEACON_NOT_FOUND": message = "이미 삭제된 비콘입니다."
+            case "POSITIONING_ADMIN_REQUIRED": message = "이 계정은 비콘 등록 권한이 없습니다."
+            case "VALIDATION_ERROR": message = "서버가 입력을 거절했습니다: \(e.message ?? "")"
+            default: message = e.message ?? "HTTP \(e.status)"
+            }
+        } catch {
+            message = "서버에 연결하지 못했습니다: \(error.localizedDescription)"
+        }
+        if changed { onRegistered() }
+        if let beacons = try? await backend.beacons() { setRegistered(beacons) }
+        if let editing, !registered.contains(where: { $0.beaconId == editing.beaconId }) {
+            self.editing = nil // deleted elsewhere
+            form = BeaconRegistrationForm()
+        }
+        submitting = false
     }
 
     func clearForm() {

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hoshi.campustracker.collection.BeaconRegistrationController
 import hoshi.campustracker.collection.RegistrationAccess
+import hoshi.campustracker.positioning.AdminBeacon
 import hoshi.campustracker.positioning.BeaconPermissions
 import hoshi.campustracker.positioning.BeaconRegistrationForm
 import hoshi.campustracker.positioning.BeaconScannerState
@@ -49,6 +52,7 @@ fun BeaconRegistrationScreen(controller: BeaconRegistrationController, onBack: (
     val ui by controller.ui.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var pending by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var confirmDelete by remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { pending?.invoke(); pending = null }
     fun withPermissions(wanted: List<String>, action: () -> Unit) {
         val missing = wanted.filter { ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }
@@ -60,7 +64,7 @@ fun BeaconRegistrationScreen(controller: BeaconRegistrationController, onBack: (
 
     Column(Modifier.verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         TextButton(onClick = onBack) { Text("‹ Settings") }
-        Heading("비콘 등록")
+        Heading("비콘 등록·관리")
         when (ui.access) {
             RegistrationAccess.CHECKING -> Caption("권한 확인 중…")
             RegistrationAccess.DENIED -> Notice("이 계정은 비콘 등록 권한이 없습니다. 서버 .env의 POSITIONING_ADMIN_COLLECTORS에 계정 코드를 추가하세요.")
@@ -83,23 +87,38 @@ fun BeaconRegistrationScreen(controller: BeaconRegistrationController, onBack: (
         if (ui.scanning && ui.heard.isEmpty()) Caption("검색 중…")
         ui.heard.forEach { b ->
             Card(
-                Modifier.fillMaxWidth().clickable(enabled = !b.registered) { controller.pick(b) },
+                Modifier.fillMaxWidth().clickable {
+                    // a registered one opens for editing, an unregistered one fills the new-beacon form
+                    if (b.registered) ui.registered.firstOrNull { it.key == b.key }?.let { controller.startEdit(it) } else controller.pick(b)
+                },
                 colors = CardDefaults.cardColors(containerColor = if (b.registered) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface),
             ) {
                 Column(Modifier.padding(10.dp)) {
                     Text(b.uuid, style = MaterialTheme.typography.bodySmall)
                     Text("Major ${b.major} · Minor ${b.minor}")
-                    Caption("${b.lastRssi ?: "—"} dBm (최대 ${b.maxRssi ?: "—"}) · 1 m ${b.measuredPower} dBm · ${b.count}회 · ${if (b.registered) "등록됨" else "눌러서 채우기"}")
+                    Caption("${b.lastRssi ?: "—"} dBm (최대 ${b.maxRssi ?: "—"}) · 1 m ${b.measuredPower} dBm · ${b.count}회 · ${if (b.registered) "등록됨 · 눌러서 수정" else "눌러서 채우기"}")
                 }
             }
         }
 
-        Text("등록 정보", style = MaterialTheme.typography.titleSmall)
+        RegisteredList(ui.registered, ui.editing?.beaconId) { controller.startEdit(it) }
+
+        val editing = ui.editing
+        if (editing == null) {
+            Text("새 비콘 등록", style = MaterialTheme.typography.titleSmall)
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("비콘 수정${if (editing.enabled) "" else " (사용 중지됨)"}", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                TextButton(onClick = { controller.cancelEdit() }) { Text("새 비콘 등록으로") }
+            }
+            Caption("UUID·Major·Minor는 바꿀 수 없습니다(다르면 삭제 후 새로 등록).")
+        }
         val f = ui.form
-        FormField("UUID", f.uuid, ui.errors["uuid"]) { v -> controller.edit { it.copy(uuid = v) } }
+        val identityEditable = editing == null
+        FormField("UUID", f.uuid, ui.errors["uuid"], enabled = identityEditable) { v -> controller.edit { it.copy(uuid = v) } }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FormField("Major", f.major, ui.errors["major"], Modifier.weight(1f), KeyboardType.Number) { v -> controller.edit { it.copy(major = v) } }
-            FormField("Minor", f.minor, ui.errors["minor"], Modifier.weight(1f), KeyboardType.Number) { v -> controller.edit { it.copy(minor = v) } }
+            FormField("Major", f.major, ui.errors["major"], Modifier.weight(1f), KeyboardType.Number, identityEditable) { v -> controller.edit { it.copy(major = v) } }
+            FormField("Minor", f.minor, ui.errors["minor"], Modifier.weight(1f), KeyboardType.Number, identityEditable) { v -> controller.edit { it.copy(minor = v) } }
         }
         FormField("1 m 송신 세기(dBm)", f.measuredPowerDbm, ui.errors["measuredPowerDbm"], keyboard = KeyboardType.Number) { v -> controller.edit { it.copy(measuredPowerDbm = v) } }
         FormField("이름", f.label, null) { v -> controller.edit { it.copy(label = v) } }
@@ -139,9 +158,29 @@ fun BeaconRegistrationScreen(controller: BeaconRegistrationController, onBack: (
         }
         Caption("설치 높이를 비우면 층 바닥 높이 + 바닥에서 높이로 계산합니다.")
         FormField("위치 정확도(m)", f.horizontalAccuracyM, ui.errors["horizontalAccuracyM"], keyboard = KeyboardType.Decimal) { v -> controller.edit { it.copy(horizontalAccuracyM = v) } }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { controller.submit() }, enabled = !ui.submitting) { Text(if (ui.submitting) "등록 중…" else "등록") }
-            OutlinedButton(onClick = { controller.edit { BeaconRegistrationForm() } }) { Text("비우기") }
+        if (editing == null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { controller.submit() }, enabled = !ui.submitting) { Text(if (ui.submitting) "등록 중…" else "등록") }
+                OutlinedButton(onClick = { controller.edit { BeaconRegistrationForm() } }) { Text("비우기") }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { controller.submit() }, enabled = !ui.submitting) { Text(if (ui.submitting) "저장 중…" else "저장") }
+                OutlinedButton(onClick = { controller.setEnabled(!editing.enabled) }, enabled = !ui.submitting) {
+                    Text(if (editing.enabled) "사용 중지" else "다시 사용")
+                }
+                OutlinedButton(onClick = { confirmDelete = true }, enabled = !ui.submitting) { Text("삭제", color = MaterialTheme.colorScheme.error) }
+            }
+            Caption("사용 중지: 설정·위치 계산에서 빠지고 기록은 남습니다. 삭제: 등록을 지우며, 그동안 모은 관측은 미등록으로 남아 다시 등록하면 쓰입니다.")
+        }
+        if (confirmDelete && editing != null) {
+            AlertDialog(
+                onDismissRequest = { confirmDelete = false },
+                title = { Text("비콘 삭제") },
+                text = { Text("${editing.label ?: "Major ${editing.major} · Minor ${editing.minor}"}을(를) 삭제할까요? 되돌릴 수 없습니다.") },
+                confirmButton = { TextButton(onClick = { confirmDelete = false; controller.delete() }) { Text("삭제", color = MaterialTheme.colorScheme.error) } },
+                dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("취소") } },
+            )
         }
         ui.message?.let { Text(it) }
     }
@@ -149,13 +188,38 @@ fun BeaconRegistrationScreen(controller: BeaconRegistrationController, onBack: (
 
 @Composable
 private fun FormField(label: String, value: String, error: String?, modifier: Modifier = Modifier,
-    keyboard: KeyboardType = KeyboardType.Text, onChange: (String) -> Unit) {
+    keyboard: KeyboardType = KeyboardType.Text, enabled: Boolean = true, onChange: (String) -> Unit) {
     OutlinedTextField(
-        value = value, onValueChange = onChange, label = { Text(label) }, singleLine = true, isError = error != null,
+        value = value, onValueChange = onChange, label = { Text(label) }, singleLine = true, isError = error != null, enabled = enabled,
         modifier = if (modifier == Modifier) Modifier.fillMaxWidth() else modifier, // alone on a row: full width
         supportingText = error?.let { { Text(it) } },
         keyboardOptions = KeyboardOptions(keyboardType = keyboard),
     )
+}
+
+/** Registered beacons (server order: UUID, major, minor); the first five unless expanded. Tap = edit. */
+@Composable
+private fun RegisteredList(beacons: List<AdminBeacon>, selected: String?, onPick: (AdminBeacon) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Text("등록된 비콘 (${beacons.size})", style = MaterialTheme.typography.titleSmall)
+    if (beacons.isEmpty()) return Caption("아직 없습니다.")
+    Caption("눌러서 수정·사용 중지·삭제")
+    (if (expanded) beacons else beacons.take(5)).forEach { b ->
+        Card(
+            Modifier.fillMaxWidth().clickable { onPick(b) },
+            colors = CardDefaults.cardColors(containerColor = when {
+                b.beaconId == selected -> MaterialTheme.colorScheme.secondaryContainer
+                !b.enabled -> MaterialTheme.colorScheme.surfaceVariant
+                else -> MaterialTheme.colorScheme.surface
+            }),
+        ) {
+            Column(Modifier.padding(10.dp)) {
+                Text("${b.label ?: "이름 없음"} · Major ${b.major} · Minor ${b.minor}${if (b.enabled) "" else " · 사용 중지"}")
+                Caption("${b.uuid} · ${b.anchor?.let { "${it.buildingId} ${it.floor ?: ""}".trim() } ?: "위치 없음"}")
+            }
+        }
+    }
+    if (beacons.size > 5) TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "접기" else "모두 보기 (${beacons.size})") }
 }
 
 @Composable
