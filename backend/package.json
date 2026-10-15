@@ -18,6 +18,7 @@
     "fusion:diagnose": "tsx scripts/fusion-diagnose.ts",
     "fusion:golden": "tsx scripts/fusion-golden.ts",
     "fusion:replay": "tsx scripts/fusion-replay.ts",
+    "fusion:compare": "tsx scripts/fusion-compare.ts",
     "fusion:prune": "tsx scripts/fusion-prune.ts",
     "qc:run": "tsx scripts/qc-run.ts",
     "sim:session": "tsx scripts/sim-session.ts",

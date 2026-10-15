@@ -63,7 +63,8 @@ export default defineConfig(({ mode }) => {
     envDir: '..',
     build: {
       chunkSizeWarningLimit: 6000, // CesiumJS alone is ~4 MB minified (loaded lazily by campus-map.ts)
-      rollupOptions: { input: { preview: path.resolve(import.meta.dirname, 'index.html'), editor: path.resolve(import.meta.dirname, 'editor.html'), client3d: path.resolve(import.meta.dirname, 'client3d.html') } },
+      rollupOptions: { input: { preview: path.resolve(import.meta.dirname, 'index.html'), editor: path.resolve(import.meta.dirname, 'editor.html'),
+        beacons: path.resolve(import.meta.dirname, 'beacons.html'), client3d: path.resolve(import.meta.dirname, 'client3d.html') } },
     },
     server: {
       host: true, // all interfaces, so the preview is reachable over LAN / Tailscale (Vite's default is localhost only)

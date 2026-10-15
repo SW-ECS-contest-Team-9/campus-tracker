@@ -1,0 +1,134 @@
+{
+  "description": "log-distance model: range = 10^((P1m - rssi)/(10 n)); ln-range sigma = sqrt(var) ln10 / (10 n). Calibration selection order.",
+  "defaults": {
+    "measuredPower1m": -59,
+    "pathLossExponent": 2.2,
+    "rssiVariance": 36
+  },
+  "modelCases": [
+    {
+      "rssi": -59,
+      "measuredPower1m": -59,
+      "pathLossExponent": 2.2,
+      "rssiVariance": 36,
+      "expectedRangeM": 1.0,
+      "expectedLnSigma": 0.627978
+    },
+    {
+      "rssi": -70,
+      "measuredPower1m": -59,
+      "pathLossExponent": 2.2,
+      "rssiVariance": 36,
+      "expectedRangeM": 3.162278,
+      "expectedLnSigma": 0.627978
+    },
+    {
+      "rssi": -80,
+      "measuredPower1m": -62,
+      "pathLossExponent": 2.0,
+      "rssiVariance": 25,
+      "expectedRangeM": 7.943282,
+      "expectedLnSigma": 0.575646
+    },
+    {
+      "rssi": -50,
+      "measuredPower1m": -59,
+      "pathLossExponent": 2.2,
+      "rssiVariance": 36,
+      "expectedRangeM": 0.38986,
+      "expectedLnSigma": 0.627978
+    },
+    {
+      "rssi": -90,
+      "measuredPower1m": -65,
+      "pathLossExponent": 3.0,
+      "rssiVariance": 49,
+      "expectedRangeM": 6.812921,
+      "expectedLnSigma": 0.53727
+    }
+  ],
+  "calibrationRows": [
+    {
+      "beaconId": null,
+      "platform": "*",
+      "deviceGroup": "*",
+      "measuredPower1m": -60,
+      "pathLossExponent": 2.0,
+      "rssiVariance": 30,
+      "sampleCount": 0
+    },
+    {
+      "beaconId": null,
+      "platform": "ios",
+      "deviceGroup": "*",
+      "measuredPower1m": -61,
+      "pathLossExponent": 2.1,
+      "rssiVariance": 31,
+      "sampleCount": 0
+    },
+    {
+      "beaconId": "b1",
+      "platform": "android",
+      "deviceGroup": "Pixel 8",
+      "measuredPower1m": -63,
+      "pathLossExponent": 2.3,
+      "rssiVariance": 33,
+      "sampleCount": 40
+    },
+    {
+      "beaconId": "b1",
+      "platform": "*",
+      "deviceGroup": "*",
+      "measuredPower1m": -64,
+      "pathLossExponent": 2.4,
+      "rssiVariance": 34,
+      "sampleCount": 10
+    }
+  ],
+  "selectionCases": [
+    {
+      "beaconId": "b1",
+      "platform": "android",
+      "deviceModel": "Pixel 8",
+      "advertised": -59,
+      "expectedSource": "BEACON_DEVICE",
+      "expectedMeasuredPower1m": -63
+    },
+    {
+      "beaconId": "b1",
+      "platform": "ios",
+      "deviceModel": "iPhone15,2",
+      "advertised": null,
+      "expectedSource": "BEACON",
+      "expectedMeasuredPower1m": -64
+    },
+    {
+      "beaconId": "b2",
+      "platform": "ios",
+      "deviceModel": "iPhone15,2",
+      "advertised": -55,
+      "expectedSource": "GLOBAL_PLATFORM",
+      "expectedMeasuredPower1m": -61
+    },
+    {
+      "beaconId": "b2",
+      "platform": "android",
+      "deviceModel": "SM-S918N",
+      "advertised": -55,
+      "expectedSource": "GLOBAL",
+      "expectedMeasuredPower1m": -60
+    }
+  ],
+  "noCalibrationCases": [
+    {
+      "advertised": -55,
+      "expectedSource": "ADVERTISED",
+      "expectedMeasuredPower1m": -55
+    },
+    {
+      "advertised": null,
+      "expectedSource": "DEFAULT",
+      "expectedMeasuredPower1m": -59
+    }
+  ]
+}

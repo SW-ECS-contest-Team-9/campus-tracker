@@ -3,6 +3,7 @@ package hoshi.campustracker.auth
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -26,6 +27,10 @@ data class AppSettings(
     val motionRate: MotionSamplingRate = MotionSamplingRate.DEFAULT,
     val locationProfile: LocationCollectionProfile = LocationCollectionProfile.DEFAULT,
     val distanceFilter: Double = 0.0,
+    /** BLE beacon collection (docs/BEACON_POSITIONING.md). Off by default: existing collection is unchanged until enabled. */
+    val beaconScanningEnabled: Boolean = false,
+    /** Upload beacon observations (they are kept on the phone while this is off or the server lacks the feature). */
+    val beaconUploadEnabled: Boolean = true,
 )
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "campus_collector")
@@ -42,6 +47,8 @@ class SettingsStore(private val context: Context) {
         val motionHz = intPreferencesKey("motionSamplingRate")
         val locationProfile = stringPreferencesKey("locationProfile")
         val distanceFilter = doublePreferencesKey("locationDistanceFilter")
+        val beaconScanning = booleanPreferencesKey("beaconScanningEnabled")
+        val beaconUpload = booleanPreferencesKey("beaconUploadEnabled")
     }
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { p ->
@@ -56,6 +63,8 @@ class SettingsStore(private val context: Context) {
             motionRate = p[Keys.motionHz]?.let(MotionSamplingRate::fromHz) ?: MotionSamplingRate.DEFAULT,
             locationProfile = LocationCollectionProfile.fromName(p[Keys.locationProfile]),
             distanceFilter = p[Keys.distanceFilter] ?: 0.0,
+            beaconScanningEnabled = p[Keys.beaconScanning] ?: false,
+            beaconUploadEnabled = p[Keys.beaconUpload] ?: true,
         )
     }
 
@@ -83,6 +92,13 @@ class SettingsStore(private val context: Context) {
 
     suspend fun saveWebSocketUrl(url: String?) {
         context.dataStore.edit { p -> if (url == null) p.remove(Keys.webSocketUrl) else p[Keys.webSocketUrl] = url }
+    }
+
+    suspend fun saveBeacon(scanning: Boolean? = null, upload: Boolean? = null) {
+        context.dataStore.edit { p ->
+            scanning?.let { p[Keys.beaconScanning] = it }
+            upload?.let { p[Keys.beaconUpload] = it }
+        }
     }
 
     suspend fun saveSampling(motionRate: MotionSamplingRate? = null, profile: LocationCollectionProfile? = null, distanceFilter: Double? = null) {

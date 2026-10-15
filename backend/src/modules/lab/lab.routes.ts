@@ -23,6 +23,10 @@ const ReplayBody = z.object({
   overrides: z.record(z.string(), z.union([z.number(), z.boolean(), z.string()])).nullish(),
   mode: z.enum(['SENSOR_TIME', 'AS_RECEIVED']).default('SENSOR_TIME'),
   publish: z.boolean().default(false),
+  /** experiments: only raw rows captured up to this sensor time (compare sessions over the same span) */
+  cutoff: z.iso.datetime({ offset: true }).nullish(),
+  /** experiments, SENSOR_TIME: false = forward pass only (no smoother) */
+  finalize: z.boolean().optional(),
 });
 
 async function run(req: Request) {
@@ -36,8 +40,11 @@ async function run(req: Request) {
 labRoutes.post('/sessions/:sessionId/replays', async (req: Request, res: Response) => {
   const { sessionId } = SessionParam.parse(req.params);
   const b = ReplayBody.parse(req.body ?? {});
-  const r = await replaySession(sessionId, b.algorithmVersion, 'lab', { variant: b.variant ?? null, overrides: b.overrides ?? null, mode: b.mode, publish: b.publish });
-  res.json({ runId: r.runId, outputs: r.outputs.length, durationMs: r.durationMs, published: r.published, metrics: r.metrics });
+  const r = await replaySession(sessionId, b.algorithmVersion, 'lab', {
+    variant: b.variant ?? null, overrides: b.overrides ?? null, mode: b.mode, publish: b.publish,
+    cutoff: b.cutoff ? new Date(b.cutoff) : null, finalize: b.finalize,
+  });
+  res.json({ runId: r.runId, outputs: r.outputs.length, durationMs: r.durationMs, published: r.published, replay: r.replay, metrics: r.metrics });
 });
 labRoutes.get('/sessions/:sessionId/runs', async (req: Request, res: Response) => {
   const { sessionId } = SessionParam.parse(req.params);

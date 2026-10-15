@@ -1,6 +1,7 @@
 // fusion-v4 building blocks (pure): 3x3 Kalman algebra, heading-offset fit, forward filter + RTS smoother.
 // State vector: [x (East m), y (North m), theta (rad)]; walking direction = rel + theta, rel = -CMAttitude.yaw.
 import type { FusionConfigV4 } from './fusion.config.js';
+import { beaconUpdate, type BeaconRangeMeasurement } from './fusion-beacon.js';
 
 export type Vec3 = [number, number, number];
 export type Mat3 = number[]; // row-major 3x3
@@ -107,8 +108,22 @@ export interface HeadingFit { theta: number; sigma: number; tx: number; ty: numb
  * fixes with a robust (Cauchy) cost, so a few bad indoor fixes cannot pull it. Returns null when the walk is
  * too short / straight-line evidence too weak, or when two clearly different headings fit about equally well.
  */
-export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4): HeadingFit | null {
-  if (steps.length < c.headingFitMinSteps || fixes.length < c.headingFitMinFixes) return null;
+/** Why a fit was not possible (diagnostics only; the first failing condition in the order the fit checks them). */
+export interface HeadingFitFailure {
+  reason: 'TOO_FEW_STEPS' | 'TOO_FEW_FIXES' | 'EXTENT_TOO_SMALL' | 'AMBIGUOUS';
+  steps: number;
+  fixes: number;
+  extentM: number | null;
+  costGap: number | null;
+}
+
+export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4, why?: { failure?: HeadingFitFailure }): HeadingFit | null {
+  const fail = (reason: HeadingFitFailure['reason'], extentM: number | null = null, costGap: number | null = null) => {
+    if (why) why.failure = { reason, steps: steps.length, fixes: fixes.length, extentM, costGap };
+    return null;
+  };
+  if (steps.length < c.headingFitMinSteps) return fail('TOO_FEW_STEPS');
+  if (fixes.length < c.headingFitMinFixes) return fail('TOO_FEW_FIXES');
   // shape in the "rel" frame
   const ux = [0];
   const uy = [0];
@@ -131,7 +146,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
   const cx = fx.reduce((a, b) => a + b, 0) / fx.length;
   const cy = fy.reduce((a, b) => a + b, 0) / fy.length;
   const extent = Math.max(...fx.map((x, i) => Math.hypot(x - cx, fy[i] - cy)));
-  if (extent < c.headingFitMinExtentM) return null;
+  if (extent < c.headingFitMinExtentM) return fail('EXTENT_TOO_SMALL', extent);
 
   const evaluate = (theta: number) => {
     const cs = Math.cos(theta), sn = Math.sin(theta);
@@ -176,7 +191,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
     const d = Math.min(Math.abs(k - best), n - Math.abs(k - best));
     if (d >= amb) alt = Math.min(alt, costs[k]);
   }
-  if (alt - costs[best] < c.headingFitMinCostGap) return null;
+  if (alt - costs[best] < c.headingFitMinCostGap) return fail('AMBIGUOUS', extent, alt - costs[best]);
   // curvature => 1-sigma (cost ~ chi^2 near the minimum)
   const c0 = costs[best], cp = costs[(best + 1) % n], cm = costs[(best - 1 + n) % n];
   const d2 = Math.max(cp + cm - 2 * c0, 1e-6);
@@ -203,15 +218,19 @@ export type SmootherEvent =
   | { kind: 'segment'; t: number; theta: number | null; thetaVar: number }
   | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean }
   | { kind: 'walked'; t: number; distance: number } // pedometer distance while motion was missing
-  | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean };
+  | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean }
+  /** rev 18: a beacon range / proximity measurement; anchor (ax, ay) in local ENU */
+  | { kind: 'range'; t: number; ax: number; ay: number; m: BeaconRangeMeasurement };
 
 export interface SmoothedPoint { t: number; x: Vec3; P: Mat3; event: SmootherEvent }
 
 /**
  * Runs the filter over events sorted by time and smooths it. weights[i] scales fix i's variance (1 / w);
  * w = 0 skips the fix. gate = chi-square gate applied in the forward pass (null = no gate).
+ * still = sorted intervals in which the phone was motion-still: no time noise there (the position cannot drift).
  */
-export function smoothEvents(events: SmootherEvent[], weights: number[], gate: number | null, c: FusionConfigV4) {
+export function smoothEvents(events: SmootherEvent[], weights: number[], gate: number | null, c: FusionConfigV4,
+  still: { from: number; to: number }[] = []) {
   const n = events.length;
   const xs: Vec3[] = new Array(n);
   const Ps: Mat3[] = new Array(n);
@@ -219,15 +238,20 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
   const Pp: Mat3[] = new Array(n);
   const Fs: Mat3[] = new Array(n);
   const gated = new Set<number>();
+  let rangeGated = 0;
   let x: Vec3 = [0, 0, 0];
   let P = diag3(1e8, 1e8, 1);
   let lastT = events[0]?.t ?? 0;
   let thetaKnown = false;
   let vehicle = false;
   const rw = (c.headingRandomWalkDegPerStep * Math.PI) / 180;
+  let si = 0;
   for (let k = 0; k < n; k++) {
     const e = events[k];
-    const dt = Math.max(0, (e.t - lastT) / 1000);
+    while (si < still.length && still[si].to <= lastT) si++;
+    let held = 0;
+    for (let j = si; j < still.length && still[j].from < e.t; j++) held += Math.max(0, Math.min(e.t, still[j].to) - Math.max(lastT, still[j].from));
+    const dt = Math.max(0, (e.t - lastT - held) / 1000);
     lastT = e.t;
     // time noise, then the event's own prediction; combined into one transition for RTS
     const qTime = (vehicle ? c.vehicleProcessNoiseM2PerS : c.idleProcessNoiseM2PerS) * dt;
@@ -260,6 +284,10 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
     Fs[k] = F;
     let xu = pred.x;
     let Pu = Pk;
+    if (e.kind === 'range') {
+      const u = beaconUpdate(xu, Pu, e.m, { x: e.ax, y: e.ay }, c);
+      if (u.applied) { xu = u.x; Pu = u.P; } else if (u.reason === 'INNOVATION_GATED') rangeGated++;
+    }
     if (e.kind === 'fix') {
       if (e.vehicle) vehicle = true;
       const w = weights[e.index] ?? 1;
@@ -292,5 +320,5 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
     sx[k] = [xs[k][0] + corr[0], xs[k][1] + corr[1], xs[k][2] + corr[2]];
     sP[k] = sym(add3(Ps[k], mul3(mul3(C, sub3(sP[k + 1], Pp[k + 1])), tr3(C))));
   }
-  return { points: events.map((event, k): SmoothedPoint => ({ t: event.t, x: sx[k], P: sP[k], event })), gated };
+  return { points: events.map((event, k): SmoothedPoint => ({ t: event.t, x: sx[k], P: sP[k], event })), gated, rangeGated };
 }

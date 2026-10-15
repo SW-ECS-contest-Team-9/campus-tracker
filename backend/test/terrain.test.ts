@@ -112,8 +112,90 @@ test('v4 + terrain: GPS heights far from the ground are not used as the zero', (
   const ctx = slopeTerrain();
   const s = createFusionStateV4();
   // standing still: no ground contacts; the GPS ellipsoidal height 150 m is ~27 m above ground + phone (H = 126.6)
-  for (const o of walk(ctx, 1).filter((x) => x.kind === 'gps' || x.kind === 'altimeter')) processObservationV4(s, o, cfg);
+  for (const o of walk(ctx, 4).filter((x) => x.kind === 'gps' || x.kind === 'altimeter')) processObservationV4(s, o, cfg);
   assert.equal(s.gpsOffsets.length, 0);
+  assert.equal(s.bestGpsDatum?.accuracy, 30); // kept separately as a provisional fallback
+});
+
+test('v4 + terrain: provisional GPS Z is available immediately, then yields to consistent ground-compatible GPS', () => {
+  const s = createFusionStateV4();
+  const ctx = slopeTerrain();
+  for (let i = 0; i < 4; i++) {
+    const h = i === 0 ? 150 : 100 + cfg.phoneHeightM + ctx.geoidSeparation;
+    const out = processObservationV4(s, {
+      kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+      altitude: null, ellipsoidalAltitude: h, horizontalAccuracy: 8, verticalAccuracy: i === 0 ? 30 : 8,
+      speed: -1, course: -1, terrainContext: ctx,
+    }, cfg).outputs.at(-1)!;
+    assert.equal(out.ellipsoidalAltitude, h);
+    assert.equal(out.zDatumSource, i < 3 ? 'GPS_FALLBACK' : 'GPS');
+    assert.ok(Math.abs(out.heightAboveGround! - (h - ctx.geoidSeparation - out.terrainHeight!)) < 1e-6);
+  }
+});
+
+test('v4 indoors: fixed DEM datum beats bad GPS and preserves barometric ascent across XY moves and sensor restarts', () => {
+  const ctx = slopeTerrain();
+  const o = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  ctx.buildings.push({ buildingId: 'indoor', name: 'test', polygons: [[[
+    [o.x - 200, o.y - 200], [o.x + 200, o.y - 200], [o.x + 200, o.y + 200], [o.x - 200, o.y + 200], [o.x - 200, o.y - 200],
+  ]]], groundFloors: 5, undergroundFloors: 1, heightM: 20, floorLabels: [] });
+  const s = createFusionStateV4();
+  const outputs = [];
+  for (let i = 0; i < 6; i++) {
+    const ll = localToWgs84(ORIGIN, { x: 0, y: i * 4, z: 0 });
+    const observations: Observation[] = [
+      { kind: 'altimeter', t: T0 + i * 1000, seq: i, relativeAltitude: i < 3 ? 10 + i : 100 + i - 3, segment: i < 3 ? 'a' : 'b', terrainContext: ctx },
+      { kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ll.latitude, longitude: ll.longitude,
+        altitude: 20, ellipsoidalAltitude: 50, horizontalAccuracy: 8, verticalAccuracy: 30, speed: -1, course: -1, terrainContext: ctx },
+    ];
+    for (const observation of observations) outputs.push(...processObservationV4(s, observation, cfg).outputs);
+  }
+  assert.equal(s.contacts.length, 0);
+  assert.equal(s.gpsOffsets.length, 0);
+  assert.equal(outputs[0].buildingId, 'indoor');
+  assert.equal(outputs[0].zDatumSource, 'TERRAIN_FALLBACK');
+  assert.ok(Math.abs(outputs[0].heightAboveGround! - cfg.phoneHeightM) < 1e-6);
+  const last = outputs.at(-1)!;
+  assert.ok(last.ellipsoidalAltitude! > 120); // bad indoor GPS reported only 50 m
+  assert.ok(Math.abs(last.ellipsoidalAltitude! - outputs[0].ellipsoidalAltitude! - 4) < 1e-6);
+  assert.ok(last.terrainHeight! > outputs[0].terrainHeight!); // moving across sloped DEM must not reset the zero
+  assert.ok(outputs.every((p) => p.zDatumSource === 'TERRAIN_FALLBACK' && p.zDatumSigma! >= cfg.terrainFallbackMinSigmaM));
+  const final = finalizeFusionV4(s, cfg).outputs;
+  assert.ok(final.length > 0);
+  assert.equal(s.smoothed!.datumSource, 'TERRAIN_FALLBACK');
+  assert.ok(final.every((p) => p.zDatumSource === 'TERRAIN_FALLBACK'));
+  assert.ok(Math.abs(final.at(-1)!.ellipsoidalAltitude! - final[0].ellipsoidalAltitude! - 4) < 1e-6);
+});
+
+test('v4 DEM fallback yields to trusted GPS when the required consistent samples arrive', () => {
+  const ctx = slopeTerrain();
+  const s = createFusionStateV4();
+  processObservationV4(s, { kind: 'altimeter', t: T0, seq: 0, relativeAltitude: 10, terrainContext: ctx }, cfg);
+  for (let i = 0; i < 4; i++) {
+    const h = i === 0 ? 50 : 100 + cfg.phoneHeightM + ctx.geoidSeparation;
+    const out = processObservationV4(s, {
+      kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+      altitude: null, ellipsoidalAltitude: h, horizontalAccuracy: 8, verticalAccuracy: i === 0 ? 30 : 8,
+      speed: -1, course: -1, terrainContext: ctx,
+    }, cfg).outputs.at(-1)!;
+    assert.equal(out.zDatumSource, i < 3 ? 'TERRAIN_FALLBACK' : 'GPS');
+  }
+});
+
+test('v4 DEM fallback requires barometer data and valid terrain coverage', () => {
+  for (const outsideCoverage of [false, true]) {
+    const ctx = slopeTerrain();
+    if (outsideCoverage) ctx.grid = { ...ctx.grid, originX: 0, originY: 0 };
+    const s = createFusionStateV4();
+    if (outsideCoverage) processObservationV4(s, { kind: 'altimeter', t: T0, seq: 0, relativeAltitude: 0, terrainContext: ctx }, cfg);
+    const out = processObservationV4(s, {
+      kind: 'gps', t: T0, seq: 0, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+      altitude: null, ellipsoidalAltitude: 50, horizontalAccuracy: 8, verticalAccuracy: 30,
+      speed: -1, course: -1, terrainContext: ctx,
+    }, cfg).outputs[0];
+    assert.equal(out.zDatumSource, 'GPS_FALLBACK');
+    assert.equal(out.ellipsoidalAltitude, 50);
+  }
 });
 
 test('terrain.buildingAt: inside a footprint and distance to the nearest edge', () => {

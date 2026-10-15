@@ -7,6 +7,8 @@ import hoshi.campustracker.model.CollectionSession
 import hoshi.campustracker.model.CollectionStatus
 import hoshi.campustracker.model.CollectorAppState
 import hoshi.campustracker.model.DeviceInfo
+import hoshi.campustracker.model.AnchorRules
+import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.LocationFix
@@ -41,6 +43,7 @@ import hoshi.campustracker.sync.UploadOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
+import kotlin.math.abs
 
 /** One serial execution context: sensor callbacks, sample creation, sequences, local writes (§4.0). */
 interface SerialExecutor {
@@ -76,6 +79,14 @@ data class CollectorUiState(
     val lastPersistedMs: Long? = null,
     val diagnostics: CollectionDiagnostics? = null,
     val starting: Boolean = false,
+    /** Last place anchor (building, floor) of this session: prefills the next anchor picker. */
+    val lastPlace: CollectionAnchor? = null,
+    /** stairStart / elevatorBoard / rampStart pressed and not yet closed by its end marker */
+    val openVertical: EventMarkerType? = null,
+    /** the anchor of [openVertical]: prefills its end marker */
+    val openVerticalAnchor: CollectionAnchor? = null,
+    /** The barometer moved more than 3 m since the last vertical anchor with no stairs/elevator marker open. */
+    val verticalReminder: Boolean = false,
     /** Publish time; makes every 0.5 s snapshot distinct so "last x.xs ago" stays current. */
     val publishedAtMs: Long = 0,
 ) {
@@ -135,6 +146,11 @@ class CollectionCoordinator(
     private var lastAppState = CollectorAppState.FOREGROUND
     private var appStateChangedMs = clock.nowMs()
     private var lastAuthorizationLabel: String? = null
+    private var lastPlace: CollectionAnchor? = null
+    private var openVertical: EventMarkerType? = null
+    private var openVerticalAnchor: CollectionAnchor? = null
+    /** relative altitude at the last vertical anchor (start, stair/elevator/ramp end, entrance) */
+    private var verticalReference: Double? = null
 
     init {
         // A state file at process start means the process died while collecting (§5.5). Activity recreation never
@@ -151,12 +167,14 @@ class CollectionCoordinator(
 
     // ---- public API ----
 
+    /** [startAnchor]: where the collector stands (node, building, floor), recorded as the sessionStart marker. */
     fun startSession(
         collectorId: String,
         owner: UploadOwner,
         motionRate: MotionSamplingRate,
         locationProfile: LocationCollectionProfile,
         distanceFilter: Double,
+        startAnchor: CollectionAnchor? = null,
     ) {
         val startedAt = clock.nowMs() // the moment Start was pressed; fixed for every re-send
         executor.post {
@@ -168,13 +186,22 @@ class CollectionCoordinator(
             publish()
             // The declination needs a recent position; wait briefly for it (never recorded as a sample).
             location.lastKnownPosition { position ->
-                executor.post { beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position) }
+                executor.post {
+                    beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position)
+                    val started = session
+                    if (started != null && startAnchor != null) {
+                        recordMarker(started, EventMarkerType.sessionStart, startAnchor, startedAt)
+                        publish()
+                    }
+                }
             }
         }
     }
 
-    fun stopSession() = executor.post {
+    /** [endAnchor]: where the collector stands at the end, recorded as the sessionEnd marker before the finish. */
+    fun stopSession(endAnchor: CollectionAnchor? = null) = executor.post {
         val current = session ?: return@post
+        if (endAnchor != null) recordMarker(current, EventMarkerType.sessionEnd, endAnchor, clock.nowMs())
         stopSensors("user_stop")
         val finished = current.copy(status = CollectionStatus.completed, endedAt = clock.nowMs(), sampleCounts = counts)
         sync.finish(
@@ -194,18 +221,45 @@ class CollectionCoordinator(
         publish()
     }
 
-    fun addMarker(type: EventMarkerType) = executor.post {
+    fun addMarker(type: EventMarkerType, anchor: CollectionAnchor? = null) = executor.post {
         val current = session ?: return@post
+        recordMarker(current, type, anchor, clock.nowMs())
+        publish()
+    }
+
+    private fun recordMarker(current: CollectionSession, type: EventMarkerType, anchor: CollectionAnchor?, at: Long) {
         val fix = lastFix
         val marker = MarkerPayload(
-            markerId = newId(), clientSessionId = current.id, timestamp = Iso.format(clock.nowMs()), type = type.wire,
+            markerId = newId(), clientSessionId = current.id, timestamp = Iso.format(at), type = type.wire,
             latitude = fix?.latitude, longitude = fix?.longitude, altitude = fix?.altitude, ellipsoidalAltitude = fix?.ellipsoidalAltitude,
             horizontalAccuracy = fix?.horizontalAccuracy, verticalAccuracy = fix?.verticalAccuracy,
+            nodeId = anchor?.nodeId, buildingId = anchor?.buildingId, floor = anchor?.floor, direction = anchor?.direction,
+            fromFloor = anchor?.fromFloor, toFloor = anchor?.toFloor,
         )
         repository.appendMarker(marker)
         sync.appendMarker(marker, needsLocation = fix == null)
         counts = counts.copy(marker = counts.marker + 1)
         trackCounts()
+        noteAnchor(type, anchor)
+    }
+
+    /** Keeps the current place for the pickers and the barometric reference for the stairs/elevator reminder. */
+    private fun noteAnchor(type: EventMarkerType, anchor: CollectionAnchor?) {
+        when (type) {
+            EventMarkerType.stairStart, EventMarkerType.elevatorBoard, EventMarkerType.rampStart -> {
+                openVertical = type
+                openVerticalAnchor = anchor
+            }
+            EventMarkerType.stairEnd, EventMarkerType.elevatorExit, EventMarkerType.rampEnd -> {
+                openVertical = null
+                openVerticalAnchor = null
+                verticalReference = latestRelativeAltitude
+                anchor?.toFloor?.let { floor -> lastPlace = lastPlace?.copy(floor = floor, nodeId = null, nodeLabel = null) }
+            }
+            EventMarkerType.sessionStart, EventMarkerType.entrance -> verticalReference = latestRelativeAltitude
+            else -> Unit
+        }
+        if (anchor?.buildingId != null) lastPlace = CollectionAnchor(buildingId = anchor.buildingId, floor = anchor.floor)
     }
 
     fun resumeInterrupted(owner: UploadOwner) = executor.post {
@@ -482,6 +536,7 @@ class CollectionCoordinator(
         sync.appendAltimeter(sample)
         counts = counts.copy(altimeter = counts.altimeter + 1)
         latestRelativeAltitude = reading.relativeAltitude
+        if (verticalReference == null) verticalReference = reading.relativeAltitude
         runtime = runtime?.let {
             it.copy(
                 altimeterSequence = altimeterSequence, lastAltimeterTimestamp = timestampMs,
@@ -552,6 +607,10 @@ class CollectionCoordinator(
         latestLocation = null
         latestRelativeAltitude = null
         latestStepCount = null
+        lastPlace = null
+        openVertical = null
+        openVerticalAnchor = null
+        verticalReference = null
     }
 
     private fun startPayload(s: CollectionSession) = SessionStartPayload(
@@ -577,6 +636,9 @@ class CollectionCoordinator(
             lastLocationMs = r?.lastLocationTimestamp, lastMotionMs = r?.lastMotionTimestamp,
             lastAltimeterMs = r?.lastAltimeterTimestamp, lastPedometerMs = r?.lastPedometerTimestamp,
             lastPersistedMs = r?.lastPersistedAt, diagnostics = r?.diagnostics, starting = starting,
+            lastPlace = lastPlace, openVertical = openVertical, openVerticalAnchor = openVerticalAnchor,
+            verticalReminder = session != null && openVertical == null && verticalReference != null && latestRelativeAltitude != null &&
+                abs(latestRelativeAltitude!! - verticalReference!!) > AnchorRules.VERTICAL_REMINDER_M,
             publishedAtMs = clock.nowMs(),
         )
     }

@@ -44,6 +44,11 @@ export interface FusionMetrics {
     healthStrideBlend: number | null;
   } | null;
   terrain: AlgorithmSummary['terrain'] | null;
+  startHeightSelection?: AlgorithmSummary['startHeightSelection'];
+  roadHeightAnchors?: AlgorithmSummary['roadHeightAnchors'];
+  markerAnchors?: AlgorithmSummary['markerAnchors'];
+  circularCorridor?: AlgorithmSummary['circularCorridor'];
+  absoluteAltitude?: AlgorithmSummary['absoluteAltitude'];
   validation: FusionValidation;
 }
 
@@ -52,6 +57,7 @@ const RAD = Math.PI / 180;
 
 export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutput[], summary: AlgorithmSummary): FusionMetrics {
   const fixes = timeline.filter((o): o is Extract<Observation, { kind: 'gps' }> => o.kind === 'gps');
+  const absolute = outputs.some((o) => o.zDatumSource != null && o.zDatumSource !== 'NONE' && o.ellipsoidalAltitude != null);
   const valid = fixes.filter((f) => f.horizontalAccuracy !== null && f.horizontalAccuracy > 0);
   const accuracies = valid.map((f) => f.horizontalAccuracy!).sort((a, b) => a - b);
   let rawPath = 0;
@@ -103,6 +109,20 @@ export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutp
       healthStrideBlend: summary.healthStrideBlend ?? null,
     },
     terrain: summary.terrain ?? null,
-    validation: validateFusion(timeline, outputs.map((o) => ({ latitude: o.latitude, longitude: o.longitude, height: o.geomZ }))),
+    absoluteAltitude: summary.absoluteAltitude,
+    startHeightSelection: summary.startHeightSelection ?? null,
+    roadHeightAnchors: summary.roadHeightAnchors,
+    markerAnchors: summary.markerAnchors,
+    circularCorridor: summary.circularCorridor,
+    validation: validateFusion(timeline, outputs.map((o) => ({ latitude: o.latitude, longitude: o.longitude, height: zRangeHeight(o, absolute) }))),
   };
+}
+
+/**
+ * geomZ falls back to relative Z where a point has no absolute height. A run that leaves some points without a
+ * reference (v4 unknown-height runs) must not compare those relative values with absolute heights in the Z range.
+ */
+function zRangeHeight(o: FusedOutput, absolute: boolean): number | null {
+  if (!absolute) return o.geomZ;
+  return o.ellipsoidalAltitude != null ? o.geomZ : null;
 }

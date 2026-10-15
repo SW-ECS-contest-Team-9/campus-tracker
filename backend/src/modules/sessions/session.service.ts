@@ -1,3 +1,4 @@
+import { trainingLabel } from '../markers/marker-anchor.js';
 import { withTransaction } from '../../config/database.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../common/errors/app-error.js';
@@ -10,6 +11,7 @@ import { sessionRepository, type SessionRow } from './session.repository.js';
 import { fusionService } from '../fusion/fusion.service.js';
 import { evaluateStrideCalibration } from '../fusion/fusion.stride.js';
 import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
+import { BEACON_FEATURE } from '../positioning/beacon.dto.js';
 import type {
   DiagnosticEventsRequest,
   ListSessionsQuery,
@@ -36,13 +38,29 @@ export function syncStateOf(view: Pick<SessionView, 'status' | 'finalizedAt' | '
   return 'OFFLINE';
 }
 
+/**
+ * Why a session may NOT be interrupted by hand, or null when it may. Allowed only for a session the phone has
+ * visibly left behind: still ACTIVE, the collector's socket is gone, and nothing was received for the delayed-upload
+ * window (a tunnel or elevator drops the socket for seconds; that is not a dead session).
+ */
+export function manualInterruptBlock(status: string, socketConnected: boolean, syncState: SyncState): 'NOT_ACTIVE' | 'COLLECTOR_CONNECTED' | 'RECENTLY_RECEIVED' | null {
+  if (status !== 'ACTIVE') return 'NOT_ACTIVE';
+  if (socketConnected) return 'COLLECTOR_CONNECTED';
+  if (syncState !== 'OFFLINE') return 'RECENTLY_RECEIVED';
+  return null;
+}
+
 /** Additive API fields; existing fields are unchanged. */
-function decorate(view: SessionView) {
+function decorate({ anchorMarkers, ...view }: SessionView) {
   const connected = realtimeState.get(view.collectorId)?.socketConnected ?? false;
   return {
     ...view,
+    /** "학습용 유효": the session has start/end anchors and paired stair/elevator anchors (markers/marker-anchor.ts) */
+    trainingLabel: trainingLabel(anchorMarkers ?? []),
     collectionState: view.status,
     syncState: syncStateOf(view, connected),
+    /** null = the preview may interrupt this session by hand (POST /sessions/:id/interrupt) */
+    manualInterruptBlock: manualInterruptBlock(view.status, connected, syncStateOf(view, connected)),
     fusion: { version: REALTIME_FUSION_VERSION, state: view.fusionState, needsReprocess: view.needsReprocess },
   };
 }
@@ -54,10 +72,23 @@ async function broadcastSession(kind: 'started' | 'finished', sessionId: string)
   else previewBroadcast.sessionFinished(decorate(view));
 }
 
+/** Lifecycle trace (finish / syncComplete / final replay): best effort, never part of the ACK's success. */
+export function traceSession(sessionId: string, eventType: `SERVER_${string}`, metadata: Record<string, unknown> = {}) {
+  void sessionRepository.insertServerEvent(sessionId, eventType, metadata)
+    .catch((e) => logger.warn('session.trace_failed', { sessionId, eventType, message: e instanceof Error ? e.message : String(e) }));
+}
+
 function ownedOrThrow(identity: CollectorIdentity, session: SessionRow | null): SessionRow {
   if (!session) throw AppError.notFound('SESSION_NOT_FOUND', 'Session not found');
   if (session.collector_id !== identity.collectorDatabaseId) throw AppError.forbidden('SESSION_FORBIDDEN', 'Session belongs to another collector');
   return session;
+}
+
+/** Optional telemetry streams this server stores (session:start ack). An app must not send a stream the server would drop. */
+export const SUPPORTED_TELEMETRY_FEATURES = ['absoluteAltitudeV1'] as const;
+/** Advertised features: beaconObservationsV1 only while BEACON_POSITIONING=on (apps hold beacon rows otherwise). */
+export function supportedTelemetryFeatures(): string[] {
+  return [...SUPPORTED_TELEMETRY_FEATURES, ...(env.BEACON_POSITIONING === 'on' ? [BEACON_FEATURE] : [])];
 }
 
 export const sessionService = {
@@ -142,6 +173,7 @@ export const sessionService = {
       if (created) {
         fusionService.sessionStarted(session.id, identity.collectorId, {
           strideCalibration: session.stride_calibration_status === 'ACCEPTED' ? session.stride_calibration : null,
+          absoluteAltitudeEnabled: req.sensorCapabilities.absoluteAltitudeEnabled === true,
         });
         await broadcastSession('started', session.id);
       }
@@ -154,6 +186,8 @@ export const sessionService = {
       status: session.status,
       collectionState: session.status,
       resumed: !created,
+      // New and resumed sessions alike: the phone holds optional streams back until the server confirms them.
+      supportedTelemetryFeatures: supportedTelemetryFeatures(),
       strideCalibration: {
         status: session.stride_calibration_status,
         reason: session.stride_calibration_reason,
@@ -177,6 +211,12 @@ export const sessionService = {
       logger.info('session.finish_duplicate', { collectorId: identity.collectorId, sessionId: session.id });
     }
     if (sync?.synchronized) fusionService.finalizeSoon(session.id, 0);
+    // after the state change is stored: the ACK below reports what is already durable
+    traceSession(session.id, 'SERVER_FINISH_RECEIVED', {
+      duplicate: !changed, interrupted: req.interrupted ?? false, endedAt: row.ended_at?.toISOString() ?? null,
+      manifest: sync ? { synchronized: sync.synchronized } : null,
+      finalReplay: sync?.synchronized ? 'NOW' : changed ? 'AFTER_UPLOAD_IDLE' : 'UNCHANGED',
+    });
 
     return {
       ok: true as const,
@@ -195,7 +235,8 @@ export const sessionService = {
   async compareManifest(sessionId: string, expected: SyncCompleteRequest['lastSequences']) {
     const server = await sessionRepository.maxSequences(sessionId);
     const streams: Record<string, { expected: number | null; server: number | null; synchronized: boolean }> = {};
-    for (const key of ['location', 'motion', 'altimeter', 'pedometer'] as const) {
+    for (const key of ['location', 'motion', 'altimeter', 'pedometer', 'absoluteAltitude'] as const) {
+      if (key === 'absoluteAltitude' && expected[key] == null) continue;
       const exp = expected[key] ?? null;
       // pedometer: compare by max client sequence when sent, else by row count - 1 (0-based)
       const have = key === 'pedometer' ? (server.pedometer ?? (server.pedometer_count > 0 ? server.pedometer_count - 1 : null)) : server[key];
@@ -213,6 +254,12 @@ export const sessionService = {
     const sync = await this.compareManifest(session.id, req.lastSequences);
     logger.info('session.sync_complete', { collectorId: identity.collectorId, sessionId: session.id, synchronized: sync.synchronized });
     if (sync.synchronized && session.status !== 'ACTIVE') fusionService.finalizeSoon(session.id, 0);
+    traceSession(session.id, 'SERVER_SYNC_COMPLETE_RECEIVED', {
+      synchronized: sync.synchronized, status: session.status,
+      behind: Object.fromEntries(Object.entries(sync.streams).filter(([, v]) => !v.synchronized).map(([k, v]) => [k, { expected: v.expected, server: v.server }])),
+      // syncComplete before finish never finalizes: the session is still collecting
+      finalReplay: sync.synchronized && session.status !== 'ACTIVE' ? 'NOW' : session.status === 'ACTIVE' ? 'WAITS_FOR_FINISH' : 'WAITS_FOR_MISSING_DATA',
+    });
     return { ok: true as const, sessionId: session.id, collectionState: session.status, ...sync };
   },
 
@@ -243,7 +290,60 @@ export const sessionService = {
   /** Detail: state + raw statistics (counts, live vs recovered, capture/receive ranges, receive delay, gaps). */
   async detail(sessionId: string) {
     const view = await this.get(sessionId);
-    return { ...view, raw: await sessionRepository.rawStats(sessionId) };
+    const [raw, fusion] = await Promise.all([sessionRepository.rawStats(sessionId), fusionService.summary(sessionId)]);
+    const run = fusion.runs.find((r: { algorithmVersion: string }) => r.algorithmVersion === REALTIME_FUSION_VERSION) as
+      | { id: string; status: string; trigger: string; completedAt: Date | null; error: string | null } | undefined;
+    const manifest = raw.syncManifest as { synchronized?: boolean; comparedAt?: string } | null;
+    return {
+      ...view,
+      raw,
+      /** One place to follow a session from "stop" to the final result. Unknown stays null — never assumed. */
+      finalization: {
+        finishRequestedAt: view.finishRequestedAt,
+        manifestReceived: manifest !== null,
+        manifestSynchronized: manifest?.synchronized ?? null,
+        manifestComparedAt: manifest?.comparedAt ?? null,
+        /** the debounced final replay is scheduled in this server process (lost on restart, recovered at start-up) */
+        finalReplayScheduled: fusion.finalizePending,
+        fusionState: view.fusionState,
+        needsReprocess: view.needsReprocess,
+        finalizedAt: view.finalizedAt,
+        lastPublishedRun: run ? { id: run.id, status: run.status, trigger: run.trigger, completedAt: run.completedAt, error: run.error } : null,
+        /** the server cannot see the phone's upload queue; without a manifest this is unknown, not zero */
+        pendingOnDevice: manifest === null ? null : manifest.synchronized ? 0 : 'SOME',
+      },
+    };
+  },
+
+  /**
+   * Preview: close a session the phone left ACTIVE (no finish request, socket gone, nothing received lately), so its
+   * final replay (smoother) runs. Nothing is deleted and nothing is refused afterwards: raw data the phone uploads
+   * later is stored as a late upload and finalization runs again; a later session:finish turns it into FINISHED.
+   * The phone is NOT told to stop — the conditions are what makes that acceptable.
+   */
+  async interruptManually(sessionId: string) {
+    const view = await this.get(sessionId);
+    if (view.manualInterruptBlock) {
+      const why = {
+        NOT_ACTIVE: `Session is ${view.status}, not ACTIVE`,
+        COLLECTOR_CONNECTED: `${view.collectorId} is connected: stop the collection on the phone instead`,
+        RECENTLY_RECEIVED: `Data arrived within the last ${Math.round(env.SYNC_DELAYED_WINDOW_MS / 1000)} s: the phone may only be out of coverage`,
+      }[view.manualInterruptBlock];
+      throw AppError.conflict(`INTERRUPT_${view.manualInterruptBlock}`, why);
+    }
+    if (!(await sessionRepository.interruptManually(sessionId))) throw AppError.conflict('INTERRUPT_NOT_ACTIVE', 'Session is no longer ACTIVE');
+    logger.info('session.interrupted_manually', { collectorId: view.collectorId, sessionId, lastReceivedAt: view.lastReceivedAt });
+    traceSession(sessionId, 'SERVER_MANUAL_INTERRUPT', { lastReceivedAt: view.lastReceivedAt, lastCapturedAt: view.lastCapturedAt, finalReplay: 'AFTER_UPLOAD_IDLE' });
+    previewBroadcast.collectorStatus(realtimeState.sessionEnded(view.collectorId, sessionId));
+    fusionService.sessionFinished(sessionId, view.collectorId);
+    await broadcastSession('finished', sessionId);
+    return this.get(sessionId);
+  },
+
+  /** Phone lifecycle events + server trace (SERVER_*), by time. */
+  async diagnosticEventList(sessionId: string) {
+    await this.get(sessionId);
+    return sessionRepository.listDiagnosticEvents(sessionId);
   },
 
   /**

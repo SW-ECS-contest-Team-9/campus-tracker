@@ -64,6 +64,9 @@ class AuthenticationManager(
 
     val authenticatedCollectorId: String? get() = (state.value as? AuthState.Authenticated)?.collectorId
 
+    /** Stored access token for REST calls that need it (beacon config); null when signed out. */
+    fun accessToken(): String? = if (authenticatedCollectorId != null) tokens.load() else null
+
     val currentOwner: UploadOwner?
         get() {
             val id = authenticatedCollectorId ?: return null

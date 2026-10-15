@@ -3,8 +3,10 @@
 //
 // Visual language: collector color = identity. Raw = same color, thin + translucent. Fused = same color, thick + solid
 // with a white outline. Raw sample dots are colored by GPS accuracy instead.
+import { anchorLabel } from './anchor-label';
 import type { FusedPosition, LocationPoint, Marker, SpatialGpsDecision, SpatialMap } from './api';
 import type { Viewer } from './vworld';
+import { canDrawFusedHeightIn3D, describeFusedHeight, fusedDisplayHeight, hasAbsoluteHeight, splitByDrawableHeight } from './track-display';
 
 const Cesium = () => (window as any).Cesium;
 
@@ -29,11 +31,23 @@ export function heightOf(p: { altitude: number | null; ellipsoidalAltitude: numb
   return { h: 0, source: 'none' };
 }
 
+/**
+ * Raw GPS dots and line: drawn at the fused height of the same moment ('fused', default) or at the phone's own GPS
+ * height ('phone'). iPhone GPS heights sat 30-55 m under the terrain for minutes (vertical accuracy reported 3 m)
+ * while the barometer moved, so drawn at their own height the raw dots disappeared under the ground.
+ */
+export type RawHeightMode = 'fused' | 'phone';
+let rawHeightMode: RawHeightMode = 'fused';
+export const setRawHeightMode = (mode: RawHeightMode) => {
+  rawHeightMode = mode;
+};
+/** Fused points farther than this in time from a raw fix do not lend it their height. */
+const RAW_HEIGHT_MAX_GAP_MS = 120_000;
+
 function toCartesian(p: { longitude: number; latitude: number }, h: number) {
   // Always (longitude, latitude, height) — never swap.
   return Cesium().Cartesian3.fromDegrees(p.longitude, p.latitude, h);
 }
-const rawCartesian = (p: LocationPoint) => toCartesian(p, heightOf(p).h);
 /** "entrance floor +N" for a building + ellipsoidal height, from the building calibration (set by main.ts). */
 let floorLabel: (building: string | null | undefined, ellipsoidal: number | null | undefined) => string | null = () => null;
 export const setFloorLabel = (fn: typeof floorLabel) => {
@@ -42,10 +56,10 @@ export const setFloorLabel = (fn: typeof floorLabel) => {
 export const describeFloor = (building: string | null | undefined, ellipsoidal: number | null | undefined) => floorLabel(building, ellipsoidal);
 /**
  * Fused height: its ellipsoidal estimate. Without a vertical datum (v4: no ground contact / consistent GPS height)
- * the point is drawn on the terrain (DEM + 1 m phone height) when known, else at the given fallback.
+ * the point is only PROJECTED onto the terrain (DEM + 1 m) so it can be seen, else drawn at the given fallback.
+ * That drawing height is not a floor: such points and line stretches are drawn hollow / thin-dashed (track-display.ts).
  */
-const fusedCartesian = (p: FusedPosition, fallbackH: number) =>
-  toCartesian(p, p.ellipsoidalAltitude != null ? sceneHeight(p.ellipsoidalAltitude) : p.terrainHeight != null ? p.terrainHeight + 1 : fallbackH);
+const fusedCartesian = (p: FusedPosition, fallbackH: number) => toCartesian(p, fusedDisplayHeight(p, fallbackH, sceneHeight).h);
 
 export function accuracyColor(hacc: number | null): string {
   if (hacc == null || hacc < 0) return '#9ca3af';
@@ -201,7 +215,7 @@ export class SessionTrack {
       if (last && byCapture(p, last) < 0) outOfOrder = true;
       const dot = this.rawDots.add({
         id: { kind: 'raw', sessionId: this.sessionId, seq: p.sequence } satisfies PickId,
-        position: rawCartesian(p),
+        position: this.rawPosition(p),
         pixelSize: 6,
         color: C.Color.fromCssColorString(accuracyColor(p.horizontalAccuracy)).withAlpha(0.85),
         outlineColor: C.Color.BLACK.withAlpha(0.5),
@@ -213,7 +227,7 @@ export class SessionTrack {
     }
     if (added === 0) return 0;
     if (outOfOrder) this.points.sort(byCapture);
-    this.rawLine.polyline.positions = this.points.map(rawCartesian);
+    this.rawLine.polyline.positions = this.points.map((q) => this.rawPosition(q));
     for (const v of this.fusedLayers.keys()) this.redrawFused(v);
     this.applyGpsDecisions();
     return added;
@@ -221,6 +235,37 @@ export class SessionTrack {
 
   fused(version: string): FusedPosition[] {
     return this.fusedLayers.get(version)?.list ?? [];
+  }
+
+  /** Drawing height of a raw fix (see RawHeightMode): the nearest live fused point in time, else its own. */
+  rawHeight(p: LocationPoint): number {
+    const own = heightOf(p).h;
+    const list = rawHeightMode === 'fused' ? this.fusedLayers.get(this.liveVersion)?.list : undefined;
+    if (!list?.length) return own;
+    const t = Date.parse(p.timestamp);
+    let lo = 0;
+    let hi = list.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (Date.parse(list[mid].timestamp) <= t) lo = mid;
+      else hi = mid;
+    }
+    const near = [list[lo], list[hi]].reduce((a, b) => (Math.abs(Date.parse(b.timestamp) - t) < Math.abs(Date.parse(a.timestamp) - t) ? b : a));
+    if (Math.abs(Date.parse(near.timestamp) - t) > RAW_HEIGHT_MAX_GAP_MS) return own;
+    return fusedDisplayHeight(near, own, sceneHeight).h;
+  }
+
+  private rawPosition(p: LocationPoint) {
+    return toCartesian(p, this.rawHeight(p));
+  }
+
+  /** Raw dots and line again (the live fused track or the raw height mode changed). */
+  redrawRaw() {
+    for (const p of this.points) {
+      const dot = this.rawDotBySeq.get(p.sequence);
+      if (dot) dot.position = this.rawPosition(p);
+    }
+    this.rawLine.polyline.positions = this.points.map((q) => this.rawPosition(q));
   }
 
   setSpatialGpsDecisions(decisions: SpatialGpsDecision[], version = 'fusion-v3') {
@@ -275,7 +320,10 @@ export class SessionTrack {
     if (added) {
       l.list.sort((a, b) => a.fusionSequence - b.fusionSequence);
       this.redrawFused(version);
-      if (version === this.liveVersion) this.applyGpsDecisions();
+      if (version === this.liveVersion) {
+        this.applyGpsDecisions();
+        if (rawHeightMode === 'fused') this.redrawRaw();
+      }
     }
     return added;
   }
@@ -287,7 +335,10 @@ export class SessionTrack {
     l.seqs.clear();
     this.addFused(version, list);
     this.redrawFused(version);
-    if (version === this.liveVersion) this.applyGpsDecisions();
+    if (version === this.liveVersion) {
+      this.applyGpsDecisions();
+      if (rawHeightMode === 'fused') this.redrawRaw();
+    }
   }
 
   private fallbackHeight() {
@@ -310,30 +361,52 @@ export class SessionTrack {
       segment.push(point);
       segments.set(id, segment);
     }
-    l.line.polyline.positions = (segments.get(currentSegmentId) ?? []).map((f) => fusedCartesian(f, h));
+    // The main line carries the current segment's stretch WITH an absolute height; a stretch without a vertical
+    // datum is only projected onto the terrain and gets its own thin dotted line, so it cannot be read as a floor.
+    const live = version === this.liveVersion;
+    const absoluteLine = (positions: any[]) => this.viewer.entities.add({
+      polyline: {
+        positions,
+        width: live ? 5 : 3,
+        material: live
+          ? new C.PolylineOutlineMaterialProperty({ color, outlineColor: C.Color.WHITE, outlineWidth: 1.5 })
+          : new C.PolylineDashMaterialProperty({ color: color.withAlpha(0.9), gapColor: C.Color.BLACK.withAlpha(0.35), dashLength: dashLengthFor(version, this.allVersions) }),
+        depthFailMaterial: new C.PolylineDashMaterialProperty({ color: color.withAlpha(live ? 0.8 : 0.5) }),
+      },
+    });
+    const projectedLine = (positions: any[]) => this.viewer.entities.add({
+      polyline: {
+        positions,
+        width: 2,
+        material: new C.PolylineDashMaterialProperty({ color: color.withAlpha(0.75), gapColor: C.Color.TRANSPARENT, dashLength: 8 }),
+        depthFailMaterial: new C.PolylineDashMaterialProperty({ color: color.withAlpha(0.35), dashLength: 8 }),
+      },
+    });
     for (const line of l.additionalLines) this.viewer.entities.remove(line);
     l.additionalLines.length = 0;
+    let mainUsed = false;
+    l.line.polyline.positions = [];
     for (const [segmentId, segment] of segments) {
-      if (segmentId === currentSegmentId || segment.length < 2) continue;
-      l.additionalLines.push(this.viewer.entities.add({
-        polyline: {
-          positions: segment.map((f) => fusedCartesian(f, h)),
-          width: version === this.liveVersion ? 5 : 3,
-          material: version === this.liveVersion
-            ? new C.PolylineOutlineMaterialProperty({ color, outlineColor: C.Color.WHITE, outlineWidth: 1.5 })
-            : new C.PolylineDashMaterialProperty({ color: color.withAlpha(0.9), gapColor: C.Color.BLACK.withAlpha(0.35), dashLength: dashLengthFor(version, this.allVersions) }),
-          depthFailMaterial: new C.PolylineDashMaterialProperty({ color: color.withAlpha(version === this.liveVersion ? 0.8 : 0.5) }),
-        },
-      }));
+      for (const run of splitByDrawableHeight(segment)) {
+        if (run.points.length < 2) continue;
+        const positions = run.points.map((f) => fusedCartesian(f, h));
+        if (run.absolute && segmentId === currentSegmentId && !mainUsed) {
+          l.line.polyline.positions = positions;
+          mainUsed = true;
+        } else l.additionalLines.push(run.absolute ? absoluteLine(positions) : projectedLine(positions));
+      }
     }
+    for (const line of l.additionalLines) line.show = l.line.show;
     l.dots.removeAll();
     for (const f of l.list) {
+      if (!canDrawFusedHeightIn3D(f)) continue;
       l.dots.add({
         id: { kind: 'fused', sessionId: this.sessionId, version, seq: f.fusionSequence } satisfies PickId,
         position: fusedCartesian(f, h),
         pixelSize: version === this.liveVersion ? 5 : 4,
-        color: f.stationary ? C.Color.WHITE : color,
-        outlineColor: C.Color.BLACK.withAlpha(0.6),
+        // no vertical datum: hollow (drawn on the terrain only so it can be seen)
+        color: !hasAbsoluteHeight(f) ? color.withAlpha(0.12) : f.stationary ? C.Color.WHITE : color,
+        outlineColor: hasAbsoluteHeight(f) ? C.Color.BLACK.withAlpha(0.6) : f.stationary ? C.Color.WHITE : color,
         outlineWidth: 1,
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       });
@@ -380,7 +453,7 @@ export class SessionTrack {
     const at = m.fused ? { longitude: m.fused.longitude, latitude: m.fused.latitude } : m;
     const heightText = source === 'fused'
       ? `${m.fused!.buildingName ? `${m.fused!.buildingName} ` : ''}${floor ?? (m.fused!.heightAboveGround != null ? `ground +${m.fused!.heightAboveGround.toFixed(1)} m` : `${h.toFixed(1)} m`)}`
-      : `${h.toFixed(1)} m${source === 'msl' ? ' MSL' : ''} (phone)`;
+      : `${h.toFixed(1)} m${source === 'msl' ? ' MSL' : ''} (phone)${m.fused ? ' · 융합 고도 미확정' : ''}`;
     const entity = this.viewer.entities.add({
       position: toCartesian(at, h),
       point: {
@@ -391,7 +464,7 @@ export class SessionTrack {
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
       label: {
-        text: `${m.type}${m.note ? `: ${m.note}` : ''}\n${heightText}`,
+        text: `${anchorLabel(m)}${m.note ? `: ${m.note}` : ''}\n${heightText}`,
         font: '13px sans-serif',
         fillColor: C.Color.WHITE,
         outlineColor: C.Color.BLACK,
@@ -436,7 +509,7 @@ export class SessionTrack {
   flyTo() {
     const C = Cesium();
     const h = this.fallbackHeight();
-    const positions = this.points.map(rawCartesian);
+    const positions = this.points.map((p) => this.rawPosition(p));
     for (const [version, l] of this.fusedLayers) if (this.versionVisible(version)) positions.push(...l.list.map((f) => fusedCartesian(f, h)));
     for (const e of this.markers.values()) positions.push(e.position.getValue(C.JulianDate.now()));
     if (positions.length === 0) return;
@@ -526,25 +599,32 @@ export class CollectorVisualization {
     // "latest" = newest sensor time: a recovered backlog point must not move the live marker backwards
     if (this.latestRaw && this.latestRaw.sessionId === p.sessionId && byCapture(p, this.latestRaw) <= 0) return;
     this.latestRaw = p;
-    const { h, source } = heightOf(p);
-    this.raw.position = rawCartesian(p);
+    const { h: own, source } = heightOf(p);
+    const f = this.latestFused;
+    const h = rawHeightMode === 'fused' && f && f.sessionId === p.sessionId && Math.abs(Date.parse(f.timestamp) - Date.parse(p.timestamp)) <= RAW_HEIGHT_MAX_GAP_MS
+      ? fusedDisplayHeight(f, own, sceneHeight).h
+      : own;
+    this.raw.position = toCartesian(p, h);
     const r = p.horizontalAccuracy != null && p.horizontalAccuracy > 0 ? p.horizontalAccuracy : 0;
     this.raw.ellipse.semiMajorAxis = Math.max(r, 0.1);
     this.raw.ellipse.semiMinorAxis = Math.max(r, 0.1);
     this.raw.ellipse.height = h;
-    this.raw.label.text = `${this.collectorId} raw  ${h.toFixed(1)} m${source === 'msl' ? ' MSL' : source === 'none' ? ' (no alt)' : ''}  ±${r.toFixed(1)} m`;
+    this.raw.label.text = `${this.collectorId} raw  ${own.toFixed(1)} m${source === 'msl' ? ' MSL' : source === 'none' ? ' (no alt)' : ''}${h !== own ? ' (융합 높이에 표시)' : ''}  ±${r.toFixed(1)} m`;
     this.apply();
   }
 
   updateFused(f: FusedPosition & { sessionId: string }) {
     if (this.latestFused && this.latestFused.sessionId === f.sessionId && f.fusionSequence <= this.latestFused.fusionSequence) return;
     this.latestFused = f;
-    const h = f.ellipsoidalAltitude != null ? sceneHeight(f.ellipsoidalAltitude) : this.latestRaw ? heightOf(this.latestRaw).h : 0;
-    this.fusedEntity.position = fusedCartesian(f, h);
+    const fallback = this.latestRaw ? heightOf(this.latestRaw).h : 0;
+    const shown = fusedDisplayHeight(f, fallback, sceneHeight);
+    // the number is only printed when it is an estimated height; a drawing height is named as such
+    const heightText = shown.kind === 'ABSOLUTE' ? `${shown.h.toFixed(1)} m` : describeFusedHeight(f).status;
+    this.fusedEntity.position = toCartesian(f, shown.h);
     const building = f.buildingName ? `  ·  ${f.buildingName} (참고)` : '';
     const capturedAt = new Date(f.timestamp).toLocaleTimeString();
   const lastValid = f.algorithmVersion === 'fusion-v3' || f.algorithmVersion === 'fusion-v3.1' ? '최근 유효 위치' : '위치';
-    this.fusedEntity.label.text = `${this.collectorId}  ${lastValid} ${capturedAt}  conf ${f.overallConfidence.toFixed(2)}  ${h.toFixed(1)} m${f.heading != null ? `  ${f.heading.toFixed(0)}°` : ''}${building}`;
+    this.fusedEntity.label.text = `${this.collectorId}  ${lastValid} ${capturedAt}  내부 conf ${f.overallConfidence.toFixed(2)}  ${heightText}${f.heading != null ? `  ${f.heading.toFixed(0)}°` : '  방향 미확정'}${building}`;
     this.apply();
   }
 

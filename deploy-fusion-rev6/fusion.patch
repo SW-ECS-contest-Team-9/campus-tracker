@@ -1,0 +1,1131 @@
+diff --git a/backend/src/modules/fusion/fusion-state-v4.ts b/backend/src/modules/fusion/fusion-state-v4.ts
+index 212137b..6dec9a4 100644
+--- a/backend/src/modules/fusion/fusion-state-v4.ts
++++ b/backend/src/modules/fusion/fusion-state-v4.ts
+@@ -2,9 +2,16 @@ import type { TerrainContext } from '../../geo/terrain.js';
+ import type { LocalOrigin } from '../../geo/wgs84.js';
+ import { createPedometerCounter, type PedometerCounter } from './fusion.pedometer.js';
+ import { diag3, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
++import type { StrideCalibration } from './fusion.stride.js';
+ 
+-/** One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk. */
+-export interface StepV4 { t: number; rel: number; length: number; stairs: boolean; segment: number }
++/**
++ * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
++ * Vertical movement can be confirmed as stairs (tread) or a slope (full stride), or retained as verticalUnknown
++ * until there is enough path evidence; z = barometric Z at the step.
++ */
++export interface StepV4 {
++  t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean; segment: number; z?: number;
++}
+ /** A usable GPS fix in local ENU meters (kept for the smoother). */
+ export interface FixV4 {
+   t: number;
+@@ -36,6 +43,8 @@ export interface SmoothedSummaryV4 {
+   segmentsWithHeading: number;
+   steps: number;
+   stairSteps: number;
++  slopeSteps: number;
++  verticalUnknownSteps: number;
+   walkedWithoutMotionM: number;
+   /** diagnostics (rev 4): robust weight and final residual of every fix (aligned with state.fixes), kept ground contacts */
+   fixWeights: number[];
+@@ -44,6 +53,11 @@ export interface SmoothedSummaryV4 {
+ }
+ 
+ export interface FusionStateV4 {
++  healthStrideCalibration?: StrideCalibration;
++  strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
++  healthStrideBlend?: number;
++  strideLevelSteps: number;
++  strideEffectiveM?: number;
+   origin?: LocalOrigin;
+   initialized: boolean;
+   /** [x East m, y North m, theta rad] and its covariance */
+@@ -75,11 +89,30 @@ export interface FusionStateV4 {
+   accelWindow: { t: number; m2: number }[];
+   stationary: boolean;
+ 
+-  // ---- stride calibration (CMPedometer distance per detected level step) ----
++  // ---- stride calibration (CMPedometer distance per detected step, from pedometer updates of level walking) ----
+   strideA: number;
+   strideB: number;
+-  levelStepsSinceUpdate: number;
++  /** pedometer reading at the last stride sample and the pedometer updates since */
++  strideSample?: { steps: number | null; distance: number; updates: number };
++  stairStepsSinceUpdate: number;
++  slopeStepsSinceUpdate: number;
++  verticalUnknownStepsSinceUpdate: number;
+   stepsSinceUpdate: number;
++  /**
++   * current climb: vertical steps in one direction, at most slopeRunGapMs apart (stairs or slope: see slopeFrom),
++   * the stride of its slope walking, and the pedometer updates held back because their steps count as stairs
++   */
++  climb?: {
++    first: number;
++    dir: number;
++    lastT: number;
++    mode: 'unknown' | 'stairs' | 'slope';
++    strideA: number;
++    strideB: number;
++    held: { from: number; to: number; distance: number }[];
++  };
++  /** steps from this index on moved the live position by dead reckoning (not before a fix / heading fit set it) */
++  reckonedFrom: number;
+   pedometerCounter: PedometerCounter;
+   pedometerStarted: boolean;
+   lastPedometerSegment?: string | null;
+@@ -140,8 +173,12 @@ export const emptyWindowV4 = (): FusionStateV4['window'] => ({
+   gpsUsed: null, gpsReason: null, gpsSeq: null, gpsAccuracy: null, innovation: null, steps: 0, unheadedSteps: 0, anchored: false, reanchored: false,
+ });
+ 
+-export function createFusionStateV4(): FusionStateV4 {
++export function createFusionStateV4(context?: { strideCalibration: StrideCalibration | null }): FusionStateV4 {
+   return {
++    ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
++    ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),
++    strideLevelSteps: 0,
++    strideEffectiveM: context?.strideCalibration?.stepLengthM,
+     initialized: false,
+     x: [0, 0, 0],
+     P: diag3(1e8, 1e8, 1),
+@@ -157,8 +194,11 @@ export function createFusionStateV4(): FusionStateV4 {
+     stationary: false,
+     strideA: 0,
+     strideB: 0,
+-    levelStepsSinceUpdate: 0,
++    stairStepsSinceUpdate: 0,
++    slopeStepsSinceUpdate: 0,
++    verticalUnknownStepsSinceUpdate: 0,
+     stepsSinceUpdate: 0,
++    reckonedFrom: 0,
+     pedometerCounter: createPedometerCounter(),
+     pedometerStarted: false,
+     altWindow: [],
+diff --git a/backend/src/modules/fusion/fusion-v4.engine.ts b/backend/src/modules/fusion/fusion-v4.engine.ts
+index 19b1355..510661f 100644
+--- a/backend/src/modules/fusion/fusion-v4.engine.ts
++++ b/backend/src/modules/fusion/fusion-v4.engine.ts
+@@ -6,7 +6,8 @@
+  * flat-ground stride on stairs; yaw is in an arbitrary frame, so the absolute heading is unknown.
+  *
+  *  - steps:   detected from 50 Hz vertical user acceleration, each applied with the yaw at its own time;
+- *             stride = CMPedometer distance per detected level step; barometric |dz/dt| => stair tread
++ *             stride starts from the session Health prior (when valid), then this-session pedometer samples;
++ *             barometric vertical movement stays uncertain until a long straight ramp or folded stair run is clear
+  *  - heading: walking direction = -yaw + theta. theta is one unknown per heading segment (new segment on a
+  *             phone pose change / motion gap). It is found by fitting the walked shape to GPS fixes (robust grid
+  *             search) or carried over a segment change by assuming the walking direction continues.
+@@ -111,8 +112,63 @@ function verticalSpeed(s: FusionStateV4, t: number, c: FusionConfigV4): number {
+ }
+ 
+ function stride(s: FusionStateV4, c: FusionConfigV4) {
+-  if (s.strideB < c.strideCalibrationMinSteps) return c.defaultStrideM;
+-  return Math.min(c.strideMaxM, Math.max(c.strideMinM, s.strideA / s.strideB));
++  const learned = s.strideB >= c.strideCalibrationMinSteps
++    ? Math.min(c.strideMaxM, Math.max(c.strideMinM, s.strideA / s.strideB))
++    : null;
++  const health = s.healthStrideCalibration?.stepLengthM;
++  if (health === undefined) return learned ?? c.defaultStrideM;
++  const blend = Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps);
++  return learned === null ? health : (1 - blend) * health + blend * learned;
++}
++
++/** The stride on a slope is not the level one (0.59 m down an 18 % road, 0.81 m level): the pedometer distance of this climb. */
++function slopeStride(s: FusionStateV4, c: FusionConfigV4) {
++  const k = s.climb;
++  if (!k || k.strideB < c.strideCalibrationMinSteps) return stride(s, c);
++  return Math.min(c.strideMaxM, Math.max(c.strideMinM, k.strideA / k.strideB));
++}
++
++function reclassifySteps(s: FusionStateV4, from: number, toMode: 'stairs' | 'slope', rel: number, c: FusionConfigV4) {
++  const k = s.climb;
++  if (!k) return;
++  if (toMode === 'slope') {
++    for (const h of k.held) {
++      if (h.from < from) continue;
++      k.strideA = c.strideForgetting * k.strideA + h.distance;
++      k.strideB = c.strideForgetting * k.strideB + (h.to - h.from);
++    }
++    k.held = [];
++  } else {
++    // The held pedometer spans belong to stairs and must not become either a level or slope stride sample.
++    k.held = [];
++  }
++  const length = toMode === 'stairs' ? c.stairTreadM : slopeStride(s, c);
++  let dx = 0, dy = 0, q0 = 0, q1 = 0, q3 = 0;
++  let turn = 0, next = { rel, segment: s.segments.length - 1 };
++  for (let i = s.steps.length - 1; i >= from; i--) {
++    const p = s.steps[i];
++    if (p.segment !== next.segment) turn += next.rel - p.rel;
++    next = p;
++    if (!(p.stairs || p.slope || p.verticalUnknown)) continue;
++    const d = length - p.length;
++    p.stairs = toMode === 'stairs';
++    p.slope = toMode === 'slope';
++    p.verticalUnknown = false;
++    p.length = length;
++    if (i < s.reckonedFrom) continue;
++    const sn = Math.sin(p.rel + turn + s.x[2]), cs = Math.cos(p.rel + turn + s.x[2]);
++    const fraction = toMode === 'stairs' ? c.stairStrideSigmaFraction : c.slopeStrideSigmaFraction;
++    const variance = (fraction * d) ** 2;
++    dx += d * sn; dy += d * cs;
++    q0 += variance * sn * sn; q1 += variance * sn * cs; q3 += variance * cs * cs;
++  }
++  const open = s.steps.slice(s.steps.length - s.stepsSinceUpdate);
++  s.stairStepsSinceUpdate = open.filter((p) => p.stairs).length;
++  s.slopeStepsSinceUpdate = open.filter((p) => p.slope).length;
++  s.verticalUnknownStepsSinceUpdate = open.filter((p) => p.verticalUnknown).length;
++  if (!dx && !dy) return;
++  s.P = applyPrediction(s.P, { x: s.x, F: [1, 0, dy, 0, 1, -dx, 0, 0, 1], Q: [q0, q1, 0, q1, q3, 0, 0, 0, 0] });
++  s.x = [s.x[0] + dx, s.x[1] + dy, s.x[2]];
+ }
+ 
+ function startSegment(s: FusionStateV4, t: number, reason: string, r: StepResultV4, c: FusionConfigV4) {
+@@ -142,12 +198,89 @@ function resetStepDetector(s: FusionStateV4) {
+ // sensors
+ // ---------------------------------------------------------------------------------------------
+ 
++/**
++ * Stairs or slope? Both have the same barometric speed (a 15 % hill road and a stair flight: 0.2-0.3 m/s); rise per
++ * detected step and steadiness overlap. A long straight climb supports a slope; a climb with a sustained foldback
++ * supports stairs. A vertical climb without either pattern stays unknown and uses the walking stride with greater
++ * uncertainty. Long straight stairs and tight switchback ramps remain ambiguous with these sensors.
++ */
++function slopeFrom(s: FusionStateV4, t: number, rel: number, dir: number, c: FusionConfigV4): number | null {
++  let k = s.climb;
++  if (k && k.dir === dir && t - k.lastT <= c.slopeRunGapMs) k.lastT = t;
++  else k = s.climb = { first: s.steps.length, dir, lastT: t, mode: 'unknown', strideA: 0, strideB: 0, held: [] };
++  if (k.mode === 'slope') return k.first;
++  if (s.z === undefined) return null;
++  // the last slopeMinClimbM of the climb (+10 %: the barometer advances in ~1 s samples, several steps share one)
++  let east = Math.sin(rel), north = Math.cos(rel), from = s.steps.length, reached = false;
++  let turn = 0, next = { rel, segment: s.segments.length - 1 };
++  for (let i = s.steps.length - 1; i >= k.first; i--) {
++    const p = s.steps[i];
++    if (p.z === undefined || dir * (s.z - p.z) > 1.1 * c.slopeMinClimbM) break;
++    if (p.segment !== next.segment) turn += next.rel - p.rel; // the walking direction continues over a heading segment change
++    east += Math.sin(p.rel + turn);
++    north += Math.cos(p.rel + turn);
++    from = i;
++    next = p;
++    reached ||= dir * (s.z - p.z) >= c.slopeMinClimbM;
++  }
++  // walked (not an elevator or escalator ride with a few steps) and straight: net / walked length of the unit steps
++  const n = s.steps.length - from + 1;
++  if (reached && n * c.slopeMaxRiseM >= c.slopeMinClimbM && Math.hypot(east, north) / n >= c.slopeMinStraightness) {
++    k.mode = 'slope';
++    return from;
++  }
++  return null;
++}
++
++/** A sustained foldback during an active vertical climb is positive stair evidence. */
++function stairsFrom(s: FusionStateV4, rel: number, c: FusionConfigV4): number | null {
++  const k = s.climb;
++  if (!k) return null;
++  if (k.mode === 'stairs') return k.first;
++  const run = s.steps.slice(k.first);
++  const firstZ = run.find((p) => p.z !== undefined)?.z;
++  if (firstZ === undefined || s.z === undefined || k.dir * (s.z - firstZ) < c.stairConfirmMinRiseM) return null;
++  let east = 0, north = 0, turn = 0, walked = 0;
++  let prior = { rel, segment: s.segments.length - 1 };
++  let previousHeading: number | undefined;
++  for (const p of run) {
++    if (p.z === undefined) continue;
++    if (p.segment !== prior.segment) turn += prior.rel - p.rel;
++    const heading = p.rel + turn;
++    if (previousHeading !== undefined) walked += Math.abs(normalizeAngleRad(heading - previousHeading));
++    east += Math.sin(heading);
++    north += Math.cos(heading);
++    previousHeading = heading;
++    prior = p;
++  }
++  if (run.length < 8 || walked < c.stairConfirmMinTurnDeg * DEG
++      || Math.hypot(east, north) / run.length > c.stairConfirmMaxStraightness) return null;
++  k.mode = 'stairs';
++  return k.first;
++}
++
+ function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4, r: StepResultV4) {
+-  const stairs = Math.abs(verticalSpeed(s, t, c)) >= c.stairVerticalSpeedMps;
+-  const length = stairs ? c.stairTreadM : stride(s, c);
+-  s.steps.push({ t, rel, length, stairs, segment: s.segments.length - 1 });
++  const vz = verticalSpeed(s, t, c);
++  const vertical = Math.abs(vz) >= c.stairVerticalSpeedMps;
++  const straightFrom = vertical ? slopeFrom(s, t, rel, Math.sign(vz), c) : null;
++  const stairStart = vertical && straightFrom === null ? stairsFrom(s, rel, c) : null;
++  if (straightFrom !== null) reclassifySteps(s, straightFrom, 'slope', rel, c);
++  else if (stairStart !== null) reclassifySteps(s, stairStart, 'stairs', rel, c);
++  const mode = vertical ? s.climb?.mode ?? 'unknown' : 'unknown';
++  const stairs = vertical && mode === 'stairs';
++  const slope = vertical && mode === 'slope';
++  const verticalUnknown = vertical && mode === 'unknown';
++  const walkingStride = stride(s, c);
++  const length = stairs ? c.stairTreadM : slope ? slopeStride(s, c) : walkingStride;
++  s.strideEffectiveM = walkingStride;
++  s.healthStrideBlend = s.healthStrideCalibration ? Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps) : undefined;
++  s.strideSource = s.healthStrideCalibration && (s.healthStrideBlend ?? 0) < 1 ? 'APPLE_HEALTH'
++    : s.strideB >= c.strideCalibrationMinSteps ? 'SESSION_PEDOMETER' : 'DEFAULT';
++  s.steps.push({ t, rel, length, stairs, ...(slope ? { slope } : {}), ...(verticalUnknown ? { verticalUnknown } : {}), segment: s.segments.length - 1, z: s.z });
+   s.stepsSinceUpdate++;
+-  if (!stairs) s.levelStepsSinceUpdate++;
++  if (stairs) s.stairStepsSinceUpdate++;
++  else if (slope) s.slopeStepsSinceUpdate++;
++  else if (verticalUnknown) s.verticalUnknownStepsSinceUpdate++;
+   s.lastStepT = t;
+   s.vehicle = false;
+   if (s.pendingContinuity) {
+@@ -157,16 +290,26 @@ function applyStep(s: FusionStateV4, t: number, rel: number, c: FusionConfigV4,
+     s.pendingContinuity = undefined;
+   }
+   s.lastStepRel = rel;
++  if (!s.initialized || !s.headingKnown) s.reckonedFrom = s.steps.length;
+   if (!s.initialized) return;
+   advance(s, t, c);
++  const healthWeight = s.healthStrideCalibration ? 1 - Math.min(1, s.strideLevelSteps / c.healthStrideBlendSteps) : 0;
++  const healthSigmaFraction = s.healthStrideCalibration
++    ? Math.max(s.healthStrideCalibration.dispersionM, c.healthStrideSigmaFloorM) / length
++    : 0;
++  const strideSigma = stairs ? c.stairStrideSigmaFraction
++    : slope ? c.slopeStrideSigmaFraction
++      : verticalUnknown ? c.verticalUnknownStrideSigmaFraction
++        : Math.max(c.strideSigmaFraction, healthWeight * healthSigmaFraction);
+   const p = s.headingKnown
+-    ? predictStep(s.x, length, rel, stairs ? c.stairStrideSigmaFraction : c.strideSigmaFraction, c.headingRandomWalkDegPerStep * DEG)
++    ? predictStep(s.x, length, rel, strideSigma, c.headingRandomWalkDegPerStep * DEG)
+     : predictUnheaded(s.x, s.P, length);
+   s.P = applyPrediction(s.P, p);
+   s.x = p.x;
+   s.window.steps++;
+   if (!s.headingKnown) s.window.unheadedSteps++;
+-  if (s.terrain && s.headingKnown && !stairs && s.z !== undefined) {
++  // a slope may be a garage ramp below the DEM surface: like stairs, it is not a ground contact
++  if (s.terrain && s.headingKnown && !vertical && s.z !== undefined) {
+     const k = groundContact(s, t, s.x, s.P, s.z, c);
+     if (k) s.contacts.push(k);
+   }
+@@ -259,6 +402,15 @@ function applyMotion(s: FusionStateV4, o: Extract<Observation, { kind: 'motion'
+   s.f1 = { v: y, t: o.t, rel: s.rel };
+ }
+ 
++/** Starts the next stride sample at this pedometer reading. */
++function restartStrideSample(s: FusionStateV4, steps: number | null, distance: number) {
++  s.strideSample = { steps, distance, updates: 0 };
++  s.stairStepsSinceUpdate = 0;
++  s.slopeStepsSinceUpdate = 0;
++  s.verticalUnknownStepsSinceUpdate = 0;
++  s.stepsSinceUpdate = 0;
++}
++
+ function applyPedometer(s: FusionStateV4, o: Extract<Observation, { kind: 'pedometer' }>, c: FusionConfigV4) {
+   if (!finite(o.distance)) return;
+   const steps = finite(o.steps) ? o.steps : null;
+@@ -267,33 +419,55 @@ function applyPedometer(s: FusionStateV4, o: Extract<Observation, { kind: 'pedom
+   if (!s.pedometerStarted || segChanged) {
+     restartPedometerCounter(s.pedometerCounter, steps, o.distance);
+     s.pedometerStarted = true;
+-    s.levelStepsSinceUpdate = 0;
+-    s.stepsSinceUpdate = 0;
++    restartStrideSample(s, steps, o.distance);
+     return;
+   }
+   const before = s.pedometerCounter.maxDistance ?? o.distance;
+   const verdict = checkPedometerCounter(s.pedometerCounter, steps, o.distance);
+-  if (verdict === 'COUNTER_RESTARTED') {
+-    s.levelStepsSinceUpdate = 0;
+-    s.stepsSinceUpdate = 0;
+-  }
++  if (verdict === 'COUNTER_RESTARTED') restartStrideSample(s, steps, o.distance);
+   if (verdict !== 'OK') return;
+   const d = o.distance - before;
+-  if (d <= 0) return;
++  const detected = s.stepsSinceUpdate;
++  // the stretch since the last stride sample: its pedometer distance and steps against the steps detected here
++  const from = s.strideSample ?? { steps, distance: before, updates: 0 };
++  const updates = from.updates + 1;
++  if (d <= 0) {
++    if (detected) s.strideSample = { ...from, updates };
++    else restartStrideSample(s, steps, o.distance);
++    return;
++  }
++  const distance = o.distance - from.distance;
++  const counted = steps === null || from.steps === null ? null : steps - from.steps;
++  const sameSteps = counted === null || Math.abs(counted - detected) <= Math.max(1, c.strideStepMismatch * detected);
+   const motionMissing = s.lastMotionT === undefined || o.t - s.lastMotionT > c.motionGapMs;
+-  if (motionMissing || s.stepsSinceUpdate === 0) {
++  if (motionMissing || detected === 0) {
+     // walked, but no detected step can carry it (app suspended / steps too soft to detect): only uncertainty grows
+     s.walked.push({ t: o.t, distance: d });
+     if (s.initialized) {
+       advance(s, o.t, c);
+       s.P = applyPrediction(s.P, predictUnheaded(s.x, s.P, d));
+     }
+-  } else if (Math.abs(verticalSpeed(s, o.t, c)) < c.stairVerticalSpeedMps && s.levelStepsSinceUpdate > 0) {
+-    s.strideA = c.strideForgetting * s.strideA + d;
+-    s.strideB = c.strideForgetting * s.strideB + s.levelStepsSinceUpdate;
++  } else if (!sameSteps && updates < c.strideSampleMaxUpdates) {
++    // CMPedometer reports in bursts (4 steps, then 7): the stretch grows by the next update until the counts meet
++    s.strideSample = { ...from, updates };
++    return;
++  } else if (!sameSteps || updates > c.strideSampleMaxUpdates) {
++    // steps CMPedometer does not count (fidgeting, a shuffle in a room) are not walking strides: no sample
++  } else if (s.stairStepsSinceUpdate > 0 || s.verticalUnknownStepsSinceUpdate > 0) {
++    // Mixed/uncertain vertical spans cannot train either the flat or slope stride until the climb is classified.
++    if (s.climb && s.climb.mode !== 'stairs') s.climb.held.push({ from: s.steps.length - detected, to: s.steps.length, distance });
++  } else {
++    const k = s.slopeStepsSinceUpdate > 0 ? s.climb : undefined;
++    if (k) {
++      k.strideA = c.strideForgetting * k.strideA + distance;
++      k.strideB = c.strideForgetting * k.strideB + detected;
++    } else {
++      s.strideA = c.strideForgetting * s.strideA + distance;
++      s.strideB = c.strideForgetting * s.strideB + detected;
++      s.strideLevelSteps += detected;
++    }
+   }
+-  s.levelStepsSinceUpdate = 0;
+-  s.stepsSinceUpdate = 0;
++  restartStrideSample(s, steps, o.distance);
+ }
+ 
+ function applyAltimeter(s: FusionStateV4, o: Extract<Observation, { kind: 'altimeter' }>, c: FusionConfigV4) {
+@@ -349,6 +523,7 @@ function maybeReanchor(s: FusionStateV4, t: number, c: FusionConfigV4, r: StepRe
+   }
+   const shift = Math.hypot(mx - s.x[0], my - s.x[1]);
+   s.x = [mx, my, s.x[2]];
++  s.reckonedFrom = s.steps.length;
+   const theta = s.P[8] + (20 * DEG) ** 2;
+   s.P = diag3(ms * ms, ms * ms, theta);
+   s.counters.reanchors++;
+@@ -368,6 +543,7 @@ function tryHeadingFit(s: FusionStateV4, t: number, c: FusionConfigV4, r: StepRe
+   const fit = fitHeading(steps, fixes, c);
+   if (!fit) return;
+   s.x = [fit.endX, fit.endY, fit.theta];
++  s.reckonedFrom = s.steps.length;
+   const pos = Math.max(fit.medianResidual, c.positionSigmaFloorM) ** 2;
+   s.P = diag3(pos, pos, fit.sigma ** 2);
+   s.headingKnown = true;
+@@ -417,6 +593,8 @@ function applyGps(s: FusionStateV4, o: Extract<Observation, { kind: 'gps' }>, c:
+   if (used) {
+     s.x = u.x;
+     s.P = floorPosition(u.P, c.positionSigmaFloorM);
++    // Do not add a later reclassification delta to steps already reconciled by an accepted GPS fix.
++    s.reckonedFrom = s.steps.length;
+     s.rejectRun = [];
+     acceptGps(s, o, r, innovation);
+   } else {
+@@ -749,7 +927,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
+     headings = segmentHeadings(s, weights, c);
+     const events: SmootherEvent[] = [
+       ...s.segments.map((g, k): SmootherEvent => ({ kind: 'segment', t: g.startT, theta: headings[k].theta, thetaVar: headings[k].variance })),
+-      ...s.steps.map((p): SmootherEvent => ({ kind: 'step', t: p.t, rel: p.rel, length: p.length, stairs: p.stairs })),
++      ...s.steps.map((p): SmootherEvent => ({ kind: 'step', t: p.t, rel: p.rel, length: p.length, stairs: p.stairs,
++        slope: p.slope === true, verticalUnknown: p.verticalUnknown === true })),
+       ...s.walked.map((w): SmootherEvent => ({ kind: 'walked', t: w.t, distance: w.distance })),
+       ...s.fixes.map((f, i): SmootherEvent => ({ kind: 'fix', t: f.t, index: i, x: f.x, y: f.y, sigma: f.sigma, vehicle: f.vehicle })),
+     ].sort((a, b) => a.t - b.t || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
+@@ -787,7 +966,7 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
+     let known = false;
+     for (const p of points) {
+       if (p.event.kind === 'segment') known = p.event.theta !== null;
+-      if (p.event.kind !== 'step' || !known || p.event.stairs) continue;
++      if (p.event.kind !== 'step' || !known || p.event.stairs || p.event.slope || p.event.verticalUnknown) continue;
+       const z = zAt(p.t);
+       if (z === null) continue;
+       const k = groundContact(s, p.t, p.x, p.P, z, c);
+@@ -809,6 +988,8 @@ export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResul
+     segmentsWithHeading: headings.filter((h) => h.theta !== null).length,
+     steps: s.steps.length,
+     stairSteps: s.steps.filter((p) => p.stairs).length,
++    slopeSteps: s.steps.filter((p) => p.slope).length,
++    verticalUnknownSteps: s.steps.filter((p) => p.verticalUnknown).length,
+     walkedWithoutMotionM: s.walked.reduce((a, w) => a + w.distance, 0),
+     fixWeights: weights,
+     fixResiduals: finalResiduals(s, points),
+@@ -901,9 +1082,14 @@ export function summarizeV4(s: FusionStateV4) {
+     altimeterRebases: s.counters.altimeterRebases,
+     stepsDetected: s.steps.length,
+     stairSteps: s.steps.filter((p) => p.stairs).length,
++    slopeSteps: s.steps.filter((p) => p.slope).length,
++    verticalUnknownSteps: s.steps.filter((p) => p.verticalUnknown).length,
+     headingSegments: s.segments.length,
+     headingSegmentsWithHeading: s.smoothed?.segmentsWithHeading ?? null,
+-    strideM: s.strideB >= 20 ? Math.round((s.strideA / s.strideB) * 100) / 100 : null,
++    strideM: s.strideEffectiveM === undefined ? null : Math.round(s.strideEffectiveM * 100) / 100,
++    strideSource: s.strideSource,
++    healthStrideM: s.healthStrideCalibration?.stepLengthM ?? null,
++    healthStrideBlend: s.healthStrideBlend ?? null,
+     terrain: s.smoothed
+       ? { versionId: s.terrain?.versionId ?? null, datumSource: s.smoothed.datumSource, contacts: s.smoothed.contacts, datumSigmaM: s.smoothed.datumSigma, driftRangeM: s.smoothed.driftRangeM, geoidSeparationM: s.terrain?.geoidSeparation ?? null }
+       : null,
+diff --git a/backend/src/modules/fusion/fusion-v4.smoother.ts b/backend/src/modules/fusion/fusion-v4.smoother.ts
+index 213ecb5..834eee1 100644
+--- a/backend/src/modules/fusion/fusion-v4.smoother.ts
++++ b/backend/src/modules/fusion/fusion-v4.smoother.ts
+@@ -201,7 +201,7 @@ export function fitHeading(steps: FitStep[], fixes: FitFix[], c: FusionConfigV4)
+ 
+ export type SmootherEvent =
+   | { kind: 'segment'; t: number; theta: number | null; thetaVar: number }
+-  | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean }
++  | { kind: 'step'; t: number; rel: number; length: number; stairs: boolean; slope?: boolean; verticalUnknown?: boolean }
+   | { kind: 'walked'; t: number; distance: number } // pedometer distance while motion was missing
+   | { kind: 'fix'; t: number; index: number; x: number; y: number; sigma: number; vehicle: boolean };
+ 
+@@ -243,7 +243,9 @@ export function smoothEvents(events: SmootherEvent[], weights: number[], gate: n
+     } else if (e.kind === 'step') {
+       vehicle = false;
+       const p2 = thetaKnown
+-        ? predictStep(pred.x, e.length, e.rel, e.stairs ? c.stairStrideSigmaFraction : c.strideSigmaFraction, rw)
++        ? predictStep(pred.x, e.length, e.rel, e.stairs ? c.stairStrideSigmaFraction
++          : e.slope ? c.slopeStrideSigmaFraction
++            : e.verticalUnknown ? c.verticalUnknownStrideSigmaFraction : c.strideSigmaFraction, rw)
+         : predictUnheaded(pred.x, Pk, e.length);
+       Pk = applyPrediction(Pk, p2);
+       F = mul3(p2.F, F);
+diff --git a/backend/src/modules/fusion/fusion.algorithms.ts b/backend/src/modules/fusion/fusion.algorithms.ts
+index 239b159..4f40be5 100644
+--- a/backend/src/modules/fusion/fusion.algorithms.ts
++++ b/backend/src/modules/fusion/fusion.algorithms.ts
+@@ -1,5 +1,6 @@
+ import { env } from '../../config/env.js';
+ import { fusionConfigV1, fusionConfigV2, fusionConfigV21, fusionConfigV4, type FusionConfigV4 } from './fusion.config.js';
++import type { FusionSessionContext } from './fusion.stride.js';
+ import { flushFusion, processObservation, type FusionEvent } from './fusion.engine.js';
+ import { describeEventV2, flushFusionV2, processObservationV2, summarizeV2, type FusionEventV2 } from './fusion-v2.engine.js';
+ import { createFusionState, type FusionState } from './fusion-state.js';
+@@ -36,9 +37,14 @@ export interface AlgorithmSummary {
+   // v4
+   stepsDetected?: number;
+   stairSteps?: number;
++  slopeSteps?: number;
++  verticalUnknownSteps?: number;
+   headingSegments?: number;
+   headingSegmentsWithHeading?: number | null;
+   strideM?: number | null;
++  strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
++  healthStrideM?: number | null;
++  healthStrideBlend?: number | null;
+   terrain?: { versionId: string | null; datumSource: string; contacts: number; datumSigmaM: number | null; driftRangeM: number | null; geoidSeparationM: number | null } | null;
+ }
+ 
+@@ -56,7 +62,7 @@ export interface FusionAlgorithm<S = any, E = any> {
+   requiresSpatialMap?: boolean;
+   /** Uses the session's terrain version (DEM) when there is one: part of the reproducibility hash. */
+   usesTerrain?: boolean;
+-  createState(): S;
++  createState(context?: FusionSessionContext): S;
+   process(state: S, obs: Observation): { outputs: FusedOutput[]; events: E[] };
+   flush(state: S): { outputs: FusedOutput[]; events: E[] };
+   /** Replay only (not for a session that continues live): replaces all outputs, e.g. with a smoothed trajectory. */
+@@ -180,12 +186,14 @@ const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
+ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => ({
+   version: 'fusion-v4',
+   // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors;
+-  // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3
+-  revision: 4,
++  // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3;
++  // 5: long straight ramps retain a calibrated stride; 6: Health stride prior + uncertain vertical movement uses stride,
++  //    confirmed stair classification is separated from barometric vertical-motion detection.
++  revision: 6,
+   usesTerrain: true,
+-  description: 'Step-level PDR (50 Hz steps, stair-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
++  description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
+   config: cfg,
+-  createState: createFusionStateV4,
++  createState: (context) => createFusionStateV4(cfg.healthStrideEnabled ? context : undefined),
+   process: (s, o) => processObservationV4(s, o, cfg),
+   flush: (s) => flushFusionV4(s, cfg),
+   finalize: (s) => finalizeFusionV4(s, cfg),
+diff --git a/backend/src/modules/fusion/fusion.config.ts b/backend/src/modules/fusion/fusion.config.ts
+index 481d117..eeb665e 100644
+--- a/backend/src/modules/fusion/fusion.config.ts
++++ b/backend/src/modules/fusion/fusion.config.ts
+@@ -547,15 +547,30 @@ export const fusionConfigV4 = {
+   stepMaxIntervalS: 1.3,
+   stepConfirmPeaks: 3, // periodic peaks in a row before they count as walking (phone handling is not periodic)
+   motionGapMs: 2000, // longer motion gap => new heading segment
+-  // stride: CMPedometer distance per detected level step, flat-ground default until calibrated
++  // stride: CMPedometer distance per detected step (level and slope walking), flat-ground default until calibrated
+   defaultStrideM: 0.72,
+   strideMinM: 0.35,
+   strideMaxM: 1.1,
+   strideCalibrationMinSteps: 20,
+   strideForgetting: 0.97, // per pedometer update
+-  stairVerticalSpeedMps: 0.13, // barometric |dz/dt| while stepping => stairs
++  healthStrideEnabled: true, // optional session-scoped HealthKit prior; false for paired-control variants
++  healthStrideBlendSteps: 40, // accepted level steps to transition from the Health prior to this-session pedometer stride
++  healthStrideSigmaFloorM: 0.1, // do not treat an aggregate from HealthKit as a precise per-step measurement
++  strideStepMismatch: 0.3, // a stride sample needs CMPedometer's step count within this fraction (or 1 step) of ours
++  strideSampleMaxUpdates: 3, // ...over at most this many pedometer updates (it reports in bursts: 0, 0, 10 steps)
++  stairVerticalSpeedMps: 0.13, // barometric |dz/dt| while stepping => vertical movement; pattern decides stairs/slope
+   stairWindowMs: 4000,
+   stairTreadM: 0.3, // horizontal progress per stair step
++  // slope (ramp / hill road) vs stairs: same barometric speed and rise per step; stairs fold back or end after a storey
++  slopeMinClimbM: 5, // a climb longer than this (more than one storey) in one direction, along a straight path, is a slope
++  slopeMinStraightness: 0.7, // net / walked length of the steps over that climb (stairwells measured <= 0.35, slopes >= 0.87)
++  slopeRunGapMs: 4000, // vertical steps further apart are separate climbs (a landing or level stretch in between)
++  slopeMaxRiseM: 0.25, // per step: steeper than a 25-30 % grade is not walked (elevator / escalator with a few steps)
++  slopeStrideSigmaFraction: 0.15,
++  verticalUnknownStrideSigmaFraction: 0.35,
++  stairConfirmMinRiseM: 1.0,
++  stairConfirmMaxStraightness: 0.55,
++  stairConfirmMinTurnDeg: 120,
+   // heading = -yaw + theta (yaw is relative); theta is estimated per heading segment
+   poseChangeDeg: 50, // gravity direction change in the phone frame (hand <-> pocket) => new segment
+   poseChangeHoldMs: 1000,
+diff --git a/backend/src/modules/fusion/fusion.diagnostics.ts b/backend/src/modules/fusion/fusion.diagnostics.ts
+index 4076b6b..8b6412e 100644
+--- a/backend/src/modules/fusion/fusion.diagnostics.ts
++++ b/backend/src/modules/fusion/fusion.diagnostics.ts
+@@ -41,7 +41,7 @@ export function diagnosticsFromEvents(events: unknown[]): RunDiagnostics {
+   return { fixes: [...fixes.values()], events: out };
+ }
+ 
+-/** v4: forward decisions + smoother weights/residuals, steps (with stairs), kept ground contacts. */
++/** v4: forward decisions + smoother weights/residuals, stair/slope/uncertain steps, kept ground contacts. */
+ export function diagnosticsV4(s: FusionStateV4, events: FusionEventV4[]): RunDiagnostics {
+   const d = diagnosticsFromEvents(events);
+   if (s.smoothed) {
+@@ -55,7 +55,7 @@ export function diagnosticsV4(s: FusionStateV4, events: FusionEventV4[]): RunDia
+     d.fixes = [...bySeq.values()];
+     for (const k of s.smoothed.contactLog) d.events.push({ t: k.t, type: 'ground-contact', details: { offset: k.offset, sigma: Math.sqrt(k.variance) } });
+   }
+-  for (const p of s.steps) d.events.push({ t: p.t, type: p.stairs ? 'stair-step' : 'step', details: { length: p.length, segment: p.segment } });
++  for (const p of s.steps) d.events.push({ t: p.t, type: p.stairs ? 'stair-step' : 'step', details: { length: p.length, segment: p.segment, ...(p.slope ? { slope: true } : {}) } });
+   d.events.sort((a, b) => a.t - b.t);
+   d.fixes.sort((a, b) => a.t - b.t || a.seq - b.seq);
+   return d;
+diff --git a/backend/src/modules/fusion/fusion.metrics.ts b/backend/src/modules/fusion/fusion.metrics.ts
+index 4fd613d..0e8e80b 100644
+--- a/backend/src/modules/fusion/fusion.metrics.ts
++++ b/backend/src/modules/fusion/fusion.metrics.ts
+@@ -31,7 +31,18 @@ export interface FusionMetrics {
+     fallbackStepDistanceM: number;
+     horizontalUncertaintyM: number | null;
+   } | null;
+-  pdr: { stepsDetected: number; stairSteps: number; headingSegments: number; headingSegmentsWithHeading: number | null; strideM: number | null } | null;
++  pdr: {
++    stepsDetected: number;
++    stairSteps: number;
++    slopeSteps: number;
++    verticalUnknownSteps: number;
++    headingSegments: number;
++    headingSegmentsWithHeading: number | null;
++    strideM: number | null;
++    strideSource: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT' | null;
++    healthStrideM: number | null;
++    healthStrideBlend: number | null;
++  } | null;
+   terrain: AlgorithmSummary['terrain'] | null;
+   validation: FusionValidation;
+ }
+@@ -82,9 +93,14 @@ export function computeFusionMetrics(timeline: Observation[], outputs: FusedOutp
+     pdr: summary.stepsDetected === undefined ? null : {
+       stepsDetected: summary.stepsDetected,
+       stairSteps: summary.stairSteps ?? 0,
++      slopeSteps: summary.slopeSteps ?? 0,
++      verticalUnknownSteps: summary.verticalUnknownSteps ?? 0,
+       headingSegments: summary.headingSegments ?? 0,
+       headingSegmentsWithHeading: summary.headingSegmentsWithHeading ?? null,
+       strideM: summary.strideM ?? null,
++      strideSource: summary.strideSource ?? null,
++      healthStrideM: summary.healthStrideM ?? null,
++      healthStrideBlend: summary.healthStrideBlend ?? null,
+     },
+     terrain: summary.terrain ?? null,
+     validation: validateFusion(timeline, outputs.map((o) => ({ latitude: o.latitude, longitude: o.longitude, height: o.geomZ }))),
+diff --git a/backend/src/modules/fusion/fusion.pipeline.ts b/backend/src/modules/fusion/fusion.pipeline.ts
+index 738b4cb..47882e2 100644
+--- a/backend/src/modules/fusion/fusion.pipeline.ts
++++ b/backend/src/modules/fusion/fusion.pipeline.ts
+@@ -6,6 +6,7 @@ import { spatial } from '../../geo/spatial.js';
+ import { terrain, type TerrainContext } from '../../geo/terrain.js';
+ import { buildTimeline, compareObservations, type Observation, type RawSamples } from './fusion.timeline.js';
+ import type { FusionAlgorithm } from './fusion.algorithms.js';
++import type { FusionSessionContext } from './fusion.stride.js';
+ import type { FusedOutput } from './fusion.types.js';
+ import { fusionRepository } from './fusion.repository.js';
+ 
+@@ -65,8 +66,8 @@ export interface ReplayResult {
+ }
+ 
+ /** Authoritative replay of a sensor-time-ordered timeline. continuesLive: no flush / finalize (realtime goes on). */
+-export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], opts: { finalize: boolean; state?: unknown }): ReplayResult {
+-  const state = opts.state ?? algo.createState();
++export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], opts: { finalize: boolean; state?: unknown; context?: FusionSessionContext }): ReplayResult {
++  const state = opts.state ?? algo.createState(opts.context);
+   const r = runObservations(algo, state, timeline);
+   const forward = r.outputs;
+   const events = r.events;
+@@ -86,8 +87,8 @@ export function replayInMemory(algo: FusionAlgorithm, timeline: Observation[], o
+  * one created_at) and fed in arrival order through the realtime reorder buffer, then the live finish (flush).
+  * Reproduces what the realtime result looked like, including samples dropped because they arrived too late.
+  */
+-export function replayAsReceived(algo: FusionAlgorithm, batches: Observation[][], windowMs: number): ReplayResult & { skippedLate: number } {
+-  const state = algo.createState();
++export function replayAsReceived(algo: FusionAlgorithm, batches: Observation[][], windowMs: number, context?: FusionSessionContext): ReplayResult & { skippedLate: number } {
++  const state = algo.createState(context);
+   const buffer = new ReorderBuffer(windowMs);
+   const forward: FusedOutput[] = [];
+   const events: unknown[] = [];
+diff --git a/backend/src/modules/fusion/fusion.repository.ts b/backend/src/modules/fusion/fusion.repository.ts
+index fdf6b63..91ce04a 100644
+--- a/backend/src/modules/fusion/fusion.repository.ts
++++ b/backend/src/modules/fusion/fusion.repository.ts
+@@ -205,14 +205,14 @@ export const fusionRepository = {
+     trigger: string,
+     config: object,
+     configHash: string,
+-    extra: { revision: number; variant: string | null; overrides: object | null; mode: string; codeRef: string | null; published: boolean } | null = null,
++    extra: { revision: number; variant: string | null; overrides: object | null; mode: string; codeRef: string | null; published: boolean; inputHash?: string | null } | null = null,
+     db: DbClient = pool,
+   ): Promise<string> {
+     const { rows } = await db.query<{ id: string }>(
+-      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash, revision, variant, overrides, mode, code_ref, published)
+-       VALUES ($1, $2, 'RUNNING', $3, $4, $5, $6, $7, $8, COALESCE($9, 'SENSOR_TIME'), $10, COALESCE($11, true)) RETURNING id`,
++      `INSERT INTO fusion_runs (session_id, algorithm_version, status, trigger, config, config_hash, revision, variant, overrides, mode, code_ref, published, input_hash)
++       VALUES ($1, $2, 'RUNNING', $3, $4, $5, $6, $7, $8, COALESCE($9, 'SENSOR_TIME'), $10, COALESCE($11, true), $12) RETURNING id`,
+       [sessionId, version, trigger, JSON.stringify(config), configHash, extra?.revision ?? null, extra?.variant ?? null,
+-        extra?.overrides ? JSON.stringify(extra.overrides) : null, extra?.mode ?? null, extra?.codeRef ?? null, extra?.published ?? null],
++        extra?.overrides ? JSON.stringify(extra.overrides) : null, extra?.mode ?? null, extra?.codeRef ?? null, extra?.published ?? null, extra?.inputHash ?? null],
+     );
+     return rows[0].id;
+   },
+@@ -263,10 +263,11 @@ export const fusionRepository = {
+     return rows;
+   },
+ 
+-  async hasCompletedRun(sessionId: string, version: string, configHash: string, db: DbClient = pool): Promise<boolean> {
++  async hasCompletedRun(sessionId: string, version: string, configHash: string, inputHash: string | null = null, db: DbClient = pool): Promise<boolean> {
+     const { rowCount } = await db.query(
+-      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3 AND status = 'COMPLETED' AND published LIMIT 1`,
+-      [sessionId, version, configHash],
++      `SELECT 1 FROM fusion_runs WHERE session_id = $1 AND algorithm_version = $2 AND config_hash = $3
++        AND input_hash IS NOT DISTINCT FROM $4 AND status = 'COMPLETED' AND published LIMIT 1`,
++      [sessionId, version, configHash, inputHash],
+     );
+     return (rowCount ?? 0) > 0;
+   },
+diff --git a/backend/src/modules/fusion/fusion.service.ts b/backend/src/modules/fusion/fusion.service.ts
+index 72d54f4..53eb602 100644
+--- a/backend/src/modules/fusion/fusion.service.ts
++++ b/backend/src/modules/fusion/fusion.service.ts
+@@ -19,6 +19,7 @@ import { codeRef } from '../../common/code-ref.js';
+ import { loadReplayInputs, ReorderBuffer, replayAsReceived, replayInMemory, runObservations, withTerrain, type ReplayResult } from './fusion.pipeline.js';
+ import { fusionRunsRepository, type ReplayMode } from './fusion-runs.repository.js';
+ import { qcService } from '../qc/qc.service.js';
++import { strideCalibrationConfig, strideCalibrationHash, type FusionSessionContext } from './fusion.stride.js';
+ 
+ /**
+  * Orchestrates fusion around the raw pipeline. Fusion is DERIVED processing:
+@@ -86,11 +87,17 @@ function sensorEventRows(version: string, events: unknown[]) {
+   });
+ }
+ 
+-export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null): string {
++function sessionInputHash(algo: FusionAlgorithm, context: FusionSessionContext): string | null {
++  if (algo.version !== 'fusion-v4' || (algo.config as { healthStrideEnabled?: boolean }).healthStrideEnabled === false) return null;
++  return strideCalibrationHash(context.strideCalibration);
++}
++
++export function configHash(algo: FusionAlgorithm, mapVersionId: string | null = null, terrainVersionId: string | null = null, inputHash: string | null = null): string {
+   // version + engine revision + exact config: identical hash => identical results for the same raw data
+   const hash = createHash('sha256').update(`${algo.version}#${algo.revision}`);
+   if (algo.requiresSpatialMap) hash.update(`#${mapVersionId ?? 'NO_MAP'}`);
+   if (algo.usesTerrain) hash.update(`#terrain:${terrainVersionId ?? 'NONE'}`);
++  if (inputHash) hash.update(`#input:${inputHash}`);
+   return hash.update(JSON.stringify(algo.config)).digest('hex').slice(0, 16);
+ }
+ 
+@@ -215,11 +222,14 @@ export async function replaySession(sessionId: string, version: string, trigger:
+   let lastT = -Infinity;
+   let outcome: 'success' | 'failed' = 'failed';
+   const terrainVersionId = algo.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
++  const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
++  const inputHash = sessionInputHash(algo, context);
+   const runConfig = algo.requiresSpatialMap || algo.usesTerrain
+-    ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId }
++    ? { algorithm: algo.config, spatialMapVersionId: mapVersionId, terrainVersionId,
++      ...(version === 'fusion-v4' ? { sessionInput: { strideCalibration: strideCalibrationConfig(context.strideCalibration), inputHash } } : {}) }
+     : algo.config;
+-  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId), {
+-    revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish,
++  const runId = await fusionRepository.createRun(sessionId, version, trigger, runConfig, configHash(algo, mapVersionId, terrainVersionId, inputHash), {
++    revision: algo.revision, variant: opts.variant ?? (isVariant ? 'custom' : null), overrides: opts.overrides ?? null, mode, codeRef: codeRef(), published: publish, inputHash,
+   });
+   try {
+     const inputs = await loadReplayInputs(sessionId, algo);
+@@ -230,9 +240,9 @@ export async function replaySession(sessionId: string, version: string, trigger:
+       const spatialContext = await spatial.context(mapVersionId);
+       const batches = (await fusionRunsRepository.loadArrivalBatches(sessionId))
+         .map((b) => withTerrain(spatial.annotate(buildTimeline(b, { sessionStartedAt: session.startedAt }), spatialContext), terrainContext));
+-      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS);
++      r = replayAsReceived(algo, batches, env.FUSION_REORDER_WINDOW_MS, context);
+     } else {
+-      r = replayInMemory(algo, timeline, { finalize: !continuesLive });
++      r = replayInMemory(algo, timeline, { finalize: !continuesLive, context });
+     }
+     const { state, outputs, events } = r;
+     const history = sensorEventRows(version, events);
+@@ -303,9 +313,9 @@ async function reprocessNow(sessionId: string, version: string, trigger: ReplayT
+ 
+ export const fusionService = {
+   /** session:start (new session): fresh state, uninitialized until the first usable GPS fix. */
+-  sessionStarted(sessionId: string, collectorId: string) {
++  sessionStarted(sessionId: string, collectorId: string, context: FusionSessionContext = { strideCalibration: null }) {
+     void enqueue(sessionId, 'start', async () => {
+-      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
++      if (!live.has(sessionId)) live.set(sessionId, { collectorId, state: realtimeAlgo().createState(context), reorder: new ReorderBuffer(env.FUSION_REORDER_WINDOW_MS) });
+     });
+   },
+ 
+@@ -431,7 +441,9 @@ export const fusionService = {
+       throw AppError.conflict('SPATIAL_MAP_UNAVAILABLE', `${version} requires a valid spatial map pinned to this session`);
+     }
+     const terrainVersionId = algo?.usesTerrain ? await terrain.sessionVersion(sessionId) : null;
+-    if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId)))) {
++    const context: FusionSessionContext = { strideCalibration: await sessionRepository.getStrideCalibration(sessionId) };
++    const inputHash = algo ? sessionInputHash(algo, context) : null;
++    if (!force && algo && (await fusionRepository.hasCompletedRun(sessionId, version, configHash(algo, mapVersionId, terrainVersionId, inputHash), inputHash))) {
+       const run = (await fusionRepository.latestRuns(sessionId)).find((r) => r.algorithmVersion === version);
+       return { sessionId, algorithmVersion: version, skipped: true, reason: 'already processed with the same code and config (use force)', run };
+     }
+diff --git a/backend/src/modules/fusion/fusion.stride.ts b/backend/src/modules/fusion/fusion.stride.ts
+new file mode 100644
+index 0000000..80b07a1
+--- /dev/null
++++ b/backend/src/modules/fusion/fusion.stride.ts
+@@ -0,0 +1,99 @@
++import { createHash } from 'node:crypto';
++import { z } from 'zod';
++
++export const STRIDE_CALIBRATION_SOURCE = 'APPLE_HEALTH_WALKING_STEP_LENGTH' as const;
++export const STRIDE_CALIBRATION_AGGREGATION = 'median_mad_v1' as const;
++export const STRIDE_CALIBRATION_SOURCE_POLICY = 'IPHONE_AUTOMATIC_V1' as const;
++
++export const StrideCalibrationSchema = z.object({
++  schemaVersion: z.literal(1),
++  source: z.literal(STRIDE_CALIBRATION_SOURCE),
++  aggregationVersion: z.literal(STRIDE_CALIBRATION_AGGREGATION),
++  sourcePolicy: z.literal(STRIDE_CALIBRATION_SOURCE_POLICY),
++  stepLengthM: z.number().finite().min(0.2).max(1.5),
++  sampleCount: z.number().int().min(0).max(5000),
++  observedDays: z.number().int().min(0).max(29),
++  dispersionM: z.number().finite().min(0).max(1.5),
++  windowStart: z.string().datetime({ offset: true }),
++  windowEnd: z.string().datetime({ offset: true }),
++  latestSampleAt: z.string().datetime({ offset: true }),
++  computedAt: z.string().datetime({ offset: true }),
++}).strict();
++
++export type StrideCalibration = z.infer<typeof StrideCalibrationSchema>;
++export type StrideCalibrationReason = 'MISSING' | 'INVALID_FORMAT' | 'UNSUPPORTED_VERSION' | 'INSUFFICIENT_DATA' | 'STALE'
++  | 'OUT_OF_RANGE' | 'EXCESSIVE_DISPERSION' | 'INVALID_TIME';
++export type StrideCalibrationDecision = {
++  status: 'ACCEPTED' | 'FALLBACK';
++  reason: StrideCalibrationReason | null;
++  calibration: StrideCalibration | null;
++};
++
++const DAY_MS = 86_400_000;
++const WINDOW_TOLERANCE_MS = 1000;
++const MAX_AGE_AT_START_MS = 14 * DAY_MS;
++const MAX_COMPUTE_AGE_MS = DAY_MS;
++const WALK_STRIDE_MIN_M = 0.35;
++const WALK_STRIDE_MAX_M = 1.1;
++
++function fallback(reason: StrideCalibrationReason): StrideCalibrationDecision {
++  return { status: 'FALLBACK', reason, calibration: null };
++}
++
++/** Validates the optional app summary without allowing a bad calibration to reject session capture. */
++export function evaluateStrideCalibration(raw: unknown, startedAt: string | null, now = Date.now()): StrideCalibrationDecision {
++  if (raw === undefined || raw === null) return fallback('MISSING');
++  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return fallback('INVALID_FORMAT');
++  const record = raw as Record<string, unknown>;
++  if (record.schemaVersion !== 1 || record.aggregationVersion !== STRIDE_CALIBRATION_AGGREGATION
++      || record.source !== STRIDE_CALIBRATION_SOURCE || record.sourcePolicy !== STRIDE_CALIBRATION_SOURCE_POLICY) {
++    return fallback('UNSUPPORTED_VERSION');
++  }
++  const parsed = StrideCalibrationSchema.safeParse(raw);
++  if (!parsed.success) return fallback('INVALID_FORMAT');
++  const c = parsed.data;
++  if (c.sampleCount < 20 || c.observedDays < 3 || c.observedDays > c.sampleCount) return fallback('INSUFFICIENT_DATA');
++  if (c.dispersionM > 0.2) return fallback('EXCESSIVE_DISPERSION');
++  if (c.stepLengthM < WALK_STRIDE_MIN_M || c.stepLengthM > WALK_STRIDE_MAX_M) return fallback('OUT_OF_RANGE');
++  if (!startedAt) return fallback('INVALID_TIME');
++
++  const start = Date.parse(startedAt);
++  const windowStart = Date.parse(c.windowStart);
++  const windowEnd = Date.parse(c.windowEnd);
++  const latest = Date.parse(c.latestSampleAt);
++  const computed = Date.parse(c.computedAt);
++  const ordered = [start, windowStart, windowEnd, latest, computed].every(Number.isFinite)
++    && Math.abs(windowEnd - computed) <= WINDOW_TOLERANCE_MS
++    && Math.abs((windowEnd - windowStart) - 28 * DAY_MS) <= WINDOW_TOLERANCE_MS
++    && windowStart <= latest && latest <= windowEnd
++    && latest <= start && computed <= start;
++  if (!ordered) return fallback('INVALID_TIME');
++  if (start - computed > MAX_COMPUTE_AGE_MS) return fallback('STALE');
++  if (latest < start - MAX_AGE_AT_START_MS) return fallback('STALE');
++  if (start - latest > MAX_AGE_AT_START_MS || start - computed > MAX_COMPUTE_AGE_MS) return fallback('STALE');
++
++  return { status: 'ACCEPTED', reason: null, calibration: c };
++}
++
++export function strideCalibrationHash(calibration: StrideCalibration | null): string {
++  return createHash('sha256').update(calibration ? JSON.stringify(calibration) : 'NO_HEALTH_STRIDE').digest('hex').slice(0, 64);
++}
++
++export function strideCalibrationConfig(calibration: StrideCalibration | null) {
++  return calibration ? {
++    schemaVersion: calibration.schemaVersion,
++    source: calibration.source,
++    aggregationVersion: calibration.aggregationVersion,
++    sourcePolicy: calibration.sourcePolicy,
++    stepLengthM: calibration.stepLengthM,
++    sampleCount: calibration.sampleCount,
++    observedDays: calibration.observedDays,
++    dispersionM: calibration.dispersionM,
++    windowStart: calibration.windowStart,
++    windowEnd: calibration.windowEnd,
++    latestSampleAt: calibration.latestSampleAt,
++    computedAt: calibration.computedAt,
++  } : null;
++}
++
++export type FusionSessionContext = { strideCalibration: StrideCalibration | null };
+diff --git a/backend/src/modules/sessions/session.dto.ts b/backend/src/modules/sessions/session.dto.ts
+index 9bc84d0..6231cb0 100644
+--- a/backend/src/modules/sessions/session.dto.ts
++++ b/backend/src/modules/sessions/session.dto.ts
+@@ -13,6 +13,8 @@ export const SessionStartRequest = z.object({
+   systemVersion: OptionalString(32),
+   appVersion: OptionalString(32),
+   sensorCapabilities: z.record(z.string(), z.unknown()).default({}),
++  /** Optional HealthKit summary; fusion.stride validates it separately so malformed priors never block raw capture. */
++  strideCalibration: z.unknown().nullish(),
+   /** When the phone actually started collecting (session started offline => sent later). Defaults to server time. */
+   startedAt: SensorTimestamp.nullish(),
+   /** alias of startedAt */
+diff --git a/backend/src/modules/sessions/session.repository.ts b/backend/src/modules/sessions/session.repository.ts
+index f1e5f39..f8b48b4 100644
+--- a/backend/src/modules/sessions/session.repository.ts
++++ b/backend/src/modules/sessions/session.repository.ts
+@@ -1,5 +1,6 @@
+ import { pool, type DbClient } from '../../config/database.js';
+ import type { ListSessionsQuery, LocationPointView, SessionStatus, SessionView } from './session.dto.js';
++import type { StrideCalibration, StrideCalibrationReason } from '../fusion/fusion.stride.js';
+ 
+ export interface SessionRow {
+   id: string;
+@@ -9,9 +10,12 @@ export interface SessionRow {
+   started_at: Date;
+   ended_at: Date | null;
+   status: SessionStatus;
++  stride_calibration: StrideCalibration | null;
++  stride_calibration_status: 'ACCEPTED' | 'FALLBACK';
++  stride_calibration_reason: StrideCalibrationReason | null;
+ }
+ 
+-const SESSION_COLUMNS = 'id, client_session_id, collector_id, device_id, started_at, ended_at, status';
++const SESSION_COLUMNS = 'id, client_session_id, collector_id, device_id, started_at, ended_at, status, stride_calibration, stride_calibration_status, stride_calibration_reason';
+ 
+ // Shared SELECT for SessionView. Counts are correlated subqueries: fine for a dev tool's data volume.
+ const SESSION_VIEW_SELECT = `
+@@ -38,6 +42,14 @@ const SESSION_VIEW_SELECT = `
+     JOIN devices d    ON d.id = s.device_id`;
+ 
+ export const sessionRepository = {
++  async getStrideCalibration(id: string, db: DbClient = pool): Promise<StrideCalibration | null> {
++    const { rows } = await db.query<{ stride_calibration: StrideCalibration | null; stride_calibration_status: string }>(
++      'SELECT stride_calibration, stride_calibration_status FROM collection_sessions WHERE id = $1', [id],
++    );
++    const row = rows[0];
++    return row?.stride_calibration_status === 'ACCEPTED' ? row.stride_calibration : null;
++  },
++
+   async findById(id: string, db: DbClient = pool): Promise<SessionRow | null> {
+     const { rows } = await db.query<SessionRow>(`SELECT ${SESSION_COLUMNS} FROM collection_sessions WHERE id = $1`, [id]);
+     return rows[0] ?? null;
+@@ -54,15 +66,26 @@ export const sessionRepository = {
+   /** Returns null when client_session_id already exists (idempotent start). */
+   async insert(
+     db: DbClient,
+-    data: { clientSessionId: string; collectorId: string; deviceId: string; startedAt: string | null; sensorCapabilities: unknown },
++    data: {
++      clientSessionId: string;
++      collectorId: string;
++      deviceId: string;
++      startedAt: string | null;
++      sensorCapabilities: unknown;
++      strideCalibration: StrideCalibration | null;
++      strideCalibrationStatus: 'ACCEPTED' | 'FALLBACK';
++      strideCalibrationReason: StrideCalibrationReason | null;
++    },
+   ): Promise<SessionRow | null> {
+     const { rows } = await db.query<SessionRow>(
+-      `INSERT INTO collection_sessions (client_session_id, collector_id, device_id, started_at, sensor_capabilities, spatial_map_version_id)
++      `INSERT INTO collection_sessions (client_session_id, collector_id, device_id, started_at, sensor_capabilities,
++                                       spatial_map_version_id, stride_calibration, stride_calibration_status, stride_calibration_reason)
+        VALUES ($1, $2, $3, COALESCE($4::timestamptz, now()), $5,
+-               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1))
++               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1), $6::jsonb, $7, $8)
+        ON CONFLICT (client_session_id) DO NOTHING
+        RETURNING ${SESSION_COLUMNS}`,
+-      [data.clientSessionId, data.collectorId, data.deviceId, data.startedAt, JSON.stringify(data.sensorCapabilities)],
++      [data.clientSessionId, data.collectorId, data.deviceId, data.startedAt, JSON.stringify(data.sensorCapabilities),
++        data.strideCalibration ? JSON.stringify(data.strideCalibration) : null, data.strideCalibrationStatus, data.strideCalibrationReason],
+     );
+     return rows[0] ?? null;
+   },
+diff --git a/backend/src/modules/sessions/session.service.ts b/backend/src/modules/sessions/session.service.ts
+index fc3a599..89ab078 100644
+--- a/backend/src/modules/sessions/session.service.ts
++++ b/backend/src/modules/sessions/session.service.ts
+@@ -8,6 +8,7 @@ import { previewBroadcast } from '../../realtime/preview.gateway.js';
+ import { collectorRepository } from '../collectors/collector.repository.js';
+ import { sessionRepository, type SessionRow } from './session.repository.js';
+ import { fusionService } from '../fusion/fusion.service.js';
++import { evaluateStrideCalibration } from '../fusion/fusion.stride.js';
+ import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
+ import type {
+   DiagnosticEventsRequest,
+@@ -95,6 +96,7 @@ export const sessionService = {
+       throw AppError.forbidden('DEVICE_MISMATCH', 'deviceId does not match the authenticated device');
+     }
+     const startedAt = req.startedAt ?? req.clientStartedAt ?? null;
++    const strideDecision = evaluateStrideCalibration(req.strideCalibration, startedAt);
+ 
+     const result = await withTransaction(async (client) => {
+       await collectorRepository.upsertDevice(identity.collectorDatabaseId, identity.clientDeviceId, req, client);
+@@ -104,6 +106,9 @@ export const sessionService = {
+         deviceId: identity.deviceDatabaseId,
+         startedAt,
+         sensorCapabilities: req.sensorCapabilities,
++        strideCalibration: strideDecision.calibration,
++        strideCalibrationStatus: strideDecision.status,
++        strideCalibrationReason: strideDecision.reason,
+       });
+       if (inserted) {
+         // A device collects one session at a time: other ACTIVE sessions of this device were left behind.
+@@ -135,7 +140,9 @@ export const sessionService = {
+     if (session.status === 'ACTIVE') {
+       previewBroadcast.collectorStatus(realtimeState.sessionStarted(identity.collectorId, session.id));
+       if (created) {
+-        fusionService.sessionStarted(session.id, identity.collectorId);
++        fusionService.sessionStarted(session.id, identity.collectorId, {
++          strideCalibration: session.stride_calibration_status === 'ACCEPTED' ? session.stride_calibration : null,
++        });
+         await broadcastSession('started', session.id);
+       }
+     }
+@@ -147,6 +154,10 @@ export const sessionService = {
+       status: session.status,
+       collectionState: session.status,
+       resumed: !created,
++      strideCalibration: {
++        status: session.stride_calibration_status,
++        reason: session.stride_calibration_reason,
++      },
+     };
+   },
+ 
+diff --git a/backend/test/fusion-v4.engine.test.ts b/backend/test/fusion-v4.engine.test.ts
+index 61750da..71ddddb 100644
+--- a/backend/test/fusion-v4.engine.test.ts
++++ b/backend/test/fusion-v4.engine.test.ts
+@@ -19,7 +19,11 @@ function rng(seed: number) {
+   return { u, n: () => Math.sqrt(-2 * Math.log(u())) * Math.cos(2 * Math.PI * u()) };
+ }
+ 
+-interface Leg { durationS: number; headingDeg: number; walking: boolean; vzMps?: number }
++/**
++ * vzMps: the barometer moves while walking = stairs (0.3 m tread; CMPedometer keeps its flat stride), or with slope a
++ * ramp / hill road (full steps of strideM). uncounted: steps CMPedometer does not count (fidgeting on the spot).
++ */
++interface Leg { durationS: number; headingDeg: number; walking: boolean; vzMps?: number; slope?: boolean; strideM?: number; uncounted?: boolean }
+ /** Truth + raw observations: 50 Hz motion (2 steps/s), CMPedometer every 2.5 s, 1 Hz barometer, GPS every 2 s. */
+ function simulate(legs: Leg[], opts: { gpsSigma?: number; gpsAccuracy?: number; seed?: number; stride?: number } = {}) {
+   const r = rng(opts.seed ?? 7);
+@@ -41,9 +45,10 @@ function simulate(legs: Leg[], opts: { gpsSigma?: number; gpsAccuracy?: number;
+       obs.push({ kind: 'motion', t: ms, seq: seq++, yaw: -(heading - THETA_TRUE), ax: 0.005 * r.n(), ay: 0.005 * r.n(), az, gx: 0, gy: 0, gz: -1 });
+       if (leg.walking && Math.floor(t * 2) !== lastStepAt) {
+         lastStepAt = Math.floor(t * 2);
+-        const L = leg.vzMps ? 0.3 : stride;
++        const stairs = Boolean(leg.vzMps) && !leg.slope;
++        const L = leg.uncounted ? 0 : stairs ? 0.3 : (leg.strideM ?? stride);
+         x += L * Math.sin(heading); y += L * Math.cos(heading);
+-        steps++; dist += leg.vzMps ? stride : L; // CMPedometer uses a flat stride even on stairs
++        if (!leg.uncounted) { steps++; dist += stairs ? stride : L; } // CMPedometer uses a flat stride even on stairs
+       }
+       z += (leg.vzMps ?? 0) * dt;
+       truth.push({ t: ms, x, y });
+@@ -113,12 +118,46 @@ test('smoothed replay follows the true L-shaped walk better than the raw GPS', (
+   }
+ });
+ 
+-test('stairs: barometer descent while stepping uses the stair tread, not the flat stride', () => {
+-  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 0, walking: true, vzMps: -0.3 }]);
++test('short straight descent: neither stairs nor slope is confirmed, so the walking stride is kept (rev 6)', () => {
++  // one straight flight (3.6 m): under slopeMinClimbM, and no foldback, so the barometer alone decides nothing.
++  // Height change by itself no longer shortens the step to the stair tread (docs/STAIR_SLOPE_STRIDE_PLAN.md).
++  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 12, headingDeg: 0, walking: true, vzMps: -0.3 }]);
++  const { s } = run(obs);
++  const unknown = s.steps.filter((p) => p.verticalUnknown);
++  assert.ok(unknown.length >= 18, `vertical-unknown steps ${unknown.length}`);
++  assert.ok(unknown.every((p) => p.length > cfg.stairTreadM), 'walking stride, not the stair tread');
++  assert.equal(s.steps.filter((p) => p.stairs).length, 0);
++  assert.equal(s.steps.filter((p) => p.slope).length, 0);
++});
++
++test('stairwell: a long descent that folds back (dog-leg flights, no pause on the landings) stays stairs', () => {
++  const flights: Leg[] = [0, 180, 0, 180, 0].map((headingDeg) => ({ durationS: 6, headingDeg, walking: true, vzMps: -0.3 }));
++  const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, ...flights]); // 9 m down without a break
+   const { s } = run(obs);
+   const stairs = s.steps.filter((p) => p.stairs);
+-  assert.ok(stairs.length >= 30, `stair steps ${stairs.length}`);
++  assert.ok(stairs.length >= 50, `stair steps ${stairs.length}`);
+   assert.ok(stairs.every((p) => p.length === cfg.stairTreadM));
++  assert.equal(s.steps.filter((p) => p.slope).length, 0);
++});
++
++test('slope: a long straight descent (ramp / hill road) keeps the stride, taken from the pedometer on that slope', () => {
++  // 60 s down a 0.2 m/s slope with 0.6 m steps (level stride 0.75): 12 m of descent, 72 m of walking
++  const legs: Leg[] = [{ durationS: 30, headingDeg: 0, walking: true }, { durationS: 60, headingDeg: 0, walking: true, vzMps: -0.2, slope: true, strideM: 0.6 }];
++  const { obs, truth } = simulate(legs, { gpsSigma: 10, gpsAccuracy: 15 });
++  const fwd = run(obs);
++  const onSlope = fwd.s.steps.filter((p) => p.t > T0 + 30_000);
++  const slope = onSlope.filter((p) => p.slope);
++  assert.ok(slope.length >= 110, `slope steps ${slope.length} of ${onSlope.length}`); // the 4 s barometer window lags the start
++  assert.equal(onSlope.filter((p) => p.stairs).length, 0, 'the first 5 m were filed as stairs and are reclassified');
++  assert.ok(slope.every((p) => Math.abs(p.length - 0.6) < 0.05), `slope stride ${slope[0].length}..${slope.at(-1)!.length}`);
++  // the level stride is not disturbed by the slope
++  assert.ok(Math.abs(fwd.s.strideA / fwd.s.strideB - 0.75) < 0.03, `level stride ${fwd.s.strideA / fwd.s.strideB}`);
++  // live position caught up when the slope was recognised; the replay covers the whole distance
++  const live = errors(fwd.s, fwd.outputs.slice(-5), truth);
++  assert.ok(Math.max(...live) < 12, `live error at the end ${Math.max(...live).toFixed(1)} m`);
++  const fin = finalizeFusionV4(fwd.s, cfg).outputs.filter((o) => o.timestamp > T0 + 30_000);
++  const walked = Math.hypot(fin.at(-1)!.x - fin[0].x, fin.at(-1)!.y - fin[0].y);
++  assert.ok(Math.abs(walked - 72) < 8, `slope length ${walked.toFixed(1)} m of 72`);
+ });
+ 
+ test('stride is calibrated from CMPedometer distance per detected level step', () => {
+@@ -128,6 +167,16 @@ test('stride is calibrated from CMPedometer distance per detected level step', (
+   assert.ok(Math.abs(level.length - 0.9) < 0.08, `stride ${level.length}`);
+ });
+ 
++test('stride calibration ignores stairs (CMPedometer flat stride) and steps CMPedometer does not count', () => {
++  const flights: Leg[] = [0, 180, 0].map((headingDeg) => ({ durationS: 6, headingDeg, walking: true, vzMps: 0.3 }));
++  const { obs } = simulate([
++    { durationS: 40, headingDeg: 0, walking: true }, ...flights, { durationS: 20, headingDeg: 0, walking: true },
++    { durationS: 30, headingDeg: 0, walking: true, uncounted: true }, { durationS: 5, headingDeg: 0, walking: true },
++  ]);
++  const { s } = run(obs);
++  assert.ok(Math.abs(s.strideA / s.strideB - 0.75) < 0.03, `stride ${s.strideA / s.strideB}`);
++});
++
+ test('standing still with jittery indoor GPS: the position barely moves', () => {
+   const { obs } = simulate([{ durationS: 120, headingDeg: 0, walking: false }], { gpsSigma: 20, gpsAccuracy: 25 });
+   const fwd = run(obs);

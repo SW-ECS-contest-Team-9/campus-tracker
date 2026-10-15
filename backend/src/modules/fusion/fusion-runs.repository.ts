@@ -170,7 +170,7 @@ export const fusionRunsRepository = {
    * Batches are returned in arrival order (AS_RECEIVED replay).
    */
   async loadArrivalBatches(sessionId: string, db: DbClient = pool): Promise<RawSamples[]> {
-    const [loc, mot, alt, ped] = await Promise.all([
+    const [loc, mot, alt, ped, abs] = await Promise.all([
       db.query(`SELECT created_at::text AS b, sequence, "timestamp", latitude, longitude, altitude, ellipsoidal_altitude AS "ellipsoidalAltitude",
                        horizontal_accuracy AS "horizontalAccuracy", vertical_accuracy AS "verticalAccuracy", speed, course
                   FROM location_samples WHERE session_id = $1`, [sessionId]),
@@ -182,6 +182,9 @@ export const fusionRunsRepository = {
                   FROM altimeter_samples WHERE session_id = $1`, [sessionId]),
       db.query(`SELECT created_at::text AS b, "timestamp", distance, number_of_steps AS "numberOfSteps", sensor_segment_id AS segment
                   FROM pedometer_samples WHERE session_id = $1 ORDER BY "timestamp", id`, [sessionId]),
+      db.query(`SELECT created_at::text AS b, sequence, "timestamp", altitude, accuracy, precision,
+                       vertical_reference AS "verticalReference", invalid_reason AS "invalidReason", sensor_segment_id AS segment
+                  FROM absolute_altitude_samples WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'`, [sessionId]),
     ]);
     const batches = new Map<string, RawSamples>();
     const get = (b: string) => {
@@ -193,6 +196,7 @@ export const fusionRunsRepository = {
     for (const r of mot.rows) get(r.b).motion.push(r);
     for (const r of alt.rows) get(r.b).altimeter.push(r);
     for (const r of ped.rows) get(r.b).pedometer.push(r);
+    for (const r of abs.rows) (get(r.b).absoluteAltitude ??= []).push(r);
     return [...batches.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).map((e) => e[1]);
   },
 };

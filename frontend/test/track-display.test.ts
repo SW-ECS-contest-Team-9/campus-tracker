@@ -1,0 +1,126 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { canDrawFusedHeightIn3D, describeFusedHeight, describeHeading, fusedDisplayHeight, publishedStage, relativeAltitudeLabel, runStage, sessionStateLines, splitByAbsoluteHeight, splitByDrawableHeight } from '../src/track-display.ts';
+
+const scene = (e: number) => e - 23.4;
+
+test('Core Motion height remains provisional, and an unknown indoor height is not drawn on a guessed floor', () => {
+  const point = { ellipsoidalAltitude: 144, zDatumSource: 'CM_ABSOLUTE', zDatumSigma: 5, buildingName: '북악관' };
+  const h = describeFusedHeight(point);
+  assert.match(h.datum, /아이폰 절대 고도/);
+  assert.match(h.status, /임시/);
+  assert.equal(h.floorAllowed, false);
+  assert.equal(canDrawFusedHeightIn3D(point), true);
+  assert.equal(canDrawFusedHeightIn3D({ ...point, ellipsoidalAltitude: null }), false);
+  assert.equal(canDrawFusedHeightIn3D({ ellipsoidalAltitude: null, buildingName: null }), true);
+  const unknown = { ...point, ellipsoidalAltitude: null };
+  const groups = splitByDrawableHeight([point, point, unknown, point, point]);
+  assert.deepEqual(groups.map((g) => g.points.length), [2, 2]);
+  assert.ok(groups.every((g) => g.absolute && g.points.every((p) => p.ellipsoidalAltitude !== null)));
+});
+
+test('height: only a point with a vertical datum is an absolute height; the rest is a drawing height', () => {
+  assert.deepEqual(fusedDisplayHeight({ ellipsoidalAltitude: 123.4, terrainHeight: 90 }, 0, scene), { h: 100, kind: 'ABSOLUTE' });
+  assert.deepEqual(fusedDisplayHeight({ ellipsoidalAltitude: null, terrainHeight: 90 }, 55, scene), { h: 91, kind: 'GROUND_PROJECTED' });
+  assert.deepEqual(fusedDisplayHeight({ ellipsoidalAltitude: null, terrainHeight: null }, 55, scene), { h: 55, kind: 'FALLBACK' });
+});
+
+test('height: no datum => "미확정", no floor, and the relative Z is not presented as raw for v4', () => {
+  const none = describeFusedHeight({ ellipsoidalAltitude: null, terrainHeight: 90, zDatumSource: 'NONE', relativeAltitude: 12 });
+  assert.equal(none.kind, 'GROUND_PROJECTED');
+  assert.equal(none.floorAllowed, false);
+  assert.match(none.status, /미확정/);
+  assert.match(none.status, /투영/);
+  const terrain = describeFusedHeight({ ellipsoidalAltitude: 120, zDatumSource: 'TERRAIN', zDatumSigma: 1.1 });
+  assert.equal(terrain.floorAllowed, true);
+  assert.match(terrain.datum, /TERRAIN/);
+  assert.match(describeFusedHeight({ ellipsoidalAltitude: 120, zDatumSource: 'GPS', zDatumSigma: 3 }).datum, /GPS/);
+  assert.match(relativeAltitudeLabel('fusion-v4'), /구간 연결/);
+  assert.match(relativeAltitudeLabel('fusion-v2.1'), /원시/);
+});
+
+test('height: provisional GPS Z is drawn at its absolute estimate, with uncertainty and no floor claim', () => {
+  const p = { ellipsoidalAltitude: 120, terrainHeight: 90, zDatumSource: 'GPS_FALLBACK', zDatumSigma: 25 };
+  const h = describeFusedHeight(p);
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /25.0 m/);
+  assert.match(h.datum, /수직 오차가 가장 작은/);
+  assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 97, kind: 'ABSOLUTE' });
+});
+
+test('height: DEM + barometer fallback explains the assumed ground-level start and does not name a floor', () => {
+  const p = { ellipsoidalAltitude: 127, terrainHeight: 100, zDatumSource: 'TERRAIN_FALLBACK', zDatumSigma: 5 };
+  const h = describeFusedHeight(p);
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /시작 층 미확정/);
+  assert.match(h.datum, /기압 변화 누적/);
+  assert.deepEqual(fusedDisplayHeight(p, 0, (e) => e - 23), { h: 104, kind: 'ABSOLUTE' });
+});
+
+test('height: mapped start height remains a provisional estimate', () => {
+  const h = describeFusedHeight({ ellipsoidalAltitude: 130, zDatumSource: 'MAP_START', zDatumSigma: 3 });
+  assert.equal(h.kind, 'ABSOLUTE');
+  assert.equal(h.floorAllowed, false);
+  assert.match(h.status, /임시/);
+  assert.match(h.datum, /길·층별 고도/);
+});
+
+test('height: road passage correction reports its source without treating drawn road height as a surveyed floor', () => {
+  const h = describeFusedHeight({ ellipsoidalAltitude: 134, zDatumSource: 'ROAD_ANCHOR', zDatumSigma: 2 });
+  assert.match(h.datum, /길 통과 앵커/);
+  assert.equal(h.floorAllowed, false);
+});
+
+test('height: a track is split where the datum appears, without a hole in the line', () => {
+  const p = (e: number | null) => ({ ellipsoidalAltitude: e, terrainHeight: 90 });
+  const runs = splitByAbsoluteHeight([p(null), p(null), p(100), p(101), p(null)]);
+  assert.deepEqual(runs.map((r) => [r.absolute, r.points.length]), [[false, 2], [true, 3], [false, 2]]);
+  assert.equal(runs[1].points[0], runs[0].points[1]);
+  assert.deepEqual(splitByAbsoluteHeight([]), []);
+  // C04 case: every point without a datum is one projected run
+  assert.deepEqual(splitByAbsoluteHeight([p(null), p(null), p(null)]).map((r) => r.absolute), [false]);
+});
+
+test('heading: UNKNOWN is shown as unknown, CONTINUITY as an assumption', () => {
+  assert.equal(describeHeading({ heading: null, headingSource: 'UNKNOWN' }).known, false);
+  assert.equal(describeHeading({ heading: 90, headingSource: 'UNKNOWN' }).known, false);
+  assert.match(describeHeading({ heading: 90, headingSource: 'CONTINUITY' }).text, /가정/);
+  assert.match(describeHeading({ heading: 90, headingSource: 'GPS_SHAPE_FIT' }).text, /90°.*맞춤/);
+});
+
+test('stage: forward and smoothed runs are told apart, old runs by what they stored', () => {
+  assert.equal(runStage({ mode: 'AS_RECEIVED' }), 'FORWARD_AS_RECEIVED');
+  assert.equal(runStage({ mode: 'SENSOR_TIME', metrics: { replay: { finalizeApplied: true } } }), 'FINAL_SMOOTHED');
+  assert.equal(runStage({ mode: 'SENSOR_TIME', metrics: { replay: { finalizeApplied: false }, terrain: null } }), 'FORWARD_SENSOR_TIME');
+  assert.equal(runStage({ mode: 'SENSOR_TIME', trigger: 'api', metrics: { terrain: null } }), 'FORWARD_SENSOR_TIME'); // C04 22:13 run
+  assert.equal(runStage({ mode: 'SENSOR_TIME', trigger: 'auto-finalize', metrics: { terrain: { datumSource: 'TERRAIN' } } }), 'FINAL_SMOOTHED'); // C02
+  const active = publishedStage({ status: 'ACTIVE' }, { mode: 'SENSOR_TIME', metrics: { terrain: null } }, false);
+  assert.equal(active.stage, 'FORWARD_SENSOR_TIME');
+  assert.match(active.note, /직접 비교 불가/);
+  assert.equal(publishedStage({ status: 'ACTIVE' }, null, false).stage, 'REALTIME');
+});
+
+test('session: ACTIVE with no recent data is not shown as finished, and the unknown is stated', () => {
+  const now = Date.parse('2026-10-13T16:00:00Z');
+  const c04 = sessionStateLines({ status: 'ACTIVE', syncState: 'OFFLINE', finishRequestedAt: null, lastReceivedAt: '2026-10-13T13:06:10Z', outOfOrderBatches: 263, fusionState: 'CLEAN', needsReprocess: false, finalizedAt: null, raw: { syncManifest: null } }, now);
+  const by = Object.fromEntries(c04.map((l) => [l.label, l]));
+  assert.match(by['수집'].text, /ACTIVE · 최근 수신 없음/);
+  assert.match(by['수집'].text, /종료가 아님/);
+  assert.match(by['종료 요청'].text, /받지 못함/);
+  assert.match(by['동기화'].text, /알 수 없음/);
+  assert.doesNotMatch(by['동기화'].text, /0개/);
+  assert.match(by['수신 순서'].text, /263/);
+  assert.match(by['융합'].text, /최종화 전/);
+
+  const c02 = sessionStateLines({ status: 'FINISHED', syncState: 'FINALIZED', finishRequestedAt: '2026-10-13T13:16:09Z', finalizedAt: '2026-10-13T13:16:10Z', fusionState: 'CLEAN',
+    raw: { syncManifest: { synchronized: true, streams: { motion: { expected: 63786, server: 63786, synchronized: true } } } } }, now);
+  assert.equal(c02.find((l) => l.label === '동기화')!.tone, 'ok');
+  const behind = sessionStateLines({ status: 'FINISHED', finishRequestedAt: '2026-10-13T13:16:09Z', raw: { syncManifest: { synchronized: false, streams: { motion: { expected: 100, server: 80, synchronized: false } } } } }, now);
+  assert.match(behind.find((l) => l.label === '동기화')!.text, /motion 80\/100/);
+  // list view (no raw statistics loaded): no claim about the manifest at all
+  assert.equal(sessionStateLines({ status: 'ACTIVE', syncState: 'LIVE' }, now).some((l) => l.label === '동기화'), false);
+});

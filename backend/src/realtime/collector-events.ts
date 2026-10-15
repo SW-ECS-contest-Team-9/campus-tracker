@@ -1,3 +1,4 @@
+import { arkitService } from '../modules/arkit/arkit.service.js';
 import type { CollectorIdentity } from '../common/auth/jwt.js';
 import { toErrorBody, type ErrorBody } from '../common/errors/app-error.js';
 import { logger } from '../common/logger.js';
@@ -5,6 +6,7 @@ import { collectorController } from '../modules/collectors/collector.controller.
 import { sessionController } from '../modules/sessions/session.controller.js';
 import { telemetryController } from '../modules/telemetry/telemetry.controller.js';
 import { markerController } from '../modules/markers/marker.controller.js';
+import { beaconService } from '../modules/positioning/beacon.service.js';
 
 // Collector events shared by both transports (Socket.IO /collector and raw WebSocket /ws/collector).
 // Each handler validates its DTO, runs the service (DB COMMIT included) and returns the ACK body.
@@ -12,6 +14,8 @@ import { markerController } from '../modules/markers/marker.controller.js';
 type Handler = (identity: CollectorIdentity, payload: unknown) => unknown | Promise<unknown>;
 
 export const COLLECTOR_EVENTS = [
+  'arkit:pose',
+  'beacon:observations.v1',
   'session:start',
   'session:finish',
   'session:syncComplete',
@@ -30,9 +34,16 @@ export function normalizeEventName(name: string): string {
 // Resolved at call time (not module load): the controllers sit in an import cycle with the gateways.
 function handlerFor(event: string): Handler | undefined {
   switch (event) {
+    case 'arkit:pose': return arkitService.ingest;
+    // beacon.observations.v1 (raw) / beacon:observations.v1 (normalized): docs/BEACON_POSITIONING.md
+    case 'beacon:observations.v1': return (identity, payload) => beaconService.ingest(identity, payload);
     case 'session:start': return sessionController.start;
     case 'session:finish': return sessionController.finish;
-    case 'telemetry:batch': return telemetryController.batch;
+    case 'telemetry:batch': return async (identity, payload) => {
+      const ack = await telemetryController.batch(identity, payload);
+      void arkitService.telemetryCommitted(identity, payload);
+      return ack;
+    };
     case 'marker:create': return markerController.create;
     case 'collector:status': return collectorController.status;
     case 'session:syncComplete': return sessionController.syncComplete;

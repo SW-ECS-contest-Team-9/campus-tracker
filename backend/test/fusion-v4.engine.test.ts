@@ -7,6 +7,9 @@ import { createFusionStateV4, type FusionStateV4 } from '../src/modules/fusion/f
 import { fusionConfigV4 as cfg } from '../src/modules/fusion/fusion.config.js';
 import { localToWgs84 } from '../src/geo/local-to-wgs84.js';
 import type { FusedOutput } from '../src/modules/fusion/fusion.types.js';
+import { tmForward } from '../src/geo/tm.js';
+import type { TerrainContext } from '../src/geo/terrain.js';
+import type { StartHeightMap } from '../src/geo/start-height-map.js';
 
 const ORIGIN = { latitude: 37.6158, longitude: 127.0118, height: 0 };
 const T0 = Date.parse('2026-10-02T06:00:00.000Z');
@@ -88,6 +91,150 @@ function errors(s: FusionStateV4, outputs: FusedOutput[], truth: { t: number; x:
 }
 const rms = (v: number[]) => Math.sqrt(v.reduce((a, b) => a + b * b, 0) / v.length);
 
+test('provisional Z uses the best vertical accuracy, preserves barometric rise, and survives replay', () => {
+  const gps = (t: number, height: number, accuracy: number): Observation => ({
+    kind: 'gps', t: T0 + t, seq: t, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: height, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1,
+  });
+  const { s, outputs } = run([
+    { kind: 'altimeter', t: T0, seq: 0, relativeAltitude: 10 },
+    gps(0, 100, 40),
+    { kind: 'altimeter', t: T0 + 1000, seq: 1, relativeAltitude: 12 },
+    gps(2000, 110, 25),
+    gps(3000, 150, 35),
+    { kind: 'altimeter', t: T0 + 4000, seq: 2, relativeAltitude: 13 },
+    gps(5000, 150, 35),
+  ]);
+  assert.equal(outputs[0].ellipsoidalAltitude, 100);
+  assert.equal(outputs[0].zDatumSource, 'GPS_FALLBACK');
+  assert.equal(outputs[0].zDatumSigma, 40);
+  const last = outputs.at(-1)!;
+  assert.equal(last.ellipsoidalAltitude, 111); // best fix at Z=2, then one more meter
+  assert.equal(last.z, 3);
+  assert.equal(last.zDatumSigma, 25);
+  const replay = finalizeFusionV4(s, cfg).outputs;
+  assert.ok(replay.length > 0);
+  assert.ok(replay.every((o) => o.zDatumSource === 'GPS_FALLBACK' && o.zDatumSigma === 25));
+  assert.equal(s.smoothed!.datumSource, 'GPS_FALLBACK');
+  assert.equal(replay.at(-1)!.ellipsoidalAltitude, 111);
+});
+
+test('provisional Z ignores invalid/pre-session heights and does not require horizontal acceptance', () => {
+  const s = createFusionStateV4();
+  const gps = (t: number, height: number | null, accuracy: number | null, extra = {}) => processObservationV4(s, {
+    kind: 'gps', t: T0 + t, seq: t, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: height, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1, ...extra,
+  }, cfg);
+  for (const [i, accuracy] of [null, -1, 0, NaN, Infinity].entries()) {
+    const out = gps(i * 1000, 100, accuracy).outputs.at(-1)!;
+    assert.equal(out.ellipsoidalAltitude, null);
+    assert.equal(out.zDatumSource, 'NONE');
+  }
+  gps(5000, null, 1);
+  gps(6000, NaN, 1);
+  gps(7000, 999, 1, { preSession: true });
+  assert.equal(s.bestGpsDatum, undefined);
+  const out = gps(8000, 120, 25, { horizontalAccuracy: cfg.gpsMaxAccuracyM + 1 }).outputs.at(-1)!;
+  assert.equal(out.gpsUsed, false);
+  assert.equal(out.ellipsoidalAltitude, 120);
+  assert.equal(out.zDatumSource, 'GPS_FALLBACK');
+});
+
+test('a trusted GPS datum replaces provisional Z', () => {
+  const { outputs } = run([30, 8].map((accuracy, i): Observation => ({
+    kind: 'gps', t: T0 + i * 1000, seq: i, latitude: ORIGIN.latitude, longitude: ORIGIN.longitude,
+    altitude: null, ellipsoidalAltitude: 100 + i, horizontalAccuracy: 12, verticalAccuracy: accuracy, speed: -1, course: -1,
+  })));
+  assert.equal(outputs[0].zDatumSource, 'GPS_FALLBACK');
+  assert.equal(outputs[1].zDatumSource, 'GPS');
+  assert.equal(outputs[1].ellipsoidalAltitude, 101);
+});
+
+test('confirmed mapped road passage corrects indoor Z retrospectively, preserves later barometric climb, and leaves XY independent', () => {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  const terrain: TerrainContext = { versionId: 't',
+    grid: { originX: xy.x - 200, originY: xy.y - 200, resolution: 2, width: 250, height: 250 },
+    heights: new Float32Array(62500).fill(100), sigma: new Float32Array(62500).fill(1), modified: new Uint8Array(62500), geoidSeparation: 23,
+    buildings: [{ buildingId: 'b', name: 'indoor', groundFloors: 5, undergroundFloors: 1, heightM: 20, floorLabels: [],
+      polygons: [[[[xy.x - 150, xy.y - 150], [xy.x + 150, xy.y - 150], [xy.x + 150, xy.y + 150], [xy.x - 150, xy.y + 150], [xy.x - 150, xy.y - 150]]]] }],
+  };
+  const map: StartHeightMap = { mapVersionId: 'm', floors: [], roads: [{ id: 'indoor-road', buildingId: 'b', levelId: 'L2', status: 'APPROVED', revision: 1,
+    coordinates: [[xy.x, xy.y, 110], [xy.x, xy.y + 120, 110]] }] };
+  const { obs } = simulate([{ durationS: 60, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 90, walking: true, vzMps: 0.1, slope: true }], { gpsSigma: 1, gpsAccuracy: 3 });
+  const finals: FusedOutput[][] = [];
+  for (const enabled of [false, true]) {
+    const c = { ...cfg, roadHeightAnchorsEnabled: enabled };
+    const s = createFusionStateV4({ strideCalibration: null, startHeightMap: map });
+    const live: FusedOutput[] = [];
+    for (const o of obs) live.push(...processObservationV4(s, { ...o, terrainContext: terrain }, c).outputs);
+    if (enabled) {
+      assert.ok(s.roadHeightContacts.length > 0);
+      assert.ok(live.some((p) => p.zDatumSource === 'ROAD_ANCHOR'));
+    }
+    const fin = finalizeFusionV4(s, c).outputs;
+    finals.push(fin);
+    assert.ok(fin.length > 0);
+    assert.ok(fin.every((p) => p.zDatumSource === (enabled ? 'ROAD_ANCHOR' : 'TERRAIN_FALLBACK')));
+    if (enabled) {
+      assert.ok(s.roadHeightContacts.length > 0);
+      assert.ok(fin.every((p) => Math.abs(p.ellipsoidalAltitude! - p.z - 134) < 0.1));
+      assert.ok(fin.at(-1)!.ellipsoidalAltitude! - fin[0].ellipsoidalAltitude! > 1.5);
+      // A cached forward match is not evidence if the final path does not pass that road.
+      s.startHeightMap = { ...map, roads: map.roads.map((r) => ({ ...r,
+        coordinates: r.coordinates.map(([x, y, z]): [number, number, number] => [x - 30, y, z]),
+      })) };
+      const invalidated = finalizeFusionV4(s, c).outputs;
+      assert.equal(s.roadHeightContacts.length, 0);
+      assert.ok(invalidated.length > 0);
+      assert.ok(invalidated.every((p) => p.zDatumSource === 'TERRAIN_FALLBACK'));
+    }
+  }
+  assert.deepEqual(finals[0].map((p) => [p.timestamp, p.x, p.y]), finals[1].map((p) => [p.timestamp, p.x, p.y]));
+});
+
+/** Flat 100 m DEM around ORIGIN whose cells are all modified (campus roads): no strict ground contact anywhere. */
+function roadTerrain(): TerrainContext {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  return { versionId: 't', grid: { originX: xy.x - 300, originY: xy.y - 300, resolution: 2, width: 300, height: 300 },
+    heights: new Float32Array(90000).fill(100), sigma: new Float32Array(90000).fill(1), modified: new Uint8Array(90000).fill(1),
+    geoidSeparation: 23, buildings: [] };
+}
+// 6 m down a stair from an upper entrance, then 100 s on the road: outdoors the phone is at 101 m (ellipsoidal 124)
+const ENTRANCE_WALK: Leg[] = [{ durationS: 60, headingDeg: 0, walking: true, vzMps: -0.1 }, { durationS: 100, headingDeg: 90, walking: true }];
+
+test('rev 14: walking on modified ground gives a loose ground datum instead of "the start is on the ground"', () => {
+  const terrain = roadTerrain();
+  const { obs } = simulate(ENTRANCE_WALK, { gpsSigma: 3, gpsAccuracy: 8 }); // GPS heights 90 + z: 40 m under the road
+  const finals = [false, true].map((enabled) => {
+    const c = { ...cfg, provisionalDatumsEnabled: enabled };
+    const s = createFusionStateV4();
+    for (const o of obs) processObservationV4(s, { ...o, terrainContext: terrain }, c);
+    return { s, out: finalizeFusionV4(s, c).outputs };
+  });
+  const road = (o: FusedOutput) => o.timestamp > T0 + 80_000;
+  assert.equal(finals[0].s.smoothed!.datumSource, 'TERRAIN_FALLBACK');
+  assert.ok(finals[0].out.filter(road).every((o) => o.ellipsoidalAltitude! < 120), 'rev 13 sank 6 m under the road');
+  assert.equal(finals[1].s.smoothed!.datumSource, 'TERRAIN_LOOSE'); // the GPS heights are impossible (under the road)
+  for (const o of finals[1].out.filter(road)) assert.ok(Math.abs(o.ellipsoidalAltitude! - 124) < 1.5, `${o.ellipsoidalAltitude}`);
+});
+
+test('rev 14: GPS heights that follow the barometer join the ground datum; heights stuck at one value do not', () => {
+  const terrain = roadTerrain();
+  const { obs } = simulate(ENTRANCE_WALK, { gpsSigma: 3, gpsAccuracy: 8 });
+  let n = 0;
+  const withHeights = obs.map((o) => {
+    if (o.kind !== 'gps') return o;
+    // true ellipsoidal height = 130 + z (+-1 m); every third fix is stuck at 112 with a 3 m vertical accuracy
+    const stuck = n++ % 3 === 0;
+    return { ...o, ellipsoidalAltitude: stuck ? 112 : o.ellipsoidalAltitude! + 40 + Math.sin(n), verticalAccuracy: stuck ? 3 : 10 };
+  });
+  const s = createFusionStateV4();
+  for (const o of withHeights) processObservationV4(s, { ...o, terrainContext: terrain }, cfg);
+  const out = finalizeFusionV4(s, cfg).outputs;
+  assert.equal(s.smoothed!.datumSource, 'TERRAIN_GPS');
+  for (const o of out.filter((p) => p.timestamp > T0 + 80_000)) assert.ok(Math.abs(o.ellipsoidalAltitude! - 124) < 1.5, `${o.ellipsoidalAltitude}`);
+});
+
 test('steps are detected from 50 Hz vertical acceleration (2 steps/s for 60 s)', () => {
   const { obs } = simulate([{ durationS: 60, headingDeg: 0, walking: true }]);
   const { s } = run(obs);
@@ -118,13 +265,15 @@ test('smoothed replay follows the true L-shaped walk better than the raw GPS', (
   }
 });
 
-test('stairs: barometer descent while stepping uses the stair tread, not the flat stride', () => {
-  // one straight flight (3.6 m): shorter than a storey and a half, so not a slope
+test('short straight descent: neither stairs nor slope is confirmed, so the walking stride is kept (rev 6)', () => {
+  // one straight flight (3.6 m): under slopeMinClimbM, and no foldback, so the barometer alone decides nothing.
+  // Height change by itself no longer shortens the step to the stair tread (docs/STAIR_SLOPE_STRIDE_PLAN.md).
   const { obs } = simulate([{ durationS: 20, headingDeg: 0, walking: true }, { durationS: 12, headingDeg: 0, walking: true, vzMps: -0.3 }]);
   const { s } = run(obs);
-  const stairs = s.steps.filter((p) => p.stairs);
-  assert.ok(stairs.length >= 18, `stair steps ${stairs.length}`);
-  assert.ok(stairs.every((p) => p.length === cfg.stairTreadM));
+  const unknown = s.steps.filter((p) => p.verticalUnknown);
+  assert.ok(unknown.length >= 18, `vertical-unknown steps ${unknown.length}`);
+  assert.ok(unknown.every((p) => p.length > cfg.stairTreadM), 'walking stride, not the stair tread');
+  assert.equal(s.steps.filter((p) => p.stairs).length, 0);
   assert.equal(s.steps.filter((p) => p.slope).length, 0);
 });
 
@@ -185,9 +334,78 @@ test('standing still with jittery indoor GPS: the position barely moves', () => 
   assert.ok(spread < 8, `spread ${spread.toFixed(1)} m (raw GPS scatters ~40 m)`);
 });
 
+test('rev 13: a still phone ignores a speed spike and a wandering GPS run, and stops adding points', () => {
+  const { obs } = simulate([{ durationS: 120, headingDeg: 0, walking: false }, { durationS: 20, headingDeg: 90, walking: true }], { gpsSigma: 3, gpsAccuracy: 10 });
+  // like session 79587965: one fix reports 3.9 m/s, then 30 s of 40 m fixes walk away 30 m while the phone lies still
+  const wander = obs.map((o) => {
+    const s = (o.t - T0) / 1000;
+    if (o.kind !== 'gps' || s < 60 || s > 90) return o;
+    const p = localToWgs84(ORIGIN, { x: 0, y: (s - 60), z: 0 });
+    return { ...o, latitude: p.latitude, longitude: p.longitude, horizontalAccuracy: 40, speed: s < 62 ? 3.9 : -1 };
+  });
+  const fwd = run(wander);
+  assert.equal(fwd.s.counters.reasons.INNOVATION_TOO_LARGE ?? 0, 0);
+  const stillLive = fwd.outputs.filter((o) => o.timestamp < T0 + 118_000);
+  const dist = (o: FusedOutput) => Math.hypot(o.x, o.y);
+  assert.ok(Math.max(...stillLive.map(dist)) < 5, `live max ${Math.max(...stillLive.map(dist)).toFixed(1)} m`);
+  assert.ok(stillLive.length < 10, `${stillLive.length} live points while still`);
+  const fin = finalizeFusionV4(fwd.s, cfg).outputs;
+  const stillFinal = fin.filter((o) => o.timestamp < T0 + 118_000);
+  // the replay places the whole stop from all its fixes and the walk after it; the 30 m wander (+y) must not show
+  const ys = stillFinal.map((o) => o.y);
+  assert.ok(Math.max(...ys) < 3, `final still y up to ${Math.max(...ys).toFixed(1)} m`);
+  const off = { ...cfg, stationaryHoldEnabled: false };
+  const s2 = createFusionStateV4();
+  for (const o of wander) processObservationV4(s2, o, off);
+  const before = finalizeFusionV4(s2, off).outputs.filter((o) => o.timestamp < T0 + 118_000);
+  assert.ok(Math.max(...before.map((o) => o.y)) > 8, 'rev 12 behaviour followed the wander (guards the scenario)');
+  assert.ok(stillFinal.length < 10, `${stillFinal.length} final points while still`);
+  assert.ok(fin.length - stillFinal.length >= 15, 'walking emits points again');
+});
+
 test('replay is deterministic', () => {
   const { obs } = simulate([{ durationS: 30, headingDeg: 45, walking: true }]);
   const a = finalizeFusionV4(run(obs).s, cfg).outputs;
   const b = finalizeFusionV4(run(obs).s, cfg).outputs;
   assert.deepEqual(a, b);
+});
+
+test('rev 17: collection anchors naming a node set the absolute height and pull the track to the node', () => {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  const terrain: TerrainContext = { versionId: 't',
+    grid: { originX: xy.x - 200, originY: xy.y - 200, resolution: 2, width: 250, height: 250 },
+    heights: new Float32Array(62500).fill(100), sigma: new Float32Array(62500).fill(1), modified: new Uint8Array(62500), geoidSeparation: 23,
+    buildings: [{ buildingId: 'b', name: 'indoor', groundFloors: 5, undergroundFloors: 1, heightM: 20, floorLabels: [],
+      polygons: [[[[xy.x - 150, xy.y - 150], [xy.x + 150, xy.y - 150], [xy.x + 150, xy.y + 150], [xy.x - 150, xy.y + 150], [xy.x - 150, xy.y - 150]]]] }],
+  };
+  const { obs, truth } = simulate([{ durationS: 60, headingDeg: 0, walking: true }, { durationS: 20, headingDeg: 90, walking: true, vzMps: 0.1, slope: true }],
+    { gpsSigma: 1, gpsAccuracy: 3 });
+  // every GPS fix 12 m east of the truth (indoor multipath): only the anchors know better
+  const biased = obs.map((o) => o.kind === 'gps' ? { ...o, longitude: o.longitude + 12 / (6371008.8 * Math.cos(ORIGIN.latitude * Math.PI / 180)) * 180 / Math.PI } : o);
+  const at = (t: number) => truth.reduce((best, p) => (Math.abs(p.t - t) < Math.abs(best.t - t) ? p : best));
+  // the node floor is at 110 m (MSL) at the start; the end node is 2 m higher (the ramp climbed 2 m)
+  const anchors = [{ t: T0 + 2_000, z: 110 }, { t: T0 + 30_000, z: 110 }, { t: T0 + 58_000, z: 110 }, { t: T0 + 79_000, z: 112 }].map((a, i) => {
+    const p = at(a.t);
+    const ll = localToWgs84(ORIGIN, { x: p.x, y: p.y, z: 0 });
+    const g = tmForward(ll.latitude, ll.longitude);
+    return { markerId: `m${i}`, t: a.t, type: i === 0 ? 'sessionStart' : 'entrance', nodeId: `n${i}`, x: g.x, y: g.y, z: a.z };
+  });
+  const finish = (markerAnchors: typeof anchors | null) => {
+    const s = createFusionStateV4({ strideCalibration: null, markerAnchors });
+    for (const o of biased) processObservationV4(s, { ...o, terrainContext: terrain }, cfg);
+    return { s, out: finalizeFusionV4(s, cfg).outputs };
+  };
+  const without = finish(null);
+  const withAnchors = finish(anchors);
+  assert.equal(without.s.smoothed!.datumSource, 'TERRAIN_FALLBACK');
+  assert.equal(withAnchors.s.smoothed!.datumSource, 'MARKER_ANCHOR');
+  assert.equal(withAnchors.s.markerHeightContacts.length, 4);
+  assert.ok(withAnchors.out.every((p) => p.zDatumSource === 'MARKER_ANCHOR'));
+  // floor 110 + phone 1 + geoid 23 at the start
+  const first = withAnchors.out[0];
+  assert.ok(Math.abs(first.ellipsoidalAltitude! - 134) < 0.5, `${first.ellipsoidalAltitude}`);
+  const near = (r: ReturnType<typeof finish>) => errors(r.s, r.out.filter((o) => anchors.some((a) => Math.abs(o.timestamp - a.t) < 1000)), truth);
+  const before = rms(near(without));
+  const after = rms(near(withAnchors));
+  assert.ok(after < before - 2, `rms at the anchors ${before.toFixed(1)} -> ${after.toFixed(1)} m`);
 });

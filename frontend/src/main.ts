@@ -1,6 +1,8 @@
 import './styles.css';
+import { ArkitPreview } from './arkit';
 import {
   api,
+  API_BASE_URL,
   DELETE_CONFIRM_TEXT,
   type CollectorState,
   type CarriagewayRoad,
@@ -32,6 +34,7 @@ import {
   describeFloor,
   setFloorLabel,
   setGeoidSeparation,
+  setRawHeightMode,
   SessionTrack,
   SpatialMapOverlay,
   accuracyColor,
@@ -42,6 +45,7 @@ import {
   type LayerVisibility,
   type PickId,
 } from './trajectory';
+import { describeFusedHeight, describeHeading, fusedDisplayHeight, publishedStage, relativeAltitudeLabel, sessionStateLines, STAGE_LABEL } from './track-display';
 
 // ---------------- state ----------------
 type Selection = { kind: 'collector'; id: string } | { kind: 'session'; id: string } | { kind: 'point'; pick: PickId } | { kind: 'building'; id: string } | { kind: 'mobility'; pick: MobilityPick } | { kind: 'structure'; id: string } | null;
@@ -53,6 +57,7 @@ const state = {
   /** From GET /api/v1/fusion/versions: the live (realtime) version and all versions available for comparison. */
   fusion: { active: 'fusion-v2', versions: [] as string[] },
   runs: new Map<string, FusionRun[]>(), // sessionId -> latest run per version
+  interruptResult: new Map<string, string>(), // sessionId -> message of the last manual interrupt
   sensorEvents: new Map<string, FusionSensorEvent[]>(), // `${sessionId}|${version}`
   reprocessing: new Set<string>(), // `${sessionId}|${version}`
   reprocessResult: new Map<string, string>(),
@@ -61,6 +66,7 @@ const state = {
   sessions: [] as Session[],
 };
 
+const arkitPreview = new ArkitPreview(document.getElementById('arkit-panel')!, API_BASE_URL);
 let viewer: Viewer | null = null;
 const lab = new Lab(document.getElementById('lab-panel')!, () => viewer);
 let spatialMapOverlay: SpatialMapOverlay | null = null;
@@ -122,6 +128,7 @@ function ensureTrack(sessionId: string, collectorId: string): Promise<void> {
   }
   let load = trackLoads.get(sessionId);
   if (!load) {
+    void arkitPreview.load(sessionId);
     load = reloadTrack(sessionId);
     trackLoads.set(sessionId, load);
   }
@@ -198,6 +205,8 @@ function liftedTracks(): LvTrack[] {
 }
 
 function applyVisibility() {
+  const selected = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
+  arkitPreview.setVisible(state.mode === 'live' ? liveSessionIds : new Set(state.mode === 'history' && selected ? [selected] : []));
   for (const [id, track] of tracks) {
     track.setLayers(state.layers);
     const selectedSession = state.selected?.kind === 'session' ? state.selected.id : state.selected?.kind === 'point' ? state.selected.pick.sessionId : null;
@@ -210,7 +219,9 @@ function applyVisibility() {
 
 async function loadRuns(sessionId: string) {
   try {
-    state.runs.set(sessionId, (await api.fusionSummary(sessionId)).runs);
+    const [summary, detail] = await Promise.all([api.fusionSummary(sessionId), api.session(sessionId)]);
+    state.runs.set(sessionId, summary.runs);
+    upsertSession(detail); // the detail carries the sync manifest and receive bookkeeping
   } catch (err) {
     console.error(err);
   }
@@ -248,12 +259,19 @@ async function onReconnect() {
   void mobilityLayer?.reload().catch(() => undefined); // QGIS edits made while disconnected
   void reloadSceneLayers().catch(() => undefined); // roads edited while disconnected
   await loadInitial();
+  await Promise.all([...tracks.keys()].map(id => arkitPreview.load(id)));
   await Promise.all([...tracks.keys()].map((id) => reloadTrack(id, true)));
 }
 
 // ---------------- realtime handlers ----------------
 function startRealtime() {
   connectPreview({
+    onArkitPose(event) {
+      arkitPreview.pose(event);
+      if (state.mode === 'live' && !liveSessionIds.has(event.sessionId)) { liveSessionIds.add(event.sessionId); applyVisibility(); }
+      scheduleRender();
+    },
+    onArkitUpdated({sessionId}) { if(tracks.has(sessionId) || liveSessionIds.has(sessionId)) void arkitPreview.load(sessionId).then(scheduleRender); },
     onConnectionChange(connected) {
       state.connected = connected;
       scheduleRender();
@@ -366,6 +384,10 @@ function scheduleRender() {
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const num = (v: number | null | undefined, digits = 1, unit = '') => (v == null ? '–' : `${v.toFixed(digits)}${unit}`);
+/** Phone MSL altitude; Android fixes without one (no MSL from the provider) show ellipsoidal − geoid, marked as computed. */
+const mslText = (p: { altitude: number | null; ellipsoidalAltitude: number | null } | null | undefined) =>
+  p?.altitude != null || p?.ellipsoidalAltitude == null ? num(p?.altitude, 1, ' m')
+    : `${sceneHeight(p.ellipsoidalAltitude).toFixed(1)} m <span class="tag">계산: 타원체고 − 지오이드</span>`;
 function ago(iso: string | null) {
   if (!iso) return '–';
   const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
@@ -416,12 +438,22 @@ function offsetText(track: SessionTrack | undefined, raw: LocationPoint | null, 
   return `<b>${horizontalOffsetMeters(raw, f).toFixed(1)} m</b> <span class="${unusable ? 'warn-text' : 'muted'}">(raw ±${num(acc, 0)} m${unusable ? ', not a usable fix' : ''})</span> ${OFFSET_NOTE}`;
 }
 
+function interruptHint(block: string | null | undefined): string {
+  if (block === null) return '종료 요청 없이 남은 세션을 닫고 최종 평활화를 실행 (원시 데이터는 그대로, 폰은 멈추지 않음)';
+  if (block === 'COLLECTOR_CONNECTED') return '폰이 연결되어 있음: 폰에서 Stop으로 종료';
+  if (block === 'RECENTLY_RECEIVED') return '최근에 수신함: 잠시 끊긴 것일 수 있어 아직 불가';
+  return '세션 상세를 불러오는 중';
+}
+
 /** Fusion diagnostics rows shared by the collector and point views. */
 function fusedRows(f: FusedPosition) {
   // fusion-v1 stores no diagnostics (all null); v2+ always records the motion state and heading source.
   const hasDiagnostics = f.stationary != null || f.headingSource != null;
   const hasV21 = f.reanchored != null || f.gpsQuality != null || f.divergenceDetected != null;
   const na = `<span class="muted">not recorded by ${esc(f.algorithmVersion)}</span>`;
+  const height = describeFusedHeight(f);
+  const shown = fusedDisplayHeight(f, 0, sceneHeight);
+  const heading = describeHeading(f);
   const gps = !hasDiagnostics
     ? na
     : f.gpsUsed == null
@@ -433,32 +465,27 @@ function fusedRows(f: FusedPosition) {
     row('Algorithm', esc(f.algorithmVersion)),
     row('Time', `${time(f.timestamp)} (${ago(f.timestamp)})`),
     row('Lon / Lat', `${f.longitude.toFixed(6)}, ${f.latitude.toFixed(6)}`),
-    row('Ellipsoidal', num(f.ellipsoidalAltitude, 1, ' m')),
+    row('절대 고도 (타원체)', height.kind === 'ABSOLUTE' ? num(f.ellipsoidalAltitude, 1, ' m') : `<span class="tag warn">미확정</span> ${esc(height.status)}`),
     ...(f.zDatumSource != null
       ? [
-          row(
-            'Height reference',
-            f.zDatumSource === 'TERRAIN'
-              ? `<span class="tag active">TERRAIN</span> ground contacts ±${num(f.zDatumSigma, 1, ' m')}`
-              : f.zDatumSource === 'GPS'
-                ? `<span class="tag warn">GPS</span> ±${num(f.zDatumSigma, 1, ' m')} (no outdoor ground contact)`
-                : '<span class="tag warn">NONE</span> no ground contact or consistent GPS height — drawn on the terrain',
-          ),
+          row('절대 고도 기준', `<span class="tag ${f.zDatumSource === 'TERRAIN' ? 'active' : 'warn'}">${esc(f.zDatumSource)}</span> ${esc(height.datum)}`),
+          row('표시용 높이', `${shown.h.toFixed(1)} m MSL${shown.kind === 'ABSOLUTE' ? '' : shown.kind === 'GROUND_PROJECTED' ? ' — 지면(DEM)+1 m 에 투영한 그리기용 값, 층·높이 추정 아님' : ' — 임시 그리기용 값'}`),
           row('Ground (DEM, MSL)', num(f.terrainHeight, 1, ' m')),
-          row('Above ground', f.heightAboveGround != null ? `<b>${f.heightAboveGround.toFixed(1)} m</b>` : '–'),
-          row('Building', esc(f.buildingName ?? '– (outside footprints)')),
-          row('Floor (calibrated)', esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)')),
+          row('Above ground', f.heightAboveGround != null ? `<b>${f.heightAboveGround.toFixed(1)} m</b>` : '– (절대 고도 없음)'),
+          row('Building (지도상 위치)', esc(f.buildingName ?? '– (outside footprints)')),
+          row('Floor (calibrated)', height.floorAllowed ? esc(describeFloor(f.buildingName, f.ellipsoidalAltitude) ?? '– (building not calibrated)') : '– (절대 고도 미확정 또는 임시 기준: 층을 정할 수 없음)'),
         ]
       : []),
+    row(esc(relativeAltitudeLabel(f.algorithmVersion)), num(f.relativeAltitude ?? null, 2, ' m')),
     row('Position source', `<span class="tag">${esc(f.source)}</span>`),
     row('Motion state', !hasDiagnostics ? na : f.stationary ? '<b>STATIONARY</b>' : 'MOVING'),
-    row('Heading', f.heading != null ? `${f.heading.toFixed(1)}°` : '– (not anchored yet)'),
+    row('Heading', heading.known ? esc(heading.text) : `<span class="tag warn">UNKNOWN</span> ${esc(heading.text)}`),
     row('Heading source', hasDiagnostics ? esc(f.headingSource ?? '–') : na),
     row('GPS', `${gps}${f.gpsRejectReason ? ` <b>${esc(f.gpsRejectReason)}</b>` : ''}`),
-    row('GPS H accuracy', f.gpsHorizontalAccuracy != null ? `${dot(accuracyColor(f.gpsHorizontalAccuracy))}${num(f.gpsHorizontalAccuracy, 1, ' m')}` : '–'),
-    row('Innovation', num(f.innovationDistance, 1, ' m')),
+    row('GPS 보고 정확도 (폰의 주장)', f.gpsHorizontalAccuracy != null ? `${dot(accuracyColor(f.gpsHorizontalAccuracy))}${num(f.gpsHorizontalAccuracy, 1, ' m')}` : '–'),
+    row('GPS와의 차이 (innovation, 오차 아님)', num(f.innovationDistance, 1, ' m')),
     row('Uncertainty (heuristic)', num(f.horizontalUncertainty, 1, ' m')),
-    row('Confidence H / V / all', `${f.horizontalConfidence.toFixed(2)} / ${f.verticalConfidence.toFixed(2)} / <b>${f.overallConfidence.toFixed(2)}</b>`),
+    row('내부 confidence H / V / all (정확도 아님)', `${f.horizontalConfidence.toFixed(2)} / ${f.verticalConfidence.toFixed(2)} / <b>${f.overallConfidence.toFixed(2)}</b>`),
     ...(hasV21
       ? [
           row('Local X / Y / Z', `${num(f.localX, 1)} / ${num(f.localY, 1)} / ${num(f.localZ, 1)} m`),
@@ -471,7 +498,6 @@ function fusedRows(f: FusedPosition) {
                 ? `<span class="tag active">applied</span>${f.pdrRejectReason ? ` ${esc(f.pdrRejectReason)}` : ''}`
                 : `<span class="tag warn">not applied</span> <b>${esc(f.pdrRejectReason ?? '')}</b>`,
           ),
-          row('Relative altitude (raw)', num(f.relativeAltitude, 2, ' m')),
           row('Re-anchored', f.reanchored ? `<span class="tag warn">yes</span> <b>${esc(f.reanchorReason ?? '')}</b>` : 'no'),
           row('Divergence detected', f.divergenceDetected ? '<span class="tag warn">yes — state reset to GPS evidence</span>' : 'no'),
         ]
@@ -488,6 +514,7 @@ function setHtml(id: string, html: string) {
 }
 
 function render() {
+  arkitPreview.render(state.connected);
   spaceViews?.level.tracksChanged(); // F10: what is lifted follows the sessions and layers shown
   const status = $('socket-status');
   status.textContent = state.connected ? 'live' : 'disconnected';
@@ -524,7 +551,7 @@ function render() {
         return `<li data-session="${esc(s.sessionId)}" class="${sel ? 'selected' : ''}">
           ${dot(collectorColor(s.collectorId))}
           <b>${esc(s.collectorId)}</b>
-          <span class="tag ${s.status.toLowerCase()}">${s.status}</span>
+          <span class="tag ${s.status.toLowerCase()}">${s.status}</span>${s.status === 'ACTIVE' && (s.syncState === 'OFFLINE' || s.syncState === 'DELAYED') ? '<span class="tag warn" title="종료된 것이 아님: 종료 요청을 받지 못했고 최근 수신이 없음">최근 수신 없음</span>' : ''}
           <span class="muted right">${new Date(s.startedAt).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           <div class="sub muted">${s.locationCount} pts · ${s.markerCount} markers · ${esc(s.sessionId.slice(0, 8))}</div>
         </li>`;
@@ -564,7 +591,7 @@ function renderCollectorDetail(el: HTMLElement, collectorId: string) {
     ${row('Session', `${esc(c.activeSessionId?.slice(0, 8) ?? '–')} ${c.collecting ? '(collecting)' : ''}`)}
     ${section('Raw GPS')}
     ${row('Lon / Lat', l ? `${l.longitude.toFixed(6)}, ${l.latitude.toFixed(6)}` : '–')}
-    ${row('Altitude (MSL)', num(l?.altitude, 1, ' m'))}
+    ${row('Altitude (MSL)', mslText(l))}
     ${row('Ellipsoidal', num(l?.ellipsoidalAltitude, 1, ' m'))}
     ${row('Map height', hs ? `${hs.h.toFixed(1)} m <span class="tag ${hs.source === 'none' ? 'warn' : ''}">${hs.source === 'msl' ? 'MSL' : hs.source === 'ellipsoidal' ? 'ellipsoidal − geoid' : 'no altitude'}</span>` : '–')}
     ${row('H / V accuracy', l ? `${dot(accuracyColor(l.horizontalAccuracy))}${num(l.horizontalAccuracy, 1, ' m')} / ${num(l.verticalAccuracy, 1, ' m')}` : '–')}
@@ -600,6 +627,10 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
     if (event.eventType === 'position-suppressed') return `위치 출력 보류 · ${String(d.reason ?? '')} · 오차 ${Number(d.uncertaintyM ?? 0).toFixed(1)} m`;
     return event.eventType;
   };
+  const liveRun = runs.find((r) => r.algorithmVersion === state.fusion.active && r.status === 'COMPLETED') ?? null;
+  const lastFused = track?.fused(state.fusion.active).at(-1);
+  const stage = publishedStage(s, liveRun ? { mode: 'SENSOR_TIME', trigger: liveRun.trigger, metrics: liveRun.metrics } : null,
+    !!(liveRun?.completedAt && lastFused && s.lastReceivedAt && Date.parse(s.lastReceivedAt) > Date.parse(liveRun.completedAt)));
   const m = (v: string) => runs.find((r) => r.algorithmVersion === v)?.metrics ?? null;
   const cell = (v: string, f: (x: NonNullable<FusionRun['metrics']>) => string) => {
     const x = m(v);
@@ -610,6 +641,8 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
     ${row('Session', esc(s.sessionId))}
     ${row('Collector', `${dot(collectorColor(s.collectorId))}${esc(s.collectorId)} · ${esc(s.device.deviceModel ?? '?')} iOS ${esc(s.device.systemVersion ?? '?')} · app ${esc(s.device.appVersion ?? '?')}`)}
     ${row('Status', `<span class="tag ${s.status.toLowerCase()}">${s.status}</span>`)}
+    ${sessionStateLines(s, Date.now()).map((l) => row(esc(l.label), `<span class="${l.tone === 'ok' ? 'ok-text' : l.tone === 'warn' ? 'warn-text' : 'muted'}">${esc(l.text)}</span>`)).join('')}
+    ${row('표시 중인 융합 결과', `<span class="tag">${esc(STAGE_LABEL[stage.stage])}</span> <span class="muted">${esc(stage.note)}</span>`)}
     ${row('Started / Ended', `${time(s.startedAt)} / ${time(s.endedAt)}`)}
     ${row('Raw locations', `${s.locationCount}${track ? ` (on map ${pts.length})` : ''} · markers ${s.markerCount}`)}
     ${row('Last usable raw → fusion', offsetText(track, lastRaw, null))}
@@ -646,7 +679,11 @@ function renderSessionDetail(el: HTMLElement, sessionId: string) {
       })
       .join('')}
     <span class="muted">${esc(versions.map((v) => state.reprocessResult.get(`${s.sessionId}|${v}`)).filter(Boolean).join(' · ') || 'Recompute from raw data (raw is never modified)')}</span>
-  </div>`;
+  </div>
+  ${s.status === 'ACTIVE' ? `<div class="actions">
+    <button type="button" data-action="interrupt" data-session="${esc(s.sessionId)}" ${s.manualInterruptBlock === null ? '' : 'disabled'}>수동 인터럽트</button>
+    <span class="muted">${esc(state.interruptResult.get(s.sessionId) ?? interruptHint(s.manualInterruptBlock))}</span>
+  </div>` : ''}`;
 }
 
 /** A building of the campus 3D model: height and its basis, floors, base/roof, floor calibration. */
@@ -723,7 +760,7 @@ function renderPointDetail(el: HTMLElement, pick: PickId) {
     ${row('Time', time(p.timestamp))}
     ${row('Lon / Lat', `${p.longitude.toFixed(6)}, ${p.latitude.toFixed(6)}`)}
     ${row('H / V accuracy', `${dot(accuracyColor(p.horizontalAccuracy))}${num(p.horizontalAccuracy, 1, ' m')} / ${num(p.verticalAccuracy, 1, ' m')}`)}
-    ${row('Altitude / Ellipsoidal', `${num(p.altitude, 1, ' m')} / ${num(p.ellipsoidalAltitude, 1, ' m')}`)}
+    ${row('Altitude (MSL) / Ellipsoidal', `${mslText(p)} / ${num(p.ellipsoidalAltitude, 1, ' m')}`)}
     ${section(`Decision by ${esc(state.fusion.active)}`)}
     ${row(
       'GPS',
@@ -780,6 +817,23 @@ $('session-list').addEventListener('pointerdown', async (e) => {
   tracks.get(id)?.flyTo();
 });
 
+// Manual interrupt: only offered by the server for an ACTIVE session whose phone is gone (socket closed, nothing received lately)
+$('detail').addEventListener('pointerdown', async (e) => {
+  const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action="interrupt"]');
+  if (!btn || btn.hasAttribute('disabled')) return;
+  const id = btn.dataset.session!;
+  if (!window.confirm('이 세션을 INTERRUPTED로 닫고 최종 평활화를 실행합니다.\n폰은 멈추지 않습니다: 나중에 올라오는 데이터는 그대로 저장되고 결과가 다시 계산됩니다.\n계속할까요?')) return;
+  try {
+    upsertSession(await api.interruptSession(id));
+    state.interruptResult.set(id, '인터럽트됨 · 최종 재처리 대기 중');
+    window.setTimeout(() => void reloadTrack(id, true).then(() => loadRuns(id)), 12_000); // after the debounced final replay
+  } catch (err) {
+    state.interruptResult.set(id, `실패: ${(err as Error).message}`);
+    void loadRuns(id); // the reason usually is a changed state: refresh it
+  }
+  scheduleRender();
+});
+
 // Reprocess buttons (pointerdown: the detail panel is re-rendered every second)
 $('detail').addEventListener('pointerdown', async (e) => {
   const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action="reprocess"]');
@@ -830,6 +884,11 @@ for (const key of ['rawPoints', 'rawTrajectory', 'fusedPosition', 'fusedTrajecto
   });
 }
 
+$<HTMLInputElement>('raw-phone-height').addEventListener('change', (e) => {
+  setRawHeightMode((e.target as HTMLInputElement).checked ? 'phone' : 'fused');
+  for (const track of tracks.values()) track.redrawRaw();
+});
+
 /** One checkbox per fusion version; the live version is on by default, others load on demand for comparison. */
 function renderVersionToggles() {
   $('fused-versions').innerHTML = state.fusion.versions
@@ -858,6 +917,7 @@ function removeCollectorLocally(collectorId: string, sessionIds: string[]) {
   for (const s of state.sessions) if (s.collectorId === collectorId) removed.add(s.sessionId);
   state.sessions = state.sessions.filter((s) => !removed.has(s.sessionId));
   for (const id of removed) {
+    arkitPreview.remove(id);
     tracks.get(id)?.destroy();
     tracks.delete(id);
     trackLoads.delete(id);
@@ -1093,6 +1153,7 @@ async function boot() {
   start
     .then((v) => {
       viewer = v;
+      arkitPreview.setViewer(v);
       if (import.meta.env.DEV) (window as any).__previewViewer = v; // debugging in the browser console
       enablePicking(v);
       mobilityLayer = new MobilityLayer(v);
@@ -1129,3 +1190,5 @@ async function boot() {
 }
 
 void boot();
+
+setInterval(() => { arkitPreview.tick(); scheduleRender(); }, 1000);

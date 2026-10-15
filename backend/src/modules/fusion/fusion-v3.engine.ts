@@ -128,6 +128,7 @@ function rejectReason(o: Extract<Observation, { kind: 'gps' }>, state: FusionSta
 }
 
 export function processObservationV3(state: FusionStateV3, observation: Observation) {
+  if (observation.kind === 'absoluteAltitude') return { outputs: [], events: [] };
   if (observation.spatialContext !== undefined) {
     state.context = observation.spatialContext;
     state.mapUnavailable = observation.spatialContext === null;

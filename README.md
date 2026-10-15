@@ -5,6 +5,7 @@
 - Backend: Node.js + TypeScript + Express 5 + Socket.IO 4 + `pg` (ORM 없음) + Zod + JWT
 - Frontend: Vite + TypeScript + Vanilla DOM + Socket.IO Client + VWorld WebGL 3D API 3.0
 - DB: PostgreSQL 16 + PostGIS 3.5 (Docker Compose)
+- ARKit VIO 서버 통합: **[docs/ARKIT_VIO_SERVER.md](docs/ARKIT_VIO_SERVER.md)** (계약·마이그레이션·정합·프리뷰·검증)
 - iPhone ↔ Server 계약: **[docs/API_CONTRACT.md](docs/API_CONTRACT.md)**
 
 ## 브랜치 전략
