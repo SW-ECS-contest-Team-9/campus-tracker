@@ -32,7 +32,7 @@ class AndroidBleBeaconScanner(
     private val context: Context,
     private val clock: CollectorClock,
     private val handler: Handler,
-) : BeaconScanner {
+) : BeaconScanner, hoshi.campustracker.collection.SurveyScanner {
     companion object {
         private const val TAG = "BeaconScanner"
         const val MIN_RESTART_MS = 6_500L
@@ -44,6 +44,8 @@ class AndroidBleBeaconScanner(
 
     private val normalizer = BeaconObservationNormalizer(clock::epochMs)
     private var uuids: Set<String> = emptySet()
+    /** registration survey: every iBeacon, whatever its UUID (positioning scans never use this) */
+    private var anyUuid = false
     private var listener: BeaconObservationListener? = null
     private var callback: ScanCallback? = null
     private var receiverRegistered = false
@@ -62,8 +64,14 @@ class AndroidBleBeaconScanner(
         }
     }
 
-    override fun start(proximityUuids: Set<String>, listener: BeaconObservationListener) {
+    override fun start(proximityUuids: Set<String>, listener: BeaconObservationListener) = begin(proximityUuids, false, listener)
+
+    /** Every iBeacon in range (registration screen only): ScanFilter on the iBeacon prefix 0x02 0x15 alone. */
+    override fun startSurvey(listener: BeaconObservationListener) = begin(emptySet(), true, listener)
+
+    private fun begin(proximityUuids: Set<String>, any: Boolean, listener: BeaconObservationListener) {
         handler.post {
+            this.anyUuid = any
             this.uuids = proximityUuids.map { it.lowercase() }.toSet()
             this.listener = listener
             if (!receiverRegistered) {
@@ -98,14 +106,17 @@ class AndroidBleBeaconScanner(
         if (BeaconPermissions.locationServicesRequired() && location != null && !LocationManagerCompat.isLocationEnabled(location)) {
             return setState(BeaconScannerState.LocationOff)
         }
-        if (uuids.isEmpty()) return setState(BeaconScannerState.NoRegisteredBeacons)
+        if (uuids.isEmpty() && !anyUuid) return setState(BeaconScannerState.NoRegisteredBeacons)
         val scanner = adapter.bluetoothLeScanner ?: return setState(BeaconScannerState.BluetoothOff)
         val wait = lastStartMs + MIN_RESTART_MS - SystemClock.elapsedRealtime()
         if (wait > 0) {
             handler.postDelayed({ if (listener != null && callback == null) startScan() }, wait)
             return
         }
-        val filters = uuids.mapNotNull { uuid ->
+        val filters = if (anyUuid) {
+            val prefix = byteArrayOf(IBeaconParser.TYPE.toByte(), IBeaconParser.LENGTH.toByte())
+            listOf(ScanFilter.Builder().setManufacturerData(IBeaconParser.APPLE_COMPANY_ID, prefix, byteArrayOf(-1, -1)).build())
+        } else uuids.mapNotNull { uuid ->
             runCatching {
                 val (data, mask) = IBeaconParser.filterFor(uuid)
                 ScanFilter.Builder().setManufacturerData(IBeaconParser.APPLE_COMPANY_ID, data, mask).build()
@@ -134,7 +145,7 @@ class AndroidBleBeaconScanner(
         try {
             scanner.startScan(filters, settings, cb)
             callback = cb
-            setState(BeaconScannerState.Scanning(uuids.size))
+            setState(BeaconScannerState.Scanning(if (anyUuid) 0 else uuids.size))
             L.i(TAG, "scan started uuids=${uuids.size}")
         } catch (e: SecurityException) {
             setState(BeaconScannerState.PermissionDenied(BeaconPermissions.required()))
@@ -155,7 +166,7 @@ class AndroidBleBeaconScanner(
         val l = listener ?: return
         val data = result.scanRecord?.getManufacturerSpecificData(IBeaconParser.APPLE_COMPANY_ID)
         // result.timestampNanos: elapsedRealtimeNanos of the advertisement (the same clock as Location / SensorEvent)
-        normalizer.normalize(IBeaconParser.APPLE_COMPANY_ID, data, result.rssi, result.timestampNanos, uuids)
+        normalizer.normalize(IBeaconParser.APPLE_COMPANY_ID, data, result.rssi, result.timestampNanos, if (anyUuid) null else uuids)
             .onSuccess(l::onObservation)
             .onFailure { rejected++ }
     }

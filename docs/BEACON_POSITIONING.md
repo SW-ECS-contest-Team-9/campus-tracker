@@ -98,13 +98,60 @@ collector 토큰 + `POSITIONING_ADMIN_COLLECTORS`(쉼표 구분 collector ID)에
 | --- | --- |
 | `GET /beacons?includeDisabled=&buildingId=` | 비콘 목록(앵커 포함) |
 | `POST /beacons` | 등록 `{uuid, major, minor, measuredPowerDbm?, anchorId? \| anchor?, label?}`. 중복 식별자 409 `BEACON_EXISTS`(기존 id 포함) |
-| `GET/PATCH /beacons/:id` | 조회 / 수정(측정 전력, 앵커 연결, 활성, 라벨). **식별자(uuid/major/minor)는 수정 불가** |
-| `DELETE /beacons/:id`, `POST /beacons/:id/disable` | 비활성화(soft delete). 하드 삭제 없음 |
+| `GET/PATCH /beacons/:id` | 조회 / 수정(측정 전력, 앵커 연결, 활성, 라벨, `anchor`: 설치 위치 전체 교체). **식별자(uuid/major/minor)는 수정 불가**. `anchor`는 그 비콘만 쓰는 앵커면 제자리 수정, 다른 비콘과 공유하면 새 앵커를 만들어 연결(공유 앵커는 그대로). `anchorId`와 동시 지정 불가 |
+| `DELETE /beacons/:id`, `POST /beacons/:id/disable` | 비활성화(soft delete, 기본값) |
+| `DELETE /beacons/:id?permanent=true` | 영구 삭제. 관측 행은 식별자를 그대로 두고 `beacon_id = NULL`, `UNREGISTERED`가 되어 `/discovered`에 다시 나오며, 같은 식별자를 다시 등록하면 퓨전에 쓰인다(퓨전은 식별자로 조인). 비콘별 보정값은 삭제, 다른 비콘이 쓰지 않는 앵커도 삭제 |
 | `PUT /beacons/:id/anchor` | `{anchorId \| null}` 앵커 연결/해제 |
 | `GET/POST /anchors`, `PATCH /anchors/:id` | Spatial Anchor 조회/생성/수정(위치 보정, 비활성화) |
 | `GET/PUT /calibrations` | 보정값 upsert |
 
 모든 변경은 `configVersion`을 올리고 로그(`beacon.registry.*`, actor 포함)를 남긴다.
+
+### 5.3 비콘 등록 화면 `/beacons.html`
+
+편집기와 같은 비밀번호 없는 트랙커 계정으로 로그인한다(같은 브라우저 저장소를 써서 편집기에 로그인돼 있으면 그대로 사용).
+등록은 `POSITIONING_ADMIN_COLLECTORS`에 있는 계정만 가능하고, 아니면 화면 상단에 그 이유를 표시한다.
+
+| 방법 | 동작 |
+| --- | --- |
+| 직접 입력 | UUID(대시·중괄호 없이 붙여 넣어도 정규화), Major·Minor(0~65535), 1 m 송신 세기, 이름, 설치 위치(건물·층·층 바닥 높이·위도/경도 또는 EPSG:5186 X/Y·설치 높이(해발)·정확도). 위치를 비우면 앵커 없이 등록 |
+| 현재 위치 사용 | 브라우저 위치 권한으로 위도·경도·정확도를 채움(실내 GPS는 부정확하다고 표시) |
+| 이 기기 블루투스 | `navigator.bluetooth.requestLEScan`으로 **브라우저의 블루투스 권한을 요청**하고 iBeacon 광고(Apple 0x004C, 0x02 0x15)만 검색. 신호 센 순으로 목록, 누르면 UUID·Major·Minor·송신 세기 채움. 이미 등록된 비콘은 "등록됨" 표시 |
+| 앱이 들은 미등록 비콘 | `GET /admin/discovered`: 수집 앱이 올린 미등록 관측(UUID·Major·Minor별 횟수·최대 RSSI·플랫폼·최근 시각)과 **제안 위치**(신호가 가장 셀 때 그 세션의 fused 위치·층·건물). 누르면 식별자와 제안 위치를 채움 |
+| 검색 UUID | `GET/POST/DELETE /admin/survey-uuids`. 앱 설정의 `proximityUuids`에 들어가, 아직 등록되지 않은 Major·Minor도 앱이 수집한다(iOS는 UUID를 모르면 검색 자체가 불가능) |
+
+브라우저 블루투스 검색의 제약: Chromium 계열에서만, `chrome://flags/#enable-experimental-web-platform-features`를 켜야 하고,
+https 또는 localhost에서만 열린다(LAN의 http 주소에서는 불가). Safari·iOS에는 Web Bluetooth가 없다. 일부 브라우저는 Apple 제조사
+광고를 전달하지 않을 수 있어, 15초 동안 결과가 없으면 앱 수집 목록·직접 입력을 안내한다. 화면은 지원 여부와 이유를 먼저 표시한다.
+
+관리 API 추가: 앵커 위치는 `{x, y, z}`(EPSG:5186) 또는 `{latitude, longitude, z}`(WGS84, 서버가 EPSG:5186으로 변환) 중 하나.
+`GET /admin/me`(권한 확인), `GET /admin/discovered?sinceHours=&limit=`, `GET/POST/DELETE /admin/survey-uuids`.
+퓨전 입력은 관측을 수신 시점의 해석(`beacon_id`)이 아니라 **식별자로 다시 찾으므로**, 검색 UUID로 걸으며 모은 관측은 나중에
+그 비콘을 등록한 뒤 재처리하면 측정으로 쓰인다(migration `031_beacon_survey.sql`).
+
+### 5.4 앱에서 비콘 등록·수정·삭제 (Android·iOS 설정 → "비콘 등록·수정·삭제")
+
+웹 화면과 같은 관리 API(`/admin/me`, `/admin/beacons`, `/admin/survey-uuids`)를 앱의 collector 토큰으로 부른다. 권한도 같다
+(`POSITIONING_ADMIN_COLLECTORS`). 폼 규칙(UUID 정규화, 범위, 층 형식, `z = 층 바닥 높이 + 바닥에서 높이`)은 웹·Android·iOS가
+공용 fixture `fixtures/beacon/registration-cases.json`으로 같은 결과를 내는지 검사한다. 등록에 성공하면 수집 중인 비콘 설정을
+바로 다시 받는다(maxAge를 기다리지 않음). 등록 화면은 수집 세션과 독립된 별도 스캐너·위치 요청을 쓰며 수집 데이터에 섞이지 않는다.
+
+등록된 비콘 목록(사용 중지 포함)에서 하나를 누르거나, 검색 목록에서 "등록됨" 비콘을 누르면 수정 모드가 된다.
+- 수정: 같은 폼(식별자 칸은 잠김) → `PATCH /admin/beacons/:id`. 비운 1 m 송신 세기·이름은 지워지고(null), 설치 위치를 모두 비우면
+  앵커 연결이 해제된다(`anchorId: null`). 저장된 위치는 EPSG:5186이라 폼은 X/Y 모드로 열린다(위도·경도로 바꾸려면 "현재 위치").
+  폼 → 요청 변환과 비콘 → 폼 변환은 같은 fixture의 `editCases`, `beaconToForm`으로 Android·iOS가 검사한다.
+- 사용 중지 / 다시 사용: `PATCH {enabled}`. 설정·퓨전에서 빠지고 기록은 남는다.
+- 삭제: 확인 후 `DELETE ?permanent=true`(위 5.2). 되돌릴 수 없다.
+- 변경마다 목록과 수집 앱의 비콘 설정을 다시 받는다. 다른 곳에서 이미 삭제된 비콘은 "이미 삭제된 비콘" 안내 후 새 등록 모드로 돌아간다.
+
+| | Android | iOS |
+| --- | --- | --- |
+| 주변 검색 | Nearby devices(+위치) 권한을 받아 **UUID와 관계없이** 모든 iBeacon 검색(ScanFilter: Apple 0x004C, 접두 0x02 0x15만) | Core Location은 UUID를 아는 비콘만 ranging 가능 → 등록된 비콘의 UUID + 검색 UUID + 화면에서 입력한 UUID로 검색 |
+| 목록 | 미등록 먼저, 최대 RSSI 순. 누르면 UUID·Major·Minor·1 m 송신 세기 채움 | 같음. 단 iOS는 광고의 1 m 송신 세기를 알려주지 않아 그 칸은 비워 둔다(서버 기본값) |
+| 현재 위치 | 수집 중 30초 이내 fix 재사용, 없으면 `LocationManagerCompat.getCurrentLocation`(GPS→네트워크, 15초) | 수집 중 30초 이내 fix 재사용, 없으면 `CLLocationManager.requestLocation`(15초) |
+| 코드 | `collection/BeaconRegistrationController.kt`, `ui/BeaconRegistrationScreen.kt`, `positioning/BeaconRegistration.kt` | `Services/BeaconRegistrationModel.swift`, `BeaconRegistrationView.swift`, `Positioning/BeaconRegistration.swift` |
+
+iOS에서 UUID를 모르는 비콘은 직접 입력하거나, Android·웹 화면으로 찾거나, 웹에서 검색 UUID를 추가해야 한다.
 
 ## 6. WebSocket `beacon.observations.v1`
 
@@ -250,13 +297,15 @@ fusion config 값은 재처리·Lab에서 `overrides`/`--set`으로 바꿀 수 �
 
 | 대상 | 명령 | 결과 |
 | --- | --- | --- |
-| 서버 전체 | `npm test -w backend` (DB 통합: `FUSION_/ARKIT_/BEACON_TEST_DATABASE_URL`) | 307개 중 305 통과, 2 skip, 실패 0. skip된 편집기 통합 테스트 2개는 각각 빈 DB로 따로 실행해 통과 |
-| 프론트엔드 | `npm test -w frontend`, `npm run typecheck` | 148개 통과, 타입 검사 통과 (변경 없음, 회귀 확인) |
+| 서버 전체 | `npm test -w backend` (DB 통합: `FUSION_/ARKIT_/BEACON_TEST_DATABASE_URL`) | 308개 중 306 통과, 2 skip, 실패 0. skip된 편집기 통합 테스트 2개는 각각 빈 DB로 따로 실행해 통과 |
+| 프론트엔드 | `npm test -w frontend`, `npm run typecheck` | 153개 통과, 타입 검사 통과 (변경 없음, 회귀 확인) |
 | 서버 타입 | `npm run typecheck -w backend` | 통과 |
 | 서버 신규 | `test/beacon-positioning.test.ts`(15), `test/beacon.integration.test.ts`(1, PostGIS) | 통과 |
-| Android | `./gradlew :app:testDebugUnitTest :app:lintDebug` | 81개 중 80 통과·1 skip(기존), 신규 19개 포함. lint: 신규 코드 경고 없음 |
+| 등록 화면 | `frontend/test/beacon-scan.test.ts`(5, 공용 iBeacon 패킷 fixture), `backend/test/beacon-registration.integration.test.ts`(1, 수정·앵커 공유·사용 중지·영구 삭제·재등록 포함), Playwright/Chromium으로 로그인·블루투스 검색(가짜 광고)·검증 오류·등록·중복·검색 UUID·앱 수집 목록·권한 없는 계정·폰 폭 14개 확인 | 통과. 실제 블루투스 하드웨어 검색은 미확인 |
+| Android | `./gradlew :app:testDebugUnitTest :app:lintDebug` | 92개 중 91 통과·1 skip(기존). 앱 등록·수정·삭제 11개(공용 등록·수정 fixture, 목록, 컨트롤러+가짜 스캐너·서버) 포함. lint: 신규 코드 경고 없음 |
 | iOS 공통 코어 | Linux Swift 6.2로 `BeaconPositioning.swift` 컴파일(Swift 5/6, MainActor 기본 격리, strict concurrency) + fixture 검사 | 통과 |
-| iOS 앱·테스트 | Xcode 빌드, `CampusTrackerTests/BeaconPositioningTests.swift` | **미실행**(Xcode 없음). 기존 103개 `@Test` 회귀도 미실행 |
+| iOS 등록 | Linux Swift 6.2: `BeaconRegistration.swift` + 등록 fixture, `BeaconRegistrationModel.swift`를 CoreLocation 스텁으로 타입 검사 + `BeaconRegistrationTests.swift` 9개(등록·수정 fixture, 수정·사용 중지·삭제 흐름)를 스텁 위에서 실행 | 통과. SwiftUI 화면(`BeaconRegistrationView.swift`)은 Linux에서 컴파일 불가로 **미검증** |
+| iOS 앱·테스트 | Xcode 빌드, `CampusTrackerTests/BeaconPositioningTests.swift`, `BeaconRegistrationTests.swift` | **미실행**(Xcode 없음). 기존 103개 `@Test` 회귀도 미실행 |
 
 같은 fixture(`fixtures/beacon/*.json`: iBeacon 패킷, 측정 모델·보정 선택, 설정, 관측 배치)를 세 플랫폼 테스트가 함께 읽는다.
 
@@ -274,6 +323,7 @@ fusion config 값은 재처리·Lab에서 `overrides`/`--set`으로 바꿀 수 �
 7. 양 플랫폼: 같은 비콘을 iOS·Android로 동시에 수집해 플랫폼별 RSSI 차이 측정 → `beacon_calibrations` 입력.
 8. 서버: 실제 캠퍼스 세션에서 `fusion:compare --set beaconFusionEnabled=false`로 비콘 효과와 층 판정 확인.
 9. 비콘 설치 위치·설치 높이·층 바닥 높이 측량값 입력과 관리 API 등록.
+10. 앱 등록 화면: Android 실제 BLE 검색(UUID 무관)·현재 위치·등록·중복 메시지, iOS 등록/검색 UUID로 ranging·위치 권한 요청·등록 후 수집 설정 갱신, 권한 없는 계정 안내. 수정(위치 바꾸기)·사용 중지·다시 사용·삭제 확인 대화상자, 삭제 후 같은 비콘이 검색 목록에서 미등록으로 보이는지.
 
 ## 12. 향후 과제
 

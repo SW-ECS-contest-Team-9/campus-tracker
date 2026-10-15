@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { IsoDateTime, isPlausibleSensorTime, Uuid } from '../../common/dto.js';
 import { FLOOR_NAME } from '../markers/marker-anchor.js';
+import { tmForward } from '../../geo/tm.js';
 
 // BLE / iBeacon positioning contract (docs/BEACON_POSITIONING.md). Zod schemas are the single source of truth.
 
@@ -68,12 +69,24 @@ export const beaconKey = (protocol: string, uuid: string, major: number, minor: 
 
 // ---- admin ----
 
-export const AnchorPosition = z.object({
+const Height = z.number().finite().min(-500).max(3000);
+const GridPosition = z.object({
   /** EPSG:5186 metres */
   x: z.number().finite().min(100_000).max(700_000),
   y: z.number().finite().min(100_000).max(800_000),
   /** orthometric height above MSL (KVD Incheon), metres: the beacon's mounting point */
-  z: z.number().finite().min(-500).max(3000),
+  z: Height,
+}).strict();
+/** WGS84 input (the registration page, a phone's location); stored as EPSG:5186 like every other anchor */
+const GeoPosition = z.object({
+  latitude: z.number().finite().min(33).max(39),
+  longitude: z.number().finite().min(124).max(132),
+  z: Height,
+}).strict();
+export const AnchorPosition = z.union([GridPosition, GeoPosition]).transform((p) => {
+  if ('x' in p) return p;
+  const g = tmForward(p.latitude, p.longitude);
+  return { x: g.x, y: g.y, z: p.z };
 });
 
 export const AnchorCreate = z.object({
@@ -118,9 +131,11 @@ export type BeaconCreate = z.infer<typeof BeaconCreate>;
 export const BeaconUpdate = z.object({
   measuredPowerDbm: z.number().int().min(-127).max(20).nullish(),
   anchorId: Uuid.nullable().optional(),
+  /** replace the placement: the beacon's own anchor is rewritten in place, a shared one is left alone (new anchor) */
+  anchor: AnchorCreate.optional(),
   enabled: z.boolean().optional(),
   label: z.string().trim().max(200).nullish(),
-}).strict();
+}).strict().refine((b) => !(b.anchorId !== undefined && b.anchor), { message: 'give anchorId or anchor, not both', path: ['anchor'] });
 export type BeaconUpdate = z.infer<typeof BeaconUpdate>;
 
 export const CalibrationUpsert = z.object({
@@ -135,7 +150,20 @@ export const CalibrationUpsert = z.object({
 }).strict();
 export type CalibrationUpsert = z.infer<typeof CalibrationUpsert>;
 
+export const BeaconDeleteQuery = z.object({
+  /** true = remove the row (observations keep their identifier and become unregistered); default = disable */
+  permanent: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+}).passthrough();
+
 export const BeaconListQuery = z.object({
   includeDisabled: z.stringbool().default(false),
   buildingId: z.string().trim().min(1).max(64).optional(),
+});
+
+export const SurveyUuidCreate = z.object({ uuid: Uuid, label: z.string().trim().max(200).nullish() }).strict();
+
+export const DiscoveredQuery = z.object({
+  /** look back this many hours (default one week) */
+  sinceHours: z.coerce.number().int().min(1).max(24 * 90).default(24 * 7),
+  limit: z.coerce.number().int().min(1).max(500).default(100),
 });

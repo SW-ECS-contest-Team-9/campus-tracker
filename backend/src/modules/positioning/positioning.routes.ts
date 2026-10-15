@@ -5,7 +5,7 @@ import { AppError } from '../../common/errors/app-error.js';
 import { env } from '../../config/env.js';
 import { Uuid } from '../../common/dto.js';
 import { collectorService } from '../collectors/collector.service.js';
-import { BeaconListQuery } from './beacon.dto.js';
+import { BeaconDeleteQuery, BeaconListQuery } from './beacon.dto.js';
 import { beaconRepository } from './beacon.repository.js';
 import { beaconService } from './beacon.service.js';
 
@@ -60,9 +60,15 @@ admin.post('/beacons', async (req, res) => res.status(201).json(await beaconServ
 admin.get('/beacons/:beaconId', async (req, res) => res.json(await beaconService.getBeacon(id(req.params.beaconId, 'BEACON_NOT_FOUND'))));
 admin.patch('/beacons/:beaconId', async (req, res) =>
   res.json(await beaconService.updateBeacon(id(req.params.beaconId, 'BEACON_NOT_FOUND'), req.body, actor(res))));
-/** Soft delete (disable). There is no hard delete: stored observations keep their beacon reference. */
-admin.delete('/beacons/:beaconId', async (req, res) =>
-  res.json(await beaconService.disableBeacon(id(req.params.beaconId, 'BEACON_NOT_FOUND'), actor(res))));
+/**
+ * Default: soft delete (disable; the row and its observation references stay). `?permanent=true` removes the row; the
+ * observations keep their identifier and become unregistered (a later registration of the same identifier applies to them).
+ */
+admin.delete('/beacons/:beaconId', async (req, res) => {
+  const beaconId = id(req.params.beaconId, 'BEACON_NOT_FOUND');
+  if (BeaconDeleteQuery.parse(req.query).permanent) return res.json(await beaconService.deleteBeacon(beaconId, actor(res)));
+  res.json(await beaconService.disableBeacon(beaconId, actor(res)));
+});
 admin.post('/beacons/:beaconId/disable', async (req, res) =>
   res.json(await beaconService.disableBeacon(id(req.params.beaconId, 'BEACON_NOT_FOUND'), actor(res))));
 admin.put('/beacons/:beaconId/anchor', async (req, res) => {
@@ -74,6 +80,13 @@ admin.get('/anchors', async (_req, res) => res.json({ anchors: await beaconRepos
 admin.post('/anchors', async (req, res) => res.status(201).json(await beaconService.createAnchor(req.body, actor(res))));
 admin.patch('/anchors/:anchorId', async (req, res) =>
   res.json(await beaconService.updateAnchor(id(req.params.anchorId, 'ANCHOR_NOT_FOUND'), req.body, actor(res))));
+
+admin.get('/discovered', async (req, res) => res.json({ discovered: await beaconService.discovered(req.query) }));
+admin.get('/survey-uuids', async (_req, res) => res.json({ surveyUuids: await beaconRepository.surveyUuids() }));
+admin.post('/survey-uuids', async (req, res) => res.status(201).json(await beaconService.addSurveyUuid(req.body, actor(res))));
+admin.delete('/survey-uuids/:uuid', async (req, res) => res.json(await beaconService.removeSurveyUuid(id(req.params.uuid, 'SURVEY_UUID_NOT_FOUND'))));
+/** Who may register beacons: lets the registration page explain a 403 before the user fills the form. */
+admin.get('/me', (_req, res) => res.json({ collectorId: actor(res), admin: true }));
 
 admin.get('/calibrations', async (_req, res) => res.json({ calibrations: await beaconRepository.calibrations() }));
 admin.put('/calibrations', async (req, res) => res.json(await beaconService.upsertCalibration(req.body, actor(res))));
