@@ -153,6 +153,34 @@ https 또는 localhost에서만 열린다(LAN의 http 주소에서는 불가). S
 
 iOS에서 UUID를 모르는 비콘은 직접 입력하거나, Android·웹 화면으로 찾거나, 웹에서 검색 UUID를 추가해야 한다.
 
+### 5.5 편집기 3D 지도에서 비콘 배치 (`/editor.html` → 왼쪽 "비콘 배치")
+
+편집기의 3D 지도에 비콘 레이어를 그리고, 편집기 커서(EPSG:5186 X/Y + 정표고 Z)로 설치 위치를 정한다.
+- 표시
+  - 등록 비콘: 앵커 위치에 파란 점(사용 중지는 회색)과 지면에서 올라오는 기둥, "이름 · 층" 표지
+  - 미등록 비콘(`/admin/discovered`, 최근 30일): 신호가 가장 셀 때 폰의 fused 위치에 주황 점선 기둥과 "? major / minor" 표시. 높이는 모르므로 지면 + 1.5 m
+  - 편집 중인 비콘: 노란 점. 원래 위치에서 노란 점선으로 이어짐
+  - 층 따로 보기·1인칭 보기에서는 다른 편집 표시와 함께 숨김
+- 선택: 지도에서 비콘(점·표지·기둥)을 클릭하거나 패널 목록에서 고른다. "새 비콘"은 식별자를 입력해 새로 만든다.
+- 배치
+  - 클릭·WASD·R/F로 커서를 옮긴 뒤 **Space**(커서 위치에 놓기), **Enter**(저장), **Esc**(닫기)
+  - "커서보다 위(m)": 커서를 바닥에 두고 설치 높이만 더한다(z = 커서 Z + 값)
+  - "커서 따라가기": 커서를 움직이면 비콘도 따라간다
+- 자동 채움: 놓는 순간 3D 지도의 건물 데이터로 건물 ID·층·층 바닥 높이를 채운다(`beacon-map.ts`)
+  - 건물 ID는 커서 위치의 건물 외곽선에서 정한다
+  - 층과 층 바닥 높이는 건물 노트의 층 표(`appearance.windows.floorsM` / `floorNames`)에서 커서 높이(+0.3 m 여유)가 속한 층으로 정한다
+  - 건물 밖이면 `outdoor`(직접 입력한 건물 ID는 유지), 층 표가 없는 건물이면 층은 비운다
+- 저장
+  - 등록 비콘: `PATCH`(§5.2, 그 비콘만 쓰는 앵커는 제자리 수정)
+  - 미등록·새 비콘: `POST`
+  - "위치 해제" 후 저장하면 앵커 연결을 끊는다
+  - 사용 중지 / 다시 사용 / 영구 삭제도 이 패널에서 한다
+  - 입력 규칙과 변환은 웹 등록 페이지·앱과 같다(`buildCreateRequest` / `buildEditRequest`, 공용 fixture)
+- 권한
+  - `POSITIONING_ADMIN_COLLECTORS` 계정만 편집할 수 있다
+  - 그 밖의 계정은 `beacon-config`(사용 중 비콘)를 읽기 전용으로 본다
+- 동시 편집: 다른 편집자의 비콘 변경은 실시간으로 오지 않으므로 "새로고침"이 필요하다(도로·장소와 달리 편집권 lease도 없음)
+
 ## 6. WebSocket `beacon.observations.v1`
 
 Raw WS `{ requestId, type: "beacon.observations.v1", payload }` 또는 Socket.IO 이벤트 `beacon.observations.v1` /
@@ -298,9 +326,10 @@ fusion config 값은 재처리·Lab에서 `overrides`/`--set`으로 바꿀 수 �
 | 대상 | 명령 | 결과 |
 | --- | --- | --- |
 | 서버 전체 | `npm test -w backend` (DB 통합: `FUSION_/ARKIT_/BEACON_TEST_DATABASE_URL`) | 308개 중 306 통과, 2 skip, 실패 0. skip된 편집기 통합 테스트 2개는 각각 빈 DB로 따로 실행해 통과 |
-| 프론트엔드 | `npm test -w frontend`, `npm run typecheck` | 153개 통과, 타입 검사 통과 (변경 없음, 회귀 확인) |
+| 프론트엔드 | `npm test -w frontend`, `npm run typecheck` | 156개 통과, 타입 검사 통과 (변경 없음, 회귀 확인) |
 | 서버 타입 | `npm run typecheck -w backend` | 통과 |
 | 서버 신규 | `test/beacon-positioning.test.ts`(15), `test/beacon.integration.test.ts`(1, PostGIS) | 통과 |
+| 편집기 비콘 배치 | `frontend/test/beacon-map.test.ts`(2: 건물·층 판정, 커서 → 폼 → 요청), `beacon-scan.test.ts`(수정 fixture). Playwright/Chromium(swiftshader)으로 실제 편집기에서 20개 확인: 관리자 패널 로드·지도 위 비콘 클릭으로 열기·식별자 잠금·Space로 커서+2.4 m 배치·Enter 저장 후 DB 좌표 일치·커서 따라가기·실외 배치·새 비콘 검증/등록·영구 삭제·읽기 전용 계정·페이지 오류 없음 | 통과. 테스트 DB에 캠퍼스 3D 건물이 없어 건물·층 자동 채움은 단위 테스트로만 확인 |
 | 등록 화면 | `frontend/test/beacon-scan.test.ts`(5, 공용 iBeacon 패킷 fixture), `backend/test/beacon-registration.integration.test.ts`(1, 수정·앵커 공유·사용 중지·영구 삭제·재등록 포함), Playwright/Chromium으로 로그인·블루투스 검색(가짜 광고)·검증 오류·등록·중복·검색 UUID·앱 수집 목록·권한 없는 계정·폰 폭 14개 확인 | 통과. 실제 블루투스 하드웨어 검색은 미확인 |
 | Android | `./gradlew :app:testDebugUnitTest :app:lintDebug` | 92개 중 91 통과·1 skip(기존). 앱 등록·수정·삭제 11개(공용 등록·수정 fixture, 목록, 컨트롤러+가짜 스캐너·서버) 포함. lint: 신규 코드 경고 없음 |
 | iOS 공통 코어 | Linux Swift 6.2로 `BeaconPositioning.swift` 컴파일(Swift 5/6, MainActor 기본 격리, strict concurrency) + fixture 검사 | 통과 |
@@ -324,6 +353,7 @@ fusion config 값은 재처리·Lab에서 `overrides`/`--set`으로 바꿀 수 �
 8. 서버: 실제 캠퍼스 세션에서 `fusion:compare --set beaconFusionEnabled=false`로 비콘 효과와 층 판정 확인.
 9. 비콘 설치 위치·설치 높이·층 바닥 높이 측량값 입력과 관리 API 등록.
 10. 앱 등록 화면: Android 실제 BLE 검색(UUID 무관)·현재 위치·등록·중복 메시지, iOS 등록/검색 UUID로 ranging·위치 권한 요청·등록 후 수집 설정 갱신, 권한 없는 계정 안내. 수정(위치 바꾸기)·사용 중지·다시 사용·삭제 확인 대화상자, 삭제 후 같은 비콘이 검색 목록에서 미등록으로 보이는지.
+11. 편집기 비콘 배치: 실제 캠퍼스 건물 위에서 건물·층 자동 채움, 층 따로 보기 중 표시, 다른 편집자 변경 후 새로고침.
 
 ## 12. 향후 과제
 

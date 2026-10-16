@@ -7,6 +7,8 @@ import type { TerrainGrid } from './api';
 import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, type ViewPrefs, type NavPreset, type EndpointMode, type ColorMode } from './editor-view';
 import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
 import { AreaEditor } from './editor-areas';
+import { BeaconMapper } from './editor-beacons';
+import type { MapBuilding } from './beacon-map';
 import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
 import { areaSurfacePart } from './road-surface-layer';
 import { SceneLayers, bindLayerControls } from './scene-layers';
@@ -21,6 +23,7 @@ import { isUnderground } from './road-surface';
 import { LABELS, MAP_LINE_SCALE, bindViewStyleControls, onViewStyle, viewStyle, viewStyleControls } from './view-style';
 
 let areaEditor: AreaEditor | null = null;
+let beaconMapper: BeaconMapper | null = null;
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -687,6 +690,17 @@ let spaceViewOn = false;
  * put away while a lifted view or the walk is on, and (F09) while a cut is on, unless the section panel's switch shows
  * them: they would bury the cut face, which marks every way at its height itself.
  */
+/** The 3D map's buildings for the beacon layer (footprint in EPSG:5186, floor table of the note), made once per scene. */
+let mapBuildingCache: { from: unknown; list: MapBuilding[] } | null = null;
+function mapBuildings(): MapBuilding[] {
+  const from = buildingScene?.scene.buildings ?? [];
+  if (mapBuildingCache?.from === from) return mapBuildingCache.list;
+  const list = from.map((b) => ({ buildingId: b.buildingId, name: b.name,
+    polygons: b.geometry.coordinates.map((poly) => poly.map((ring) => ring.map(([lon, lat]) => { const g = tmForward(lat, lon); return [g.x, g.y]; }))),
+    floorsM: b.appearance?.windows?.floorsM, floorNames: b.appearance?.windows?.floorNames }));
+  mapBuildingCache = { from, list };
+  return list;
+}
 function syncEntityVisibility() {
   const cutHides = !!sceneLayers?.section.active && !sceneLayers.section.showOverlays;
   viewer.entities.show = !spaceViewOn && !cutHides;
@@ -1124,6 +1138,7 @@ function setCursor(p: XYZ, updateCamera = true, relativeMove = false) {
   sendCursor();
   if (positionChanged && (roadDraft || placeDraft)) publishDraft();
   if (positionChanged && tool === 'junction') scheduleJunctionPreview();
+  if (positionChanged) beaconMapper?.cursorMoved();
 }
 function drawCursorOnly() {
   if (!viewer) return;
@@ -1900,6 +1915,15 @@ function installControls() {
       if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 공간을 그릴까요?')) return false;
       clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); return true;
     } });
+  beaconMapper = new BeaconMapper({ viewer, C, point: drawPoint, cursor: () => ownCursor, setCursor: (p) => setCursor(p), terrain: terrainAt,
+    request, say, buildings: mapBuildings,
+    focus: (p) => { setCursor(p); viewer.camera.flyToBoundingSphere(new C.BoundingSphere(drawPoint(p), 25), { duration: 0.8 }); },
+    start: () => {
+      if (areaEditor?.active) { if (!confirm('공간 초안을 취소할까요?')) return false; areaEditor.cancel(); }
+      if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 비콘을 편집할까요?')) return false;
+      if (roadDraft || placeDraft || tool !== 'select') { clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); }
+      return true;
+    } });
   document.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) => b.onclick = () => { setTool(b.dataset.tool!); viewer.scene.canvas.focus(); });
   $('editor-cancel').onclick = () => {
     if (areaEditor?.active) { if (confirm('공간 초안을 취소할까요?')) areaEditor.cancel(); return; }
@@ -1964,6 +1988,7 @@ function installControls() {
     if (e.code === 'Escape' && !$('editor-help').hidden) { e.preventDefault(); toggleHelp(false); return; }
     if (handleViewKey(e)) return;
     if (areaEditor?.handleKey(e)) return;
+    if (!roadDraft && !placeDraft && beaconMapper?.handleKey(e)) return;
     if (e.code === 'Escape' && !e.repeat) {
       e.preventDefault();
       if (roadDraft || placeDraft) {
@@ -2032,6 +2057,10 @@ function installControls() {
     if (sceneLayers?.section.placing) return; // the click places the section line
     if (spaceViews?.handleClick(movement.position)) return; // 층 따로 보기 · 1인칭: no selection, no cursor move
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
+    // a beacon of the beacon layer (its point, label or stem) opens it in the 비콘 배치 panel
+    const beaconId = !roadDraft && !placeDraft && !areaEditor?.active ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
+      typeof id === 'string' && /^editor:beacon(-found)?:/.test(id))?.replace(/:stem$/, '') : null;
+    if (beaconId && beaconMapper?.pick(beaconId)) { viewer.scene.canvas.focus(); return; }
     const feature = tool === 'select' && !areaEditor?.active ? hits.map((h: any) => h.id?.cutFrom ?? h.id?.id).find((id: unknown) =>
       typeof id === 'string' && /^editor:(road|place):/.test(id))?.replace(/:(tube|shaft)$/, '') : null;
     if (feature?.startsWith('editor:road:')) { selectRoad(feature.slice('editor:road:'.length)); setTool('select'); return; }
@@ -2121,6 +2150,7 @@ async function startEditor() {
   ownCursor[2] = terrainAt(ownCursor[0], ownCursor[1]) ?? ownCursor[2];
   viewer.scene.canvas.addEventListener('click', () => viewer.scene.canvas.focus());
   installControls(); installSocket(); void loadSessions(); await loadSnapshot();
+  void beaconMapper?.load();
   setTool('select');
   if (result.warning) say(result.warning, 'warning');
   $('editor-logout').title = `${userCode()} · tracker account`;
