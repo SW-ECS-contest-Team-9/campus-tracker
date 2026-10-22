@@ -153,6 +153,12 @@ final class AuthenticationManager: ObservableObject {
         restoreSession()
     }
 
+    /// Stored access token for REST calls that need it (beacon config); nil when signed out.
+    func currentAccessToken() -> String? {
+        guard authenticatedCollector != nil else { return nil }
+        return try? tokenStore.load()
+    }
+
     var authenticatedCollector: AuthenticatedCollector? {
         guard case let .authenticated(collector) = state else { return nil }
         return collector

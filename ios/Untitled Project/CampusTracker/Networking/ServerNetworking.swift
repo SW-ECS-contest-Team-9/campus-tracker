@@ -34,6 +34,11 @@ struct ServerConfiguration: Codable, Equatable {
         return components.url
     }
 
+    /// Identifies "which server" a queued upload belongs to, independent of login state. Used to
+    /// hold local data recorded against a server the app is no longer pointed at, rather than
+    /// silently uploading it to whatever server is configured now (see `UploadOwner`).
+    var ownerKey: String { "\(scheme.rawValue)://\(host.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()):\(port)" }
+
     var validationError: String? {
         let trimmedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedHost.isEmpty else { return "Enter a server address." }
@@ -201,8 +206,18 @@ enum WebSocketConnectionState: Equatable {
     }
 }
 
+/// The transport surface `TelemetrySyncCoordinator` actually depends on, extracted so tests can
+/// drive the sync/queue state machine with a mock transport instead of a real WebSocket.
+protocol CollectorSocket: AnyObject {
+    var state: WebSocketConnectionState { get }
+    var onConnected: (() -> Void)? { get set }
+    var onDisconnected: (() -> Void)? { get set }
+    var onTextMessage: ((String) -> Void)? { get set }
+    func send(text: String, completion: @escaping (Error?) -> Void)
+}
+
 /// Standard RFC 6455 WebSocket transport using Foundation only.
-final class RawWebSocketConnectionManager: NSObject, ObservableObject {
+final class RawWebSocketConnectionManager: NSObject, ObservableObject, CollectorSocket {
     @Published private(set) var state: WebSocketConnectionState = .disconnected
 
     var onConnected: (() -> Void)?
@@ -355,5 +370,56 @@ extension RawWebSocketConnectionManager: URLSessionWebSocketDelegate {
             guard self.task === webSocketTask else { return }
             self.connectionEnded(error: error)
         }
+    }
+}
+
+// MARK: Collection anchor nodes
+
+/// `GET /api/v1/mobility/nodes`: buildings and the network nodes to pick for a collection anchor (no auth).
+struct AnchorBuilding: Codable, Identifiable, Equatable {
+    let buildingId: String
+    let buildingName: String
+    var nodeCount: Int? = nil
+    var floorsWithNodes: [String]? = nil
+    var id: String { buildingId }
+}
+
+struct AnchorNode: Codable, Identifiable, Equatable {
+    let nodeId: String
+    let buildingId: String
+    /// nil: the map does not say which floor
+    var floor: String? = nil
+    let label: String
+    var heightM: Double? = nil
+    var distanceM: Double? = nil
+    var id: String { nodeId }
+}
+
+struct AnchorNodesResponse: Codable, Equatable {
+    var buildings: [AnchorBuilding] = []
+    var nodes: [AnchorNode] = []
+}
+
+enum AnchorNodeAPI {
+    static func fetch(configuration: ServerConfiguration, buildingId: String?, floor: String?,
+                      latitude: Double?, longitude: Double?, client: APIClient = HTTPAPIClient()) async throws -> AnchorNodesResponse {
+        guard let base = configuration.baseURL, var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
+            throw APIClientError.invalidURL
+        }
+        components.path = "/api/v1/mobility/nodes"
+        var query = [URLQueryItem(name: "limit", value: "40")]
+        if let buildingId { query.append(URLQueryItem(name: "buildingId", value: buildingId)) }
+        if let floor { query.append(URLQueryItem(name: "floor", value: floor)) }
+        if let latitude, let longitude {
+            query.append(URLQueryItem(name: "latitude", value: String(latitude)))
+            query.append(URLQueryItem(name: "longitude", value: String(longitude)))
+        }
+        components.queryItems = query
+        guard let url = components.url else { throw APIClientError.invalidURL }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+        let data = try await client.send(request)
+        do { return try JSONDecoder().decode(AnchorNodesResponse.self, from: data) }
+        catch { throw APIClientError.decodingFailed }
     }
 }

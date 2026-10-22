@@ -30,10 +30,12 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     private(set) var lastLocation: CLLocation?
     private(set) var isActive = false
+    private var requestedActive = false
     var onLocation: ((CLLocation) -> Void)?
     var onAuthorizationChanged: ((CLAuthorizationStatus) -> Void)?
     var onPaused: (() -> Void)?
     var onResumed: (() -> Void)?
+    var onError: ((Error) -> Void)?
     var authorizationStatus: CLAuthorizationStatus { manager.authorizationStatus }
     var accuracyAuthorization: CLAccuracyAuthorization { manager.accuracyAuthorization }
 
@@ -44,10 +46,16 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.pausesLocationUpdatesAutomatically = true
     }
 
+    /// `profile`/`distanceFilter` are accepted (and still recorded in `sensorCapabilities` as the
+    /// requested values) but no longer change what's actually applied: collection always runs at
+    /// `kCLLocationAccuracyBestForNavigation` with no distance filter, regardless of profile. A
+    /// lower accuracy or a non-zero filter must never ship for a collection session — not from a
+    /// profile choice, not from a resumed/crash-recovered session carrying an old profile value.
     func start(profile: LocationCollectionProfile, distanceFilter: CLLocationDistance) {
+        requestedActive = true
         manager.activityType = .fitness
-        manager.desiredAccuracy = profile.desiredAccuracy
-        manager.distanceFilter = distanceFilter
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        manager.distanceFilter = kCLDistanceFilterNone
         manager.pausesLocationUpdatesAutomatically = false
         manager.allowsBackgroundLocationUpdates = true
         manager.showsBackgroundLocationIndicator = true
@@ -71,7 +79,23 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.requestAlwaysAuthorization()
     }
 
+    /// Proactive, ahead-of-Start permission request — separate from `start()`'s own fallback
+    /// request so the system prompt appears when the app opens, not when the user taps Start.
+    func requestWhenInUseAuthorizationIfNeeded() {
+        guard manager.authorizationStatus == .notDetermined else { return }
+        manager.requestWhenInUseAuthorization()
+    }
+
+    // A one-session "Precise Location" upgrade via `requestTemporaryFullAccuracyAuthorization(withPurposeKey:)`
+    // is intentionally NOT implemented here: it requires an `NSLocationTemporaryUsageDescriptionDictionary`
+    // entry in Info.plist (a single dictionary keyed by purpose string), which the available
+    // Info.plist tooling in this environment cannot express (its `dictionaryArray` option writes
+    // an array of dicts, not a dict — the wrong shape, which would make the call fail/crash at
+    // runtime). Until that Info.plist key is added directly in Xcode, reduced accuracy is only
+    // surfaced as a warning with a link to Settings (see `CollectionCoordinator`/`ContentView`).
+
     func stop() {
+        requestedActive = false
         manager.stopUpdatingLocation()
         manager.allowsBackgroundLocationUpdates = false
         manager.showsBackgroundLocationIndicator = false
@@ -81,12 +105,32 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         onAuthorizationChanged?(status)
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
+        if requestedActive && (status == .authorizedAlways || status == .authorizedWhenInUse) {
             isActive = true
             manager.startUpdatingLocation()
         } else {
+            if status == .denied || status == .restricted {
+                manager.stopUpdatingLocation()
+            }
             isActive = false
         }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let locationError = error as? CLError, locationError.code == .denied {
+            manager.stopUpdatingLocation()
+            isActive = false
+        }
+        onError?(error)
+    }
+
+    static func capture(_ location: CLLocation) -> LocationCapture {
+        LocationCapture(timestamp: location.timestamp, latitude: location.coordinate.latitude,
+                        longitude: location.coordinate.longitude, altitude: location.altitude,
+                        ellipsoidalAltitude: location.ellipsoidalAltitude,
+                        horizontalAccuracy: location.horizontalAccuracy, verticalAccuracy: location.verticalAccuracy,
+                        speed: location.speed, course: location.course, speedAccuracy: location.speedAccuracy,
+                        courseAccuracy: location.courseAccuracy, floor: location.floor?.level)
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -114,7 +158,6 @@ final class MotionService {
         queue.qualityOfService = .utility
         return queue
     }()
-    var onMotion: ((CMDeviceMotion) -> Void)?
     private(set) var activeReferenceFrame: CMAttitudeReferenceFrame?
 
     var isAvailable: Bool { manager.isDeviceMotionAvailable }
@@ -140,19 +183,46 @@ final class MotionService {
         }
     }
 
-    func start(rate: MotionSamplingRate, using frame: CMAttitudeReferenceFrame) {
+    /// `handler` runs on the motion OperationQueue with an immutable copy of the callback values.
+    /// It must not touch MainActor state; the walking-frame estimator runs in `CollectionCore`.
+    func start(rate: MotionSamplingRate, using frame: CMAttitudeReferenceFrame,
+               handler: @escaping @Sendable (MotionCapture) -> Void) {
         guard manager.isDeviceMotionAvailable, !manager.isDeviceMotionActive else { return }
         manager.deviceMotionUpdateInterval = rate.interval
         activeReferenceFrame = frame
-        manager.startDeviceMotionUpdates(using: frame, to: queue) { [weak self] motion, _ in
-            guard let motion = motion else { return }
-            self?.onMotion?(motion)
+        manager.startDeviceMotionUpdates(using: frame, to: queue) { @Sendable motion, _ in
+            guard let motion else { return }
+            handler(Self.capture(motion))
         }
     }
 
     func stop() {
         manager.stopDeviceMotionUpdates()
         activeReferenceFrame = nil
+    }
+
+    nonisolated static func capture(_ motion: CMDeviceMotion) -> MotionCapture {
+        let quaternion = motion.attitude.quaternion
+        let field = motion.magneticField
+        return MotionCapture(
+            nativeTimestamp: motion.timestamp,
+            userAcceleration: Vector3D(x: motion.userAcceleration.x, y: motion.userAcceleration.y, z: motion.userAcceleration.z),
+            rotationRate: Vector3D(x: motion.rotationRate.x, y: motion.rotationRate.y, z: motion.rotationRate.z),
+            gravity: Vector3D(x: motion.gravity.x, y: motion.gravity.y, z: motion.gravity.z),
+            roll: motion.attitude.roll, pitch: motion.attitude.pitch, yaw: motion.attitude.yaw,
+            quaternion: QuaternionD(x: quaternion.x, y: quaternion.y, z: quaternion.z, w: quaternion.w),
+            magneticField: CalibratedMagneticFieldSample(x: field.field.x, y: field.field.y, z: field.field.z,
+                                                         accuracy: magneticQuality(field.accuracy)))
+    }
+
+    nonisolated private static func magneticQuality(_ accuracy: CMMagneticFieldCalibrationAccuracy) -> MagneticCalibrationQuality {
+        switch accuracy {
+        case .uncalibrated: return .uncalibrated
+        case .low: return .low
+        case .medium: return .medium
+        case .high: return .high
+        @unknown default: return .unavailable
+        }
     }
 }
 
@@ -165,15 +235,15 @@ final class AltimeterService {
         queue.qualityOfService = .utility
         return queue
     }()
-    var onAltitude: ((CMAltitudeData) -> Void)?
     private(set) var isActive = false
 
-    func start() {
+    func start(handler: @escaping @Sendable (AltimeterCapture) -> Void) {
         guard CMAltimeter.isRelativeAltitudeAvailable() else { return }
         isActive = true
-        altimeter.startRelativeAltitudeUpdates(to: queue) { [weak self] data, _ in
-            guard let data = data else { return }
-            self?.onAltitude?(data)
+        altimeter.startRelativeAltitudeUpdates(to: queue) { @Sendable data, _ in
+            guard let data else { return }
+            handler(AltimeterCapture(nativeTimestamp: data.timestamp, relativeAltitude: data.relativeAltitude.doubleValue,
+                                     pressure: data.pressure.doubleValue))
         }
     }
 
@@ -183,40 +253,77 @@ final class AltimeterService {
     }
 }
 
+final class AbsoluteAltitudeService {
+    private let altimeter = CMAltimeter()
+    private let queue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "CampusCollector.absolute-altitude"
+        queue.maxConcurrentOperationCount = 1
+        queue.qualityOfService = .utility
+        return queue
+    }()
+    private(set) var isActive = false
+    var onError: (@Sendable (String, Int) -> Void)?
+
+    func start(handler: @escaping @Sendable (AbsoluteAltitudeCapture) -> Void) {
+        let authorization = CMAltimeter.authorizationStatus()
+        guard CMAltimeter.isAbsoluteAltitudeAvailable(), authorization != .denied,
+              authorization != .restricted, !isActive else { return }
+        isActive = true
+        altimeter.startAbsoluteAltitudeUpdates(to: queue) { [weak self] data, error in
+            if let error {
+                let value = error as NSError
+                self?.onError?(value.domain, value.code)
+                return
+            }
+            guard let data else { return }
+            handler(AbsoluteAltitudeCapture(nativeTimestamp: data.timestamp, altitude: data.altitude,
+                                             accuracy: data.accuracy, precision: data.precision))
+        }
+    }
+
+    func stop() {
+        altimeter.stopAbsoluteAltitudeUpdates()
+        isActive = false
+    }
+}
+
 final class PedometerService {
     private let pedometer = CMPedometer()
-    var onPedometer: ((CMPedometerData) -> Void)?
-    var onError: ((Error?) -> Void)?
     private(set) var isActive = false
 
     /// Must be started with `from: sessionStartDate` (not `Date()`), since the server treats
     /// every sample in a pedometer run as a *cumulative* count since that baseline. Starting
     /// from "now" on a restart silently resets the running total the server already has.
-    func start(capabilities: SensorCapabilities, from sessionStartDate: Date) {
+    func start(capabilities: SensorCapabilities, from sessionStartDate: Date,
+               handler: @escaping @Sendable (PedometerCapture) -> Void,
+               onError: @escaping @Sendable (String, Int) -> Void) {
         guard capabilities.pedometerAvailable else { return }
         isActive = true
-        pedometer.startUpdates(from: sessionStartDate) { [weak self] data, error in
+        pedometer.startUpdates(from: sessionStartDate) { @Sendable data, error in
             guard let data, error == nil else {
-                self?.onError?(error)
+                let nsError = error as NSError?
+                onError(nsError?.domain ?? "unknown", nsError?.code ?? -1)
                 return
             }
-            self?.onPedometer?(data)
+            handler(Self.capture(data, capabilities: capabilities, source: .live))
         }
     }
 
     /// Recovers a gap by re-querying the *entire* session-to-date window, so the single
     /// recovered sample is a cumulative value consistent with the live stream, not an
     /// incremental delta since the last sample.
-    func recover(from start: Date, to end: Date = Date(), completion: @escaping (CMPedometerData?) -> Void) {
+    func recover(from start: Date, to end: Date = Date(), capabilities: SensorCapabilities,
+                 completion: @escaping @Sendable (PedometerCapture?) -> Void) {
         guard start < end else {
             completion(nil)
             return
         }
-        pedometer.queryPedometerData(from: start, to: end) { data, error in
+        pedometer.queryPedometerData(from: start, to: end) { @Sendable data, error in
             if let error {
                 print("[Pedometer] historical recovery failed error=\(error.localizedDescription)")
             }
-            completion(data)
+            completion(data.map { Self.capture($0, capabilities: capabilities, source: .historicalRecovery) })
         }
     }
 
@@ -224,21 +331,48 @@ final class PedometerService {
         pedometer.stopUpdates()
         isActive = false
     }
+
+    nonisolated static func capture(_ data: CMPedometerData, capabilities: SensorCapabilities,
+                                    source: SensorCaptureSource) -> PedometerCapture {
+        PedometerCapture(
+            endDate: data.endDate,
+            numberOfSteps: capabilities.stepCountingAvailable ? data.numberOfSteps.intValue : nil,
+            distance: capabilities.distanceAvailable ? data.distance?.doubleValue : nil,
+            currentPace: capabilities.paceAvailable ? data.currentPace?.doubleValue : nil,
+            currentCadence: capabilities.cadenceAvailable ? data.currentCadence?.doubleValue : nil,
+            floorsAscended: capabilities.floorCountingAvailable ? data.floorsAscended?.intValue : nil,
+            floorsDescended: capabilities.floorCountingAvailable ? data.floorsDescended?.intValue : nil,
+            source: source)
+    }
 }
 
 enum SensorCapabilityDetector {
+    private static var absoluteAltitudeEnabled: Bool {
+        let authorization = CMAltimeter.authorizationStatus()
+        return CMAltimeter.isAbsoluteAltitudeAvailable() && authorization != .denied && authorization != .restricted
+    }
+
     static func detect(
         attitudeReferenceFrame: String? = nil,
         motionUpdateHz: Int? = nil,
         locationAuthorization: String? = nil,
         locationAccuracyAuthorization: String? = nil,
         backgroundLocationUpdates: Bool? = nil,
-        pausesLocationUpdatesAutomatically: Bool? = nil
+        pausesLocationUpdatesAutomatically: Bool? = nil,
+        locationDesiredAccuracy: String? = nil,
+        locationDistanceFilterMeters: Double? = nil,
+        locationActivityType: String? = nil,
+        locationRequestedProfile: String? = nil,
+        arkitEnabled: Bool? = nil,
+        walkingFrameEnabled: Bool? = nil,
+        walkingFrameConfiguration: WalkingFrameEstimatorConfiguration? = nil
     ) -> SensorCapabilities {
         SensorCapabilities(
             locationAvailable: CLLocationManager.locationServicesEnabled(),
             deviceMotionAvailable: CMMotionManager().isDeviceMotionAvailable,
             altimeterAvailable: CMAltimeter.isRelativeAltitudeAvailable(),
+            absoluteAltitudeAvailable: CMAltimeter.isAbsoluteAltitudeAvailable(),
+            absoluteAltitudeEnabled: absoluteAltitudeEnabled,
             stepCountingAvailable: CMPedometer.isStepCountingAvailable(),
             distanceAvailable: CMPedometer.isDistanceAvailable(),
             floorCountingAvailable: CMPedometer.isFloorCountingAvailable(),
@@ -249,7 +383,17 @@ enum SensorCapabilityDetector {
             locationAuthorization: locationAuthorization,
             locationAccuracyAuthorization: locationAccuracyAuthorization,
             backgroundLocationUpdates: backgroundLocationUpdates,
-            pausesLocationUpdatesAutomatically: pausesLocationUpdatesAutomatically
+            pausesLocationUpdatesAutomatically: pausesLocationUpdatesAutomatically,
+            locationDesiredAccuracy: locationDesiredAccuracy,
+            locationDistanceFilterMeters: locationDistanceFilterMeters,
+            locationActivityType: locationActivityType,
+            locationRequestedProfile: locationRequestedProfile,
+            arkitEnabled: arkitEnabled,
+            walkingFrameEnabled: walkingFrameEnabled,
+            walkingFrameAlgorithmVersion: walkingFrameEnabled == true ? WalkingFrameEstimatorConfiguration.algorithmVersion : nil,
+            walkingFrameSchemaVersion: walkingFrameEnabled == true ? WalkingFrameSnapshot.schemaVersion : nil,
+            walkingFrameWindowSeconds: walkingFrameConfiguration?.windowDuration,
+            walkingFrameUpdateIntervalSeconds: walkingFrameConfiguration?.updateInterval
         )
     }
 }

@@ -35,6 +35,24 @@ data class LoginResponse(
     val socketNamespace: String? = null,
 )
 
+/** `GET /api/v1/mobility/nodes`: the buildings and the network nodes to pick for a collection anchor (no auth). */
+@Serializable
+data class AnchorBuilding(val buildingId: String, val buildingName: String, val nodeCount: Int = 0, val floorsWithNodes: List<String> = emptyList())
+
+@Serializable
+data class AnchorNode(
+    val nodeId: String,
+    val buildingId: String,
+    /** null: the map does not say which floor */
+    val floor: String? = null,
+    val label: String,
+    val heightM: Double? = null,
+    val distanceM: Double? = null,
+)
+
+@Serializable
+data class AnchorNodesResponse(val buildings: List<AnchorBuilding> = emptyList(), val nodes: List<AnchorNode> = emptyList())
+
 /** HTTP-level failures with the iOS user messages (§3.2). */
 sealed class ApiError(message: String) : Exception(message) {
     class Http(val status: Int, val code: String?, serverMessage: String?) : ApiError(messageFor(status)) {
@@ -87,6 +105,74 @@ class CollectorApi(private val baseClient: OkHttpClient) {
             L.w("CollectorApi", "login response unreadable", e)
             throw ApiError.Unreadable()
         }
+    }
+
+    /** `GET /api/v1/mobility/nodes` filtered by building and floor, nearest first. Blocking; call off the main thread. */
+    fun anchorNodes(configuration: ServerConfiguration, buildingId: String?, floor: String?, latitude: Double?, longitude: Double?): AnchorNodesResponse {
+        val url = configuration.url("/api/v1/mobility/nodes").newBuilder().apply {
+            buildingId?.let { addQueryParameter("buildingId", it) }
+            floor?.let { addQueryParameter("floor", it) }
+            if (latitude != null && longitude != null) {
+                addQueryParameter("latitude", latitude.toString())
+                addQueryParameter("longitude", longitude.toString())
+            }
+            addQueryParameter("limit", "40")
+        }.build()
+        val text = execute(healthClient, Request.Builder().url(url).get().build())
+        return try {
+            AppJson.decodeFromString(AnchorNodesResponse.serializer(), text)
+        } catch (e: Exception) {
+            L.w("CollectorApi", "anchor nodes unreadable", e)
+            throw ApiError.Unreadable()
+        }
+    }
+
+    /**
+     * `GET /api/v1/positioning/beacon-config` with If-None-Match. Returns (status, etag, body): 304 = cached copy still
+     * current. Blocking; call off the main thread. Network errors throw like the other calls.
+     */
+    fun beaconConfig(configuration: ServerConfiguration, accessToken: String, etag: String?): Triple<Int, String?, String?> {
+        val request = Request.Builder().url(configuration.url("/api/v1/positioning/beacon-config"))
+            .header("Authorization", "Bearer $accessToken")
+            .apply { if (etag != null) header("If-None-Match", etag) }
+            .get().build()
+        try {
+            loginClient.newCall(request).execute().use { response ->
+                if (response.code == 304) return Triple(304, etag, null)
+                val text = response.body.string()
+                if (!response.isSuccessful) {
+                    val (code, message) = ApiError.parseErrorBody(text)
+                    throw ApiError.Http(response.code, code, message)
+                }
+                return Triple(response.code, response.header("ETag"), text)
+            }
+        } catch (e: ApiError) {
+            throw e
+        } catch (e: SocketTimeoutException) {
+            throw ApiError.Timeout()
+        } catch (e: InterruptedIOException) {
+            throw ApiError.Timeout()
+        } catch (e: IOException) {
+            throw ApiError.CannotConnect()
+        }
+    }
+
+    /** Beacon registry admin API (`/api/v1/positioning/admin/...`): GET with the collector token. Blocking. */
+    fun positioningAdminGet(configuration: ServerConfiguration, accessToken: String, path: String, query: Map<String, String> = emptyMap()): String {
+        val url = configuration.url("/api/v1/positioning/admin$path").newBuilder().apply { query.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
+        return execute(loginClient, Request.Builder().url(url).header("Authorization", "Bearer $accessToken").get().build())
+    }
+
+    /** Beacon registry admin API: POST a JSON body. Blocking. Errors carry the server code (BEACON_EXISTS, ...). */
+    fun positioningAdminPost(configuration: ServerConfiguration, accessToken: String, path: String, json: String): String =
+        positioningAdminSend(configuration, accessToken, "POST", path, json)
+
+    /** Beacon registry admin API: any method (PATCH / DELETE), optional JSON body. Blocking. */
+    fun positioningAdminSend(configuration: ServerConfiguration, accessToken: String, method: String, path: String, json: String? = null,
+        query: Map<String, String> = emptyMap()): String {
+        val url = configuration.url("/api/v1/positioning/admin$path").newBuilder().apply { query.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
+        return execute(loginClient, Request.Builder().url(url).header("Authorization", "Bearer $accessToken")
+            .method(method, json?.toRequestBody("application/json".toMediaType())).build())
     }
 
     private fun execute(client: OkHttpClient, request: Request): String {

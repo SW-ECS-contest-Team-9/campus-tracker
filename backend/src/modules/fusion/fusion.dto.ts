@@ -60,6 +60,12 @@ export interface FusedPositionView {
   heightAboveGround: number | null;
   zDatumSource: string | null;
   zDatumSigma: number | null;
+  // v4 rev 18: floor estimate and beacon use
+  floorLabel: string | null;
+  floorBuildingId: string | null;
+  floorSource: string | null;
+  floorConfidence: number | null;
+  beaconUpdates: number | null;
 }
 
 /** /preview position:fused payload */

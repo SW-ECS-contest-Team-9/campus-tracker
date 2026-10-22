@@ -10,7 +10,7 @@ import { sessionRepository } from '../sessions/session.repository.js';
 import { fusionService } from '../fusion/fusion.service.js';
 import { preSessionCutoff } from '../fusion/fusion.timeline.js';
 import { telemetryRepository } from './telemetry.repository.js';
-import type { TelemetryBatchAck, TelemetryBatchRequest } from './telemetry.dto.js';
+import { IMPLAUSIBLE_TIMESTAMP, type TelemetryBatchAck, type TelemetryBatchRequest } from './telemetry.dto.js';
 
 /**
  * Oldest / newest sensor timestamp in a batch (all streams). Sensor time is authoritative, not arrival time.
@@ -30,6 +30,7 @@ function captureRange(b: TelemetryBatchRequest, sessionStartedAt: Date): { min: 
   for (const s of b.locations) visit(s.timestamp);
   for (const s of b.motion) visit(s.timestamp);
   for (const s of b.altimeter) visit(s.timestamp);
+  for (const s of b.absoluteAltitude ?? []) if (s.invalidReason !== IMPLAUSIBLE_TIMESTAMP) visit(s.timestamp);
   for (const s of b.pedometer) visit(s.timestamp);
   const iso = (v: number | null) => (v === null ? null : new Date(v).toISOString());
   return { min: iso(min), max: iso(max), orderMin: iso(orderMin) };
@@ -58,12 +59,14 @@ export const telemetryService = {
       locations: batch.locations.length,
       motion: batch.motion.length,
       altimeter: batch.altimeter.length,
+      absoluteAltitude: batch.absoluteAltitude?.length ?? 0,
       pedometer: batch.pedometer.length,
     };
     const range = captureRange(batch, session.started_at);
     const locations = withMeta(batch.locations, batch);
     const motion = withMeta(batch.motion, batch);
     const altimeter = withMeta(batch.altimeter, batch);
+    const absoluteAltitude = withMeta(batch.absoluteAltitude ?? [], batch);
     const pedometer = withMeta(batch.pedometer, batch);
 
     const result = await withTransaction(async (client) => {
@@ -93,6 +96,7 @@ export const telemetryService = {
       const insertedSequences = await telemetryRepository.insertLocations(client, session.id, locations);
       await telemetryRepository.insertMotion(client, session.id, motion);
       await telemetryRepository.insertAltimeter(client, session.id, altimeter);
+      await telemetryRepository.insertAbsoluteAltitude(client, session.id, absoluteAltitude);
       await telemetryRepository.insertPedometer(client, session.id, pedometer);
       const ingest = await sessionRepository.recordIngest(client, session.id, locked, range.orderMin, range.max, env.OUT_OF_ORDER_TOLERANCE_MS);
       if (ingest.outOfOrder) await telemetryRepository.markBatchOutOfOrder(client, batch.batchId);
@@ -126,9 +130,20 @@ export const telemetryService = {
             ax: m.userAcceleration?.x ?? null,
             ay: m.userAcceleration?.y ?? null,
             az: m.userAcceleration?.z ?? null,
+            // same fields as the replay query (fusionRepository.loadRawSamples): v4 needs gravity to detect steps
+            rx: m.rotationRate?.x ?? null,
+            ry: m.rotationRate?.y ?? null,
+            rz: m.rotationRate?.z ?? null,
+            gx: m.gravity?.x ?? null,
+            gy: m.gravity?.y ?? null,
+            gz: m.gravity?.z ?? null,
+            roll: m.attitude?.roll ?? null,
+            pitch: m.attitude?.pitch ?? null,
             segment: m.sensorSegmentId ?? null,
           })),
           altimeter: altimeter.map((a) => ({ ...a, segment: a.sensorSegmentId ?? null })),
+          absoluteAltitude: absoluteAltitude.filter((a) => a.invalidReason !== IMPLAUSIBLE_TIMESTAMP)
+            .map((a) => ({ ...a, segment: a.sensorSegmentId ?? null })),
           pedometer: pedometer.map((p) => ({ ...p, segment: p.sensorSegmentId ?? null })),
         });
       } else {
@@ -146,7 +161,7 @@ export const telemetryService = {
     sessionId: string,
     batch: TelemetryBatchRequest,
     insertedSequences: number[],
-    counts: { locations: number; motion: number; altimeter: number; pedometer: number },
+    counts: { locations: number; motion: number; altimeter: number; pedometer: number; absoluteAltitude?: number },
     range: { min: string | null; max: string | null },
   ) {
     const inserted = new Set(insertedSequences);

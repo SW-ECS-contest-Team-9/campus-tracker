@@ -43,6 +43,16 @@ export const sessionController = {
     res.json(await sessionService.detail(sessionId));
   },
 
+  async interrupt(req: Request, res: Response) {
+    const { sessionId } = SessionIdParam.parse(req.params);
+    res.json(await sessionService.interruptManually(sessionId));
+  },
+
+  async diagnosticEventList(req: Request, res: Response) {
+    const { sessionId } = SessionIdParam.parse(req.params);
+    res.json(await sessionService.diagnosticEventList(sessionId));
+  },
+
   async locations(req: Request, res: Response) {
     const { sessionId } = SessionIdParam.parse(req.params);
     res.json(await sessionService.getLocations(sessionId));

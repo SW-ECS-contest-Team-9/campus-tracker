@@ -33,6 +33,10 @@ const SESSION_VIEW_SELECT = `
          s.sensor_capabilities AS "sensorCapabilities",
          (SELECT count(*) FROM location_samples l WHERE l.session_id = s.id) AS "locationCount",
          (SELECT count(*) FROM event_markers m WHERE m.session_id = s.id)    AS "markerCount",
+         (SELECT COALESCE(json_agg(json_build_object('type', m.type, 'timestamp', m."timestamp", 'nodeId', m.node_id,
+                   'buildingId', m.building_id, 'floor', m.floor, 'direction', m.direction, 'fromFloor', m.from_floor,
+                   'toFloor', m.to_floor) ORDER BY m."timestamp"), '[]'::json)
+            FROM event_markers m WHERE m.session_id = s.id) AS "anchorMarkers",
          (SELECT max(l."timestamp") FROM location_samples l WHERE l.session_id = s.id) AS "lastLocationAt",
          s.interrupted, s.created_at AS "createdAt", s.finish_requested_at AS "finishRequestedAt", s.finalized_at AS "finalizedAt",
          s.last_captured_at AS "lastCapturedAt", s.last_received_at AS "lastReceivedAt",
@@ -42,6 +46,11 @@ const SESSION_VIEW_SELECT = `
     JOIN devices d    ON d.id = s.device_id`;
 
 export const sessionRepository = {
+  async getAbsoluteAltitudeEnabled(id: string, db: DbClient = pool): Promise<boolean> {
+    const { rows } = await db.query<{ enabled: boolean }>(
+      `SELECT sensor_capabilities->'absoluteAltitudeEnabled' = 'true'::jsonb AS enabled FROM collection_sessions WHERE id=$1`, [id]);
+    return rows[0]?.enabled === true;
+  },
   async getStrideCalibration(id: string, db: DbClient = pool): Promise<StrideCalibration | null> {
     const { rows } = await db.query<{ stride_calibration: StrideCalibration | null; stride_calibration_status: string }>(
       'SELECT stride_calibration, stride_calibration_status FROM collection_sessions WHERE id = $1', [id],
@@ -99,6 +108,18 @@ export const sessionRepository = {
       [deviceId, exceptSessionId],
     );
     return rows.map((r) => r.id);
+  },
+
+  /**
+   * Manual interrupt from the preview: ACTIVE -> INTERRUPTED, only if it is still ACTIVE (idempotent, race-safe).
+   * ended_at stays empty, like an interrupt by a newer session: a later session:finish from the phone still sets it.
+   */
+  async interruptManually(id: string, db: DbClient = pool): Promise<boolean> {
+    const { rowCount } = await db.query(
+      `UPDATE collection_sessions SET status = 'INTERRUPTED', interrupted = true, updated_at = now() WHERE id = $1 AND status = 'ACTIVE'`,
+      [id],
+    );
+    return (rowCount ?? 0) > 0;
   },
 
   /**
@@ -177,10 +198,11 @@ export const sessionRepository = {
 
   /** Highest client sequence stored per stream (pedometer: max sequence if the client sends one, else count). */
   async maxSequences(id: string, db: DbClient = pool) {
-    const { rows } = await db.query<{ location: number | null; motion: number | null; altimeter: number | null; pedometer: number | null; pedometer_count: number }>(
+    const { rows } = await db.query<{ location: number | null; motion: number | null; altimeter: number | null; absoluteAltitude: number | null; pedometer: number | null; pedometer_count: number }>(
       `SELECT (SELECT max(sequence) FROM location_samples WHERE session_id = $1) AS location,
               (SELECT max(sequence) FROM motion_samples WHERE session_id = $1) AS motion,
               (SELECT max(sequence) FROM altimeter_samples WHERE session_id = $1) AS altimeter,
+              (SELECT max(sequence) FROM absolute_altitude_samples WHERE session_id = $1) AS "absoluteAltitude",
               (SELECT max(sequence) FROM pedometer_samples WHERE session_id = $1) AS pedometer,
               (SELECT count(*) FROM pedometer_samples WHERE session_id = $1) AS pedometer_count`,
       [id],
@@ -208,6 +230,28 @@ export const sessionRepository = {
     return rowCount ?? 0;
   },
 
+  /**
+   * Server-side lifecycle trace in the same table as the phone's events (event_type SERVER_*, metadata.source =
+   * 'server', client_timestamp = server time): finish / syncComplete received, final replay completed / failed.
+   * Analysis only; a failure to write it must never fail the request that caused it.
+   */
+  async insertServerEvent(sessionId: string, eventType: `SERVER_${string}`, metadata: Record<string, unknown> = {}, db: DbClient = pool) {
+    await db.query(
+      `INSERT INTO collection_diagnostic_events (session_id, event_type, client_timestamp, metadata) VALUES ($1, $2, now(), $3::jsonb)`,
+      [sessionId, eventType, JSON.stringify({ ...metadata, source: 'server' })],
+    );
+  },
+
+  /** Phone lifecycle events and the server trace of one session, by event time (read-only; analysis). */
+  async listDiagnosticEvents(sessionId: string, db: DbClient = pool) {
+    const { rows } = await db.query<{ eventType: string; clientTimestamp: Date; receivedAt: Date; metadata: Record<string, unknown> | null }>(
+      `SELECT event_type AS "eventType", client_timestamp AS "clientTimestamp", received_at AS "receivedAt", metadata
+         FROM collection_diagnostic_events WHERE session_id = $1 ORDER BY client_timestamp, id`,
+      [sessionId],
+    );
+    return rows.map((r) => ({ ...r, source: r.eventType.startsWith('SERVER_') ? ('server' as const) : ('client' as const) }));
+  },
+
   /** Raw statistics for the session detail (counts, live vs recovered, capture/receive ranges, gaps, segments). */
   async rawStats(id: string, db: DbClient = pool) {
     const [streams, gaps, extra] = await Promise.all([
@@ -216,6 +260,8 @@ export const sessionRepository = {
            SELECT 'location' AS stream, "timestamp" AS ts, created_at AS rcv, capture_source AS src, sensor_segment_id AS seg FROM location_samples WHERE session_id = $1
            UNION ALL SELECT 'motion', "timestamp", created_at, capture_source, sensor_segment_id FROM motion_samples WHERE session_id = $1
            UNION ALL SELECT 'altimeter', "timestamp", created_at, capture_source, sensor_segment_id FROM altimeter_samples WHERE session_id = $1
+           UNION ALL SELECT 'absoluteAltitude', "timestamp", created_at, capture_source, sensor_segment_id FROM absolute_altitude_samples
+             WHERE session_id = $1 AND invalid_reason IS DISTINCT FROM 'TIMESTAMP_IMPLAUSIBLE'
            UNION ALL SELECT 'pedometer', "timestamp", created_at, capture_source, sensor_segment_id FROM pedometer_samples WHERE session_id = $1)
          SELECT stream, count(*) AS count,
                 count(*) FILTER (WHERE src = 'LIVE') AS live,

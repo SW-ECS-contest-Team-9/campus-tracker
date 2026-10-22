@@ -1,3 +1,4 @@
+import { scheduleArkit } from '../modules/arkit/arkit.service.js';
 import type { Namespace, Server } from 'socket.io';
 import { logger } from '../common/logger.js';
 import { realtimeState, type CollectorRealtimeState } from './realtime-state.service.js';
@@ -34,6 +35,8 @@ function emit(event: string, payload: unknown) {
 }
 
 export const previewBroadcast = {
+  arkitPose: (payload: unknown) => emit('arkit:pose', payload),
+  arkitUpdated: (payload: { sessionId: string }) => emit('arkit:updated', payload),
   collectorConnected: (state: CollectorRealtimeState) => emit('collector:connected', state),
   collectorDisconnected: (state: CollectorRealtimeState) => emit('collector:disconnected', state),
   collectorCreated: (state: CollectorRealtimeState) => emit('collector:created', state),
@@ -46,7 +49,7 @@ export const previewBroadcast = {
   positionFused: (position: unknown) => emit('position:fused', position),
   /** A session's fused results of one version were recomputed: clients reload them via REST. */
   fusionReprocessed: (payload: { sessionId: string; collectorId: string; algorithmVersion: string; count: number }) =>
-    emit('fusion:reprocessed', payload),
+    { emit('fusion:reprocessed', payload); scheduleArkit(payload.sessionId); },
   spatialGpsDecisions: (payload: { sessionId: string; collectorId: string; algorithmVersion: string; decisions: unknown[] }) =>
     emit('spatial:gps-decisions', payload),
   fusionSensorEvents: (payload: { sessionId: string; collectorId: string; algorithmVersion: string; events: unknown[] }) =>

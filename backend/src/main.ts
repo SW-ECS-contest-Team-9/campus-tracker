@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { arkitService, stopArkitJobs } from './modules/arkit/arkit.service.js';
 import os from 'node:os';
 import { Server } from 'socket.io';
 import { env } from './config/env.js';
@@ -82,6 +83,7 @@ async function main() {
     const active = await sessionRepository.activeSessionsByCollector();
     realtimeState.hydrate(active);
     await fusionService.recoverPending();
+    await arkitService.recoverPending().catch(err => logger.warn('arkit.recovery_failed', { message: String(err) }));
     listenMobilityChanges(); // QGIS edits -> preview
     listenEditorChanges(); // authored network edits -> collaborative editor
     logger.info('sessions.restored', { activeSessions: active.length });
@@ -101,6 +103,7 @@ async function main() {
 
 function shutdown(signal: string) {
   logger.info('server.stopping', { signal });
+  stopArkitJobs();
   io.close();
   httpServer.close(() => {
     void pool.end().finally(() => process.exit(0));

@@ -51,9 +51,10 @@ async function diagnose(id: string) {
   console.log(`Raw time range:  ${capFirst.length ? `${t(new Date(Math.min(...capFirst)))} → ${t(new Date(Math.max(...capLast)))}` : '–'}`);
   console.log(`Receive range:   ${rcvFirst.length ? `${t(new Date(Math.min(...rcvFirst)))} → ${t(new Date(Math.max(...rcvLast)))}` : '–'}`);
   console.log(`Max upload delay: ${dur(maxDelay)}   batches ${raw.batches} (out-of-order ${raw.outOfOrderBatches})   out-of-order motion samples ${await outOfOrderSamples(id)}`);
-  for (const k of ['location', 'motion', 'altimeter', 'pedometer']) {
+  for (const k of ['location', 'motion', 'altimeter', 'absoluteAltitude', 'pedometer']) {
     const s = by[k];
-    console.log(`${(k[0].toUpperCase() + k.slice(1) + ':').padEnd(11)} ${s ? `${String(s.count).padStart(7)} samples (live ${s.live}, recovered ${s.recovered}, segments ${s.segments})` : '      0 samples'}`);
+    if (k === 'absoluteAltitude' && !s) continue; // optional stream: older apps never send it
+    console.log(`${(k[0].toUpperCase() + k.slice(1) + ':').padEnd(18)} ${s ? `${String(s.count).padStart(7)} samples (live ${s.live}, recovered ${s.recovered}, segments ${s.segments})` : '      0 samples'}`);
   }
   console.log(`Motion gaps > 1s: ${raw.motionGapsOver1s}   max motion gap ${raw.maxMotionGapMs ?? '–'} ms   diagnostic events ${raw.diagnosticEvents}`);
   if (raw.syncManifest) console.log(`Sync manifest:   ${raw.syncManifest.synchronized ? 'all streams synchronized' : 'NOT synchronized'} ${JSON.stringify(raw.syncManifest)}`);

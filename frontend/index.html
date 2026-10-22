@@ -10,6 +10,7 @@
     <header class="topbar">
       <h1>Campus Collection Preview</h1>
       <a class="editor-nav" href="/editor.html">3D 도로·장소 편집기</a>
+      <a class="editor-nav" href="/beacons.html">비콘 등록</a>
       <div class="mode" role="group" aria-label="Mode">
         <button id="mode-live" class="active" type="button">Live</button>
         <button id="mode-history" type="button">Historical</button>
@@ -19,6 +20,7 @@
         <span class="layer-group raw">Raw
           <label><input type="checkbox" id="layer-rawPoints" checked /> Points</label>
           <label><input type="checkbox" id="layer-rawTrajectory" checked /> Trajectory</label>
+          <label title="끄면 원본 GPS 점을 같은 시각의 융합 높이(기압 기반)에 그립니다. 켜면 폰이 보고한 GPS 고도 그대로 그립니다(iPhone은 실내에서 수십 m 낮게 멈춰 있는 경우가 많음)."><input type="checkbox" id="raw-phone-height" /> 폰 고도</label>
         </span>
         <span class="layer-group fused">Fused
           <label><input type="checkbox" id="layer-fusedPosition" checked /> Position</label>
@@ -88,6 +90,7 @@
         <h2>Detail</h2>
         <div id="detail" class="detail muted">Select a collector, a session, or click a point on the map.</div>
       </section>
+      <section><h2>ARKit VIO</h2><div id="arkit-panel"></div></section>
       <section class="legend">
         Raw point color = horizontal accuracy:
         <span class="dot" style="background:#22c55e"></span>&lt;5 m

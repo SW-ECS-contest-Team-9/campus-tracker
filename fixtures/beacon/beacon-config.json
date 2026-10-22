@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "configVersion": 7,
+  "updatedAt": "2026-10-15T00:00:00.000Z",
+  "generatedAt": "2026-10-15T00:00:01.000Z",
+  "coordinateSystem": {
+    "horizontal": "EPSG:5186",
+    "vertical": "MSL_KVD_INCHEON",
+    "units": "m"
+  },
+  "cachePolicy": {
+    "maxAgeSeconds": 3600,
+    "staleMaxSeconds": 1209600
+  },
+  "features": {
+    "scanning": true,
+    "upload": true,
+    "fusion": true,
+    "floorCorrection": false
+  },
+  "proximityUuids": [
+    "e2c56db5-dffb-48d2-b060-d0f5a71096e0"
+  ],
+  "rssiDefaults": {
+    "measuredPower1m": -59,
+    "pathLossExponent": 2.2,
+    "rssiVariance": 36
+  },
+  "defaultCalibrations": [],
+  "beacons": [
+    {
+      "beaconId": "7d4f6a51-2f0e-4a51-9d0e-1f2a3b4c5d01",
+      "protocol": "IBEACON",
+      "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+      "major": 1,
+      "minor": 2,
+      "measuredPowerDbm": -59,
+      "anchor": {
+        "anchorId": "0a6c1f00-0000-4000-8000-000000000001",
+        "anchorType": "BEACON",
+        "buildingId": "B07",
+        "floor": "3F",
+        "floorHeightM": 148.2,
+        "position": {
+          "x": 201100.0,
+          "y": 557250.0,
+          "z": 150.7
+        },
+        "latitude": 37.6105,
+        "longitude": 126.9971,
+        "horizontalAccuracyM": 0.5,
+        "verticalAccuracyM": 0.5
+      },
+      "calibrations": [
+        {
+          "platform": "ios",
+          "deviceGroup": "*",
+          "measuredPower1m": -61,
+          "pathLossExponent": 2.1,
+          "rssiVariance": 31,
+          "sampleCount": 20
+        }
+      ]
+    },
+    {
+      "beaconId": "7d4f6a51-2f0e-4a51-9d0e-1f2a3b4c5d02",
+      "protocol": "IBEACON",
+      "uuid": "e2c56db5-dffb-48d2-b060-d0f5a71096e0",
+      "major": 1,
+      "minor": 3,
+      "measuredPowerDbm": null,
+      "anchor": null,
+      "calibrations": []
+    }
+  ],
+  "unknownFutureField": {
+    "ignored": true
+  }
+}

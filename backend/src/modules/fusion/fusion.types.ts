@@ -9,7 +9,9 @@
  * STATIONARY_HOLD(v2) user detected as stationary, XY held
  * HELD           (v2) nothing moved the position (e.g. walking but heading not anchored yet)
  */
-export type PositionSource = 'GPS_ANCHORED' | 'GPS_CORRECTED' | 'FUSED' | 'PDR_PREDICTED' | 'GPS_REANCHOR' | 'STATIONARY_HOLD' | 'HELD';
+export type PositionSource = 'GPS_ANCHORED' | 'GPS_CORRECTED' | 'FUSED' | 'PDR_PREDICTED' | 'GPS_REANCHOR' | 'STATIONARY_HOLD' | 'HELD' | 'MAP_CONSTRAINED'
+  /** v4 rev 18: the local frame started at a near beacon (no GPS yet) / beacon range updates without GPS in this window */
+  | 'BEACON_ANCHORED' | 'BEACON_CORRECTED';
 
 export type GpsRejectReason =
   | 'INVALID_ACCURACY'
@@ -75,8 +77,15 @@ export interface FusedOutput {
   // ---- v4 rev 2: absolute height ----
   terrainHeight?: number | null; // DEM orthometric height under the position
   heightAboveGround?: number | null; // orthometric height - terrain height
-  zDatumSource?: 'TERRAIN' | 'GPS' | 'NONE' | null;
+  zDatumSource?: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'BEACON_FLOOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE' | 'NONE' | null;
   zDatumSigma?: number | null;
+  // ---- v4 rev 18: floor estimate and beacon use ----
+  floorLabel?: string | null;
+  floorBuildingId?: string | null;
+  floorSource?: 'BEACON' | 'BEACON_BAROMETER' | 'BAROMETER' | null;
+  floorConfidence?: number | null;
+  /** beacon range / proximity updates applied in this output window (forward) or within +-1 s (smoothed); null = no beacons */
+  beaconUpdates?: number | null;
 }
 
 export interface SpatialGpsDecision {

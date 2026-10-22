@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import hoshi.campustracker.collection.CollectorUiState
+import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.net.ConnectionState
 import hoshi.campustracker.sync.UploadStatus
@@ -105,9 +106,17 @@ fun CollectScreen(
             }
             Caption("Quarantined uploads: ${header.upload.quarantined}")
         }
+        if (ui.verticalReminder) {
+            SectionCard(background = Color(0x33FF9800)) {
+                Heading("Did you change floors?")
+                Text("The barometer moved more than 3 m since the last stairs/elevator marker. Mark the stairs or elevator you took.")
+            }
+        }
         SectionCard {
             Heading("Markers")
-            EventMarkerType.entries.chunked(2).forEach { row ->
+            ui.lastPlace?.let { p -> Caption("Now: ${if (p.buildingId == CollectionAnchor.OUTDOOR) "outside" else listOfNotNull(p.buildingId, p.floor).joinToString(" ")}") }
+            ui.openVertical?.let { Caption("Open: ${it.title} — press its end marker when you arrive", color = Color(0xFFE65100)) }
+            EventMarkerType.entries.filter { it.button }.chunked(2).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
                     row.forEach { type ->
                         Button(

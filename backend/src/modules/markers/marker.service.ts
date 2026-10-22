@@ -8,6 +8,7 @@ import { markerRepository } from './marker.repository.js';
 import type { MarkerCreateRequest } from './marker.dto.js';
 import { fusionRepository } from '../fusion/fusion.repository.js';
 import type { FusedPositionView } from '../fusion/fusion.dto.js';
+import { fusionService } from '../fusion/fusion.service.js';
 
 /** Markers are shown on the finished (replayed) fusion track: position and height at the marker time. */
 const SNAP_VERSION = 'fusion-v4';
@@ -58,7 +59,12 @@ export const markerService = {
       return { ok: true as const, markerId: req.markerId, duplicate: true };
     }
 
-    logger.info('marker.created', { collectorId: identity.collectorId, sessionId: session.id, markerId: req.markerId, type: req.type });
+    logger.info('marker.created', { collectorId: identity.collectorId, sessionId: session.id, markerId: req.markerId, type: req.type, nodeId: req.nodeId ?? null });
+    // A node anchor is a fix point of the final replay: one arriving after the session ended (offline queue) redoes it.
+    if (created.nodeId && session.status !== 'ACTIVE') {
+      await fusionRepository.markDirty(session.id);
+      fusionService.finalizeSoon(session.id);
+    }
     previewBroadcast.markerCreated({ collectorId: identity.collectorId, ...created });
     previewBroadcast.collectorStatus(realtimeState.markerCreated(identity.collectorId));
     return { ok: true as const, markerId: req.markerId, duplicate: false };

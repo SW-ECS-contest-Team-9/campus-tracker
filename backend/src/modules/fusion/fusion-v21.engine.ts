@@ -115,6 +115,7 @@ export function currentHeightV21(state: FusionStateV21): number {
 // ---------------- core ----------------
 
 export function processObservationV21(state: FusionStateV21, obs: Observation, c: FusionConfigV21): StepResultV21 {
+  if (obs.kind === 'absoluteAltitude') return { outputs: [], events: [] };
   const r: StepResultV21 = { outputs: [], events: [] };
   if (obs.kind === 'gps' && obs.preSession) {
     // Cached fix from before the session (raw is kept): never an initial position, never a correction.

@@ -45,7 +45,7 @@ export interface CollectorRealtimeState {
   lastCapturedAt: string | null;
   lastReceivedAt: string | null;
   /** Counted by the server from committed batches since server start */
-  receivedCounts: { batches: number; locations: number; motion: number; altimeter: number; pedometer: number; markers: number };
+  receivedCounts: { batches: number; locations: number; motion: number; altimeter: number; absoluteAltitude: number; pedometer: number; markers: number };
 }
 
 const states = new Map<string, CollectorRealtimeState>();
@@ -78,7 +78,7 @@ export const realtimeState = {
       pendingBatchCount: null,
       lastCapturedAt: null,
       lastReceivedAt: null,
-      receivedCounts: { batches: 0, locations: 0, motion: 0, altimeter: 0, pedometer: 0, markers: 0 },
+      receivedCounts: { batches: 0, locations: 0, motion: 0, altimeter: 0, absoluteAltitude: 0, pedometer: 0, markers: 0 },
     };
   },
 
@@ -128,7 +128,7 @@ export const realtimeState = {
 
   batchCommitted(
     collectorId: string,
-    counts: { locations: number; motion: number; altimeter: number; pedometer: number },
+    counts: { locations: number; motion: number; altimeter: number; absoluteAltitude?: number; pedometer: number },
     latest: LatestLocation | null,
     maxCapturedAt: string | null = null,
   ): CollectorRealtimeState {
@@ -139,6 +139,7 @@ export const realtimeState = {
     s.receivedCounts.locations += counts.locations;
     s.receivedCounts.motion += counts.motion;
     s.receivedCounts.altimeter += counts.altimeter;
+    s.receivedCounts.absoluteAltitude += counts.absoluteAltitude ?? 0;
     s.receivedCounts.pedometer += counts.pedometer;
     // Late (recovered) batches must not move the "current position" backwards:
     // ignore points of a session other than the active one, and older sequences of the same session.

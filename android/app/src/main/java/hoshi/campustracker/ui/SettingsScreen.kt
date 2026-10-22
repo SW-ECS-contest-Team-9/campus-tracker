@@ -13,6 +13,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import hoshi.campustracker.auth.AppSettings
 import hoshi.campustracker.auth.AuthenticationManager
+import hoshi.campustracker.collection.BeaconUiState
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.MotionSamplingRate
 import hoshi.campustracker.net.ServerConfiguration
@@ -42,6 +44,10 @@ fun SettingsScreen(
     onMotionRate: (MotionSamplingRate) -> Unit,
     onProfile: (LocationCollectionProfile) -> Unit,
     onDistanceFilter: (Double) -> Unit,
+    beacon: BeaconUiState = BeaconUiState(),
+    onBeaconScanning: (Boolean) -> Unit = {},
+    onBeaconUpload: (Boolean) -> Unit = {},
+    onOpenBeaconRegistration: () -> Unit = {},
 ) {
     Column(Modifier.verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Heading("Account")
@@ -72,6 +78,20 @@ fun SettingsScreen(
             OutlinedButton(onClick = { onDistanceFilter((settings.distanceFilter - 1).coerceAtLeast(0.0)) }) { Text("−") }
             OutlinedButton(onClick = { onDistanceFilter((settings.distanceFilter + 1).coerceAtMost(100.0)) }) { Text("+") }
         }
+
+        Heading("Beacons (BLE)")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Collect registered iBeacons", modifier = Modifier.weight(1f))
+            Switch(checked = settings.beaconScanningEnabled, onCheckedChange = onBeaconScanning)
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Upload beacon observations", modifier = Modifier.weight(1f))
+            Switch(checked = settings.beaconUploadEnabled, onCheckedChange = onBeaconUpload, enabled = settings.beaconScanningEnabled)
+        }
+        Caption("Scanner: ${beacon.scanner.javaClass.simpleName} · plan: ${beacon.plan?.reason ?: "—"} · config v${beacon.configVersion ?: "—"} (${beacon.configFreshness})")
+        Caption("Observations: ${beacon.observations} (registered ${beacon.registeredObservations})${beacon.lastRefreshError?.let { " · config refresh failed: $it" } ?: ""}")
+        Caption("Needs Bluetooth on, location on and the Nearby devices permission (asked on Start). GPS / motion collection never depends on it.")
+        TextButton(onClick = onOpenBeaconRegistration) { Text("비콘 등록·수정·삭제 ›") }
     }
 }
 

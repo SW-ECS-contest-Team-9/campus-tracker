@@ -1,363 +1,744 @@
+import ARKit
 import Combine
 import CoreLocation
 import CoreMotion
 import Foundation
 import UIKit
 
+/// UI + lifecycle commands only. Raw samples never pass through the MainActor: each sensor
+/// callback submits an immutable DTO to its stream's ingress, `CollectionCore` processes and
+/// commits it to SQLite, and the upload engine is told about committed ledger items.
 @MainActor
 final class CollectionCoordinator: NSObject, ObservableObject {
+    enum CaptureLifecycleState: String {
+        case idle, starting, recording, stopping, storageFailure
+    }
+
     @Published private(set) var activeSession: CollectionSession?
+    @Published private(set) var captureState: CaptureLifecycleState = .idle
     @Published private(set) var capabilities = SensorCapabilityDetector.detect()
     @Published private(set) var latestLocation: LocationSample?
     @Published private(set) var latestRelativeAltitude: Double?
     @Published private(set) var latestStepCount: Int?
     @Published private(set) var uiCounts = SampleCounts()
+    @Published private(set) var durableCounts = SampleCounts()
     @Published private(set) var locationAuthorization: CLAuthorizationStatus
+    @Published private(set) var accuracyAuthorization: CLAccuracyAuthorization
     @Published private(set) var pendingUploadCount = 0
+    @Published private(set) var heldUploadCount = 0
+    @Published private(set) var quarantinedUploadCount = 0
+    @Published private(set) var unsynchronizedSessionCount = 0
     @Published private(set) var appState: CollectorAppState = .foreground
     @Published private(set) var interruptedCollection: ActiveCollectionState?
     @Published private(set) var lastPersistedAt: Date?
     @Published private(set) var diagnostics: CollectionDiagnostics?
+    @Published private(set) var arkitSupported = ARKitTrackingService.isSupported
+    @Published private(set) var arkitTrackingState: ARKitTrackingState = .notAvailable
+    @Published private(set) var arkitTrackingStateReason: ARKitTrackingStateReason?
+    @Published private(set) var arkitSessionId: UUID?
+    @Published private(set) var arkitPoseCount = 0
+    @Published private(set) var arkitLastPoseAt: Date?
+    @Published private(set) var arkitError: String?
+    @Published private(set) var arkitBackpressurePaused = false
+    @Published private(set) var walkingFrameSnapshot: WalkingFrameSnapshot?
+    @Published private(set) var magneticCalibrationQuality: MagneticCalibrationQuality = .unavailable
+    @Published private(set) var captureStorageError: String?
+    @Published private(set) var uploadStorageError: String?
+    /// Collection anchors: the session's current place (prefills the pickers), the open vertical
+    /// marker (stairStart / elevatorBoard / rampStart without its end) and its anchor.
+    @Published private(set) var lastPlace: CollectionAnchor?
+    @Published private(set) var openVertical: EventMarkerType?
+    @Published private(set) var openVerticalAnchor: CollectionAnchor?
+    /// relative altitude at the last vertical anchor (start, stair/elevator/ramp end, entrance)
+    @Published private(set) var verticalReference: Double?
 
-    private let repository: SensorDataRepository
-    private let activeCollectionStore = ActiveCollectionStore()
+    let store: CollectionStore
+    private let core: CollectionCore
     private let locationService = LocationService()
     private let motionService = MotionService()
     private let altimeterService = AltimeterService()
+    private let absoluteAltitudeService = AbsoluteAltitudeService()
     private let pedometerService = PedometerService()
-    private let bootTime = Date().addingTimeInterval(-ProcessInfo.processInfo.systemUptime)
-    private var locationSequence = 0
-    private var motionSequence = 0
-    private var altimeterSequence = 0
-    private var pedometerSequence = 0
-    private var locationSegmentId = ""
-    private var motionSegmentId = ""
-    private var altimeterSegmentId = ""
-    private var pedometerSegmentId = ""
-    private var refreshTimer: Timer?
-    private var pendingCounts = SampleCounts()
-    private var pendingLocation: LocationSample?
-    private var pendingRelativeAltitude: Double?
-    private var pendingStepCount: Int?
-    private var telemetrySync: TelemetrySyncCoordinator?
+    private let arkitTrackingService = ARKitTrackingService()
+    private let clockFactory: () throws -> TrackingClockAnchor
+    private let capabilityDetector: () -> SensorCapabilities
+    private let startsHardwareSensors: Bool
+    private let appStateBox = CaptureAppStateBox()
+    private var uploadEngine: TelemetryUploadEngine?
+    /// BLE beacon collection (separate from the sensor capture path; see BeaconCollectionRecorder).
+    private(set) lazy var beaconRecorder = BeaconCollectionRecorder(store: store)
+    private var contexts: [CaptureStream: TrackingCaptureContext] = [:]
+    private var lastPreparedClocks: SensorRunClocks?
     private var runtimeState: ActiveCollectionState?
     private var appStateChangedAt = Date()
+    private var motionStallReported = false
+    private var altimeterStallReported = false
+    private var arkitEnabledSetting = false
+    private var arkitRateSetting: ARKitPoseRate = .hz10
+    private var uploadPeak = 0
 
     var isBackgroundCollectionEnabled: Bool { activeSession != nil && locationService.isActive }
+    /// The barometer moved more than 3 m since the last vertical anchor and no stairs/elevator
+    /// marker is open: the collector probably changed floors without marking it.
+    var verticalReminder: Bool {
+        guard activeSession != nil, openVertical == nil, let reference = verticalReference, let altitude = latestRelativeAltitude else { return false }
+        return abs(altitude - reference) > AnchorRules.verticalReminderMeters
+    }
     var isLocationActive: Bool { locationService.isActive }
     var isMotionActive: Bool { motionService.isActive }
     var isAltimeterActive: Bool { altimeterService.isActive }
+    var isAbsoluteAltitudeActive: Bool { absoluteAltitudeService.isActive }
     var isPedometerActive: Bool { pedometerService.isActive }
+    var isArkitActive: Bool { arkitTrackingService.isActive }
     var lastLocationTimestamp: Date? { runtimeState?.lastLocationTimestamp }
     var lastMotionTimestamp: Date? { runtimeState?.lastMotionTimestamp }
     var lastAltimeterTimestamp: Date? { runtimeState?.lastAltimeterTimestamp }
     var lastPedometerTimestamp: Date? { runtimeState?.lastPedometerTimestamp }
+    var uploadEngineForTesting: TelemetryUploadEngine? { uploadEngine }
 
-    init(repository: SensorDataRepository? = nil) {
-        self.repository = repository ?? LocalSensorDataRepository()
+    /// - Parameters:
+    ///   - capabilityDetector: sensor availability (injectable for tests).
+    ///   - startsHardwareSensors: `false` opens the same ingress contexts without starting
+    ///     Core Location / Core Motion / ARKit, so tests drive the real admission → core → SQLite
+    ///     path with synthetic DTOs only.
+    init(store: CollectionStore? = nil,
+         coreConfiguration: CollectionCoreConfiguration = .init(),
+         clockFactory: @escaping () throws -> TrackingClockAnchor = TrackingClockAnchor.captureNominal,
+         capabilityDetector: (() -> SensorCapabilities)? = nil,
+         startsHardwareSensors: Bool = true) {
+        let store = store ?? CollectionStore()
+        self.store = store
+        self.core = CollectionCore(store: store, configuration: coreConfiguration)
+        self.clockFactory = clockFactory
+        self.capabilityDetector = capabilityDetector ?? { SensorCapabilityDetector.detect() }
+        self.startsHardwareSensors = startsHardwareSensors
         self.locationAuthorization = locationService.authorizationStatus
+        self.accuracyAuthorization = locationService.accuracyAuthorization
         super.init()
-        configureCallbacks()
-        if var recovered = activeCollectionStore.load() {
-            recovered.diagnostics.wasInterrupted = true
-            interruptedCollection = recovered
-            activeCollectionStore.save(recovered, immediately: true)
-            print("[Diagnostics] INTERRUPTED_COLLECTION_FOUND session=\(recovered.session.id.uuidString)")
+        core.setEventHandler { [weak self] event in
+            DispatchQueue.main.async { self?.handle(event) }
         }
+        configureCallbacks()
+        loadRecoverableCollection()
+    }
+
+    /// A DB row still `recording` (process died) is offered for Resume/Finish; `stopping` (Stop was
+    /// requested and persisted) is never resumed, only finished.
+    private func loadRecoverableCollection() {
+        store.async({ try $0.sessions(in: [.recording, .stopping]) }) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(sessions):
+                guard self.activeSession == nil, let stored = sessions.first, var snapshot = stored.snapshot else { return }
+                snapshot.diagnostics.wasInterrupted = true
+                if let intent = stored.stopIntent, snapshot.pendingStop == nil { snapshot.apply(intent) }
+                self.interruptedCollection = snapshot
+                print("[Diagnostics] INTERRUPTED_COLLECTION_FOUND session=\(stored.id.uuidString) state=\(stored.captureState.rawValue)")
+            case let .failure(error):
+                // Never continue with an empty store: original files are preserved by the store.
+                self.captureStorageError = "STORE_UNAVAILABLE: \(error)"
+            }
+        }
+    }
+
+    private func prepareSensorRunClocks() throws -> SensorRunClocks {
+        // All three anchors are built and validated before any is used; a failure leaves nothing
+        // half-initialized.
+        let clocks = SensorRunClocks(motion: try clockFactory(), altimeter: try clockFactory(),
+                                     absoluteAltitude: try clockFactory(), arkit: try clockFactory())
+        lastPreparedClocks = clocks
+        return clocks
     }
 
     func bind(webSocket: RawWebSocketConnectionManager) {
-        guard telemetrySync == nil else { return }
-        let sync = TelemetrySyncCoordinator(webSocket: webSocket)
-        sync.onPendingCountChanged = { [weak self] count in self?.pendingUploadCount = count }
-        sync.onServerSessionStarted = { [weak self] localSessionID, serverSessionID in
+        bind(socket: webSocket)
+    }
+
+    func bind(socket: CollectorSocket) {
+        guard uploadEngine == nil else { return }
+        let engine = TelemetryUploadEngine(webSocket: socket, store: store)
+        engine.onPendingCountChanged = { [weak self] count in self?.updatePendingCount(count) }
+        engine.onQuarantinedCountChanged = { [weak self] count in self?.quarantinedUploadCount = count }
+        engine.onHeldCountChanged = { [weak self] count in self?.heldUploadCount = count }
+        engine.onUnsynchronizedCountChanged = { [weak self] count in self?.unsynchronizedSessionCount = count }
+        engine.onStorageError = { [weak self] message in self?.uploadStorageError = message }
+        engine.onServerSessionStarted = { [weak self] localSessionID, serverSessionID in
             guard var session = self?.activeSession, session.id == localSessionID else { return }
             session.serverSessionId = serverSessionID
             self?.activeSession = session
-            self?.repository.update(session: session)
         }
-        telemetrySync = sync
-        pendingUploadCount = sync.pendingCount
+        engine.onAbsoluteAltitudeSupported = { [weak self] localSessionID in
+            self?.core.enableAbsoluteAltitudeUpload(sessionID: localSessionID)
+        }
+        uploadEngine = engine
+        if let id = activeSession?.id { engine.activate(sessionID: id) }
     }
+
+    /// BLE beacons (docs/BEACON_POSITIONING.md): batches committed by `BeaconCollectionRecorder` join the same ledger.
+    func ingestUploadItems(_ items: [UploadItemRecord]) {
+        uploadEngine?.ingest(items)
+    }
+
+    /// Local + remote beacon upload switch: off keeps beacon batches on the phone.
+    func setBeaconUploadEnabled(_ enabled: Bool) {
+        uploadEngine?.beaconUploadEnabled = enabled
+    }
+
+    private func updatePendingCount(_ count: Int) {
+        pendingUploadCount = count
+        guard activeSession != nil, count > uploadPeak else { return }
+        uploadPeak = count
+        core.updateHostDiagnostics { $0.pendingUploadPeakCount = max($0.pendingUploadPeakCount, count) }
+    }
+
+    /// Called whenever the authenticated collector or configured server changes (login, logout,
+    /// server address edit). Gates every queued upload — including leftovers from a previous
+    /// run — to the collector+server currently signed in.
+    func updateUploadOwner(collectorId: String?, serverKey: String?) {
+        guard let collectorId, let serverKey else {
+            uploadEngine?.updateOwner(nil)
+            return
+        }
+        uploadEngine?.updateOwner(UploadOwner(collectorId: collectorId, serverKey: serverKey))
+    }
+
+    // MARK: Start
 
     func startSession(
         collectorId: String,
+        serverKey: String,
         motionRate: MotionSamplingRate,
         locationProfile: LocationCollectionProfile,
         distanceFilter: Double,
-        healthStride: HealthStrideService? = nil
+        healthStride: HealthStrideService? = nil,
+        arkitEnabled: Bool = false,
+        arkitRate: ARKitPoseRate = .hz10,
+        walkingFrameEnabled: Bool = false,
+        startAnchor: CollectionAnchor? = nil
     ) {
-        guard activeSession == nil else {
-            print("[Start] blocked: a local session is already active")
+        guard activeSession == nil, captureState == .idle else {
+            print("[Start] blocked: capture state \(captureState.rawValue)")
             return
         }
-        print("[Start] CollectionCoordinator.startSession entered")
+        guard interruptedCollection == nil else {
+            captureStorageError = "START_BLOCKED_INTERRUPTED_SESSION: resume or finish the interrupted session first"
+            return
+        }
+        let clocks: SensorRunClocks
+        do {
+            clocks = try prepareSensorRunClocks()
+        } catch {
+            captureStorageError = "CLOCK_ANCHOR_INITIALIZATION_FAILED: \(String(reflecting: error))"
+            print("[Diagnostics] CLOCK_ANCHOR_INITIALIZATION_FAILED error=\(String(reflecting: error))")
+            return
+        }
+        captureStorageError = nil
         let attitudeFrame = MotionService.preferredAttitudeReferenceFrame()
-        capabilities = SensorCapabilityDetector.detect(
-            attitudeReferenceFrame: MotionService.label(for: attitudeFrame),
-            motionUpdateHz: motionRate.rawValue,
-            locationAuthorization: locationService.authorizationStatus.diagnosticLabel,
-            locationAccuracyAuthorization: locationService.accuracyAuthorization.diagnosticLabel,
-            backgroundLocationUpdates: true,
-            pausesLocationUpdatesAutomatically: false
-        )
-        let device = DeviceInfoProvider.current(capabilities: capabilities)
-        // Fixed once, here, from whatever was ready in-memory at this instant. Never revisited
-        // for this session even if a HealthKit query still in flight completes afterward.
+        var walkingConfiguration = WalkingFrameEstimatorConfiguration()
+        walkingConfiguration.nominalSamplingHz = motionRate.rawValue
+        var detected = capabilityDetector()
+        detected.attitudeReferenceFrame = MotionService.label(for: attitudeFrame)
+        detected.motionUpdateHz = motionRate.rawValue
+        detected.locationAuthorization = locationService.authorizationStatus.diagnosticLabel
+        detected.locationAccuracyAuthorization = locationService.accuracyAuthorization.diagnosticLabel
+        detected.backgroundLocationUpdates = true
+        detected.pausesLocationUpdatesAutomatically = false
+        // Always BestForNavigation / no filter during collection (see `LocationService.start`),
+        // independent of whatever `locationProfile`/`distanceFilter` were requested below.
+        detected.locationDesiredAccuracy = "kCLLocationAccuracyBestForNavigation"
+        detected.locationDistanceFilterMeters = 0
+        detected.locationActivityType = "fitness"
+        detected.locationRequestedProfile = locationProfile.rawValue
+        detected.arkitEnabled = arkitEnabled && arkitSupported
+        detected.walkingFrameEnabled = walkingFrameEnabled
+        detected.walkingFrameAlgorithmVersion = walkingFrameEnabled ? WalkingFrameEstimatorConfiguration.algorithmVersion : nil
+        detected.walkingFrameSchemaVersion = walkingFrameEnabled ? WalkingFrameSnapshot.schemaVersion : nil
+        detected.walkingFrameWindowSeconds = walkingFrameEnabled ? walkingConfiguration.windowDuration : nil
+        detected.walkingFrameUpdateIntervalSeconds = walkingFrameEnabled ? walkingConfiguration.updateInterval : nil
+        capabilities = detected
+        let device = DeviceInfoProvider.current(capabilities: detected)
+        // Fixed once, here, from whatever was ready in-memory at this instant.
         let startedAt = Date()
         let strideCalibration = healthStride?.readyCandidateForNewSession(sessionStartedAt: startedAt)
         let session = CollectionSession(
-            id: UUID(),
-            collectorId: collectorId.isEmpty ? "Unassigned" : collectorId,
-            deviceId: device.deviceId,
-            startedAt: startedAt,
-            endedAt: nil,
-            status: .recording,
-            serverSessionId: nil,
-            deviceModel: device.deviceModel,
-            systemVersion: device.systemVersion,
-            sensorCapabilities: capabilities,
-            sampleCounts: SampleCounts(),
-            strideCalibration: strideCalibration
-        )
-        activeSession = session
+            id: UUID(), collectorId: collectorId.isEmpty ? "Unassigned" : collectorId, deviceId: device.deviceId,
+            startedAt: startedAt, endedAt: nil, status: .recording, serverSessionId: nil,
+            deviceModel: device.deviceModel, systemVersion: device.systemVersion, sensorCapabilities: detected,
+            sampleCounts: SampleCounts(), strideCalibration: strideCalibration)
+        let snapshot = ActiveCollectionState(
+            session: session, motionRate: motionRate, locationProfile: locationProfile, distanceFilter: distanceFilter,
+            locationSequence: 0, motionSequence: 0, altimeterSequence: 0, pedometerSequence: 0,
+            lastPersistedAt: startedAt, lastLocationTimestamp: nil, lastMotionTimestamp: nil,
+            lastAltimeterTimestamp: nil, lastPedometerTimestamp: nil,
+            diagnostics: CollectionDiagnostics(lowPowerModeObserved: ProcessInfo.processInfo.isLowPowerModeEnabled,
+                                               thermalStatePeak: ProcessInfo.processInfo.thermalState.rawValue))
+        let startPayload = SessionStartPayload(
+            clientSessionId: session.id.uuidString, deviceId: device.deviceId.uuidString, deviceModel: device.deviceModel,
+            systemVersion: device.systemVersion, appVersion: device.appVersion, sensorCapabilities: detected,
+            startedAt: startedAt, strideCalibration: strideCalibration)
+        let payloadData: Data
+        do { payloadData = try TrackingJSONCodec.makeEncoder().encode(startPayload) }
+        catch {
+            captureStorageError = "SESSION_START_ENCODING_FAILED: \(error)"
+            return
+        }
+        arkitEnabledSetting = arkitEnabled && arkitSupported
+        arkitRateSetting = arkitRate
+        let streams = Self.streams(for: detected, arkit: arkitEnabledSetting)
+        let request = SessionBeginRequest(
+            snapshot: snapshot, owner: UploadOwner(collectorId: session.collectorId, serverKey: serverKey),
+            startPayload: payloadData, clocks: clocks, streams: streams,
+            walkingFrame: walkingFrameEnabled ? walkingConfiguration : nil, deviceID: device.deviceId)
+        captureState = .starting
+        resetRunUI()
+        print("[Start] persisting session id=\(session.id.uuidString)")
+        core.beginSession(request) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(info):
+                self.didOpenRun(info, attitudeFrame: attitudeFrame, recoverPedometer: false)
+                print("[Diagnostics] SESSION_STARTED session=\(info.snapshot.session.id.uuidString)")
+                // the place picked before Start, at the moment Start was pressed
+                if let startAnchor { self.addMarker(type: .sessionStart, anchor: startAnchor, at: startedAt) }
+            case let .failure(error):
+                // Same session is never re-created under a new UUID automatically.
+                self.captureState = .idle
+                self.captureStorageError = "SESSION_START_PERSISTENCE_FAILED: \(error)"
+            }
+        }
+    }
+
+    private static func streams(for capabilities: SensorCapabilities, arkit: Bool) -> Set<CaptureStream> {
+        var streams: Set<CaptureStream> = []
+        if capabilities.locationAvailable { streams.insert(.location) }
+        if capabilities.deviceMotionAvailable { streams.insert(.motion) }
+        if capabilities.altimeterAvailable { streams.insert(.altimeter) }
+        if capabilities.absoluteAltitudeEnabled == true { streams.insert(.absoluteAltitude) }
+        if capabilities.pedometerAvailable { streams.insert(.pedometer) }
+        if arkit { streams.insert(.arkit) }
+        return streams
+    }
+
+    private func resetRunUI() {
         uiCounts = SampleCounts()
-        pendingCounts = SampleCounts()
+        durableCounts = SampleCounts()
         latestLocation = nil
         latestRelativeAltitude = nil
         latestStepCount = nil
-        pendingLocation = nil
-        pendingRelativeAltitude = nil
-        pendingStepCount = nil
-        locationSequence = 0
-        motionSequence = 0
-        altimeterSequence = 0
-        pedometerSequence = 0
-        repository.create(session: session)
-        let state = ActiveCollectionState(
-            session: session,
-            motionRate: motionRate,
-            locationProfile: locationProfile,
-            distanceFilter: distanceFilter,
-            locationSequence: 0,
-            motionSequence: 0,
-            altimeterSequence: 0,
-            pedometerSequence: 0,
-            lastPersistedAt: Date(),
-            lastLocationTimestamp: nil,
-            lastMotionTimestamp: nil,
-            lastAltimeterTimestamp: nil,
-            lastPedometerTimestamp: nil,
-            diagnostics: CollectionDiagnostics(
-                lowPowerModeObserved: ProcessInfo.processInfo.isLowPowerModeEnabled,
-                thermalStatePeak: ProcessInfo.processInfo.thermalState.rawValue
-            )
-        )
-        runtimeState = state
-        interruptedCollection = nil
-        persistRuntime(immediately: true)
-        print("[Diagnostics] SESSION_STARTED session=\(session.id.uuidString)")
-        print("[Start] local session created id=\(session.id.uuidString)")
-        telemetrySync?.start(session: session, device: device)
+        lastPlace = nil
+        openVertical = nil
+        openVerticalAnchor = nil
+        verticalReference = nil
+        walkingFrameSnapshot = nil
+        magneticCalibrationQuality = .unavailable
+        arkitTrackingState = .notAvailable
+        arkitTrackingStateReason = nil
+        arkitSessionId = nil
+        arkitPoseCount = 0
+        arkitLastPoseAt = nil
+        arkitError = nil
+        arkitBackpressurePaused = false
+        uploadPeak = 0
+    }
 
-        startSensors(
-            sessionStart: session.startedAt,
-            motionRate: motionRate,
-            attitudeFrame: attitudeFrame,
-            locationProfile: locationProfile,
-            distanceFilter: distanceFilter
-        )
-        startUIRefreshTimer()
+    private func didOpenRun(_ info: CaptureRunInfo, attitudeFrame: CMAttitudeReferenceFrame, recoverPedometer: Bool) {
+        let snapshot = info.snapshot
+        activeSession = snapshot.session
+        runtimeState = snapshot
+        diagnostics = snapshot.diagnostics
+        capabilities = snapshot.session.sensorCapabilities
+        uiCounts = snapshot.session.sampleCounts
+        durableCounts = snapshot.session.sampleCounts
+        contexts = info.contexts
+        captureState = .recording
+        interruptedCollection = nil
+        if let engine = uploadEngine {
+            let id = snapshot.session.id
+            engine.registerSession(id: id) { [weak engine] in engine?.activate(sessionID: id) }
+            engine.ingest(info.committedItems)
+        }
+        startSensors(sessionStart: snapshot.session.startedAt, motionRate: snapshot.motionRate, attitudeFrame: attitudeFrame,
+                     locationProfile: snapshot.locationProfile, distanceFilter: snapshot.distanceFilter)
+        if recoverPedometer { recoverPedometerIfNeeded(since: snapshot.lastPedometerTimestamp) }
         UIApplication.shared.isIdleTimerDisabled = true
     }
 
-    func stopSession() {
-        guard var session = activeSession else { return }
-        UIApplication.shared.isIdleTimerDisabled = false
-        locationService.stop()
-        logDiagnosticEvent("SENSOR_STOPPED", metadata: ["sensor": "location", "sensorSegmentId": locationSegmentId, "reason": "user_stop"])
-        motionService.stop()
-        logDiagnosticEvent("SENSOR_STOPPED", metadata: ["sensor": "motion", "sensorSegmentId": motionSegmentId, "reason": "user_stop"])
-        altimeterService.stop()
-        logDiagnosticEvent("SENSOR_STOPPED", metadata: ["sensor": "altimeter", "sensorSegmentId": altimeterSegmentId, "reason": "user_stop"])
-        pedometerService.stop()
-        logDiagnosticEvent("SENSOR_STOPPED", metadata: ["sensor": "pedometer", "sensorSegmentId": pedometerSegmentId, "reason": "user_stop"])
-        refreshTimer?.invalidate()
-        refreshTimer = nil
-        publishUI()
-        session.status = .completed
-        session.endedAt = Date()
-        session.sampleCounts = pendingCounts
-        telemetrySync?.finish(
-            session: session,
-            lastSequences: LastSequencesPayload(
-                location: locationSequence,
-                motion: motionSequence,
-                altimeter: altimeterSequence,
-                pedometer: pedometerSequence
-            )
-        )
-        print("[Diagnostics] LOCATION_STOPPED")
-        print("[Diagnostics] MOTION_STOPPED")
-        print("[Diagnostics] ALTIMETER_STOPPED")
-        print("[Diagnostics] PEDOMETER_STOPPED")
-        print("[Diagnostics] SESSION_FINISHED session=\(session.id.uuidString) lastSequences location=\(locationSequence) motion=\(motionSequence) altimeter=\(altimeterSequence) pedometer=\(pedometerSequence)")
-        activeSession = nil
-        runtimeState = nil
-        diagnostics = nil
-        interruptedCollection = nil
-        activeCollectionStore.clear()
-        repository.finish(session: session) { }
+    // MARK: Stop
+
+    /// `endAnchor`: where the collector stands at the end; recorded before the stop so the
+    /// sessionEnd marker is committed ahead of the finish item.
+    func stopSession(endAnchor: CollectionAnchor? = nil) {
+        guard let session = activeSession else { return }
+        if captureState == .recording, let endAnchor { addMarker(type: .sessionEnd, anchor: endAnchor) }
+        switch captureState {
+        case .stopping, .starting, .idle:
+            return
+        case .storageFailure:
+            // Retry the same Stop: same session, fixed endedAt and already-issued sequences.
+            captureState = .stopping
+            core.beginStop(reason: "user_stop") { [weak self] result in self?.handleStopResult(result) }
+        case .recording:
+            captureState = .stopping
+            UIApplication.shared.isIdleTimerDisabled = false
+            // Logged first so these diagnostics precede the finish item in the ledger.
+            logSensorStops(sessionID: session.id, reason: "user_stop")
+            // Admission boundary first (ingress close + drain barrier), then stop hardware.
+            core.beginStop(reason: "user_stop") { [weak self] result in self?.handleStopResult(result) }
+            stopSensors()
+            print("[Diagnostics] SESSION_STOP_REQUESTED session=\(session.id.uuidString)")
+        }
     }
 
-    func addMarker(type: EventMarkerType, note: String? = nil) {
-        guard let session = activeSession else { return }
+    private func handleStopResult(_ result: Result<StopResult, Error>) {
+        switch result {
+        case let .success(stop):
+            uploadEngine?.ingest(stop.items)
+            uploadEngine?.deactivate(sessionID: stop.sessionID)
+            durableCounts = stop.snapshot.session.sampleCounts
+            uiCounts = stop.snapshot.session.sampleCounts
+            activeSession = nil
+            runtimeState = nil
+            diagnostics = nil
+            contexts = [:]
+            captureState = .idle
+            captureStorageError = nil
+            print("[Diagnostics] SESSION_FINISHED session=\(stop.sessionID.uuidString) lastSequences location=\(stop.manifest.location) motion=\(stop.manifest.motion) altimeter=\(stop.manifest.altimeter) pedometer=\(stop.manifest.pedometer)")
+        case let .failure(error):
+            // Stop intent, buffer and recovery info are kept; pressing Stop again retries.
+            captureState = .storageFailure
+            captureStorageError = String(describing: error)
+            print("[Diagnostics] STOP_FINALIZATION_FAILED error=\(error)")
+        }
+    }
+
+    private func logSensorStops(sessionID: UUID, reason: String) {
+        for stream in contexts.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
+            var metadata = ["sensor": stream.rawValue, "reason": reason]
+            if let context = contexts[stream] { metadata["sensorSegmentId"] = context.streamSegmentID.uuidString }
+            if stream == .arkit { metadata["arSessionId"] = arkitTrackingService.arSessionId.uuidString }
+            logDiagnosticEvent("SENSOR_STOPPED", metadata: metadata, sessionID: sessionID)
+        }
+    }
+
+    private func stopSensors() {
+        locationService.stop()
+        motionService.stop()
+        altimeterService.stop()
+        absoluteAltitudeService.stop()
+        pedometerService.stop()
+        arkitTrackingService.stop()
+        arkitEnabledSetting = false
+    }
+
+    // MARK: Interrupted sessions
+
+    /// ARKit never resumes across an app relaunch: this always starts ARKit fresh with a new
+    /// `arSessionId`. The session id, owner and durable sequence boundaries are kept; every stream
+    /// gets a new segment/generation and the clocks are re-anchored for the new run.
+    func resumeInterruptedCollection(serverKey: String, arkitEnabled: Bool = false, arkitRate: ARKitPoseRate = .hz10) {
+        guard let recovered = interruptedCollection, activeSession == nil, captureState == .idle else { return }
+        guard recovered.pendingStop == nil else {
+            captureStorageError = "RESUME_BLOCKED_PENDING_FINALIZATION"
+            return
+        }
+        let clocks: SensorRunClocks
+        do {
+            clocks = try prepareSensorRunClocks()
+        } catch {
+            captureStorageError = "CLOCK_ANCHOR_INITIALIZATION_FAILED: \(String(reflecting: error))"
+            print("[Diagnostics] CLOCK_ANCHOR_INITIALIZATION_FAILED phase=resume error=\(String(reflecting: error))")
+            return
+        }
+        arkitEnabledSetting = arkitEnabled && arkitSupported
+        arkitRateSetting = arkitRate
+        var walking: WalkingFrameEstimatorConfiguration?
+        if recovered.session.sensorCapabilities.walkingFrameEnabled == true {
+            var configuration = WalkingFrameEstimatorConfiguration()
+            configuration.nominalSamplingHz = recovered.motionRate.rawValue
+            walking = configuration
+        }
+        let device = DeviceInfoProvider.current(capabilities: recovered.session.sensorCapabilities)
+        let request = SessionResumeRequest(sessionID: recovered.session.id, clocks: clocks,
+            streams: Self.streams(for: recovered.session.sensorCapabilities, arkit: arkitEnabledSetting),
+            walkingFrame: walking, deviceID: device.deviceId)
+        captureState = .starting
+        resetRunUI()
+        core.resumeSession(request) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(info):
+                self.captureStorageError = nil
+                self.didOpenRun(info, attitudeFrame: MotionService.preferredAttitudeReferenceFrame(), recoverPedometer: true)
+                print("[Diagnostics] SESSION_RESUMED_WITH_GAP session=\(info.snapshot.session.id.uuidString)")
+            case let .failure(error):
+                self.captureState = .idle
+                self.captureStorageError = "RESUME_FAILED: \(error)"
+            }
+        }
+    }
+
+    /// Closes the interrupted session locally AND tells the server. `endedAt` is the last moment
+    /// this device is known to have recorded (or the persisted Stop cutoff), not "now".
+    func finishInterruptedCollection(serverKey: String) {
+        guard let recovered = interruptedCollection, activeSession == nil, captureState == .idle else { return }
+        UIApplication.shared.isIdleTimerDisabled = false
+        captureState = .stopping
+        core.finishRecovered(sessionID: recovered.session.id) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(stop):
+                if let engine = self.uploadEngine {
+                    engine.registerSession(id: stop.sessionID) { [weak engine] in engine?.ingest(stop.items) }
+                }
+                self.interruptedCollection = nil
+                self.captureState = .idle
+                self.captureStorageError = nil
+            case let .failure(error):
+                self.captureState = .idle
+                self.captureStorageError = "INTERRUPTED_FINISH_FAILED: \(error)"
+            }
+        }
+    }
+
+    // MARK: Markers, app state, history
+
+    func addMarker(type: EventMarkerType, note: String? = nil, anchor: CollectionAnchor? = nil, at timestamp: Date = Date()) {
+        guard let session = activeSession, captureState == .recording else { return }
         let location = locationService.lastLocation
-        let marker = EventMarker(
-            id: UUID(),
-            sessionId: session.id,
-            timestamp: Date(),
-            type: type,
-            note: note,
-            latitude: location?.coordinate.latitude,
-            longitude: location?.coordinate.longitude,
-            altitude: location?.altitude,
-            horizontalAccuracy: location?.horizontalAccuracy,
-            verticalAccuracy: location?.verticalAccuracy
-        )
-        repository.append(marker: marker)
-        telemetrySync?.append(marker: marker, session: session)
-        pendingCounts.marker += 1
-        telemetrySync?.update(sampleCounts: pendingCounts)
+        core.addMarker(EventMarker(
+            id: UUID(), sessionId: session.id, timestamp: timestamp, type: type, note: note,
+            latitude: location?.coordinate.latitude, longitude: location?.coordinate.longitude,
+            altitude: location?.altitude, horizontalAccuracy: location?.horizontalAccuracy,
+            verticalAccuracy: location?.verticalAccuracy, anchor: anchor))
+        noteAnchor(type: type, anchor: anchor)
+    }
+
+    /// Keeps the current place for the pickers and the barometric reference for the reminder.
+    private func noteAnchor(type: EventMarkerType, anchor: CollectionAnchor?) {
+        switch type {
+        case .stairStart, .elevatorBoard, .rampStart:
+            openVertical = type
+            openVerticalAnchor = anchor
+        case .stairEnd, .elevatorExit, .rampEnd:
+            openVertical = nil
+            openVerticalAnchor = nil
+            verticalReference = latestRelativeAltitude
+            if let floor = anchor?.toFloor, var place = lastPlace {
+                place.floor = floor; place.nodeId = nil; place.nodeLabel = nil
+                lastPlace = place
+            }
+        case .sessionStart, .entrance:
+            verticalReference = latestRelativeAltitude
+        default:
+            break
+        }
+        if let building = anchor?.buildingId { lastPlace = CollectionAnchor(buildingId: building, floor: anchor?.floor) }
     }
 
     func requestAlwaysLocationAuthorization() {
         locationService.requestAlwaysAuthorization()
     }
 
-    func resumeInterruptedCollection() {
-        guard var recovered = interruptedCollection, activeSession == nil else { return }
-        recovered.diagnostics.wasInterrupted = true
-        runtimeState = recovered
-        capabilities = recovered.session.sensorCapabilities
-        activeSession = recovered.session
-        locationSequence = recovered.locationSequence
-        motionSequence = recovered.motionSequence
-        altimeterSequence = recovered.altimeterSequence
-        pedometerSequence = recovered.pedometerSequence
-        pendingCounts = recovered.session.sampleCounts
-        uiCounts = pendingCounts
-        interruptedCollection = nil
-
-        repository.resume(session: recovered.session)
-        let device = DeviceInfoProvider.current(capabilities: recovered.session.sensorCapabilities)
-        telemetrySync?.start(session: recovered.session, device: device)
-        let attitudeFrame = MotionService.preferredAttitudeReferenceFrame()
-        startSensors(
-            sessionStart: recovered.session.startedAt,
-            motionRate: recovered.motionRate,
-            attitudeFrame: attitudeFrame,
-            locationProfile: recovered.locationProfile,
-            distanceFilter: recovered.distanceFilter
-        )
-        recoverPedometerIfNeeded(since: recovered.lastPedometerTimestamp)
-        startUIRefreshTimer()
-        persistRuntime(immediately: true)
-        UIApplication.shared.isIdleTimerDisabled = true
-        print("[Diagnostics] SESSION_RESUMED_WITH_GAP session=\(recovered.session.id.uuidString)")
-    }
-
-    func finishInterruptedCollection() {
-        guard var recovered = interruptedCollection else { return }
-        UIApplication.shared.isIdleTimerDisabled = false
-        recovered.session.status = .completed
-        recovered.session.endedAt = Date()
-        recovered.diagnostics.wasInterrupted = true
-        repository.resume(session: recovered.session)
-        repository.finish(session: recovered.session) { }
-        activeCollectionStore.clear()
-        interruptedCollection = nil
-        print("[Diagnostics] SESSION_FINISHED_AS_INTERRUPTED session=\(recovered.session.id.uuidString)")
+    /// Call as early as possible (app launch), not from the Start button: the system permission
+    /// prompt must be settled before a session can start, never appear mid-start.
+    func requestLocationAuthorizationIfNeeded() {
+        locationService.requestWhenInUseAuthorizationIfNeeded()
     }
 
     func handleAppState(_ state: CollectorAppState) {
         let now = Date()
         let elapsed = now.timeIntervalSince(appStateChangedAt)
-        if var runtime = runtimeState {
-            switch appState {
-            case .background: runtime.diagnostics.backgroundDuration += elapsed
-            case .foreground: runtime.diagnostics.foregroundDuration += elapsed
-            case .inactive: break
+        let previous = appState
+        appStateBox.set(state)
+        if activeSession != nil, captureState == .recording {
+            let lowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+            let thermal = ProcessInfo.processInfo.thermalState.rawValue
+            core.updateHostDiagnostics { diagnostics in
+                switch previous {
+                case .background: diagnostics.backgroundDuration += elapsed
+                case .foreground: diagnostics.foregroundDuration += elapsed
+                case .inactive: break
+                }
+                if state == .background, previous != .background { diagnostics.backgroundTransitionCount += 1 }
+                diagnostics.lowPowerModeObserved = diagnostics.lowPowerModeObserved || lowPower
+                diagnostics.thermalStatePeak = max(diagnostics.thermalStatePeak, thermal)
             }
-            if state == .background, appState != .background {
-                runtime.diagnostics.backgroundTransitionCount += 1
+            if state == .background, previous != .background {
                 print("[Diagnostics] APP_BACKGROUND")
                 logDiagnosticEvent("APP_BACKGROUND")
-            } else if state == .foreground, appState != .foreground {
+                // Background may precede suspension: commit the unsaved tail now.
+                core.flushNow()
+            } else if state == .foreground, previous != .foreground {
                 print("[Diagnostics] APP_FOREGROUND")
                 logDiagnosticEvent("APP_FOREGROUND")
             }
-            runtime.diagnostics.lowPowerModeObserved = runtime.diagnostics.lowPowerModeObserved || ProcessInfo.processInfo.isLowPowerModeEnabled
-            runtime.diagnostics.thermalStatePeak = max(runtime.diagnostics.thermalStatePeak, ProcessInfo.processInfo.thermalState.rawValue)
-            runtimeState = runtime
-            persistRuntime(immediately: state == .background)
+            if state == .background, arkitTrackingService.isActive {
+                arkitTrackingService.pauseForBackground()
+                logDiagnosticEvent("SENSOR_PAUSED", metadata: ["sensor": "arkit", "reason": "app_background"])
+            } else if state == .foreground, arkitEnabledSetting, !arkitBackpressurePaused,
+                      arkitTrackingService.runState == .pausedInBackground {
+                arkitTrackingService.resumeFromBackground(rate: arkitRateSetting)
+                logDiagnosticEvent("SENSOR_RESUMED", metadata: ["sensor": "arkit", "arSessionId": arkitTrackingService.arSessionId.uuidString, "reason": "app_foreground"])
+            }
         }
         appState = state
         appStateChangedAt = now
 
-        // Ordinary foreground transitions (screen lock/unlock, brief app switches) do NOT need
-        // pedometer recovery: `pedometerService.start(from: sessionStartDate)` keeps delivering
-        // cumulative counts the whole time regardless of app state. Calling recovery here used to
-        // inject an incremental (near-zero) sample into the cumulative stream on every such
-        // transition, which is what produced the spurious 0-step samples right before Stop.
+        if state == .foreground {
+            // Settings (permission, Precise Location) can change while backgrounded.
+            let newAuthorization = locationService.authorizationStatus
+            let newAccuracy = locationService.accuracyAuthorization
+            if activeSession != nil, newAuthorization != locationAuthorization || newAccuracy != accuracyAuthorization {
+                logDiagnosticEvent("LOCATION_AUTHORIZATION_CHANGED", metadata: [
+                    "status": newAuthorization.diagnosticLabel,
+                    "accuracyAuthorization": newAccuracy.diagnosticLabel
+                ])
+            }
+            locationAuthorization = newAuthorization
+            accuracyAuthorization = newAccuracy
+        }
+        // Ordinary foreground transitions do NOT need pedometer recovery: the live pedometer
+        // stream keeps delivering cumulative counts from the session start.
     }
 
     func loadSessions(completion: @escaping ([CollectionSession]) -> Void) {
-        repository.loadSessions(completion: completion)
+        let legacyRoot = store.legacyDirectory
+        store.async({ access -> [CollectionSession] in
+            let current = try access.listCollectionSessions()
+            let known = Set(current.map(\.id))
+            let legacy = LegacySessionArchive.listSessions(root: legacyRoot).filter { !known.contains($0.id) }
+            return (current + legacy).sorted { $0.startedAt > $1.startedAt }
+        }) { result in
+            completion((try? result.get()) ?? [])
+        }
     }
 
-    private func startSensors(
-        sessionStart: Date,
-        motionRate: MotionSamplingRate,
-        attitudeFrame: CMAttitudeReferenceFrame,
-        locationProfile: LocationCollectionProfile,
-        distanceFilter: Double
-    ) {
-        if capabilities.locationAvailable {
-            locationSegmentId = UUID().uuidString
+    // MARK: ARKit backpressure
+
+    /// Manual only (never automatic). Allowed once the stored backlog is below the resume
+    /// thresholds; restarts ARKit with a new arSessionId.
+    func resumeArkitAfterBackpressure() {
+        guard arkitBackpressurePaused, activeSession != nil, captureState == .recording else { return }
+        core.reopenArkit { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(context):
+                self.contexts[.arkit] = context
+                self.arkitBackpressurePaused = false
+                self.arkitError = nil
+                self.arkitEnabledSetting = true
+                self.startArkit(context: context)
+                self.logDiagnosticEvent("ARKIT_BACKPRESSURE_RESUMED", metadata: ["arSessionId": self.arkitTrackingService.arSessionId.uuidString])
+            case let .failure(error):
+                self.arkitError = String(describing: error)
+            }
+        }
+    }
+
+    func arkitBacklog() -> (count: Int, oldestAgeSeconds: Double)? {
+        guard let id = activeSession?.id else { return nil }
+        return uploadEngine?.arkitBacklog(sessionID: id)
+    }
+
+    // MARK: Sensors
+
+    private func startSensors(sessionStart: Date, motionRate: MotionSamplingRate, attitudeFrame: CMAttitudeReferenceFrame,
+                              locationProfile: LocationCollectionProfile, distanceFilter: Double) {
+        let core = self.core
+        let box = appStateBox
+        func started(_ stream: CaptureStream, _ ok: Bool, extra: [String: String] = [:]) {
+            guard let context = contexts[stream] else { return }
+            var metadata = ["sensor": stream.rawValue, "sensorSegmentId": context.streamSegmentID.uuidString]
+            metadata.merge(extra) { $1 }
+            logDiagnosticEvent(ok ? "SENSOR_STARTED" : "SENSOR_START_FAILED", metadata: metadata)
+        }
+        guard startsHardwareSensors else { return }
+        if let context = contexts[.location] {
+            locationService.onLocation = { location in
+                core.submit(.now(.location(LocationService.capture(location)), appState: box.value), context: context)
+            }
             locationService.start(profile: locationProfile, distanceFilter: distanceFilter)
-            print("[Diagnostics] LOCATION_STARTED segmentId=\(locationSegmentId) allowsBackgroundLocationUpdates=true pausesLocationUpdatesAutomatically=false")
-            logDiagnosticEvent("SENSOR_STARTED", metadata: ["sensor": "location", "sensorSegmentId": locationSegmentId])
+            started(.location, locationService.isActive)
         }
-        if capabilities.deviceMotionAvailable {
-            motionSegmentId = UUID().uuidString
-            motionService.start(rate: motionRate, using: attitudeFrame)
-            print("[Diagnostics] MOTION_STARTED segmentId=\(motionSegmentId) referenceFrame=\(MotionService.label(for: attitudeFrame))")
-            logDiagnosticEvent("SENSOR_STARTED", metadata: ["sensor": "motion", "sensorSegmentId": motionSegmentId, "referenceFrame": MotionService.label(for: attitudeFrame)])
+        if let context = contexts[.motion] {
+            motionService.start(rate: motionRate, using: attitudeFrame) { capture in
+                core.submit(.now(.motion(capture), appState: box.value), context: context)
+            }
+            started(.motion, motionService.isActive, extra: ["referenceFrame": MotionService.label(for: attitudeFrame)])
         }
-        if capabilities.altimeterAvailable {
-            altimeterSegmentId = UUID().uuidString
-            altimeterService.start()
-            print("[Diagnostics] ALTIMETER_STARTED segmentId=\(altimeterSegmentId)")
-            logDiagnosticEvent("SENSOR_STARTED", metadata: ["sensor": "altimeter", "sensorSegmentId": altimeterSegmentId])
+        if let context = contexts[.altimeter] {
+            altimeterService.start { capture in
+                core.submit(.now(.altimeter(capture), appState: box.value), context: context)
+            }
+            started(.altimeter, altimeterService.isActive)
         }
-        if capabilities.pedometerAvailable {
-            pedometerSegmentId = UUID().uuidString
-            pedometerService.start(capabilities: capabilities, from: sessionStart)
-            print("[Diagnostics] PEDOMETER_STARTED segmentId=\(pedometerSegmentId) from=\(sessionStart)")
-            logDiagnosticEvent("SENSOR_STARTED", metadata: ["sensor": "pedometer", "sensorSegmentId": pedometerSegmentId])
+        if let context = contexts[.absoluteAltitude] {
+            absoluteAltitudeService.start { capture in
+                core.submit(.now(.absoluteAltitude(capture), appState: box.value), context: context)
+            }
+            started(.absoluteAltitude, absoluteAltitudeService.isActive)
+        }
+        if let context = contexts[.pedometer] {
+            pedometerService.start(capabilities: capabilities, from: sessionStart, handler: { capture in
+                core.submit(.now(.pedometer(capture), appState: box.value), context: context)
+            }, onError: { [weak self] domain, code in
+                DispatchQueue.main.async {
+                    self?.logDiagnosticEvent("PEDOMETER_ERROR", metadata: ["domain": domain, "code": String(code)])
+                }
+            })
+            started(.pedometer, pedometerService.isActive)
+        }
+        if let context = contexts[.arkit] {
+            startArkit(context: context)
+        }
+    }
+
+    private func startArkit(context: TrackingCaptureContext) {
+        let core = self.core
+        let box = appStateBox
+        guard startsHardwareSensors else { return }
+        arkitTrackingService.onPose = { pose in
+            core.submit(.now(.arkit(pose), appState: box.value), context: context)
+        }
+        arkitTrackingService.start(rate: arkitRateSetting)
+        print("[Diagnostics] ARKIT_STARTED arSessionId=\(arkitTrackingService.arSessionId.uuidString) rate=\(arkitRateSetting.rawValue)Hz")
+        logDiagnosticEvent(arkitTrackingService.isActive ? "SENSOR_STARTED" : "SENSOR_START_FAILED",
+                           metadata: ["sensor": "arkit", "arSessionId": arkitTrackingService.arSessionId.uuidString])
+    }
+
+    /// Only reached from `resumeInterruptedCollection()` (a genuine relaunch recovery). Queries
+    /// from the session start so the recovered sample is cumulative; the core drops it if a live
+    /// sample with the same millisecond endDate already exists.
+    private func recoverPedometerIfNeeded(since timestamp: Date?) {
+        guard startsHardwareSensors, let timestamp, let session = activeSession, timestamp < Date(),
+              let context = contexts[.pedometer] else { return }
+        let core = self.core
+        let box = appStateBox
+        pedometerService.recover(from: session.startedAt, capabilities: capabilities) { capture in
+            guard let capture, capture.endDate > timestamp else { return }
+            print("[Diagnostics] PEDOMETER_HISTORICAL_RECOVERY to=\(capture.endDate)")
+            core.submit(.now(.pedometer(capture), appState: box.value), context: context)
         }
     }
 
     private func configureCallbacks() {
         locationService.onAuthorizationChanged = { [weak self] status in
             DispatchQueue.main.async {
-                self?.locationAuthorization = status
-                self?.logDiagnosticEvent("LOCATION_AUTHORIZATION_CHANGED", metadata: ["status": status.diagnosticLabel])
+                guard let self else { return }
+                self.locationAuthorization = status
+                let accuracy = self.locationService.accuracyAuthorization
+                self.accuracyAuthorization = accuracy
+                self.logDiagnosticEvent("LOCATION_AUTHORIZATION_CHANGED", metadata: [
+                    "status": status.diagnosticLabel,
+                    "accuracyAuthorization": accuracy.diagnosticLabel
+                ])
             }
         }
-        locationService.onLocation = { [weak self] location in
-            DispatchQueue.main.async { self?.record(location: location) }
+        locationService.onError = { [weak self] error in
+            let nsError = error as NSError
+            DispatchQueue.main.async {
+                self?.logDiagnosticEvent("LOCATION_ERROR", metadata: ["domain": nsError.domain, "code": String(nsError.code)])
+            }
         }
         locationService.onPaused = { [weak self] in
             DispatchQueue.main.async { self?.logDiagnosticEvent("LOCATION_PAUSED") }
@@ -365,924 +746,126 @@ final class CollectionCoordinator: NSObject, ObservableObject {
         locationService.onResumed = { [weak self] in
             DispatchQueue.main.async { self?.logDiagnosticEvent("LOCATION_RESUMED") }
         }
-        motionService.onMotion = { [weak self] motion in
-            DispatchQueue.main.async { self?.record(motion: motion) }
-        }
-        altimeterService.onAltitude = { [weak self] altitude in
-            DispatchQueue.main.async { self?.record(altitude: altitude) }
-        }
-        pedometerService.onPedometer = { [weak self] data in
-            DispatchQueue.main.async { self?.record(pedometer: data) }
-        }
-        pedometerService.onError = { [weak self] error in
+        arkitTrackingService.onTrackingStateChanged = { [weak self] state, reason in
             DispatchQueue.main.async {
-                let nsError = error as NSError?
-                self?.logDiagnosticEvent("PEDOMETER_ERROR", metadata: [
-                    "domain": nsError?.domain ?? "unknown",
-                    "code": nsError.map { String($0.code) } ?? "unknown"
+                self?.arkitTrackingState = state
+                self?.arkitTrackingStateReason = reason
+                self?.logDiagnosticEvent("ARKIT_TRACKING_STATE_CHANGED", metadata: [
+                    "trackingState": state.rawValue,
+                    "reason": reason?.rawValue ?? "none"
                 ])
             }
         }
-    }
-
-    private func record(location: CLLocation) {
-        guard let session = activeSession else { return }
-        locationSequence += 1
-        let ellipsoidalAltitude: Double?
-        if #available(iOS 15.0, *) {
-            ellipsoidalAltitude = location.ellipsoidalAltitude
-        } else {
-            ellipsoidalAltitude = nil
-        }
-        let sample = LocationSample(id: UUID(), sessionId: session.id, sequence: locationSequence, timestamp: location.timestamp, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, altitude: location.altitude, ellipsoidalAltitude: ellipsoidalAltitude, horizontalAccuracy: location.horizontalAccuracy, verticalAccuracy: location.verticalAccuracy, speed: location.speed, course: location.course, speedAccuracy: location.speedAccuracy, courseAccuracy: location.courseAccuracy, floor: location.floor?.level, appState: appState, sensorSegmentId: locationSegmentId)
-        updateRuntimeForLocation(timestamp: sample.timestamp)
-        repository.append(location: sample)
-        telemetrySync?.append(location: sample, session: session)
-        pendingLocation = sample
-        pendingCounts.location += 1
-        telemetrySync?.update(sampleCounts: pendingCounts)
-    }
-
-    private func record(motion: CMDeviceMotion) {
-        guard let session = activeSession else { return }
-        motionSequence += 1
-        let measuredAt = bootTime.addingTimeInterval(motion.timestamp)
-        let sample = MotionSample(id: UUID(), sessionId: session.id, sequence: motionSequence, timestamp: measuredAt, userAccelerationX: motion.userAcceleration.x, userAccelerationY: motion.userAcceleration.y, userAccelerationZ: motion.userAcceleration.z, rotationRateX: motion.rotationRate.x, rotationRateY: motion.rotationRate.y, rotationRateZ: motion.rotationRate.z, gravityX: motion.gravity.x, gravityY: motion.gravity.y, gravityZ: motion.gravity.z, attitudeRoll: motion.attitude.roll, attitudePitch: motion.attitude.pitch, attitudeYaw: motion.attitude.yaw, appState: appState, sensorSegmentId: motionSegmentId)
-        updateRuntimeForMotion(timestamp: sample.timestamp)
-        repository.append(motion: sample)
-        telemetrySync?.append(motion: sample, session: session)
-        pendingCounts.motion += 1
-        telemetrySync?.update(sampleCounts: pendingCounts)
-    }
-
-    private func record(altitude: CMAltitudeData) {
-        guard let session = activeSession else { return }
-        altimeterSequence += 1
-        let measuredAt = bootTime.addingTimeInterval(altitude.timestamp)
-        let sample = AltimeterSample(id: UUID(), sessionId: session.id, sequence: altimeterSequence, timestamp: measuredAt, relativeAltitude: altitude.relativeAltitude.doubleValue, pressure: altitude.pressure.doubleValue, appState: appState, sensorSegmentId: altimeterSegmentId)
-        updateRuntimeForAltimeter(timestamp: sample.timestamp)
-        repository.append(altimeter: sample)
-        telemetrySync?.append(altimeter: sample, session: session)
-        pendingRelativeAltitude = sample.relativeAltitude
-        pendingCounts.altimeter += 1
-        telemetrySync?.update(sampleCounts: pendingCounts)
-    }
-
-    private func record(pedometer data: CMPedometerData, source: SensorCaptureSource = .live) {
-        guard let session = activeSession else { return }
-        pedometerSequence += 1
-        let sample = PedometerSample(id: UUID(), sessionId: session.id, sequence: pedometerSequence, timestamp: data.endDate, captureSource: source, numberOfSteps: capabilities.stepCountingAvailable ? data.numberOfSteps.intValue : nil, distance: capabilities.distanceAvailable ? data.distance?.doubleValue : nil, currentPace: capabilities.paceAvailable ? data.currentPace?.doubleValue : nil, currentCadence: capabilities.cadenceAvailable ? data.currentCadence?.doubleValue : nil, floorsAscended: capabilities.floorCountingAvailable ? data.floorsAscended?.intValue : nil, floorsDescended: capabilities.floorCountingAvailable ? data.floorsDescended?.intValue : nil, appState: appState, sensorSegmentId: pedometerSegmentId)
-        updateRuntimeForPedometer(timestamp: sample.timestamp)
-        repository.append(pedometer: sample)
-        telemetrySync?.append(pedometer: sample, session: session)
-        pendingStepCount = sample.numberOfSteps
-        pendingCounts.pedometer += 1
-        telemetrySync?.update(sampleCounts: pendingCounts)
-    }
-
-    private func updateRuntimeForLocation(timestamp: Date) {
-        guard var runtime = runtimeState else { return }
-        runtime.diagnostics.locationGaps.record(
-            previous: runtime.lastLocationTimestamp,
-            current: timestamp,
-            expectedInterval: 1
-        )
-        runtime.lastLocationTimestamp = timestamp
-        runtime.locationSequence = locationSequence
-        runtimeState = runtime
-        persistRuntimeIfNeeded()
-    }
-
-    private func updateRuntimeForMotion(timestamp: Date) {
-        guard var runtime = runtimeState else { return }
-        runtime.diagnostics.motionGaps.record(
-            previous: runtime.lastMotionTimestamp,
-            current: timestamp,
-            expectedInterval: runtime.motionRate.interval
-        )
-        runtime.lastMotionTimestamp = timestamp
-        runtime.motionSequence = motionSequence
-        runtimeState = runtime
-        persistRuntimeIfNeeded()
-    }
-
-    private func updateRuntimeForAltimeter(timestamp: Date) {
-        guard var runtime = runtimeState else { return }
-        runtime.diagnostics.altimeterGaps.record(
-            previous: runtime.lastAltimeterTimestamp,
-            current: timestamp,
-            expectedInterval: 1
-        )
-        runtime.lastAltimeterTimestamp = timestamp
-        runtime.altimeterSequence = altimeterSequence
-        runtimeState = runtime
-        persistRuntimeIfNeeded()
-    }
-
-    private func updateRuntimeForPedometer(timestamp: Date) {
-        guard var runtime = runtimeState else { return }
-        runtime.diagnostics.pedometerGaps.record(
-            previous: runtime.lastPedometerTimestamp,
-            current: timestamp,
-            expectedInterval: 5
-        )
-        runtime.lastPedometerTimestamp = timestamp
-        runtime.pedometerSequence = pedometerSequence
-        runtimeState = runtime
-        persistRuntimeIfNeeded()
-    }
-
-    private func persistRuntimeIfNeeded() {
-        guard let runtime = runtimeState,
-              Date().timeIntervalSince(runtime.lastPersistedAt) >= 1 else { return }
-        persistRuntime()
-    }
-
-    private func persistRuntime(immediately: Bool = false) {
-        guard var runtime = runtimeState else { return }
-        runtime.session.sampleCounts = pendingCounts
-        runtime.lastPersistedAt = Date()
-        runtime.diagnostics.pendingUploadPeakCount = max(runtime.diagnostics.pendingUploadPeakCount, pendingUploadCount)
-        runtimeState = runtime
-        diagnostics = runtime.diagnostics
-        lastPersistedAt = runtime.lastPersistedAt
-        activeCollectionStore.save(runtime, immediately: immediately)
-    }
-
-    /// Only reached from `resumeInterruptedCollection()` (a genuine app-relaunch recovery), not
-    /// from ordinary foreground transitions. Queries from the session start date so the single
-    /// recovered sample is a cumulative value consistent with the live stream, never an
-    /// incremental delta since the last sample.
-    private func recoverPedometerIfNeeded(since timestamp: Date?) {
-        guard let timestamp, let session = activeSession, timestamp < Date() else { return }
-        let sessionStart = session.startedAt
-        pedometerService.recover(from: sessionStart) { [weak self] data in
-            guard let data else { return }
+        arkitTrackingService.onSessionReset = { [weak self] newArSessionId in
             DispatchQueue.main.async {
-                guard let self,
-                      let latest = self.runtimeState?.lastPedometerTimestamp,
-                      data.endDate > latest else { return }
-                print("[Diagnostics] PEDOMETER_HISTORICAL_RECOVERY from=\(sessionStart) to=\(data.endDate)")
-                self.record(pedometer: data, source: .historicalRecovery)
+                self?.arkitSessionId = newArSessionId
+                self?.logDiagnosticEvent("ARKIT_SESSION_RESET", metadata: ["arSessionId": newArSessionId.uuidString])
             }
         }
-    }
-
-    private func logDiagnosticEvent(_ type: String, metadata: [String: String] = [:]) {
-        telemetrySync?.logDiagnostic(eventType: type, metadata: metadata)
-    }
-
-    private func startUIRefreshTimer() {
-        refreshTimer?.invalidate()
-        refreshTimer = Timer.scheduledTimer(
-            timeInterval: 0.5,
-            target: self,
-            selector: #selector(publishUI),
-            userInfo: nil,
-            repeats: true
-        )
-    }
-
-    @objc private func publishUI() {
-        uiCounts = pendingCounts
-        latestLocation = pendingLocation
-        latestRelativeAltitude = pendingRelativeAltitude
-        latestStepCount = pendingStepCount
-    }
-}
-
-// MARK: - Raw WebSocket synchronization
-
-nonisolated private struct WebSocketRequest<Payload: Encodable>: Encodable {
-    let requestId: String
-    let type: String
-    let payload: Payload
-}
-
-nonisolated private extension Double {
-    /// JSONEncoder rejects NaN and infinity. Raw local samples remain untouched; only network DTOs are normalized.
-    var finiteOrNil: Double? { isFinite ? self : nil }
-}
-
-private struct WebSocketAck: Decodable {
-    let requestId: String
-    let ok: Bool
-}
-
-nonisolated private struct SessionStartPayload: Codable {
-    let clientSessionId: String
-    let deviceId: String
-    let platform = "ios"
-    let deviceModel: String
-    let systemVersion: String
-    let appVersion: String
-    let sensorCapabilities: SensorCapabilities
-    let startedAt: Date
-    // Top-level per the server contract (docs/HEALTH_STRIDE_SERVER_PLAN.md), not nested under
-    // sensorCapabilities. Omitted (nil) when no fresh candidate was ready at session start.
-    let strideCalibration: StrideCalibration?
-}
-
-private struct SessionStartResponse: Decodable {
-    let sessionId: String
-    // Decoded as plain strings (see StrideCalibrationAck) so a future status/reason value this
-    // build doesn't know about still decodes instead of failing the whole ACK. Absent on old
-    // servers, which is also just `nil` here, not an error.
-    let strideCalibration: StrideCalibrationAck?
-}
-
-nonisolated private struct AxisPayload: Codable {
-    let x: Double?
-    let y: Double?
-    let z: Double?
-}
-
-nonisolated private struct LocationPayload: Codable {
-    let sequence: Int
-    let timestamp: Date
-    let latitude: Double?
-    let longitude: Double?
-    let altitude: Double?
-    let ellipsoidalAltitude: Double?
-    let horizontalAccuracy: Double?
-    let verticalAccuracy: Double?
-    let speed: Double?
-    let course: Double?
-    let speedAccuracy: Double?
-    let courseAccuracy: Double?
-    let floor: Int?
-    let appState: String
-    let sensorSegmentId: String
-
-    init(_ sample: LocationSample) {
-        sequence = sample.sequence
-        timestamp = sample.timestamp
-        latitude = sample.latitude.finiteOrNil
-        longitude = sample.longitude.finiteOrNil
-        altitude = sample.altitude.finiteOrNil
-        ellipsoidalAltitude = sample.ellipsoidalAltitude?.finiteOrNil
-        horizontalAccuracy = sample.horizontalAccuracy.finiteOrNil
-        verticalAccuracy = sample.verticalAccuracy.finiteOrNil
-        speed = sample.speed.finiteOrNil
-        course = sample.course.finiteOrNil
-        speedAccuracy = sample.speedAccuracy.finiteOrNil
-        courseAccuracy = sample.courseAccuracy.finiteOrNil
-        floor = sample.floor
-        appState = sample.appState.rawValue.uppercased()
-        sensorSegmentId = sample.sensorSegmentId
-    }
-}
-
-nonisolated private struct MotionPayload: Codable {
-    let sequence: Int
-    let timestamp: Date
-    let userAcceleration: AxisPayload
-    let rotationRate: AxisPayload
-    let gravity: AxisPayload
-    let attitude: AttitudePayload
-    let appState: String
-    let sensorSegmentId: String
-
-    struct AttitudePayload: Codable {
-        let roll: Double?
-        let pitch: Double?
-        let yaw: Double?
-    }
-
-    init(_ sample: MotionSample) {
-        sequence = sample.sequence
-        timestamp = sample.timestamp
-        userAcceleration = AxisPayload(x: sample.userAccelerationX.finiteOrNil, y: sample.userAccelerationY.finiteOrNil, z: sample.userAccelerationZ.finiteOrNil)
-        rotationRate = AxisPayload(x: sample.rotationRateX.finiteOrNil, y: sample.rotationRateY.finiteOrNil, z: sample.rotationRateZ.finiteOrNil)
-        gravity = AxisPayload(x: sample.gravityX.finiteOrNil, y: sample.gravityY.finiteOrNil, z: sample.gravityZ.finiteOrNil)
-        attitude = AttitudePayload(roll: sample.attitudeRoll.finiteOrNil, pitch: sample.attitudePitch.finiteOrNil, yaw: sample.attitudeYaw.finiteOrNil)
-        appState = sample.appState.rawValue.uppercased()
-        sensorSegmentId = sample.sensorSegmentId
-    }
-}
-
-nonisolated private struct AltimeterPayload: Codable {
-    let sequence: Int
-    let timestamp: Date
-    let relativeAltitude: Double?
-    let pressure: Double?
-    let appState: String
-    let sensorSegmentId: String
-
-    init(_ sample: AltimeterSample) {
-        sequence = sample.sequence
-        timestamp = sample.timestamp
-        relativeAltitude = sample.relativeAltitude.finiteOrNil
-        pressure = sample.pressure.finiteOrNil
-        appState = sample.appState.rawValue.uppercased()
-        sensorSegmentId = sample.sensorSegmentId
-    }
-}
-
-nonisolated private struct PedometerPayload: Codable {
-    let sequence: Int
-    let timestamp: Date
-    let captureSource: String
-    let numberOfSteps: Int?
-    let distance: Double?
-    let currentPace: Double?
-    let currentCadence: Double?
-    let floorsAscended: Int?
-    let floorsDescended: Int?
-    let appState: String
-    let sensorSegmentId: String
-
-    init(_ sample: PedometerSample) {
-        sequence = sample.sequence
-        timestamp = sample.timestamp
-        captureSource = sample.captureSource.rawValue
-        numberOfSteps = sample.numberOfSteps
-        distance = sample.distance?.finiteOrNil
-        currentPace = sample.currentPace?.finiteOrNil
-        currentCadence = sample.currentCadence?.finiteOrNil
-        floorsAscended = sample.floorsAscended
-        floorsDescended = sample.floorsDescended
-        appState = sample.appState.rawValue.uppercased()
-        sensorSegmentId = sample.sensorSegmentId
-    }
-}
-
-nonisolated private struct TelemetryBatchPayload: Codable, Identifiable {
-    let batchId: String
-    var sessionId: String?
-    let clientSessionId: String
-    let createdAt: Date
-    let locations: [LocationPayload]
-    let motion: [MotionPayload]
-    let altimeter: [AltimeterPayload]
-    let pedometer: [PedometerPayload]
-
-    var id: String { batchId }
-}
-
-nonisolated private struct MarkerPayload: Codable, Identifiable {
-    let markerId: String
-    var sessionId: String?
-    let clientSessionId: String
-    let timestamp: Date
-    let type: String
-    let note: String?
-    let latitude: Double?
-    let longitude: Double?
-    let altitude: Double?
-    let ellipsoidalAltitude: Double? = nil
-    let horizontalAccuracy: Double?
-    let verticalAccuracy: Double?
-
-    var id: String { markerId }
-}
-
-nonisolated struct LastSequencesPayload: Codable {
-    let location: Int
-    let motion: Int
-    let altimeter: Int
-    let pedometer: Int
-}
-
-nonisolated private struct FinishPayload: Codable, Identifiable {
-    let clientSessionId: String
-    var sessionId: String?
-    let endedAt: Date
-    // Optional so a queue file persisted before this field existed still decodes instead of
-    // throwing and silently dropping every queued upload (session starts, batches, markers).
-    let lastSequences: LastSequencesPayload?
-
-    var id: String { clientSessionId }
-}
-
-nonisolated private struct DiagnosticEventItem: Codable {
-    let eventId: String
-    let eventType: String
-    let clientTimestamp: Date
-    let metadata: [String: String]
-}
-
-nonisolated private struct QueuedDiagnosticEvent: Codable, Identifiable {
-    let clientSessionId: String
-    let event: DiagnosticEventItem
-
-    var id: String { event.eventId }
-}
-
-nonisolated private struct DiagnosticEventPayload: Codable {
-    let clientSessionId: String
-    let events: [DiagnosticEventItem]
-}
-
-nonisolated private struct CollectorStatusPayload: Codable {
-    let sessionId: String
-    let collecting: Bool
-    let locationSampleCount: Int
-    let motionSampleCount: Int
-    let pendingBatchCount: Int
-}
-
-nonisolated private struct UploadQueueState: Codable {
-    var sessionStarts: [String: SessionStartPayload] = [:]
-    var serverSessionIds: [String: String] = [:]
-    var telemetry: [TelemetryBatchPayload] = []
-    var markers: [MarkerPayload] = []
-    var finishes: [FinishPayload] = []
-    var diagnosticEvents: [QueuedDiagnosticEvent] = []
-
-    init() {}
-
-    // Manual Decodable so a queue file persisted before `diagnosticEvents` existed still
-    // decodes (missing key -> empty array) instead of throwing and dropping every queued
-    // upload that was waiting to sync.
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionStarts = try container.decodeIfPresent([String: SessionStartPayload].self, forKey: .sessionStarts) ?? [:]
-        serverSessionIds = try container.decodeIfPresent([String: String].self, forKey: .serverSessionIds) ?? [:]
-        telemetry = try container.decodeIfPresent([TelemetryBatchPayload].self, forKey: .telemetry) ?? []
-        markers = try container.decodeIfPresent([MarkerPayload].self, forKey: .markers) ?? []
-        finishes = try container.decodeIfPresent([FinishPayload].self, forKey: .finishes) ?? []
-        diagnosticEvents = try container.decodeIfPresent([QueuedDiagnosticEvent].self, forKey: .diagnosticEvents) ?? []
-    }
-}
-
-private final class PersistentUploadQueue {
-    private let url: URL
-    private let encoder = TelemetrySyncCoordinator.makeEncoder()
-    private let decoder = TelemetrySyncCoordinator.makeDecoder()
-    private let storageQueue = DispatchQueue(label: "CampusTracker.upload-queue.storage", qos: .utility)
-    private var pendingSave: DispatchWorkItem?
-    var state: UploadQueueState
-
-    init(fileManager: FileManager = .default) {
-        let support = (try? fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)) ?? fileManager.temporaryDirectory
-        let directory = support.appendingPathComponent("CampusCollector", isDirectory: true)
-        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
-        url = directory.appendingPathComponent("pending_uploads.json")
-        if let data = try? Data(contentsOf: url), let decoded = try? decoder.decode(UploadQueueState.self, from: data) {
-            state = decoded
-        } else {
-            state = UploadQueueState()
-        }
-    }
-
-    func save() {
-        let snapshot = state
-        pendingSave?.cancel()
-
-        let workItem = DispatchWorkItem { [url, encoder] in
-            do {
-                let data = try encoder.encode(snapshot)
-                try data.write(to: url, options: .atomic)
-            } catch {
-                let field: String
-                if case let EncodingError.invalidValue(_, context) = error {
-                    field = context.codingPath.map(\.stringValue).joined(separator: ".")
-                } else {
-                    field = "unknown"
-                }
-                print("[UploadQueue] persistence failed field=\(field) error=\(String(reflecting: error))")
-            }
-        }
-        pendingSave = workItem
-
-        // Rapid ACKs previously re-encoded the entire backlog on the main actor.
-        // Coalescing adjacent snapshots keeps UI updates responsive while preserving
-        // the newest durable queue state.
-        storageQueue.asyncAfter(deadline: .now() + 0.1, execute: workItem)
-    }
-
-    var pendingCount: Int { state.telemetry.count + state.markers.count + state.finishes.count + state.diagnosticEvents.count }
-}
-
-@MainActor
-final class TelemetrySyncCoordinator {
-    var onPendingCountChanged: ((Int) -> Void)?
-    var onServerSessionStarted: ((UUID, String) -> Void)?
-
-    private let webSocket: RawWebSocketConnectionManager
-    private let queue = PersistentUploadQueue()
-    private var locations: [LocationPayload] = []
-    private var motion: [MotionPayload] = []
-    private var altimeter: [AltimeterPayload] = []
-    private var pedometer: [PedometerPayload] = []
-    private var activeSession: CollectionSession?
-    private var batchTimer: Timer?
-    private var statusTimer: Timer?
-    private var sampleCounts = SampleCounts()
-    private var awaiting = Set<String>()
-    private var ackHandlers: [String: (Bool, Data?) -> Void] = [:]
-    private let encodingQueue = DispatchQueue(label: "CampusTracker.websocket.encoding", qos: .userInitiated)
-
-    var pendingCount: Int { queue.pendingCount }
-
-    init(webSocket: RawWebSocketConnectionManager) {
-        self.webSocket = webSocket
-        webSocket.onConnected = { [weak self] in self?.handleConnected() }
-        webSocket.onDisconnected = { [weak self] in self?.handleDisconnected() }
-        webSocket.onTextMessage = { [weak self] in self?.handle(message: $0) }
-        notifyCount()
-    }
-
-    func start(session: CollectionSession, device: DeviceInfo) {
-        activeSession = session
-        let payload = SessionStartPayload(
-            clientSessionId: session.id.uuidString,
-            deviceId: device.deviceId.uuidString,
-            deviceModel: device.deviceModel,
-            systemVersion: device.systemVersion,
-            appVersion: device.appVersion,
-            sensorCapabilities: session.sensorCapabilities,
-            startedAt: session.startedAt,
-            strideCalibration: session.strideCalibration
-        )
-        queue.state.sessionStarts[session.id.uuidString] = payload
-        queue.save()
-        startBatchTimer()
-        startStatusTimer()
-        synchronize()
-    }
-
-    func finish(session: CollectionSession, lastSequences: LastSequencesPayload) {
-        flushBatch()
-        batchTimer?.invalidate()
-        batchTimer = nil
-        statusTimer?.invalidate()
-        statusTimer = nil
-        let id = session.id.uuidString
-        if !queue.state.finishes.contains(where: { $0.clientSessionId == id }) {
-            queue.state.finishes.append(FinishPayload(clientSessionId: id, sessionId: queue.state.serverSessionIds[id], endedAt: session.endedAt ?? Date(), lastSequences: lastSequences))
-            queue.save()
-        }
-        activeSession = nil
-        synchronize()
-    }
-
-    func append(location: LocationSample, session: CollectionSession) { locations.append(LocationPayload(location)); flushIfNeeded() }
-    func append(motion: MotionSample, session: CollectionSession) { self.motion.append(MotionPayload(motion)); flushIfNeeded() }
-    func append(altimeter: AltimeterSample, session: CollectionSession) { self.altimeter.append(AltimeterPayload(altimeter)); flushIfNeeded() }
-    func append(pedometer: PedometerSample, session: CollectionSession) { self.pedometer.append(PedometerPayload(pedometer)); flushIfNeeded() }
-
-    func append(marker: EventMarker, session: CollectionSession) {
-        queue.state.markers.append(MarkerPayload(
-            markerId: marker.id.uuidString,
-            sessionId: queue.state.serverSessionIds[session.id.uuidString],
-            clientSessionId: session.id.uuidString,
-            timestamp: marker.timestamp,
-            type: marker.type.rawValue,
-            note: marker.note,
-            latitude: marker.latitude?.finiteOrNil,
-            longitude: marker.longitude?.finiteOrNil,
-            altitude: marker.altitude?.finiteOrNil,
-            horizontalAccuracy: marker.horizontalAccuracy?.finiteOrNil,
-            verticalAccuracy: marker.verticalAccuracy?.finiteOrNil
-        ))
-        queue.save()
-        notifyCount()
-        synchronize()
-    }
-
-    func update(sampleCounts: SampleCounts) {
-        self.sampleCounts = sampleCounts
-    }
-
-    /// Local-first diagnostic events: not fusion input, used by the server only to explain gaps
-    /// and restarts. Queued the same way as markers/finishes so they survive app restarts and
-    /// disconnects, deduplicated server-side by `eventId`.
-    func logDiagnostic(eventType: String, metadata: [String: String] = [:]) {
-        guard let session = activeSession else { return }
-        queue.state.diagnosticEvents.append(QueuedDiagnosticEvent(
-            clientSessionId: session.id.uuidString,
-            event: DiagnosticEventItem(eventId: UUID().uuidString, eventType: eventType, clientTimestamp: Date(), metadata: metadata)
-        ))
-        queue.save()
-        notifyCount()
-        synchronize()
-    }
-
-    private func startBatchTimer() {
-        batchTimer?.invalidate()
-        batchTimer = Timer.scheduledTimer(
-            timeInterval: 1,
-            target: self,
-            selector: #selector(flushBatch),
-            userInfo: nil,
-            repeats: true
-        )
-    }
-
-    private func startStatusTimer() {
-        statusTimer?.invalidate()
-        statusTimer = Timer.scheduledTimer(
-            timeInterval: 7,
-            target: self,
-            selector: #selector(sendStatus),
-            userInfo: nil,
-            repeats: true
-        )
-    }
-
-    private func flushIfNeeded() {
-        if locations.count + motion.count + altimeter.count + pedometer.count >= 64 { flushBatch() }
-    }
-
-    @objc private func flushBatch() {
-        guard let session = activeSession, !(locations.isEmpty && motion.isEmpty && altimeter.isEmpty && pedometer.isEmpty) else { return }
-        print("[UploadQueue] flush session=\(session.id.uuidString) samples location=\(locations.count) motion=\(motion.count) altimeter=\(altimeter.count) pedometer=\(pedometer.count)")
-        queue.state.telemetry.append(TelemetryBatchPayload(
-            batchId: UUID().uuidString,
-            sessionId: queue.state.serverSessionIds[session.id.uuidString],
-            clientSessionId: session.id.uuidString,
-            createdAt: Date(),
-            locations: locations,
-            motion: motion,
-            altimeter: altimeter,
-            pedometer: pedometer
-        ))
-        locations.removeAll(keepingCapacity: true)
-        motion.removeAll(keepingCapacity: true)
-        altimeter.removeAll(keepingCapacity: true)
-        pedometer.removeAll(keepingCapacity: true)
-        queue.save()
-        notifyCount()
-        synchronize()
-    }
-
-    private func synchronize() {
-        print("[UploadQueue] flush start state=\(webSocket.state.label) pending=\(queue.pendingCount) starts=\(queue.state.sessionStarts.count)")
-        guard webSocket.state == .connected else {
-            print("[UploadQueue] flush paused: WebSocket is not connected")
-            return
-        }
-        sendMissingSessionStarts()
-    }
-
-    private func handleConnected() {
-        // A reconnect must repeat session:start with the same clientSessionId so the
-        // server can restore (rather than replace) the active session.
-        if let id = activeSession?.id.uuidString {
-            queue.state.serverSessionIds.removeValue(forKey: id)
-            queue.save()
-            print("[UploadQueue] reconnect handshake required clientSessionId=\(id)")
-        }
-        synchronize()
-    }
-
-    private func handleDisconnected() {
-        print("[UploadQueue] WebSocket disconnected; retaining pending=\(queue.pendingCount)")
-        let handlers = ackHandlers
-        ackHandlers.removeAll()
-        awaiting.removeAll()
-        handlers.values.forEach { $0(false, nil) }
-    }
-
-    private func sendMissingSessionStarts() {
-        guard let pair = queue.state.sessionStarts.first(where: { queue.state.serverSessionIds[$0.key] == nil }), !awaiting.contains("start-\(pair.key)") else {
-            sendNextTelemetry()
-            return
-        }
-        let key = pair.key
-        awaiting.insert("start-\(key)")
-        print("[UploadQueue] sending session:start clientSessionId=\(key)")
-        send(type: "session:start", payload: pair.value, itemID: key) { [weak self] ok, data in
-            guard let self = self else { return }
-            self.awaiting.remove("start-\(key)")
-            guard ok, let data = data,
-                  let response = try? Self.makeDecoder().decode(SessionStartResponse.self, from: data) else {
-                print("[UploadQueue] session:start ACK invalid or unsuccessful clientSessionId=\(key)")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.synchronize() }
-                return
-            }
-            self.queue.state.serverSessionIds[key] = response.sessionId
-            self.queue.save()
-            print("[UploadQueue] session:start ACK serverSessionId=\(response.sessionId)")
-            if let ack = response.strideCalibration {
-                print("[UploadQueue] session:start ACK strideCalibration status=\(ack.status) reason=\(ack.reason ?? "—")")
-            }
-            if let uuid = UUID(uuidString: key) { self.onServerSessionStarted?(uuid, response.sessionId) }
-            self.sendStatus()
-            self.synchronize()
-        }
-    }
-
-    private func sendNextTelemetry() {
-        guard let index = queue.state.telemetry.firstIndex(where: { !awaiting.contains("batch-\($0.batchId)") }) else {
-            sendNextMarker()
-            return
-        }
-        var batch = queue.state.telemetry[index]
-        guard let serverSessionId = batch.sessionId ?? queue.state.serverSessionIds[batch.clientSessionId] else {
-            print("[UploadQueue] blocked telemetry:batch batchId=\(batch.batchId) clientSessionId=\(batch.clientSessionId): no persisted server sessionId; preserving oldest-first order")
-            print("[UploadQueue] flush end pending=\(queue.pendingCount) blocked=batch")
-            return
-        }
-        batch.sessionId = serverSessionId
-        queue.state.telemetry[index] = batch
-        queue.save()
-        awaiting.insert("batch-\(batch.batchId)")
-        print("[UploadQueue] sending telemetry:batch batchId=\(batch.batchId)")
-        send(type: "telemetry:batch", payload: batch, itemID: batch.batchId) { [weak self] ok, _ in
-            guard let self = self else { return }
-            self.awaiting.remove("batch-\(batch.batchId)")
-            if ok, let index = self.queue.state.telemetry.firstIndex(where: { $0.batchId == batch.batchId }) {
-                self.queue.state.telemetry.remove(at: index)
-                self.queue.save()
-                self.notifyCount()
-            }
-            self.synchronize()
-        }
-    }
-
-    private func sendNextMarker() {
-        guard let index = queue.state.markers.firstIndex(where: { !awaiting.contains("marker-\($0.markerId)") }) else {
-            sendNextFinish()
-            return
-        }
-        var marker = queue.state.markers[index]
-        guard let serverSessionId = marker.sessionId ?? queue.state.serverSessionIds[marker.clientSessionId] else {
-            print("[UploadQueue] blocked marker:create markerId=\(marker.markerId) clientSessionId=\(marker.clientSessionId): no persisted server sessionId; preserving oldest-first order")
-            print("[UploadQueue] flush end pending=\(queue.pendingCount) blocked=marker")
-            return
-        }
-        marker.sessionId = serverSessionId
-        queue.state.markers[index] = marker
-        queue.save()
-        awaiting.insert("marker-\(marker.markerId)")
-        print("[UploadQueue] sending marker:create markerId=\(marker.markerId)")
-        send(type: "marker:create", payload: marker, itemID: marker.markerId) { [weak self] ok, _ in
-            guard let self = self else { return }
-            self.awaiting.remove("marker-\(marker.markerId)")
-            if ok, let index = self.queue.state.markers.firstIndex(where: { $0.markerId == marker.markerId }) {
-                self.queue.state.markers.remove(at: index)
-                self.queue.save()
-                self.notifyCount()
-            }
-            self.synchronize()
-        }
-    }
-
-    private func sendNextFinish() {
-        guard let index = queue.state.finishes.firstIndex(where: { !awaiting.contains("finish-\($0.clientSessionId)") }) else {
-            sendNextDiagnosticEvent()
-            return
-        }
-        var finish = queue.state.finishes[index]
-        guard let serverSessionId = finish.sessionId ?? queue.state.serverSessionIds[finish.clientSessionId] else {
-            print("[UploadQueue] blocked session:finish clientSessionId=\(finish.clientSessionId): no persisted server sessionId")
-            print("[UploadQueue] flush end pending=\(queue.pendingCount)")
-            return
-        }
-        finish.sessionId = serverSessionId
-        queue.state.finishes[index] = finish
-        queue.save()
-        awaiting.insert("finish-\(finish.clientSessionId)")
-        print("[UploadQueue] sending session:finish clientSessionId=\(finish.clientSessionId)")
-        send(type: "session:finish", payload: finish, itemID: finish.clientSessionId) { [weak self] ok, _ in
-            guard let self = self else { return }
-            self.awaiting.remove("finish-\(finish.clientSessionId)")
-            if ok, let index = self.queue.state.finishes.firstIndex(where: { $0.clientSessionId == finish.clientSessionId }) {
-                self.queue.state.finishes.remove(at: index)
-                self.queue.state.sessionStarts.removeValue(forKey: finish.clientSessionId)
-                self.queue.state.serverSessionIds.removeValue(forKey: finish.clientSessionId)
-                self.queue.save()
-                self.notifyCount()
-            }
-            self.synchronize()
-        }
-    }
-
-    private func sendNextDiagnosticEvent() {
-        guard let index = queue.state.diagnosticEvents.firstIndex(where: { !awaiting.contains("diagnostic-\($0.event.eventId)") }) else {
-            print("[UploadQueue] flush end pending=\(queue.pendingCount)")
-            return
-        }
-        let queued = queue.state.diagnosticEvents[index]
-        awaiting.insert("diagnostic-\(queued.event.eventId)")
-        print("[UploadQueue] sending diagnostic:event eventId=\(queued.event.eventId) type=\(queued.event.eventType)")
-        let payload = DiagnosticEventPayload(clientSessionId: queued.clientSessionId, events: [queued.event])
-        send(type: "diagnostic:event", payload: payload, itemID: queued.event.eventId) { [weak self] ok, _ in
-            guard let self = self else { return }
-            self.awaiting.remove("diagnostic-\(queued.event.eventId)")
-            if ok, let index = self.queue.state.diagnosticEvents.firstIndex(where: { $0.event.eventId == queued.event.eventId }) {
-                self.queue.state.diagnosticEvents.remove(at: index)
-                self.queue.save()
-                self.notifyCount()
-            }
-            self.synchronize()
-        }
-    }
-
-    @objc private func sendStatus() {
-        guard webSocket.state == .connected,
-              let session = activeSession,
-              let serverSessionId = queue.state.serverSessionIds[session.id.uuidString] else { return }
-        let payload = CollectorStatusPayload(
-            sessionId: serverSessionId,
-            collecting: true,
-            locationSampleCount: sampleCounts.location,
-            motionSampleCount: sampleCounts.motion,
-            pendingBatchCount: queue.state.telemetry.count
-        )
-        send(type: "collector:status", payload: payload, itemID: serverSessionId) { _, _ in }
-    }
-
-    private func send<Payload: Encodable>(type: String, payload: Payload, itemID: String, completion: @escaping (Bool, Data?) -> Void) {
-        let requestId = UUID().uuidString
-        let request = WebSocketRequest(requestId: requestId, type: type, payload: payload)
-
-        encodingQueue.async { [weak self] in
-            let result: Result<Data, Error>
-            do {
-                result = .success(try Self.makeEncoder().encode(request))
-            } catch {
-                result = .failure(error)
-            }
-
+        arkitTrackingService.onError = { [weak self] message in
             DispatchQueue.main.async {
-                guard let self = self else { return }
-                switch result {
-                case let .failure(error):
-                    let field: String
-                    if case let EncodingError.invalidValue(_, context) = error {
-                        field = context.codingPath.map(\.stringValue).joined(separator: ".")
-                    } else {
-                        field = "unknown"
-                    }
-                    print("[WebSocket] JSON encode failed type=\(type) item=\(itemID) field=\(field) error=\(String(reflecting: error))")
-                    completion(false, nil)
-
-                case let .success(data):
-                    guard let text = String(data: data, encoding: .utf8) else {
-                        print("[WebSocket] UTF-8 conversion failed type=\(type) item=\(itemID)")
-                        completion(false, nil)
-                        return
-                    }
-                    print("[WebSocket] send type=\(type) requestId=\(requestId) item=\(itemID) bytes=\(data.count)")
-                    self.ackHandlers[requestId] = completion
-                    self.webSocket.send(text: text) { [weak self] error in
-                        DispatchQueue.main.async {
-                            guard let self = self else { return }
-                            if let error = error {
-                                print("[WebSocket] send completed type=\(type) requestId=\(requestId) error=\(error.localizedDescription)")
-                                self.resolve(requestId: requestId, ok: false, data: nil)
-                            } else {
-                                print("[WebSocket] send completed type=\(type) requestId=\(requestId) error=nil")
-                            }
-                        }
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
-                        self?.resolve(requestId: requestId, ok: false, data: nil)
-                    }
-                }
+                self?.arkitError = message
+                self?.logDiagnosticEvent("ARKIT_ERROR", metadata: ["message": message])
+            }
+        }
+        arkitTrackingService.onInterruption = { [weak self] began in
+            DispatchQueue.main.async {
+                self?.logDiagnosticEvent(began ? "ARKIT_INTERRUPTED" : "ARKIT_INTERRUPTION_ENDED")
             }
         }
     }
 
-    private func handle(message text: String) {
-        guard let data = text.data(using: .utf8), let ack = try? Self.makeDecoder().decode(WebSocketAck.self, from: data) else {
-            print("[WebSocket] ignored non-ACK message bytes=\(text.utf8.count)")
-            return
-        }
-        let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
-        let responseData = object? ["data"].flatMap { try? JSONSerialization.data(withJSONObject: $0) }
-        let errorObject = object?["error"] as? [String: Any]
-        let errorCode = (errorObject?["code"] as? String) ?? "—"
-        let duplicate = (object?["duplicate"] as? Bool) ?? ((object?["data"] as? [String: Any])?["duplicate"] as? Bool) ?? false
-        let retryable = errorObject?["retryable"] as? Bool
-        print("[WebSocket] ACK requestId=\(ack.requestId) ok=\(ack.ok) duplicate=\(duplicate) errorCode=\(errorCode) retryable=\(retryable.map(String.init) ?? "—")")
-        resolve(requestId: ack.requestId, ok: ack.ok, data: responseData)
-    }
+    // MARK: Core events
 
-    private func resolve(requestId: String, ok: Bool, data: Data?) {
-        guard let handler = ackHandlers.removeValue(forKey: requestId) else { return }
-        handler(ok, data)
-    }
-
-    private func notifyCount() { onPendingCountChanged?(queue.pendingCount) }
-
-    nonisolated static func makeEncoder() -> JSONEncoder {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .custom { date, encoder in
-            let formatter = ISO8601DateFormatter()
-            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            var container = encoder.singleValueContainer()
-            try container.encode(formatter.string(from: date))
-        }
-        return encoder
-    }
-
-    nonisolated static func makeDecoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let formatter = ISO8601DateFormatter()
-            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let container = try decoder.singleValueContainer()
-            let value = try container.decode(String.self)
-            guard let date = formatter.date(from: value) else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ISO-8601 date")
+    private func handle(_ event: CollectionCoreEvent) {
+        switch event {
+        case let .snapshot(snapshot):
+            guard snapshot.sessionID == activeSession?.id else { return }
+            uiCounts = snapshot.acceptedCounts
+            durableCounts = snapshot.durableCounts
+            latestLocation = snapshot.latestLocation ?? latestLocation
+            latestRelativeAltitude = snapshot.latestRelativeAltitude ?? latestRelativeAltitude
+            if verticalReference == nil { verticalReference = latestRelativeAltitude }
+            latestStepCount = snapshot.latestStepCount ?? latestStepCount
+            arkitPoseCount = snapshot.arkitPoseCount
+            arkitLastPoseAt = snapshot.arkitLastPoseAt
+            if let frame = snapshot.walkingFrame { walkingFrameSnapshot = frame }
+            if let quality = snapshot.magneticQuality { magneticCalibrationQuality = quality }
+            runtimeState = snapshot.state
+            diagnostics = snapshot.state.diagnostics
+            lastPersistedAt = snapshot.lastCommitAt
+            uploadEngine?.update(sampleCounts: snapshot.acceptedCounts)
+            detectSensorCallbackStalls(now: Date())
+        case let .uploadItemsCommitted(items):
+            uploadEngine?.ingest(items)
+        case let .storageFailure(sessionID, code, message):
+            guard sessionID == activeSession?.id else { return }
+            if captureState == .recording {
+                stopSensors()
+                UIApplication.shared.isIdleTimerDisabled = false
             }
-            return date
+            if captureState != .stopping { captureState = .storageFailure }
+            captureStorageError = "\(code): \(message)"
+        case let .diagnostic(sessionID, type, metadata):
+            logDiagnosticEvent(type, metadata: metadata, sessionID: sessionID)
+        case let .arkitBackpressurePaused(sessionID, backlog, age):
+            guard sessionID == activeSession?.id else { return }
+            arkitTrackingService.stop()
+            arkitBackpressurePaused = true
+            logDiagnosticEvent("ARKIT_BACKPRESSURE_PAUSED", metadata: [
+                "pendingPoses": String(backlog), "oldestAgeSeconds": String(format: "%.1f", age)], sessionID: sessionID)
         }
-        return decoder
+    }
+
+    private func logDiagnosticEvent(_ type: String, metadata: [String: String] = [:], sessionID: UUID? = nil) {
+        guard let id = sessionID ?? activeSession?.id else { return }
+        uploadEngine?.logDiagnostic(eventType: type, metadata: metadata, clientSessionId: id.uuidString)
+    }
+
+    private func detectSensorCallbackStalls(now: Date) {
+        guard activeSession != nil else { return }
+        if motionService.isActive, let last = runtimeState?.lastMotionTimestamp {
+            if now.timeIntervalSince(last) >= 2, !motionStallReported {
+                motionStallReported = true
+                logDiagnosticEvent("SENSOR_CALLBACK_STALLED", metadata: [
+                    "sensor": "motion", "seconds": String(format: "%.1f", now.timeIntervalSince(last)), "appState": appState.rawValue])
+            } else if now.timeIntervalSince(last) < 2 {
+                motionStallReported = false
+            }
+        }
+        if altimeterService.isActive, let last = runtimeState?.lastAltimeterTimestamp {
+            if now.timeIntervalSince(last) >= 5, !altimeterStallReported {
+                altimeterStallReported = true
+                logDiagnosticEvent("SENSOR_CALLBACK_STALLED", metadata: [
+                    "sensor": "altimeter", "seconds": String(format: "%.1f", now.timeIntervalSince(last)), "appState": appState.rawValue])
+            } else if now.timeIntervalSince(last) < 5 {
+                altimeterStallReported = false
+            }
+        }
+    }
+
+    // MARK: Test seams (real ingress → core → SQLite path, no sensor hardware)
+
+    func ingestSyntheticMotionForTesting(nativeTimestamp: TimeInterval) {
+        guard let context = contexts[.motion] else { return }
+        let zero = Vector3D(x: 0, y: 0, z: 0)
+        core.submit(.now(.motion(MotionCapture(nativeTimestamp: nativeTimestamp, userAcceleration: zero, rotationRate: zero,
+            gravity: Vector3D(x: 0, y: 0, z: -1), roll: 0, pitch: 0, yaw: 0,
+            quaternion: QuaternionD(x: 0, y: 0, z: 0, w: 1), magneticField: nil)), appState: appStateBox.value),
+            context: context)
+    }
+
+    func ingestSyntheticForTesting(_ payload: CapturedPayload) {
+        guard let context = contexts[payload.stream] else { return }
+        core.submit(.now(payload, appState: appStateBox.value), context: context)
+    }
+
+    func waitForCaptureIdleForTesting() { core.waitUntilIdleForTesting() }
+
+    var captureContextsForTesting: [CaptureStream: TrackingCaptureContext] { contexts }
+
+    var sensorRunClockIdentityForTesting: (Date, Date, Date)? {
+        guard let clocks = lastPreparedClocks else { return nil }
+        return (clocks.motion.epochAtAnchor, clocks.altimeter.epochAtAnchor, clocks.arkit.epochAtAnchor)
     }
 }

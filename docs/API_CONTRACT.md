@@ -126,7 +126,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 - 같은 `clientSessionId` 재전송 → 기존 세션 반환 (idempotent).
 - `strideCalibration`은 선택 입력이다. 서버가 평지 보폭 요약을 검사해 세션 시작 시 고정하며 오류·누락·오래된 자료는 fallback 처리한다. 같은 `clientSessionId` 재전송은 최초 결정을 유지한다. 성공 ACK의 `strideCalibration.status/reason`은 `ACCEPTED` 또는 `FALLBACK` 판정이다. `ACCEPTED`는 모든 걸음에 적용됐다는 뜻이 아니다.
 - 같은 device의 다른 ACTIVE 세션은 `INTERRUPTED`로 바뀜 (앱 크래시 후 새 세션 대비).
-- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE" }`
+- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE", "resumed": false, "supportedTelemetryFeatures": ["absoluteAltitudeV1"] }`
+- `supportedTelemetryFeatures`는 서버가 저장하는 선택 스트림 목록이다. 새 세션과 재전송(`resumed: true`) 응답 모두 포함한다. 목록에 없는 선택 스트림은 보내지 않는다(구서버는 모르는 필드를 버리고 ACK만 성공시킨다).
 - 에러: `DEVICE_MISMATCH`(403), `SESSION_CONFLICT`(409, 다른 collector가 쓴 clientSessionId)
 
 ### `session:finish`
@@ -153,6 +154,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
     "attitude":         { "roll": 0.1, "pitch": 0.2, "yaw": 1.5 }
   }],
   "altimeter": [{ "sequence": 12, "timestamp": "...", "relativeAltitude": 1.25, "pressure": 100.9 }],
+  "absoluteAltitude": [{ "sequence": 1, "timestamp": "...", "altitude": 150.2, "accuracy": 4.8,
+                         "precision": 0.5, "verticalReference": "APPLE_MSL", "invalidReason": null }],
   "pedometer": [{ "timestamp": "...", "numberOfSteps": 120, "distance": 84.2, "currentPace": 0.6,
                   "currentCadence": 1.9, "floorsAscended": 0, "floorsDescended": 0 }]
 }
@@ -177,6 +180,8 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
   "altitude": 82.4, "ellipsoidalAltitude": 105.7, "horizontalAccuracy": 3.1, "verticalAccuracy": 5.2 }
 ```
 - `type`: `entrance | intersection | stairStart | stairEnd | rampStart | rampEnd | elevator | stop | custom` (그 외 문자열도 저장됨, 최대 32자)
+- **수집 기준점** (모두 선택, 예전 앱은 안 보냄): `nodeId`(mobility 노드 UUID), `buildingId`(건물 ID, 바깥이면 `"outdoor"`), `floor`, `direction`(`up`·`down`), `fromFloor`, `toFloor`. 층 이름은 `1F`…`15F`, `B1`…`B9`(소문자도 받아 대문자로 저장, 그 외 형식은 400). 기준점 종류: `sessionStart`(시작 버튼 전 노드·건물·층), `sessionEnd`(끝 버튼 때), `stairStart`/`stairEnd`(방향·출발 층·도착 층), `elevatorBoard`/`elevatorExit`(탄 층·내린 층), `entrance`(입구 노드·건물·층), `rampStart`/`rampEnd`(방향). 실내 노드가 없는 층은 건물+층만 보낸다. 바깥은 노드가 필수다.
+- `nodeId`가 있으면 서버가 그 시각의 노드 위치를 함께 저장한다(나중에 노드가 지워져도 Fusion이 씀). 세션이 끝난 뒤 도착한 노드 기준점은 최종 재처리를 다시 예약한다.
 - `markerId` 재전송 → `{ "ok": true, "markerId": "...", "duplicate": true }`
 - ACK `{ "ok": true, "markerId": "...", "duplicate": false }`
 
@@ -200,7 +205,7 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 | `fusion:reprocessed` | `{ sessionId, collectorId, algorithmVersion, count }` — 해당 version 결과가 통째로 재계산됨, REST로 다시 받을 것 |
 | `fusion:sensor-events` | `{ sessionId, collectorId, algorithmVersion, events }` — fusion-v3.1의 앵커·추적 상태·센서 품질 판정 |
 | `location:update` | `{ collectorId, sessionId, sequence, longitude, latitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy, timestamp }` — 새로 저장된 point마다 1개 |
-| `marker:created` | `{ collectorId, markerId, sessionId, timestamp, type, note, latitude, longitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy }` |
+| `marker:created` | `{ collectorId, markerId, sessionId, timestamp, type, note, latitude, longitude, altitude, ellipsoidalAltitude, horizontalAccuracy, verticalAccuracy, nodeId, buildingId, floor, direction, fromFloor, toFloor }` |
 
 Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 
@@ -223,7 +228,10 @@ Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 | `GET /api/v1/sessions?collectorId=C03&status=ACTIVE&limit=50` | 최신순 `SessionView[]` (limit 1–500, 기본 50) |
 | `GET /api/v1/sessions/:sessionId` | `SessionView` |
 | `GET /api/v1/sessions/:sessionId/locations` | sequence 순 전체 point |
-| `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker |
+| `POST /api/v1/sessions/:sessionId/interrupt` | 수동 인터럽트: ACTIVE → INTERRUPTED 후 최종 재처리. 허용 조건은 `SessionView.manualInterruptBlock === null` — ACTIVE이고, collector 소켓이 끊겨 있고, `syncState`가 `OFFLINE`(최근 수신 없음)일 때만. 아니면 409 `INTERRUPT_NOT_ACTIVE` / `INTERRUPT_COLLECTOR_CONNECTED` / `INTERRUPT_RECENTLY_RECEIVED`. 원시 데이터는 지우지 않고, 이후 올라오는 데이터는 늦은 업로드로 저장되어 다시 최종화된다. 폰에는 알리지 않는다. 추적 이벤트 `SERVER_MANUAL_INTERRUPT` |
+| `GET /api/v1/sessions/:sessionId/diagnostic-events` | 폰 수명주기 이벤트 + 서버 추적(`SERVER_*`, `source: "server"`)을 시각순으로. 서버 추적: `SERVER_FINISH_RECEIVED`(`duplicate`, `manifest`, `finalReplay`), `SERVER_SYNC_COMPLETE_RECEIVED`(`synchronized`, `behind`), `SERVER_FINALIZE_COMPLETED`(`runId`, `outputs`), `SERVER_FINALIZE_FAILED`(`message`). 분석용이며 fusion 입력이 아님 |
+| `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker. 기준점 칸과 `node{x, y, z, current}`(EPSG:5186, 바닥 MSL 높이, `current=false`는 지금은 없는 노드의 저장 당시 위치), `fused`(fusion-v4 궤적에 맞춘 위치·높이) 포함 |
+| `GET /api/v1/mobility/nodes?buildingId=&floor=&latitude=&longitude=&limit=50&includeUnknownFloor=true` | 기준점으로 고를 노드(인증 없음). `{ buildings: [{ buildingId, buildingName, nodeCount, floorsWithNodes }], nodes: [{ nodeId, kind, buildingId, floor, structures, label, latitude, longitude, heightM, distanceM }] }`. 건물은 길의 `building_id` → 노드가 든 건물 윤곽 → `outdoor` 순. 층은 노드·길의 `levelId`에서 읽고(`3층`→`3F`), 모르면 `null`. 층을 주면 그 층 노드 먼저, 다음에 층 모르는 노드(끄려면 `includeUnknownFloor=false`), 각각 가까운 순 |
 | `GET /api/v1/sessions/:sessionId/fused-positions?algorithmVersion=fusion-v1` | fusion 결과, timestamp/fusionSequence 순 (기본 version = realtime version). v3.1은 최초 앵커 전까지 위치 출력을 만들지 않으며 상태·판정 이력은 `fusion-events`에서 조회 |
 | `GET /api/v1/sessions/:sessionId/fusion` | 저장된 version별 개수/기간, version별 최신 `fusion_runs`(metrics 포함), realtime state 요약 |
 | `GET /api/v1/sessions/:sessionId/fusion-events?algorithmVersion=fusion-v3.1` | 센서 추적 상태 변화, GPS 앵커 판정, 재획득 사유 등 위치 출력이 없어도 남는 진단 이력 |
@@ -234,7 +242,26 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 
 **fusion-v2.1 추가 진단 필드**: `localX/localY/localZ`(m), `gpsQuality`(`EXCELLENT`·`GOOD`·`MARGINAL`·`POOR`·`UNUSABLE`), `pdrApplied`, `pdrRejectReason`(`NO_HEADING`·`NOT_INITIALIZED`·`NEGATIVE_DELTA`·`NOT_FINITE`·`OVERSPEED_CLAMPED`), `relativeAltitude`, `reanchored`, `reanchorReason`(`GPS_CLUSTER`·`GPS_TRACK`·`DIVERGENCE`), `divergenceDetected`. v2.1의 `headingSource`: `UNKNOWN`·`GPS_COURSE`·`GPS_TWO_POINT`·`YAW_DELTA`, `gpsRejectReason`에 `UNUSABLE_ACCURACY` 추가.
 
-`SessionView`: `sessionId, clientSessionId, collectorId, device{deviceId, clientDeviceId, platform, deviceModel, systemVersion, appVersion}, startedAt, endedAt, status, sensorCapabilities, locationCount, markerCount, lastLocationAt`
+`SessionView`: `sessionId, clientSessionId, collectorId, device{deviceId, clientDeviceId, platform, deviceModel, systemVersion, appVersion}, startedAt, endedAt, status, sensorCapabilities, locationCount, markerCount, lastLocationAt, trainingLabel`
+
+**`trainingLabel`(학습용 유효)**: `{ valid, problems[], anchors, nodeAnchors }`. `valid`는 시작·끝 기준점(건물+층, 바깥이면 노드)이 있고 계단·승강기 기준점이 시작·끝 짝으로 방향·층을 갖출 때 true. `problems`: `START_MISSING`·`START_INCOMPLETE`·`END_MISSING`·`END_INCOMPLETE`·`STAIR_UNPAIRED`·`STAIR_INCOMPLETE`·`ELEVATOR_UNPAIRED`·`ELEVATOR_INCOMPLETE`·`ENTRANCE_INCOMPLETE`·`RAMP_INCOMPLETE`. 예전 앱 세션은 `START_MISSING`으로 나온다(거부하지 않음).
+
+**세션 상세(`GET /sessions/:sessionId`)의 `finalization`**: `finishRequestedAt`, `manifestReceived`, `manifestSynchronized`(manifest 없으면 null), `finalReplayScheduled`, `fusionState`, `needsReprocess`, `finalizedAt`, `lastPublishedRun{id,status,trigger,completedAt,error}`, `pendingOnDevice`(`0` / `"SOME"` / manifest가 없으면 `null` — 서버는 폰의 미전송 개수를 알 수 없으며 0으로 추정하지 않음). ACTIVE는 무수신 시간으로 종료되지 않는다(`collectionState`와 `syncState`는 별개).
+
+**fusion-v4 rev 17 수집 기준점**: 최종 재처리에서 `nodeId`가 있는 marker마다 노드 위치를 부드러운 XY 고정점(σ 2 m)으로 넣고, `노드 바닥 높이 + 휴대폰 높이 1 m − 그 시각 기압 Z`를 높이 영점 관측(σ 1 m)으로 넣는다. 다른 지면·길 접촉과 함께 평활되며, 그런 세션의 `zDatumSource`는 `MARKER_ANCHOR`다. 실시간 경로에는 쓰지 않는다. 끄려면 `markerAnchorsEnabled=false`. run metrics의 `markerAnchors{count, heightContacts}`.
+
+**fusion-v4의 `relativeAltitude`**: 원시 `CMAltimeter.relativeAltitude`가 아니라 엔진의 상대 Z(`localZ`와 같은 값)다. 세션 첫 기압 샘플을 0으로 두고, 센서 구간이 바뀌면(재시작) 직전 값에 이어 붙인다 — 공백 동안의 실제 높이 변화는 알 수 없다(`metrics.altimeterRebases`가 그 횟수). `ellipsoidalAltitude`가 null이고 `zDatumSource`가 `NONE`이면 절대 고도는 미확정이며, 프리뷰는 그 점을 지면(DEM+1 m)에 투영해 그리기만 한다(층 표시 없음).
+
+## Lab replay (비공개 실험 run)
+
+`POST /api/v1/sessions/:sessionId/replays` body `{ algorithmVersion, mode: "SENSOR_TIME" | "AS_RECEIVED", publish?: false, variant?, overrides?, cutoff?, finalize? }`
+
+- `cutoff`(ISO, 선택): 이 센서 시각까지 캡처된 원시 행만 입력으로 쓴다(포함). 서로 다른 세션, 또는 ACTIVE 세션과 종료된 세션을 같은 구간으로 비교할 때 사용.
+- `finalize`(선택, SENSOR_TIME): `false`면 시간순 전방만 계산(평활화 없음). 기본은 전방(FORWARD)과 평활화(FINAL) 두 단계를 모두 스냅샷에 저장.
+- `cutoff` 또는 `finalize:false`가 있는 run은 게시할 수 없다(`NOT_PUBLISHABLE`). 실험 run은 `fused_positions`, 세션 상태, 실시간 상태, CLEAN/DIRTY를 바꾸지 않는다.
+- 한 run의 입력은 하나의 DB 스냅샷(repeatable read)에서 읽는다: 실행 중 도착한 배치는 통째로 포함되거나 통째로 빠진다.
+- 응답과 `fusion_runs.metrics.replay`: `mode`, `ordering`(`SENSOR_TIME` / `ARRIVAL_BATCHES`), `reorderWindowMs`, `published`, `continuesLive`(ACTIVE 세션의 게시 재처리: 전방만, 마지막 구간 flush 안 함), `finalizeRequested`, `finalizeApplied`, `sessionStatusAtRun`, `input{cutoff, counts, firstSensorAt, lastSensorAt, hash}`(같은 hash = 같은 fusion 입력, 도착 순서와 무관), `revision`, `spatialMapVersionId`, `terrainVersionId`, `stages{forward, final}`(경로 길이·최대 점프·방향 미확정 시간·절대 고도 출력 수 등), `asReceived{batches, outOfOrderBatches, skippedLateObservations}`.
+- 읽기 전용 비교(아무것도 쓰지 않음): `npm run fusion:compare -- --session=<id> --session=<id> --cutoff=<iso> [--from=<iso>] [--set stepTimeBased=true]`.
 
 # 공간 지도와 fusion-v3 / fusion-v3.1
 
@@ -244,3 +271,26 @@ fused position 공통 필드 외 **fusion-v2 진단 필드** (v1은 null): `gpsU
 - `fusion-v3` 결과에는 `spatialMapVersionId`, `spatialStatus`, `spatialSegmentId`, `buildingId`, `buildingName`, `buildingMatchStatus` 진단 필드가 포함됩니다. 건물 필드는 위치 보정에 영향을 주지 않습니다.
 - `fusion-v3.1`도 지도 버전을 고정하고 캠퍼스 출력 필터를 적용합니다. 고정밀 GPS 관측 묶음이 없으면 절대 위경도 출력은 만들지 않고 추적 상태와 센서 이력을 저장합니다. 기압 높이는 상대값이며 `ellipsoidalAltitude`와 층수를 대신하지 않습니다.
 - v3를 켜려면 먼저 DB migration과 `npm run spatial:import`를 실행한 뒤 세션별로 v3를 재처리합니다. 실시간 기본 알고리즘 전환은 대표 경로 비교가 끝난 뒤 `ACTIVE_FUSION_VERSION=fusion-v3`로 설정합니다.
+
+
+## ARKit VIO (schemaVersion 1)
+
+기존 Collector 연결에 `arkit.pose` / `arkit:pose` 이벤트가 추가되었습니다. 일반 WebSocket은 기존 `requestId/type/payload` envelope를 유지하고, Socket.IO는 동일 pose 객체를 이벤트 payload로 전송합니다. payload의 `type`은 `arkit.pose`, 시각은 Unix epoch milliseconds입니다. 기존 telemetry 계약은 유지됩니다. 필수 필드·ACK·제한·세션 초기화·REST 계약은 [ARKit VIO 서버 통합](ARKIT_VIO_SERVER.md#websocket-계약-v1)을 참조하세요.
+
+### iOS absoluteAltitudeV1 (선택 스트림)
+
+`session:start` 응답의 `supportedTelemetryFeatures`에 `absoluteAltitudeV1`이 포함되면 위 선택 배열을 전송할 수 있다. 새 관측은 독립 sequence·측정 시각·sensorSegmentId를 가지며, 상대 기압 샘플에 복사하지 않는다. 해수면 기준 `APPLE_MSL` 값과 추정 오차 `accuracy`, 표시 해상도 `precision`을 원본 그대로 보존한다. null 수치와 음의 고도를 허용하며, `invalidReason`이 있는 관측도 저장하되 기준 채택에서는 제외한다. 이 배열의 `timestamp`가 비정상(2020년 이전 또는 하루 이상 미래)이면 배치를 거절하지 않고 그 행을 `TIMESTAMP_IMPLAUSIBLE`로 저장한다. 다른 스트림은 여전히 배치 단위로 거절한다.
+
+`session:finish`와 `session:syncComplete`의 `lastSequences.absoluteAltitude`는 마지막 보존 sequence이며, 빈 스트림은 -1이다. 서버가 광고한 스트림도 기존 스트림과 같은 저장·동기화 보장을 적용한다. 구버전의 필드 누락은 호환된다.
+
+`fusion-v4` revision 15는 `sensorCapabilities.absoluteAltitudeEnabled=true`인 세션 또는 실제 새 관측이 있는 세션에 새 정책을 적용한다. 기본 `absoluteAltitudeMode=fallback`에서 검증한 값은 `zDatumSource=CM_ABSOLUTE`로 기록하고 상대 Z와 함께 추적한다. 검증된 기준이 없으면 지면층을 가정하지 않고 절대 높이를 null로 둔다. 이전 앱·기록은 기존 정책을 유지한다. `CM_ABSOLUTE`는 잠정 추정이며 층 확정의 근거가 아니다. 세부 조건과 배포 순서는 [서버 적용 문서](ABSOLUTE_ALTITUDE_SERVER.md)를 따른다.
+
+
+## BLE iBeacon (beaconObservationsV1)
+
+`session:start` 응답의 `supportedTelemetryFeatures`에 `beaconObservationsV1`이 있으면 같은 연결로 `beacon.observations.v1`
+(Socket.IO는 `beacon.observations.v1` / `beacon:observations.v1`)을 보낼 수 있다. 없으면 보내지 않고 휴대폰에 보관한다.
+기존 메시지·ACK·`lastSequences` manifest는 바뀌지 않았다(비콘은 manifest에 들어가지 않는다). 비콘 설정은
+`GET /api/v1/positioning/beacon-config`(collector 토큰, ETag), 레지스트리 관리는 `/api/v1/positioning/admin/*`.
+`fused_positions`/`position:fused`에 `floorLabel`, `floorBuildingId`, `floorSource`, `floorConfidence`, `beaconUpdates`(fusion-v4 rev 18,
+없으면 null)와 `source` 값 `BEACON_CORRECTED`·`BEACON_ANCHORED`가 추가되었다. 상세: [BLE 비콘 위치추정](BEACON_POSITIONING.md).

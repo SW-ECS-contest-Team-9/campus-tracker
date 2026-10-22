@@ -18,8 +18,20 @@ import type { FusionEventV31 } from './fusion-v31.engine.js';
 import { createFusionStateV4, describeEventV4, finalizeFusionV4, flushFusionV4, processObservationV4, summarizeV4, type FusionEventV4 } from './fusion-v4.engine.js';
 import type { FusionStateV4 } from './fusion-state-v4.js';
 import { diagnosticsFromEvents, diagnosticsV4, type RunDiagnostics } from './fusion.diagnostics.js';
+import type { StartHeightSelection } from '../../geo/start-height-map.js';
+import type { RoadHeightContact } from './fusion-road-height.js';
+import type { MarkerHeightContact } from './fusion-marker-anchor.js';
+import type { CircularSummary } from './fusion-circular-corridor.js';
+import { validateAbsoluteAltitudeConfig } from './fusion-absolute-altitude.js';
 
 export interface AlgorithmSummary {
+  absoluteAltitude?: { enabled: boolean; accepted: number; reasons: Record<string, number>;
+    runs: { from: number; through: number; anchor: { t: number; seq: number; b: number; sigma: number; appleGeoid: number | null } | null }[];
+    verticalFrame: { deviceGeoidM: number | null; deviceGeoidFixes: number; mapGeoidM: number | null } };
+  startHeightSelection?: StartHeightSelection | null;
+  roadHeightAnchors?: { count: number; roadIds: string[]; contacts: RoadHeightContact[] };
+  markerAnchors?: { count: number; heightContacts: MarkerHeightContact[] };
+  circularCorridor?: CircularSummary;
   gpsAccepted: number;
   gpsRejected: number;
   rejectReasons: Record<string, number>;
@@ -183,17 +195,28 @@ const fusionV31: FusionAlgorithm<FusionStateV31, FusionEventV31> = {
   diagnostics: (_s, events) => diagnosticsFromEvents(events),
 };
 
-const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => ({
+const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEventV4> => {
+  validateAbsoluteAltitudeConfig(cfg);
+  return {
   version: 'fusion-v4',
   // 2: terrain (DEM) Z datum from ground contacts + barometric drift, height above ground; 3: indoor stair anchors;
   // 4: diagnostics only (per-fix smoother weights/residuals, kept ground contacts) — outputs identical to rev 3;
   // 5: long straight ramps retain a calibrated stride; 6: Health stride prior + uncertain vertical movement uses stride,
   //    confirmed stair classification is separated from barometric vertical-motion detection.
-  revision: 6,
+  // 7: optional time-based step signal (stepTimeBased, off in the registered config) + heading-fit-pending diagnostics —
+  //    outputs of the registered config are identical to rev 6.
+  // 8: best vertical-accuracy GPS fallback; 9: fixed provisional DEM datum + barometric changes indoors.
+  // 10: optional start materials; 11: confirmed traversals of mapped roads constrain the Z datum.
+  // 12: optional shared-axis XY constraint on confirmed flat circular hallway loops, replay only.
+  // 13: motion-still stops: no drift, one stop = one GPS measurement, no repeated points; vehicle needs 3 good fixes.
+  // 15: optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start.
+  // 16: APPLE_MSL -> map height through the session's measured device geoid, not the map geoid.
+  // 17: collection anchors naming a network node: soft XY fix + height-zero observation in the replay.
+  revision: 18, // registered BLE beacons: log-range / proximity EKF updates (forward + smoother), floor estimate; no beacons = rev 17 outputs
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,
-  createState: (context) => createFusionStateV4(cfg.healthStrideEnabled ? context : undefined),
+  createState: (context) => createFusionStateV4(context ? { ...context, strideCalibration: cfg.healthStrideEnabled ? context.strideCalibration : null } : undefined),
   process: (s, o) => processObservationV4(s, o, cfg),
   flush: (s) => flushFusionV4(s, cfg),
   finalize: (s) => finalizeFusionV4(s, cfg),
@@ -202,7 +225,8 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   describeEvent: describeEventV4,
   diagnostics: diagnosticsV4,
   withConfig: (c) => makeV4(c as FusionConfigV4),
-});
+  };
+};
 const fusionV4 = makeV4(fusionConfigV4);
 
 export const FUSION_ALGORITHMS: Record<string, FusionAlgorithm> = {

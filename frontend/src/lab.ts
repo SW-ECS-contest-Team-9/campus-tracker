@@ -1,6 +1,7 @@
 // Lab mode (docs/MOBILITY_MAP_PLAN.md 4.11): replay run snapshots in time (1x / 5x / 20x / Instant), compare two
 // runs, define routes, find their passes and show canonical path + confidence corridor + validation errors.
 // Everything here only READS results the backend computed (replays are deterministic; the speed is playback).
+import { canDrawFusedHeightIn3D, describeFusedHeight, runStage, splitByDrawableHeight, STAGE_LABEL } from './track-display';
 import {
   api,
   type CanonicalPath,
@@ -270,12 +271,21 @@ export class Lab {
     const f = a.forward[i];
     const fin = a.final[Math.max(0, indexAt(a.final, this.t))];
     const correction = fin && a.forward !== a.final ? Math.hypot(fin.x - f.x, fin.y - f.y) : null;
+    const height = describeFusedHeight({ ellipsoidalAltitude: f.h, zDatumSource: f.zDatumSource, zDatumSigma: f.zDatumSigma });
+    const start = a.run.metrics?.startHeightSelection;
+    const roadAnchors = a.run.metrics?.roadHeightAnchors;
+    const circle = a.run.metrics?.circularCorridor;
+    const startReason = start ? { SELECTED: '후보 선택(신뢰 고도 기준이 있으면 그 기준 우선)', NO_CANDIDATE: '근처 후보 없음', AMBIGUOUS: '여러 높이 후보: 기준에 반영하지 않음', POSITION_UNCERTAIN: '수평 위치 불확실: 기준에 반영하지 않음' }[start.reason] : '';
     return `<table>
       <tr><th>source</th><td>${esc(f.source)}${f.stationary ? ' · stationary' : ''}</td></tr>
-      <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${num(f.heading, 0, '°')}</td></tr>
+      <tr><th>σ / heading</th><td>${num(f.sigmaH, 1, ' m')} / ${f.heading === null ? '<span class="warn-text">방향 미확정</span>' : num(f.heading, 0, '°')}</td></tr>
       <tr><th>GPS</th><td>${f.gpsUsed === null ? '–' : f.gpsUsed ? 'used' : 'rejected'}${f.gpsSequence ? ` #${f.gpsSequence}` : ''}</td></tr>
-      <tr><th>height</th><td>${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · above ground ${num(f.heightAboveGround, 1, ' m')}</td></tr>
+      <tr><th>height</th><td>${f.h === null ? `<span class="warn-text">절대 고도 미확정</span> (기준 ${esc(f.zDatumSource ?? 'NONE')}) · 실내 3D 높이는 표시 보류` : `${num(f.h, 1, ' m')} (${esc(f.zDatumSource ?? '–')}) · ${esc(height.status)} · ${esc(height.datum)} · above ground ${num(f.heightAboveGround, 1, ' m')}`}</td></tr>
+      <tr><th>상대 Z</th><td>${num(f.zRel, 1, ' m')} <span class="muted">(기압, 세션 시작 기준 · 센서 재시작 구간은 이어 붙임)</span></td></tr>
+      ${start ? `<tr><th>시작 높이 재료</th><td>${esc(startReason)}${start.selected ? ` · ${esc(start.selected.kind)} ${esc(start.selected.id)} · ${num(start.selected.phoneHeightM, 1, ' m MSL')}` : ''}<br><span class="muted">${start.candidates.map((c) => `${esc(c.id)} (${num(c.phoneHeightM, 1, ' m')}, 층 ${esc(c.levelId ?? '–')})`).join(' / ') || '후보 없음'}</span></td></tr>` : ''}
       <tr><th>building</th><td>${esc(f.buildingName ?? '–')}</td></tr>
+      ${roadAnchors ? `<tr><th>길 통과 Z 앵커</th><td>${roadAnchors.count}개 · ${roadAnchors.roadIds.map(esc).join(', ') || '통과 조건을 만족한 길 없음'}</td></tr>` : ''}
+      ${circle && circle.reason !== 'DISABLED' ? `<tr><th>원형 복도 XY 제약</th><td>${esc(circle.reason)} · ${circle.runs.length}구간 · 반지름 ${num(circle.radiusM, 1, ' m')} · ${circle.anchors}개 관측<br><span class="muted">선택한 건물 중심 가정에 따른 보정이며 측정 정확도는 아닙니다.</span></td></tr>` : ''}
       <tr><th>smoother moved</th><td>${correction === null ? '–' : `${correction.toFixed(1)} m (realtime → final)`}</td></tr>
     </table>`;
   }
@@ -334,6 +344,11 @@ export class Lab {
     });
   }
 
+  private heightRuns(positions: RunPosition[]) {
+    return splitByDrawableHeight(positions.map((point) => ({ point, ellipsoidalAltitude: point.h, buildingName: point.buildingName })))
+      .map((group) => ({ absolute: group.absolute, points: group.points.map((p) => p.point) }));
+  }
+
   private drawRuns() {
     const v = this.viewer();
     if (!v) return;
@@ -347,28 +362,40 @@ export class Lab {
     const a = this.a;
     if (a) {
       // realtime-equivalent track grows with the playback time; the final (smoothed) track is drawn whole
-      const fwdGround = a.forward.some((p) => p.h == null);
-      const cart = a.forward.map((p) => C.Cartesian3.fromDegrees(p.longitude, p.latitude, fwdGround ? 0 : p.h! + 0.3));
-      this.runEntities.push(v.entities.add({
-        polyline: {
-          positions: new C.CallbackProperty(() => cart.slice(0, Math.max(indexAt(a.forward, this.t) + 1, 0)), false),
-          width: 3, clampToGround: fwdGround, material: C.Color.fromCssColorString('#f472b6'),
-        },
-        show: this.layers.forward,
-      }));
-      this.runEntities.at(-1).labRole = 'forward';
-      this.runEntities.push(v.entities.add({
-        position: new C.CallbackProperty(() => cart[Math.max(indexAt(a.forward, this.t), 0)], false),
-        point: { pixelSize: 12, color: C.Color.fromCssColorString('#f472b6'), outlineColor: C.Color.WHITE, outlineWidth: 2,
-          heightReference: fwdGround ? C.HeightReference.CLAMP_TO_GROUND : C.HeightReference.NONE, disableDepthTestDistance: Number.POSITIVE_INFINITY },
-        show: this.layers.forward,
-      }));
-      this.runEntities.at(-1).labRole = 'forward';
-      if (a.final !== a.forward && a.final.length) {
-        const e = this.line(a.final, '#fde047', 3);
-        e.show = this.layers.final;
-        e.labRole = 'final';
+      for (const group of this.heightRuns(a.forward)) {
+        const ground = !group.absolute;
+        const cart = group.points.map((p) => C.Cartesian3.fromDegrees(p.longitude, p.latitude, ground ? 0 : p.h! + 0.3));
+        const e = v.entities.add({
+          polyline: {
+            positions: new C.CallbackProperty(() => cart.slice(0, Math.max(indexAt(group.points, this.t) + 1, 0)), false),
+            width: 3, clampToGround: ground, material: C.Color.fromCssColorString('#f472b6'),
+          },
+          show: this.layers.forward,
+        });
+        e.labRole = 'forward';
         this.runEntities.push(e);
+      }
+      const current = () => a.forward[indexAt(a.forward, this.t)];
+      const marker = v.entities.add({
+        position: new C.CallbackProperty(() => {
+          const p = current();
+          return p && canDrawFusedHeightIn3D({ ellipsoidalAltitude: p.h, buildingName: p.buildingName })
+            ? C.Cartesian3.fromDegrees(p.longitude, p.latitude, (p.h ?? 0) + (p.h == null ? 0 : 0.3)) : undefined;
+        }, false),
+        point: { pixelSize: 12, color: C.Color.fromCssColorString('#f472b6'), outlineColor: C.Color.WHITE, outlineWidth: 2,
+          heightReference: new C.CallbackProperty(() => current()?.h == null ? C.HeightReference.CLAMP_TO_GROUND : C.HeightReference.NONE, false),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY },
+        show: this.layers.forward,
+      });
+      marker.labRole = 'forward';
+      this.runEntities.push(marker);
+      if (a.final !== a.forward && a.final.length) {
+        for (const group of this.heightRuns(a.final)) {
+          const e = this.line(group.points, '#fde047', 3);
+          e.show = this.layers.final;
+          e.labRole = 'final';
+          this.runEntities.push(e);
+        }
       }
       this.gpsPoints = v.scene.primitives.add(new C.PointPrimitiveCollection());
       for (const p of a.gps) {
@@ -383,10 +410,12 @@ export class Lab {
       }
     }
     if (this.b?.final.length) {
-      const e = this.line(this.b.final, '#22d3ee', 3, { dashed: true });
-      e.show = this.layers.compare;
-      e.labRole = 'compare';
-      this.runEntities.push(e);
+      for (const group of this.heightRuns(this.b.final)) {
+        const e = this.line(group.points, '#22d3ee', 3, { dashed: true });
+        e.show = this.layers.compare;
+        e.labRole = 'compare';
+        this.runEntities.push(e);
+      }
     }
     this.updatePlayback();
   }
@@ -591,13 +620,44 @@ export class Lab {
       const raw = line.slice(i + 1).trim();
       overrides[line.slice(0, i).trim()] = raw === 'true' ? true : raw === 'false' ? false : Number.isFinite(Number(raw)) && raw !== '' ? Number(raw) : raw;
     }
+    if (val('lab-version') === 'fusion-v4') {
+      for (const [id, key] of [['lab-start-roads', 'startHeightRoadsEnabled'], ['lab-start-floors', 'startHeightFloorsEnabled'], ['lab-start-drafts', 'startHeightIncludeDrafts'], ['lab-road-anchors', 'roadHeightAnchorsEnabled'], ['lab-road-anchor-drafts', 'roadHeightAnchorIncludeDrafts'], ['lab-circle', 'circularCorridorEnabled']]) {
+        if (this.el.querySelector<HTMLInputElement>(`#${id}`)?.checked) overrides[key] = true;
+      }
+      if (val('lab-start-building').trim()) overrides.startHeightBuildingId = val('lab-start-building').trim();
+      if (val('lab-start-level').trim()) overrides.startHeightLevelId = val('lab-start-level').trim();
+      if (val('lab-road-anchor-level').trim()) overrides.roadHeightAnchorLevelId = val('lab-road-anchor-level').trim();
+      if (overrides.circularCorridorEnabled === true) {
+        const building = val('lab-circle-building').trim() || overrides.circularCorridorBuildingId;
+        if (!building) { this.message = '원형 복도 보정: 중심축으로 사용할 건물 ID를 입력하세요.'; this.render(); return; }
+        overrides.circularCorridorBuildingId = building;
+        const radius = val('lab-circle-radius').trim();
+        if (radius) {
+          if (!Number.isFinite(Number(radius)) || Number(radius) <= 0) { this.message = '원형 복도 반지름은 양수로 입력하세요.'; this.render(); return; }
+          overrides.circularCorridorRadiusM = Number(radius);
+        }
+      }
+    }
+    const algorithmVersion = val('lab-version');
+    const variant = val('lab-variant') || null;
+    const mode = val('lab-mode') as 'SENSOR_TIME' | 'AS_RECEIVED';
+    const cutoffText = val('lab-cutoff').trim();
+    const cutoff = cutoffText ? new Date(cutoffText) : null;
+    if (cutoff && !Number.isFinite(cutoff.getTime())) {
+      this.message = 'cutoff: ISO 시각으로 입력하세요';
+      this.render();
+      return;
+    }
+    const finalize = this.el.querySelector<HTMLInputElement>('#lab-finalize')?.checked ?? true;
     this.busy = 'replaying…';
     this.message = '';
     this.render();
     try {
       const r = await api.replay(this.sessionId, {
-        algorithmVersion: val('lab-version'), variant: val('lab-variant') || null, overrides: Object.keys(overrides).length ? overrides : null,
-        mode: val('lab-mode') as 'SENSOR_TIME' | 'AS_RECEIVED',
+        algorithmVersion, variant, overrides: Object.keys(overrides).length ? overrides : null,
+        mode,
+        ...(cutoff ? { cutoff: cutoff.toISOString() } : {}),
+        ...(mode === 'SENSOR_TIME' && !finalize ? { finalize: false } : {}),
       });
       this.message = `run ${r.runId.slice(0, 8)}: ${r.outputs} positions in ${r.durationMs} ms`;
       this.runs = await api.runs(this.sessionId);
@@ -645,14 +705,19 @@ export class Lab {
       .join('');
     const runs = this.runs
       .map((r) => {
-        const label = `${r.algorithmVersion.replace('fusion-', '')}${r.revision ? ` r${r.revision}` : ''}${r.variant ? ` · ${esc(r.variant)}` : ''}${r.mode === 'AS_RECEIVED' ? ' · as-received' : ''}`;
+        const label = `${r.algorithmVersion.replace('fusion-', '')}${r.revision ? ` r${r.revision}` : ''}${r.variant ? ` · ${esc(r.variant)}` : ''}`;
+        const rep = r.metrics?.replay ?? null;
+        const stage = STAGE_LABEL[runStage(r)];
+        const cut = rep?.input.cutoff ? ` · cutoff ${new Date(rep.input.cutoff).toLocaleTimeString()}` : '';
+        const input = rep ? ` · 입력 ${rep.input.counts.motion} motion / ${rep.input.counts.locations} GPS · #${esc(rep.input.hash.slice(0, 8))}` : '';
+        const lost = rep?.asReceived ? ` · 늦게 와서 건너뜀 ${rep.asReceived.skippedLateObservations} (역순 배치 ${rep.asReceived.outOfOrderBatches}/${rep.asReceived.batches})` : '';
         const warn = r.metrics?.validation?.warnings.map((w) => w.code).join(', ');
         return `<li class="${this.a?.run.id === r.id ? 'selected' : ''}">
           <span data-action="load-run" data-run="${r.id}" class="lab-link"><b>${label}</b></span>
-          ${r.published ? '<span class="tag">published</span>' : ''}${r.pinned ? '<span class="tag">📌</span>' : ''}
+          <span class="tag">${esc(stage)}</span>${r.published ? '<span class="tag">published</span>' : ''}${r.pinned ? '<span class="tag">📌</span>' : ''}
           <span class="muted right">${new Date(r.startedAt).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           <div class="sub muted">${r.outputCount ?? '–'} pts · path ${num(r.metrics?.fusedPathLengthM, 0, ' m')} · GPS ${r.metrics?.gpsAccepted ?? '–'}/${r.metrics?.gpsRejected ?? '–'}
-            ${r.overrides ? ` · ${esc(JSON.stringify(r.overrides))}` : ''}${warn ? ` · <span class="warn-text">${esc(warn)}</span>` : ''}
+            ${esc(cut)}${input}${lost}${r.overrides ? ` · ${esc(JSON.stringify(r.overrides))}` : ''}${warn ? ` · <span class="warn-text">${esc(warn)}</span>` : ''}
             · <span class="lab-link" data-action="compare-run" data-run="${r.id}">${this.b?.run.id === r.id ? '비교 해제' : '비교(B)'}</span>
             · <span class="lab-link" data-action="pin-run" data-run="${r.id}">${r.pinned ? 'unpin' : 'pin'}</span></div>
         </li>`;
@@ -676,7 +741,23 @@ export class Lab {
           <select id="lab-version">${this.versions.map((v) => `<option ${v === 'fusion-v4' ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
           <select id="lab-mode"><option value="SENSOR_TIME">센서 시각순 (정식)</option><option value="AS_RECEIVED">수신 순서 (실시간 재현)</option></select>
           <input id="lab-variant" placeholder="변형 이름 (선택)" maxlength="48" />
+          <input id="lab-cutoff" placeholder="cutoff 센서 시각 (선택, ISO 예: 2026-10-13T13:06:02.238Z)" title="이 시각까지 캡처된 원시 데이터만 사용: 두 세션을 같은 구간으로 비교" />
+          <label class="small"><input id="lab-finalize" type="checkbox" checked /> 평활화(FINAL)까지 실행 — 끄면 시간순 전방만</label>
           <textarea id="lab-overrides" rows="2" placeholder="파라미터 변경 (선택) 예: gpsGateChi2=9"></textarea>
+          <label class="small"><input id="lab-start-roads" type="checkbox" /> v4 시작 높이에 그려진 길의 3D 고도 활용</label>
+          <label class="small"><input id="lab-start-floors" type="checkbox" /> v4 시작 높이에 건물 층별 고도(지도·보정) 활용</label>
+          <label class="small"><input id="lab-start-drafts" type="checkbox" /> DRAFT 길도 후보에 포함</label>
+          <input id="lab-start-building" placeholder="시작 건물 ID (선택, 후보 제한)" />
+          <input id="lab-start-level" placeholder="시작 층 ID (선택: 길 level ID / 지도 층 이름 / 보정 층 입구=0…)" />
+          <div class="small muted">여러 높이가 겹치면 층 ID나 정확한 GPS로 구분될 때만 사용합니다. 건물 층수만 있고 층별 고도가 없으면 층 높이를 만들지 않습니다.</div>
+          <label class="small"><input id="lab-road-anchors" type="checkbox" /> v4 그려진 길의 연속 통과를 Z 앵커로 활용</label>
+          <label class="small"><input id="lab-road-anchor-drafts" type="checkbox" /> 길 통과 앵커에 DRAFT도 포함</label>
+          <input id="lab-road-anchor-level" placeholder="길 통과 앵커 층 ID (선택, 여러 층이 겹친 길의 후보 제한)" />
+          <div class="small muted">보행 방향·거리·연속 통과·기압 변화가 일치해야 앵커를 생성합니다. 여러 높이의 길을 구분하지 못하면 보정을 보류합니다.</div>
+          <label class="small"><input id="lab-circle" type="checkbox" /> v4 원형 복도의 층별 공통 중심으로 XY 보정 (최종 Replay)</label>
+          <input id="lab-circle-building" placeholder="중심축이 확인된 원통형 건물 ID (예: 한림관)" />
+          <input id="lab-circle-radius" type="number" min="2" max="12" step="0.1" placeholder="복도 반지름 m (비우면 걸음·회전량에서 추정)" />
+          <div class="small muted">건물 중심과 복도 중심이 같은 경우에만 선택하세요. 평탄한 높이에서 한 방향으로 270° 이상 회전한 보행 구간만 적용하며 계단·엘리베이터 이동은 원에 맞추지 않습니다.</div>
           <button data-action="replay" ${this.busy ? 'disabled' : ''}>Replay 실행</button>
         </div>
         <div class="small muted">결과는 실행 스냅샷으로만 저장됩니다(게시 안 함). 기존 결과는 지워지지 않습니다.</div>
@@ -697,6 +778,7 @@ export class Lab {
         </div>
         <div class="small muted">GPS 색: <span style="color:#22c55e">채택</span> · <span style="color:#ef4444">실시간 거부</span> · <span style="color:#f97316">스무더 가중치↓</span> · <span style="color:#64748b">qc-v1 제외</span></div>
         <div id="lab-now" class="detail"></div>
+        ${relativeZChart(a.forward, a.final !== a.forward ? a.final : null)}
       </section>
       <section><h3>사건 <span class="muted">걸음 ${steps} · 계단 ${stairs}</span></h3><ul class="list lab-events">${events || '<li class="muted">없음</li>'}</ul></section>` : ''}`;
   }
@@ -783,6 +865,31 @@ export class Lab {
       </table><div class="small muted">회차 간 일관성 지표입니다. 같은 장소에서 모든 회차가 같은 쪽으로 틀리는 편향은 앵커로만 드러납니다.</div></section>` : ''}
       ${point}${create}`;
   }
+}
+
+/**
+ * Relative barometric Z over time (the engine's value, continuous over sensor restarts). The band under the curve
+ * marks where an absolute height existed; without it the curve is a height CHANGE only — no floor is implied.
+ */
+function relativeZChart(forward: RunPosition[], final: RunPosition[] | null): string {
+  const pts = forward.filter((p) => p.zRel !== null);
+  if (pts.length < 2) return '<div class="small muted">상대 Z 없음 (기압 데이터 없음)</div>';
+  const W = 320, H = 90, pad = 4;
+  const t0 = pts[0].t, t1 = pts.at(-1)!.t;
+  const zs = pts.map((p) => p.zRel!);
+  const zMin = Math.min(...zs), zMax = Math.max(...zs);
+  const x = (t: number) => pad + ((t - t0) / Math.max(t1 - t0, 1)) * (W - 2 * pad);
+  const y = (z: number) => H - 14 - ((z - zMin) / Math.max(zMax - zMin, 0.5)) * (H - 22);
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.zRel!).toFixed(1)}`).join('');
+  const band = (list: RunPosition[], yy: number, color: string) => list.filter((p) => p.h !== null && p.t >= t0 && p.t <= t1)
+    .map((p) => `<rect x="${x(p.t).toFixed(1)}" y="${yy}" width="1.2" height="3" fill="${color}"/>`).join('');
+  const abs = (list: RunPosition[]) => `${list.filter((p) => p.h !== null).length}/${list.length}`;
+  return `<div class="small muted">상대 Z (기압) ${zMin.toFixed(1)} … ${zMax.toFixed(1)} m · 범위 ${(zMax - zMin).toFixed(1)} m — 높이 변화만 나타냄(시작 높이·층 미정)</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="background:#0f172a;border-radius:4px">
+      <path d="${path}" fill="none" stroke="#93c5fd" stroke-width="1.2"/>
+      ${band(forward, H - 9, '#f472b6')}${final ? band(final, H - 5, '#fde047') : ''}
+    </svg>
+    <div class="small muted">아래 띠 = 절대 고도 기준이 있던 시점: <span style="color:#f472b6">전방 ${abs(forward)}</span>${final ? ` · <span style="color:#fde047">최종 ${abs(final)}</span>` : ''}</div>`;
 }
 
 function eventText(e: RunEvent): string {

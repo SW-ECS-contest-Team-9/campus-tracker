@@ -34,6 +34,33 @@ export interface Session {
   locationCount: number;
   markerCount: number;
   lastLocationAt: string | null;
+  // collection / sync / fusion state (separate concepts; see track-display.ts sessionStateLines)
+  interrupted?: boolean;
+  finishRequestedAt?: string | null;
+  finalizedAt?: string | null;
+  lastCapturedAt?: string | null;
+  lastReceivedAt?: string | null;
+  outOfOrderBatches?: number;
+  needsReprocess?: boolean;
+  fusionState?: string | null;
+  syncState?: 'LIVE' | 'DELAYED' | 'OFFLINE' | 'FINALIZED';
+  /** null = may be interrupted by hand; otherwise why not (NOT_ACTIVE / COLLECTOR_CONNECTED / RECENTLY_RECEIVED) */
+  manualInterruptBlock?: string | null;
+  /** only in the session detail (GET /sessions/:id) */
+  raw?: { syncManifest?: { synchronized?: boolean; comparedAt?: string; streams?: Record<string, { expected: number | null; server: number | null; synchronized: boolean }> } | null; batches?: number; outOfOrderBatches?: number } | null;
+}
+
+/** What a replay did (fusion_runs.metrics.replay, rev 7+): its input boundary and which stages it stored. */
+export interface ReplayRecord {
+  mode: 'SENSOR_TIME' | 'AS_RECEIVED';
+  ordering: 'SENSOR_TIME' | 'ARRIVAL_BATCHES';
+  published: boolean;
+  continuesLive: boolean;
+  finalizeRequested: boolean;
+  finalizeApplied: boolean;
+  sessionStatusAtRun: string;
+  input: { cutoff: string | null; counts: { locations: number; motion: number; altimeter: number; pedometer: number }; firstSensorAt: string | null; lastSensorAt: string | null; hash: string };
+  asReceived: { batches: number; outOfOrderBatches: number; skippedLateObservations: number } | null;
 }
 
 /** Building level calibration from a field session (buildings:calibrate). Heights are orthometric (Incheon MSL). */
@@ -57,6 +84,15 @@ export interface Marker {
   ellipsoidalAltitude: number | null;
   horizontalAccuracy: number | null;
   verticalAccuracy: number | null;
+  /** collection anchor (absent or null on markers of older apps) */
+  nodeId?: string | null;
+  buildingId?: string | null;
+  floor?: string | null;
+  direction?: 'up' | 'down' | null;
+  fromFloor?: string | null;
+  toFloor?: string | null;
+  /** the named node, EPSG:5186 with the MSL floor height */
+  node?: { x: number; y: number; z: number; current: boolean } | null;
   /** fusion-v4 estimate at the marker time: drawn at this height instead of the phone altitude */
   fused?: { algorithmVersion: string; latitude: number; longitude: number; ellipsoidalAltitude: number | null; heightAboveGround: number | null; zDatumSource: string | null; buildingName: string | null } | null;
 }
@@ -164,6 +200,9 @@ export interface FusionRun {
     sensorTracking?: { trackingStatus: string; headingStatus: string; fallbackStepDistanceM: number; horizontalUncertaintyM: number | null } | null;
     reanchors?: number | null;
     divergences?: number | null;
+    /** v4, smoothed runs only: the vertical datum summary */
+    terrain?: unknown;
+    replay?: ReplayRecord | null;
     validation?: {
       durationS: number;
       pedometerPathM: number;
@@ -238,6 +277,17 @@ export interface CollectorSummary {
 
 
 // ---- Lab (docs/MOBILITY_MAP_PLAN.md): run snapshots, qc-v1, routes, canonical paths, validation ----
+export interface StartHeightSelection {
+  reason: 'SELECTED' | 'NO_CANDIDATE' | 'AMBIGUOUS' | 'POSITION_UNCERTAIN';
+  candidates: { id: string; kind: 'ROAD' | 'FLOOR'; buildingId: string | null; levelId: string | null; phoneHeightM: number }[];
+  selected: StartHeightSelection['candidates'][number] | null;
+}
+
+export interface CircularCorridorSummary {
+  reason: 'DISABLED' | 'AXIS_UNAVAILABLE' | 'NO_CONFIRMED_LOOP' | 'APPLIED';
+  radiusM: number | null; anchors: number; runs: { from: number; to: number; steps: number; inferredRadiusM: number }[];
+}
+
 export interface LabRun {
   id: string;
   sessionId: string;
@@ -254,7 +304,7 @@ export interface LabRun {
   startedAt: string;
   completedAt: string | null;
   outputCount: number | null;
-  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] } } | null;
+  metrics: { fusedPathLengthM?: number; gpsAccepted?: number; gpsRejected?: number; validation?: { warnings: { code: string }[] }; replay?: ReplayRecord | null; terrain?: unknown; startHeightSelection?: StartHeightSelection | null; roadHeightAnchors?: { count: number; roadIds: string[] }; circularCorridor?: CircularCorridorSummary } | null;
   error: string | null;
 }
 export interface RunPosition {
@@ -394,6 +444,7 @@ export const api = {
     return get<Session[]>(`/api/v1/sessions?${q}`);
   },
   session: (id: string) => get<Session>(`/api/v1/sessions/${id}`),
+  interruptSession: (id: string) => send<Session>('POST', `/api/v1/sessions/${id}/interrupt`, {}),
   locations: (id: string) => get<LocationPoint[]>(`/api/v1/sessions/${id}/locations`),
   markers: (id: string) => get<Marker[]>(`/api/v1/sessions/${id}/markers`),
   fusedPositions: (id: string, algorithmVersion: string) =>
@@ -427,7 +478,7 @@ export const api = {
     return { ...meta, heights: new Float32Array(await res.arrayBuffer()) };
   },
   // Lab
-  replay: (sessionId: string, body: { algorithmVersion: string; variant?: string | null; overrides?: Record<string, unknown> | null; mode: 'SENSOR_TIME' | 'AS_RECEIVED'; publish?: boolean }) =>
+  replay: (sessionId: string, body: { algorithmVersion: string; variant?: string | null; overrides?: Record<string, unknown> | null; mode: 'SENSOR_TIME' | 'AS_RECEIVED'; publish?: boolean; cutoff?: string | null; finalize?: boolean }) =>
     send<{ runId: string; outputs: number; durationMs: number }>('POST', `/api/v1/sessions/${sessionId}/replays`, body),
   runs: (sessionId: string) => get<LabRun[]>(`/api/v1/sessions/${sessionId}/runs`),
   run: (runId: string) => get<LabRun>(`/api/v1/runs/${runId}`),

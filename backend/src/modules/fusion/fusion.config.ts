@@ -547,6 +547,14 @@ export const fusionConfigV4 = {
   stepMaxIntervalS: 1.3,
   stepConfirmPeaks: 3, // periodic peaks in a row before they count as walking (phone handling is not periodic)
   motionGapMs: 2000, // longer motion gap => new heading segment
+  // rev 7: the step signal on the sensor's own time base. false = the rev 6 behaviour (every sample is assumed to be
+  // 20 ms after the previous one: a 20 Hz stream moved the 3 Hz low-pass to 1.2 Hz and lost every step).
+  // true = the signal is resampled onto a fixed stepResampleHz grid from the sample timestamps, so the filter,
+  // its priming and the peak test do not depend on the rate; gravity smoothing and the stationary window use time too.
+  // Off in the registered config until paired replays of real 50 Hz sessions agree (variant override: stepTimeBased=true).
+  stepTimeBased: false,
+  stepResampleHz: 50,
+  stepMaxSampleGapMs: 160, // wider spacing (< ~6 Hz) cannot carry a 3 Hz step signal: the filter restarts after it
   // stride: CMPedometer distance per detected step (level and slope walking), flat-ground default until calibrated
   defaultStrideM: 0.72,
   strideMinM: 0.35,
@@ -597,6 +605,13 @@ export const fusionConfigV4 = {
   vehicleSpeedMps: 3,
   vehicleNoStepsMs: 10_000,
   vehicleProcessNoiseM2PerS: 225,
+  // rev 13: motion-still stops. A phone lying still reported 3.9 m/s once and the 225 m2/s vehicle noise then
+  // followed 30-90 m fixes for minutes (79587965). While still: no time noise, the stop's fixes count as one
+  // measurement (median; their errors are correlated), and no new output point unless the estimate moved.
+  stationaryHoldEnabled: true,
+  stationaryOutputMinMoveM: 2,
+  vehicleMinFixes: 3, // consecutive fixes at vehicle speed, not still, accuracy <= vehicleMaxAccuracyM
+  vehicleMaxAccuracyM: 20,
   // smoother (replay / finalization)
   smootherIterations: 3,
   smootherCauchyScale: 2, // residual scale in sigmas for the robust re-weighting
@@ -611,6 +626,58 @@ export const fusionConfigV4 = {
   // absolute height from the terrain DEM: "walking outdoors = ground + phone height" (ground contacts)
   phoneHeightM: 1.0,
   phoneHeightSigmaM: 0.3,
+  terrainFallbackMinSigmaM: 5, // provisional ground-level start; the initial indoor floor is unknown
+  // New sessions opt in through sensorCapabilities.absoluteAltitudeEnabled or an actual observation.
+  // off/shadow preserve the legacy output policy; fallback never invents a ground-level start for opted-in sessions.
+  absoluteAltitudeMode: 'fallback' as 'off' | 'shadow' | 'fallback',
+  absoluteAltitudeMaxAccuracyM: 8,
+  absoluteAltitudeWindowMs: 30_000,
+  absoluteAltitudeMinSamples: 3,
+  absoluteAltitudeMinSpanMs: 5000,
+  absoluteAltitudeMaxRelativeAgeMs: 1500,
+  absoluteAltitudeMaxAlignmentErrorM: 1,
+  absoluteAltitudeMaxMadM: 2,
+  absoluteAltitudeMaxOffsetRangeM: 6,
+  absoluteAltitudeMinSigmaM: 5,
+  absoluteAltitudeDatumOffsetM: 0, // Apple MSL -> map orthometric: provisional identity, not a surveyed conversion
+  absoluteAltitudeDatumSigmaM: 3,
+  startHeightRoadsEnabled: false,
+  startHeightFloorsEnabled: false,
+  startHeightIncludeDrafts: false,
+  startHeightBuildingId: '', // optional restriction to one building
+  startHeightLevelId: '', // road level_id or calibrated relativeFloor (0 = entrance level)
+  startHeightRoadRadiusM: 10,
+  startHeightMaxPositionSigmaM: 15,
+  startHeightAmbiguityM: 0.75,
+  startHeightGpsMaxSigmaM: 5,
+  startHeightMinSigmaM: 3,
+  roadHeightAnchorsEnabled: false,
+  roadHeightAnchorIncludeDrafts: false,
+  roadHeightAnchorLevelId: '', // optional level restriction for stacked roads
+  roadHeightAnchorRadiusM: 3,
+  roadHeightAnchorMaxPositionSigmaM: 8,
+  roadHeightAnchorMaxHeadingDeg: 25,
+  roadHeightAnchorMinSpanMs: 3000,
+  roadHeightAnchorMinTravelM: 4,
+  roadHeightAnchorMinSamples: 6,
+  roadHeightAnchorMaxGapMs: 2000,
+  roadHeightAnchorMaxSpeedMps: 4,
+  roadHeightAnchorMaxBaroResidualM: 1.5,
+  roadHeightAnchorIntervalMs: 5000,
+  roadHeightAnchorSigmaM: 2, // author-supplied map height is not an independent survey
+  circularCorridorEnabled: false, // replay only, user-selected building with a confirmed common axis
+  circularCorridorBuildingId: '',
+  circularCorridorRadiusM: 0, // 0: shared median of walked arc length / yaw turn across confirmed loops
+  circularCorridorMinRadiusM: 2,
+  circularCorridorMaxRadiusM: 12,
+  circularCorridorMaxCentreOffsetM: 35,
+  circularCorridorMaxStepGapMs: 3000,
+  circularCorridorMaxHeightRangeM: 0.8,
+  circularCorridorMinSteps: 20,
+  circularCorridorMinTurnDeg: 270,
+  circularCorridorMinTurnPurity: 0.65,
+  circularCorridorAnchorIntervalMs: 1000,
+  circularCorridorAnchorSigmaM: 1.5,
   contactMaxPositionSigmaM: 15,
   contactBuildingClearanceM: 3, // also at least half the position sigma away from any footprint
   contactMaxHeightSigmaM: 2.5, // DEM sigma + position sigma x slope (campus DEM sigma median 1.1-1.5 m)
@@ -624,10 +691,80 @@ export const fusionConfigV4 = {
   gpsDatumMaxAccuracyM: 15,
   gpsDatumMinSamples: 3,
   gpsDatumMaxMadM: 3,
+  // rev 14: provisional datums when no strict ground contact exists. On the 2026-10-14 walks every outdoor step
+  // was on modified DEM cells (campus roads), so iPhones fell back to "the start is on the ground" and sat
+  // 16-20 m under the terrain (the start was an upper entrance). Replayed against paired Android/terrain datums:
+  // loose ground contacts -3.5..+2 m, barometer-consistent GPS heights -3.3..+0.7 m.
+  provisionalDatumsEnabled: true,
+  looseContactExtraSigmaM: 3, // modified ground: cut / fill and kerbs vs the DEM surface
+  looseContactMaxHeightSigmaM: 6,
+  looseContactMinCount: 6, // thinned (5 s apart)
+  looseContactMinSpanMs: 30_000,
+  looseContactMaxMadM: 3,
+  looseDatumMinSigmaM: 2,
+  // GPS height - barometric Z is constant while the phone moves, if the GPS height is real. iPhone heights stuck
+  // at one value for minutes indoors (vertical accuracy 3 m, 40-55 m too low) while the barometer moved 20 m.
+  baroGpsMaxAccuracyM: 50,
+  baroGpsBelowGroundM: 6, // outdoors: no deeper under the DEM than a road cut
+  baroGpsBelowGroundInsideM: 12, // inside a footprint: basements
+  baroGpsAboveGroundM: 8,
+  baroGpsAboveGroundInsideM: 60, // upper floors
+  baroGpsMinFixes: 10,
+  baroGpsMinFraction: 0.3, // of the session's GPS heights: a small consistent cluster is a stuck value
+  baroGpsMinZSpanM: 4, // the kept heights must have followed the barometer through a real height change
+  baroGpsMinSigmaM: 3,
+  // rev 14: GPS sigma scaled up where the fixes disagree with the walk more than good stretches do
+  gpsAdaptiveSigmaEnabled: false, // off: on the paired 10-13 walk it moved the iPhone track further from the Android one (p90 53 -> 72 m)
+  gpsAdaptiveWindowMs: 30_000, // replay: fixes within +-30 s
+  gpsAdaptiveForwardFixes: 10, // live: the last 10 fixes
+  gpsAdaptiveMinFixes: 5,
+  gpsAdaptiveExpectedRatio: 0.6, // median residual / sigma on good stretches (paired Android walks 0.33-0.79)
+  gpsAdaptiveMaxScale: 4,
   // indoor stairs: a barometric stair run between two moments inside the same building stays inside it
   indoorStairContextMs: 10_000,
   indoorStairRunGapMs: 4000,
   indoorStairMarginM: 2.5,
   indoorStairSigmaM: 1.0,
+  // rev 17: collection anchors (markers naming a network node), replay only
+  markerAnchorsEnabled: true,
+  markerAnchorSigmaXYM: 2, // the collector presses near the node, and most indoor node positions are estimates
+  markerAnchorHeightSigmaM: 1, // node floor heights are mostly estimated (not surveyed)
+  // rev 18: registered BLE beacons (docs/BEACON_POSITIONING.md). A beacon is a log-distance RANGE likelihood in the
+  // same EKF (forward) and RTS smoother (replay), never a position fix: RSSI says "about this far from the anchor".
+  beaconFusionEnabled: true, // false = beacons are ignored (the result equals rev 17 for every session)
+  beaconWindowMs: 3000, // per-beacon RSSI window (Android: single advertisements; iOS: ~1 s Core Location aggregates)
+  beaconUpdateIntervalMs: 1000, // at most one range update per beacon per interval (window samples are correlated)
+  beaconMaxAgeMs: 4000, // a window sample older than this (vs. the newest observation of any sensor) is dropped
+  beaconMinRssiDbm: -100, // weaker: too little range information, mostly multipath
+  beaconMaxRssiDbm: -20,
+  beaconOutlierMinDb: 8, // window outlier: |rssi - median| > max(this, 3 x 1.4826 MAD)
+  beaconMaxEffectiveSamples: 3, // the window median counts as at most this many independent RSSI samples
+  beaconMinRangeM: 0.5,
+  beaconMaxRangeM: 25, // farther model ranges carry almost no position information at 6 dB sigma
+  beaconDefaultMountAboveFloorM: 2.5, // anchor height above its floor when floorHeightM is unknown
+  beaconGateChi2: 10.83, // 1 dof, p = 0.001: larger normalized innovations are rejected (outlier / spoofing / floor leak)
+  beaconRobustChi2: 3.84, // 1 dof, p = 0.05: above it the variance is inflated by d2 / this (Huber-like)
+  beaconMaxShiftM: 3, // one update may move the position at most this far (variance inflated to keep the gain below it)
+  beaconMaxPriorSigmaM: 30, // a wider prior cannot be linearized around: no range update (proximity only)
+  beaconProximityMaxRangeM: 3, // upper 2-sigma HORIZONTAL range below this: a proximity observation (region around the anchor)
+  beaconProximitySigmaFloorM: 2, // proximity region 1-sigma never below this
+  beaconProximityGateChi2: 13.82, // 2 dof, p = 0.001
+  beaconProximityRobustChi2: 5.99, // 2 dof, p = 0.05
+  beaconInitializationEnabled: true, // no GPS yet: a proximity observation may start the local frame at the anchor
+  beaconInitMinSigmaM: 4,
+  beaconFloorMismatchRejected: true, // a beacon on another floor than the confirmed floor does not update XY
+  // floor estimation (beacon floor votes + barometer + stairs); diagnostics + optional Z datum
+  beaconFloorEstimationEnabled: true,
+  beaconFloorCorrectionEnabled: false, // true: a confirmed beacon floor also observes the height zero (like a node anchor)
+  beaconFloorVoteMaxRangeM: 8,
+  beaconFloorWindowMs: 6000,
+  beaconFloorMinShare: 0.6,
+  beaconFloorConfirmMs: 3000, // first floor: the same leading floor for this long
+  beaconFloorChangeMs: 5000, // a change: the new floor leads for this long ...
+  beaconFloorChangeMinDzFraction: 0.5, // ... and the barometer moved at least this share of the floor height that way
+  beaconFloorHeightDefaultM: 3.6, // when the anchors do not give both floor heights
+  beaconFloorNoBaroChangeMs: 15_000, // no barometer: a change needs this long and share >= 0.8
+  beaconFloorBaroOnlyFraction: 0.8, // no beacons: the barometer alone moves the floor by whole storeys (|dz| >= this x storey, within 0.3 storey of a whole number)
+  beaconFloorHeightSigmaM: 1.5, // height-zero observation of a confirmed beacon floor (beaconFloorCorrectionEnabled)
 };
 export type FusionConfigV4 = typeof fusionConfigV4;

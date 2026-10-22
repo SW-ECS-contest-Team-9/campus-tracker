@@ -3,6 +3,13 @@ import type { LocalOrigin } from '../../geo/wgs84.js';
 import { createPedometerCounter, type PedometerCounter } from './fusion.pedometer.js';
 import { diag3, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
 import type { StrideCalibration } from './fusion.stride.js';
+import type { FusionSessionContext } from './fusion.stride.js';
+import { createAbsoluteAltitudeTracker } from './fusion-absolute-altitude.js';
+import type { StartHeightMap, StartHeightSelection } from '../../geo/start-height-map.js';
+import type { RoadHeightContact, RoadHeightTracker } from './fusion-road-height.js';
+import type { MarkerAnchorInput, MarkerHeightContact } from './fusion-marker-anchor.js';
+import type { CircularSummary } from './fusion-circular-corridor.js';
+import type { BeaconTracker } from './fusion-beacon.js';
 
 /**
  * One detected step: its own time and relative heading (rel = -yaw), not the pedometer's 2.6 s chunk.
@@ -22,19 +29,25 @@ export interface FixV4 {
   sigma: number;
   vehicle: boolean;
   forwardUsed: boolean;
+  /** rev 13: taken while the motion sensors said the phone was still (one stop's fixes share one error) */
+  stationary?: boolean;
 }
 /** Stretch with one constant device-to-walking-direction offset (theta). */
 export interface HeadingSegmentV4 { id: number; startT: number; reason: string; firstStep: number }
 /** Ground contact: orthometric zero offset b = DEM + phone height - barometric Z, at time t. */
 export interface ContactV4 { t: number; offset: number; variance: number }
+export interface GpsHeightV4 { t: number; H: number; hacc: number; z: number; ground: number | null; inside: boolean }
 /** Absolute height: H = z + b (orthometric) when frame = ORTHO, ellipsoidal = z + b when frame = ELLIPSOIDAL (no DEM). */
-export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'GPS'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
+export interface DatumV4 { b: number; sigma: number; source: 'TERRAIN' | 'ROAD_ANCHOR' | 'MARKER_ANCHOR' | 'BEACON_FLOOR' | 'GPS' | 'MAP_START' | 'TERRAIN_LOOSE' | 'GPS_BARO' | 'TERRAIN_GPS' | 'TERRAIN_FALLBACK' | 'GPS_FALLBACK' | 'CM_ABSOLUTE'; frame: 'ORTHO' | 'ELLIPSOIDAL' }
 
 export type HeadingSourceV4 = 'UNKNOWN' | 'GPS_SHAPE_FIT' | 'CONTINUITY';
 
 export interface SmoothedSummaryV4 {
-  datumSource: 'TERRAIN' | 'GPS' | 'NONE';
+  datumSource: DatumV4['source'] | 'NONE';
   contacts: number;
+  /** rev 14: step-level ground contact candidates before the agreement check, and why the other steps were not */
+  contactCandidates?: number;
+  contactRejects?: Record<string, number>;
   datumSigma: number | null;
   driftRangeM: number | null;
   gpsAccepted: number;
@@ -53,6 +66,7 @@ export interface SmoothedSummaryV4 {
 }
 
 export interface FusionStateV4 {
+  absoluteAltitude: import('./fusion-absolute-altitude.js').AbsoluteAltitudeTracker;
   healthStrideCalibration?: StrideCalibration;
   strideSource?: 'APPLE_HEALTH' | 'SESSION_PEDOMETER' | 'DEFAULT';
   healthStrideBlend?: number;
@@ -68,6 +82,10 @@ export interface FusionStateV4 {
   pendingContinuity?: { thetaPlusRel: number; variance: number };
   lastEventT?: number;
   vehicle: boolean;
+  /** consecutive good fixes reporting vehicle speed while the motion sensors were not still */
+  vehicleRun: number;
+  /** rev 13: current stop (motion-still): state when it began and its fixes, combined into one measurement */
+  stop?: { x: Vec3; P: Mat3; fixes: number[] };
 
   // ---- motion: relative heading, pose, step detection, stationarity ----
   lastMotionT?: number;
@@ -76,6 +94,10 @@ export interface FusionStateV4 {
   rel: number;
   relInitialized: boolean;
   bq: { x1: number; x2: number; y1: number; y2: number; primed: number };
+  /** stepTimeBased: last raw step-signal sample and the next grid time to interpolate at */
+  resample?: { t: number; v: number; rel: number; next: number };
+  /** last reported reason the current segment's heading fit failed (one event per change, diagnostics only) */
+  headingFitFailure?: string;
   f1?: { v: number; t: number; rel: number };
   f2?: number;
   lastPeakT?: number;
@@ -125,9 +147,31 @@ export interface FusionStateV4 {
   altWindow: { t: number; z: number }[];
   zLog: { t: number; z: number }[];
   datumSamples: number[];
+  /** Best reported vertical accuracy, used provisionally only when no trusted datum exists. */
+  bestGpsDatum?: { b: number; accuracy: number };
+  /** Fixed provisional zero: assume the first usable DEM position is at ground level. */
+  terrainFallbackDatum?: DatumV4;
+  startHeightMap?: StartHeightMap | null;
+  startHeightSelection?: StartHeightSelection;
+  mapStartDatum?: DatumV4;
+  roadHeightTracker: RoadHeightTracker;
+  roadHeightContacts: RoadHeightContact[];
+  /** rev 17: collection anchors naming a node (replay input) and the height contacts the final replay made of them */
+  markerAnchors?: MarkerAnchorInput[];
+  markerHeightContacts: MarkerHeightContact[];
+  circularCorridor?: CircularSummary;
+  /** rev 18: registered BLE beacons (created on the first beacon observation; absent = rev 17 behaviour) */
+  beacon?: BeaconTracker;
   /** terrain: session DEM, ground contacts (thinned), GPS heights consistent with the ground (orthometric offsets) */
   terrain?: TerrainContext | null;
   contacts: ContactV4[];
+  /** rev 14: outdoor steps on modified DEM cells (roads, plazas) or steeper ground: wide ground contacts */
+  looseContacts: ContactV4[];
+  /** rev 14: GPS heights (orthometric) with the barometric Z and the ground under the position at that time */
+  gpsHeights: GpsHeightV4[];
+  provisionalCache?: { key: string; datum: DatumV4 | null };
+  /** rev 14: normalized innovations (reported sigma) of the recent fixes, for the adaptive GPS sigma */
+  gpsNis: number[];
   gpsOffsets: number[];
   datum?: DatumV4;
 
@@ -142,6 +186,8 @@ export interface FusionStateV4 {
   // ---- outputs / bookkeeping ----
   fusionSequence: number;
   nextOutputAt?: number;
+  /** position of the last emitted output (rev 13: a stop emits no further points unless the position moved) */
+  lastOutputXY?: [number, number];
   window: {
     gpsUsed: boolean | null;
     gpsReason: string | null;
@@ -152,6 +198,8 @@ export interface FusionStateV4 {
     unheadedSteps: number;
     anchored: boolean;
     reanchored: boolean;
+    /** rev 18: the local frame started at a beacon in this window */
+    beaconAnchored?: boolean;
   };
   lastObservationT?: number;
   skippedLateObservations: number;
@@ -173,8 +221,12 @@ export const emptyWindowV4 = (): FusionStateV4['window'] => ({
   gpsUsed: null, gpsReason: null, gpsSeq: null, gpsAccuracy: null, innovation: null, steps: 0, unheadedSteps: 0, anchored: false, reanchored: false,
 });
 
-export function createFusionStateV4(context?: { strideCalibration: StrideCalibration | null }): FusionStateV4 {
+export function createFusionStateV4(context?: FusionSessionContext): FusionStateV4 {
   return {
+    absoluteAltitude: createAbsoluteAltitudeTracker(context?.absoluteAltitudeEnabled === true),
+    startHeightMap: context?.startHeightMap,
+    ...(context?.markerAnchors?.length ? { markerAnchors: context.markerAnchors } : {}),
+    markerHeightContacts: [],
     ...(context?.strideCalibration ? { healthStrideCalibration: context.strideCalibration } : {}),
     ...(context?.strideCalibration ? { strideSource: 'APPLE_HEALTH' as const, healthStrideBlend: 0 } : {}),
     strideLevelSteps: 0,
@@ -185,6 +237,7 @@ export function createFusionStateV4(context?: { strideCalibration: StrideCalibra
     headingKnown: false,
     headingSource: 'UNKNOWN',
     vehicle: false,
+    vehicleRun: 0,
     rel: 0,
     relInitialized: false,
     bq: { x1: 0, x2: 0, y1: 0, y2: 0, primed: 0 },
@@ -205,6 +258,11 @@ export function createFusionStateV4(context?: { strideCalibration: StrideCalibra
     zLog: [],
     datumSamples: [],
     contacts: [],
+    looseContacts: [],
+    gpsHeights: [],
+    gpsNis: [],
+    roadHeightTracker: {},
+    roadHeightContacts: [],
     gpsOffsets: [],
     segments: [],
     steps: [],

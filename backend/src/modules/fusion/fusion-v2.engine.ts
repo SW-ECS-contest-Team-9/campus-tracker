@@ -85,6 +85,7 @@ const blendUncertainty = (u: number, measurement: number, a: number) => Math.hyp
 
 /** Applies one observation (mutates state). Observations must arrive in compareObservations order. */
 export function processObservationV2(state: FusionStateV2, obs: Observation, c: FusionConfigV2): StepResultV2 {
+  if (obs.kind === 'absoluteAltitude') return { outputs: [], events: [] };
   const r: StepResultV2 = { outputs: [], events: [] };
   if (state.lastObservationT !== undefined && obs.t < state.lastObservationT) {
     state.skippedLateObservations++;

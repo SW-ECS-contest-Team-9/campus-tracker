@@ -25,6 +25,8 @@ type SensorObservation =
     }
   | { kind: 'pedometer'; t: number; seq: number; distance: number | null; steps: number | null; segment?: string | null } // cumulative values
   | { kind: 'altimeter'; t: number; seq: number; relativeAltitude: number | null; segment?: string | null } // cumulative per segment, meters
+  | { kind: 'absoluteAltitude'; t: number; seq: number; altitude: number | null; accuracy: number | null;
+      precision: number | null; verticalReference: string; invalidReason?: string | null; segment?: string | null }
   | {
       kind: 'gps';
       t: number;
@@ -39,7 +41,30 @@ type SensorObservation =
       course: number | null; // degrees clockwise from North, -1 = invalid
       /** captured before the session started (iOS hands out its last cached fix, often minutes old) */
       preSession?: boolean;
-    };
+    }
+  | ({ kind: 'beacon'; t: number; seq: number } & BeaconMeasurementInput);
+
+/**
+ * One registered iBeacon observation, resolved to its spatial anchor and RSSI model when loaded (fusion stays pure).
+ * Anchor coordinates: EPSG:5186 metres, Z = mounting height above MSL; floorHeightM = floor surface (MSL) if known.
+ */
+export interface BeaconMeasurementInput {
+  beaconId: string;
+  rssi: number;
+  platform: string;
+  anchorX: number;
+  anchorY: number;
+  anchorZ: number;
+  buildingId: string;
+  floor: string | null;
+  floorHeightM: number | null;
+  anchorHorizontalAccuracyM: number;
+  measuredPower1m: number;
+  pathLossExponent: number;
+  rssiVariance: number;
+  /** advertisements behind one RSSI value (iOS ranging aggregates ~1 s); null = unknown (one) */
+  sampleCount?: number | null;
+}
 
 export type Observation = SensorObservation & {
   /** Fixed per-session map context, attached by fusion orchestration. Null means map data is unavailable. */
@@ -54,7 +79,7 @@ export type Observation = SensorObservation & {
  * Same timestamp => motion, pedometer, altimeter, then GPS: predict first, correct last, so a fix taken at
  * time t corrects the prediction made up to t. Then by per-sensor sequence. Fully deterministic.
  */
-const KIND_ORDER: Record<Observation['kind'], number> = { motion: 0, pedometer: 1, altimeter: 2, gps: 3 };
+const KIND_ORDER: Record<Observation['kind'], number> = { motion: 0, pedometer: 1, altimeter: 2, absoluteAltitude: 3, beacon: 4, gps: 5 };
 
 export function compareObservations(a: Observation, b: Observation): number {
   return a.t - b.t || KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.seq - b.seq;
@@ -78,8 +103,14 @@ export interface RawSamples {
     rx?: number | null; ry?: number | null; rz?: number | null; gx?: number | null; gy?: number | null; gz?: number | null;
     roll?: number | null; pitch?: number | null; segment?: string | null }[];
   altimeter: { sequence: number; timestamp: string | Date; relativeAltitude?: number | null; segment?: string | null }[];
+  absoluteAltitude?: { sequence: number; timestamp: string | Date; altitude?: number | null; accuracy?: number | null;
+    precision?: number | null; verticalReference: string; invalidReason?: string | null; segment?: string | null }[];
   pedometer: { timestamp: string | Date; distance?: number | null; numberOfSteps?: number | null; segment?: string | null }[];
+  /** registered beacons only (resolved); absent for sessions without beacon observations */
+  beacons?: BeaconRawSample[];
 }
+
+export type BeaconRawSample = { observationId: string; timestamp: string | Date } & BeaconMeasurementInput;
 
 const ms = (t: string | Date) => (t instanceof Date ? t.getTime() : Date.parse(t));
 const n = <T>(v: T | null | undefined): T | null => (v === undefined ? null : v);
@@ -103,6 +134,12 @@ export function buildTimeline(s: RawSamples, opts: { sessionStartedAt?: string |
     obs.push({ kind: 'pedometer', t: ms(p.timestamp), seq: i, distance: n(p.distance), steps: n(p.numberOfSteps), segment: n(p.segment) }),
   );
   for (const a of s.altimeter) obs.push({ kind: 'altimeter', t: ms(a.timestamp), seq: a.sequence, relativeAltitude: n(a.relativeAltitude), segment: n(a.segment) });
+  for (const a of s.absoluteAltitude ?? []) obs.push({ kind: 'absoluteAltitude', t: ms(a.timestamp), seq: a.sequence,
+    altitude: n(a.altitude), accuracy: n(a.accuracy), precision: n(a.precision), verticalReference: a.verticalReference,
+    invalidReason: n(a.invalidReason), segment: n(a.segment) });
+  // seq: per-session order of the beacon rows as loaded (sorted by time, then observation id) for a deterministic tie-break
+  [...(s.beacons ?? [])].sort((a, b) => ms(a.timestamp) - ms(b.timestamp) || a.observationId.localeCompare(b.observationId))
+    .forEach(({ observationId: _id, timestamp, ...b }, i) => obs.push({ kind: 'beacon', t: ms(timestamp), seq: i, ...b }));
   for (const l of s.locations) {
     obs.push({
       kind: 'gps',
