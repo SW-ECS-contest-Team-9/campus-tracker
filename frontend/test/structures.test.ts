@@ -332,12 +332,12 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   const b1 = solids.find((s: any) => s.id === 'U02-VOID-B1'), b2 = solids.find((s: any) => s.id === 'U02-VOID-B2');
   assert.deepEqual([b1.role, voidName(b1), b2.role, voidName(b2)], ['void', '운동장 지하 1층', 'void', '운동장 지하 2층']);
   assert.equal(voidName({ props: {} } as any), '빈 곳');
-  // 사용자 붉은 선(±1 m): 지하 1층 띠 약 140.1~144.4. 지하 1층 천장 위 4 m 넘게는 빈 층 없이 구조, 두 층 사이는 바닥 판
-  assert.ok(Math.abs(b1.topM - 144.4) <= 1 && b1.bottomM >= 140.1 && b1.bottomM <= 141.7);
-  // U11: 지하 2층은 한 층(사진 22·23 에서 잰 3.1~3.8 m) 아래다. 붉은 선의 133 m 는 따르지 않는다(까닭은 구역 노트 U11 '높이'). 사이 바닥 판 0.5 m
-  assert.ok(b1.bottomM - b2.bottomM >= 3.1 && b1.bottomM - b2.bottomM <= 3.8 && Math.abs(b1.bottomM - b2.topM - 0.5) < 1e-9, `${b2.bottomM} ${b2.topM}`);
-  assert.ok(148.9 - b1.topM > 4 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
-  assert.ok(!solids.some((s: any) => s.role === 'void' && s.id !== 'U02-VOID-FIELD-STAIR' && s.topM > 144.7 + 1e-9));
+  // 2026-10-22 사용자 결정: 지하 1층 바닥 143.5(±0.5), 빈 높이 3.0 m(전: 사용자 붉은 선 140.1~144.4). 천장 위 운동장까지는 빈 층 없이 구조, 두 층 사이는 바닥 판
+  assert.ok(Math.abs(b1.bottomM - 143.5) <= 0.5 && Math.abs(b1.topM - b1.bottomM - 3.0) < 1e-9);
+  // 2026-10-22: 지하 2층 바닥은 약 138(U11 137.9 그대로, 지하 1층 - 30~40 단 = 5.1~6.8 m). 사이 바닥 판 0.5 m
+  assert.ok(Math.abs(b2.bottomM - 138) <= 0.5 && b1.bottomM - b2.bottomM >= 5.1 && b1.bottomM - b2.bottomM <= 6.8 && Math.abs(b1.bottomM - b2.topM - 0.5) < 1e-9, `${b2.bottomM} ${b2.topM}`);
+  assert.ok(148.9 - b1.topM > 2 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
+  assert.ok(!solids.some((s: any) => s.role === 'void' && s.id !== 'U02-VOID-FIELD-STAIR' && s.topM > b1.topM + 1e-9));
   // 지하 차도 연장의 바닥은 서쪽에서 동쪽으로 내려가지 않는다(계단 없는 한 경사), 끝은 지하 1층 바닥이다(지하 1층으로 들어온다)
   const road = solids.filter((s: any) => /^U02-VOID-ROAD-\d+$/.test(s.id)).sort((a: any, b: any) => a.id.localeCompare(b.id));
   assert.ok(road.length > 5 && road.every((s: any, i: number) => i === 0 || s.bottomM >= road[i - 1].bottomM) && Math.abs(road[road.length - 1].bottomM - b1.bottomM) < 1e-9);
@@ -357,7 +357,8 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   const ends = ramp.map((s: any) => s.profile.points.map((q: number[]) => q[1]));
   assert.ok(Math.abs(ends[0][0] - b2.bottomM) < 0.03 && Math.abs(ends[last][1] - b1.bottomM) < 1e-9 && ends.every((q: number[], i: number) => q[1] > q[0] && (i === 0 || Math.abs(q[0] - ends[i - 1][1]) < 0.011)));
   const runM = ramp.reduce((t: number, s: any) => t + s.profile.points[1][0], 0), gradeAll = (b1.bottomM - b2.bottomM) / runM;
-  assert.ok(Math.abs(runM - 20) < 0.5 && gradeAll >= 0.15 && gradeAll <= 0.19, `${runM} ${gradeAll}`);
+  // 2026-10-22: 평면(20 m)은 사진대로 두고 층 차가 5.6 m 가 되어 28 % (사진의 15~19 % 와 어긋남: 구역 노트 같은 날 절, 풀리지 않음)
+  assert.ok(Math.abs(runM - 20) < 0.5 && Math.abs(gradeAll - (b1.bottomM - b2.bottomM) / 20) < 0.01 && gradeAll >= 0.15 && gradeAll <= 0.3, `${runM} ${gradeAll}`);
   // ㄴ자: 곧은 12 m(두 조각, 같은 방향) 뒤에 한쪽으로만 굽어 60~90도 돈다
   const d0 = ramp[0].profile.direction, d1 = ramp[1].profile.direction, dN = ramp[last].profile.direction;
   assert.ok(Math.abs(d0[0] * d1[0] + d0[1] * d1[1] - 1) < 1e-6 && Math.abs(ramp[0].profile.points[1][0] + ramp[1].profile.points[1][0] - 12) < 0.01, 'straight leg');
