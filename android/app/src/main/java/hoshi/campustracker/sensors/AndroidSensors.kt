@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import hoshi.campustracker.core.ClockCalibration
 import hoshi.campustracker.core.CollectorClock
 import hoshi.campustracker.core.L
 import hoshi.campustracker.core.SensorTimestampCorrector
@@ -239,21 +240,30 @@ class AndroidMotionSource(
         attitude: AttitudeChoice,
         onReading: (MotionReading) -> Unit,
         onRotationAccuracyChanged: (Int) -> Unit,
-        onClockOffset: (Long) -> Unit,
+        onClockCalibrated: (ClockCalibration) -> Unit,
     ) {
         if (isActive || !isAvailable) return
         val attitudeSensor = if (attitude.sensor == AttitudeChoice.ROTATION_VECTOR) rotationVector else gameRotationVector
         val assembler = MotionAssembler(hz, if (attitude.referenceFrame == AttitudeChoice.TRUE_NORTH) attitude.declinationRad else 0.0)
+        // Events of the calibration window, released with the decided offset (SensorTimestampCorrector).
+        val held = ArrayList<Triple<Int, Long, FloatArray>>()
+        fun dispatch(type: Int, rawTimestamp: Long, values: FloatArray) {
+            val ts = corrector.correct(rawTimestamp)
+            when (type) {
+                Sensor.TYPE_GRAVITY -> assembler.onGravity(ts, values)
+                Sensor.TYPE_GYROSCOPE -> assembler.onGyroscope(ts, values)
+                Sensor.TYPE_ROTATION_VECTOR, Sensor.TYPE_GAME_ROTATION_VECTOR -> assembler.onRotationVector(ts, values)
+                Sensor.TYPE_LINEAR_ACCELERATION -> assembler.onLinearAcceleration(ts, values)?.let(onReading)
+            }
+        }
         val l = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
-                corrector.calibrateIfNeeded(event.timestamp)?.let(onClockOffset)
-                val ts = corrector.correct(event.timestamp)
-                when (event.sensor.type) {
-                    Sensor.TYPE_GRAVITY -> assembler.onGravity(ts, event.values)
-                    Sensor.TYPE_GYROSCOPE -> assembler.onGyroscope(ts, event.values)
-                    Sensor.TYPE_ROTATION_VECTOR, Sensor.TYPE_GAME_ROTATION_VECTOR -> assembler.onRotationVector(ts, event.values)
-                    Sensor.TYPE_LINEAR_ACCELERATION -> assembler.onLinearAcceleration(ts, event.values)?.let(onReading)
-                }
+                if (corrector.isCalibrated) return dispatch(event.sensor.type, event.timestamp, event.values)
+                held += Triple(event.sensor.type, event.timestamp, event.values.clone())
+                val result = corrector.observe(event.timestamp) ?: return
+                onClockCalibrated(result)
+                for ((type, timestamp, values) in held) dispatch(type, timestamp, values)
+                held.clear()
             }
 
             override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {

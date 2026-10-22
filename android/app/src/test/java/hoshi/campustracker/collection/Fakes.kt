@@ -1,5 +1,6 @@
 package hoshi.campustracker.collection
 
+import hoshi.campustracker.core.ClockCalibration
 import hoshi.campustracker.core.CollectorClock
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.SensorCapabilities
@@ -67,7 +68,7 @@ class FakeMotion : MotionSource {
     var startedWith: AttitudeChoice? = null
     override fun chooseAttitude(position: KnownPosition?, nowMs: Long) =
         AttitudeChoice(AttitudeChoice.ROTATION_VECTOR, AttitudeChoice.TRUE_NORTH, -8.7)
-    override fun start(hz: Int, attitude: AttitudeChoice, onReading: (MotionReading) -> Unit, onRotationAccuracyChanged: (Int) -> Unit, onClockOffset: (Long) -> Unit) {
+    override fun start(hz: Int, attitude: AttitudeChoice, onReading: (MotionReading) -> Unit, onRotationAccuracyChanged: (Int) -> Unit, onClockCalibrated: (ClockCalibration) -> Unit) {
         isActive = true; callback = onReading; startedWith = attitude
     }
     override fun stop() { isActive = false; callback = null }

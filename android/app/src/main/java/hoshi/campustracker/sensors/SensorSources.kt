@@ -1,5 +1,6 @@
 package hoshi.campustracker.sensors
 
+import hoshi.campustracker.core.ClockCalibration
 import hoshi.campustracker.model.LocationCollectionProfile
 
 /** A fix already mapped to the iPhone field meanings (§4.1). Fields the provider does not report are null. */
@@ -60,7 +61,7 @@ interface MotionSource {
         attitude: AttitudeChoice,
         onReading: (MotionReading) -> Unit,
         onRotationAccuracyChanged: (Int) -> Unit,
-        onClockOffset: (Long) -> Unit,
+        onClockCalibrated: (ClockCalibration) -> Unit,
     )
     fun stop()
     /** Epoch ms for a reading's corrected sensor timestamp. */

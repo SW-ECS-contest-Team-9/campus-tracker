@@ -142,7 +142,9 @@ class CollectionCoordinatorTest {
         // Stop: an empty stream (no barometer, no steps) reports −1.
         second.coordinator.stopSession()
         second.executor.runAll()
+        assertTrue(File(root, "active_collection.json").exists()) // kept until the finish is in the upload queue
         runCurrent()
+        second.executor.runAll()
         assertFalse(File(root, "active_collection.json").exists())
         assertFalse(second.platform.foreground)
         val finish = queue.allItems().first { it.kind == ItemKind.finish }
@@ -170,6 +172,7 @@ class CollectionCoordinatorTest {
         second.coordinator.finishInterrupted(owner)
         second.executor.runAll()
         runCurrent()
+        second.executor.runAll()
         assertNull(second.coordinator.ui.value.interrupted)
         assertFalse(File(root, "active_collection.json").exists())
         val finish = Json.parseToJsonElement(queue.allItems().first { it.kind == ItemKind.finish }.payload).jsonObject
@@ -232,5 +235,53 @@ class CollectionCoordinatorTest {
         val lines = File(root, "sessions/${batch.str("clientSessionId")}/location.ndjson").readLines()
         assertEquals(1, lines.size)
         assertTrue(Regex("\"timestamp\":\"\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d{3}Z\"").containsMatchIn(lines[0]))
+    }
+
+    private fun diagnostics(): List<kotlinx.serialization.json.JsonObject> = queue.allItems().filter { it.kind == ItemKind.diagnostic }.map {
+        Json.parseToJsonElement(it.payload).jsonObject["events"]!!.jsonArray.single().jsonObject
+    }
+
+    @Test
+    fun lateCallbackAfterStopNeverLandsInTheNextSession() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        val first = p.coordinator.ui.value.activeSession!!.id
+        val staleLocation = p.location.callback!!
+        val staleMotion = p.motion.callback!!
+        p.coordinator.stopSession()
+        p.executor.runAll(); runCurrent(); p.executor.runAll()
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        val second = p.coordinator.ui.value.activeSession!!.id
+        assertTrue(first != second)
+        // Callbacks registered for the first run arrive after the second run started.
+        staleLocation(hoshi.campustracker.sensors.LocationReading(p.clock.now, 37.6, 127.0, null, null, 5.0, null, null, null, null, null))
+        staleMotion(hoshi.campustracker.sensors.MotionReading(p.clock.now * 1_000_000, null, null, null, null))
+        p.motion.emit(p.clock.now) // the current run's callback still records
+        p.advance(1_100); runCurrent()
+        val batches = queue.allItems().filter { it.kind == ItemKind.batch }.map { Json.parseToJsonElement(it.payload).jsonObject }
+        val ofSecond = batches.filter { it.str("clientSessionId") == second }
+        assertEquals(0, ofSecond.sumOf { it["locations"]!!.jsonArray.size })
+        assertEquals(1, ofSecond.sumOf { it["motion"]!!.jsonArray.size })
+        assertEquals(0, p.coordinator.ui.value.counts.location)
+    }
+
+    @Test
+    fun stalledMotionIsReportedOnceAndReArmedWhenSamplesReturn() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        p.motion.emit(p.clock.now)
+        p.advance(1_500); runCurrent()
+        assertTrue(diagnostics().none { it.str("eventType") == "SENSOR_CALLBACK_STALLED" })
+        p.advance(4_000); runCurrent()
+        val stalls = { diagnostics().filter { it.str("eventType") == "SENSOR_CALLBACK_STALLED" } }
+        assertEquals(1, stalls().size)
+        assertEquals("motion", stalls().single()["metadata"]!!.jsonObject.str("sensor"))
+        p.motion.emit(p.clock.now)
+        p.advance(500); runCurrent()
+        p.advance(2_500); runCurrent()
+        assertEquals(2, stalls().size)
     }
 }
