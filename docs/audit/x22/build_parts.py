@@ -343,9 +343,9 @@ box('X22-CHEONGUN-B1-DOOR', 'wall', rect_frame(DO, DW, DN, 0.3, 1.5, -0.05, 0.05
 box('X22-CHEONGUN-B1-WALL', 'wall', rect_frame(DO, DW, DN, -1.2, 3.4, 0.05, 0.25), ZP, ZP + 2.9, '문 둘레 벽: 청록 허리벽 위 콘크리트 면(청록으로 줄임)', SRC_V2, GV2, 'U02-VOID-B1', color='#2f8f8a', **UG)
 box('X22-CHEONGUN-B1-SIGN', 'wall', rect_frame(DO, DW, DN, 1.8, 2.3, -0.08, 0.05), ZP + 0.8, ZP + 2.6, '"청운관" 세로 조명 글자 판(회색 세로 살 판에 밝은 글자, 글자는 싣지 않음)', SRC_V2, GV2, 'X22-CHEONGUN-B1-WALL', color='#8b9096', **UG)
 box('X22-CHEONGUN-B1-SIGN-LIGHT', 'wall', rect_frame(DO, DW, DN, 1.95, 2.15, -0.1, -0.08), ZP + 0.95, ZP + 2.45, '세로 조명 글자(밝은 띠로 줄임)', SRC_V2, GV2, 'X22-CHEONGUN-B1-SIGN', color='#fff8dc', **UG)
-# 2026-10-22: 계단실 빈 곳(붉은 벽 칸 어귀 149.2 → 지하 1층 앞방 143.5 → 지하 2층 137.9). 평면은 시험용 DB 길 c9319f92·1eccfdaf(x22/build_group.py cheongun)의 선을 감싼 네모 + 0.4 m. 단·난간은 그리지 않음(X24)
+# 2026-10-22: 계단실 빈 곳(붉은 벽 칸 어귀 149.2 → 지하 1층 앞방 143.5 → 지하 2층 140.0, 사용자 결정 2026-10-22). 평면은 시험용 DB 길 c9319f92·1eccfdaf(x22/build_group.py cheongun)의 선을 감싼 네모 + 0.4 m. 단·난간은 그리지 않음(X24)
 FEATS.append({'type': 'Feature', 'properties': {'id': 'X22-CHEONGUN-STAIRWELL', 'type': 'void', 'kind': 'void', 'estimated': True, 'grade': '확정(계단실이 있다: 영상 2·사용자), 추정(평면·높이)',
-    'fromM': 137.9, 'toM': 149.2, 'name': '청운관 계단실', 'assumption': '청운관 계단실: 붉은 벽 칸(149.2)에서 두 줄 26 단으로 지하 1층 앞방(143.5, 단 0.22 m), 앞방에서 되돌림 두 줄로 지하 2층(137.9, 5.6 m). 평면 추정', 'source': SRC_V2},
+    'fromM': 140.0, 'toM': 149.2, 'name': '청운관 계단실', 'assumption': '청운관 계단실: 붉은 벽 칸(149.2)에서 두 줄 26 단으로 지하 1층 앞방(143.5, 단 0.22 m), 앞방에서 되돌림 두 줄 약 20 단으로 지하 2층(140.0, 3.5 m: 사용자 결정 2026-10-22). 평면 추정', 'source': SRC_V2},
     'geometry': geom(Polygon([(201207.5, 557281.4), (201215.6, 557281.4), (201215.6, 557284.3), (201207.5, 557284.3)]))})
 b15 = load('b15-cheongun.geojson'); n0 = len(b15['features'])
 b15['features'] = [f for f in b15['features'] if f['properties']['id'] != 'B15-CHEONGUN-PORCH-GLASS-B1']; dump('b15-cheongun.geojson', b15); print('b15 유리 면 걷음', n0 - len(b15['features']))
