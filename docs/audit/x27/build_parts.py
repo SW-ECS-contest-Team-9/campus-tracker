@@ -95,12 +95,12 @@ UW, UE, UFL = -5.25, 5.25, -7.25
 DARK = '#3c3f44'
 for k in range(1, NR):
     v0, v1 = V0 + GO * (k - 1), V0 + GO * k; zt = Z0 + RISE * k
-    box(f'X27-STAIR-S{k:02d}', 'stair_step', Q(UFL if k <= 3 else UW, UE, v0, v1), Z0 - 0.3, zt, f'정문 계단 {k}단(짙은 광택 화강석, 한 줄 15단: 125.1 → 127.2). 아래 3단은 서쪽으로 2 m 더 넓다(사진 17)', SRC_S, GS, 'X27-PLATFORM-HANLIM-STAIR',
+    box(f'X27-STAIR-S{k:02d}', 'stair_step', Q(UFL if k <= 3 else UW, UE, v0, v1), Z0 - 0.3, zt, f'정문 계단 {k}단(짙은 광택 화강석, 한 줄 15단: 125.1 → 127.2). 아래 3단은 서쪽으로 2 m 더 넓다(사진 17)', SRC_S, GS, 'X27-PLATFORM-UPPER-HANLIM-STAIR',
         stair='X27-STAIR', riseM=r2(RISE), runM=r2(GO), widthM=r2(UE - UW), color=DARK)
     if k >= 4:
-        box(f'X27-STAIR-WALL-W-{k:02d}', 'wall', Q(-5.65, UW, v0, v1), Z0 - 0.3, max(zt + 1.0, 127.6), '서쪽 높은 짙은 화강석 난간벽(계단과 나란히 단마다)', SRC_S, GS, 'X27-PLATFORM-HANLIM-STAIR', color='#33363a')
-    box(f'X27-STAIR-WALL-E-{k:02d}', 'wall', Q(UE, 5.55, v0, v1), Z0 - 0.3, zt + 0.5, '동쪽 낮은 짙은 화강석 벽(그 너머 화단·바위 정원)', SRC_S, GS, 'X27-PLATFORM-HANLIM-STAIR', color='#33363a')
-box('X27-STAIR-WALL-W-04-POST', 'wall', Q(-5.75, UW + 0.1, V0 + GO * 3, V0 + GO * 3 + 0.45), Z0 - 0.3, max(Z0 + RISE * 4 + 1.3, 127.9), '서쪽 난간벽 끝 기둥(머릿돌)', SRC_S, GS, 'X27-PLATFORM-HANLIM-STAIR', color='#2c2f33')
+        box(f'X27-STAIR-WALL-W-{k:02d}', 'wall', Q(-5.65, UW, v0, v1), Z0 - 0.3, max(zt + 1.0, 127.6), '서쪽 높은 짙은 화강석 난간벽(계단과 나란히 단마다)', SRC_S, GS, 'X27-PLATFORM-UPPER-HANLIM-STAIR', color='#33363a')
+    box(f'X27-STAIR-WALL-E-{k:02d}', 'wall', Q(UE, 5.55, v0, v1), Z0 - 0.3, zt + 0.5, '동쪽 낮은 짙은 화강석 벽(그 너머 화단·바위 정원)', SRC_S, GS, 'X27-PLATFORM-UPPER-HANLIM-STAIR', color='#33363a')
+box('X27-STAIR-WALL-W-04-POST', 'wall', Q(-5.75, UW + 0.1, V0 + GO * 3, V0 + GO * 3 + 0.45), Z0 - 0.3, max(Z0 + RISE * 4 + 1.3, 127.9), '서쪽 난간벽 끝 기둥(머릿돌)', SRC_S, GS, 'X27-PLATFORM-UPPER-HANLIM-STAIR', color='#2c2f33')
 box('X27-LANDING', 'landing', Q(UW, UE, VT, 1.45), 127.0, ZL + 0.02, '문 앞 참: 광택 화강석, 깊이 3.2 m(계단 머리 ~ 유리 면)', SRC_S, GS, 'X27-PLATFORM-HANLIM-1F', color='#45484d')
 box('X27-LANDING-WALL-W', 'wall', Q(-5.65, UW, VT, 0.6), 127.0, ZL + 1.0, '참 서쪽 끝벽(그 밖은 흰 돌 계단식 화단: 사진 21)', SRC_S, GS, 'X27-PLATFORM-HANLIM-1F', color='#33363a')
 box('X27-LANDING-WALL-E', 'wall', Q(UE, 5.55, VT, 0.6), 127.0, ZL + 0.5, '참 동쪽 낮은 벽', SRC_S, GS, 'X27-PLATFORM-HANLIM-1F', color='#33363a')
@@ -184,9 +184,9 @@ TERRZ = TERR.intersection(W.buffer(0.5)).buffer(0)
 # 길 따라 오르는 화단·곡선 계단 바닥: 북좌표 557266 125.2 → 557247 128.4(위쪽 갈래 차도 종단과 나란히)
 LOWPROF = {'origin': [201111.0, 557266.0], 'direction': [0.0, -1.0], 'points': [[0.0, 125.2], [19.0, 128.4]]}
 NEWP = {
-    'X27-PLATFORM-HANLIM-STAIR': (unary_union([OLD['Z05-PLATFORM-UPPER-HANLIM-FRONT'], STAIRZ]).difference(LANDZ).difference(RG).difference(LOW).difference(U1).buffer(0), 125.0, 'paving',
+    'X27-PLATFORM-UPPER-HANLIM-STAIR': (unary_union([OLD['Z05-PLATFORM-UPPER-HANLIM-FRONT'], STAIRZ]).difference(LANDZ).difference(RG).difference(LOW).difference(U1).buffer(0), 125.0, 'paving',
         '정문 계단 밑과 발치 앞(계단 상자가 얹히는 바탕): 차도 높이 한 면. 옛 HANLIM-FRONT 경사면(125.2→126.6)을 대신한다', '항공사진(계단 자리), S-MAP·사용자 핀(차도 125.1), 추정(외곽)'),
-    'X27-PLATFORM-ROCKGARDEN': (RG, 125.6, 'rock', '바위 정원 바탕(물 자리·흰 돌 바닥 높이): 그 위에 막돌 단 셋을 상자로 얹는다. 옛 HANLIM-SOUTH·EUNJU1-NW 경사면 자리', '사진 17·19(막돌 단·물 자리), 구역 노트 X30(바탕 125.6), 추정(외곽)'),
+    'X27-PLATFORM-UPPER-ROCKGARDEN': (RG, 125.6, 'rock', '바위 정원 바탕(물 자리·흰 돌 바닥 높이): 그 위에 막돌 단 셋을 상자로 얹는다. 옛 HANLIM-SOUTH·EUNJU1-NW 경사면 자리', '사진 17·19(막돌 단·물 자리), 구역 노트 X30(바탕 125.6), 추정(외곽)'),
     'X27-PLATFORM-EUNJU-STAIR-BED': (LOW, LOWPROF, 'planting', '은주1관 곡선 돌계단 밑과 차도 쪽 철쭉 화단 바탕: 위쪽 갈래 차도와 나란히 남쪽으로 오르는 한 경사면', '사진 은주관-곡선계단(철쭉 화단), 항공사진, 추정(외곽·높이 = 차도 종단 + 0)'),
     'X27-PLATFORM-EUNJU-TERRACE-BASE': (TERRZ, 125.6, 'concrete', '반원 테라스(131.3) 밑 바탕: 테라스 상자가 얹힌다', '사진 19·은주관-곡선계단, B15 후보 A, 추정'),
 }
@@ -197,7 +197,7 @@ for fid in EDIT:
     if fid == 'Z05-PLATFORM-UPPER-HANLIM-1F':
         g = unary_union([OLD[fid].difference(STAIRZ), LANDZ.difference(HANLIM.buffer(-1.0))]).buffer(0); gs = unary_union([OLDS[fid].difference(STAIRZ), LANDZ.difference(HANLIM.buffer(-1.0))]).buffer(0) if OLDS[fid] else None
     elif fid == 'Z05-PLATFORM-UPPER-HANLIM-FRONT':
-        g = None; gs = None                                   # X27-PLATFORM-HANLIM-STAIR 가 대신한다
+        g = None; gs = None                                   # X27-PLATFORM-UPPER-HANLIM-STAIR 가 대신한다
     else:
         g = OLD[fid].difference(CUT).buffer(0); gs = OLDS[fid].difference(CUT).buffer(0) if OLDS[fid] else None
     CHANGED[fid] = (g, gs)
@@ -299,15 +299,15 @@ for k, (v0, v1, zt) in enumerate(LEVELS, 1):
     part = RGB.intersection(vband(v0, v1)).buffer(-0.05).buffer(0.05)
     for j, g in enumerate([part] if part.geom_type == 'Polygon' else sorted(part.geoms, key=lambda q: -q.area)):
         if g.area < 1.0: continue
-        box(f'X27-ROCK-TIER{k}-{j + 1}', 'planter', g, 125.3, zt, f'바위 정원 막돌 단 {k}(분홍빛 막돌 쌓기, 윗면은 심은 흙)', SRC_R, GR, 'X27-PLATFORM-ROCKGARDEN', color='#b8a08e', topColor='#6f8a55')
+        box(f'X27-ROCK-TIER{k}-{j + 1}', 'planter', g, 125.3, zt, f'바위 정원 막돌 단 {k}(분홍빛 막돌 쌓기, 윗면은 심은 흙)', SRC_R, GR, 'X27-PLATFORM-UPPER-ROCKGARDEN', color='#b8a08e', topColor='#6f8a55')
         bands.append((k, g, zt))
 lowz_ = RGB.intersection(vband(-30, -6.0))
 wc = (201115.8, 557264.2)
 water = disc(wc, 1.4, 14).intersection(lowz_)
-box('X27-ROCK-WATER', 'wall', water, 125.6, 125.64, '물 자리(청록: 항공사진)', SRC_R, GR, 'X27-PLATFORM-ROCKGARDEN', material='water')
-box('X27-ROCK-PEBBLES', 'wall', lowz_.difference(disc(wc, 1.45, 14)).intersection(disc((201114.8, 557265.5), 3.2, 18)), 125.6, 125.63, '흰 돌 바닥(마른 물길)', SRC_R, GR, 'X27-PLATFORM-ROCKGARDEN', color='#e6e4dc')
+box('X27-ROCK-WATER', 'wall', water, 125.6, 125.64, '물 자리(청록: 항공사진)', SRC_R, GR, 'X27-PLATFORM-UPPER-ROCKGARDEN', material='water')
+box('X27-ROCK-PEBBLES', 'wall', lowz_.difference(disc(wc, 1.45, 14)).intersection(disc((201114.8, 557265.5), 3.2, 18)), 125.6, 125.63, '흰 돌 바닥(마른 물길)', SRC_R, GR, 'X27-PLATFORM-UPPER-ROCKGARDEN', color='#e6e4dc')
 _bp = lowz_.difference(CLINE.buffer(2.7)).difference(disc(wc, 1.5)).representative_point()
-box('X27-ROCK-BOULDER', 'wall', disc((_bp.x, _bp.y), 0.9, 7).intersection(lowz_), 125.6, 126.8, '큰 바위', SRC_R, GR, 'X27-PLATFORM-ROCKGARDEN', color='#7c7f7a')
+box('X27-ROCK-BOULDER', 'wall', disc((_bp.x, _bp.y), 0.9, 7).intersection(lowz_), 125.6, 126.8, '큰 바위', SRC_R, GR, 'X27-PLATFORM-UPPER-ROCKGARDEN', color='#7c7f7a')
 def inside_pt(g, frac):
     c = g.centroid
     return (c.x, c.y) if g.contains(c) else (g.representative_point().x, g.representative_point().y)

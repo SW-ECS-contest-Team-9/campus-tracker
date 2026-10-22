@@ -11264,7 +11264,7 @@
   {
    "type": "Feature",
    "properties": {
-    "name": "X27-HANLIM-STAIR",
+    "name": "X27-UPPER-HANLIM-STAIR",
     "srid": 5186,
     "reason": "X27 정문 계단 밑과 발치 앞(계단 상자가 얹히는 바탕)",
     "grade": "항공사진(계단 자리), S-MAP·사용자 핀(차도 125.1), 추정(외곽)",
@@ -13593,7 +13593,7 @@
   {
    "type": "Feature",
    "properties": {
-    "name": "X27-ROCKGARDEN",
+    "name": "X27-UPPER-ROCKGARDEN",
     "srid": 5186,
     "reason": "X27 바위 정원 바탕(물 자리·흰 돌 바닥 높이)",
     "grade": "사진 17·19(막돌 단·물 자리), 구역 노트 X30(바탕 125.6), 추정(외곽)",
