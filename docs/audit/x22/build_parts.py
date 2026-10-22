@@ -272,6 +272,34 @@ for i, ch in enumerate('SKON SQUARE'):
                 c = e + 1
             else: c += 1
 
+# ===================== 영상 2: 청운관 현관 틀 밑 통로(X19)와 주차장 쪽 청운관 문(X21) =====================
+SRC_V2 = '전경 영상 2(전경-영상2.mp4) 2~12 초(틀 밑 통로·붉은 벽 칸), 31·33 초(청록 앞방·지하 1층 문), 52~56 초(주차장 쪽 문·"청운관" 세로 조명 글자), 사용자 2026-10-22'
+GV2 = '확정(있음: 영상 2), 추정(치수·자리 ±1.5 m: 틀의 첫째·둘째 기둥 줄 사이 통로 안쪽)'
+PO = np.array([201213.35, 557281.05]); PP = np.array([0.7205, 0.6935]); PQ = np.array([-0.6935, 0.7205])   # 통로 어귀(기둥 앞선) · 안쪽(북동) · 왼쪽(북서)
+ZB1, ZR = 148.9, 149.2
+for k2, (a0, a1, zt) in enumerate(((2.0, 2.3, 149.05), (2.3, 2.6, ZR))):
+    box(f'X22-CHEONGUN-PASSAGE-STEP-{k2 + 1}', 'stair_step', rect_frame(PO, PP, PQ, a0, a1, -1.5, 1.5), ZB1, zt, '틀 밑 통로의 짙은 돌 디딤(2단, 줄무늬 철 코)', SRC_V2, GV2, 'B15-CHEONGUN-PORCH-FLOOR-B1', stair='X22-CHEONGUN-PASSAGE-STEPS', riseM=0.15, runM=0.3, widthM=3.0, color='#5b5852')
+box('X22-CHEONGUN-REDCELL-FLOOR', 'landing', rect_frame(PO, PP, PQ, 2.6, 5.3, -1.5, 1.5), ZB1, ZR, '붉은 벽 칸 바닥(149.2 m 추정 = 운동장 + 디딤 2단)', SRC_V2, GV2, 'B15-CHEONGUN-PORCH-FLOOR-B1', color='#8d8a84')
+box('X22-CHEONGUN-REDCELL-WALL-BACK', 'wall', rect_frame(PO, PP, PQ, 5.3, 5.45, -1.5, 1.5), ZR, 151.8, '붉게 칠한 안쪽 벽(사진 09 의 분홍 조명 문으로 보이던 것. 전에는 유리 면)', SRC_V2, GV2, 'X22-CHEONGUN-REDCELL-FLOOR', color='#c0392b')
+box('X22-CHEONGUN-REDCELL-WALL-LEFT', 'wall', rect_frame(PO, PP, PQ, 2.6, 5.3, 1.45, 1.55), ZR, 151.8, '붉게 칠한 왼쪽 벽', SRC_V2, GV2, 'X22-CHEONGUN-REDCELL-FLOOR', color='#c0392b')
+box('X22-CHEONGUN-REDCELL-DOOR', 'wall', rect_frame(PO, PP, PQ, 3.6, 4.6, 1.38, 1.45), ZR, ZR + 2.1, '왼쪽 벽의 회색 문', SRC_V2, GV2, 'X22-CHEONGUN-REDCELL-WALL-LEFT', color='#7d8287')
+box('X22-CHEONGUN-REDCELL-CEILING', 'canopy', rect_frame(PO, PP, PQ, 2.0, 5.45, -1.5, 1.55), 151.8, 151.9, '나무 판 천장', SRC_V2, GV2, 'X22-CHEONGUN-REDCELL-WALL-BACK', color='#b88a55')
+box('X22-CHEONGUN-PASSAGE-SIDEWALL', 'wall', rect_frame(PO, PP, PQ, 0.6, 2.6, 1.45, 1.6), ZB1, 150.3, '디딤 왼쪽 거친 돌 옆벽', SRC_V2, GV2, 'B15-CHEONGUN-PORCH-FLOOR-B1', color='#b3ad9f')
+_lw = Polygon(ALL['B15-CHEONGUN-PORCH-PLANTER-LOW-W']['geometry']['coordinates'][0]); _ax = LineString([_lw.exterior.coords[0], _lw.exterior.coords[1]]); _off = np.array(_lw.centroid.coords[0]) - np.array(_ax.interpolate(0.5, normalized=True).coords[0])
+for k2, c in enumerate(tuple(np.array(_ax.interpolate(f, normalized=True).coords[0]) + _off) for f in (0.3, 0.5, 0.7)):
+    fid, z = holder(c[0], c[1], ('B15-CHEONGUN-PORCH-PLANTER-LOW-W',))
+    box(f'X22-CHEONGUN-FIRE-POST-{k2 + 1}', 'wall', disc(c, 0.1, 6), z, z + 0.75, '낮은 돌 화단 위 소방 송수구 기둥(빨강)', SRC_V2, GV2, fid, color='#d0312d')
+# 주차장(지하 1층) 쪽 청운관 문: 학교 지하도 지도 초록 점 "청운관 서"(201209.4, 557280.8)가 주차장 북쪽 벽 꺾이는 자리. 문은 앞방에서 내려가는 계단의 왼쪽(사용자 2026-10-22, 영상 2 31 초)
+DW = np.array([0.866, -0.5]); DN = np.array([0.5, 0.866])   # 벽을 따라(남동) · 벽 안쪽(북동)
+DO = np.array([201209.4, 557280.8]); ZP = 141.4
+UG = dict(underground=True, inVoid=True)
+box('X22-CHEONGUN-B1-DOOR', 'wall', rect_frame(DO, DW, DN, 0.3, 1.5, -0.05, 0.05), ZP, ZP + 2.2, '주차장 쪽 청운관 문(유리 붙은 갈색 철문)', SRC_V2, GV2, 'U02-VOID-B1', color='#6b4a2f', **UG)
+box('X22-CHEONGUN-B1-WALL', 'wall', rect_frame(DO, DW, DN, -1.2, 3.4, 0.05, 0.25), ZP, ZP + 2.9, '문 둘레 벽: 청록 허리벽 위 콘크리트 면(청록으로 줄임)', SRC_V2, GV2, 'U02-VOID-B1', color='#2f8f8a', **UG)
+box('X22-CHEONGUN-B1-SIGN', 'wall', rect_frame(DO, DW, DN, 1.8, 2.3, -0.08, 0.05), ZP + 0.8, ZP + 2.6, '"청운관" 세로 조명 글자 판(회색 세로 살 판에 밝은 글자, 글자는 싣지 않음)', SRC_V2, GV2, 'X22-CHEONGUN-B1-WALL', color='#8b9096', **UG)
+box('X22-CHEONGUN-B1-SIGN-LIGHT', 'wall', rect_frame(DO, DW, DN, 1.95, 2.15, -0.1, -0.08), ZP + 0.95, ZP + 2.45, '세로 조명 글자(밝은 띠로 줄임)', SRC_V2, GV2, 'X22-CHEONGUN-B1-SIGN', color='#fff8dc', **UG)
+b15 = load('b15-cheongun.geojson'); n0 = len(b15['features'])
+b15['features'] = [f for f in b15['features'] if f['properties']['id'] != 'B15-CHEONGUN-PORCH-GLASS-B1']; dump('b15-cheongun.geojson', b15); print('b15 유리 면 걷음', n0 - len(b15['features']))
+
 # ===================== z02-daeil-front.geojson 고침(항공사진: 데크 띠 v 0.9~3.2, 앞 화단 v 3.2~6.3, 동쪽 끝 계단 u 50.6~55.0, 가운데 화단 u 55.2~57.7) =====================
 z02 = load('z02-daeil-front.geojson'); F = {f['properties']['id']: f for f in z02['features']}
 def setp(fid, uvs, **props):
