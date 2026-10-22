@@ -17,13 +17,13 @@ const b1 = zones.find((z: any) => z.id === 'b1'), b2 = zones.find((z: any) => z.
 const underground = zones.filter((z: any) => z.layer === 'underground');
 const outline = (z: any) => z.polygons.map((p: number[][][]) => p[0]);
 // 두 층의 통로 면·장소(DB 에 있는 것과 같은 높이)와, 두 층을 잇는 경사로·지하 1층의 문 통로
-const areas = [{ id: 4, name: '운동장 지하 1층 주차장 통로 면', elevationM: 143.5, rings: outline(b1) }, { id: 5, name: '운동장 지하 2층 주차장 통로 면', elevationM: 137.9, rings: outline(b2) }];
-const places = [{ id: 'p1', name: '운동장 지하 1층 주차장', buildingId: null, x: 201190, y: 557240, z: 143.5 }, { id: 'p2', name: '운동장 지하 2층 주차장', buildingId: null, x: 201185, y: 557235, z: 137.9 }];
+const areas = [{ id: 4, name: '운동장 지하 1층 주차장 통로 면', elevationM: 143.5, rings: outline(b1) }, { id: 5, name: '운동장 지하 2층 주차장 통로 면', elevationM: 140.0, rings: outline(b2) }];
+const places = [{ id: 'p1', name: '운동장 지하 1층 주차장', buildingId: null, x: 201190, y: 557240, z: 143.5 }, { id: 'p2', name: '운동장 지하 2층 주차장', buildingId: null, x: 201185, y: 557235, z: 140.0 }];
 const road = (id: string, coordinates: number[][], more: object = {}) => ({ id, name: id, roadClass: 'pedestrian', structure: 'ordinary', widthM: null, levelId: null, buildingId: null, geometry: { coordinates }, ...more });
 const roads = [
-  road('ramp', [[201151.1, 557253.1, 143.5], [201153, 557262, 140.7], [201156.4, 557270.7, 137.9]], { roadClass: 'vehicle', structure: 'ramp', widthM: 6 }),
+  road('ramp', [[201151.1, 557253.1, 143.5], [201153, 557262, 141.75], [201156.4, 557270.7, 140.0]], { roadClass: 'vehicle', structure: 'ramp', widthM: 6 }),
   road('door', [[201170, 557250, 143.5], [201180, 557250, 143.5]]),
-  road('b2-aisle', [[201170, 557240, 137.9], [201180, 557240, 137.9]], { roadClass: 'vehicle' }),
+  road('b2-aisle', [[201170, 557240, 140.0], [201180, 557240, 140.0]], { roadClass: 'vehicle' }),
 ];
 const data = { roads, areas, solids, places, zones };
 
@@ -37,9 +37,9 @@ test('F10 원인: 층 사이 틈(0.5 m)보다 큰 높이 여유(0.6 m)가 윗층
   // 경사 구획(지하 차도)은 그대로 범위 ± 여유
   const tunnel = zones.find((z: any) => z.id === 'tunnel');
   assert.equal(inRange(tunnel, tunnel.toM + LEVEL_VIEW.rangeSlackM), true);
-  // 누른 높이로 고르기: 143.5 는 지하 1층, 137.9 는 지하 2층
+  // 누른 높이로 고르기: 143.5 는 지하 1층, 140.0 는 지하 2층
   assert.equal(zoneAt(zones, 201190, 557240, 143.5)?.id, 'b1');
-  assert.equal(zoneAt(zones, 201190, 557240, 137.9)?.id, 'b2');
+  assert.equal(zoneAt(zones, 201190, 557240, 140.0)?.id, 'b2');
 });
 
 test('F10 지하 1층과 2층은 같은 것을 고르지 않는다: 통로 면·장소·구조물·평평한 길이 한 층에만', () => {
@@ -111,8 +111,8 @@ const P = (h: number | null, more: object = {}) => ({ x: 201190, y: 557240, h, .
 
 test('F10 세션 점의 자리: 층은 바닥 − 1.0 m ~ 윗층 바닥 − 1.0 m(맨 위층은 천장), 실외는 지면 ± 4 m', () => {
   const at = (h: number | null, more: object = {}) => { const r = trackPlace(P(h, more), ctx); return [r.zone?.id ?? null, r.sure]; };
-  assert.deepEqual(at(137.9 + 1.2), ['b2', true]); // 지하 2층을 걷는 폰
-  assert.deepEqual(at(137.9 - TRACK.belowFloorM), ['b2', true]);
+  assert.deepEqual(at(140.0 + 1.2), ['b2', true]); // 지하 2층을 걷는 폰
+  assert.deepEqual(at(140.0 - TRACK.belowFloorM), ['b2', true]);
   assert.deepEqual(at(143.5 - TRACK.belowFloorM - 0.01), ['b2', true]); // 윗층 바닥 − 1.0 m 바로 아래까지
   assert.deepEqual(at(143.5 - TRACK.belowFloorM), ['b1', true]);
   assert.deepEqual(at(143.5 + 1.2), ['b1', true]);
@@ -135,7 +135,7 @@ test('F10 구획 위의 세션 점: 평면이 안이고 높이가 맞는 것만,
   const points = [P(144.7), P(139.1), P(150.1), P(null), P(125), { x: 200000, y: 550000, h: 144.7 }, P(144.1, { reliable: false })];
   const on = (zone: any) => trackOnZone(points, zone, ctx).map((s: any) => [s.index, s.sure, s.z]);
   assert.deepEqual(on(b1), [[0, true, 143.5], [3, false, 143.5], [6, false, 143.5]]); // 판(바닥) 높이에 그림
-  assert.deepEqual(on(b2), [[1, true, 137.9], [3, false, 137.9], [4, false, 137.9], [6, false, 137.9]]);
+  assert.deepEqual(on(b2), [[1, true, 140.0], [3, false, 140.0], [4, false, 140.0], [6, false, 140.0]]);
   assert.deepEqual(on(field), [[2, true, 148.9], [3, false, 148.9], [6, false, 148.9]]); // 아래에 지하 층이 있어 높이 모르는 점은 확실하지 않음
   // 아래에 지하가 없는 지상 구획: 높이 모르는 점도 그 구획의 점(있을 곳이 지면뿐)
   const way = zones.find((z: any) => z.id === 'gate');
@@ -156,7 +156,7 @@ test('F10 경사 지하 구획(지하 차도): 범위 안이고 땅보다 1.5 m 
   let inside: number[] | null = null;
   for (let i = 0; i < ring.length && !inside; i++) for (let j = i + 2; j < ring.length && !inside; j++) {
     const m = [(ring[i][0] + ring[j][0]) / 2, (ring[i][1] + ring[j][1]) / 2];
-    if (zoneAt([tunnel], m[0], m[1], 130) && !zoneAt([b1, b2], m[0], m[1], 143.5) && !zoneAt([b1, b2], m[0], m[1], 137.9)) inside = m;
+    if (zoneAt([tunnel], m[0], m[1], 130) && !zoneAt([b1, b2], m[0], m[1], 143.5) && !zoneAt([b1, b2], m[0], m[1], 140.0)) inside = m;
   }
   assert.ok(inside);
   const c = { zones, groundAt: () => 140 };
