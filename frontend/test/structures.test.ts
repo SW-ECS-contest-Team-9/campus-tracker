@@ -337,7 +337,7 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   // 2026-10-22: 지하 2층 바닥은 약 138(U11 137.9 그대로, 지하 1층 - 30~40 단 = 5.1~6.8 m). 사이 바닥 판 0.5 m
   assert.ok(Math.abs(b2.bottomM - 138) <= 0.5 && b1.bottomM - b2.bottomM >= 5.1 && b1.bottomM - b2.bottomM <= 6.8 && Math.abs(b1.bottomM - b2.topM - 0.5) < 1e-9, `${b2.bottomM} ${b2.topM}`);
   assert.ok(148.9 - b1.topM > 2 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
-  assert.ok(!solids.some((s: any) => s.role === 'void' && s.id !== 'U02-VOID-FIELD-STAIR' && s.topM > b1.topM + 1e-9));
+  assert.ok(!solids.some((s: any) => s.role === 'void' && !s.id.startsWith('U02-VOID-FIELD-STAIR') && s.topM > b1.topM + 1e-9)); // 운동장 계단실(은주관 입구 상자 안 윗부분 포함)만 지하 1층 천장 위로
   // 지하 차도 연장의 바닥은 서쪽에서 동쪽으로 내려가지 않는다(계단 없는 한 경사), 끝은 지하 1층 바닥이다(지하 1층으로 들어온다)
   const road = solids.filter((s: any) => /^U02-VOID-ROAD-\d+$/.test(s.id)).sort((a: any, b: any) => a.id.localeCompare(b.id));
   assert.ok(road.length > 5 && road.every((s: any, i: number) => i === 0 || s.bottomM >= road[i - 1].bottomM) && Math.abs(road[road.length - 1].bottomM - b1.bottomM) < 1e-9);
