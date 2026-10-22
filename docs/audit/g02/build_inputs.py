@@ -129,6 +129,9 @@ for nm, (a, b) in {'A': (S_WALL0, 59.2)}.items():
 # R02: 문 앞(s 63.4)부터 은주관 옆(s 105)까지 옹벽이 꺾여 들어온 선을 따름. 그 뒤 화단 띠는 본관 벽(s < 69.3)·옛 한림관 쪽 가장자리(t −2.5/−3)까지(사진 26: 벽 위에 바위·소나무 화단)
 # X22: 곧은 옹벽·화단. 본관 앞(s 63.4~69.3)은 아래 구간과 같고, 본관을 지난 뒤(s 69.3~105)는 길 기단 가장자리(t −2.5) 밖으로 나온 판(인도·옹벽·화단)이라
 #   두께를 준 기운 판으로 매달고 그 밑에 콘크리트 판을 둔다(데크 쪽에서 보이는 옹벽 = 사진 16 의 콘크리트 벽, 아래 트인 곳은 X22 기둥이 받침)
+# X22(2026-10-22): 옹벽 머릿돌 밑 LED 띠(사진 08·05, 영상 0~44 초). 벽 길 쪽 면에 붙인 얇은 밝은 띠. 높이(길 + 0.95 m)는 사진만으로 확실하지 않아 그대로(사진 08 판독 1.1~1.3 m, 낮음)
+for _nm, (_a, _b) in {'A': (S_WALL0, 59.2), 'B': (63.4, 69.3), 'C': (69.3, 105.0)}.items():
+    pbox(f'G03-SWALL-LED-{_nm}', 'wall', rect(_a, _b, S_WALL, S_WALL + 0.03), 0.87, '옹벽 머릿돌 밑 LED 띠(밝은 줄, 두께 4 cm 판)', '사진 05·08(KakaoTalk_20261022_143522517_05·08), 전경 영상 0~44 초', thick=0.04, grade='확정(있음: 사진), 추정(높이·두께)', color='#fff1c1')
 pbox('G03-SWALL-B', 'wall', rect(63.4, 69.3, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽 윗구간(본관 북동 모서리까지, 곧은 선). 윗선은 길 + 0.95 m', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2')
 pbox('G03-SBED-B', 'planter', rect(63.4, 69.3, WALL_T, S_WALL - 0.25), 0.85, '옹벽 뒤 화단 띠(본관 벽까지)', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
 SB_OUT = S_WALL - 0.25 - 1.6   # 화단 띠 바깥(정사 그림의 남쪽 턱 너머 풀 띠 약 1.5~2 m, 추정)
@@ -209,10 +212,10 @@ box('G02-BUKAK-PLANTER-E', 'planter', ring(rect(-3.3, 0.0, 9.0, 17.0)), 130.6, 1
 box('G03-BARRIER-POST', 'barrier', ring(rect(S_GATE - 0.2, S_GATE + 0.2, RAMP_N - 0.4, RAMP_N)), way_z(S_GATE) - 0.1, way_z(S_GATE) + 1.05, '차단기 기둥(노란 상자 0.4 m 각, 높이 1.05 m): 차도의 문예관 쪽 가장자리(인도 턱 바로 앞)', SV21, grade='원천(거리뷰 21·정사 그림), 추정(자리 ±1 m)', color='#e0a41c')
 box('G03-BARRIER-POST-CAP', 'barrier', ring(rect(S_GATE - 0.2, S_GATE + 0.2, RAMP_N - 0.4, RAMP_N)), way_z(S_GATE) + 1.05, way_z(S_GATE) + 1.2, '기둥 머리(회색)', SV21, color='#b9bbbd')
 for j in range(6):
-    box(f'G03-BARRIER-ARM-{j + 1}', 'barrier', ring(rect(S_GATE - 0.05, S_GATE + 0.05, RAMP_N - 3.8 + j * 3.4 / 6, RAMP_N - 3.8 + (j + 1) * 3.4 / 6)), way_z(S_GATE) + 0.95, way_z(S_GATE) + 1.05, '차단기 막대: 붉은·흰 띠, 길이 3.4 m(정사 그림), 가운데 차로만 막음', SV21, grade='원천(거리뷰 21·정사 그림)', color='#d9534a' if j % 2 == 0 else '#f1eee6')
+    box(f'G03-BARRIER-ARM-{j + 1}', 'barrier', ring(rect(S_GATE - 0.05, S_GATE + 0.05, RAMP_N - 3.8 + j * 3.4 / 6, RAMP_N - 3.8 + (j + 1) * 3.4 / 6)), way_z(S_GATE) + 0.95, way_z(S_GATE) + 1.05, '차단기 막대: 빨간 LED 빛 막대(X22: 사진 04 야간), 길이 3.4 m(정사 그림), 가운데 차로만 막음', SV21 + ', 사진 04(KakaoTalk_20261022_143522517_04)', grade='원천(거리뷰 21·정사 그림), 확정(빨간 빛 막대: 사진 04)', color='#ff3b30')
 for j, tc in enumerate((-1.1, -1.75)):
-    for q, (za, zb, col) in enumerate(((0.0, 0.42, '#1d1f22'), (0.42, 0.56, '#e2b320'), (0.56, 0.78, '#1d1f22'))):
-        box(f'G03-BOLLARD-{j + 1}-{q + 1}', 'barrier', ring(rect(S_GATE - 0.08, S_GATE + 0.08, tc - 0.08, tc + 0.08)), way_z(S_GATE) + za - (0.1 if q == 0 else 0), way_z(S_GATE) + zb, '막대 끝과 본관 쪽 띠 사이의 말뚝 둘(검정 바탕·노란 띠, 높이 0.78 m)', SV21, grade='원천(거리뷰 21)', color=col)
+    for q, (za, zb, col) in enumerate(((0.0, 0.42, '#1d1f22'), (0.42, 0.56, '#f1eee6'), (0.56, 0.78, '#1d1f22'))):   # X22: 띠는 흰 반사 띠(사진 04)
+        box(f'G03-BOLLARD-{j + 1}-{q + 1}', 'barrier', ring(rect(S_GATE - 0.08, S_GATE + 0.08, tc - 0.08, tc + 0.08)), way_z(S_GATE) + za - (0.1 if q == 0 else 0), way_z(S_GATE) + zb, '막대 끝과 본관 쪽 띠 사이의 말뚝 둘(검정 바탕·흰 반사 띠, 높이 0.78 m. X22: 사진 04)', SV21, grade='원천(거리뷰 21)', color=col)
 # 흡연장(P01 의 P01-SMOKING-BOOTH-* 를 옮겨 다시 만듦. 사용자 2026-10-12: "노란 박스는 흡연장", "높은 화단이랑 겹쳤다"): 본관 북서 모서리의 북쪽 벽에 붙은 노란 세로 살 상자.
 # 자리는 거리뷰 21 의 앞면·오른쪽 면에서 다시 잡음(추정 ±1 m): 서쪽 끝 = 본관 벽 모서리(s 4.6), 동쪽 끝 s 14.0(그 바로 뒤 s 15.5 에서 옹벽이 시작), 앞면 t −3.4, 높이 한 층(3.0 m)
 BS0, BS1, BT, BZ = 4.9, 14.0, -3.4, float(way_z(9.3))
@@ -248,7 +251,12 @@ cbox('DECK', 'deck', CR(D0, D1, 0.0, DD), ZT - 0.1, DZ, '짙은 나무 데크(�
 for k in range(2):
     cbox(f'DECK-STEP-{k + 1}', 'stair_step', CR(D0 - 0.3 * (2 - k), D0 - 0.3 * (1 - k), 0.0, DD), ZT - 0.1, ZT + 0.15 * (k + 1), '데크 서쪽 끝의 계단(3단: 0.15 m 씩, 맨 윗단이 데크 바닥)', stair='G03-CAFE-DECK-STAIR', riseM=0.15, runM=0.3, widthM=DD, color='#4b423b')
 RAILC = '#c8262c'   # Q01: 데크 난간은 붉은 판(새 사진 03)
-cbox('RAIL-S', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ, DZ + 1.0, '데크 길 쪽 세로 살 난간(높이 1.0 m). 사진 02 는 짙은 회색, 사진 03(다른 시기)은 붉은색', color=RAILC)
+# X22(2026-10-22): 데크 앞면 난간은 빨간 물결(격자) 무늬(전경 영상 100~106 초). 판 하나를 위·아래 띠 + 가운데 띠 + 0.25 m 마다 살로
+cbox('RAIL-S', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ + 0.92, DZ + 1.0, '데크 길 쪽 빨간 격자 난간의 윗 띠(높이 1.0 m). 영상 100~106 초: 앞면 전체가 빨간 물결(격자) 무늬', color=RAILC)
+cbox('RAIL-S-BOTTOM', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ, DZ + 0.08, '격자 난간 아래 띠', color=RAILC)
+cbox('RAIL-S-MID', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ + 0.46, DZ + 0.54, '격자 난간 가운데 띠', color=RAILC)
+for _k, _a in enumerate(np.arange(D0 + 2.6, D1 - 0.05, 0.25)):
+    cbox(f'RAIL-S-BAR-{_k + 1:02d}', 'wall', CR(_a, _a + 0.05, DD - 0.06, DD), DZ + 0.08, DZ + 0.92, '격자 난간의 살(물결 무늬를 0.25 m 간격 살과 띠로 줄임)', color=RAILC)
 cbox('RAIL-E', 'wall', CR(D1 - 0.06, D1, 0.0, DD), DZ, DZ + 1.0, '데크 동쪽 끝 난간', color=RAILC)
 cbox('RAIL-W', 'wall', CR(D0 + 2.6, D0 + 2.66, DD - 0.9, DD), DZ, DZ + 1.0, '데크 난간의 서쪽 끝(계단 옆은 트임)', color=RAILC)
 for k, sc in enumerate((D0 + 2.6, D0 + 6.4, D1 - 0.1)):
