@@ -21,15 +21,15 @@ def way_top(x, y):
 
 # ---------- 높이 ----------
 Z_FIELD = 148.9            # 측정(E06). 바꾸지 않는다
-Z_B1 = 141.4               # 지하 1층 바닥. 범위 140.1(사용자 선) ~ 141.7. 사용자가 맞다고 한 지하 차도 진입 높이(141.4~) 와 은주1관 3층(5층 148.9 에서 두 층 아래) 계산이 같이 맞는 값(구역 노트)
-C_B1 = 144.4               # 지하 1층 천장 = 사용자 윗선(±1)
+Z_B1 = 143.5               # 2026-10-22 사용자 결정 "143.5로 진행해"(±0.5): C02 10-15 기압(지하 1층 → 본관 5층 137.8 에 5.7 m), 영상 2 계단, 지하 2층 ↔ 지하 1층 30~40 단(구역 노트 같은 날 절). 아래는 전 값 141.4 의 근거: 지하 1층 바닥. 범위 140.1(사용자 선) ~ 141.7. 사용자가 맞다고 한 지하 차도 진입 높이(141.4~) 와 은주1관 3층(5층 148.9 에서 두 층 아래) 계산이 같이 맞는 값(구역 노트)
+C_B1 = r2(Z_B1 + 3.0)      # 지하 1층 천장(보 밑). 2026-10-22: 빈 높이 3.0 m 를 그대로(전 141.4~144.4 = 사용자 윗선 ±1). 그 위 운동장 148.9 까지 2.4 m 는 구조
 SLAB_B1 = 0.5              # U11: 지하 1층 바닥 가장자리의 보(사진 22: 낮은 벽 1.1 m 의 0.45배쯤). U02~U10 은 1.0 m(추정)였다
 C_B2 = r2(Z_B1 - SLAB_B1)  # 140.9
 Z_B2 = 137.9               # U11: 지하 2층 바닥 = 지하 1층 바닥 - 3.5 m (사진 23·22·26 에서 잰 한 층: 기둥 높이 2.9 m + 보 0.5 m, 곧은 경사 17.5 % × 20 m. 범위 3.1~3.8 m). U02~U10 의 133.0 m(사용자 붉은 선 ±1, 8.4 m 아래)에서 벗어난다: 그 선은 층이 틀린 모델 화면 위에 그린 것이고, 사진은 한 층만 오르내린다(구역 노트 U11 절)
 BASE = 1.0                 # 추정: 기초 판
 WALL = 1.0
 ROAD_W, CLEAR, ROOF = 7.2, 3.5, 0.6
-C_ROAD = 144.7             # 지하 차도 연장의 천장 상한(U01 단면 그대로: 사용자가 "사진과 같다"고 한 141.4~144.7)
+C_ROAD = C_B1              # 지하 차도 연장의 천장 상한 = 지하 1층 천장(2026-10-22. 전 144.7: U01 단면 그대로, 사용자가 "사진과 같다"고 한 141.4~144.7)
 
 # ---------- 평면: 학교 지도의 주차장 외곽 ----------
 NL0, NL1 = np.array(GEO['xy']['parking'][0]), np.array(GEO['xy']['parking'][5])   # 북쪽 변(은주1관 북동 모서리 ~ 청운관 서쪽 초록 점)
@@ -53,7 +53,10 @@ P0 = np.array([201100.3, 557327.58]); Z_P0 = 136.39
 D_WAY = np.array(WP['direction']); D_WAY = D_WAY / np.hypot(*D_WAY)
 D = np.array([0.87402234, -0.48588573]); D = D / np.hypot(*D); NRM = np.array([-D[1], D[0]])   # NRM = 축의 왼쪽(북)
 hit = LineString([P0, P0 + D * 200]).intersection(FIELD.buffer(-WALL, join_style=2)); hit = hit if hit.geom_type == 'LineString' else max(hit.geoms, key=lambda g: g.length)
-E0 = np.array(hit.coords[0]); L_APP = float(np.hypot(*(E0 - P0))); GRADE_APP = (Z_B1 - Z_P0) / L_APP
+E0 = np.array(hit.coords[0]); L_APP = float(np.hypot(*(E0 - P0)))
+# 2026-10-22: 시험용 DB 의 길은 P0 → 노드 496ea877(137.8 m = 본관 5층 높이, 지하 차도 보행 구간이 붙는 곳) → 들머리. 앞 14.45 m 는 그대로(9.8 %), 그 뒤 들머리까지를 지하 1층 143.5 로 다시 기울인다. 목(들머리 ~ J0 14 m)은 전처럼 평지
+K0 = np.array([201112.93, 557320.56]); Z_K0 = 137.8; S_K0 = float((K0 - P0) @ D); G_APP0 = (Z_K0 - Z_P0) / S_K0; GRADE_APP = (Z_B1 - Z_K0) / (L_APP - S_K0)
+z_app = lambda s: min(Z_B1, Z_P0 + G_APP0 * s if s <= S_K0 else Z_K0 + GRADE_APP * (s - S_K0))
 LANE_L = 97.4                           # 곧은 차로의 길이(들머리에서): 사용자 붉은 선 1 의 끝(동쪽 한 줄 앞)
 LANE_END = E0 + D * LANE_L
 J0 = E0 + D * 14.0                      # 통로 면에 닿는 노드(들머리에서 14 m, 축 위)
@@ -90,7 +93,8 @@ R_OUT, R_C, V_C = R_ISL + RAMP_W, R_ISL + RAMP_W / 2, -(R_ISL + RAMP_W / 2)
 S_TOE = 12.0                               # 발치(기둥 줄) ~ 안쪽 벽이 굽기 시작하는 곳. 사진 23: 12.3 m(11~13.5)
 S_BAND = 6.5                               # 낮은 벽(지하 1층 바닥이 끝나는 가장자리)이 섬 중심에서 북동으로. 사진 22: 낮은 벽 밑 빈 높이 2.1 m → 발치에서 4.6~5.9 m 위
 G_RAMP = 0.175                             # 사진 23: 소실점으로 17.5 %(15~19), 턱 선으로 17.3 %
-DROP = Z_B1 - Z_B2; L_RAMP = DROP / G_RAMP; L_ARC = L_RAMP - S_TOE; PHI_CREST = float(np.degrees(L_ARC / R_C)); PHI_WALL = 95.0   # 굽은 곳에서 더 오르는 길이, 마루(지하 1층 바닥에 닿는 곳)의 각, 바깥 청록 벽이 끝나는 각
+L_RAMP = 20.0; G_RAMP_PHOTO = G_RAMP   # 2026-10-22: 평면(사진에서 잰 곧은 12 m + 굽은 8 m)은 그대로 두고 층 차가 3.5 → 5.6 m 로 커져 경사가 17.5 → 28 % 가 된다(사진과 어긋남: 구역 노트 같은 날 절)
+DROP = Z_B1 - Z_B2; G_RAMP = DROP / L_RAMP; L_ARC = L_RAMP - S_TOE; PHI_CREST = float(np.degrees(L_ARC / R_C)); PHI_WALL = 95.0   # 굽은 곳에서 더 오르는 길이, 마루(지하 1층 바닥에 닿는 곳)의 각, 바깥 청록 벽이 끝나는 각
 assert 60 < PHI_CREST < 90, PHI_CREST
 G_RAMP_PCT = G_RAMP
 sp = lambda s_, v_: ISL + ht * s_ + hn * v_                                                   # 띠 좌표: s = 섬 중심에서 주차 줄을 따라 북동, v = 혜인관 쪽(남동). 경사로는 v < 0(북서) 쪽
@@ -143,14 +147,14 @@ def feat(id, typ, kind, poly, grade, assumption, **props):
 def box(id, typ, poly, lo, hi, color, assumption, grade='추정', **kw):
     feat(id, typ, 'extrude', poly, grade, assumption, fromM=r2(lo), toM=r2(hi), material='concrete', inVoid=True, color=color, **kw)
 
-G_LEVEL = f'확정(층이 있음, 높이 띠: 사용자 붉은 선 ±1 m), 원천(평면: 학교 지도, 잔차 RMS {RES} m), 추정(판 두께·벽)'
-feat('U02-VOID-B1', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 1층: 바닥 {Z_B1} m(범위 140.1~141.7), 천장 {C_B1} m(사용자 윗선). 그 위 {C_B1}~{Z_FIELD} m 는 빈 층 없이 구조. 평면은 학교 지하도 지도의 사다리꼴 그대로(U09) + 북서 모서리의 지하 차도 목 {INNER.area - INNER_OLD.area:.0f} ㎡(U05)', fromM=Z_B1, toM=C_B1, name='운동장 지하 1층')
-feat('U02-VOID-B2', 'void', 'void', INNER_B2, '확정(층이 있음), 추정(바닥 높이: 사진 22·23·26 에서 잰 한 층 3.5 m, 범위 3.1~3.8), 원천(평면: 학교 지도)', f'운동장 지하 2층: 바닥 {Z_B2} m = 지하 1층 바닥 - {Z_B1 - Z_B2:.1f} m(U11: 사진에서 잰 한 층. 사용자 붉은 선의 133 m 에서 벗어남), 천장 {C_B2} m = 지하 1층 바닥 가장자리 보({SLAB_B1} m) 밑. 평면은 학교 지하도 지도의 사다리꼴. 목 없음', fromM=Z_B2, toM=C_B2, name='운동장 지하 2층')
+G_LEVEL = f'확정(층이 있음, 지하 1층 바닥: 사용자 결정 2026-10-22 143.5 ±0.5 m), 원천(평면: 학교 지도, 잔차 RMS {RES} m), 추정(판 두께·벽)'
+feat('U02-VOID-B1', 'void', 'void', INNER, G_LEVEL, f'운동장 지하 1층: 바닥 {Z_B1} m(사용자 결정 2026-10-22, 전 141.4), 천장 {C_B1} m(빈 높이 3.0 m). 그 위 {C_B1}~{Z_FIELD} m 는 빈 층 없이 구조. 평면은 학교 지하도 지도의 사다리꼴 그대로(U09) + 북서 모서리의 지하 차도 목 {INNER.area - INNER_OLD.area:.0f} ㎡(U05)', fromM=Z_B1, toM=C_B1, name='운동장 지하 1층')
+feat('U02-VOID-B2', 'void', 'void', INNER_B2, '확정(층이 있음), 추정(바닥 높이: U11 137.9 그대로 = 사용자 결정 "약 138"(2026-10-22, 지하 1층 - 30~40 단)), 원천(평면: 학교 지도)', f'운동장 지하 2층: 바닥 {Z_B2} m = 지하 1층 바닥 - {Z_B1 - Z_B2:.1f} m(2026-10-22. U11 의 사진에서 잰 한 층 3.5 m 보다 크다), 천장 {C_B2} m = 지하 1층 바닥 가장자리 보({SLAB_B1} m) 밑. 평면은 학교 지하도 지도의 사다리꼴. 목 없음', fromM=Z_B2, toM=C_B2, name='운동장 지하 2층')
 
 # 지하 차도 연장(내리막길 밑, U01 의 선) + 운동장 북쪽 띠를 지나 주차장으로 들어가는 평평한 통로
 n = int(np.ceil((L_APP + WALL + 0.5) / 1.0)); step = (L_APP + WALL + 0.5) / n; covers = []
 for k in range(n):
-    a, b = k * step, (k + 1) * step; za, zb = (min(Z_B1, Z_P0 + GRADE_APP * s) for s in (a, b)); mid = P0 + D * (a + b) / 2
+    a, b = k * step, (k + 1) * step; za, zb = (z_app(s) for s in (a, b)); mid = P0 + D * (a + b) / 2
     seg = LineString([P0 + D * a, P0 + D * b]).buffer(ROAD_W / 2, cap_style=2).difference(BLD.buffer(0.3)); under = WAY.contains(Point(mid))
     top = r2(min(zb + CLEAR, min(way_top(*(P0 + D * a)), way_top(*(P0 + D * b))) - ROOF)) if under else r2(zb + CLEAR)
     top = min(top, C_ROAD)
@@ -310,7 +314,7 @@ OUTLINE = {'source': '학교 지하도 지도의 사다리꼴(georef.json xy.par
 pt = lambda p, z: {'xy': [r2(p[0]), r2(p[1])], 'z': r2(z)}
 path = [pt(pol(R_C, f), z_up(S_TOE + np.radians(f) * R_C)) for f in fs[::-1]] + [pt(NB, z_up(S_TOE - S_BAND)), pt(RB, Z_B2)]; path[0] = pt(T0, Z_B1)
 SYM = [np.array(q) for q in GEO['xy']['rampSymbol']]
-model = {'heights': {'field': Z_FIELD, 'b1Floor': Z_B1, 'b1FloorRange': [140.1, 141.7], 'b1Ceiling': C_B1, 'b1SlabM': SLAB_B1, 'b2Ceiling': C_B2, 'b2Floor': Z_B2, 'solidAboveB1M': r2(Z_FIELD - C_B1), 'platformBottom': r2(Z_B2 - BASE), 'userLines': [144.4, 140.1, 133.0], 'storeyM': r2(Z_B1 - Z_B2), 'storeyRangeM': [3.1, 3.8], 'b2FloorU10': 133.0},
+model = {'heights': {'field': Z_FIELD, 'b1Floor': Z_B1, 'b1FloorRange': [143.0, 144.0], 'b1Ceiling': C_B1, 'b1SlabM': SLAB_B1, 'b2Ceiling': C_B2, 'b2Floor': Z_B2, 'solidAboveB1M': r2(Z_FIELD - C_B1), 'platformBottom': r2(Z_B2 - BASE), 'userLines': [144.4, 140.1, 133.0], 'storeyM': r2(Z_B1 - Z_B2), 'storeyRangeM': [3.1, 3.8], 'b2FloorU10': 133.0},
          'areaM2': r2(INNER.area), 'areaB2M2': r2(INNER_B2.area), 'areaU02M2': r2(INNER_OLD.area), 'outline': OUTLINE, 'fieldAreaM2': r2(FIELD.area), 'u01AreaM2': 8072.05, 'mapOutlineAreaM2': r2(MAPPOLY.area), 'mapOutlineOverlap': r2(MAPPOLY.intersection(INNER).area / MAPPOLY.union(INNER).area),
          'northWallInsetM': [r2(FIELD.exterior.distance(Point(NL0 + dn * s))) for s in (10, 30, 50)], 'columns': cols, 'bayRows': rows, 'georefRmsM': RES,
          'approach': {'from': pt(P0, Z_P0), 'entry': pt(E0, Z_B1), 'lengthM': r2(L_APP), 'gradePct': r2(GRADE_APP * 100), 'surfaceAboveFloorUnderWayM': [min(covers), max(covers)], 'widthM': ROAD_W,
