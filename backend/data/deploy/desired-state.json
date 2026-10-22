@@ -15,8 +15,8 @@
   "scene": {
     "sourceDir": "data/scene/source",
     "overrides": "data/scene/overrides/building-roofs.json",
-    "id": "campus3d-3f40e495",
+    "id": "campus3d-1be496e2",
     "gpkgSha256": "26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13",
-    "overridesSha256": "2035583d65f7c7a5fdb03c5712748bdade87964fe5d7e1350f3c567a3bc37733"
+    "overridesSha256": "2fe475063884974da069e270da3b9fc67ca503c1183c4d735f5b868f6331d4f0"
   }
 }
