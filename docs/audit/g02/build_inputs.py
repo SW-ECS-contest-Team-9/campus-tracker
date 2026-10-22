@@ -100,20 +100,23 @@ while _s < 14.3 - 1e-9:
 # R02(2026-10-15): 본관을 지난 뒤(s 63~74) 길이 북쪽으로 꺾이며 좁아진다(사용자 지적 2026-10-15, 사진 26). 선은 S-MAP 0.5 m 메시에서 길 경사면과 0.35 m 안인 띠의 가장자리(docs/audit/r02/st_relief.py, 추정 ±1 m):
 #   남쪽 옹벽 면 t −3.8(s 63.4) → −0.4(s 72) → 0.4(s 88) → 0.8(s 100) → 0.4(s 105), 북쪽 화단 벽 선 4.6(s 70) → 7.0(s 74). 본관 쪽 인도 2.2 → 1.2 m, 차로 4.2 → 2.4 m(s 100)
 WF_S, WF_T = [63.4, 72.0, 88.0, 100.0, 105.0], [S_WALL, -0.4, 0.4, 0.8, 0.4]   # 메시 가장자리(0.0 / 1.0 / 2.0 / 0.0)보다 s 88~100 에서 0.6~1.2 m 남쪽: 시험용 DB 길 8e71c240(t 1.2)이 인도 위에 남게(묶음으로 옮기면 길이 쪼개져서 안 함)
-def wf(s_): return float(np.interp(s_, WF_S, WF_T))                     # 남쪽 옹벽 면
-def sw(s_): return float(np.interp(s_, [63.4, 72.0], [2.2, 1.2]))       # 본관 쪽 인도 폭
-def npl(s_): return float(np.interp(s_, [70.0, 74.0], [STRIP_N, 7.0]))  # 북쪽 인도 바깥(화단 벽) 선
+# X22(2026-10-22): R02 의 꺾임을 거둠. 사용자: "애당초 오르막 길은 직선". S-MAP 정사 그림(g02/smap-ortho-rectified-01m.png)에서 밝은 포장 띠와 남쪽 턱 선이
+#   본관 북동 모서리를 지나 은주관 옆까지 곧게 이어진다(메시 가장자리는 보조). 옹벽 면·인도 폭·북쪽 화단 벽 선을 아래 구간과 같은 곧은 선으로 둔다
+WF_T = [S_WALL] * len(WF_S)
+def wf(s_): return float(np.interp(s_, WF_S, WF_T))                     # 남쪽 옹벽 면(곧음)
+def sw(s_): return 2.2                                                  # 본관 쪽 인도 폭(곧음)
+def npl(s_): return STRIP_N                                             # 북쪽 인도 바깥(화단 벽) 선(곧음)
 RS = [63.4, 67.0, 70.0, 72.0, 74.0, 80.0, 88.0, 94.0, 100.0, 105.0]
 def band(ss_, f0, f1): return [(a, f0(a)) for a in ss_] + [(a, f1(a)) for a in ss_[::-1]]   # 인도는 차도보다 밝은 포장(고리 무늬), 차도와 인도 사이는 짙은 띠(사용자 사진 02)
 pbox('G03-PAINT-LANE-1', 'wall', rect(S_GATE, 63.4, S_PAVE, RAMP_N), 0.05, '가운데 차로(공사 차량만 다님: 확정): 짙은 회색 무늬 블록, 폭 4.2 m(차단기 막대 3.4 m + 말뚝 둘)', SV21 + ', 사진 21', thick=0.03, color=LANE, pattern='rings')
-pbox('G03-PAINT-LANE-2', 'wall', band(RS, lambda a: wf(a) + sw(a), lambda a: npl(a) - 2.0), 0.05, 'R02: 가운데 차로 윗구간. 본관을 지난 뒤 북쪽으로 꺾이며 좁아짐(4.2 → 약 2.4 m, 추정)', '사진 26, S-MAP 메시(r02/st_relief.py)', thick=0.03, color=LANE, pattern='rings')
+pbox('G03-PAINT-LANE-2', 'wall', band(RS, lambda a: wf(a) + sw(a), lambda a: npl(a) - 2.0), 0.05, '가운데 차로 윗구간(X22: 곧은 선, 폭 4.2 m 그대로. R02 의 꺾임은 거둠)', 'S-MAP 정사 그림 g02/smap-ortho-rectified-01m.png, 사용자 2026-10-22(직선)', thick=0.03, color=LANE, pattern='rings')
 # 양쪽 인도(사용자 확정 2026-10-12: "차도를 두고 양쪽 다 인도", "양쪽 모두 약간 턱 있는 인도, 계단 아님"): 길과 나란히 오르는 판, 차도보다 KERB 만큼 높고 차도 쪽에 밝은 경계석 줄
 KERB = 0.12        # 턱 높이(추정 0.10~0.15)
 STRIP_END = 105.0  # 은주1관 북쪽 끝 옆(사용자 확정 2026-10-11: 띠는 차단기에서 은주관 바로 옆까지)
 SIDEWALK, KERBSTONE = '#b6b4ac', '#4f5154'
 WALKS = {  # 이름: (인도 외곽, 경계석 줄 외곽, 무엇)
   'S1': (rect(S_WALL0, 63.4, S_WALL, S_PAVE), rect(S_WALL0, 63.4, S_PAVE - 0.25, S_PAVE), '본관 쪽 인도: 옹벽 발치에서 차도까지 폭 2.2 m(거리뷰 21 에서 말뚝 둘 바깥 ~ 옹벽)'),
-  'S2': (band(RS, wf, lambda a: wf(a) + sw(a)), band(RS, lambda a: wf(a) + sw(a) - 0.25, lambda a: wf(a) + sw(a)), 'R02: 본관 쪽 인도 윗구간(옹벽 면을 따라 북쪽으로 꺾임, 은주관 옆까지), 폭 2.2 → 1.2 m(추정)'),
+  'S2': (band(RS, wf, lambda a: wf(a) + sw(a)), band(RS, lambda a: wf(a) + sw(a) - 0.25, lambda a: wf(a) + sw(a)), '본관 쪽 인도 윗구간(X22: 곧은 선, 폭 2.2 m, 은주관 옆까지. 본관을 지난 뒤 기단 가장자리(t −2.5) 밖은 아래 콘크리트 판이 받친다)'),
   'N1': (band([S_GATE, 70.0, 74.0, STRIP_END], lambda a: npl(a) - 2.0, npl), band([S_GATE, 70.0, 74.0, STRIP_END], lambda a: npl(a) - 2.0, lambda a: npl(a) - 1.75), '북악관·문예관 쪽 인도: 차도에서 화단 벽까지 폭 2.0 m(거리뷰 21 에서 차단기 기둥 ~ 화단 벽)'),
 }
 for nm, (ring_st, kerb_st, what) in WALKS.items():
@@ -124,11 +127,17 @@ for nm, (a, b) in {'A': (S_WALL0, 59.2)}.items():
     pbox(f'G03-SWALL-{nm}', 'wall', rect(a, b, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽: 밝은 거친 돌판을 세워 붙인 허리 높이 벽(길 + 0.95 m, 추정 0.9~1.1: 거리뷰에서 지나가는 사람 허리), 윗선은 길과 나란히 오름, 두께 0.25 m. 흡연장 끝 바로 뒤(s 15.5)에서 시작. s 59.2~63.4 는 본관으로 통하는 문 앞이라 비움(자리 추정 ±3 m)', SV21 + ', ' + PH + ', SKU 0:58', bottom=way_z(a) - 0.3, color='#d6d1c2')
     pbox(f'G03-SBED-{nm}', 'planter', rect(a, b, WALL_T, S_WALL - 0.25), 0.85, 'Q01: 옹벽 뒤 화단 띠(소나무·바위): 벽 머릿돌에서 본관 벽까지 2.3 m(사진: 약 2 m). 본관 외곽(t −4.9)은 처마 선이고 벽은 처마 깊이 1.5 m(동 노트 B12, 추정) 안쪽이라 화단은 처마 밑으로 벽까지 간다', SV21 + ', ' + PH, bottom=way_z(a) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
 # R02: 문 앞(s 63.4)부터 은주관 옆(s 105)까지 옹벽이 꺾여 들어온 선을 따름. 그 뒤 화단 띠는 본관 벽(s < 69.3)·옛 한림관 쪽 가장자리(t −2.5/−3)까지(사진 26: 벽 위에 바위·소나무 화단)
-pbox('G03-SWALL-B', 'wall', band(RS, lambda a: wf(a) - 0.25, wf), 0.95, 'R02: 본관 쪽 옹벽 윗구간. 본관을 지난 뒤 북쪽으로 꺾여(s 63.4~72 에서 3.4 m) 길을 좁힘, 그 위로는 완만히 북쪽으로(추정 ±1 m). 윗선은 길 + 0.95 m', '사진 26, S-MAP 메시(r02/st_relief.py), ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2')
-pbox('G03-SBED-B', 'planter', [(a, wf(a) - 0.25) for a in RS] + [(105.0, -3.0), (101.0, -3.0), (101.0, -2.5), (69.3, -2.5), (69.3, WALL_T), (63.4, WALL_T)], 0.85, 'R02: 꺾인 옹벽 뒤 화단 띠(바위·소나무, 사진 26). 바깥 가장자리는 본관 벽·옛 한림관 쪽 가장자리', '사진 26, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
+# X22: 곧은 옹벽·화단. 본관 앞(s 63.4~69.3)은 아래 구간과 같고, 본관을 지난 뒤(s 69.3~105)는 길 기단 가장자리(t −2.5) 밖으로 나온 판(인도·옹벽·화단)이라
+#   두께를 준 기운 판으로 매달고 그 밑에 콘크리트 판을 둔다(데크 쪽에서 보이는 옹벽 = 사진 16 의 콘크리트 벽, 아래 트인 곳은 X22 기둥이 받침)
+pbox('G03-SWALL-B', 'wall', rect(63.4, 69.3, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽 윗구간(본관 북동 모서리까지, 곧은 선). 윗선은 길 + 0.95 m', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2')
+pbox('G03-SBED-B', 'planter', rect(63.4, 69.3, WALL_T, S_WALL - 0.25), 0.85, '옹벽 뒤 화단 띠(본관 벽까지)', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
+SB_OUT = S_WALL - 0.25 - 1.6   # 화단 띠 바깥(정사 그림의 남쪽 턱 너머 풀 띠 약 1.5~2 m, 추정)
+pbox('G03-SWALL-C', 'wall', rect(69.3, 105.0, S_WALL - 0.25, S_WALL), 0.95, '본관을 지난 뒤 옹벽(곧은 선, 길 + 0.95 m). 기단 가장자리 밖이라 판으로 매닮', 'S-MAP 정사 그림, 사용자 2026-10-22(직선)', thick=0.98, color='#d6d1c2')
+pbox('G03-SBED-C', 'planter', rect(69.3, 105.0, SB_OUT, S_WALL - 0.25), 0.85, '본관을 지난 뒤 옹벽 뒤 화단 띠(바위·소나무, 폭 1.6 m 추정). 기단 가장자리 밖이라 판으로 매닮', 'S-MAP 정사 그림, 사진 26', thick=0.88, color='#cfcbc0', topColor='#7f9a6b')
+pbox('G03-SLAB-C', 'wall', [(69.3, SB_OUT), (105.0, SB_OUT), (105.0, -3.0), (101.0, -3.0), (101.0, -2.5), (69.3, -2.5)], -0.03, '본관을 지난 뒤 길 기단 가장자리(t −2.5) 밖으로 나온 인도·옹벽·화단 밑의 콘크리트 판(두께 0.6 m, 추정). 기본 평면은 그대로', 'S-MAP 정사 그림, 사진 16', thick=0.6, color='#b9b6ad')
 k = 0
 for sc in np.arange(72.0, 101.0, 6.0):
-    k += 1; tree(f'R02-TREE-SB{k:02d}', sc, (wf(sc) - 0.25 - 2.5) / 2, way_z(sc) + 0.85, '꺾인 옹벽 뒤 화단의 소나무', '사진 26', 'G03-SBED-B')
+    k += 1; tree(f'R02-TREE-SB{k:02d}', sc, (S_WALL - 0.25 + SB_OUT) / 2, way_z(sc) + 0.85, '옹벽 뒤 화단의 소나무', '사진 26', 'G03-SBED-C')
 k = 0
 for sc in np.arange(18.0, 68.5, 5.5):
     if 58.5 < sc < 64.0: continue
@@ -167,8 +176,8 @@ for k in range(nr):
         f'갈림 계단(문예관 3층 로비로 가는 옆 계단): {nr}단 = (144.2 − {zb:.2f}) ÷ 0.16, 폭 2 m(가정). 선은 사용자 그림 10 을 옮긴 시험용 DB 길 040d4571(±3 m)', '사용자 확정(오르막길 중간에 옆으로 빠지는 계단), 그림 10, 시험용 DB 길 040d4571', stair='G02-FORK-STAIR')
 for a in np.arange(76.0, 91.9, 5.34):
     b = min(a + 5.34, 92.0)
-    box(f'G02-NPLANT-D{int(round(a)):02d}', 'planter', ring(rect(a, b, 7.0, 9.5)), way_z(a) - 0.2, 145.5 + 0.45, '대일관 서쪽 끝 앞 평탄부(145.5 m)와 길 사이 화단: 짙은 화강석, 윗면 = 145.5 + 0.45 m(추정). 평면은 정사 그림의 나무 자리', '사용자 사진 8·25, 그림 11, g02/smap-ortho-rectified-01m.png', color=DARK, topColor='#7f9a6b')
-    tree(f'G03-TREE-ND{int(round(a)):02d}', (a + b) / 2, 8.25, 145.95, '대일관 서쪽 끝 앞 화단의 소나무', '사진 25', f'G02-NPLANT-D{int(round(a)):02d}')
+    box(f'G02-NPLANT-D{int(round(a)):02d}', 'planter', ring(rect(a, b, STRIP_N, 9.5)), way_z(a) - 0.2, 145.5 + 0.45, '대일관 서쪽 끝 앞 평탄부(145.5 m)와 길 사이 화단: 짙은 화강석, 윗면 = 145.5 + 0.45 m(추정). 평면은 정사 그림의 나무 자리', '사용자 사진 8·25, 그림 11, g02/smap-ortho-rectified-01m.png', color=DARK, topColor='#7f9a6b')
+    tree(f'G03-TREE-ND{int(round(a)):02d}', (a + b) / 2, 7.0, 145.95, '대일관 서쪽 끝 앞 화단의 소나무', '사진 25', f'G02-NPLANT-D{int(round(a)):02d}')
 # R02: 한림관 쪽 난간 벽(G02-HWALL, t −2.5)은 꺾인 옹벽 G03-SWALL-B 로 바뀜
 # 본관 5층–한림관 3층 나무 데크: 학교 표지 "본관-한림관 연결통로"(201098.0, 557302.7) 자리. 위치 확정(사용자), 크기 추정
 dk = np.array([201098.0, 557302.7]); dv = np.array([201112.0, 557295.0]) - dk; dv = dv / np.hypot(*dv); dw = np.array([-dv[1], dv[0]]) * 1.5
