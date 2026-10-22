@@ -213,22 +213,68 @@ for k2, (c, r) in enumerate((((201098.6, 557292.6), 1.0), ((201096.6, 557290.6),
     for part, mat, hh, z0, z1 in (('TRUNK', 'trunk', 0.12, 0.0, 2.6), ('CROWN', 'foliage', 0.8, 2.3, 3.2), ('TOP', 'foliage', 0.45, 3.2, 3.9)):
         box(f'X22-ROOF-YARD-TREE-{k2 + 1}-{part}', 'tree', disc(c, hh, 4), ZD + 0.7 + z0, ZD + 0.7 + z1, '둥근 화단의 소나무(단순한 나무)', SRC_R, GR, f'X22-ROOF-YARD-PLANTER-ROUND-{k2 + 1}', material=mat)
 
-# ===================== 은주관 입구(영상 158 초): 운동장과 지상 오르막이 만나는 곳의 골강판 작은 상자 =====================
-SRC_K = '전경 영상 158~159 초(2 fps 프레임, frames/t080.jpg), 사용자 2026-10-22(은주관 입구), 시험용 DB 길 7e2741ec(운동장 지하 1층 → 운동장 계단 머리 201150.5, 557299.5)'
-GK = '확정(있음·은주관 입구: 사용자, 골강판·노란 원형 표지·빨간 문틀·노란 글자판·윗변 LED: 영상), 추정(자리 = 지하 1층 계단 머리, 크기 2.8 x 3.2 m·높이 4.4 m, 문 방향 = 운동장 쪽 동쪽)'
-KX0, KX1, KY0, KY1, KZ = 201148.9, 201151.7, 557296.2, 557299.4, 148.9
-box('X22-EUNJU-KIOSK', 'wall', [(KX0, KY0), (KX1, KY0), (KX1, KY1), (KX0, KY1)], KZ, KZ + 4.25, '은주관 입구 상자: 골강판(은회색) 벽의 작은 상자. 안에 지하 1층으로 내려가는 계단(길 7e2741ec 의 머리)', SRC_K, GK, 'Z02-PLATFORM-FIELD', color='#a7abad')
-box('X22-EUNJU-KIOSK-ROOF', 'canopy', [(KX0 - 0.1, KY0 - 0.1), (KX1 + 0.1, KY0 - 0.1), (KX1 + 0.1, KY1 + 0.1), (KX0 - 0.1, KY1 + 0.1)], KZ + 4.25, KZ + 4.4, '지붕 테', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#55595e')
-for nm, b in {'E': [(KX1, KY0), (KX1 + 0.03, KY0), (KX1 + 0.03, KY1), (KX1, KY1)], 'S': [(KX0, KY0 - 0.03), (KX1, KY0 - 0.03), (KX1, KY0), (KX0, KY0)]}.items():
-    box(f'X22-EUNJU-KIOSK-LED-{nm}', 'wall', b, KZ + 3.95, KZ + 4.05, '윗변의 LED 줄(밝은 점)', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#fffbe6')
-DY0, DY1 = 557297.0, 557298.4
-box('X22-EUNJU-KIOSK-DOOR', 'wall', [(KX1, DY0), (KX1 + 0.04, DY0), (KX1 + 0.04, DY1), (KX1, DY1)], KZ, KZ + 2.3, '유리문(어두운 유리)', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#33404a')
-for nm, (y0, y1, z0, z1) in {'L': (DY0 - 0.12, DY0, KZ, KZ + 2.45), 'R': (DY1, DY1 + 0.12, KZ, KZ + 2.45), 'T': (DY0 - 0.12, DY1 + 0.12, KZ + 2.3, KZ + 2.45)}.items():
-    box(f'X22-EUNJU-KIOSK-FRAME-{nm}', 'wall', [(KX1, y0), (KX1 + 0.07, y0), (KX1 + 0.07, y1), (KX1, y1)], z0, z1, '빨간 문틀', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#c8262c')
-box('X22-EUNJU-KIOSK-LETTERS', 'wall', [(KX1, DY0 - 0.1), (KX1 + 0.05, DY0 - 0.1), (KX1 + 0.05, DY1 + 0.1), (KX1, DY1 + 0.1)], KZ + 2.5, KZ + 3.3, '문 위 노란 글자판(그림 글자)', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#f2c21b')
-for k2 in range(5):
-    z0 = KZ + 0.9 + k2 * 0.55
-    box(f'X22-EUNJU-KIOSK-SIGN-{k2 + 1}', 'wall', [(KX1, 557296.4), (KX1 + 0.04, 557296.4), (KX1 + 0.04, 557296.8), (KX1, 557296.8)], z0, z0 + 0.4, '노란 원형 표지(금지 그림, 원을 네모로 줄임)', SRC_K, GK, 'X22-EUNJU-KIOSK', color='#f2c21b')
+# ===================== 은주관 입구 상자(2026-10-22 사양: 데이터/보완자료/학교-전경-20261022/확인/은주관-박스-탑다운-사양.png·-정면-사양.png) =====================
+# 전 X22-EUNJU-KIOSK(2.8 x 3.2 m, 계단 머리 자리)는 없앰. 꼭짓점은 사용자 항공사진에서 읽은 사양 그대로(±1.5 m, 항공-한림관정문-은주1관 과 1 m 안에서 맞음).
+# 틀: o = 남서 모서리, A = 긴 축(북, 은주1관 동벽과 나란, 방위 9.4도), B = 짧은 축(동). 북면 a = 8.5(운동장·오르막 어귀 쪽 문), 동면 b = 4.0
+SRC_K = ('은주관 입구 상자 사양(2026-10-22, 근거 = 사용자 항공사진, 전경 영상 1 158~159 초·사용자 표시 사진), 사용자 항공사진 항공-한림관정문-은주1관(2026-10-22), '
+         '시험용 DB 길 7e2741ec(지하 1층 계단 참 → 상자 북쪽 참)')
+GK = '확정(있음·은주관 입구: 사용자, 골강판·노란 원형 표지·빨간 문틀·노란 글자판·처마 LED·동면 옆 출입구: 영상·사진), 원천(평면: 사용자 항공사진 ±1.5 m), 추정(치수·높이 5.2 m)'
+KO = np.array([201143.02, 557291.74]); KA = (np.array([201144.40, 557300.13]) - KO) / 8.5; KB = (np.array([201146.96, 557291.09]) - KO) / 4.0
+KA, KB = KA / np.hypot(*KA), KB / np.hypot(*KB)
+KZ, KT, KW = 148.9, 154.1, 0.12          # 바닥(운동장, 문턱 없음), 벽 윗면, 벽 두께
+STEEL, SEAM, EDGE, RED, YEL, GLASS = '#a9adb0', '#979b9e', '#55595e', '#c8262c', '#f2c21b', '#33404a'
+kq = lambda a0, a1, b0, b1: rect_frame(KO, KA, KB, a0, a1, b0, b1)
+kb = lambda id_, typ, a0, a1, b0, b1, z0, z1, what, color, base='Z02-PLATFORM-FIELD': box(id_, typ, kq(a0, a1, b0, b1), z0, z1, what, SRC_K, GK, base, color=color)
+FR = (1.36, 3.06); DR = (1.51, 2.91)    # 북면 빨간 문틀(폭 1.7) · 유리 두짝문(1.4) 의 b 범위(동쪽 모서리에서 0.94~2.64 m)
+OP = (6.75, 8.14)                       # 동면 북쪽 끝 옆 출입구 틀의 a 범위(북쪽 끝에서 0.36~1.75 m, 틀 안 1.4 m 가 문 자리 쪽)
+# 벽: 서(은주1관 쪽)·남은 통벽, 북은 문틀 자리를 비우고 위만, 동은 옆 출입구 자리를 비우고 위만
+kb('X22-EUNJU-BOX-WALL-W', 'wall', 0.0, 8.5, 0.0, KW, KZ, KT, '은주관 입구 상자 서쪽 벽(은주1관 동벽에서 0.3 m): 은회색 골강판', STEEL)
+kb('X22-EUNJU-BOX-WALL-S', 'wall', 0.0, KW, KW, 4.0, KZ, KT, '남쪽 벽: 은회색 골강판', STEEL)
+kb('X22-EUNJU-BOX-WALL-N-W', 'wall', 8.5 - KW, 8.5, KW, FR[0], KZ, KT, '북쪽 벽(문틀 서쪽): 은회색 골강판', STEEL)
+kb('X22-EUNJU-BOX-WALL-N-E', 'wall', 8.5 - KW, 8.5, FR[1], 4.0 - KW, KZ, KT, '북쪽 벽(문틀 동쪽, 노란 원형 표지가 붙는 면)', STEEL)
+kb('X22-EUNJU-BOX-WALL-N-TOP', 'wall', 8.5 - KW, 8.5, FR[0], FR[1], KZ + 3.5, KT, '북쪽 벽(문틀 위)', STEEL)
+kb('X22-EUNJU-BOX-WALL-E-S', 'wall', KW, OP[0], 4.0 - KW, 4.0, KZ, KT, '동쪽 벽(옆 출입구 남쪽)', STEEL)
+kb('X22-EUNJU-BOX-WALL-E-N', 'wall', OP[1], 8.5, 4.0 - KW, 4.0, KZ, KT, '동쪽 벽(옆 출입구 북쪽)', STEEL)
+kb('X22-EUNJU-BOX-WALL-E-TOP', 'wall', OP[0], OP[1], 4.0 - KW, 4.0, KZ + 2.85, KT, '동쪽 벽(옆 출입구 위)', STEEL)
+# 지붕 테: 북쪽으로 0.5 m 처마, 그 밑 선형 LED 3줄
+kb('X22-EUNJU-BOX-ROOF', 'canopy', -0.1, 9.0, -0.1, 4.1, KT, KT + 0.25, '지붕과 지붕 테(짙은 회색). 북쪽(문 쪽)으로 0.5 m 처마', EDGE)
+for k2, a0 in enumerate((8.58, 8.72, 8.86)):
+    kb(f'X22-EUNJU-BOX-LED-{k2 + 1}', 'wall', a0, a0 + 0.05, 0.25, 3.75, KT - 0.06, KT - 0.01, '처마 밑 선형 LED(밝은 줄)', '#fffbe6', 'X22-EUNJU-BOX-ROOF')
+# 북면: 빨간 문틀 1.7 x 3.5, 유리 두짝문 1.4 x 2.4(문턱 없음), 문 위 노란 글자판(글자 없음), 노란 원형 표지 다섯(Ø0.6, 중심 1.6~4.8 m)
+kb('X22-EUNJU-BOX-FRAME-W', 'wall', 8.5 - KW, 8.56, FR[0], DR[0], KZ, KZ + 3.5, '빨간 문틀(서쪽 기둥)', RED)
+kb('X22-EUNJU-BOX-FRAME-E', 'wall', 8.5 - KW, 8.56, DR[1], FR[1], KZ, KZ + 3.5, '빨간 문틀(동쪽 기둥)', RED)
+kb('X22-EUNJU-BOX-FRAME-MID', 'wall', 8.5 - KW, 8.56, DR[0], DR[1], KZ + 2.4, KZ + 2.5, '빨간 문틀(문 위 가로대)', RED)
+kb('X22-EUNJU-BOX-FRAME-TOP', 'wall', 8.5 - KW, 8.56, DR[0], DR[1], KZ + 3.38, KZ + 3.5, '빨간 문틀(위)', RED)
+kb('X22-EUNJU-BOX-LETTERS', 'wall', 8.5 - KW, 8.5, DR[0], DR[1], KZ + 2.5, KZ + 3.38, '문 위 노란 글자판(그림 글자, 글자는 싣지 않음)', YEL)
+kb('X22-EUNJU-BOX-DOOR', 'wall', 8.43, 8.47, DR[0], DR[1], KZ, KZ + 2.4, '유리 두짝문(어두운 유리, 문턱 없음)', GLASS)
+for k2, zc in enumerate((1.6, 2.4, 3.2, 4.0, 4.8)):
+    kb(f'X22-EUNJU-BOX-SIGN-{k2 + 1}', 'wall', 8.5, 8.53, 3.25, 3.85, KZ + zc - 0.3, KZ + zc + 0.3, '노란 원형 표지(Ø0.6, 금지 그림. 원을 네모로 줄임)', YEL)
+# 동면: 북쪽 끝 옆 출입구(빨간 틀, 1.4 x 2.7), 그 위 짙은 원형 환기구 둘
+kb('X22-EUNJU-BOX-SIDE-FRAME-S', 'wall', OP[0], OP[0] + 0.15, 4.0 - KW, 4.06, KZ, KZ + 2.85, '동면 옆 출입구 빨간 틀(남쪽 기둥)', RED)
+kb('X22-EUNJU-BOX-SIDE-FRAME-N', 'wall', OP[1] - 0.15, OP[1], 4.0 - KW, 4.06, KZ, KZ + 2.85, '동면 옆 출입구 빨간 틀(북쪽 기둥)', RED)
+kb('X22-EUNJU-BOX-SIDE-FRAME-T', 'wall', OP[0] + 0.15, OP[1] - 0.15, 4.0 - KW, 4.06, KZ + 2.7, KZ + 2.85, '동면 옆 출입구 빨간 틀(위)', RED)
+for k2, zc in enumerate((3.6, 4.5)):
+    kb(f'X22-EUNJU-BOX-VENT-{k2 + 1}', 'wall', 7.2, 7.7, 4.0, 4.04, KZ + zc - 0.25, KZ + zc + 0.25, '짙은 원형 환기구(추정, 네모로 줄임)', '#3c4044')
+# 골강판 세로 골: 바탕과 대비가 낮은 이음 줄(북·동·남 바깥 면, 0.6 m 마다, 문·출입구 자리는 비움)
+for k2, bb in enumerate(np.arange(0.3, 4.0, 0.6)):
+    if FR[0] - 0.05 < bb < FR[1] + 0.05: continue
+    if 3.2 < bb < 3.9: z0s = [(KZ, KZ + 1.25), (KZ + 5.15, KT)]
+    else: z0s = [(KZ, KT)]
+    for j2, (z0, z1) in enumerate(z0s):
+        kb(f'X22-EUNJU-BOX-SEAM-N-{k2:02d}{j2}', 'wall', 8.5, 8.52, bb - 0.02, bb + 0.02, z0, z1, '골강판 세로 골(낮은 대비)', SEAM)
+    kb(f'X22-EUNJU-BOX-SEAM-S-{k2:02d}', 'wall', -0.02, 0.0, bb - 0.02, bb + 0.02, KZ, KT, '골강판 세로 골(낮은 대비)', SEAM)
+for k2, aa in enumerate(np.arange(0.3, 8.5, 0.6)):
+    if OP[0] - 0.05 < aa < OP[1] + 0.05: continue
+    z0s = [(KZ, KZ + 3.3), (KZ + 4.8, KT)] if 7.1 < aa < 7.8 else [(KZ, KT)]
+    for j2, (z0, z1) in enumerate(z0s):
+        kb(f'X22-EUNJU-BOX-SEAM-E-{k2:02d}{j2}', 'wall', aa - 0.02, aa + 0.02, 4.0, 4.02, z0, z1, '골강판 세로 골(낮은 대비)', SEAM)
+# 안: 북쪽 끝 참(운동장 높이 148.9, 바닥 그대로) → 남쪽으로 내려가는 계단(빈 곳 U02-VOID-FIELD-STAIR-BOX 와 U02-VOID-FIELD-STAIR, 단은 그리지 않음)
+# 화단 Z05-EUNJU-FIELD-PLANTER-4: 북쪽 끝을 상자 남쪽 벽 앞(약 557291)에서 자름(겹침 없앰)
+z5 = load('z05-eunju.geojson'); BOXP = Polygon(kq(-0.05, 8.55, -0.05, 4.05))
+for f in z5['features']:
+    if f['properties']['id'] == 'Z05-EUNJU-FIELD-PLANTER-4' and Polygon(f['geometry']['coordinates'][0]).intersects(BOXP):
+        f['geometry'] = geom(Polygon(f['geometry']['coordinates'][0]).difference(BOXP)); f['properties']['assumption'] = f['properties'].get('assumption', '') + ' 2026-10-22: 북쪽 끝을 은주관 입구 상자 남쪽 벽 앞에서 자름'
+dump('z05-eunju.geojson', z5)
 
 # ===================== 대일관 앞: 데크·화단·동쪽 끝 계단(사용자 항공사진 2026-10-22), 청운관 앞 표지석(X06), 상승관 쪽 작은 계단 =====================
 SRC_AE = '사용자 항공사진 보완자료/학교-전경-20261022/항공-대일관앞-원본.webp·-데크-사용자표시.webp(운동장 칠 무늬 5점으로 S-MAP 정사 화면에 맞춤, 잔차 0.13 m 이하, 절대 ±1 m 추정), 사진 09·10·11'
