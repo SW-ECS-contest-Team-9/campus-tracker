@@ -808,9 +808,9 @@
     "estimated": true,
     "grade": "추정",
     "basePlane": "Z02-PLATFORM-ENTRANCE",
-    "fromM": 151.3,
+    "fromM": 154.2,
     "toM": 155.2,
-    "assumption": "현관 동쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함)",
+    "assumption": "현관 동쪽 옆벽(막혔는지 뚫렸는지 사진으로 확인 못 함) [X40 2026-10-23: 아래를 아치로 틈: 154.2 m 위 머리벽만 남김(양 끝 기둥은 X40-PORCH-E-PIER)]",
     "source": "사용자 사진 18, 대일관-현관-계단-가까이.webp, 사용자 사진 13, S-MAP 메시(g02/smap-mesh-g02-way-05m-d.txt 0.5 m, b09/smap-mesh-b09-sangseung-1m.txt 1 m) (낮은 지붕 처마 155.8 / 용마루 158.0)",
     "material": "brick"
    },
