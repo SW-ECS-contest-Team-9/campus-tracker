@@ -717,7 +717,8 @@ export function parseInteriors(fc: any): Interior[] {
 /**
  * Floor i of a building carved: the walls left standing (the footprint without the spaces of that floor, clipped to the
  * footprint), how high they stand, and the spaces (clipped to the footprint) to outline. null when no space of the
- * building lies on that floor (the plate is drawn as before).
+ * building lies on that floor (the plate is drawn as before). Only the footprint pieces a space reaches get walls: a part
+ * with no space on that floor (은주관: 1관 and 2관 have floors at different heights) stays a plain plate.
  */
 export function carvedFloor(interiors: Interior[], buildingId: string, floors: Floor[], i: number, footprint: Polygon[]): { walls: Polygon[]; wallM: number; spaces: { space: Interior; polygons: Polygon[] }[] } | null {
   const floor = floors[i];
@@ -727,5 +728,6 @@ export function carvedFloor(interiors: Interior[], buildingId: string, floors: F
   if (!spaces.length) return null;
   const next = floors[i + 1];
   const wallM = Math.max(INTERIOR.minWallM, Math.min(INTERIOR.wallM, next ? next.m - floor.m - INTERIOR.belowNextM : INTERIOR.wallM));
-  return { walls: polygonOps('minus', footprint, spaces.flatMap((s) => s.polygons)), wallM, spaces };
+  const reached = footprint.filter((piece) => spaces.some((s) => polygonOps('both', s.polygons, [piece]).length));
+  return { walls: polygonOps('minus', reached, spaces.flatMap((s) => s.polygons)), wallM, spaces };
 }

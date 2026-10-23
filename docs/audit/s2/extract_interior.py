@@ -1,6 +1,8 @@
 """사2: 시험용 DB 실내 길(indoor-roads.json) -> 동 노트 머리의 `실내_구조` 초안.
 
   python docs/audit/s2/extract_interior.py 북악관 [--notes <동 노트 폴더>] [--apply]
+  python docs/audit/s2/extract_interior.py 은주관 --table 은주1관=은주관 --table 은주2관=은주관#2관 --apply
+    # 층 표가 여럿인 동: 층_바닥_높이 안의 표 이름 = 그 표의 길이 붙은 장면 건물 id. 항목마다 층_표 를 적는다
 
 한 동에 한 번만 쓰는 도구다. --apply 는 노트 머리 끝(닫는 --- 앞)에 실내_구조 를 넣는다(이미 있으면 하지 않는다).
 그 뒤로는 노트가 원본이고 손으로 다듬는다.
@@ -31,8 +33,10 @@ STAIR_MATCH = 0.5   # a stair end counts for a floor only this near (an entrance
 LIFT_JOIN = 1.0
 
 
-def floors_of(head):
-    table = ((head.get('층_바닥_높이') or {}).get('층') or {})
+def floors_of(head, name=None):
+    table = head.get('층_바닥_높이') or {}
+    if name: table = table.get(name) or {}
+    table = table.get('층') or {}
     return {str(name): v['값'] for name, v in table.items() if isinstance(v, dict) and isinstance(v.get('값'), (int, float))}
 
 
@@ -66,8 +70,9 @@ def short(name, fallback):
     return re.split(r' \(', name or '')[0].strip() or fallback
 
 
-def draft(head, roads, stair_width=1.4):
-    floors = floors_of(head)
+def draft(head, roads, stair_width=1.4, table=None):
+    floors = floors_of(head, table)
+    tag = {'층_표': table} if table else {}
     order = list(floors)
     by_order = lambda s: sorted(s, key=order.index)
     corridors, stairs, lifts = {}, {}, []
@@ -93,15 +98,15 @@ def draft(head, roads, stair_width=1.4):
     for e in corridors.values():
         name = short(e['name'], '복도')
         kind = '연결' if re.search('연결.{0,3}통로', name) else '로비' if re.search('홀|로비', name) else '복도'
-        items.append({'종류': kind, '이름': name, '층': by_order(e['floors']), '선': [[round(p[0], 2), round(p[1], 2)] for p in e['coords']],
+        items.append({'종류': kind, '이름': name, '층': by_order(e['floors']), **tag, '선': [[round(p[0], 2), round(p[1], 2)] for p in e['coords']],
                       **({'폭': 4.0} if kind == '로비' else {}), '길': sorted(e['roads']), '등급': '추정'})
     for e in stairs.values():
         if not e['floors']: continue
-        items.append({'종류': '계단실', '이름': short(e['name'], '계단'), '층': by_order(e['floors']),
+        items.append({'종류': '계단실', '이름': short(e['name'], '계단'), '층': by_order(e['floors']), **tag,
                       '외곽': rect_around(e['coords'], stair_width / 2), '길': sorted(e['roads']), '등급': '추정'})
     for k, e in enumerate(lifts, 1):
         if not e['floors']: continue
-        items.append({'종류': '승강기', '이름': f'승강기 {k}' if len(lifts) > 1 else '승강기', '층': by_order(e['floors']),
+        items.append({'종류': '승강기', '이름': f'승강기 {k}' if len(lifts) > 1 else '승강기', '층': by_order(e['floors']), **tag,
                       '중심': [round(e['at'][0], 2), round(e['at'][1], 2)], '길': sorted(e['roads']), '등급': '추정'})
     return items
 
@@ -123,13 +128,18 @@ def main(argv=None):
     ap.add_argument('--notes', default=reg.DEFAULT_NOTES)
     ap.add_argument('--roads', default=str(HERE / 'indoor-roads.json'))
     ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--table', action='append', default=[], help='표이름=장면 건물 id (층 표가 여럿인 동, 표마다 한 번)')
     a = ap.parse_args(argv)
     path = pathlib.Path(a.notes) / f'{a.building}.md'
     text = path.read_text(encoding='utf-8')
     head = reg.read_head(text)
-    sid = scene_id(head)
-    roads = [r for r in json.load(open(a.roads, encoding='utf-8')) if r['buildingId'] == sid]
-    items = draft(head, roads)
+    every = json.load(open(a.roads, encoding='utf-8'))
+    groups = [t.split('=', 1) for t in a.table] or [(None, scene_id(head))]
+    items, roads = [], []
+    for table, sid in groups:
+        mine = [r for r in every if r['buildingId'] == sid]
+        roads += mine; items += draft(head, mine, table=table)
+    sid = ', '.join(s for _, s in groups)
     out = block(items)
     sys.stdout.reconfigure(encoding='utf-8')
     if not a.apply:

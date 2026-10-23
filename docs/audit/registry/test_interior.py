@@ -25,6 +25,16 @@ class Interior(unittest.TestCase):
         self.assertEqual(out, [])
         self.assertIn('4층', bad[0])
 
+    def test_named_floor_table(self):
+        head = {'이름': '가관', '층_바닥_높이': {'가1관': {'층': {'1층': {'값': 100.0}}}, '가2관': {'층': {'1층': {'값': 101.0}}}},
+                '실내_구조': {'공간': [{'종류': '복도', '이름': 'a', '층': ['1층'], '층_표': '가2관', '선': [[0, 0], [1, 0]], '폭': 2, '등급': '추정'}]}}
+        out, bad = interior.from_note(head)
+        self.assertEqual((bad, out[0]['properties']['floorsM']), ([], [101.0]))
+        del head['실내_구조']['공간'][0]['층_표']
+        out, bad = interior.from_note(head)
+        self.assertEqual(out, [])
+        self.assertIn('1층', bad[0])
+
     def test_scene_id_prefers_added_building(self):
         self.assertEqual(interior.scene_id({'이름': '다', '모델_id': {'서버_건물_id': '혜인관'}, '모델_추가': {'건물_id': '추가-다'}}), '추가-다')
         self.assertEqual(interior.scene_id({'이름': '라', '모델_id': {'서버_건물_id': '추가-라 (설명)'}}), '추가-라')

@@ -234,4 +234,6 @@ test('사2: interiors.geojson spaces carve a floor (walls = footprint without sp
   assert.equal(carvedFloor(spaces, '가관', floors, 2, footprint)!.wallM, INTERIOR.wallM);
   assert.equal(carvedFloor(spaces, '가관', floors, 1, footprint), null, 'no space on that floor: not carved');
   assert.equal(carvedFloor(spaces, '나관', floors, 0, footprint), null);
+  const parts = carvedFloor(spaces, '가관', floors, 0, [...footprint, [rect(0, 20, 10, 10)]])!;
+  assert.ok(Math.abs(parts.walls.reduce((t, w) => t + polygonArea(w), 0) - (400 - 96)) < 0.5, 'a part no space reaches gets no walls');
 });

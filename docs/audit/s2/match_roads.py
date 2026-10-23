@@ -38,7 +38,7 @@ def main(argv=None):
     bad = 0
     stats = {}
     for r in roads:
-        b = r['buildingId']
+        b = r['buildingId'].split('#')[0]   # 부분(은주관#2관)의 길은 그 동의 빈 곳과 견준다
         if b not in heights: continue
         c = r['coordinates']; zs = [q[2] for q in c]
         if r['structure'] != 'elevator' and r['structure'] != 'stairs' and max(zs) - min(zs) <= 0.9:

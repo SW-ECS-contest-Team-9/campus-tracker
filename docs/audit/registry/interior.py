@@ -5,6 +5,7 @@ building_registry.py 가 부른다(write·check 에 함께 들어간다). 노트
     기본값: {복도_폭: m, 계단_폭: m, 승강기: [가로, 세로], 방향: 도(가로 변이 동쪽에서 반시계로 돈 각), 등급}
     공간:
       - {종류: 복도|로비|연결|계단실|승강기, 이름, 층: [층_바닥_높이.층 의 이름, ...], 등급, 출처(없어도 됨), 길: [실내 길 id 앞 8자리, ...](없어도 됨),
+         층_표: 층_바닥_높이 안의 표 이름(은주1관 등. 동에 표가 여럿일 때. 없으면 동의 표),
          모양은 셋 중 하나:
            선: [[x, y], ...] + 폭(없으면 복도·로비·연결은 복도_폭, 계단실은 계단_폭)   # 토막마다 끝을 폭의 반만큼 늘린 띠
            외곽: [[x, y], ...]                                                          # 다각형(닫지 않아도 됨)
@@ -25,8 +26,10 @@ num = lambda v: isinstance(v, (int, float)) and not isinstance(v, bool)
 pt = lambda p: isinstance(p, (list, tuple)) and len(p) >= 2 and num(p[0]) and num(p[1])
 
 
-def floor_table(head):
-    t = ((head.get('층_바닥_높이') or {}).get('층') or {}) if isinstance(head.get('층_바닥_높이'), dict) else {}
+def floor_table(head, name=None):
+    t = head.get('층_바닥_높이') if isinstance(head.get('층_바닥_높이'), dict) else {}
+    if name: t = t.get(name) if isinstance(t.get(name), dict) else {}
+    t = t.get('층') or {}
     return {str(k): v['값'] for k, v in t.items() if isinstance(v, dict) and num(v.get('값'))}
 
 
@@ -71,7 +74,6 @@ def from_note(head):
     if not isinstance(s, dict) or not isinstance(s.get('공간'), list):
         return [], ['실내_구조 는 {기본값, 공간: [...]}']
     base = s.get('기본값') or {}
-    table = floor_table(head)
     building = scene_id(head)
     out = []
     for i, it in enumerate(s['공간']):
@@ -84,8 +86,9 @@ def from_note(head):
         if not g.startswith(GRADES): problems.append(f'{at}: 등급 은 확정·원천·S-MAP·추정 중 하나로 시작')
         floors = it.get('층')
         if not isinstance(floors, list) or not floors: problems.append(f'{at}: 층 목록이 없다'); continue
+        table = floor_table(head, it.get('층_표'))
         missing = [str(f) for f in floors if str(f) not in table]
-        if missing: problems.append(f"{at}: 층 {missing} 이 층_바닥_높이.층 에 없다"); continue
+        if missing: problems.append(f"{at}: 층 {missing} 이 층_바닥_높이{'.' + str(it['층_표']) if it.get('층_표') else ''}.층 에 없다"); continue
         if it.get('선') is not None:
             line = it['선']
             width = it.get('폭', base.get('계단_폭' if kind == 'stair' else '복도_폭'))
