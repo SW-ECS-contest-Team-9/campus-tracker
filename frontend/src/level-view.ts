@@ -692,7 +692,7 @@ export type InteriorKind = 'corridor' | 'lobby' | 'link' | 'stair' | 'elevator';
 export type Interior = { building: string; kind: InteriorKind; name: string; floorsM: number[]; grade: string; polygons: Polygon[] };
 export const INTERIOR = {
   /** How high the walls of a carved floor stand (a plan cut: an oblique view still sees into the corridors). */
-  wallM: 2.0,
+  wallM: 1.2,
   /** ... and never higher than this below the next floor up. */
   belowNextM: 0.3,
   /** The lowest wall drawn. */

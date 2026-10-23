@@ -63,7 +63,7 @@ type Tag = { label: any; world: any; priority: number };
 
 /** 사2: the carved inside of a floor: the walls left standing, and per kind of space its floor tint and outline. */
 const SPACE: { wall: string; wallTop: string; fill: Record<InteriorKind, string>; edge: Record<InteriorKind, string> } = {
-  wall: '#c3c8cf', wallTop: '#9aa1ab',
+  wall: '#c3c8cf', wallTop: '#b3b9c2',
   fill: { corridor: '#fbfbf8', lobby: '#fbfbf8', link: '#e2edf9', stair: '#f8e3cc', elevator: '#eadff6' },
   edge: { corridor: '#6b7280', lobby: '#6b7280', link: '#1d6fd6', stair: '#e07a1f', elevator: '#8b3fc9' },
 };
