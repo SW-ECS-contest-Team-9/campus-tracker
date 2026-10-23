@@ -340,6 +340,54 @@ for k, (c, r) in enumerate((((201098.6, 557296.3), 1.0), ((201095.6, 557295.8), 
 box('X40-ROOF-YARD-PARAPET-E', 'wall', LineString([(201101.2, 557286.0), (201101.17, 557288.41), (201100.77, 557289.05)]).buffer(0.15, cap_style=2).intersection(YARD), ZD, ZD + 1.0,
     '동쪽 끝(원통 남서쪽, 낮은 틈 쪽으로 트인 곳) 콘크리트 난간벽(사진 15 오른쪽)', SRC7, G7, 'X22-ROOF-YARD-FLOOR', color='#c4c2bb')
 
+# ===================== 본관 사진(X37·X40·X44·X46, 비교4) =====================
+SRCB = '사진 본관-서쪽-위에서.webp(2026-10-23, 찍은 자리 (200994.9, 557307.2) 약 148 m, 비교4), 건물 노트 본관 2026-10-23 절'
+GB = '원천(사진: 있음), 추정(치수·자리)'
+BONG = [Polygon(b['coordinates'][0][0]) for b in G.buildings() if b['name'] == '본관'][0]
+WALL = BONG.buffer(-1.5, join_style=2)                      # 처마 깊이 1.5 m 안쪽이 벽(겉모습 지붕.처마_깊이)
+# X37 유리 층 앞 검은 쇠 난간(보 위 148.3 ~ 149.4)
+box('X40-BONGWAN-GLASS-RAIL', 'wall', WALL.buffer(0.12, join_style=2).difference(WALL.buffer(0.04, join_style=2)), 148.3, 149.4, '맨 위 유리 층 앞 검은 쇠 난간(돌 처마띠 위, 사진)', SRCB, GB, '본관', color='#202224')
+# X40 서쪽 끝 면: 세로 두 줄의 둥근 머리 작은 창(가운데 한 줄 4, 남서 모서리 쪽 한 줄 3)
+wa = np.array([201033.4, 557319.4]); wb = np.array([201044.7, 557344.2]); wd = (wb - wa) / np.linalg.norm(wb - wa); wn = np.array([-wd[1], wd[0]])
+if Point(*(wa + wd * 13 + wn * 3)).within(BONG): wn = -wn     # wn = 바깥(서)
+w0 = wa + wn * -1.5                                          # 벽 선 위 남쪽 끝(대략)
+Lw = float(np.linalg.norm(wb - wa))
+for col, (frac, zs) in enumerate(((0.5, (132.4, 136.1, 139.8, 143.5)), (0.17, (136.1, 139.8, 143.5)))):
+    for k, z in enumerate(zs):
+        c = w0 + wd * (Lw * frac)
+        win = Polygon([tuple(c + wd * a + wn * b) for a, b in ((-0.45, -0.02), (0.45, -0.02), (0.45, 0.1), (-0.45, 0.1))])
+        box(f'X40-BONGWAN-WEST-WIN-{col + 1}{k + 1}', 'wall', win, z, z + 1.4, '서쪽 끝 면 둥근 머리 작은 창(어두운 유리, 머리는 네모로 줄임)', SRCB, GB, '본관', color='#2f3a44')
+# X46 회차 공간 어귀 아스팔트: 포장면(회차 공간) 위에 걸친 부분이 길 기울기를 따라 솟아 덩어리로 보이던 것 → 포장면 기울기를 따르는 얇은 판으로
+apr = F('g02-way.geojson', 'G03-PAINT-APRON'); ag = shape(BASE['features']['g02-way.geojson']['G03-PAINT-APRON']['geometry']).buffer(0)
+TP = ALL['Z05-PLATFORM-TURN-PLAZA'][1]['properties']; TPG = SH('Z05-PLATFORM-TURN-PLAZA')
+on_plaza = ag.intersection(TPG).buffer(0)
+apr['geometry'] = geom(ag.difference(TPG.buffer(0.01))); note(apr, '회차 공간 포장면 위 부분은 X40-PAINT-APRON-PLAZA 로 뗌(포장면 기울기)')
+if on_plaza.area > 0.05:
+    pp = copy.deepcopy(TP['topProfile']); pp['points'] = [[q[0], r2(q[1] + 0.03)] for q in pp['points']]
+    f = box('X40-PAINT-APRON-PLAZA', 'wall', on_plaza, min(q[1] for q in pp['points']) - 0.03, max(q[1] for q in pp['points']), '어귀의 검은 아스팔트 중 회차 공간 포장면 위 부분(포장면과 같은 기울기의 얇은 판, 사진: 평평한 아스팔트)', SRCB + ', 거리뷰 21', GB,
+            'Z05-PLATFORM-TURN-PLAZA', color='#26282b')
+    f['properties'].update(topProfile=pp, thicknessM=0.03)
+def plaza_z(x, y):
+    pr = TP['topProfile']; Lp = math.hypot(*pr['direction']); d = ((x - pr['origin'][0]) * pr['direction'][0] + (y - pr['origin'][1]) * pr['direction'][1]) / Lp
+    return float(np.interp(d, [q[0] for q in pr['points']], [q[1] for q in pr['points']]))
+# X44 장애인 주차 칸(파란 바닥, 휠체어 표시, 옆 빗금 칸)과 파란 안내 표지 기둥: 전화 부스 화단 서쪽
+pc = np.array([201031.0, 557341.0]); pu = np.array([math.sin(math.radians(115.6)), math.cos(math.radians(115.6))]); pv = np.array([-pu[1], pu[0]])   # pu = 칸 긴 쪽(화단 쪽, 본관 긴 축과 나란)
+def QP(a0, a1, b0, b1): return Polygon([tuple(pc + pu * a + pv * b) for a, b in ((a0, b0), (a1, b0), (a1, b1), (a0, b1))])
+zp = plaza_z(*pc); pp2 = copy.deepcopy(TP['topProfile']); pp2['points'] = [[q[0], r2(q[1] + 0.02)] for q in pp2['points']]
+def paint(id, poly, what, color, lift=0.02):
+    pr = copy.deepcopy(TP['topProfile']); pr['points'] = [[q[0], r2(q[1] + lift)] for q in pr['points']]
+    f = box(id, 'wall', poly, min(q[1] for q in pr['points']) - 0.02, max(q[1] for q in pr['points']), what, SRCB + ', 구역 노트 회차 공간 P01 "아직 없는 것"', '원천(사진: 있음), 추정(자리 ±4 m·크기)', 'Z05-PLATFORM-TURN-PLAZA', color=color)
+    if f: f['properties'].update(topProfile=pr, thicknessM=0.02)
+paint('X40-DISABLED-BAY', QP(-2.5, 2.5, -1.65, 1.65), '장애인 주차 칸 파란 바닥(5.0 x 3.3 m)', '#2f6db5')
+paint('X40-DISABLED-BAY-SIGN', QP(-0.6, 0.6, -0.6, 0.6), '바닥의 흰 휠체어 표시(네모로 줄임)', '#f2f2ee', 0.035)
+for k in range(5):
+    paint(f'X40-DISABLED-BAY-HATCH-{k + 1}', QP(-2.5 + 1.0 * k, -2.5 + 1.0 * k + 0.25, 1.75, 3.15), '옆 빗금 칸(흰 빗금, 곧은 띠로 줄임)', '#f2f2ee')
+for nm, b0 in (('A', -1.75), ('B', 3.15)):
+    paint(f'X40-DISABLED-BAY-LINE-{nm}', QP(-2.5, 2.5, b0, b0 + 0.1), '칸 흰 테두리', '#f2f2ee')
+post = tuple(pc + pu * 3.0)
+box('X40-DISABLED-SIGN-POST', 'wall', disc(post, 0.05, 8), zp - 0.1, zp + 2.6, '파란 안내 표지 기둥(회색 쇠기둥)', SRCB, '원천(사진: 있음), 추정(자리)', 'Z05-PLATFORM-TURN-PLAZA', color='#8a8d90')
+box('X40-DISABLED-SIGN-PLATE', 'wall', Polygon([tuple(np.array(post) + pv * a + pu * b) for a, b in ((-0.3, 0.06), (0.3, 0.06), (0.3, 0.1), (-0.3, 0.1))]), zp + 1.9, zp + 2.5, '파란 장애인 주차 안내 판', SRCB, '원천(사진: 있음), 추정(자리)', 'X40-DISABLED-SIGN-POST', color='#2f6db5')
+
 # ---------- 겹침 정리: 새 상자는 높이가 겹치는 다른 상자 자리를 비우고, 나무는 겹치면 뺀다 ----------
 def zr(p):
     lo, hi = p['fromM'], p['toM']
