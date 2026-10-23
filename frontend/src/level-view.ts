@@ -729,5 +729,5 @@ export function carvedFloor(interiors: Interior[], buildingId: string, floors: F
   const next = floors[i + 1];
   const wallM = Math.max(INTERIOR.minWallM, Math.min(INTERIOR.wallM, next ? next.m - floor.m - INTERIOR.belowNextM : INTERIOR.wallM));
   const reached = footprint.filter((piece) => spaces.some((s) => polygonOps('both', s.polygons, [piece]).length));
-  return { walls: polygonOps('minus', reached, spaces.flatMap((s) => s.polygons)), wallM, spaces };
+  return { walls: polygonOps('minus', reached, spaces.flatMap((s) => s.polygons), true), wallM, spaces };
 }

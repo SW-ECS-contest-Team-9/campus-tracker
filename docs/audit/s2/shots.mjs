@@ -52,6 +52,8 @@ const PLAN = [
   ['북악관', null, STACK], ['북악관', '2층', FLOOR], ['북악관', '지하 1층', FLOOR], ['북악관', '1층', FLOOR],
   ['본관', null, STACK], ['본관', '5층', FLOOR], ['본관', '2층', FLOOR],
   ['한림관', null, STACK], ['한림관', '3층', FLOOR], ['한림관', '1층', FLOOR],
+  ['은주관', null, STACK], ['은주관', '1층', FLOOR], ['은주관', '3층', FLOOR], ['은주관', '5층', FLOOR],
+  ['수인관', null, STACK], ['수인관', '1층', FLOOR],
 ];
 for (const [id, floor, view] of PLAN) {
   if (only.length && !only.includes(id)) continue;

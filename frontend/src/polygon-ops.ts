@@ -37,9 +37,10 @@ export const polygonContains = (x: number, y: number, polygon: Polygon) => polyg
 /**
  * `a` united (`union`), `a` without `b` (`minus`), or what `a` and `b` share (`both`). The rings of the input may run
  * either way round; overlapping polygons of one side count as their union. Result: outer rings counter-clockwise,
- * holes clockwise, points on a straight edge kept.
+ * holes clockwise, points on a straight edge kept. `strict`: a hole that touches its outer ring is opened into it (Clipper
+ * StrictlySimple), so the result triangulates (earcut drops such a hole).
  */
-export function polygonOps(op: 'union' | 'minus' | 'both', a: Polygon[], b: Polygon[] = []): Polygon[] {
+export function polygonOps(op: 'union' | 'minus' | 'both', a: Polygon[], b: Polygon[] = [], strict = false): Polygon[] {
   const first = a[0]?.[0]?.[0] ?? b[0]?.[0]?.[0];
   if (!first || !a.length) return [];
   if (op === 'both' && !b.length) return [];
@@ -56,6 +57,7 @@ export function polygonOps(op: 'union' | 'minus' | 'both', a: Polygon[], b: Poly
   });
   const c = new ClipperLib.Clipper();
   c.PreserveCollinear = true;
+  c.StrictlySimple = strict;
   c.AddPaths(shape(a), ClipperLib.PolyType.ptSubject, true);
   const other = shape(b);
   if (other.length) c.AddPaths(other, ClipperLib.PolyType.ptClip, true);

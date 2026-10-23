@@ -6,7 +6,7 @@ import test from 'node:test';
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
 const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, carvedFloor, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
-const { parseStructures } = await import('../src/structures.ts');
+const { parseStructures, solidMesh } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
 
@@ -236,4 +236,13 @@ test('사2: interiors.geojson spaces carve a floor (walls = footprint without sp
   assert.equal(carvedFloor(spaces, '나관', floors, 0, footprint), null);
   const parts = carvedFloor(spaces, '가관', floors, 0, [...footprint, [rect(0, 20, 10, 10)]])!;
   assert.ok(Math.abs(parts.walls.reduce((t, w) => t + polygonArea(w), 0) - (400 - 96)) < 0.5, 'a part no space reaches gets no walls');
+  // a space whose corner touches the outline (수인관 1층: a corridor end on the wall) must not leave a hole touching the outer ring:
+  // the triangulation then drops the hole and the walls cover the corridors
+  const sooin = [[201174.739, 557125.622], [201192.294, 557144.08], [201125.566, 557204.292], [201102.938, 557190.108], [201148.208, 557110.271]];
+  const touch = parseInteriors({ features: [{ type: 'Feature', properties: { building: '가관', kind: 'corridor', name: 'x', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[201155.91, 557149.49], [201155.912, 557149.491], [201152.92, 557154.69], [201152.922, 557154.691], [201148.676, 557162.072], [201126.17, 557149.137], [201124.985, 557151.226], [201147.481, 557164.155], [201130.36, 557193.94], [201132.44, 557195.14], [201150.76, 557163.27], [201150.758, 557163.269], [201156.2, 557153.81], [201156.198, 557153.809], [201159.19, 557148.61], [201159.187, 557148.608], [201170.14, 557129.56], [201168.06, 557128.36]]] } }] });
+  const walls = carvedFloor(touch, '가관', floors, 0, [[sooin]])!.walls;
+  const top = walls.reduce((t, w) => { const m = solidMesh({ id: 'p', file: '', role: 'box', type: 'plate', polygon: w, bottomM: 99, topM: 100, estimated: false, props: {} } as never).mesh;
+    let a = 0; for (let k = 0; k < m.indices.length; k += 3) { const [i, j, l] = [0, 1, 2].map((e) => m.indices[k + e] * 5); if ([i, j, l].every((q) => m.positions[q + 2] === 100)) a += Math.abs((m.positions[j] - m.positions[i]) * (m.positions[l + 1] - m.positions[i + 1]) - (m.positions[l] - m.positions[i]) * (m.positions[j + 1] - m.positions[i + 1])) / 2; }
+    return t + a; }, 0);
+  assert.ok(Math.abs(top - 3545.7) < 0.5, `wall tops 3545.7 m² (got ${top})`);
 });
