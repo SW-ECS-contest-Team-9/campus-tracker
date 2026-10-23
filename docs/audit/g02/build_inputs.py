@@ -97,24 +97,50 @@ while _s < 14.3 - 1e-9:
             'fromM': r2(min(_z, 132.5) - 0.05), 'toM': r2(max(_z, 132.5)), 'bottomM': r2(min(_z, 132.5) - 0.05), 'topProfile': {'origin': [r2(_o[0]), r2(_o[1])], 'direction': [float(_d[0]), float(_d[1])], 'points': [[0.0, r2(_z if _z < 132.5 else _z)], [r2(_t1 - _t0), r2(132.5 if _z < 132.5 else 132.5)]]},
             'assumption': '어귀의 아스팔트와 북악관 동쪽 마당을 잇는 비탈 판(길 높이 ↔ 132.5 m). 기본 평면 둘의 뒤틀린 이음을 구조물로 메움', 'source': SV21, 'color': '#26282b'}, 'geometry': {'type': 'Polygon', 'coordinates': [ring(rect(_s, _e, _t0, _t1))]}})
     _s = _e
-pbox('G03-PAINT-LANE-1', 'wall', rect(S_GATE, 69.3, S_PAVE, RAMP_N), 0.05, '가운데 차로(공사 차량만 다님: 확정): 짙은 회색 무늬 블록, 폭 4.2 m(차단기 막대 3.4 m + 말뚝 둘)', SV21 + ', 사진 21', thick=0.03, color=LANE, pattern='rings')
-pbox('G03-PAINT-LANE-2', 'wall', [(69.3, S_PAVE), (73.3, -0.9), (101.0, -0.9), (106.0, 0.5), (106.0, RAMP_N), (69.3, RAMP_N)], 0.05, '가운데 차로 윗구간(본관을 지난 뒤, 한림관 쪽 난간 벽이 t −2.5 로 들어온 만큼 좁아짐)', '사진 26, 정사 그림', thick=0.03, color=LANE, pattern='rings')
+# R02(2026-10-15): 본관을 지난 뒤(s 63~74) 길이 북쪽으로 꺾이며 좁아진다(사용자 지적 2026-10-15, 사진 26). 선은 S-MAP 0.5 m 메시에서 길 경사면과 0.35 m 안인 띠의 가장자리(docs/audit/r02/st_relief.py, 추정 ±1 m):
+#   남쪽 옹벽 면 t −3.8(s 63.4) → −0.4(s 72) → 0.4(s 88) → 0.8(s 100) → 0.4(s 105), 북쪽 화단 벽 선 4.6(s 70) → 7.0(s 74). 본관 쪽 인도 2.2 → 1.2 m, 차로 4.2 → 2.4 m(s 100)
+WF_S, WF_T = [63.4, 72.0, 88.0, 100.0, 105.0], [S_WALL, -0.4, 0.4, 0.8, 0.4]   # 메시 가장자리(0.0 / 1.0 / 2.0 / 0.0)보다 s 88~100 에서 0.6~1.2 m 남쪽: 시험용 DB 길 8e71c240(t 1.2)이 인도 위에 남게(묶음으로 옮기면 길이 쪼개져서 안 함)
+# X22(2026-10-22): R02 의 꺾임을 거둠. 사용자: "애당초 오르막 길은 직선". S-MAP 정사 그림(g02/smap-ortho-rectified-01m.png)에서 밝은 포장 띠와 남쪽 턱 선이
+#   본관 북동 모서리를 지나 은주관 옆까지 곧게 이어진다(메시 가장자리는 보조). 옹벽 면·인도 폭·북쪽 화단 벽 선을 아래 구간과 같은 곧은 선으로 둔다
+WF_T = [S_WALL] * len(WF_S)
+def wf(s_): return float(np.interp(s_, WF_S, WF_T))                     # 남쪽 옹벽 면(곧음)
+def sw(s_): return 2.2                                                  # 본관 쪽 인도 폭(곧음)
+def npl(s_): return STRIP_N                                             # 북쪽 인도 바깥(화단 벽) 선(곧음)
+RS = [63.4, 67.0, 70.0, 72.0, 74.0, 80.0, 88.0, 94.0, 100.0, 105.0]
+def band(ss_, f0, f1): return [(a, f0(a)) for a in ss_] + [(a, f1(a)) for a in ss_[::-1]]   # 인도는 차도보다 밝은 포장(고리 무늬), 차도와 인도 사이는 짙은 띠(사용자 사진 02)
+pbox('G03-PAINT-LANE-1', 'wall', rect(S_GATE, 63.4, S_PAVE, RAMP_N), 0.05, '가운데 차로(공사 차량만 다님: 확정): 짙은 회색 무늬 블록, 폭 4.2 m(차단기 막대 3.4 m + 말뚝 둘)', SV21 + ', 사진 21', thick=0.03, color=LANE, pattern='rings')
+pbox('G03-PAINT-LANE-2', 'wall', band(RS, lambda a: wf(a) + sw(a), lambda a: npl(a) - 2.0), 0.05, '가운데 차로 윗구간(X22: 곧은 선, 폭 4.2 m 그대로. R02 의 꺾임은 거둠)', 'S-MAP 정사 그림 g02/smap-ortho-rectified-01m.png, 사용자 2026-10-22(직선)', thick=0.03, color=LANE, pattern='rings')
 # 양쪽 인도(사용자 확정 2026-10-12: "차도를 두고 양쪽 다 인도", "양쪽 모두 약간 턱 있는 인도, 계단 아님"): 길과 나란히 오르는 판, 차도보다 KERB 만큼 높고 차도 쪽에 밝은 경계석 줄
 KERB = 0.12        # 턱 높이(추정 0.10~0.15)
 STRIP_END = 105.0  # 은주1관 북쪽 끝 옆(사용자 확정 2026-10-11: 띠는 차단기에서 은주관 바로 옆까지)
-SIDEWALK, KERBSTONE = '#b6b4ac', '#4f5154'   # 인도는 차도보다 밝은 포장(고리 무늬), 차도와 인도 사이는 짙은 띠(사용자 사진 02)
+SIDEWALK, KERBSTONE = '#b6b4ac', '#4f5154'
 WALKS = {  # 이름: (인도 외곽, 경계석 줄 외곽, 무엇)
-  'S1': (rect(S_WALL0, 69.3, S_WALL, S_PAVE), rect(S_WALL0, 69.3, S_PAVE - 0.25, S_PAVE), '본관 쪽 인도: 옹벽 발치에서 차도까지 폭 2.2 m(거리뷰 21 에서 말뚝 둘 바깥 ~ 옹벽)'),
-  'S2': ([(69.3, -2.2), (101.0, -2.2), (105.0, -1.0), (101.0, -0.9), (73.3, -0.9), (69.3, S_PAVE)], [(69.3, S_PAVE - 0.25), (73.3, -1.15), (101.0, -1.15), (101.0, -0.9), (73.3, -0.9), (69.3, S_PAVE)], '본관 쪽 인도 윗구간(한림관 쪽 난간 벽 안쪽, 은주관 옆까지), 폭 1.3 m(추정). 본관을 지나며 4 m 에 걸쳐 안으로 들어옴'),
-  'N1': (rect(S_GATE, STRIP_END, RAMP_N, STRIP_N), rect(S_GATE, STRIP_END, RAMP_N, RAMP_N + 0.25), '북악관·문예관 쪽 인도: 차도에서 화단 벽까지 폭 2.0 m(거리뷰 21 에서 차단기 기둥 ~ 화단 벽)'),
+  'S1': (rect(S_WALL0, 63.4, S_WALL, S_PAVE), rect(S_WALL0, 63.4, S_PAVE - 0.25, S_PAVE), '본관 쪽 인도: 옹벽 발치에서 차도까지 폭 2.2 m(거리뷰 21 에서 말뚝 둘 바깥 ~ 옹벽)'),
+  'S2': (band(RS, wf, lambda a: wf(a) + sw(a)), band(RS, lambda a: wf(a) + sw(a) - 0.25, lambda a: wf(a) + sw(a)), '본관 쪽 인도 윗구간(X22: 곧은 선, 폭 2.2 m, 은주관 옆까지. 본관을 지난 뒤 기단 가장자리(t −2.5) 밖은 아래 콘크리트 판이 받친다)'),
+  'N1': (band([S_GATE, 70.0, 74.0, STRIP_END], lambda a: npl(a) - 2.0, npl), band([S_GATE, 70.0, 74.0, STRIP_END], lambda a: npl(a) - 2.0, lambda a: npl(a) - 1.75), '북악관·문예관 쪽 인도: 차도에서 화단 벽까지 폭 2.0 m(거리뷰 21 에서 차단기 기둥 ~ 화단 벽)'),
 }
 for nm, (ring_st, kerb_st, what) in WALKS.items():
     pbox(f'G03-SIDEWALK-{nm}', 'wall', ring_st, KERB, what + f'. 차도보다 {KERB} m 높은 턱(추정 0.10~0.15), 길과 같은 기울기, 차도보다 밝은 블록 포장. 계단이 아니다(사용자 확정). 사진 21·31·전경 18 에는 문예관 쪽 띠가 넓적한 돌판 단으로 보이나 사용자 확정을 따른다', SV21 + ', 사진 21·26, 사용자 답 2026-10-12', thick=KERB + 0.02, grade='확정(양쪽 인도, 약간 턱, 계단 아님, 고리 무늬: 사용자 2026-10-12), 추정(폭·턱 높이)', color=SIDEWALK, pattern='rings')
     pbox(f'G03-KERB-{nm}', 'wall', kerb_st, KERB + 0.01, '차도와 인도 사이의 짙은 띠(턱, 폭 0.25 m): 사용자 사진 02', SV21 + ', 사용자-오르막길-20261012/02', thick=KERB + 0.03, color=KERBSTONE)
 # 남쪽(본관 쪽): 허리 높이의 밝은 돌 옹벽 한 줄(윗선이 길 경사와 나란함) + 그 뒤 좁은 화단 띠와 소나무 줄. 본관으로 통하는 문 앞은 비움
-for nm, (a, b) in {'A': (S_WALL0, 59.2), 'B': (63.4, 69.3)}.items():
+for nm, (a, b) in {'A': (S_WALL0, 59.2)}.items():
     pbox(f'G03-SWALL-{nm}', 'wall', rect(a, b, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽: 밝은 거친 돌판을 세워 붙인 허리 높이 벽(길 + 0.95 m, 추정 0.9~1.1: 거리뷰에서 지나가는 사람 허리), 윗선은 길과 나란히 오름, 두께 0.25 m. 흡연장 끝 바로 뒤(s 15.5)에서 시작. s 59.2~63.4 는 본관으로 통하는 문 앞이라 비움(자리 추정 ±3 m)', SV21 + ', ' + PH + ', SKU 0:58', bottom=way_z(a) - 0.3, color='#d6d1c2')
     pbox(f'G03-SBED-{nm}', 'planter', rect(a, b, WALL_T, S_WALL - 0.25), 0.85, 'Q01: 옹벽 뒤 화단 띠(소나무·바위): 벽 머릿돌에서 본관 벽까지 2.3 m(사진: 약 2 m). 본관 외곽(t −4.9)은 처마 선이고 벽은 처마 깊이 1.5 m(동 노트 B12, 추정) 안쪽이라 화단은 처마 밑으로 벽까지 간다', SV21 + ', ' + PH, bottom=way_z(a) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
+# R02: 문 앞(s 63.4)부터 은주관 옆(s 105)까지 옹벽이 꺾여 들어온 선을 따름. 그 뒤 화단 띠는 본관 벽(s < 69.3)·옛 한림관 쪽 가장자리(t −2.5/−3)까지(사진 26: 벽 위에 바위·소나무 화단)
+# X22: 곧은 옹벽·화단. 본관 앞(s 63.4~69.3)은 아래 구간과 같고, 본관을 지난 뒤(s 69.3~105)는 길 기단 가장자리(t −2.5) 밖으로 나온 판(인도·옹벽·화단)이라
+#   두께를 준 기운 판으로 매달고 그 밑에 콘크리트 판을 둔다(데크 쪽에서 보이는 옹벽 = 사진 16 의 콘크리트 벽, 아래 트인 곳은 X22 기둥이 받침)
+# X22(2026-10-22): 옹벽 머릿돌 밑 LED 띠(사진 08·05, 영상 0~44 초). 벽 길 쪽 면에 붙인 얇은 밝은 띠. 높이(길 + 0.95 m)는 사진만으로 확실하지 않아 그대로(사진 08 판독 1.1~1.3 m, 낮음)
+for _nm, (_a, _b) in {'A': (S_WALL0, 59.2), 'B': (63.4, 69.3), 'C': (69.3, 105.0)}.items():
+    pbox(f'G03-SWALL-LED-{_nm}', 'wall', rect(_a, _b, S_WALL, S_WALL + 0.03), 0.87, '옹벽 머릿돌 밑 LED 띠(밝은 줄, 두께 4 cm 판)', '사진 05·08(KakaoTalk_20261022_143522517_05·08), 전경 영상 0~44 초', thick=0.04, grade='확정(있음: 사진), 추정(높이·두께)', color='#fff1c1')
+pbox('G03-SWALL-B', 'wall', rect(63.4, 69.3, S_WALL - 0.25, S_WALL), 0.95, '본관 쪽 옹벽 윗구간(본관 북동 모서리까지, 곧은 선). 윗선은 길 + 0.95 m', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2')
+pbox('G03-SBED-B', 'planter', rect(63.4, 69.3, WALL_T, S_WALL - 0.25), 0.85, '옹벽 뒤 화단 띠(본관 벽까지)', 'S-MAP 정사 그림, ' + PH, bottom=way_z(63.4) - 0.3, color='#d6d1c2', topColor='#7f9a6b')
+SB_OUT = S_WALL - 0.25 - 1.6   # 화단 띠 바깥(정사 그림의 남쪽 턱 너머 풀 띠 약 1.5~2 m, 추정)
+pbox('G03-SWALL-C', 'wall', rect(69.3, 105.0, S_WALL - 0.25, S_WALL), 0.95, '본관을 지난 뒤 옹벽(곧은 선, 길 + 0.95 m). 기단 가장자리 밖이라 판으로 매닮', 'S-MAP 정사 그림, 사용자 2026-10-22(직선)', thick=0.98, color='#d6d1c2')
+pbox('G03-SBED-C', 'planter', rect(69.3, 105.0, SB_OUT, S_WALL - 0.25), 0.85, '본관을 지난 뒤 옹벽 뒤 화단 띠(바위·소나무, 폭 1.6 m 추정). 기단 가장자리 밖이라 판으로 매닮', 'S-MAP 정사 그림, 사진 26', thick=0.88, color='#cfcbc0', topColor='#7f9a6b')
+pbox('G03-SLAB-C', 'wall', [(69.3, SB_OUT), (105.0, SB_OUT), (105.0, -3.0), (101.0, -3.0), (101.0, -2.5), (69.3, -2.5)], -0.03, '본관을 지난 뒤 길 기단 가장자리(t −2.5) 밖으로 나온 인도·옹벽·화단 밑의 콘크리트 판(두께 0.6 m, 추정). 기본 평면은 그대로', 'S-MAP 정사 그림, 사진 16', thick=0.6, color='#b9b6ad')
+k = 0
+for sc in np.arange(72.0, 101.0, 6.0):
+    k += 1; tree(f'R02-TREE-SB{k:02d}', sc, (S_WALL - 0.25 + SB_OUT) / 2, way_z(sc) + 0.85, '옹벽 뒤 화단의 소나무', '사진 26', 'G03-SBED-C')
 k = 0
 for sc in np.arange(18.0, 68.5, 5.5):
     if 58.5 < sc < 64.0: continue
@@ -155,7 +181,7 @@ for a in np.arange(76.0, 91.9, 5.34):
     b = min(a + 5.34, 92.0)
     box(f'G02-NPLANT-D{int(round(a)):02d}', 'planter', ring(rect(a, b, STRIP_N, 9.5)), way_z(a) - 0.2, 145.5 + 0.45, '대일관 서쪽 끝 앞 평탄부(145.5 m)와 길 사이 화단: 짙은 화강석, 윗면 = 145.5 + 0.45 m(추정). 평면은 정사 그림의 나무 자리', '사용자 사진 8·25, 그림 11, g02/smap-ortho-rectified-01m.png', color=DARK, topColor='#7f9a6b')
     tree(f'G03-TREE-ND{int(round(a)):02d}', (a + b) / 2, 7.0, 145.95, '대일관 서쪽 끝 앞 화단의 소나무', '사진 25', f'G02-NPLANT-D{int(round(a)):02d}')
-pbox('G02-HWALL', 'wall', rect(69.3, 101.0, -2.5, -2.2), 1.0, '한림관 쪽 가장자리 난간 벽: 윗선은 길과 나란히 오름(길 + 1.0 m), 두께 0.3 m, 선 자리 t = −2.5 는 S-MAP 이 꺼지기 시작하는 곳(±1.5 m). 모두 추정. 본관 쪽 인도는 이 벽 안쪽으로 은주관 옆까지 이어진다', '사용자 사진 25·26·30, 그림 11, 사용자 답 2026-10-11, ' + SRC_MESH, bottom=way_z(69.3) - 0.3, color='#d6d1c2')
+# R02: 한림관 쪽 난간 벽(G02-HWALL, t −2.5)은 꺾인 옹벽 G03-SWALL-B 로 바뀜
 # 본관 5층–한림관 3층 나무 데크: 학교 표지 "본관-한림관 연결통로"(201098.0, 557302.7) 자리. 위치 확정(사용자), 크기 추정
 dk = np.array([201098.0, 557302.7]); dv = np.array([201112.0, 557295.0]) - dk; dv = dv / np.hypot(*dv); dw = np.array([-dv[1], dv[0]]) * 1.5
 box('G02-DECK-MAIN-HANLIM', 'deck', ring_xy([dk - 1.8 * dv + dw, dk + 3.0 * dv + dw, dk + 3.0 * dv - dw, dk - 1.8 * dv - dw]), 137.5, 137.8,
@@ -186,10 +212,10 @@ box('G02-BUKAK-PLANTER-E', 'planter', ring(rect(-3.3, 0.0, 9.0, 17.0)), 130.6, 1
 box('G03-BARRIER-POST', 'barrier', ring(rect(S_GATE - 0.2, S_GATE + 0.2, RAMP_N - 0.4, RAMP_N)), way_z(S_GATE) - 0.1, way_z(S_GATE) + 1.05, '차단기 기둥(노란 상자 0.4 m 각, 높이 1.05 m): 차도의 문예관 쪽 가장자리(인도 턱 바로 앞)', SV21, grade='원천(거리뷰 21·정사 그림), 추정(자리 ±1 m)', color='#e0a41c')
 box('G03-BARRIER-POST-CAP', 'barrier', ring(rect(S_GATE - 0.2, S_GATE + 0.2, RAMP_N - 0.4, RAMP_N)), way_z(S_GATE) + 1.05, way_z(S_GATE) + 1.2, '기둥 머리(회색)', SV21, color='#b9bbbd')
 for j in range(6):
-    box(f'G03-BARRIER-ARM-{j + 1}', 'barrier', ring(rect(S_GATE - 0.05, S_GATE + 0.05, RAMP_N - 3.8 + j * 3.4 / 6, RAMP_N - 3.8 + (j + 1) * 3.4 / 6)), way_z(S_GATE) + 0.95, way_z(S_GATE) + 1.05, '차단기 막대: 붉은·흰 띠, 길이 3.4 m(정사 그림), 가운데 차로만 막음', SV21, grade='원천(거리뷰 21·정사 그림)', color='#d9534a' if j % 2 == 0 else '#f1eee6')
+    box(f'G03-BARRIER-ARM-{j + 1}', 'barrier', ring(rect(S_GATE - 0.05, S_GATE + 0.05, RAMP_N - 3.8 + j * 3.4 / 6, RAMP_N - 3.8 + (j + 1) * 3.4 / 6)), way_z(S_GATE) + 0.95, way_z(S_GATE) + 1.05, '차단기 막대: 빨간 LED 빛 막대(X22: 사진 04 야간), 길이 3.4 m(정사 그림), 가운데 차로만 막음', SV21 + ', 사진 04(KakaoTalk_20261022_143522517_04)', grade='원천(거리뷰 21·정사 그림), 확정(빨간 빛 막대: 사진 04)', color='#ff3b30')
 for j, tc in enumerate((-1.1, -1.75)):
-    for q, (za, zb, col) in enumerate(((0.0, 0.42, '#1d1f22'), (0.42, 0.56, '#e2b320'), (0.56, 0.78, '#1d1f22'))):
-        box(f'G03-BOLLARD-{j + 1}-{q + 1}', 'barrier', ring(rect(S_GATE - 0.08, S_GATE + 0.08, tc - 0.08, tc + 0.08)), way_z(S_GATE) + za - (0.1 if q == 0 else 0), way_z(S_GATE) + zb, '막대 끝과 본관 쪽 띠 사이의 말뚝 둘(검정 바탕·노란 띠, 높이 0.78 m)', SV21, grade='원천(거리뷰 21)', color=col)
+    for q, (za, zb, col) in enumerate(((0.0, 0.42, '#1d1f22'), (0.42, 0.56, '#f1eee6'), (0.56, 0.78, '#1d1f22'))):   # X22: 띠는 흰 반사 띠(사진 04)
+        box(f'G03-BOLLARD-{j + 1}-{q + 1}', 'barrier', ring(rect(S_GATE - 0.08, S_GATE + 0.08, tc - 0.08, tc + 0.08)), way_z(S_GATE) + za - (0.1 if q == 0 else 0), way_z(S_GATE) + zb, '막대 끝과 본관 쪽 띠 사이의 말뚝 둘(검정 바탕·흰 반사 띠, 높이 0.78 m. X22: 사진 04)', SV21, grade='원천(거리뷰 21)', color=col)
 # 흡연장(P01 의 P01-SMOKING-BOOTH-* 를 옮겨 다시 만듦. 사용자 2026-10-12: "노란 박스는 흡연장", "높은 화단이랑 겹쳤다"): 본관 북서 모서리의 북쪽 벽에 붙은 노란 세로 살 상자.
 # 자리는 거리뷰 21 의 앞면·오른쪽 면에서 다시 잡음(추정 ±1 m): 서쪽 끝 = 본관 벽 모서리(s 4.6), 동쪽 끝 s 14.0(그 바로 뒤 s 15.5 에서 옹벽이 시작), 앞면 t −3.4, 높이 한 층(3.0 m)
 BS0, BS1, BT, BZ = 4.9, 14.0, -3.4, float(way_z(9.3))
@@ -225,7 +251,12 @@ cbox('DECK', 'deck', CR(D0, D1, 0.0, DD), ZT - 0.1, DZ, '짙은 나무 데크(�
 for k in range(2):
     cbox(f'DECK-STEP-{k + 1}', 'stair_step', CR(D0 - 0.3 * (2 - k), D0 - 0.3 * (1 - k), 0.0, DD), ZT - 0.1, ZT + 0.15 * (k + 1), '데크 서쪽 끝의 계단(3단: 0.15 m 씩, 맨 윗단이 데크 바닥)', stair='G03-CAFE-DECK-STAIR', riseM=0.15, runM=0.3, widthM=DD, color='#4b423b')
 RAILC = '#c8262c'   # Q01: 데크 난간은 붉은 판(새 사진 03)
-cbox('RAIL-S', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ, DZ + 1.0, '데크 길 쪽 세로 살 난간(높이 1.0 m). 사진 02 는 짙은 회색, 사진 03(다른 시기)은 붉은색', color=RAILC)
+# X22(2026-10-22): 데크 앞면 난간은 빨간 물결(격자) 무늬(전경 영상 100~106 초). 판 하나를 위·아래 띠 + 가운데 띠 + 0.25 m 마다 살로
+cbox('RAIL-S', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ + 0.92, DZ + 1.0, '데크 길 쪽 빨간 격자 난간의 윗 띠(높이 1.0 m). 영상 100~106 초: 앞면 전체가 빨간 물결(격자) 무늬', color=RAILC)
+cbox('RAIL-S-BOTTOM', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ, DZ + 0.08, '격자 난간 아래 띠', color=RAILC)
+cbox('RAIL-S-MID', 'wall', CR(D0 + 2.6, D1, DD - 0.06, DD), DZ + 0.46, DZ + 0.54, '격자 난간 가운데 띠', color=RAILC)
+for _k, _a in enumerate(np.arange(D0 + 2.6, D1 - 0.05, 0.25)):
+    cbox(f'RAIL-S-BAR-{_k + 1:02d}', 'wall', CR(_a, _a + 0.05, DD - 0.06, DD), DZ + 0.08, DZ + 0.92, '격자 난간의 살(물결 무늬를 0.25 m 간격 살과 띠로 줄임)', color=RAILC)
 cbox('RAIL-E', 'wall', CR(D1 - 0.06, D1, 0.0, DD), DZ, DZ + 1.0, '데크 동쪽 끝 난간', color=RAILC)
 cbox('RAIL-W', 'wall', CR(D0 + 2.6, D0 + 2.66, DD - 0.9, DD), DZ, DZ + 1.0, '데크 난간의 서쪽 끝(계단 옆은 트임)', color=RAILC)
 for k, sc in enumerate((D0 + 2.6, D0 + 6.4, D1 - 0.1)):
@@ -351,7 +382,7 @@ walls = [
   dict(id='fork_south_wall', line=line([(67, 9), (76, 9)], lambda s_: 144.2), topM=144.2, bottomM='경사면 141.0~142.6', grade='S-MAP(높이), 추정(선)', source=SRC_MESH),
   dict(id='fork_top_step', line=line([(76, 9.5), (76, T_N)], lambda s_: 145.5), topM=145.5, bottomM=144.2, grade='S-MAP', source='사진 8(144.2/145.4), 시험용 DB 계단 a7a51d3c'),
   dict(id='top_south_wall', line=line([(76, 9.5), (93.3, 9.5)], lambda s_: 145.5), topM=145.5, bottomM='경사면 142.6~145.5', grade='S-MAP(높이), 추정(선)', source=SRC_MESH),
-  dict(id='hanlim_side_wall', line=line([(69.3, -2.5), (101, -2.5)], way_z), topM='경사면 141.4~146.9', bottomM='모름(S-MAP 133~137, 본관·한림관 사이 꺼진 자리)', grade='추정', source=SRC_MESH + ', 사진 30'),
+  dict(id='hanlim_side_wall', line=line([(a, wf(a)) for a in RS], way_z), topM='경사면 141.4~146.9', bottomM='모름(S-MAP 133~137, 본관·한림관 사이 꺼진 자리)', grade='추정', source=SRC_MESH + ', 사진 30'),
   dict(id='barrier_line', line=line([(S_GATE, S_WALL), (S_GATE, STRIP_N)], way_z), topM='경사면', bottomM='경사면', grade='원천(거리뷰 21·정사 그림), 추정(±1 m)', source=SV21),
   dict(id='main_building_wall', line=line([(3.3, -4.9), (69.3, -4.9)], way_z), topM='건물', bottomM='경사면', grade='원천(건물 외곽)', source='building-outlines-5186.json'),
 ]

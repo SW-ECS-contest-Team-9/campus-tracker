@@ -200,7 +200,7 @@ test('구획 파일: 지상 구획은 서로 겹치지 않고, 지하 구획은 
   const union = area(polygonOps('union', ground.flatMap((z: any) => z.polygons)));
   assert.ok(Math.abs(sum - union) < 1, `겹침 ${(sum - union).toFixed(2)} ㎡`);
   for (const z of under) assert.ok(z.toM > z.fromM, z.name);
-  assert.ok(under.some((z: any) => z.name === '운동장 지하 1층' && z.floorM === 141.4));
+  assert.ok(under.some((z: any) => z.name === '운동장 지하 1층' && z.floorM === 143.5)); // 2026-10-22 사용자 결정(전 141.4)
 });
 
 test('보기 설정: 기본값, 모르는 값은 기본으로, 바꾸면 알림', () => {

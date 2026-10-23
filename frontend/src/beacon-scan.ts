@@ -152,3 +152,35 @@ export const emptyForm = (): BeaconForm => ({
   uuid: '', major: '', minor: '', measuredPowerDbm: '', label: '', buildingId: '', floor: '', floorHeightM: '', mountAboveFloorM: '',
   positionMode: 'wgs84', latitude: '', longitude: '', x: '', y: '', z: '', horizontalAccuracyM: '',
 });
+
+// ---- editing a registered beacon (same rules as the apps: fixtures/beacon/registration-cases.json editCases / beaconToForm) ----
+
+/** A registered beacon as the admin API lists it (`GET /admin/beacons`). Placement is EPSG:5186 only. */
+export interface AdminBeacon {
+  beaconId: string; uuid: string; major: number; minor: number; measuredPowerDbm: number | null; enabled: boolean;
+  label: string | null; lastObservedAt?: string | null;
+  anchor: { anchorId: string; buildingId: string; floor: string | null; floorHeightM: number | null;
+    position: { x: number; y: number; z: number }; horizontalAccuracyM?: number | null } | null;
+}
+
+/** The edit form of a registered beacon; the stored placement is EPSG:5186, so grid mode. */
+export function formFromBeacon(b: AdminBeacon): BeaconForm {
+  const a = b.anchor;
+  const s = (v: number | null | undefined) => (v === null || v === undefined ? '' : String(v));
+  return {
+    ...emptyForm(), uuid: b.uuid.toUpperCase(), major: String(b.major), minor: String(b.minor), measuredPowerDbm: s(b.measuredPowerDbm),
+    label: b.label ?? '', buildingId: a?.buildingId ?? '', floor: a?.floor ?? '', floorHeightM: s(a?.floorHeightM),
+    positionMode: a ? 'grid' : 'wgs84', x: s(a?.position.x), y: s(a?.position.y), z: s(a?.position.z), horizontalAccuracyM: s(a?.horizontalAccuracyM),
+  };
+}
+
+/**
+ * Edit form -> `PATCH /admin/beacons/:id` body: the same checks as a new beacon; identity is not sent (fixed); empty power /
+ * label clear them (null); no placement unlinks the anchor.
+ */
+export function buildEditRequest(f: BeaconForm): { body: Record<string, unknown> } | { errors: Partial<Record<keyof BeaconForm, string>> } {
+  const r = buildCreateRequest(f);
+  if ('errors' in r) return r;
+  const b = r.body;
+  return { body: { measuredPowerDbm: b.measuredPowerDbm ?? null, label: b.label ?? null, ...(b.anchor ? { anchor: b.anchor } : { anchorId: null }) } };
+}

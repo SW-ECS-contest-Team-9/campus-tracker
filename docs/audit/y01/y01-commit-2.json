@@ -1,0 +1,135 @@
+{
+ "group": "Y01-FUTSAL-YARD-2",
+ "comment": "통로 길에서 풋살장 앞 마당 남동 끝으로 가지(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T02:04:16.876Z",
+ "batchId": null,
+ "results": [
+  {
+   "ref": "통로 길 N2 → 마당 남동 끝(C 구역 쪽)",
+   "op": "create_road",
+   "changeSetId": "6afe6319-c7de-4066-b777-125801285484",
+   "roads": [
+    {
+     "id": "05a14cbd-62a9-488b-9757-5717704ebafe",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주2관 입구(1) ~ 은주2관–수인관 통로 ~ 풋살장 앞 마당 (132.2 m 평평. 사진 판독, 선 추정)",
+     "lengthM": 20.06,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+      "at": [
+       201125,
+       557201.3,
+       132.2
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "c51b6a55-2538-4009-82d4-1ebfdbcf6f27",
+      "at": [
+       201139.32,
+       557193.5,
+       132.2
+      ],
+      "roadsAtNode": 3
+     }
+    },
+    {
+     "id": "88d8d862-d049-48ae-81ae-bc7624d86f7e",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주2관 입구(1) ~ 은주2관–수인관 통로 ~ 풋살장 앞 마당 (132.2 m 평평. 사진 판독, 선 추정)",
+     "lengthM": 13.57,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "c51b6a55-2538-4009-82d4-1ebfdbcf6f27",
+      "at": [
+       201139.32,
+       557193.5,
+       132.2
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "1c0cd7e8-b067-4aee-b722-5b654933e7ff",
+      "at": [
+       201130.23,
+       557183.42,
+       132.2
+      ],
+      "roadsAtNode": 1
+     }
+    },
+    {
+     "id": "6d09c9d0-de76-4f76-8226-e6b885e30f90",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주2관–수인관 통로 ~ 풋살장 앞 마당 남동 끝 (132.2 m 평평. 사진 판독, 선 추정)",
+     "lengthM": 69.41,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "c51b6a55-2538-4009-82d4-1ebfdbcf6f27",
+      "at": [
+       201139.32,
+       557193.5,
+       132.2
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "6ecbfcff-59c0-43af-92e4-817e376209a2",
+      "at": [
+       201188.65,
+       557146.02,
+       132.2
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [
+    {
+     "id": "60ef7429-6444-424e-a2b0-76c23404dd5b",
+     "replacedBy": [
+      "05a14cbd-62a9-488b-9757-5717704ebafe",
+      "88d8d862-d049-48ae-81ae-bc7624d86f7e"
+     ]
+    }
+   ],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "60ef7429-6444-424e-a2b0-76c23404dd5b",
+     "at": [
+      201139.32,
+      557193.5,
+      132.2
+     ],
+     "splitsThatRoad": true,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [
+    {
+     "toRoadId": "60ef7429-6444-424e-a2b0-76c23404dd5b",
+     "at": [
+      201139.32,
+      557193.5,
+      132.2
+     ],
+     "connected": true,
+     "nodeId": "c51b6a55-2538-4009-82d4-1ebfdbcf6f27"
+    }
+   ],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": [
+    "The line crosses itself or other roads, so it was saved as several road pieces"
+   ]
+  }
+ ]
+}

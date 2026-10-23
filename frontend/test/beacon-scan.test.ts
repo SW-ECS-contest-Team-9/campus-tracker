@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { HeardBeacons, buildCreateRequest, normalizeUuid, parseIBeacon, scanSupport, type BeaconForm } from '../src/beacon-scan.ts';
+import { HeardBeacons, buildCreateRequest, buildEditRequest, formFromBeacon, normalizeUuid, parseIBeacon, scanSupport, type AdminBeacon, type BeaconForm } from '../src/beacon-scan.ts';
 
 const packets = JSON.parse(fs.readFileSync(new URL('../../fixtures/beacon/ibeacon-packets.json', import.meta.url), 'utf8')).cases as
   { name: string; manufacturerId: number; data: string; expected: { uuid: string; major: number; minor: number; measuredPower: number } | null }[];
@@ -50,8 +50,9 @@ test('scan support explains why the browser cannot scan', () => {
   assert.equal(scanSupport({ isSecureContext: true, bluetooth: { requestLEScan: () => 0 } }).ok, true);
 });
 
-const registration = JSON.parse(fs.readFileSync(new URL('../../fixtures/beacon/registration-cases.json', import.meta.url), 'utf8')).cases as
-  { name: string; form: BeaconForm; body?: object; errors?: string[] }[];
+const registrationFixture = JSON.parse(fs.readFileSync(new URL('../../fixtures/beacon/registration-cases.json', import.meta.url), 'utf8'));
+type FormCase = { name: string; form: BeaconForm; body?: object; errors?: string[] };
+const registration = registrationFixture.cases as FormCase[];
 
 test('registration form: shared cases (same as Android and iOS)', () => {
   for (const c of registration) {
@@ -60,4 +61,16 @@ test('registration form: shared cases (same as Android and iOS)', () => {
     else assert.deepEqual(Object.keys((r as { errors: object }).errors).sort(), c.errors, c.name);
   }
   assert.equal(normalizeUuid('xyz'), null);
+});
+
+test('editing a registered beacon: shared edit cases and beacon -> form (same as Android and iOS)', () => {
+  for (const c of registrationFixture.editCases as FormCase[]) {
+    const r = buildEditRequest(c.form);
+    if (c.body) assert.deepEqual(r, { body: c.body }, c.name);
+    else assert.deepEqual(Object.keys((r as { errors: object }).errors).sort(), c.errors, c.name);
+  }
+  for (const c of registrationFixture.beaconToForm as { name: string; beacon: AdminBeacon; form: BeaconForm }[]) {
+    assert.deepEqual(formFromBeacon(c.beacon), c.form, c.name);
+    assert.ok('body' in buildEditRequest(c.form), `${c.name}: opened form saves`);
+  }
 });

@@ -332,12 +332,12 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   const b1 = solids.find((s: any) => s.id === 'U02-VOID-B1'), b2 = solids.find((s: any) => s.id === 'U02-VOID-B2');
   assert.deepEqual([b1.role, voidName(b1), b2.role, voidName(b2)], ['void', '운동장 지하 1층', 'void', '운동장 지하 2층']);
   assert.equal(voidName({ props: {} } as any), '빈 곳');
-  // 사용자 붉은 선(±1 m): 지하 1층 띠 약 140.1~144.4. 지하 1층 천장 위 4 m 넘게는 빈 층 없이 구조, 두 층 사이는 바닥 판
-  assert.ok(Math.abs(b1.topM - 144.4) <= 1 && b1.bottomM >= 140.1 && b1.bottomM <= 141.7);
-  // U11: 지하 2층은 한 층(사진 22·23 에서 잰 3.1~3.8 m) 아래다. 붉은 선의 133 m 는 따르지 않는다(까닭은 구역 노트 U11 '높이'). 사이 바닥 판 0.5 m
-  assert.ok(b1.bottomM - b2.bottomM >= 3.1 && b1.bottomM - b2.bottomM <= 3.8 && Math.abs(b1.bottomM - b2.topM - 0.5) < 1e-9, `${b2.bottomM} ${b2.topM}`);
-  assert.ok(148.9 - b1.topM > 4 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
-  assert.ok(!solids.some((s: any) => s.role === 'void' && s.id !== 'U02-VOID-FIELD-STAIR' && s.topM > 144.7 + 1e-9));
+  // 2026-10-22 사용자 결정: 지하 1층 바닥 143.5(±0.5), 빈 높이 3.0 m(전: 사용자 붉은 선 140.1~144.4). 천장 위 운동장까지는 빈 층 없이 구조, 두 층 사이는 바닥 판
+  assert.ok(Math.abs(b1.bottomM - 143.5) <= 0.5 && Math.abs(b1.topM - b1.bottomM - 3.0) < 1e-9);
+  // 2026-10-22 사용자 결정: 지하 1층 → 지하 2층 3.5 m(약 20단), 지하 2층 바닥 140.0. 사이 바닥 판 0.5 m
+  assert.ok(Math.abs(b2.bottomM - 140.0) < 1e-9 && Math.abs(b1.bottomM - b2.bottomM - 3.5) < 1e-9 && Math.abs(b1.bottomM - b2.topM - 0.5) < 1e-9, `${b2.bottomM} ${b2.topM}`);
+  assert.ok(148.9 - b1.topM > 2 && b2.topM < b1.bottomM && b2.bottomM < b2.topM);
+  assert.ok(!solids.some((s: any) => s.role === 'void' && !s.id.startsWith('U02-VOID-FIELD-STAIR') && s.topM > b1.topM + 1e-9)); // 운동장 계단실(은주관 입구 상자 안 윗부분 포함)만 지하 1층 천장 위로
   // 지하 차도 연장의 바닥은 서쪽에서 동쪽으로 내려가지 않는다(계단 없는 한 경사), 끝은 지하 1층 바닥이다(지하 1층으로 들어온다)
   const road = solids.filter((s: any) => /^U02-VOID-ROAD-\d+$/.test(s.id)).sort((a: any, b: any) => a.id.localeCompare(b.id));
   assert.ok(road.length > 5 && road.every((s: any, i: number) => i === 0 || s.bottomM >= road[i - 1].bottomM) && Math.abs(road[road.length - 1].bottomM - b1.bottomM) < 1e-9);
@@ -357,7 +357,8 @@ test('U02: 운동장 아래 두 층은 이름 있는 빈 곳이고 슬래브 기
   const ends = ramp.map((s: any) => s.profile.points.map((q: number[]) => q[1]));
   assert.ok(Math.abs(ends[0][0] - b2.bottomM) < 0.03 && Math.abs(ends[last][1] - b1.bottomM) < 1e-9 && ends.every((q: number[], i: number) => q[1] > q[0] && (i === 0 || Math.abs(q[0] - ends[i - 1][1]) < 0.011)));
   const runM = ramp.reduce((t: number, s: any) => t + s.profile.points[1][0], 0), gradeAll = (b1.bottomM - b2.bottomM) / runM;
-  assert.ok(Math.abs(runM - 20) < 0.5 && gradeAll >= 0.15 && gradeAll <= 0.19, `${runM} ${gradeAll}`);
+  // 2026-10-22: 평면(20 m)은 사진대로 두고 층 차가 5.6 m 가 되어 28 % (사진의 15~19 % 와 어긋남: 구역 노트 같은 날 절, 풀리지 않음)
+  assert.ok(Math.abs(runM - 20) < 0.5 && Math.abs(gradeAll - (b1.bottomM - b2.bottomM) / 20) < 0.01 && gradeAll >= 0.15 && gradeAll <= 0.3, `${runM} ${gradeAll}`);
   // ㄴ자: 곧은 12 m(두 조각, 같은 방향) 뒤에 한쪽으로만 굽어 60~90도 돈다
   const d0 = ramp[0].profile.direction, d1 = ramp[1].profile.direction, dN = ramp[last].profile.direction;
   assert.ok(Math.abs(d0[0] * d1[0] + d0[1] * d1[1] - 1) < 1e-6 && Math.abs(ramp[0].profile.points[1][0] + ramp[1].profile.points[1][0] - 12) < 0.01, 'straight leg');
@@ -384,9 +385,11 @@ test('Q01: 기단 속으로 오르는 계단은 기단을 파고 오른다(묻�
   const step = (id: string, y: number, topM: number, type = 'stair_step') => ({ id, file: '', role: 'box', type, polygon: sq(4, y, 6, y + 0.3), bottomM: 0, topM, estimated: true, props: {} }) as any;
   const wells = stairWells(platform, [step('out', -1, 1), step('low', 1, 1.5), step('mid', 1.3, 2.5), step('top', 1.6, 3), step('wall', 2, 1, 'wall'), platform]);
   assert.deepEqual(wells.map((w: any) => w[0][0][1]), [1, 1.3]);
-  // 실제 파일: 문예관 기단 옆 계단(G02-PODIUM-STAIR)이 기단(138.8 m) 속에 든 단은 전부 판다
+  // 실제 파일(X36, 2026-10-23): 북악관·문예관 사이 계단은 문예관 기단(138.8 m)에서 계단 자리를 판 뒤 그 바닥 기단 위에 선다 -> 기단 속에 묻힌 단이 없다
   const { solids } = parseStructures('g02', JSON.parse(fs.readFileSync(new URL('../public/structures/g02-way.geojson', import.meta.url), 'utf8')));
   const podium = solids.find((s: any) => s.id === 'G02-PLATFORM-PODIUM');
-  const inside = solids.filter((s: any) => s.stair === 'G02-PODIUM-STAIR' && s.topM < 138.8 - 0.05 && polygonContains((s.polygon[0][0][0] + s.polygon[0][2][0]) / 2, (s.polygon[0][0][1] + s.polygon[0][2][1]) / 2, podium.polygon));
-  assert.ok(inside.length > 5 && stairWells(podium, solids).length >= inside.length, `${inside.length}`);
+  const x36 = parseStructures('x36', JSON.parse(fs.readFileSync(new URL('../public/structures/x36-remaining.geojson', import.meta.url), 'utf8'))).solids;
+  const steps = x36.filter((s: any) => /^X36-PODIUM-STAIR-[LU]\d+$/.test(s.id));
+  const buried = steps.filter((s: any) => polygonContains((s.polygon[0][0][0] + s.polygon[0][2][0]) / 2, (s.polygon[0][0][1] + s.polygon[0][2][1]) / 2, podium.polygon));
+  assert.ok(steps.length >= 14 && buried.length === 0, `${steps.length} ${buried.length}`);
 });

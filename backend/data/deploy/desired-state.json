@@ -8,15 +8,15 @@
   "terrain": {
     "baseVersion": "seoul5000-2015-ba7fcb19",
     "recipe": "data/terrain/recipes/z05-smooth-ground.json",
-    "id": "recipe-a74c596e221b8cc2",
-    "inputsSha256": "7797582d5278c5946421746fd4acd72cf20359857f70f77d2bb8fe892eda6e2d",
+    "id": "recipe-e655d5ebdc8ef741",
+    "inputsSha256": "430dfdf9972fbcd34779826939fddb85a7b82b9fdfe75c4f1e912461e168987d",
     "settingsSha256": "fb1d9767f64eee0bdbccfc295a199c82b697f340b6c2db048f71f34bdf3b8c22"
   },
   "scene": {
     "sourceDir": "data/scene/source",
     "overrides": "data/scene/overrides/building-roofs.json",
-    "id": "campus3d-3f40e495",
+    "id": "campus3d-2b551314",
     "gpkgSha256": "26c66faa36bd03c3f7106d68ac8a2f8e0a89a452f7899e5b0f20ab0673b45d13",
-    "overridesSha256": "2035583d65f7c7a5fdb03c5712748bdade87964fe5d7e1350f3c567a3bc37733"
+    "overridesSha256": "c7ded0d04b3d86bae3bf6d441dfad55d1f41e4fb953817b35e42a336cb2f679d"
   }
 }
