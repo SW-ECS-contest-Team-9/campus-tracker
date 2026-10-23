@@ -1,0 +1,6 @@
+{
+  "type": "FeatureCollection",
+  "about": "Inside of buildings for the exploded floor view (level-view-layer.ts): every feature is an empty space (corridor, lobby, link, stairwell, elevator shaft) carved out of the floors it names; floorsM are the floor heights of the note. Display only.",
+  "generated": "Generated from the building notes (실내_구조) by docs/audit/registry/building_registry.py (write); do not edit by hand.",
+  "features": []
+}

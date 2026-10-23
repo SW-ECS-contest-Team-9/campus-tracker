@@ -269,12 +269,12 @@ class Registry(unittest.TestCase):
     def test_check_and_write_commands(self):
         d = folder(가관=ROOF, 나관=PARTS)
         out = pathlib.Path(d, 'o.json')
-        self.assertEqual(br.main(['write', '--notes', d, '--overrides', str(out)]), 0)
-        self.assertEqual(br.main(['check', '--notes', d, '--overrides', str(out)]), 0)
+        self.assertEqual(br.main(['write', '--notes', d, '--overrides', str(out), '--interiors', str(out.with_name('interiors.geojson'))]), 0)
+        self.assertEqual(br.main(['check', '--notes', d, '--overrides', str(out), '--interiors', str(out.with_name('interiors.geojson'))]), 0)
         out.write_text(out.read_text(encoding='utf-8').replace('189.4', '189.5'), encoding='utf-8')   # edited by hand
-        self.assertEqual(br.main(['check', '--notes', d, '--overrides', str(out)]), 1)
+        self.assertEqual(br.main(['check', '--notes', d, '--overrides', str(out), '--interiors', str(out.with_name('interiors.geojson'))]), 1)
         pathlib.Path(d, '가관.md').write_text(ROOF.replace('등급: S-MAP}\n  - 이름: 낮은', '등급: 추정}\n  - 이름: 낮은'), encoding='utf-8')
-        self.assertEqual(br.main(['write', '--notes', d, '--overrides', str(out)]), 1)   # nothing written from a low grade
+        self.assertEqual(br.main(['write', '--notes', d, '--overrides', str(out), '--interiors', str(out.with_name('interiors.geojson'))]), 1)   # nothing written from a low grade
         self.assertIn('189.5', out.read_text(encoding='utf-8'))
 
 
