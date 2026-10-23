@@ -114,6 +114,42 @@ for f in x22['features']:
         if ' [X36' not in f['properties'].get('assumption', ''): f['properties']['assumption'] = f['properties'].get('assumption', '') + ' [X36 2026-10-23: 틈과 함께 1.5 m 동쪽(s 62.8)]'
 dump(STR / 'x22-photo-fixes.geojson', x22)
 
+# ===================== 지상 오르막(한림관 북쪽 → 운동장) 폭: 사용자 규칙 2026-10-23 =====================
+# 사용자: 건물 좌표(원천 외곽)가 맞으면 길 폭 = 은주1관 북쪽 끝과 대일관 계단 끝 사이 거리이고, 시작부터 끝까지 한결같다. 사진(기울어 건물이 길을 덮음)에서 재지 않는다.
+#   은주1관 북쪽 끝(원천 외곽 북서 모서리) (201131.69, 557301.74) = s 100.0, t -4.6
+#   대일관 옆 넓은 계단(Z02-SIDE-STAIR) 발치 남서 끝 (201138.6, 557315.6) = s 100.0, t 10.6(남쪽 난간벽 바깥 t 10.6)
+#   거리 15.5 m(두 점이 같은 s 에 있어 길에 직각). 길 = s 69.3(오르막 C 구간 시작) ~ 기단 끝, t -4.6 ~ +10.9 의 한결같은 띠.
+# 띠 안: 차로 칠 판 하나(옛 차로 칠 판·양쪽 인도·북쪽 턱을 이 구간에서 걷음), 갈림 섬 화단(D76·D81·D87·둥근 끝: 영상 96~98 초)은 섬으로 남김. 남쪽 옹벽·화단 C 는 띠 밖(t -4.6)으로 0.8 m 남쪽.
+S_TOP0 = 69.3; T_S, T_N = -4.6, 10.9
+EUNJU_TIP, STAIR_END = (201131.69, 557301.74), (201138.6, 557315.6)
+WIDTH = float(np.hypot(STAIR_END[0] - EUNJU_TIP[0], STAIR_END[1] - EUNJU_TIP[1]))
+WAYF = ALL['G02-PLATFORM-WAY']; WAYG = SHAPES['G02-PLATFORM-WAY']; WP = WAYF['properties']['topProfile']
+TOPF = ['G03-SIDEWALK-N1', 'G03-KERB-N1', 'G03-SIDEWALK-S2', 'G03-PAINT-LANE-2', 'G03-SWALL-C', 'G03-SWALL-LED-C', 'G03-SBED-C']
+for f in g02f['features']:
+    i = f['properties']['id']
+    if i not in TOPF: continue
+    if i not in BASE_ALL.setdefault('top', {}): BASE_ALL['top'][i] = f['geometry']
+    g0 = shape(BASE_ALL['top'][i]); pts = np.array(g0.exterior.coords); s_, t_ = G.xy_to_st(pts[:, 0], pts[:, 1])
+    if i in ('G03-SWALL-C', 'G03-SWALL-LED-C', 'G03-SBED-C'):   # 띠 밖으로: t 를 0.8 m 남쪽(−)
+        f['geometry'] = geom(QST(float(s_.min()), float(s_.max()), float(t_.min()) - 0.8, float(t_.max()) - 0.8))
+        note = '띠(t -4.6 ~ 10.9) 밖으로 0.8 m 남쪽'
+    else:
+        s1 = min(float(s_.max()), S_TOP0)
+        if s1 - float(s_.min()) < 0.2: f['properties']['_drop'] = True; continue
+        f['geometry'] = geom(QST(float(s_.min()), s1, float(t_.min()), float(t_.max()))); note = f's {S_TOP0} 에서 끝(그 위는 한결같은 폭 띠)'
+    f['properties']['assumption'] = f['properties'].get('assumption', '').split(' [X36')[0] + f' [X36 2026-10-23: {note}]'
+g02f['features'] = [f for f in g02f['features'] if not f['properties'].pop('_drop', False)]
+island = unary_union([SHAPES[i] for i in ('G02-NPLANT-D76', 'G02-NPLANT-D81', 'G02-NPLANT-D87')])
+blockers = unary_union([SHAPES[i] for i, f in ALL.items() if f['properties'].get('kind') == 'extrude' and not f['properties'].get('underground') and not f['properties'].get('inVoid')
+                        and f['properties'].get('type') != 'tree' and not i.startswith(('G03-PAINT-LANE', 'G03-SIDEWALK', 'G03-KERB', 'G03-SWALL', 'G03-SBED', 'G03-SLAB', 'X36-')) and SHAPES[i].intersects(QST(S_TOP0, 114, T_S, T_N))])
+field = SHAPES['Z02-PLATFORM-FIELD']
+toplane = QST(S_TOP0, 113.2, T_S, T_N).intersection(WAYG).difference(blockers.buffer(0.02)).difference(island.buffer(0.3)).difference(field.buffer(0.02))
+prof = {'origin': WP['origin'], 'direction': WP['direction'], 'points': [[q[0], r2(q[1] + 0.03)] for q in WP['points'] if q[0] >= S_TOP0 - 15]}
+FEATS.append({'type': 'Feature', 'properties': {'id': 'X36-UPHILL-TOP-LANE', 'type': 'wall', 'kind': 'extrude', 'estimated': True, 'grade': f'확정(규칙: 사용자 2026-10-23), 원천(은주1관 외곽), 모델(대일관 계단 발치), 폭 {WIDTH:.1f} m',
+    'basePlane': 'WAY', 'fromM': r2(min(q[1] for q in prof['points']) - 0.03), 'toM': r2(max(q[1] for q in prof['points'])), 'topProfile': prof, 'thicknessM': 0.03, 'color': '#9c9b95', 'pattern': 'rings',
+    'assumption': f'지상 오르막(한림관 북쪽 → 운동장, s {S_TOP0} ~ 끝): 폭 {WIDTH:.1f} m 한결같은 띠(은주1관 북쪽 끝 ~ 대일관 계단 발치), 갈림 섬 화단은 섬. 높이 = 기본 평면 + 0.03', 'source': '사용자 2026-10-23(구역 노트 오르막길과 주변), 건물 외곽(은주관), 구조물 Z02-SIDE-STAIR'}, 'geometry': geom(toplane)})
+box('X36-UPHILL-TOP-KERB-N', 'wall', QST(S_TOP0, 100.0, T_N, T_N + 0.25).intersection(WAYG).difference(blockers.buffer(0.02)), 0, 0, '', '', base='WAY')   # 자리표(높이 0 이라 안 만들어짐)
+
 # ===================== X05 북악관·문예관 사이 계단(후보 가) =====================
 SRC5 = '사진 06(북악관-문예관-사이-오르막-계단.webp: 인도에서 곧게 오르는 아랫단 → 참 → 왼쪽(서)으로 꺾여 오르는 윗단, 양옆 화강석 난간벽, 위에 난간), 후보 그림 비교-후/후보-X05-북악관문예관계단.png'
 G5 = '사진(모양: 꺾인 두 줄·난간벽), Claude 결정 2026-10-23(후보 가: 사진의 윗단 끝 난간 = 테라스 가장자리), 추정(단 수·자리 ±1 m)'
@@ -250,5 +286,5 @@ box('X36-B1-PINK-BAYS', 'wall', pk.difference(pk_in), ZB1, ZB1 + 0.03, '분홍 �
 
 dump(STR / OWN, {'type': 'FeatureCollection', 'name': 'x36-remaining', 'crs': CRS,
   'provenance': {'builder': 'docs/audit/x36/build_parts.py', 'schema': 'docs/audit/g02/STRUCTURES.md', 'note': '2026-10-22 전경 영상 비교의 남은 항목(2026-10-23). 치수는 추정'}, 'features': FEATS})
-dump(HERE / 'model.json', {'x05': X05, 'b1': {'risers': nb, 'rise': r2(rb), 'from': [r2(z0b), b0], 'to': [r2(z1b), b1]}})
+dump(HERE / 'model.json', {'uphillTop': {'widthM': round(WIDTH, 2), 'eunjuTip': EUNJU_TIP, 'stairEnd': STAIR_END, 'tSouth': T_S, 'tNorth': T_N, 'sStart': S_TOP0}, 'x05': X05, 'b1': {'risers': nb, 'rise': r2(rb), 'from': [r2(z0b), b0], 'to': [r2(z1b), b1]}})
 print('x36 상자', len(FEATS), 'X05', X05)
