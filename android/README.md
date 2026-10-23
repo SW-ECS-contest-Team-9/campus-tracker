@@ -34,6 +34,12 @@ CT_SERVER_HOST=127.0.0.1 CT_COLLECTOR=C02 ./gradlew :app:testDebugUnitTest --tes
 | `persistence/` | per-session NDJSON files, `active_collection.json` for crash recovery | `Persistence/*` |
 | `ui/` | Compose screens: Server Setup, Collect, Sessions, Settings | `ContentView.swift` |
 
+Declared route (1.2): before Start the collector can plan the route (start, via points, end; each leg walk, 계단 상행/하행
+or 승강기 n층→m층) or pick a saved one (`saved_routes.json`, this phone only). Start then uses the first point as the
+start anchor and sends the route as `session:start.declaredRoute`; while recording, "Reached next" records a
+`routeWaypoint` marker on the next node (any marker on that node also counts) and "여기서 벗어남" a `routeDeviation`
+marker. `model/DeclaredRoute.kt`, `ui/RouteScreen.kt`. iOS: not implemented, contract only (`docs/API_CONTRACT.md`).
+
 `AppGraph` (in `CampusTrackerApplication.kt`) owns the singletons: collection runs on one `HandlerThread`, the upload
 queue and the socket each on their own single thread, so Activity recreation never interrupts collection or upload.
 

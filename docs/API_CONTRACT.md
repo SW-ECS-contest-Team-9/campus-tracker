@@ -136,6 +136,7 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
   - `segments[i]`: `nodeKeys[i]` → `nodeKeys[i+1]` 구간을 어떻게 가는지. `mode` `walk`(기본) · `stairs`(`direction` `up`/`down` 필수, 층 선택) · `elevator`(`fromFloor`·`toFloor` 필수). 층 이름은 marker와 같은 `1F`/`B1` 규칙. 개수는 구간 수 이하, 빠진 구간은 `walk`.
   - `text`: 사람이 읽을 설명(선택, 500자).
   - 잘못된 경로는 세션 시작을 막지 않는다: 버리고(`declaredRoute: null`) 이유를 남긴다. ACK의 `declaredRoute: { status: "NONE" | "ACCEPTED" | "REJECTED", reason }`. 같은 `clientSessionId` 재전송은 저장된 경로가 없을 때만 채우고, 있으면 그대로 둔다.
+  - 앱: Android 1.2가 보낸다. iOS는 아직 보내지 않는다(이 계약만 정해 둠: 같은 필드를 그대로 보내면 된다).
   - 걷는 중: 경유점 도착은 marker `routeWaypoint`(그 점의 `nodeId`·`buildingId`·`floor`), 경로에서 벗어난 곳은 marker `routeDeviation`(노드 없음, 그때 위치)으로 보낸다. 둘 다 일반 marker이며 `nodeId`가 있는 `routeWaypoint`는 다른 기준점 marker처럼 fusion 위치 고정점이 된다.
 - ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE", "resumed": false, "supportedTelemetryFeatures": ["absoluteAltitudeV1"], "declaredRoute": { "status": "NONE", "reason": null } }`
 - `supportedTelemetryFeatures`는 서버가 저장하는 선택 스트림 목록이다. 새 세션과 재전송(`resumed: true`) 응답 모두 포함한다. 목록에 없는 선택 스트림은 보내지 않는다(구서버는 모르는 필드를 버리고 ACK만 성공시킨다).
