@@ -12,6 +12,8 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 enum class ItemKind(val wireType: String) {
     batch("telemetry:batch"), marker("marker:create"), finish("session:finish"), diagnostic("diagnostic:event"),
@@ -32,7 +34,20 @@ data class QueueSession(
     val startPayload: String,
     val serverSessionId: String?,
     val finishAcked: Boolean = false,
+    /** `lastSequences` of the acknowledged `session:finish` (JSON); null for rows finished before schema 2. */
+    val manifest: String? = null,
+    /** Server answer to `session:syncComplete` ([SyncState]); null while not yet answered. */
+    val syncState: String? = null,
 )
+
+/** Result of `session:syncComplete` (iOS `syncState`). Any non-null value ends the session's upload. */
+object SyncState {
+    const val COMPLETE = "complete"
+    const val INCOMPLETE = "incomplete"
+    /** non-retryable rejection (e.g. an older server without the message: UNKNOWN_TYPE) */
+    const val REJECTED = "rejected"
+    const val PROTOCOL_ERROR = "protocolError"
+}
 
 data class QueueItem(
     val seq: Long = 0,
@@ -55,7 +70,8 @@ interface UploadQueueStore {
     fun session(clientSessionId: String): QueueSession?
     fun insertSessionIfAbsent(session: QueueSession)
     fun setServerSessionId(clientSessionId: String, serverSessionId: String?)
-    fun setFinishAcked(clientSessionId: String)
+    fun setFinishAcked(clientSessionId: String, manifest: String?)
+    fun setSyncState(clientSessionId: String, syncState: String)
     fun deleteSession(clientSessionId: String)
 
     fun insert(item: QueueItem): Long
@@ -65,6 +81,7 @@ interface UploadQueueStore {
     fun oldestPending(kind: ItemKind, sessionIds: Collection<String>, limit: Int = 50): List<QueueItem>
     fun pendingMarkersNeedingLocation(clientSessionId: String): List<QueueItem>
     fun countItems(clientSessionId: String): Int
+    fun countItems(clientSessionId: String, kind: ItemKind): Int
     fun countPending(kinds: Collection<ItemKind>): Int
     fun countPendingInSessions(sessionIds: Collection<String>): Int
     fun countQuarantined(): Int
@@ -78,6 +95,8 @@ data class QueueSessionEntity(
     val startPayload: String,
     val serverSessionId: String?,
     val finishAcked: Boolean,
+    val manifest: String? = null,
+    val syncState: String? = null,
 )
 
 @Entity(tableName = "queue_items", indices = [Index("kind", "state"), Index("clientSessionId")])
@@ -107,8 +126,11 @@ interface QueueDao {
     @Query("UPDATE queue_sessions SET serverSessionId = :serverId WHERE clientSessionId = :id")
     fun setServerSessionId(id: String, serverId: String?)
 
-    @Query("UPDATE queue_sessions SET finishAcked = 1 WHERE clientSessionId = :id")
-    fun setFinishAcked(id: String)
+    @Query("UPDATE queue_sessions SET finishAcked = 1, manifest = :manifest WHERE clientSessionId = :id")
+    fun setFinishAcked(id: String, manifest: String?)
+
+    @Query("UPDATE queue_sessions SET syncState = :syncState WHERE clientSessionId = :id")
+    fun setSyncState(id: String, syncState: String)
 
     @Query("DELETE FROM queue_sessions WHERE clientSessionId = :id")
     fun deleteSession(id: String)
@@ -131,6 +153,9 @@ interface QueueDao {
     @Query("SELECT COUNT(*) FROM queue_items WHERE clientSessionId = :id")
     fun countItems(id: String): Int
 
+    @Query("SELECT COUNT(*) FROM queue_items WHERE clientSessionId = :id AND kind = :kind")
+    fun countItems(id: String, kind: String): Int
+
     @Query("SELECT COUNT(*) FROM queue_items WHERE state = 'pending' AND kind IN (:kinds)")
     fun countPending(kinds: List<String>): Int
 
@@ -145,14 +170,22 @@ interface QueueDao {
  * Schema changes must ship a Room migration (never destructive fallback): the queue holds unsent raw data (§6.3).
  * Exported schemas live in `app/schemas/`.
  */
-@Database(entities = [QueueSessionEntity::class, QueueItemEntity::class], version = 1, exportSchema = true)
+@Database(entities = [QueueSessionEntity::class, QueueItemEntity::class], version = 2, exportSchema = true)
 abstract class UploadQueueDatabase : RoomDatabase() {
     abstract fun dao(): QueueDao
 
     companion object {
+        /** 2: finish manifest + `session:syncComplete` answer per session. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE queue_sessions ADD COLUMN manifest TEXT")
+                db.execSQL("ALTER TABLE queue_sessions ADD COLUMN syncState TEXT")
+            }
+        }
+
         fun open(context: Context): UploadQueueDatabase =
             Room.databaseBuilder(context, UploadQueueDatabase::class.java, "upload_queue.db")
-                // .addMigrations(...) — add every future migration here.
+                .addMigrations(MIGRATION_1_2) // add every future migration here
                 .build()
     }
 }
@@ -161,10 +194,14 @@ class RoomUploadQueueStore(private val dao: QueueDao) : UploadQueueStore {
     override fun sessions() = dao.sessions().map { it.toModel() }
     override fun session(clientSessionId: String) = dao.session(clientSessionId)?.toModel()
     override fun insertSessionIfAbsent(session: QueueSession) = dao.insertSession(
-        QueueSessionEntity(session.clientSessionId, session.collectorId, session.serverKey, session.startPayload, session.serverSessionId, session.finishAcked),
+        QueueSessionEntity(
+            session.clientSessionId, session.collectorId, session.serverKey, session.startPayload, session.serverSessionId, session.finishAcked,
+            session.manifest, session.syncState,
+        ),
     )
     override fun setServerSessionId(clientSessionId: String, serverSessionId: String?) = dao.setServerSessionId(clientSessionId, serverSessionId)
-    override fun setFinishAcked(clientSessionId: String) = dao.setFinishAcked(clientSessionId)
+    override fun setFinishAcked(clientSessionId: String, manifest: String?) = dao.setFinishAcked(clientSessionId, manifest)
+    override fun setSyncState(clientSessionId: String, syncState: String) = dao.setSyncState(clientSessionId, syncState)
     override fun deleteSession(clientSessionId: String) = dao.deleteSession(clientSessionId)
     override fun insert(item: QueueItem): Long = dao.insert(item.toEntity())
     override fun update(item: QueueItem) = dao.update(item.toEntity())
@@ -173,12 +210,14 @@ class RoomUploadQueueStore(private val dao: QueueDao) : UploadQueueStore {
         if (sessionIds.isEmpty()) emptyList() else dao.oldestPending(kind.name, sessionIds.toList(), limit).mapNotNull { it.toModel() }
     override fun pendingMarkersNeedingLocation(clientSessionId: String) = dao.pendingMarkersNeedingLocation(clientSessionId).mapNotNull { it.toModel() }
     override fun countItems(clientSessionId: String) = dao.countItems(clientSessionId)
+    override fun countItems(clientSessionId: String, kind: ItemKind) = dao.countItems(clientSessionId, kind.name)
     override fun countPending(kinds: Collection<ItemKind>) = dao.countPending(kinds.map { it.name })
     override fun countPendingInSessions(sessionIds: Collection<String>) =
         if (sessionIds.isEmpty()) 0 else dao.countPendingInSessions(sessionIds.toList())
     override fun countQuarantined() = dao.countQuarantined()
 
-    private fun QueueSessionEntity.toModel() = QueueSession(clientSessionId, collectorId, serverKey, startPayload, serverSessionId, finishAcked)
+    private fun QueueSessionEntity.toModel() =
+        QueueSession(clientSessionId, collectorId, serverKey, startPayload, serverSessionId, finishAcked, manifest, syncState)
     private fun QueueItemEntity.toModel(): QueueItem? {
         val k = ItemKind.entries.firstOrNull { it.name == kind } ?: return null
         return QueueItem(seq, k, itemId, clientSessionId, payload, state, lastErrorCode, needsLocation, sessionRetried)
@@ -200,8 +239,11 @@ class InMemoryUploadQueueStore : UploadQueueStore {
     override fun setServerSessionId(clientSessionId: String, serverSessionId: String?) {
         sessions[clientSessionId]?.let { sessions[clientSessionId] = it.copy(serverSessionId = serverSessionId) }
     }
-    override fun setFinishAcked(clientSessionId: String) {
-        sessions[clientSessionId]?.let { sessions[clientSessionId] = it.copy(finishAcked = true) }
+    override fun setFinishAcked(clientSessionId: String, manifest: String?) {
+        sessions[clientSessionId]?.let { sessions[clientSessionId] = it.copy(finishAcked = true, manifest = manifest) }
+    }
+    override fun setSyncState(clientSessionId: String, syncState: String) {
+        sessions[clientSessionId]?.let { sessions[clientSessionId] = it.copy(syncState = syncState) }
     }
     override fun deleteSession(clientSessionId: String) {
         sessions.remove(clientSessionId)
@@ -222,6 +264,7 @@ class InMemoryUploadQueueStore : UploadQueueStore {
     override fun pendingMarkersNeedingLocation(clientSessionId: String) =
         items.values.filter { it.kind == ItemKind.marker && it.state == ItemState.PENDING && it.needsLocation && it.clientSessionId == clientSessionId }
     override fun countItems(clientSessionId: String) = items.values.count { it.clientSessionId == clientSessionId }
+    override fun countItems(clientSessionId: String, kind: ItemKind) = items.values.count { it.clientSessionId == clientSessionId && it.kind == kind }
     override fun countPending(kinds: Collection<ItemKind>) = items.values.count { it.state == ItemState.PENDING && it.kind in kinds }
     override fun countPendingInSessions(sessionIds: Collection<String>) = items.values.count { it.state == ItemState.PENDING && it.clientSessionId in sessionIds }
     override fun countQuarantined() = items.values.count { it.state == ItemState.QUARANTINED }

@@ -60,6 +60,9 @@ data class ActiveCollectionState(
     val stepBaseline: Long? = null,
     val bootCount: Int? = null,
     val lastStepTotal: Long = 0,
+    /** declared route progress: index of the last point reached (0 = the start) and the "off route" marks */
+    val routeReached: Int = 0,
+    val routeDeviations: Int = 0,
 ) {
     val lastSampleTimestamp: Long?
         get() = listOfNotNull(lastLocationTimestamp, lastMotionTimestamp, lastAltimeterTimestamp, lastPedometerTimestamp).maxOrNull()

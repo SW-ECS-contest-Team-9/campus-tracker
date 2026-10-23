@@ -7,6 +7,9 @@ import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.MotionSamplingRate
+import hoshi.campustracker.model.PlannedRoute
+import hoshi.campustracker.model.RoutePoint
+import hoshi.campustracker.model.RouteSegment
 import hoshi.campustracker.persistence.FileActiveCollectionStore
 import hoshi.campustracker.persistence.LocalSensorDataRepository
 import hoshi.campustracker.sync.FakeSocket
@@ -142,7 +145,9 @@ class CollectionCoordinatorTest {
         // Stop: an empty stream (no barometer, no steps) reports −1.
         second.coordinator.stopSession()
         second.executor.runAll()
+        assertTrue(File(root, "active_collection.json").exists()) // kept until the finish is in the upload queue
         runCurrent()
+        second.executor.runAll()
         assertFalse(File(root, "active_collection.json").exists())
         assertFalse(second.platform.foreground)
         val finish = queue.allItems().first { it.kind == ItemKind.finish }
@@ -170,6 +175,7 @@ class CollectionCoordinatorTest {
         second.coordinator.finishInterrupted(owner)
         second.executor.runAll()
         runCurrent()
+        second.executor.runAll()
         assertNull(second.coordinator.ui.value.interrupted)
         assertFalse(File(root, "active_collection.json").exists())
         val finish = Json.parseToJsonElement(queue.allItems().first { it.kind == ItemKind.finish }.payload).jsonObject
@@ -206,6 +212,68 @@ class CollectionCoordinatorTest {
     }
 
     @Test
+    fun declaredRouteIsSentWithTheStartAndProgressSurvivesAResume() = runTest {
+        val root = tmp.newFolder()
+        val first = Process(this, root)
+        val points = listOf(
+            RoutePoint("n-a", "정문", "outdoor"), RoutePoint("n-b", "로비", "본관", "1F"), RoutePoint("n-c", "301호", "본관", "3F"),
+        )
+        val route = PlannedRoute(points, listOf(RouteSegment(), RouteSegment(RouteSegment.STAIRS, direction = "up")))
+        // no start anchor: the route's first point is the start
+        first.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0, route = route)
+        first.executor.runAll(); runCurrent()
+        assertEquals(route, first.coordinator.ui.value.activeSession!!.declaredRoute)
+        assertEquals(0, first.coordinator.ui.value.routeReached)
+        // an entrance marker on the next node counts as arriving there; "reached next" records a routeWaypoint on the node after
+        first.coordinator.addMarker(EventMarkerType.entrance, CollectionAnchor(nodeId = "n-b", buildingId = "본관", floor = "1F"))
+        first.coordinator.markOffRoute()
+        first.executor.runAll()
+        assertEquals(1, first.coordinator.ui.value.routeReached)
+        assertEquals(1, first.coordinator.ui.value.routeDeviations)
+        first.advance(1_100); runCurrent()
+        // process dies; the resumed session keeps the route and the progress
+        val second = Process(this, root)
+        second.executor.runAll()
+        second.coordinator.resumeInterrupted(owner)
+        second.executor.runAll(); runCurrent()
+        assertEquals(1, second.coordinator.ui.value.routeReached)
+        assertEquals(1, second.coordinator.ui.value.routeDeviations)
+        second.coordinator.reachNextRoutePoint()
+        second.coordinator.reachNextRoutePoint() // already at the last point: nothing more to record
+        second.executor.runAll()
+        assertEquals(2, second.coordinator.ui.value.routeReached)
+
+        second.socket.connect(); runCurrent()
+        val start = second.socket.last
+        assertEquals("session:start", start.type)
+        val declared = start.payload["declaredRoute"]!!.jsonObject
+        assertEquals(listOf("n-a", "n-b", "n-c"), declared["nodeKeys"]!!.jsonArray.map { it.jsonPrimitive.content })
+        assertEquals(listOf("walk", "stairs"), declared["segments"]!!.jsonArray.map { it.jsonObject.str("mode") })
+        assertEquals("up", declared["segments"]!!.jsonArray[1].jsonObject.str("direction"))
+        assertEquals("정문 → 1F 로비 → 계단 상행 → 3F 301호", declared.str("text"))
+
+        val markers = queue.allItems().filter { it.kind == ItemKind.marker }.map { Json.parseToJsonElement(it.payload).jsonObject }
+        assertEquals(listOf("sessionStart", "entrance", "routeDeviation", "routeWaypoint"), markers.map { it.str("type") })
+        assertEquals("n-a", markers[0].str("nodeId"))
+        assertNull(markers[2].str("nodeId"))
+        assertEquals("n-c", markers[3].str("nodeId"))
+        assertEquals("3F", markers[3].str("floor"))
+    }
+
+    @Test
+    fun aFreeWalkSendsNoRouteAndIgnoresRouteButtons() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        p.coordinator.markOffRoute()
+        p.coordinator.reachNextRoutePoint()
+        p.executor.runAll()
+        p.socket.connect(); runCurrent()
+        assertNull(p.socket.last.payload["declaredRoute"])
+        assertTrue(queue.allItems().none { it.kind == ItemKind.marker })
+    }
+
+    @Test
     fun samplesCarryAppStateSegmentAndMarkersWithoutFixAreHeld() = runTest {
         val root = tmp.newFolder()
         val p = Process(this, root)
@@ -232,5 +300,53 @@ class CollectionCoordinatorTest {
         val lines = File(root, "sessions/${batch.str("clientSessionId")}/location.ndjson").readLines()
         assertEquals(1, lines.size)
         assertTrue(Regex("\"timestamp\":\"\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d{3}Z\"").containsMatchIn(lines[0]))
+    }
+
+    private fun diagnostics(): List<kotlinx.serialization.json.JsonObject> = queue.allItems().filter { it.kind == ItemKind.diagnostic }.map {
+        Json.parseToJsonElement(it.payload).jsonObject["events"]!!.jsonArray.single().jsonObject
+    }
+
+    @Test
+    fun lateCallbackAfterStopNeverLandsInTheNextSession() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        val first = p.coordinator.ui.value.activeSession!!.id
+        val staleLocation = p.location.callback!!
+        val staleMotion = p.motion.callback!!
+        p.coordinator.stopSession()
+        p.executor.runAll(); runCurrent(); p.executor.runAll()
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        val second = p.coordinator.ui.value.activeSession!!.id
+        assertTrue(first != second)
+        // Callbacks registered for the first run arrive after the second run started.
+        staleLocation(hoshi.campustracker.sensors.LocationReading(p.clock.now, 37.6, 127.0, null, null, 5.0, null, null, null, null, null))
+        staleMotion(hoshi.campustracker.sensors.MotionReading(p.clock.now * 1_000_000, null, null, null, null))
+        p.motion.emit(p.clock.now) // the current run's callback still records
+        p.advance(1_100); runCurrent()
+        val batches = queue.allItems().filter { it.kind == ItemKind.batch }.map { Json.parseToJsonElement(it.payload).jsonObject }
+        val ofSecond = batches.filter { it.str("clientSessionId") == second }
+        assertEquals(0, ofSecond.sumOf { it["locations"]!!.jsonArray.size })
+        assertEquals(1, ofSecond.sumOf { it["motion"]!!.jsonArray.size })
+        assertEquals(0, p.coordinator.ui.value.counts.location)
+    }
+
+    @Test
+    fun stalledMotionIsReportedOnceAndReArmedWhenSamplesReturn() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        p.motion.emit(p.clock.now)
+        p.advance(1_500); runCurrent()
+        assertTrue(diagnostics().none { it.str("eventType") == "SENSOR_CALLBACK_STALLED" })
+        p.advance(4_000); runCurrent()
+        val stalls = { diagnostics().filter { it.str("eventType") == "SENSOR_CALLBACK_STALLED" } }
+        assertEquals(1, stalls().size)
+        assertEquals("motion", stalls().single()["metadata"]!!.jsonObject.str("sensor"))
+        p.motion.emit(p.clock.now)
+        p.advance(500); runCurrent()
+        p.advance(2_500); runCurrent()
+        assertEquals(2, stalls().size)
     }
 }

@@ -34,6 +34,8 @@ import hoshi.campustracker.model.AnchorRules
 import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.CollectionSession
 import hoshi.campustracker.model.EventMarkerType
+import hoshi.campustracker.model.PlannedRoute
+import hoshi.campustracker.model.RouteRules
 import hoshi.campustracker.net.AnchorNodesResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,8 +43,8 @@ import kotlinx.coroutines.withContext
 
 /** Callbacks that need the Activity (runtime permissions). */
 interface CollectActions {
-    /** [anchor]: the start/end collection anchor the collector picked (node, building, floor) */
-    fun start(anchor: CollectionAnchor)
+    /** [anchor]: the start/end collection anchor the collector picked (node, building, floor); [route]: the declared route */
+    fun start(anchor: CollectionAnchor, route: PlannedRoute?)
     fun stop(anchor: CollectionAnchor)
     fun resume()
     fun finishInterrupted()
@@ -88,6 +90,12 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
     val reload: () -> Unit = { scope.launch { sessions = withContext(Dispatchers.IO) { graph.coordinator.loadSessions() } } }
     // the marker whose anchor is being picked (Start and Stop open it with sessionStart / sessionEnd)
     var anchorFor by remember { mutableStateOf<EventMarkerType?>(null) }
+    // declared route for the next Start (its first point is the start anchor); saved routes live on this phone
+    var plannedRoute by remember { mutableStateOf<PlannedRoute?>(null) }
+    var planning by remember { mutableStateOf(false) }
+    var pickingSaved by remember { mutableStateOf(false) }
+    var savedRoutes by remember { mutableStateOf<List<PlannedRoute>>(emptyList()) }
+    LaunchedEffect(Unit) { savedRoutes = withContext(Dispatchers.IO) { graph.savedRoutes.load() } }
     val loadNodes: suspend (String?, String?) -> AnchorNodesResponse = { building, floor ->
         val server = configuration ?: throw IllegalStateException("No server configured.")
         val at = ui.latestLocation
@@ -103,12 +111,33 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
             onConfirm = { anchor ->
                 anchorFor = null
                 when (type) {
-                    EventMarkerType.sessionStart -> actions.start(anchor)
+                    EventMarkerType.sessionStart -> actions.start(anchor, null)
                     EventMarkerType.sessionEnd -> actions.stop(anchor)
                     else -> graph.coordinator.addMarker(type, anchor)
                 }
             },
             onDismiss = { anchorFor = null },
+        )
+    }
+    if (planning) {
+        RoutePlannerDialog(
+            initial = plannedRoute,
+            loadNodes = loadNodes,
+            onUse = { plannedRoute = it; planning = false },
+            onSave = { route ->
+                plannedRoute = route
+                planning = false
+                scope.launch { savedRoutes = withContext(Dispatchers.IO) { graph.savedRoutes.save(route) } }
+            },
+            onDismiss = { planning = false },
+        )
+    }
+    if (pickingSaved) {
+        SavedRoutesDialog(
+            routes = savedRoutes,
+            onPick = { plannedRoute = it; pickingSaved = false },
+            onDelete = { name -> scope.launch { savedRoutes = withContext(Dispatchers.IO) { graph.savedRoutes.delete(name) } } },
+            onDismiss = { pickingSaved = false },
         )
     }
 
@@ -121,7 +150,17 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                 actions = {
                     when (tab) {
                         Tab.Collect -> TextButton(
-                            onClick = { anchorFor = if (ui.activeSession == null) EventMarkerType.sessionStart else EventMarkerType.sessionEnd },
+                            onClick = {
+                                val route = plannedRoute
+                                val start = route?.let(RouteRules::startAnchor)
+                                // a declared route already names the start point: Start goes straight on. The route stays
+                                // planned afterwards, so the same walk can be repeated (Clear removes it).
+                                if (ui.activeSession == null && route != null && start != null) {
+                                    actions.start(start, route)
+                                } else {
+                                    anchorFor = if (ui.activeSession == null) EventMarkerType.sessionStart else EventMarkerType.sessionEnd
+                                }
+                            },
                             enabled = !ui.starting,
                         ) { Text(if (ui.activeSession == null) "Start" else "Stop") }
                         Tab.Sessions -> TextButton(onClick = reload) { Text("Refresh") }
@@ -159,6 +198,16 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                     onResume = actions::resume,
                     onFinishInterrupted = actions::finishInterrupted,
                     onMarker = { type -> if (AnchorRules.needs(type) == AnchorNeeds.NONE) graph.coordinator.addMarker(type) else anchorFor = type },
+                    routeSection = {
+                        val recording = ui.activeSession
+                        val declared = recording?.declaredRoute
+                        when {
+                            declared != null -> RouteProgressCard(declared, ui.routeReached, ui.routeDeviations,
+                                onReached = graph.coordinator::reachNextRoutePoint, onOffRoute = graph.coordinator::markOffRoute)
+                            recording == null && !ui.starting -> RouteIdleCard(plannedRoute, savedRoutes.size,
+                                onPlan = { planning = true }, onSaved = { pickingSaved = true }, onClear = { plannedRoute = null })
+                        }
+                    },
                 )
                 Tab.Sessions -> SessionsScreen(sessions)
                 Tab.Settings -> if (showServerSettings) {

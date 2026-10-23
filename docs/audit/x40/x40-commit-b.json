@@ -1,0 +1,707 @@
+{
+ "group": "X40-ROADS-B",
+ "comment": "X40 항목 6 은주1관 정면 길(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T05:57:55.847Z",
+ "batchId": "e2d0060c-df1e-448a-8a23-f0cbfab8fe81",
+ "results": [
+  {
+   "ref": "북쪽 아랫줄 위 끝 노드 → 가운데 참 높이 128.9",
+   "op": "move_node",
+   "changeSetId": "2d7199dc-fe3b-452e-8918-c87c1e251a4c",
+   "roads": [
+    {
+     "id": "850b756f-0dc2-4c0a-b50b-a585daa5ff7e",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "은주1관 곡선 돌계단 (41단 추정, 125.2 → 131.3 m: 아래 3단·작은 참·긴 한 줄·위 참, 사용자 지정 길)",
+     "lengthM": 11.14,
+     "vertexCount": 5,
+     "start": {
+      "nodeId": "17ed5498-305e-432b-a30f-4af0bc017ed9",
+      "at": [
+       201112.3,
+       557268,
+       125.2
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+      "at": [
+       201115.74,
+       557257.53,
+       128.9
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "9a5da733-a495-485a-bbd6-5dd02921735e",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "은주1관 반원 테라스 → 입구(1) 아치 문 (131.3 m, 사용자 지정 길)",
+     "lengthM": 7.24,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+      "at": [
+       201115.74,
+       557257.53,
+       128.9
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+      "at": [
+       201120.8,
+       557252.7,
+       131.3
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+   "at": [
+    201115.74,
+    557257.53,
+    128.9
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "북쪽 아랫줄 길(높이 다시 나눔)",
+   "op": "update_road",
+   "changeSetId": "c2e72807-087f-4a45-886c-ad674916ed87",
+   "roads": [
+    {
+     "id": "850b756f-0dc2-4c0a-b50b-a585daa5ff7e",
+     "revision": 3,
+     "status": "DRAFT",
+     "name": "은주1관 북쪽 아랫줄 곡선 돌계단 (24단 추정, 굽이 125.2 → 가운데 참 128.9 m, 사용자 지정 길)",
+     "lengthM": 11.14,
+     "vertexCount": 5,
+     "start": {
+      "nodeId": "17ed5498-305e-432b-a30f-4af0bc017ed9",
+      "at": [
+       201112.3,
+       557268,
+       125.2
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+      "at": [
+       201115.74,
+       557257.53,
+       128.9
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "348abc18-1e86-40f0-9a6b-cd08545efdcb",
+     "at": [
+      201112.3,
+      557268,
+      125.2
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "9a5da733-a495-485a-bbd6-5dd02921735e",
+     "at": [
+      201115.74,
+      557257.53,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  },
+  {
+   "ref": "옛 테라스 → 입구(1) 길(반원 테라스가 없어짐)",
+   "op": "retire_feature",
+   "changeSetId": "44e3768b-6945-4a65-8af8-e6e36c68b076",
+   "retired": {
+    "type": "road",
+    "id": "9a5da733-a495-485a-bbd6-5dd02921735e"
+   },
+   "note": "The row is kept with status RETIRED; revert_changeset restores it"
+  },
+  {
+   "ref": "가운데 참: 북쪽 아랫줄 머리 → 북쪽 위 줄 앞",
+   "op": "create_road",
+   "changeSetId": "f9c28405-42e5-41f4-be35-38e9174a471a",
+   "roads": [
+    {
+     "id": "de122b66-5ec0-43bc-8c8c-38675205bee0",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 가운데 참 (128.9 m, 둥근 화단 앞)",
+     "lengthM": 2.76,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+      "at": [
+       201115.74,
+       557257.53,
+       128.9
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "c862d9ef-4a78-4d29-9848-a2d451be4320",
+      "at": [
+       201114.59,
+       557255.03,
+       128.9
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "850b756f-0dc2-4c0a-b50b-a585daa5ff7e",
+     "at": [
+      201115.74,
+      557257.53,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 0,
+     "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+     "usedNodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "가운데 참: 북 → 남(둥근 화단 안쪽)",
+   "op": "create_road",
+   "changeSetId": "0b08d5de-eb8d-403c-9170-360e1c25c242",
+   "roads": [
+    {
+     "id": "d0ed8887-c3b2-4069-835e-0dd18243d096",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 가운데 참 (128.9 m, 둥근 화단 안쪽)",
+     "lengthM": 2.32,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "c862d9ef-4a78-4d29-9848-a2d451be4320",
+      "at": [
+       201114.59,
+       557255.03,
+       128.9
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "6954d6b1-e8c5-4669-8b84-d39f3cca19a9",
+      "at": [
+       201114.2,
+       557252.82,
+       128.9
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "de122b66-5ec0-43bc-8c8c-38675205bee0",
+     "at": [
+      201114.59,
+      557255.03,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "북쪽 위 줄 곡선 계단",
+   "op": "create_road",
+   "changeSetId": "ec46e40e-4832-4f4f-a963-c85ec157cf67",
+   "roads": [
+    {
+     "id": "db3beece-f8b0-453f-b0a9-0e8ca50396c9",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 북쪽 위 곡선 계단 (15단 추정, 가운데 참 128.9 → 위 테라스 131.3 m, 사진)",
+     "lengthM": 6.64,
+     "vertexCount": 7,
+     "start": {
+      "nodeId": "c862d9ef-4a78-4d29-9848-a2d451be4320",
+      "at": [
+       201114.59,
+       557255.03,
+       128.9
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "5f047ca8-8f10-4db5-a5c9-34a12eba885a",
+      "at": [
+       201119.95,
+       557256.98,
+       131.3
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "de122b66-5ec0-43bc-8c8c-38675205bee0",
+     "at": [
+      201114.59,
+      557255.03,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "d0ed8887-c3b2-4069-835e-0dd18243d096",
+     "at": [
+      201114.59,
+      557255.03,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "북쪽 계단 머리 → 입구(1) 문",
+   "op": "create_road",
+   "changeSetId": "7694ab59-ec9f-427a-ba15-0f97bea5a110",
+   "roads": [
+    {
+     "id": "1ad05444-0c14-415d-a29c-751c22478f80",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 위 테라스 (131.3 m): 북쪽 계단 머리 → 입구(1) 아치 문",
+     "lengthM": 5.33,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "5f047ca8-8f10-4db5-a5c9-34a12eba885a",
+      "at": [
+       201119.95,
+       557256.98,
+       131.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+      "at": [
+       201120.8,
+       557252.7,
+       131.3
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "db3beece-f8b0-453f-b0a9-0e8ca50396c9",
+     "at": [
+      201119.95,
+      557256.98,
+      131.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 2,
+     "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+     "usedNodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "남쪽 위 줄 곡선 계단",
+   "op": "create_road",
+   "changeSetId": "96b22bc1-a539-434c-8c1f-5f95a67cefe2",
+   "roads": [
+    {
+     "id": "5ed3425c-d590-40bc-8ad3-64b6a246bba8",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 남쪽 위 곡선 계단 (15단 추정, 가운데 참 128.9 → 위 테라스 131.3 m, 사진)",
+     "lengthM": 6.63,
+     "vertexCount": 7,
+     "start": {
+      "nodeId": "6954d6b1-e8c5-4669-8b84-d39f3cca19a9",
+      "at": [
+       201114.2,
+       557252.82,
+       128.9
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "6a1c0456-e0de-439a-a494-42e72e4b2922",
+      "at": [
+       201118.56,
+       557249.14,
+       131.3
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "d0ed8887-c3b2-4069-835e-0dd18243d096",
+     "at": [
+      201114.2,
+      557252.82,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "남쪽 계단 머리 → 입구(1) 문",
+   "op": "create_road",
+   "changeSetId": "c7411cf4-8b15-4a35-8f6f-c8f035e6cc0c",
+   "roads": [
+    {
+     "id": "a48d54ee-65b0-48a1-81a0-c24da3e380ff",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 위 테라스 (131.3 m): 남쪽 계단 머리 → 입구(1) 아치 문",
+     "lengthM": 5.25,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "6a1c0456-e0de-439a-a494-42e72e4b2922",
+      "at": [
+       201118.56,
+       557249.14,
+       131.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+      "at": [
+       201120.8,
+       557252.7,
+       131.3
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "1ad05444-0c14-415d-a29c-751c22478f80",
+     "at": [
+      201120.8,
+      557252.7,
+      131.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "5ed3425c-d590-40bc-8ad3-64b6a246bba8",
+     "at": [
+      201118.56,
+      557249.14,
+      131.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 2,
+     "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+     "usedNodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "남쪽 아랫줄: 가운데 참 남쪽 끝 → 위쪽 갈래 차도",
+   "op": "create_road",
+   "changeSetId": "509fbee7-193b-45fc-b06c-49d5c60563de",
+   "roads": [
+    {
+     "id": "e4c6670e-483e-4729-987c-3d824242457e",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 남쪽 아랫줄 계단 (가운데 참 128.9 → 위쪽 갈래 차도 128.32 m, 사진: 남쪽으로 벌어져 내려감, 단 수 추정)",
+     "lengthM": 6.33,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "6954d6b1-e8c5-4669-8b84-d39f3cca19a9",
+      "at": [
+       201114.2,
+       557252.82,
+       128.9
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "3490da02-0457-4c67-9642-20e4932aa7ab",
+      "at": [
+       201111.2,
+       557248.4,
+       128.32
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "d0ed8887-c3b2-4069-835e-0dd18243d096",
+     "at": [
+      201114.2,
+      557252.82,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "5ed3425c-d590-40bc-8ad3-64b6a246bba8",
+     "at": [
+      201114.2,
+      557252.82,
+      128.9
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "남쪽 아랫줄 발치 → 위쪽 갈래 차도(41dc7abe)",
+   "op": "create_road",
+   "changeSetId": "4110590e-52f8-4318-b16b-e918aad9cea4",
+   "roads": [
+    {
+     "id": "c7f5bd7f-7050-4c92-9925-0cf3339b8fd3",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+     "lengthM": 19.67,
+     "vertexCount": 10,
+     "start": {
+      "nodeId": "fa6fb6fd-8fb8-4fbb-a2c1-4afe9ac48351",
+      "at": [
+       201107.6,
+       557267.95,
+       125.16
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "f1133dda-7393-41aa-86f4-a47bae6c7837",
+      "at": [
+       201108.31,
+       557248.4,
+       128.27
+      ],
+      "roadsAtNode": 3
+     }
+    },
+    {
+     "id": "638a8e2a-4b05-4efd-ac48-2a7f89c3e623",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+     "lengthM": 38.64,
+     "vertexCount": 17,
+     "start": {
+      "nodeId": "f1133dda-7393-41aa-86f4-a47bae6c7837",
+      "at": [
+       201108.31,
+       557248.4,
+       128.27
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+      "at": [
+       201112.12,
+       557211.18,
+       130.92
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "a47fb67e-8dce-4cb8-9f3b-3e528a1e3ee6",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주1관 남쪽 아랫줄 발치 → 위쪽 갈래 차도",
+     "lengthM": 2.89,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "3490da02-0457-4c67-9642-20e4932aa7ab",
+      "at": [
+       201111.2,
+       557248.4,
+       128.32
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "f1133dda-7393-41aa-86f4-a47bae6c7837",
+      "at": [
+       201108.31,
+       557248.4,
+       128.27
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [
+    {
+     "id": "41dc7abe-c214-45d1-8d1e-982b9bd05afc",
+     "replacedBy": [
+      "c7f5bd7f-7050-4c92-9925-0cf3339b8fd3",
+      "638a8e2a-4b05-4efd-ac48-2a7f89c3e623"
+     ]
+    }
+   ],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "41dc7abe-c214-45d1-8d1e-982b9bd05afc",
+     "at": [
+      201108.31,
+      557248.4,
+      128.27
+     ],
+     "splitsThatRoad": true,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "e4c6670e-483e-4729-987c-3d824242457e",
+     "at": [
+      201111.2,
+      557248.4,
+      128.32
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [
+    {
+     "toRoadId": "41dc7abe-c214-45d1-8d1e-982b9bd05afc",
+     "at": [
+      201108.31,
+      557248.4,
+      128.27
+     ],
+     "connected": true,
+     "nodeId": "f1133dda-7393-41aa-86f4-a47bae6c7837"
+    }
+   ],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": [
+    "The line crosses itself or other roads, so it was saved as several road pieces"
+   ]
+  }
+ ]
+}

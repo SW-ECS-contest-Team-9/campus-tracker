@@ -79,6 +79,8 @@ data class CollectionSession(
     val sampleCounts: SampleCounts = SampleCounts(),
     /** Always null on Android (§11); kept so the shape matches iOS. */
     val strideCalibration: JsonElement? = null,
+    /** the route declared before Start (sent with session:start), null for a free walk */
+    val declaredRoute: PlannedRoute? = null,
 )
 
 @Serializable
@@ -120,6 +122,10 @@ enum class EventMarkerType(val wire: String, val title: String, val button: Bool
     custom("custom", "Custom"),
     sessionStart("sessionStart", "Start", button = false),
     sessionEnd("sessionEnd", "End", button = false),
+    /** declared route: arrived at its next point (carries that node) */
+    routeWaypoint("routeWaypoint", "Route point", button = false),
+    /** declared route: the collector left the declared path here */
+    routeDeviation("routeDeviation", "Off route", button = false),
 }
 
 enum class CollectorAppState(val wire: String) { FOREGROUND("FOREGROUND"), INACTIVE("INACTIVE"), BACKGROUND("BACKGROUND") }

@@ -1,6 +1,8 @@
 // "층 따로 보기" (F08) on a Cesium viewer, for the preview (main.ts) and the editor (editor-main.ts) alike.
 // While it is on, a click on the map lifts what was clicked out of the campus, into the air above it:
 //   - a building  -> its floors as a stack pulled apart (exploded), each with its indoor roads; ↑/↓ picks one floor;
+//     사2: a floor with spaces in interiors.geojson (the notes' 실내_구조) is drawn as low walls with its corridors,
+//     stairwells, elevator shafts, lobbies and links carved out of them (a plan cut, no ceiling);
 //   - anything else (a road, a square, the field) -> the 구획 (zone of zones.geojson) there: its ground plates,
 //     structures, roads and areas together; underground zones (parking levels, the tunnel, passages) are chosen from
 //     the list (or by clicking something of theirs that is visible).
@@ -12,9 +14,9 @@ import type { SceneBuilding } from './api';
 import './level-view.css';
 import { declutter as keepTags, textWidth } from './label-layout';
 import {
-  FAN, LEVEL_VIEW, TRACK, baseBuildingId, buildingFloors, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseZones, shortName, stackLiftM,
+  FAN, INTERIOR, LEVEL_VIEW, TRACK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, floorParts, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseInteriors, parseZones, shortName, stackLiftM,
   trackOnBuilding, trackOnZone, trackRuns, zoneAt, zoneContent,
-  type Floor, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackSpot, type Zone,
+  type Floor, type Interior, type InteriorKind, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackSpot, type Zone,
 } from './level-view';
 import { FirstPerson } from './first-person';
 import { polygonArea, polygonOps, type Polygon } from './polygon-ops';
@@ -59,6 +61,13 @@ export type SpaceViewSources = {
 type Unit = { kind: 'zone'; zone: Zone } | { kind: 'building'; id: string; name: string; floors: Floor[]; focus: number | null };
 type Tag = { label: any; world: any; priority: number };
 
+/** 사2: the carved inside of a floor: the walls left standing, and per kind of space its floor tint and outline. */
+const SPACE: { wall: string; wallTop: string; fill: Record<InteriorKind, string>; edge: Record<InteriorKind, string> } = {
+  wall: '#c3c8cf', wallTop: '#b3b9c2',
+  fill: { corridor: '#fbfbf8', lobby: '#fbfbf8', link: '#e2edf9', stair: '#f8e3cc', elevator: '#eadff6' },
+  edge: { corridor: '#6b7280', lobby: '#6b7280', link: '#1d6fd6', stair: '#e07a1f', elevator: '#8b3fc9' },
+};
+
 /** A colour moved towards another (0 = itself, 1 = the other): what is seen through an opening is drawn at reduced contrast. */
 const blend = (hex: string, to: string, share: number) => { const a = rgb(hex), b = rgb(to); return `#${a.map((v, i) => Math.round(v + (b[i] - v) * share).toString(16).padStart(2, '0')).join('')}`; };
 const rgb = (hex: string) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
@@ -83,6 +92,8 @@ export class LevelView {
   unit: Unit | null = null;
   zones: Zone[] = [];
   solids: Solid[] = [];
+  /** 사2: the empty spaces inside the buildings (interiors.geojson). */
+  interiors: Interior[] = [];
   private readonly C: any;
   private prims: any[] = [];
   private tags: Tag[] = [];
@@ -131,6 +142,7 @@ export class LevelView {
   async load() {
     const json = async (url: string) => { try { const r = await fetch(url); return r.ok ? await r.json() : null; } catch { return null; } };
     this.zones = parseZones(await json('/zones.geojson'));
+    this.interiors = parseInteriors(await json('/interiors.geojson'));
     const index = await json(`/structures/${STRUCTURES.indexFile}`);
     const files: string[] = Array.isArray(index) ? index.filter((f) => typeof f === 'string' && /^[\w.-]+\.geojson$/.test(f)) : STRUCTURES.files;
     const solids: Solid[] = [];
@@ -161,11 +173,26 @@ export class LevelView {
     return [...this.tracks().map((t) => `${t.id}|${t.kind}|${t.points.length}`), ...(this.src.trackPickers?.() ?? []).map((p) => `${p.select.options.length}:${p.select.value}`)].join(';');
   }
 
-  /** The buildings that can be lifted: one per base id, named by the block that has a name. */
+  /** Scene block id -> what is lifted with it (level-view.ts floorParts: 은주관 is lifted as 은주1관 and 은주2관, each with its floor table). */
+  private parts(): Map<string, string> {
+    return floorParts(this.src.buildings().map((b) => {
+      const w = b.appearance?.windows, ring = metres(b.geometry.coordinates[0][0]);
+      return { id: b.buildingId, name: b.name, table: w?.floorsM && w.floorNames ? JSON.stringify([w.floorsM, w.floorNames]) : null,
+        x: ring.reduce((t, p) => t + p[0], 0) / ring.length, y: ring.reduce((t, p) => t + p[1], 0) / ring.length };
+    }));
+  }
+
+  /** The part a block, road, place or space id belongs to (an id that is no block: its building). */
+  private partOf(): (id: string) => string {
+    const parts = this.parts();
+    return (id) => parts.get(id) ?? baseBuildingId(id);
+  }
+
+  /** The buildings (parts) that can be lifted: one per part id, named by the block that has a name. */
   buildingList(): { id: string; name: string }[] {
-    const out = new Map<string, string>();
+    const out = new Map<string, string>(), partOf = this.partOf();
     for (const b of this.src.buildings()) {
-      const id = baseBuildingId(b.buildingId);
+      const id = partOf(b.buildingId);
       if (!out.has(id) || (b.buildingId === id && b.name)) out.set(id, (b.buildingId === id ? b.name : null) ?? out.get(id) ?? id);
     }
     return [...out].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, 'ko'));
@@ -214,7 +241,7 @@ export class LevelView {
     const picked = scene.pick(position);
     if (picked && (this.prims.includes(picked.primitive) || this.prims.includes(picked.collection))) return true; // on what is lifted
     const id = picked?.id as { kind?: string; buildingId?: string } | undefined;
-    if (id?.kind === 'building' && id.buildingId) { this.showBuilding(baseBuildingId(id.buildingId)); return true; }
+    if (id?.kind === 'building' && id.buildingId) { this.showBuilding(this.partOf()(id.buildingId)); return true; }
     const p = this.pickPoint(position);
     if (!p) return true;
     const groundM = this.src.groundAt(p.x, p.y);
@@ -266,10 +293,11 @@ export class LevelView {
   }
 
   showBuilding(id: string, focus: number | null = null) {
-    const blocks = this.src.buildings().filter((b) => baseBuildingId(b.buildingId) === id);
+    const partOf = this.partOf();
+    const blocks = this.src.buildings().filter((b) => partOf(b.buildingId) === id);
     if (!blocks.length) return;
     const main = blocks.find((b) => b.buildingId === id) ?? blocks[0];
-    const roads = this.src.roads().filter((r) => r.buildingId && baseBuildingId(r.buildingId) === id);
+    const roads = this.src.roads().filter((r) => r.buildingId && partOf(r.buildingId) === id);
     const floors = buildingFloors(blocks, main.appearance?.windows?.floorsM, roads, main.appearance?.windows?.floorNames);
     this.unit = { kind: 'building', id, name: main.name ?? id, floors, focus: focus !== null && focus < floors.length ? focus : null };
     this.message = floors.length ? '' : '이 건물은 층 자료(층 표·실내 길)가 없어 바닥 판 하나만 띄웁니다.';
@@ -310,7 +338,8 @@ export class LevelView {
       const x = ring.reduce((s, p) => s + p[0], 0) / ring.length, y = ring.reduce((s, p) => s + p[1], 0) / ring.length;
       return { x, y, z: u.zone.floorM ?? this.src.groundAt(x, y) };
     }
-    const roads = this.src.roads().filter((r) => r.buildingId && baseBuildingId(r.buildingId) === u.id && !isConnector(r));
+    const partOf = this.partOf();
+    const roads = this.src.roads().filter((r) => r.buildingId && partOf(r.buildingId) === u.id && !isConnector(r));
     const floor = u.focus !== null ? u.floors[u.focus] : u.floors.find((f) => f.roadIds.length);
     const road = roads.find((r) => floor?.roadIds.includes(r.id)) ?? roads[0];
     return road ? mid(road.geometry.coordinates) : null;
@@ -550,7 +579,8 @@ export class LevelView {
         for (const track of tracks) drawTrack(track, trackOnZone(track.points, zone, ctx), (s) => [track.points[s.index].x, track.points[s.index].y, lift(s.z) + 0.6]);
       }
     } else {
-      const blocks = buildings.filter((b) => baseBuildingId(b.buildingId) === u.id);
+      const partOf = this.partOf();
+      const blocks = buildings.filter((b) => partOf(b.buildingId) === u.id);
       const floors: Floor[] = u.floors.length ? u.floors : [{ m: Math.min(...blocks.map((b) => b.baseM)), name: null, fromTable: false, roadIds: [] }];
       const footprints = blocks.map((b) => ({ b, rings: b.geometry.coordinates.map((poly) => metres(poly[0])) }));
       // F09: the floors are fanned out: each a step to the side (across the footprint's short width) and a little higher,
@@ -564,7 +594,7 @@ export class LevelView {
       dropM = baseM - floors[0].m;
       veilM = baseM - 2.5;
       const roads = this.src.roads();
-      const own = roads.filter((r) => r.buildingId && baseBuildingId(r.buildingId) === u.id);
+      const own = roads.filter((r) => r.buildingId && partOf(r.buildingId) === u.id);
       const focused = (i: number) => u.focus === null || u.focus === i;
       const others = OTHERS[style.others].plate;
       const main = footprints.reduce((a, b) => (b.rings[0].length > a.rings[0].length ? b : a)).rings[0];
@@ -575,13 +605,27 @@ export class LevelView {
         const move = onFloor(i);
         if (i > 0) line([onFloor(i - 1)([tie[0], tie[1], floors[i - 1].m]), move([tie[0], tie[1], floor.m])], 1.5, VIEW_COLORS.leader, 0.7, true, leaders);
         if (!on && others <= 0) return;
-        let here = footprints.filter(({ b }) => floor.m >= b.baseM - LEVEL_VIEW.belowBaseM && floor.m < b.roofM);
-        if (!here.length) here = footprints;
+        const here = blocksOnFloor(footprints, floor, own);
         for (const { rings } of here) for (const ring of rings) {
           this.addSolid(on ? solid : faint, this.plate([ring], floor.m), move, { body: chosen ? '#7f9cc4' : '#aab1ba', top: floor.roadIds.length ? '#f3f5f7' : '#dfe3e8' }, on ? 255 : Math.round(255 * others));
           const edge = [...ring, ring[0]].map((p) => { const q = move([p[0], p[1], floor.m]); return [q[0], q[1], q[2] + 0.05]; });
           line(edge, chosen ? px.outline + 2 : on ? px.outline : px.faint + 0.5, chosen ? VIEW_COLORS.focus : VIEW_COLORS.outline, on ? 1 : 0.45);
           if (on) frame.push(...edge);
+        }
+        // 사2: the floor carved: walls (footprint without the spaces) a plan cut high, each space tinted and outlined by its kind
+        const carved = on && u.floors.length ? carvedFloor(this.interiors, u.id, floors, i, here.flatMap(({ rings }) => rings.map((r) => [r])), partOf) : null;
+        if (carved) {
+          for (const polygon of carved.walls) this.addSolid(solid, this.plate(polygon, floor.m + carved.wallM, carved.wallM), move, { body: SPACE.wall, top: SPACE.wallTop });
+          for (const { space, polygons } of carved.spaces) {
+            for (const polygon of polygons) {
+              this.addSolid(solid, this.plate(polygon, floor.m + 0.04, 0.04), move, { body: SPACE.fill[space.kind], top: SPACE.fill[space.kind] });
+              for (const r of polygon) line([...r, r[0]].map((p) => { const q = move([p[0], p[1], floor.m]); return [q[0], q[1], q[2] + 0.08]; }), px.faint + 0.5, SPACE.edge[space.kind], 0.9);
+            }
+            if (space.kind === 'stair' || space.kind === 'elevator') {
+              const c = polygons[0][0], mid = [c.reduce((t, p) => t + p[0], 0) / c.length, c.reduce((t, p) => t + p[1], 0) / c.length];
+              tag('place', raised([[mid[0], mid[1], floor.m]], move, carved.wallM + 0.4)[0], space.kind === 'stair' ? '계단실' : '승강기', 2, 11, SPACE.edge[space.kind]);
+            }
+          }
         }
         const ring = here.reduce((a, b) => (b.rings[0].length > a.rings[0].length ? b : a)).rings[0];
         // the corner nearest to the default camera and to its right: beside the plate, not on it
@@ -619,7 +663,7 @@ export class LevelView {
       }
       // roads of the campus that start at a node of this building: a short stub, named by where it leads
       for (const road of roads) {
-        if (road.buildingId && baseBuildingId(road.buildingId) === u.id) continue;
+        if (road.buildingId && partOf(road.buildingId) === u.id) continue;
         const coords = road.geometry.coordinates;
         for (const [node, pts] of [[road.fromNodeId, coords], [road.toNodeId, [...coords].reverse()]] as [string | undefined, number[][]][]) {
           // it starts at a node of the building's roads, or (no indoor road there yet) its end lies inside the building at a floor's height
@@ -635,13 +679,13 @@ export class LevelView {
           line(raised(stub, move), px.connector, VIEW_COLORS.stub, 1, true);
           dot(raised([stub[0]], move)[0], VIEW_COLORS.stub, 8);
           const end = pts[Math.min(pts.length - 1, 1)];
-          const where = road.buildingId ? this.buildingList().find((b) => b.id === baseBuildingId(road.buildingId!))?.name ?? road.buildingId : zoneAt(this.zones, end[0], end[1], end[2])?.name ?? shortName(road.name);
+          const where = road.buildingId ? this.buildingList().find((b) => b.id === partOf(road.buildingId!))?.name ?? road.buildingId : zoneAt(this.zones, end[0], end[1], end[2])?.name ?? shortName(road.name);
           tag('link', raised([stub[stub.length - 1]], move, 0.9)[0], `→ ${shortName(where, 16)}`, 4, 12, VIEW_COLORS.stub);
         }
       }
       for (const place of this.src.places?.() ?? []) {
         const i = floorIndexAt(floors, place.z);
-        if (!place.buildingId || baseBuildingId(place.buildingId) !== u.id || !focused(i)) continue;
+        if (!place.buildingId || partOf(place.buildingId) !== u.id || !focused(i)) continue;
         const move = i >= 0 ? onFloor(i) : fan;
         dot(raised([[place.x, place.y, place.z]], move, 0.5)[0], VIEW_COLORS.place);
         tag('place', raised([[place.x, place.y, place.z]], move, 1.2)[0], shortName(place.name), 5, 12, VIEW_COLORS.place);
@@ -758,7 +802,8 @@ export class LevelView {
       ${pickers ? `<div class="level-tracks">${pickers}</div>` : ''}
       ${trackLine ? `<div class="level-track-msg">${esc(trackLine)}</div>` : ''}
       <div class="level-style">${choice('line')}${choice('labels')}${choice('others')}</div>
-      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 원본 위치', 'dot')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}${swatch(VIEW_COLORS.trackFused, '높이 미상(흐린 점선)', 'dash faint')}</div>
+      ${u?.kind === 'building' && this.interiors.some((s) => this.partOf()(s.building) === u.id) ? `<div class="level-sub">실내 구조(벽·복도·계단실·승강기·로비·연결 통로): 추정. 동 노트 실내_구조 → interiors.geojson, 바닥에서 ${INTERIOR.wallM} m 높이로 잘라 봄</div>` : ''}
+      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(SPACE.wall, '실내 벽(추정)')}${swatch(SPACE.edge.stair, '계단실')}${swatch(SPACE.edge.elevator, '승강기 통로')}${swatch(SPACE.edge.link, '연결 통로')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 원본 위치', 'dot')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}${swatch(VIEW_COLORS.trackFused, '높이 미상(흐린 점선)', 'dash faint')}</div>
       <div class="level-hint">↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>
       <details class="level-help"${this.helpOpen ? ' open' : ''}><summary>띄우는 규칙 · 세션 점 규칙</summary>띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게, 윗층은 층 차이 + ${LEVEL_VIEW.floorGapM} m 위). 한 층에는 그 층 바닥에 선 것만 그림. 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).</details>`;
   }

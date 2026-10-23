@@ -8,7 +8,8 @@
 //    where level indoor roads actually are. A floor is only named when a road says so (levelId or its name).
 //    Nothing is invented: a table floor without a name stays a height.
 //  - explode(): the height map that pulls the floors of a building apart;
-//  - the first-person walk (first-person.ts): which surface is under the feet.
+//  - the first-person walk (first-person.ts): which surface is under the feet;
+//  - 사2: the inside of a building (interiors.geojson, from the notes' 실내_구조): the empty spaces carved out of a floor.
 import { floorFromLevelId } from './floor-colors';
 import { polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import { isUnderground, isUndergroundArea } from './road-surface';
@@ -306,6 +307,28 @@ export function lowestTop(solid: Pick<Solid, 'topM' | 'profile'>): number {
 /** The building a scene block or a road belongs to: the id before '#' ("은주관#접합부" is part of "은주관"). */
 export const baseBuildingId = (id: string) => id.split('#')[0];
 
+/**
+ * What is lifted together (scene block id -> part id): a building, or, when its blocks carry different floor tables of the note
+ * (은주관: 은주1관·은주2관, 겉모습.창.층_표), one part per table, each with its own floors. `table` is the block's table
+ * (any key that is equal for the same table), null without one: such a block goes with the nearest block (centre) that has one.
+ * A part's id is the building id for the part that holds that block, else its first block that has a name (the part label), else its first.
+ */
+export function floorParts(blocks: { id: string; name?: string | null; table: string | null; x: number; y: number }[]): Map<string, string> {
+  const out = new Map<string, string>();
+  const byBuilding = new Map<string, typeof blocks>();
+  for (const b of blocks) byBuilding.set(baseBuildingId(b.id), [...(byBuilding.get(baseBuildingId(b.id)) ?? []), b]);
+  for (const [id, list] of byBuilding) {
+    const tabled = list.filter((b) => b.table !== null);
+    if (new Set(tabled.map((b) => b.table)).size < 2) { for (const b of list) out.set(b.id, id); continue; }
+    const tableOf = (b: (typeof list)[number]) => b.table ?? tabled.reduce((a, c) => (Math.hypot(c.x - b.x, c.y - b.y) < Math.hypot(a.x - b.x, a.y - b.y) ? c : a)).table!;
+    const partOf = new Map<string, string>();
+    const rank = (b: (typeof list)[number]) => (b.id === id ? 2 : b.name ? 1 : 0);
+    for (const b of [...list].sort((a, c) => rank(c) - rank(a))) if (!partOf.has(tableOf(b))) partOf.set(tableOf(b), b.id);
+    for (const b of list) out.set(b.id, partOf.get(tableOf(b))!);
+  }
+  return out;
+}
+
 /** The floor a text names first: "지하 1층" / "B1" -> -1, "3층" / "3F" -> 3; null when it names none. */
 export function floorInText(text: string | null | undefined): number | null {
   if (!text) return null;
@@ -364,6 +387,16 @@ export function buildingFloors(blocks: { baseM: number; roofM: number }[], table
     const best = [...votes].sort((a, b) => b[1] - a[1])[0];
     return { ...floor, name: floor.name ?? (best ? floorText(best[0]) : null) };
   });
+}
+
+/**
+ * The blocks (parts) of a building a floor is drawn on: those whose base and roof span it, and those a road of that floor
+ * belongs to (은주2관: the scene base follows the server terrain and lies above its lower floors). All when none.
+ */
+export function blocksOnFloor<T extends { b: { buildingId: string; baseM: number; roofM: number } }>(items: T[], floor: Floor, roads: { id: string; buildingId: string | null }[]): T[] {
+  const named = new Set(roads.filter((r) => floor.roadIds.includes(r.id)).map((r) => r.buildingId));
+  const here = items.filter(({ b }) => (floor.m >= b.baseM - LEVEL_VIEW.belowBaseM && floor.m < b.roofM) || named.has(b.buildingId));
+  return here.length ? here : items;
 }
 
 /** The floor a height is on (nearest within floorMatchM), or -1. */
@@ -683,4 +716,50 @@ export function trackRuns(spots: TrackSpot[]): TrackSpot[][] {
     if (last && last[last.length - 1].index === s.index - 1 && last[0].sure === s.sure) last.push(s); else runs.push([s]);
   }
   return runs;
+}
+
+// ---------- 사2: the inside of a building, carved (interiors.geojson) ----------
+export type InteriorKind = 'corridor' | 'lobby' | 'link' | 'stair' | 'elevator';
+/** An empty space of a building (corridor, lobby, link, stairwell, elevator shaft) on the floors of the note it names. */
+export type Interior = { building: string; kind: InteriorKind; name: string; floorsM: number[]; grade: string; polygons: Polygon[] };
+export const INTERIOR = {
+  /** How high the walls of a carved floor stand (a plan cut: an oblique view still sees into the corridors). */
+  wallM: 1.2,
+  /** ... and never higher than this below the next floor up. */
+  belowNextM: 0.3,
+  /** The lowest wall drawn. */
+  minWallM: 0.8,
+};
+const KINDS: InteriorKind[] = ['corridor', 'lobby', 'link', 'stair', 'elevator'];
+
+/** The spaces of interiors.geojson; a feature that is not a usable polygon is left out. */
+export function parseInteriors(fc: any): Interior[] {
+  const out: Interior[] = [];
+  for (const f of Array.isArray(fc?.features) ? fc.features : []) {
+    const p = f?.properties ?? {};
+    const coords: unknown = f?.geometry?.type === 'Polygon' ? [f.geometry.coordinates] : f?.geometry?.type === 'MultiPolygon' ? f.geometry.coordinates : null;
+    if (!Array.isArray(coords) || typeof p.building !== 'string' || !KINDS.includes(p.kind) || !Array.isArray(p.floorsM)) continue;
+    const polygons = (coords as number[][][][]).map((poly) => poly.map((ring) => open(ring.map((c) => [c[0], c[1]])))).filter((poly) => poly.length && poly[0].length >= 3);
+    const floorsM = (p.floorsM as unknown[]).filter((m): m is number => typeof m === 'number' && Number.isFinite(m));
+    if (polygons.length && floorsM.length) out.push({ building: p.building, kind: p.kind, name: String(p.name ?? ''), floorsM, grade: String(p.grade ?? ''), polygons });
+  }
+  return out;
+}
+
+/**
+ * Floor i of a building carved: the walls left standing (the footprint without the spaces of that floor, clipped to the
+ * footprint), how high they stand, and the spaces (clipped to the footprint) to outline. null when no space of the
+ * building lies on that floor (the plate is drawn as before). Only the footprint pieces a space reaches get walls: a part
+ * with no space on that floor (은주관: 1관 and 2관 have floors at different heights) stays a plain plate.
+ */
+export function carvedFloor(interiors: Interior[], buildingId: string, floors: Floor[], i: number, footprint: Polygon[], partOf: (id: string) => string = baseBuildingId): { walls: Polygon[]; wallM: number; spaces: { space: Interior; polygons: Polygon[] }[] } | null {
+  const floor = floors[i];
+  if (!floor || !footprint.length) return null;
+  const here = interiors.filter((s) => partOf(s.building) === buildingId && s.floorsM.some((m) => Math.abs(m - floor.m) <= LEVEL_VIEW.floorMatchM && floorIndexAt(floors, m) === i));
+  const spaces = here.map((space) => ({ space, polygons: polygonOps('both', space.polygons, footprint) })).filter((s) => s.polygons.length);
+  if (!spaces.length) return null;
+  const next = floors[i + 1];
+  const wallM = Math.max(INTERIOR.minWallM, Math.min(INTERIOR.wallM, next ? next.m - floor.m - INTERIOR.belowNextM : INTERIOR.wallM));
+  const reached = footprint.filter((piece) => spaces.some((s) => polygonOps('both', s.polygons, [piece]).length));
+  return { walls: polygonOps('minus', reached, spaces.flatMap((s) => s.polygons), true), wallM, spaces };
 }
