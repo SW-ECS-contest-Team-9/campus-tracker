@@ -57,6 +57,12 @@ def box(c, size, deg):
     return [close([[c[0] + sx * w * ux + sy * d * vx, c[1] + sx * w * uy + sy * d * vy] for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))])]
 
 
+def scene_id(head):
+    """The scene building of the note: 모델_추가.건물_id (a building added to the scene), else 서버_건물_id (its first word), else 이름."""
+    added = (head.get('모델_추가') or {}).get('건물_id') if isinstance(head.get('모델_추가'), dict) else None
+    return str(added or ((head.get('모델_id') or {}).get('서버_건물_id')) or head.get('이름')).split(' ')[0]
+
+
 def from_note(head):
     """(features, problems) of the note's 실내_구조; ([], []) when it has none."""
     s = head.get('실내_구조')
@@ -66,7 +72,7 @@ def from_note(head):
         return [], ['실내_구조 는 {기본값, 공간: [...]}']
     base = s.get('기본값') or {}
     table = floor_table(head)
-    building = str(((head.get('모델_id') or {}).get('서버_건물_id')) or head.get('이름'))
+    building = scene_id(head)
     out = []
     for i, it in enumerate(s['공간']):
         at = f"실내_구조.공간[{i}] '{(it or {}).get('이름')}'"
