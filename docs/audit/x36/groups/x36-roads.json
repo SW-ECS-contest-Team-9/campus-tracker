@@ -1,0 +1,98 @@
+{
+ "id": "X36-ROADS",
+ "comment": "북악관·문예관 사이 계단, 은주관 입구 상자 옆 출입구(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "북악관·문예관 사이 계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "북악관·문예관 사이 계단 (오르막 인도 136.29 → 참 137.7 → 서쪽으로 꺾어 문예관 기단 테라스 138.8 m, 아랫단 9·윗단 7단 추정)",
+    "structure": "stairs",
+    "widthM": 2.4,
+    "path": [
+     {
+      "at": {
+       "roadId": "aba83944-d7ad-4525-9e20-dd81d8a3bfef",
+       "nearest": [
+        201078.56,
+        557338.02
+       ]
+      }
+     },
+     {
+      "xy": [
+       201078.56,
+       557338.02
+      ],
+      "z": 136.29
+     },
+     {
+      "xy": [
+       201080.15,
+       557341.25
+      ],
+      "z": 137.7
+     },
+     {
+      "xy": [
+       201077.01,
+       557342.8
+      ],
+      "z": 138.8
+     }
+    ]
+   },
+   "grade": "Claude 결정 2026-10-23(후보 가), 사진 06(꺾인 두 줄), 추정(선·단 수)",
+   "evidence": "사진 북악관-문예관-사이-오르막-계단.webp(사진 06), 구조물 x36-remaining X36-PODIUM-STAIR-*"
+  },
+  {
+   "ref": "은주관 입구 상자 동면 옆 출입구 → 운동장",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주관 입구 상자 안 북쪽 참 → 동면 옆 출입구 → 운동장 (148.9 m, 짧은 길. 밤에는 줄로 막힘)",
+    "structure": "ordinary",
+    "widthM": 1.2,
+    "path": [
+     {
+      "at": {
+       "nodeId": "92516307-01a7-4402-9f7a-1431b2b1446c"
+      }
+     },
+     {
+      "xy": [
+       201147.5,
+       557298.55
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201148.15,
+       557298.44
+      ],
+      "z": 148.9
+     },
+     {
+      "xy": [
+       201149.4,
+       557298.24
+      ],
+      "z": 148.9
+     }
+    ]
+   },
+   "grade": "확정(옆 출입구 있음: 영상 1 158 초·사양 그림), 추정(선, 밤에는 줄로 막힘)",
+   "evidence": "은주관 입구 상자 사양(확인/은주관-박스-탑다운-사양.png), x22-photo-fixes X22-EUNJU-BOX-SIDEDOOR"
+  }
+ ]
+}

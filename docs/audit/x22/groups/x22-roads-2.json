@@ -1,0 +1,37 @@
+{
+ "id": "X22-ROADS-2",
+ "comment": "X22: 청운관 앞 계단 길의 끝을 데크 동쪽 끝 길과 같은 참 노드(f02ca9ae)로(같은 높이에서 엇갈리던 것을 고침)",
+ "ops": [
+  {
+   "ref": "청운관 앞 계단 길: 발치 → 계단 머리 → 참 노드 f02ca9ae",
+   "op": "update_road",
+   "args": {
+    "id": "838cdada-e54c-4f6c-83cd-6f671927ea9e",
+    "expectedRevision": 3,
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "at": {
+       "nodeId": "71e6ebfe-9491-4d4d-ada4-3cea021b6c16"
+      }
+     },
+     {
+      "xy": [
+       201203.99,
+       557290.16
+      ],
+      "z": 151.0
+     },
+     {
+      "at": {
+       "nodeId": "f02ca9ae-bd26-4592-bd25-e4f9f8d5384c"
+      }
+     }
+    ]
+   },
+   "grade": "추정",
+   "evidence": "길 검사 UNCONNECTED_CROSSING(838cdada x 96075de7) 고침"
+  }
+ ]
+}

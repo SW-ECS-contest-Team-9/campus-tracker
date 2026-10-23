@@ -1,0 +1,306 @@
+{
+ "id": "X22-LEVELS-1",
+ "comment": "levelId 를 \"건물_층\" 꼴로(북악관 _추정 꼬리 뗌). 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "길 b11c08e0 levelId 북악관_3F_추정 → 북악관_3F",
+   "op": "update_road",
+   "args": {
+    "id": "b11c08e0-e80a-46fb-882d-6017ba52670d",
+    "expectedRevision": 7,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_3F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 bd2df230 levelId 북악관_3F_추정 → 북악관_3F",
+   "op": "update_road",
+   "args": {
+    "id": "bd2df230-9e70-4e4e-b52b-3836a244035a",
+    "expectedRevision": 7,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_3F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 123bdf83 levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "123bdf83-9b84-4a41-88da-3856f878bf6c",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 2c9fe889 levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "2c9fe889-1d11-47f1-b053-fd15fac13cb4",
+    "expectedRevision": 7,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 5ceb6a04 levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "5ceb6a04-27bb-46f5-8916-eeeb556ae49f",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 981f886c levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "981f886c-9429-4f48-aa71-701a741d0241",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 b5895273 levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "b5895273-5301-4145-9073-50f94199db29",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 b9b7cc0e levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "b9b7cc0e-70de-4389-b392-1d72c2006045",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 ec66a05b levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "ec66a05b-0dd9-4301-9e71-b4324f7fc16e",
+    "expectedRevision": 6,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 fb9063c7 levelId 북악관_5F_추정 → 북악관_5F",
+   "op": "update_road",
+   "args": {
+    "id": "fb9063c7-95fc-440b-b23f-5b6acff85cf1",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_5F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 081bd92e levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "081bd92e-9ed3-449b-a2f3-bd10ca731777",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 0bb9d397 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "0bb9d397-9c75-495e-99f7-5439f032c325",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 391630e3 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "391630e3-124c-415e-9e06-c6cd00c367f0",
+    "expectedRevision": 6,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 5b75b809 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "5b75b809-0764-40ab-9686-7c02beac6a54",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 b36ea64e levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "b36ea64e-113c-475b-8a40-648faf789aa4",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 cca24e70 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "cca24e70-f621-4ce9-a6d8-288f1add2524",
+    "expectedRevision": 5,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 da914768 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "da914768-93f2-45a9-8fc8-f0a96c7f45e8",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 eeb3b9a9 levelId 북악관_6F_추정 → 북악관_6F",
+   "op": "update_road",
+   "args": {
+    "id": "eeb3b9a9-c74e-4d3d-a937-b17f5710bf93",
+    "expectedRevision": 1,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_6F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 1c04557f levelId 북악관_7F_추정 → 북악관_7F",
+   "op": "update_road",
+   "args": {
+    "id": "1c04557f-17fc-4345-990c-c7900e3fed52",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_7F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  },
+  {
+   "ref": "길 3623188a levelId 북악관_7F_추정 → 북악관_7F",
+   "op": "update_road",
+   "args": {
+    "id": "3623188a-8a6c-4d39-9f33-1193c94419b2",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "levelId": "북악관_7F"
+    }
+   },
+   "grade": "확정(이름 규칙)",
+   "evidence": "사용자 지시 2026-10-22(levelId 는 \"건물_층\" 꼴), 북악관 노트 2026-10-22(층 B1·1·2·3·5·6·7). \"_추정\" 은 이름이 아니라 등급이라 뺌. 북악관_8F_추정(철계단 출구 152.5 m, 층 아님)은 맞는 이름이 정해지지 않아 그대로"
+  }
+ ]
+}

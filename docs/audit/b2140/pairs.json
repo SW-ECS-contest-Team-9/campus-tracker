@@ -1,0 +1,1209 @@
+{
+ "note": "B2140: x27/pairs.json 의 지하 2층 점 137.9 → 140.0",
+ "pairs": [
+  {
+   "id": "정문>대일관 입구(1)",
+   "label": "정문 → 대일관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "3bd52867-c0ab-4a66-96a2-6d77161a1359"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 437.0,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>대일관 입구(2)",
+   "label": "정문 → 대일관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "4ee52f0d-71dc-46b9-9ff7-14ea4d40b39a"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 472.9,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>대일관 입구(3) = 뒷문",
+   "label": "정문 → 대일관 입구(3) = 뒷문",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 480.6,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>문예관 입구(1)",
+   "label": "정문 → 문예관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 409.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>본관 입구(1)",
+   "label": "정문 → 본관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "59e77b01-41b4-4d20-b8a4-a01f6a74e4ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 263.9,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>본관 입구(2)",
+   "label": "정문 → 본관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 309.4,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>본관 입구(3)",
+   "label": "정문 → 본관 입구(3)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "2995173c-585b-4a1b-9405-54b22ca26bc6"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 380.4,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>북악관 입구(1) = 정문",
+   "label": "정문 → 북악관 입구(1) = 정문",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 338.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>북악관 입구(3)",
+   "label": "정문 → 북악관 입구(3)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 331.5,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>북악관 입구(4) = GS25 문",
+   "label": "정문 → 북악관 입구(4) = GS25 문",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "190bf54c-556e-4872-b31b-c7f956bf6576"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 340.7,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>B1 통로와 계단 (본관 쪽에서)",
+   "label": "정문 → B1 통로와 계단 (본관 쪽에서)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 336.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>상승관 입구(마당 쪽, 추정)",
+   "label": "정문 → 상승관 입구(마당 쪽, 추정)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "f953d0bb-805f-425e-b4a4-bbd8796dbde8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 515.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>유담관 입구(1)",
+   "label": "정문 → 유담관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "b6cb5f28-aaf6-4978-986e-862c601b820c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 165.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>유담관 입구(2)",
+   "label": "정문 → 유담관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 209.4,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>은주1관 입구(2)",
+   "label": "정문 → 은주1관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "81833de0-8f28-4c86-b19c-8d106812482f"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 482.3,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>은주2관 입구(1)",
+   "label": "정문 → 은주2관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 287.9,
+    "strict": false
+   }
+  },
+  {
+   "id": "정문>은주2관 입구(2)",
+   "label": "정문 → 은주2관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "b3db60cc-949d-4690-bce7-b508a2adf8fa"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 572.7,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>청운관 입구(1층, 현관 위)",
+   "label": "정문 → 청운관 입구(1층, 현관 위)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "49f3b51c-7402-473e-a6c3-b0c5ef227686"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 502.0,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>한림관 입구",
+   "label": "정문 → 한림관 입구",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 220.6,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>혜인관 입구(1)",
+   "label": "정문 → 혜인관 입구(1)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 541.0,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>혜인관 입구(2)",
+   "label": "정문 → 혜인관 입구(2)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "0775ff68-da64-466d-bbd8-1b4deab44ca9"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 536.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "정문>본관–한림관 연결통로(데크)",
+   "label": "정문 → 본관–한림관 연결통로(데크)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 402.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "제1주차장 입구>대일관 입구(1)",
+   "label": "제1주차장 입구 → 대일관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "3bd52867-c0ab-4a66-96a2-6d77161a1359"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 427.5,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>대일관 입구(2)",
+   "label": "제1주차장 입구 → 대일관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "4ee52f0d-71dc-46b9-9ff7-14ea4d40b39a"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 463.4,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>대일관 입구(3) = 뒷문",
+   "label": "제1주차장 입구 → 대일관 입구(3) = 뒷문",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 471.1,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>문예관 입구(1)",
+   "label": "제1주차장 입구 → 문예관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 400.3,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>본관 입구(1)",
+   "label": "제1주차장 입구 → 본관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "59e77b01-41b4-4d20-b8a4-a01f6a74e4ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 258.3,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>본관 입구(2)",
+   "label": "제1주차장 입구 → 본관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 299.8,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>본관 입구(3)",
+   "label": "제1주차장 입구 → 본관 입구(3)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "2995173c-585b-4a1b-9405-54b22ca26bc6"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 370.9,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>북악관 입구(1) = 정문",
+   "label": "제1주차장 입구 → 북악관 입구(1) = 정문",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 328.7,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>북악관 입구(3)",
+   "label": "제1주차장 입구 → 북악관 입구(3)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 322.0,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>북악관 입구(4) = GS25 문",
+   "label": "제1주차장 입구 → 북악관 입구(4) = GS25 문",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "190bf54c-556e-4872-b31b-c7f956bf6576"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 331.1,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>B1 통로와 계단 (본관 쪽에서)",
+   "label": "제1주차장 입구 → B1 통로와 계단 (본관 쪽에서)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 327.3,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>상승관 입구(마당 쪽, 추정)",
+   "label": "제1주차장 입구 → 상승관 입구(마당 쪽, 추정)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "f953d0bb-805f-425e-b4a4-bbd8796dbde8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 505.7,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>유담관 입구(1)",
+   "label": "제1주차장 입구 → 유담관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "b6cb5f28-aaf6-4978-986e-862c601b820c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 155.0,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>유담관 입구(2)",
+   "label": "제1주차장 입구 → 유담관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 198.6,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>은주1관 입구(2)",
+   "label": "제1주차장 입구 → 은주1관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "81833de0-8f28-4c86-b19c-8d106812482f"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 472.8,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>은주2관 입구(1)",
+   "label": "제1주차장 입구 → 은주2관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 282.2,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>은주2관 입구(2)",
+   "label": "제1주차장 입구 → 은주2관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "b3db60cc-949d-4690-bce7-b508a2adf8fa"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 563.1,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>청운관 입구(1층, 현관 위)",
+   "label": "제1주차장 입구 → 청운관 입구(1층, 현관 위)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "49f3b51c-7402-473e-a6c3-b0c5ef227686"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 492.5,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>한림관 입구",
+   "label": "제1주차장 입구 → 한림관 입구",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 215.0,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>혜인관 입구(1)",
+   "label": "제1주차장 입구 → 혜인관 입구(1)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 531.5,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>혜인관 입구(2)",
+   "label": "제1주차장 입구 → 혜인관 입구(2)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "0775ff68-da64-466d-bbd8-1b4deab44ca9"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 527.2,
+    "strict": false
+   }
+  },
+  {
+   "id": "제1주차장 입구>본관–한림관 연결통로(데크)",
+   "label": "제1주차장 입구 → 본관–한림관 연결통로(데크)",
+   "from": {
+    "nodeId": "da7c81b3-d572-4c5f-8898-2d086a23e2ba"
+   },
+   "to": {
+    "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 392.7,
+    "strict": false
+   }
+  },
+  {
+   "id": "제2주차장 입구>대일관 입구(1)",
+   "label": "제2주차장 입구 → 대일관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "3bd52867-c0ab-4a66-96a2-6d77161a1359"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 210.0,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>대일관 입구(2)",
+   "label": "제2주차장 입구 → 대일관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "4ee52f0d-71dc-46b9-9ff7-14ea4d40b39a"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 245.9,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>대일관 입구(3) = 뒷문",
+   "label": "제2주차장 입구 → 대일관 입구(3) = 뒷문",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 253.6,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>문예관 입구(1)",
+   "label": "제2주차장 입구 → 문예관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "0c198093-87b2-43ce-a737-399c4532cee3"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 182.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>본관 입구(1)",
+   "label": "제2주차장 입구 → 본관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "59e77b01-41b4-4d20-b8a4-a01f6a74e4ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 42.5,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>본관 입구(2)",
+   "label": "제2주차장 입구 → 본관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 82.3,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>본관 입구(3)",
+   "label": "제2주차장 입구 → 본관 입구(3)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "2995173c-585b-4a1b-9405-54b22ca26bc6"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 153.3,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>북악관 입구(1) = 정문",
+   "label": "제2주차장 입구 → 북악관 입구(1) = 정문",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "a09e1033-9dd6-4d76-8f91-32fc13417142"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 111.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>북악관 입구(3)",
+   "label": "제2주차장 입구 → 북악관 입구(3)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "e6480084-f825-4a59-9d9b-de68a3ff91a8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 104.5,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>북악관 입구(4) = GS25 문",
+   "label": "제2주차장 입구 → 북악관 입구(4) = GS25 문",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "190bf54c-556e-4872-b31b-c7f956bf6576"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 113.6,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>B1 통로와 계단 (본관 쪽에서)",
+   "label": "제2주차장 입구 → B1 통로와 계단 (본관 쪽에서)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "3c4d5560-355a-48b9-9aa9-7b57c322cb70"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 109.7,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>상승관 입구(마당 쪽, 추정)",
+   "label": "제2주차장 입구 → 상승관 입구(마당 쪽, 추정)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "f953d0bb-805f-425e-b4a4-bbd8796dbde8"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 288.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>유담관 입구(1)",
+   "label": "제2주차장 입구 → 유담관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "b6cb5f28-aaf6-4978-986e-862c601b820c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 152.7,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>유담관 입구(2)",
+   "label": "제2주차장 입구 → 유담관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "50b9ed6a-9d36-4939-804d-b245ed36b24c"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 134.8,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>은주1관 입구(2)",
+   "label": "제2주차장 입구 → 은주1관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "81833de0-8f28-4c86-b19c-8d106812482f"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 255.3,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>은주2관 입구(1)",
+   "label": "제2주차장 입구 → 은주2관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 179.4,
+    "strict": false
+   }
+  },
+  {
+   "id": "제2주차장 입구>은주2관 입구(2)",
+   "label": "제2주차장 입구 → 은주2관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "b3db60cc-949d-4690-bce7-b508a2adf8fa"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 345.6,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>청운관 입구(1층, 현관 위)",
+   "label": "제2주차장 입구 → 청운관 입구(1층, 현관 위)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "49f3b51c-7402-473e-a6c3-b0c5ef227686"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 274.9,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>한림관 입구",
+   "label": "제2주차장 입구 → 한림관 입구",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 112.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>혜인관 입구(1)",
+   "label": "제2주차장 입구 → 혜인관 입구(1)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 314.0,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>혜인관 입구(2)",
+   "label": "제2주차장 입구 → 혜인관 입구(2)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "0775ff68-da64-466d-bbd8-1b4deab44ca9"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 309.7,
+    "strict": true
+   }
+  },
+  {
+   "id": "제2주차장 입구>본관–한림관 연결통로(데크)",
+   "label": "제2주차장 입구 → 본관–한림관 연결통로(데크)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24"
+   },
+   "vehicle": false,
+   "expect": {
+    "m": 175.2,
+    "strict": true
+   }
+  },
+  {
+   "id": "차량 서문(후문)>운동장 지하 1층 주차장",
+   "label": "(차) 서문(후문) → 운동장 지하 1층 주차장 (통로 면을 건너 혜인관 통로 어귀까지)",
+   "from": {
+    "nodeId": "2c931081-0aa5-47a7-9240-8d205094f25d"
+   },
+   "to": {
+    "point": [
+     201216.64,
+     557217.05,
+     143.5
+    ]
+   },
+   "vehicle": true,
+   "expect": null,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "차량 서문(후문)>운동장 지하 2층 주차장",
+   "label": "(차) 서문(후문) → 운동장 지하 2층 주차장 (층 사이 경사로 발치 = 지하 2층 통로 면의 접속점. U06: 노드 id 가 바뀌어 자리로 찾는다)",
+   "from": {
+    "nodeId": "2c931081-0aa5-47a7-9240-8d205094f25d"
+   },
+   "to": {
+    "point": [
+     201156.4,
+     557270.75,
+     140.0
+    ]
+   },
+   "vehicle": true,
+   "expect": null,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "차량 제2주차장 입구>운동장 지하 1층 주차장",
+   "label": "(차) 제2주차장 입구 → 운동장 지하 1층 주차장 (통로 면을 건너 혜인관 통로 어귀까지)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "point": [
+     201216.64,
+     557217.05,
+     143.5
+    ]
+   },
+   "vehicle": true,
+   "expect": null,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "차량 제2주차장 입구>운동장 지하 2층 주차장",
+   "label": "(차) 제2주차장 입구 → 운동장 지하 2층 주차장 (층 사이 경사로 발치 = 지하 2층 통로 면의 접속점. U06: 노드 id 가 바뀌어 자리로 찾는다)",
+   "from": {
+    "nodeId": "334dbc48-b34f-4d2b-bc1a-b91f4cb8748b"
+   },
+   "to": {
+    "point": [
+     201156.4,
+     557270.75,
+     140.0
+    ]
+   },
+   "vehicle": true,
+   "expect": null,
+   "snapRadiusM": 1
+  },
+  {
+   "id": "혜인관 지하 1층 문>정류장(유담관 9층 문) 지하도",
+   "label": "혜인관 지하 1층 문 → 정류장(유담관 9층 정류장 쪽 문), 지하도",
+   "from": {
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac"
+   },
+   "to": {
+    "nodeId": "6404f1ee-fc55-447f-9f8a-bcae0af0f211"
+   },
+   "vehicle": false,
+   "expect": null
+  },
+  {
+   "id": "정류장(유담관 9층 문)>운동장 지하도",
+   "label": "정류장(유담관 9층 정류장 쪽 문) → 운동장(은주관 문 옆 계단 위), 지하도",
+   "from": {
+    "nodeId": "6404f1ee-fc55-447f-9f8a-bcae0af0f211"
+   },
+   "to": {
+    "nodeId": "92516307-01a7-4402-9f7a-1431b2b1446c"
+   },
+   "vehicle": false,
+   "expect": null
+  },
+  {
+   "id": "유담관 9층 홀>은주1관 3층",
+   "label": "유담관 9층 승강기 홀 → 은주1관 3층 계단실",
+   "from": {
+    "nodeId": "43a7f874-9382-496b-ad7c-62953e1ac02f"
+   },
+   "to": {
+    "nodeId": "5893ed26-311e-4c00-92d7-1a2d103680d5"
+   },
+   "vehicle": false,
+   "expect": null
+  },
+  {
+   "id": "B1435 지하2층>북악관6층",
+   "label": "지하 2층(청운관 계단실 문) → 지하 1층 → 지하 차도 → 본관 5층 → 북악관 6층",
+   "from": {
+    "nodeId": "5e940a31-6dbf-490b-9ac9-b806d7384626"
+   },
+   "to": {
+    "nodeId": "ce5e26d2-1ce7-43d3-b94b-e34dc759bb55"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "B1435 지하2층>본관5층",
+   "label": "지하 2층(청운관 계단실 문) → 본관 5층 복도",
+   "from": {
+    "nodeId": "5e940a31-6dbf-490b-9ac9-b806d7384626"
+   },
+   "to": {
+    "nodeId": "61c94947-a259-4a9a-8b47-7f3b07277a28"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "B1435 운동장>지하1층(청운관)",
+   "label": "운동장(청운관 틀 밑 통로) → 청운관 계단실 → 지하 1층 문",
+   "from": {
+    "nodeId": "223c46db-7a4c-43ee-bc37-edf58531a0af"
+   },
+   "to": {
+    "nodeId": "931d63da-549b-4832-a9c6-7c9d996e2b41"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "B1435 혜인관>지하1층",
+   "label": "혜인관 입구(1) 지하 1층 문 → 계단 → 운동장 지하 1층 주차장",
+   "from": {
+    "nodeId": "07c38541-4d1c-4619-8ca5-2c8e93dfe5ac"
+   },
+   "to": {
+    "nodeId": "8409ade4-dc49-48bf-9b5a-52a591e9e053"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "B1435 은주1관3층>지하1층 문",
+   "label": "은주1관 3층 복도 → 문 안 계단 → 주차장 쪽 문",
+   "from": {
+    "nodeId": "ee68ae38-81ce-4202-bc34-f2d6e54fa672"
+   },
+   "to": {
+    "nodeId": "8e608a71-5268-42d6-9fe9-b64eafda79e3"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "B1435 지하2층 경사로>지하1층 목(차)",
+   "label": "층 사이 경사로 발치(지하 2층) → 지하 1층 북서 목(차량)",
+   "from": {
+    "nodeId": "a918c7ee-df75-46d3-ab60-5d49490eedce"
+   },
+   "to": {
+    "nodeId": "d80020b1-22ec-4f3a-bf04-de8fe795da44"
+   },
+   "vehicle": true
+  },
+  {
+   "id": "X27 정문>은주1관 입구(1)",
+   "label": "정문 → 은주1관 입구(1)(곡선 돌계단)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "X27 한림관 입구>은주1관 입구(1)",
+   "label": "한림관 정문 → 은주1관 입구(1)",
+   "from": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+   },
+   "to": {
+    "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "X27 굽이>은주2관 입구(1) (★)",
+   "label": "굽이 → 윗길(차단기 지나) → 은주2관 입구(1)",
+   "from": {
+    "nodeId": "d57d0927-fe79-4c52-b903-af4d8b081430"
+   },
+   "to": {
+    "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b"
+   },
+   "vehicle": false
+  },
+  {
+   "id": "X27 한림관 로비 안",
+   "label": "한림관 정문 → 안쪽 로비(128.1)",
+   "from": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+   },
+   "to": {
+    "nodeId": "30ecd749-0099-4335-a0c8-140943557830"
+   },
+   "vehicle": false
+  }
+ ]
+}

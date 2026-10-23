@@ -1,0 +1,138 @@
+{
+ "group": "Y01-FUTSAL-YARD",
+ "comment": "은주2관–수인관 통로와 풋살장 앞 마당 길, 윗길 끝 솟은 높이 고치기(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T01:57:00.523Z",
+ "batchId": "f81d8ae5-1c9b-411f-85a0-2bf6d9bd76de",
+ "results": [
+  {
+   "ref": "윗길 끝 노드 98909b6c 높이 133.93 → 130.92 (솟은 한 점, 사용자 핀 U034·기단 U1X-01)",
+   "op": "move_node",
+   "changeSetId": "63c0d8e0-d65a-4ea9-8618-b037cc74d0be",
+   "roads": [
+    {
+     "id": "7bc842f2-b460-4140-85cd-1ae78ce7bb01",
+     "revision": 4,
+     "status": "DRAFT",
+     "name": "은주관 서쪽 윗길 끝 ~ 은주2관 입구(1) 1층 로비 문 (사용자 S-MAP 핀 131.2 → 131.7 → 132.2 m, 풋살장 쪽으로 이어지는 포장)",
+     "lengthM": 16.29,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+      "at": [
+       201112.12,
+       557211.18,
+       130.92
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+      "at": [
+       201125,
+       557201.3,
+       132.2
+      ],
+      "roadsAtNode": 1
+     }
+    },
+    {
+     "id": "41dc7abe-c214-45d1-8d1e-982b9bd05afc",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "본관·한림관 사이 지선 ~ 은주관 서쪽 윗길 (S-MAP 판독)",
+     "lengthM": 58.32,
+     "vertexCount": 25,
+     "start": {
+      "nodeId": "fa6fb6fd-8fb8-4fbb-a2c1-4afe9ac48351",
+      "at": [
+       201107.6,
+       557267.95,
+       125.16
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+      "at": [
+       201112.12,
+       557211.18,
+       130.92
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "98909b6c-4a26-4eb7-a959-26664cedc2ca",
+   "at": [
+    201112.12,
+    557211.18,
+    130.92
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "은주2관 입구(1) 문 → 통로 → 풋살장 앞 마당",
+   "op": "create_road",
+   "changeSetId": "fd14f0f9-2deb-4a34-ae62-2d7771e841e7",
+   "roads": [
+    {
+     "id": "60ef7429-6444-424e-a2b0-76c23404dd5b",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "은주2관 입구(1) ~ 은주2관–수인관 통로 ~ 풋살장 앞 마당 (132.2 m 평평. 사진 판독, 선 추정)",
+     "lengthM": 33.63,
+     "vertexCount": 5,
+     "start": {
+      "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+      "at": [
+       201125,
+       557201.3,
+       132.2
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "1c0cd7e8-b067-4aee-b722-5b654933e7ff",
+      "at": [
+       201130.23,
+       557183.42,
+       132.2
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "7bc842f2-b460-4140-85cd-1ae78ce7bb01",
+     "at": [
+      201125,
+      557201.3,
+      132.2
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 0,
+     "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+     "usedNodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  }
+ ]
+}

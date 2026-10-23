@@ -1,0 +1,315 @@
+{
+ "group": "D23-DECK-ROADS",
+ "comment": "D23 대일관 앞 데크 길을 사용자 파란 구분선 사이 데크 가운데로(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T03:30:17.912Z",
+ "batchId": "d500ec9c-9889-41e7-97d2-6f9b6ab345a7",
+ "results": [
+  {
+   "ref": "입구(2) 갈림 노드(데크 길 둘·문 길): 데크 가운데 선으로",
+   "op": "move_node",
+   "changeSetId": "eacc4615-76e7-4717-8baa-90a2e4f411a7",
+   "roads": [
+    {
+     "id": "53962aa5-68b5-4b6c-8a65-c03453119bf6",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "대일관 입구(2) 문 ~ 나무 데크 (문 앞 지면 151.7 m, 데크 151.3 m. 턱인지 계단 1~2칸인지 모름)",
+     "lengthM": 4.45,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "4ee52f0d-71dc-46b9-9ff7-14ea4d40b39a",
+      "at": [
+       201186,
+       557302.2,
+       151.7
+      ],
+      "roadsAtNode": 1
+     }
+    },
+    {
+     "id": "88537fed-540b-40a8-a9a1-a6ee597e9735",
+     "revision": 3,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 = 나무 데크 (151.3 m 추정, 대일관 입구(2) 앞을 지남)",
+     "lengthM": 18.79,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "110c17e5-07f2-4555-ba48-071a3c9935a1",
+      "at": [
+       201200.93,
+       557291.64,
+       151.3
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "b94cdc87-aa91-41bb-9645-1eaaad26d54a",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 = 나무 데크 (151.3 m 추정, 대일관 입구(2) 앞을 지남)",
+     "lengthM": 22.62,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "b0845137-e2d2-4027-b274-26a0f092de8e",
+      "at": [
+       201164.61,
+       557309.39,
+       151.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+   "at": [
+    201184.22,
+    557298.12,
+    151.3
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "데크 동쪽 끝 노드 110c17e5: 데크 끝(u 49.4) 가운데로",
+   "op": "move_node",
+   "changeSetId": "7505c671-ba3d-4ec0-b2ba-061c3d913b3f",
+   "roads": [
+    {
+     "id": "88537fed-540b-40a8-a9a1-a6ee597e9735",
+     "revision": 4,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 = 나무 데크 (151.3 m 추정, 대일관 입구(2) 앞을 지남)",
+     "lengthM": 18.83,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "110c17e5-07f2-4555-ba48-071a3c9935a1",
+      "at": [
+       201200.74,
+       557291.21,
+       151.3
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "96075de7-003c-434b-8a67-e370b2361e30",
+     "revision": 3,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 동쪽 끝 → 작은 광장 (2칸 추정)",
+     "lengthM": 5.27,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "110c17e5-07f2-4555-ba48-071a3c9935a1",
+      "at": [
+       201200.74,
+       557291.21,
+       151.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "f02ca9ae-bd26-4592-bd25-e4f9f8d5384c",
+      "at": [
+       201205.84,
+       557289.88,
+       151
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "110c17e5-07f2-4555-ba48-071a3c9935a1",
+   "at": [
+    201200.74,
+    557291.21,
+    151.3
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "데크 길 서쪽: 현관 쪽 이음(v 1.25)에서 u 10.75 로 꺾어 데크 가운데 선으로",
+   "op": "update_road",
+   "changeSetId": "346c4591-7cf4-407c-a31b-aededfacd5ed",
+   "roads": [
+    {
+     "id": "b94cdc87-aa91-41bb-9645-1eaaad26d54a",
+     "revision": 3,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 = 나무 데크 (151.3 m 추정, 대일관 입구(2) 앞을 지남)",
+     "lengthM": 25.49,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "b0845137-e2d2-4027-b274-26a0f092de8e",
+      "at": [
+       201164.61,
+       557309.39,
+       151.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "53962aa5-68b5-4b6c-8a65-c03453119bf6",
+     "at": [
+      201184.22,
+      557298.12,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "88537fed-540b-40a8-a9a1-a6ee597e9735",
+     "at": [
+      201184.22,
+      557298.12,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "b15ec913-514c-4c00-8e7e-26d571e0cf72",
+     "at": [
+      201164.61,
+      557309.39,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  },
+  {
+   "ref": "데크 길 동쪽: 가운데 꼭짓점 둘을 벽 꺾임(u 40.1) 가운데 하나로",
+   "op": "update_road",
+   "changeSetId": "2cdeab7e-f4b4-4742-b6bd-462a95c20fc6",
+   "roads": [
+    {
+     "id": "88537fed-540b-40a8-a9a1-a6ee597e9735",
+     "revision": 5,
+     "status": "DRAFT",
+     "name": "높은 가장자리 길 = 나무 데크 (151.3 m 추정, 대일관 입구(2) 앞을 지남)",
+     "lengthM": 17.91,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "deda9ca6-814c-48c6-8942-62890ce83f1f",
+      "at": [
+       201184.22,
+       557298.12,
+       151.3
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "110c17e5-07f2-4555-ba48-071a3c9935a1",
+      "at": [
+       201200.74,
+       557291.21,
+       151.3
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "96075de7-003c-434b-8a67-e370b2361e30",
+     "at": [
+      201200.74,
+      557291.21,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "53962aa5-68b5-4b6c-8a65-c03453119bf6",
+     "at": [
+      201184.22,
+      557298.12,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "b94cdc87-aa91-41bb-9645-1eaaad26d54a",
+     "at": [
+      201184.22,
+      557298.12,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  }
+ ]
+}

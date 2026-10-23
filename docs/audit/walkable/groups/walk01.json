@@ -1,0 +1,67 @@
+{
+ "id": "WALK01",
+ "zone": "정문~북악관 주 진입로",
+ "comment": "WALK01: 사용자 그림(2026-10-22) 외곽 안의 지상 차도 4조각을 보차 혼용(shared)·보행 허용으로(편집기 규칙: 차량 길은 보행 허용 불가, Z10 과 같은 방식). 차량 통행은 그대로. 지하 차도(이름에 지하)는 손대지 않음",
+ "ops": [
+  {
+   "ref": "729bd2ad 정문 진입로(그림 외곽 안 57 %, 정문 쪽 끝) 보행 허용",
+   "op": "update_road",
+   "grade": "확정(사용자 그림 2026-10-22: 빨간 외곽 안의 거리는 길)",
+   "evidence": "볼트 보완자료/학교-전경-20261022/사람-다니는-곳-표시.webp, docs/audit/walkable/walkable-areas-5186.geojson 외곽 안",
+   "args": {
+    "id": "729bd2ad-9e46-4554-a584-8356ebdbda26",
+    "expectedRevision": 7,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "1b708df6 주 진입로 하부 보행 허용",
+   "op": "update_road",
+   "grade": "확정(사용자 그림 2026-10-22: 빨간 외곽 안의 거리는 길)",
+   "evidence": "볼트 보완자료/학교-전경-20261022/사람-다니는-곳-표시.webp, docs/audit/walkable/walkable-areas-5186.geojson 외곽 안",
+   "args": {
+    "id": "1b708df6-3b02-448a-9e61-b1788c7a8ed0",
+    "expectedRevision": 3,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "f3eaad1d 주 진입로 하부 보행 허용",
+   "op": "update_road",
+   "grade": "확정(사용자 그림 2026-10-22: 빨간 외곽 안의 거리는 길)",
+   "evidence": "볼트 보완자료/학교-전경-20261022/사람-다니는-곳-표시.webp, docs/audit/walkable/walkable-areas-5186.geojson 외곽 안",
+   "args": {
+    "id": "f3eaad1d-e1dd-45db-a1b0-a9e6ecb69876",
+    "expectedRevision": 6,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   }
+  },
+  {
+   "ref": "499ab1ab 주 경사로 상부 보행 허용",
+   "op": "update_road",
+   "grade": "확정(사용자 그림 2026-10-22: 빨간 외곽 안의 거리는 길)",
+   "evidence": "볼트 보완자료/학교-전경-20261022/사람-다니는-곳-표시.webp, docs/audit/walkable/walkable-areas-5186.geojson 외곽 안",
+   "args": {
+    "id": "499ab1ab-cc02-4ea6-9bd3-e5fe5e5c2a62",
+    "expectedRevision": 4,
+    "attrs": {
+     "roadClass": "shared",
+     "pedestrianAccess": "allowed",
+     "pedestrianDirection": "both"
+    }
+   }
+  }
+ ]
+}
