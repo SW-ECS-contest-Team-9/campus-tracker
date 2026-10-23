@@ -17,11 +17,13 @@
   모델_부분.덧붙임: {건물_id, 표지, 근거}: 원천 외곽 밖으로 나온 덩어리(저층부 등)를 그 동의 원천 도형과 따로 한 건물로 넣는다(-> added).
     외곽.좌표·지붕_높이는 그 부분의 것, 높이_출처는 모델_보정의 것. 표지는 지도 이름표라 동 이름과 달라야 한다. 그 부분은 원천 도형의 보정(지붕·부분)에서 빠진다.
   겉모습[]: 벽·창·지붕·특징(-> appearance, 화면 표시 전용. 양식과 등급 규칙은 appearance.py).
+  실내_구조: 복도·로비·연결·계단실·승강기 빈 곳(-> frontend/public/interiors.geojson, 층 펼치기 화면 전용. 양식은 interior.py).
 """
 import argparse, json, pathlib, re, sys
 import yaml
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import appearance
+import interior
 
 ABOUT = ('Overrides applied by scripts/scene-import.ts (see src/modules/scene/scene-overrides.ts): "buildings" = roof elevation of one building, '
          '"hidden" = a GeoPackage building that is not drawn, "parts" = one footprint drawn as several flat-roofed blocks, "added" = a building that is not in the GeoPackage or the campus map (scene only). Remove an entry, or import '
@@ -30,6 +32,7 @@ GENERATED = 'Generated from the building notes by docs/audit/registry/building_r
 ALLOWED = ('확정', '원천', 'S-MAP')
 DEFAULT_NOTES = r'C:\campus-tracker-backend\데이터\모델링 개선\건물'
 DEFAULT_OVERRIDES = pathlib.Path(__file__).resolve().parents[3] / 'backend/data/scene/overrides/building-roofs.json'
+DEFAULT_INTERIORS = pathlib.Path(__file__).resolve().parents[3] / 'frontend/public/interiors.geojson'
 
 
 def read_head(text):
@@ -162,16 +165,18 @@ def source_entry(head, used, problems):
     return 'parts', {'name': src, 'heightSource': m.get('높이_출처'), **floors, **({'uncovered': m['덮지_않는_곳']} if m.get('덮지_않는_곳') else {}), 'evidence': ev, 'parts': out}, problems
 
 
-def build(notes_dir):
-    """(document, {note name: [problems]}) from every *.md in the folder."""
+def build(notes_dir, inside=None):
+    """(document, {note name: [problems]}) from every *.md in the folder; the 실내_구조 features go into `inside` (a list) when given."""
     doc = {'about': ABOUT, 'generated': GENERATED, 'buildings': [], 'hidden': [], 'parts': [], 'added': [], 'appearance': []}
     problems = {}
+    inside = [] if inside is None else inside
     for path in sorted(pathlib.Path(notes_dir).glob('*.md')):
         try:
             head = read_head(path.read_text(encoding='utf-8'))
             section, entry, bad, added = entry_from_note(head)
             looks, bad_looks = appearance.from_note(head)
-            bad = bad + bad_looks
+            spaces, bad_spaces = interior.from_note(head)
+            bad = bad + bad_looks + bad_spaces
         except Exception as e:  # a note that cannot be read is a failure, not a skipped building
             problems[path.stem] = [f'읽지 못함: {e}']
             continue
@@ -180,10 +185,12 @@ def build(notes_dir):
             if section: doc[section].append(entry)
             doc['added'] += added
             doc['appearance'] += looks
+            inside += spaces
     for k in ('buildings', 'hidden', 'parts', 'added'): doc[k].sort(key=lambda e: e['name'])
     doc['appearance'].sort(key=lambda e: e['id'])
     ids = [e['id'] for e in doc['appearance']]
     for i in sorted({i for i in ids if ids.count(i) > 1}): problems.setdefault('(겉모습)', []).append(f'장면 건물 id {i} 가 두 번 나온다')
+    inside.sort(key=lambda f: f['properties']['building'])  # stable: the note's order within a building
     return doc, problems
 
 
@@ -228,10 +235,14 @@ def main(argv=None):
     ap.add_argument('mode', choices=('check', 'write'))
     ap.add_argument('--notes', default=DEFAULT_NOTES)
     ap.add_argument('--overrides', default=str(DEFAULT_OVERRIDES))
+    ap.add_argument('--interiors', default=str(DEFAULT_INTERIORS))
     a = ap.parse_args(argv)
     if not pathlib.Path(a.notes).is_dir():
         print(f'동 노트 폴더가 없다: {a.notes}'); return 2
-    doc, problems = build(a.notes)
+    spaces = []
+    doc, problems = build(a.notes, spaces)
+    inside = interior.document(spaces)
+    ipath = pathlib.Path(a.interiors)
     for n, bad in problems.items():
         for b in bad: print(f'[노트 문제] {n}: {b}')
     path = pathlib.Path(a.overrides)
@@ -240,12 +251,18 @@ def main(argv=None):
             print('노트에 문제가 있어 쓰지 않았다.'); return 1
         path.write_text(dumps(doc), encoding='utf-8', newline='\n')
         print(f"썼다: {path} (지붕 {len(doc['buildings'])}, 숨김 {len(doc['hidden'])}, 부분 나누기 {len(doc['parts'])}, 건물 추가 {len(doc['added'])}, 겉모습 {len(doc['appearance'])})")
+        ipath.write_text(dumps(inside), encoding='utf-8', newline='\n')
+        print(f"썼다: {ipath} (실내 빈 곳 {len(inside['features'])})")
         return 0
     text = path.read_text(encoding='utf-8')
     d = diff(doc, json.loads(text))
     for n, msgs in sorted(d.items()):
         for m in msgs: print(f'[불일치] {n}: {m}')
     same_text = text == dumps(doc)
+    itext = ipath.read_text(encoding='utf-8') if ipath.exists() else ''
+    if itext != dumps(inside):
+        print(f"[불일치] (실내 구조): {ipath.name} 이 노트의 실내_구조 와 다르다(노트 {len(inside['features'])}개). write 로 다시 만든다.")
+        same_text = False
     if not d and not same_text and not problems: print('[불일치] 값은 같지만 파일 글자가 생성 결과와 다르다(손으로 고친 흔적). write 로 다시 만든다.')
     names = lambda sec: ', '.join(f"{e['name']}" + (f"({len(e['parts'])})" if sec == 'parts' else '') for e in doc[sec]) or '없음'
     print(f"노트 기준: 지붕 {names('buildings')} / 숨김 {names('hidden')} / 부분 나누기 {names('parts')} / 건물 추가 {names('added')} / 겉모습 {len(doc['appearance'])}개")

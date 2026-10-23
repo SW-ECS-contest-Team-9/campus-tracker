@@ -5,8 +5,8 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
-const { parseStructures } = await import('../src/structures.ts');
+const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, floorParts, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { parseStructures, solidMesh } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
 
@@ -215,4 +215,62 @@ test('보기 설정: 기본값, 모르는 값은 기본으로, 바꾸면 알림'
   assert.equal(viewStyle().line, 'thin');
   assert.ok(LINE_PX.thick.road > LINE_PX.normal.road && LINE_PX.normal.road > LINE_PX.thin.road);
   setViewStyle(VIEW_STYLE_DEFAULT);
+});
+
+test('사2: interiors.geojson spaces carve a floor (walls = footprint without spaces, plan-cut height)', () => {
+  const sq = (x: number, y: number, w: number, h: number) => [...rect(x, y, w, h), rect(x, y, w, h)[0]];
+  const spaces = parseInteriors({ features: [
+    { type: 'Feature', properties: { building: '가관', kind: 'corridor', name: '복도', floorsM: [100, 103.5], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(0, 4, 40, 2.4)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'elevator', name: '승강기', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(50, 0, 2, 2)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'nope', floorsM: [100] }, geometry: { type: 'Polygon', coordinates: [sq(0, 0, 1, 1)] } },
+  ] });
+  assert.equal(spaces.length, 2);
+  const floors = [{ m: 100, name: '1층', fromTable: true, roadIds: [] }, { m: 101.5, name: '2층', fromTable: true, roadIds: [] }, { m: 103.5, name: '3층', fromTable: true, roadIds: [] }, { m: 120, name: '5층', fromTable: true, roadIds: [] }];
+  const footprint = [[rect(0, 0, 40, 10)]];
+  const one = carvedFloor(spaces, '가관', floors, 0, footprint)!;
+  assert.equal(one.spaces.length, 1, 'the elevator lies outside the footprint: clipped away');
+  assert.ok(Math.abs(polygonArea(one.walls[0]) + polygonArea(one.walls[1] ?? []) - (400 - 96)) < 0.5, 'walls = 400 m² - corridor 96 m²');
+  assert.equal(one.wallM, 1.2, 'low storey: 0.3 m below the next floor');
+  assert.equal(carvedFloor(spaces, '가관', floors, 2, footprint)!.wallM, INTERIOR.wallM);
+  assert.equal(carvedFloor(spaces, '가관', floors, 1, footprint), null, 'no space on that floor: not carved');
+  assert.equal(carvedFloor(spaces, '나관', floors, 0, footprint), null);
+  const parts = carvedFloor(spaces, '가관', floors, 0, [...footprint, [rect(0, 20, 10, 10)]])!;
+  assert.ok(Math.abs(parts.walls.reduce((t, w) => t + polygonArea(w), 0) - (400 - 96)) < 0.5, 'a part no space reaches gets no walls');
+  // a space whose corner touches the outline (수인관 1층: a corridor end on the wall) must not leave a hole touching the outer ring:
+  // the triangulation then drops the hole and the walls cover the corridors
+  const sooin = [[201174.739, 557125.622], [201192.294, 557144.08], [201125.566, 557204.292], [201102.938, 557190.108], [201148.208, 557110.271]];
+  const touch = parseInteriors({ features: [{ type: 'Feature', properties: { building: '가관', kind: 'corridor', name: 'x', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[201155.91, 557149.49], [201155.912, 557149.491], [201152.92, 557154.69], [201152.922, 557154.691], [201148.676, 557162.072], [201126.17, 557149.137], [201124.985, 557151.226], [201147.481, 557164.155], [201130.36, 557193.94], [201132.44, 557195.14], [201150.76, 557163.27], [201150.758, 557163.269], [201156.2, 557153.81], [201156.198, 557153.809], [201159.19, 557148.61], [201159.187, 557148.608], [201170.14, 557129.56], [201168.06, 557128.36]]] } }] });
+  const walls = carvedFloor(touch, '가관', floors, 0, [[sooin]])!.walls;
+  const top = walls.reduce((t, w) => { const m = solidMesh({ id: 'p', file: '', role: 'box', type: 'plate', polygon: w, bottomM: 99, topM: 100, estimated: false, props: {} } as never).mesh;
+    let a = 0; for (let k = 0; k < m.indices.length; k += 3) { const [i, j, l] = [0, 1, 2].map((e) => m.indices[k + e] * 5); if ([i, j, l].every((q) => m.positions[q + 2] === 100)) a += Math.abs((m.positions[j] - m.positions[i]) * (m.positions[l + 1] - m.positions[i + 1]) - (m.positions[l] - m.positions[i]) * (m.positions[j + 1] - m.positions[i + 1])) / 2; }
+    return t + a; }, 0);
+  assert.ok(Math.abs(top - 3545.7) < 0.5, `wall tops 3545.7 m² (got ${top})`);
+});
+
+test('사2: a floor is drawn on the parts its roads belong to, even below their scene base', () => {
+  const items = [{ b: { buildingId: '가관', baseM: 130, roofM: 160 } }, { b: { buildingId: '가관#2관', baseM: 140, roofM: 160 } }, { b: { buildingId: '가관#탑', baseM: 140, roofM: 160 } }];
+  const floor = { m: 132, name: '1층', fromTable: true, roadIds: ['r1'] };
+  assert.deepEqual(blocksOnFloor(items, floor, []).map((x) => x.b.buildingId), ['가관']);
+  assert.deepEqual(blocksOnFloor(items, floor, [{ id: 'r1', buildingId: '가관#2관' }, { id: 'r2', buildingId: '가관#탑' }]).map((x) => x.b.buildingId), ['가관', '가관#2관']);
+  assert.equal(blocksOnFloor(items, { ...floor, m: 100 }, []).length, 3, 'none spans it: all');
+});
+
+test('사2: a building whose parts have different floor tables is lifted part by part (은주관: 은주1관·은주2관)', () => {
+  const t1 = '[[131.3,137.8],["1층","3층"]]', t2 = '[[132.2,137.8],["1층","2층"]]';
+  const parts = floorParts([
+    { id: '은주관#동쪽끝', table: t2, x: 196, y: 164 }, { id: '은주관#접합부', table: t1, x: 128, y: 219 }, { id: '은주관', name: '은주1관', table: t1, x: 131, y: 264 },
+    { id: '은주관#2관', name: '은주2관', table: t2, x: 166, y: 191 }, { id: '은주관#2관-낮은단', table: null, x: 159, y: 183 }, { id: '은주관#탑', table: null, x: 132, y: 220 },
+    { id: '가관', table: t1, x: 0, y: 0 }, { id: '가관#날개', table: null, x: 5, y: 0 }, { id: '나관', table: null, x: 0, y: 0 },
+  ]);
+  assert.deepEqual(Object.fromEntries(parts), {
+    '은주관': '은주관', '은주관#접합부': '은주관', '은주관#탑': '은주관',
+    '은주관#2관': '은주관#2관', '은주관#동쪽끝': '은주관#2관', '은주관#2관-낮은단': '은주관#2관',
+    '가관': '가관', '가관#날개': '가관', '나관': '나관',
+  }, 'one table (or none): the whole building; a part without a table goes with the nearest part that has one; a part is named by its named block');
+  // the spaces of a part are carved on that part only
+  const space = parseInteriors({ features: [{ type: 'Feature', properties: { building: '은주관#2관', kind: 'corridor', name: '복도', floorsM: [137.8], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[X0, Y0], [X0 + 10, Y0], [X0 + 10, Y0 + 2], [X0, Y0 + 2]]] } }] });
+  const floors = [{ m: 137.8, name: '2층', fromTable: true, roadIds: [] }];
+  const partOf = (id: string) => parts.get(id) ?? baseBuildingId(id);
+  assert.ok(carvedFloor(space, '은주관#2관', floors, 0, [[rect(0, 0, 20, 20)]], partOf));
+  assert.equal(carvedFloor(space, '은주관', floors, 0, [[rect(0, 0, 20, 20)]], partOf), null);
 });
