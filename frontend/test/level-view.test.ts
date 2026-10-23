@@ -5,7 +5,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, carvedFloor, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
 const { parseStructures } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
@@ -215,4 +215,23 @@ test('보기 설정: 기본값, 모르는 값은 기본으로, 바꾸면 알림'
   assert.equal(viewStyle().line, 'thin');
   assert.ok(LINE_PX.thick.road > LINE_PX.normal.road && LINE_PX.normal.road > LINE_PX.thin.road);
   setViewStyle(VIEW_STYLE_DEFAULT);
+});
+
+test('사2: interiors.geojson spaces carve a floor (walls = footprint without spaces, plan-cut height)', () => {
+  const sq = (x: number, y: number, w: number, h: number) => [...rect(x, y, w, h), rect(x, y, w, h)[0]];
+  const spaces = parseInteriors({ features: [
+    { type: 'Feature', properties: { building: '가관', kind: 'corridor', name: '복도', floorsM: [100, 103.5], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(0, 4, 40, 2.4)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'elevator', name: '승강기', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(50, 0, 2, 2)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'nope', floorsM: [100] }, geometry: { type: 'Polygon', coordinates: [sq(0, 0, 1, 1)] } },
+  ] });
+  assert.equal(spaces.length, 2);
+  const floors = [{ m: 100, name: '1층', fromTable: true, roadIds: [] }, { m: 101.5, name: '2층', fromTable: true, roadIds: [] }, { m: 103.5, name: '3층', fromTable: true, roadIds: [] }, { m: 120, name: '5층', fromTable: true, roadIds: [] }];
+  const footprint = [[rect(0, 0, 40, 10)]];
+  const one = carvedFloor(spaces, '가관', floors, 0, footprint)!;
+  assert.equal(one.spaces.length, 1, 'the elevator lies outside the footprint: clipped away');
+  assert.ok(Math.abs(polygonArea(one.walls[0]) + polygonArea(one.walls[1] ?? []) - (400 - 96)) < 0.5, 'walls = 400 m² - corridor 96 m²');
+  assert.equal(one.wallM, 1.2, 'low storey: 0.3 m below the next floor');
+  assert.equal(carvedFloor(spaces, '가관', floors, 2, footprint)!.wallM, INTERIOR.wallM);
+  assert.equal(carvedFloor(spaces, '가관', floors, 1, footprint), null, 'no space on that floor: not carved');
+  assert.equal(carvedFloor(spaces, '나관', floors, 0, footprint), null);
 });

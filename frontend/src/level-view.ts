@@ -8,7 +8,8 @@
 //    where level indoor roads actually are. A floor is only named when a road says so (levelId or its name).
 //    Nothing is invented: a table floor without a name stays a height.
 //  - explode(): the height map that pulls the floors of a building apart;
-//  - the first-person walk (first-person.ts): which surface is under the feet.
+//  - the first-person walk (first-person.ts): which surface is under the feet;
+//  - 사2: the inside of a building (interiors.geojson, from the notes' 실내_구조): the empty spaces carved out of a floor.
 import { floorFromLevelId } from './floor-colors';
 import { polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import { isUnderground, isUndergroundArea } from './road-surface';
@@ -683,4 +684,48 @@ export function trackRuns(spots: TrackSpot[]): TrackSpot[][] {
     if (last && last[last.length - 1].index === s.index - 1 && last[0].sure === s.sure) last.push(s); else runs.push([s]);
   }
   return runs;
+}
+
+// ---------- 사2: the inside of a building, carved (interiors.geojson) ----------
+export type InteriorKind = 'corridor' | 'lobby' | 'link' | 'stair' | 'elevator';
+/** An empty space of a building (corridor, lobby, link, stairwell, elevator shaft) on the floors of the note it names. */
+export type Interior = { building: string; kind: InteriorKind; name: string; floorsM: number[]; grade: string; polygons: Polygon[] };
+export const INTERIOR = {
+  /** How high the walls of a carved floor stand (a plan cut: an oblique view still sees into the corridors). */
+  wallM: 2.0,
+  /** ... and never higher than this below the next floor up. */
+  belowNextM: 0.3,
+  /** The lowest wall drawn. */
+  minWallM: 0.8,
+};
+const KINDS: InteriorKind[] = ['corridor', 'lobby', 'link', 'stair', 'elevator'];
+
+/** The spaces of interiors.geojson; a feature that is not a usable polygon is left out. */
+export function parseInteriors(fc: any): Interior[] {
+  const out: Interior[] = [];
+  for (const f of Array.isArray(fc?.features) ? fc.features : []) {
+    const p = f?.properties ?? {};
+    const coords: unknown = f?.geometry?.type === 'Polygon' ? [f.geometry.coordinates] : f?.geometry?.type === 'MultiPolygon' ? f.geometry.coordinates : null;
+    if (!Array.isArray(coords) || typeof p.building !== 'string' || !KINDS.includes(p.kind) || !Array.isArray(p.floorsM)) continue;
+    const polygons = (coords as number[][][][]).map((poly) => poly.map((ring) => open(ring.map((c) => [c[0], c[1]])))).filter((poly) => poly.length && poly[0].length >= 3);
+    const floorsM = (p.floorsM as unknown[]).filter((m): m is number => typeof m === 'number' && Number.isFinite(m));
+    if (polygons.length && floorsM.length) out.push({ building: p.building, kind: p.kind, name: String(p.name ?? ''), floorsM, grade: String(p.grade ?? ''), polygons });
+  }
+  return out;
+}
+
+/**
+ * Floor i of a building carved: the walls left standing (the footprint without the spaces of that floor, clipped to the
+ * footprint), how high they stand, and the spaces (clipped to the footprint) to outline. null when no space of the
+ * building lies on that floor (the plate is drawn as before).
+ */
+export function carvedFloor(interiors: Interior[], buildingId: string, floors: Floor[], i: number, footprint: Polygon[]): { walls: Polygon[]; wallM: number; spaces: { space: Interior; polygons: Polygon[] }[] } | null {
+  const floor = floors[i];
+  if (!floor || !footprint.length) return null;
+  const here = interiors.filter((s) => baseBuildingId(s.building) === buildingId && s.floorsM.some((m) => Math.abs(m - floor.m) <= LEVEL_VIEW.floorMatchM && floorIndexAt(floors, m) === i));
+  const spaces = here.map((space) => ({ space, polygons: polygonOps('both', space.polygons, footprint) })).filter((s) => s.polygons.length);
+  if (!spaces.length) return null;
+  const next = floors[i + 1];
+  const wallM = Math.max(INTERIOR.minWallM, Math.min(INTERIOR.wallM, next ? next.m - floor.m - INTERIOR.belowNextM : INTERIOR.wallM));
+  return { walls: polygonOps('minus', footprint, spaces.flatMap((s) => s.polygons)), wallM, spaces };
 }
