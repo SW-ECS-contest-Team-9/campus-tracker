@@ -385,9 +385,11 @@ test('Q01: 기단 속으로 오르는 계단은 기단을 파고 오른다(묻�
   const step = (id: string, y: number, topM: number, type = 'stair_step') => ({ id, file: '', role: 'box', type, polygon: sq(4, y, 6, y + 0.3), bottomM: 0, topM, estimated: true, props: {} }) as any;
   const wells = stairWells(platform, [step('out', -1, 1), step('low', 1, 1.5), step('mid', 1.3, 2.5), step('top', 1.6, 3), step('wall', 2, 1, 'wall'), platform]);
   assert.deepEqual(wells.map((w: any) => w[0][0][1]), [1, 1.3]);
-  // 실제 파일: 문예관 기단 옆 계단(G02-PODIUM-STAIR)이 기단(138.8 m) 속에 든 단은 전부 판다
+  // 실제 파일(X36, 2026-10-23): 북악관·문예관 사이 계단은 문예관 기단(138.8 m)에서 계단 자리를 판 뒤 그 바닥 기단 위에 선다 -> 기단 속에 묻힌 단이 없다
   const { solids } = parseStructures('g02', JSON.parse(fs.readFileSync(new URL('../public/structures/g02-way.geojson', import.meta.url), 'utf8')));
   const podium = solids.find((s: any) => s.id === 'G02-PLATFORM-PODIUM');
-  const inside = solids.filter((s: any) => s.stair === 'G02-PODIUM-STAIR' && s.topM < 138.8 - 0.05 && polygonContains((s.polygon[0][0][0] + s.polygon[0][2][0]) / 2, (s.polygon[0][0][1] + s.polygon[0][2][1]) / 2, podium.polygon));
-  assert.ok(inside.length > 5 && stairWells(podium, solids).length >= inside.length, `${inside.length}`);
+  const x36 = parseStructures('x36', JSON.parse(fs.readFileSync(new URL('../public/structures/x36-remaining.geojson', import.meta.url), 'utf8'))).solids;
+  const steps = x36.filter((s: any) => /^X36-PODIUM-STAIR-[LU]\d+$/.test(s.id));
+  const buried = steps.filter((s: any) => polygonContains((s.polygon[0][0][0] + s.polygon[0][2][0]) / 2, (s.polygon[0][0][1] + s.polygon[0][2][1]) / 2, podium.polygon));
+  assert.ok(steps.length >= 14 && buried.length === 0, `${steps.length} ${buried.length}`);
 });
