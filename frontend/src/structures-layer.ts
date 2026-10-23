@@ -11,7 +11,7 @@ import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
-import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
+import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, boxPattern, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
@@ -256,7 +256,7 @@ export class StructuresLayer {
       // No side face where a neighbouring platform stands at least as high: the face is inside that neighbour.
       const inNeighbour = (x: number, y: number, z: number) => platforms.some((o) => o !== solid && o.bottomM < z && topHeight(o)(x, y) >= z - 0.01 && this.platformPolygons.get(o)!.some((p) => polygonContains(x, y, p)));
       const { mesh, edges } = solidMesh(solid, polygons ? { polygons, bottomAt: below, top: false, hiddenSide: inNeighbour } : {});
-      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])), pattern: polygons ? undefined : STRUCTURES.boxPatterns[String(solid.props?.pattern ?? '')] });
+      this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])), pattern: polygons ? undefined : boxPattern(solid) });
       if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
       if (!polygons) continue;
       const whole = polygons.reduce((sum, q) => sum + polygonArea(q), 0);
@@ -450,7 +450,7 @@ export class StructuresLayer {
     if (!s) return null;
     const p = s.props;
     const text = (v: unknown) => (v === undefined || v === null ? '–' : String(v));
-    const kind: Record<string, string> = { platform: '기단(땅 덩어리)', void: '빈 곳(지하 공간)', stair_step: '계단 단', landing: '참·바닥', planter: '화단', wall: '벽·옹벽·난간', deck: '데크(뜬 판)', canopy: '차양·지붕', barrier: '차단기' };
+    const kind: Record<string, string> = { platform: '기단(땅 덩어리)', void: '빈 곳(지하 공간)', stair_step: '계단 단', landing: '참·바닥', planter: '화단', wall: '벽·옹벽·난간', deck: '데크(뜬 판)', canopy: '차양·지붕', barrier: '차단기', surface: '지표면(재질 면)', curb: '경계석' };
     const top = topHeight(s);
     const heights = s.profile
       ? `윗면 ${Math.min(...s.profile.points.map((q) => q[1])).toFixed(2)} → ${s.topM.toFixed(2)} m (기운 면), 바닥 ${s.bottomM.toFixed(2)} m`
@@ -461,6 +461,7 @@ export class StructuresLayer {
       ['근거 등급', `${text(p.grade)}${s.estimated && !String(p.grade ?? '').includes('추정') ? ' · 추정 포함' : ''}`],
     ];
     if (num(p.riseM) || num(p.runM) || num(p.widthM)) rows.push(['단 치수', `한 단 ${text(p.riseM)} m · 디딤 ${text(p.runM)} m · 폭 ${text(p.widthM)} m`]);
+    if (p.surface) rows.push(['재질', `${text(p.surface)}${num(p.areaM2) ? ` · ${p.areaM2} ㎡` : ''}${p.name ? ` · ${text(p.name)}` : ''}`]);
     if (p.basePlane) rows.push(['얹힌 면', text(p.basePlane)]);
     if (p.bottomNote) rows.push(['바닥', text(p.bottomNote)]);
     if (p.assumption) rows.push(['가정', text(p.assumption)]);
