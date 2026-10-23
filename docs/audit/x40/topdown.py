@@ -10,8 +10,10 @@ plt.rcParams['font.family'] = 'Malgun Gothic'; plt.rcParams['axes.unicode_minus'
 HERE = pathlib.Path(__file__).parent
 import os
 _A = 'C:/campus-tracker-backend/데이터/보완자료/학교-전경-20261022/항공/'
-IMG = _A + os.environ.get('IMG', '사용자표시-한림관북쪽-화단.webp')   # 다른 바탕: IMG=그림 이름(georef-more.json 에 있는 것)
-M = np.array(json.loads((HERE / 'georef-more.json').read_text(encoding='utf-8'))[os.environ['IMG']]['M'] if os.environ.get('IMG') else json.loads((HERE / 'georef.json').read_text(encoding='utf-8'))['M'])
+IMG = _A + os.environ.get('IMG', '사용자표시-한림관북쪽-화단.webp')   # 다른 바탕: IMG=그림 이름(georef-more.json 에 있는 것) 또는 d23(항공-대일관앞-원본, D23 변환)
+MD23 = [[0.06406216770736912, 0.00048373671647442245], [0.00037821296498918855, -0.061974081796051905], [201121.09622608882, 557346.6850637228]]
+if os.environ.get('IMG') == 'd23': IMG = _A + '../항공-대일관앞-원본.webp'; M = np.array(MD23)
+else: M = np.array(json.loads((HERE / 'georef-more.json').read_text(encoding='utf-8'))[os.environ['IMG']]['M'] if os.environ.get('IMG') else json.loads((HERE / 'georef.json').read_text(encoding='utf-8'))['M'])
 TITLE = os.environ.get('TITLE')
 BX = tuple(float(v) for v in sys.argv[6:10]) if len(sys.argv) > 9 else (201128, 201185, 557288, 557325)
 res = 0.05
@@ -45,7 +47,7 @@ def draw(ax, sdir, roads, title):
     ax.set_xticks(np.arange(BX[0], BX[1] + 1, 5)); ax.set_yticks(np.arange(BX[2], BX[3] + 1, 5)); ax.tick_params(labelsize=6); ax.grid(color='w', lw=0.25, alpha=0.5)
     ax.set_title(title, fontsize=10)
 fig, axs = plt.subplots(1, 2, figsize=(22, 22 * (BX[3] - BX[2]) / (BX[1] - BX[0]) / 2 + 1))
-draw(axs[0], sys.argv[1], sys.argv[3], '전')
-draw(axs[1], sys.argv[2], sys.argv[4], '후 (굵은 선 = X40 새 상자)')
+draw(axs[0], sys.argv[1], sys.argv[3], '전 (main 85472a2)')
+draw(axs[1], sys.argv[2], sys.argv[4], '후 (굵은 선 = X40 새 상자, 주황·빨강 = 시험용 DB 길)')
 fig.suptitle(TITLE or '한림관 북쪽 ~ 대일관 현관 서쪽, 북 ↑, 격자 5 m. 바탕 = 사용자 표시 항공사진(X27 사진에 특징점 906개로 맞춤). 하늘색 점선 = 기단, 분홍 = 계단·참, 초록 = 화단, 노랑 = 그 밖, 주황 = 길, 빨강 = 계단 길', fontsize=11)
 fig.tight_layout(); fig.savefig(sys.argv[5], dpi=95); print('saved', sys.argv[5])
