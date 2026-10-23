@@ -367,6 +367,16 @@ export function buildingFloors(blocks: { baseM: number; roofM: number }[], table
   });
 }
 
+/**
+ * The blocks (parts) of a building a floor is drawn on: those whose base and roof span it, and those a road of that floor
+ * belongs to (은주2관: the scene base follows the server terrain and lies above its lower floors). All when none.
+ */
+export function blocksOnFloor<T extends { b: { buildingId: string; baseM: number; roofM: number } }>(items: T[], floor: Floor, roads: { id: string; buildingId: string | null }[]): T[] {
+  const named = new Set(roads.filter((r) => floor.roadIds.includes(r.id)).map((r) => r.buildingId));
+  const here = items.filter(({ b }) => (floor.m >= b.baseM - LEVEL_VIEW.belowBaseM && floor.m < b.roofM) || named.has(b.buildingId));
+  return here.length ? here : items;
+}
+
 /** The floor a height is on (nearest within floorMatchM), or -1. */
 export function floorIndexAt(floors: Floor[], z: number): number {
   let best = -1;

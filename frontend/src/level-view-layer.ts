@@ -14,7 +14,7 @@ import type { SceneBuilding } from './api';
 import './level-view.css';
 import { declutter as keepTags, textWidth } from './label-layout';
 import {
-  FAN, INTERIOR, LEVEL_VIEW, TRACK, baseBuildingId, buildingFloors, carvedFloor, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseInteriors, parseZones, shortName, stackLiftM,
+  FAN, INTERIOR, LEVEL_VIEW, TRACK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseInteriors, parseZones, shortName, stackLiftM,
   trackOnBuilding, trackOnZone, trackRuns, zoneAt, zoneContent,
   type Floor, type Interior, type InteriorKind, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackSpot, type Zone,
 } from './level-view';
@@ -587,8 +587,7 @@ export class LevelView {
         const move = onFloor(i);
         if (i > 0) line([onFloor(i - 1)([tie[0], tie[1], floors[i - 1].m]), move([tie[0], tie[1], floor.m])], 1.5, VIEW_COLORS.leader, 0.7, true, leaders);
         if (!on && others <= 0) return;
-        let here = footprints.filter(({ b }) => floor.m >= b.baseM - LEVEL_VIEW.belowBaseM && floor.m < b.roofM);
-        if (!here.length) here = footprints;
+        const here = blocksOnFloor(footprints, floor, own);
         for (const { rings } of here) for (const ring of rings) {
           this.addSolid(on ? solid : faint, this.plate([ring], floor.m), move, { body: chosen ? '#7f9cc4' : '#aab1ba', top: floor.roadIds.length ? '#f3f5f7' : '#dfe3e8' }, on ? 255 : Math.round(255 * others));
           const edge = [...ring, ring[0]].map((p) => { const q = move([p[0], p[1], floor.m]); return [q[0], q[1], q[2] + 0.05]; });

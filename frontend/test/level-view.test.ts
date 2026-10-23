@@ -5,7 +5,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, carvedFloor, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
 const { parseStructures, solidMesh } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
@@ -245,4 +245,12 @@ test('사2: interiors.geojson spaces carve a floor (walls = footprint without sp
     let a = 0; for (let k = 0; k < m.indices.length; k += 3) { const [i, j, l] = [0, 1, 2].map((e) => m.indices[k + e] * 5); if ([i, j, l].every((q) => m.positions[q + 2] === 100)) a += Math.abs((m.positions[j] - m.positions[i]) * (m.positions[l + 1] - m.positions[i + 1]) - (m.positions[l] - m.positions[i]) * (m.positions[j + 1] - m.positions[i + 1])) / 2; }
     return t + a; }, 0);
   assert.ok(Math.abs(top - 3545.7) < 0.5, `wall tops 3545.7 m² (got ${top})`);
+});
+
+test('사2: a floor is drawn on the parts its roads belong to, even below their scene base', () => {
+  const items = [{ b: { buildingId: '가관', baseM: 130, roofM: 160 } }, { b: { buildingId: '가관#2관', baseM: 140, roofM: 160 } }, { b: { buildingId: '가관#탑', baseM: 140, roofM: 160 } }];
+  const floor = { m: 132, name: '1층', fromTable: true, roadIds: ['r1'] };
+  assert.deepEqual(blocksOnFloor(items, floor, []).map((x) => x.b.buildingId), ['가관']);
+  assert.deepEqual(blocksOnFloor(items, floor, [{ id: 'r1', buildingId: '가관#2관' }, { id: 'r2', buildingId: '가관#탑' }]).map((x) => x.b.buildingId), ['가관', '가관#2관']);
+  assert.equal(blocksOnFloor(items, { ...floor, m: 100 }, []).length, 3, 'none spans it: all');
 });
