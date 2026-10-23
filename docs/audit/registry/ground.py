@@ -17,6 +17,7 @@
 """
 import argparse, glob, json, math, pathlib, sys
 import yaml
+import shapely
 from shapely.geometry import LineString, Point, Polygon, mapping, shape
 from shapely.ops import unary_union
 from shapely.prepared import prep
@@ -105,9 +106,12 @@ def standing(platform, boxes, platforms=()):
 
 
 def clean(geom):
-    geom = geom.buffer(0)
-    parts = [p for p in getattr(geom, 'geoms', [geom]) if isinstance(p, Polygon) and p.area >= MIN_AREA]
-    return unary_union(parts).simplify(0.01, preserve_topology=True) if parts else None
+    """Valid polygons of at least MIN_AREA, simplified to 1 cm and snapped to the millimetre grid of the file (still valid after rounding)."""
+    polys = lambda g: [p for p in getattr(g, 'geoms', [g]) if isinstance(p, Polygon) and p.area >= MIN_AREA]
+    parts = polys(geom.buffer(0))
+    if not parts: return None
+    parts = polys(shapely.set_precision(unary_union(parts).simplify(0.01, preserve_topology=True), 0.001).buffer(0))
+    return shapely.set_precision(unary_union(parts), 0.001) if parts else None
 
 
 def heights(platform, lift, thickness):

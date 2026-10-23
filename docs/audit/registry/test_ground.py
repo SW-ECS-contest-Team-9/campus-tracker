@@ -49,6 +49,8 @@ class Ground(unittest.TestCase):
         self.assertEqual((p['A']['fromM'], p['A']['toM']), (100.0, 100.02))
         self.assertEqual((p['A-CURB']['fromM'], p['A-CURB']['toM']), (100.0, 100.06))
         self.assertEqual(p['A']['type'], 'surface'); self.assertEqual(p['A-CURB']['type'], 'curb')
+        from shapely.geometry import shape
+        self.assertTrue(all(shape(f['geometry']).is_valid for f in doc['features']))
 
     def test_sloping_platform_gives_lifted_profile(self):
         faces, curbs, bad, d = self.run_note([{'id': 'S', '재질': '타일', '기단': 'SLOPE', '등급': '추정'}])

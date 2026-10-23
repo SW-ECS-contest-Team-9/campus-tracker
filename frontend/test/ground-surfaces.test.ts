@@ -5,7 +5,7 @@ import { register } from 'node:module';
 import test from 'node:test';
 
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { STRUCTURES, boxPattern, parseStructures, solidColors, topHeight } = await import('../src/structures.ts');
+const { STRUCTURES, boxPattern, parseStructures, solidColors, solidMesh, surfaceSeam, topHeight } = await import('../src/structures.ts');
 const { polygonContains } = await import('../src/polygon-ops.ts');
 
 const dir = new URL('../public/structures/', import.meta.url);
@@ -90,4 +90,18 @@ test('A2 무늬: 나무 데크는 무늬를 말하지 않아도 널, 콘크리�
   assert.equal(boxPattern({ type: 'deck', props: {}, material: 'concrete' }), 0);
   assert.equal(boxPattern({ type: 'deck', props: { pattern: 'rings' }, material: 'concrete' }), 3);
   assert.equal(boxPattern({ type: 'wall', props: {}, material: 'brick' }), 0);
+});
+
+test('A2 경계선: 같은 재질·같은 높이 면끼리 맞닿은 이음매에는 선이 없고, 재질이나 높이가 다르면 있다', () => {
+  const sq = (x: number, props: Record<string, unknown>) => ({ type: 'Feature', properties: { kind: 'extrude', type: 'surface', fromM: 100, toM: 100.02, ...props },
+    geometry: { type: 'Polygon', coordinates: [[[201000 + x, 557000], [201010 + x, 557000], [201010 + x, 557010], [201000 + x, 557010], [201000 + x, 557000]]] } });
+  const fc = (features: unknown[]) => ({ type: 'FeatureCollection', features });
+  const lines = (solids: any[]) => solidMesh(solids[0]).edges.filter((e: number[][]) => !surfaceSeam(e, solids[0], solids)).length;
+  const same = parseStructures('t', fc([sq(0, { id: 'A', material: 'tile' }), sq(10, { id: 'B', material: 'tile' })])).solids;
+  const other = parseStructures('t', fc([sq(0, { id: 'A', material: 'tile' }), sq(10, { id: 'B', material: 'asphalt' })])).solids;
+  const higher = parseStructures('t', fc([sq(0, { id: 'A', material: 'tile' }), sq(10, { id: 'B', material: 'tile', fromM: 100.3, toM: 100.32 })])).solids;
+  const all = solidMesh(same[0]).edges.length;
+  assert.equal(lines(same), all - 1);
+  assert.equal(lines(other), all);
+  assert.equal(lines(higher), all);
 });

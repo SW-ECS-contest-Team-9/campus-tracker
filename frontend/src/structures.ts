@@ -456,6 +456,19 @@ export function solidColors(solid: Solid): { body: string; top: string } {
   return { body: color ?? body, top };
 }
 
+/**
+ * A2: whether a top edge of a ground surface (a → b, the surface on its left, as solidMesh gives them) is a seam inside
+ * one surface: 5 cm outside its middle lies another surface of the same material at the same height (two platforms of one
+ * plaza, two pieces of one carriageway). Such an edge is not a boundary and gets no line.
+ */
+export function surfaceSeam(edge: number[][], solid: Solid, surfaces: Solid[], toleranceM = 0.05): boolean {
+  const [a, b] = edge;
+  const length = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const x = (a[0] + b[0]) / 2 + ((b[1] - a[1]) / length) * 0.05, y = (a[1] + b[1]) / 2 - ((b[0] - a[0]) / length) * 0.05;
+  const z = (a[2] + b[2]) / 2;
+  return surfaces.some((o) => o !== solid && o.type === 'surface' && o.material === solid.material && polygonContains(x, y, o.polygon) && Math.abs(topHeight(o)(x, y) - z) <= toleranceM);
+}
+
 /** The joint pattern of a box (paving-pattern.ts kind, 0 = none): its own `pattern`, else the one of its type (A2). */
 export function boxPattern(solid: Pick<Solid, 'type' | 'props' | 'material'>): number {
   const own = STRUCTURES.boxPatterns[String(solid.props?.pattern ?? '')];

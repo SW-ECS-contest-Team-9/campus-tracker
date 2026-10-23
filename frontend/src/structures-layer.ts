@@ -11,7 +11,7 @@ import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
 import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
-import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, boxPattern, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, topHeight, topMesh, voidName, type Solid } from './structures';
+import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, boxPattern, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, surfaceSeam, topHeight, topMesh, voidName, type Solid } from './structures';
 import { setTerrainClip } from './terrain-clip';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
@@ -247,6 +247,7 @@ export class StructuresLayer {
     this.structureParts = [];
     this.edges = [];
     const below = this.ground ? (x: number, y: number) => this.ground!.height(x, y) - 0.2 : undefined;
+    const surfaces = shown.filter((s) => s.type === 'surface');
     for (const solid of shown) {
       const colors = solidColors(solid);
       const body = css(colors.body), top = css(colors.top);
@@ -257,7 +258,10 @@ export class StructuresLayer {
       const inNeighbour = (x: number, y: number, z: number) => platforms.some((o) => o !== solid && o.bottomM < z && topHeight(o)(x, y) >= z - 0.01 && this.platformPolygons.get(o)!.some((p) => polygonContains(x, y, p)));
       const { mesh, edges } = solidMesh(solid, polygons ? { polygons, bottomAt: below, top: false, hiddenSide: inNeighbour } : {});
       this.structureParts.push({ mesh, stride: SOLID_STRIDE, pick, rgb: (i, at) => (at[i * SOLID_STRIDE + 4] ? top : body.map((v) => v * at[i * SOLID_STRIDE + 3])), pattern: polygons ? undefined : boxPattern(solid) });
-      if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
+      if (STRUCTURES.outlined.includes(solid.type)) for (const e of edges) {
+        if (solid.type === 'surface' && surfaceSeam(e, solid, surfaces)) continue; // A2: no line inside one surface
+        this.edges.push({ points: e, rgb: body.map((v) => v * STRUCTURES.outlineShade) });
+      }
       if (!polygons) continue;
       const whole = polygons.reduce((sum, q) => sum + polygonArea(q), 0);
       let covered = this.drawnSurfaces.covered.map((c) => ({ rgb: css(c.color), pattern: c.pattern ?? 0, polygons: polygonOps('both', polygons, c.polygons) }))
