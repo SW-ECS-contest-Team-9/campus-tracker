@@ -146,7 +146,7 @@ private fun FloorPair(anchor: CollectionAnchor, onChange: (CollectionAnchor) -> 
 }
 
 @Composable
-private fun Picker(label: String, options: List<Pair<String, String>>, selected: String?, onSelect: (String) -> Unit) {
+internal fun Picker(label: String, options: List<Pair<String, String>>, selected: String?, onSelect: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(onClick = { open = true }, enabled = options.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {
@@ -181,5 +181,6 @@ private fun titleOf(type: EventMarkerType) = when (type) {
 private fun confirmOf(type: EventMarkerType) = when (type) {
     EventMarkerType.sessionStart -> "Start"
     EventMarkerType.sessionEnd -> "Stop"
+    EventMarkerType.routeWaypoint -> "Add"
     else -> "Mark"
 }

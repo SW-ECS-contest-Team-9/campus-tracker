@@ -1,4 +1,5 @@
 import type { AnchorFields } from '../markers/marker-anchor.js';
+import type { DeclaredRoute } from '../mobility/declared-route.js';
 import { z } from 'zod';
 import { IsoDateTime, OptionalString, SensorTimestamp, Uuid } from '../../common/dto.js';
 
@@ -20,6 +21,8 @@ export const SessionStartRequest = z.object({
   startedAt: SensorTimestamp.nullish(),
   /** alias of startedAt */
   clientStartedAt: SensorTimestamp.nullish(),
+  /** Optional declared route (mobility/declared-route.ts); validated separately so a bad route never blocks raw capture. */
+  declaredRoute: z.unknown().nullish(),
 });
 export type SessionStartRequest = z.infer<typeof SessionStartRequest>;
 
@@ -104,6 +107,10 @@ export interface SessionView {
   status: SessionStatus;
   spatialMapVersionId: string | null;
   sensorCapabilities: Record<string, unknown>;
+  /** the path the collector declared before walking ({ nodeKeys, segments, text }), null when none */
+  declaredRoute: DeclaredRoute | null;
+  declaredRouteStatus: 'NONE' | 'ACCEPTED' | 'REJECTED';
+  declaredRouteReason: string | null;
   locationCount: number;
   markerCount: number;
   /** compact marker list for the training label (decorate() replaces it with trainingLabel) */

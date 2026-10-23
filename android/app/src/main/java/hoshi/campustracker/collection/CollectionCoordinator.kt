@@ -14,6 +14,8 @@ import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.LocationFix
 import hoshi.campustracker.model.MotionSamplingRate
+import hoshi.campustracker.model.PlannedRoute
+import hoshi.campustracker.model.RouteRules
 import hoshi.campustracker.model.SampleCounts
 import hoshi.campustracker.model.SensorCapabilities
 import hoshi.campustracker.persistence.ActiveCollectionState
@@ -89,6 +91,10 @@ data class CollectorUiState(
     val openVerticalAnchor: CollectionAnchor? = null,
     /** The barometer moved more than 3 m since the last vertical anchor with no stairs/elevator marker open. */
     val verticalReminder: Boolean = false,
+    /** declared route progress: index of the last point reached (0 = the start) */
+    val routeReached: Int = 0,
+    /** "여기서 벗어남" marks in this session */
+    val routeDeviations: Int = 0,
     /** Publish time; makes every 0.5 s snapshot distinct so "last x.xs ago" stays current. */
     val publishedAtMs: Long = 0,
 ) {
@@ -156,6 +162,8 @@ class CollectionCoordinator(
     private var openVerticalAnchor: CollectionAnchor? = null
     /** relative altitude at the last vertical anchor (start, stair/elevator/ramp end, entrance) */
     private var verticalReference: Double? = null
+    private var routeReached = 0
+    private var routeDeviations = 0
     /**
      * Sensor run generation: every start and stop moves it on, and a callback registered for an older run is dropped,
      * so a late callback after Stop never lands in the next session (2026-10-14 tracking correction, T3).
@@ -179,7 +187,10 @@ class CollectionCoordinator(
 
     // ---- public API ----
 
-    /** [startAnchor]: where the collector stands (node, building, floor), recorded as the sessionStart marker. */
+    /**
+     * [startAnchor]: where the collector stands (node, building, floor), recorded as the sessionStart marker.
+     * [route]: the declared route (sent with session:start); without a [startAnchor] its first point is the start anchor.
+     */
     fun startSession(
         collectorId: String,
         owner: UploadOwner,
@@ -187,6 +198,7 @@ class CollectionCoordinator(
         locationProfile: LocationCollectionProfile,
         distanceFilter: Double,
         startAnchor: CollectionAnchor? = null,
+        route: PlannedRoute? = null,
     ) {
         val startedAt = clock.nowMs() // the moment Start was pressed; fixed for every re-send
         executor.post {
@@ -199,10 +211,11 @@ class CollectionCoordinator(
             // The declination needs a recent position; wait briefly for it (never recorded as a sample).
             location.lastKnownPosition { position ->
                 executor.post {
-                    beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position)
+                    beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position, route)
                     val started = session
-                    if (started != null && startAnchor != null) {
-                        recordMarker(started, EventMarkerType.sessionStart, startAnchor, startedAt)
+                    val anchor = startAnchor ?: route?.let(RouteRules::startAnchor)
+                    if (started != null && anchor != null) {
+                        recordMarker(started, EventMarkerType.sessionStart, anchor, startedAt)
                         publish()
                     }
                 }
@@ -241,6 +254,40 @@ class CollectionCoordinator(
         publish()
     }
 
+    /** Declared route: the collector is at its next point (a routeWaypoint marker on that node). */
+    fun reachNextRoutePoint() = executor.post {
+        val current = session ?: return@post
+        val route = current.declaredRoute ?: return@post
+        val point = RouteRules.next(route, routeReached) ?: return@post
+        recordMarker(current, EventMarkerType.routeWaypoint, CollectionAnchor(nodeId = point.nodeId, buildingId = point.buildingId, floor = point.floor), clock.nowMs())
+        publish()
+    }
+
+    /** Declared route: "여기서 벗어남" — a routeDeviation marker at the current fix; progress is unchanged. */
+    fun markOffRoute() = executor.post {
+        val current = session ?: return@post
+        if (current.declaredRoute == null) return@post
+        recordMarker(current, EventMarkerType.routeDeviation, null, clock.nowMs())
+        routeDeviations++
+        saveRouteProgress()
+        publish()
+    }
+
+    /** Any marker standing on the route's next node (route point, entrance, stairs end, End) moves the progress on. */
+    private fun noteRoute(anchor: CollectionAnchor?) {
+        val route = session?.declaredRoute ?: return
+        val reached = RouteRules.advance(route, routeReached, anchor?.nodeId)
+        if (reached == routeReached) return
+        routeReached = reached
+        saveRouteProgress()
+    }
+
+    private fun saveRouteProgress() {
+        val r = runtime ?: return
+        runtime = r.copy(routeReached = routeReached, routeDeviations = routeDeviations)
+        persist()
+    }
+
     private fun recordMarker(current: CollectionSession, type: EventMarkerType, anchor: CollectionAnchor?, at: Long) {
         val fix = lastFix
         val marker = MarkerPayload(
@@ -255,6 +302,7 @@ class CollectionCoordinator(
         counts = counts.copy(marker = counts.marker + 1)
         trackCounts()
         noteAnchor(type, anchor)
+        noteRoute(anchor)
     }
 
     /** Keeps the current place for the pickers and the barometric reference for the stairs/elevator reminder. */
@@ -294,6 +342,8 @@ class CollectionCoordinator(
             diagnostics = recovered.diagnostics.copy(wasInterrupted = true),
         )
         resetLatest()
+        routeReached = recovered.routeReached
+        routeDeviations = recovered.routeDeviations
         repository.update(resumed)
         // Same clientSessionId and startedAt: the server returns the existing session (resumed: true).
         sync.start(startPayload(resumed), owner)
@@ -388,6 +438,7 @@ class CollectionCoordinator(
         distanceFilter: Double,
         startedAt: Long,
         position: KnownPosition?,
+        route: PlannedRoute?,
     ) {
         starting = false
         if (session != null) return
@@ -403,6 +454,7 @@ class CollectionCoordinator(
             deviceModel = device.deviceModel,
             systemVersion = device.systemVersion,
             sensorCapabilities = capabilities,
+            declaredRoute = route?.takeIf(RouteRules::isComplete),
         )
         session = created
         counts = SampleCounts()
@@ -650,11 +702,14 @@ class CollectionCoordinator(
         openVertical = null
         openVerticalAnchor = null
         verticalReference = null
+        routeReached = 0
+        routeDeviations = 0
     }
 
     private fun startPayload(s: CollectionSession) = SessionStartPayload(
         clientSessionId = s.id, deviceId = s.deviceId, deviceModel = s.deviceModel, systemVersion = s.systemVersion,
         appVersion = device.appVersion, sensorCapabilities = s.sensorCapabilities, startedAt = Iso.format(s.startedAt),
+        declaredRoute = s.declaredRoute?.let(RouteRules::toWire),
     )
 
     /** iOS `detectSensorCallbackStalls`: one event per stall, re-armed when samples flow again. */
@@ -696,6 +751,7 @@ class CollectionCoordinator(
             lastPlace = lastPlace, openVertical = openVertical, openVerticalAnchor = openVerticalAnchor,
             verticalReminder = session != null && openVertical == null && verticalReference != null && latestRelativeAltitude != null &&
                 abs(latestRelativeAltitude!! - verticalReference!!) > AnchorRules.VERTICAL_REMINDER_M,
+            routeReached = routeReached, routeDeviations = routeDeviations,
             publishedAtMs = clock.nowMs(),
         )
     }

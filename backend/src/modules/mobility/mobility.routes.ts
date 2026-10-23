@@ -4,6 +4,10 @@ import { z } from 'zod';
 import { pool } from '../../config/database.js';
 import { FLOOR_NAME } from '../markers/marker-anchor.js';
 import { anchorBuildings, loadAnchorNodes, pickAnchorNodes } from './anchor-nodes.js';
+import { tmInverse } from '../../geo/tm.js';
+import { areaLinks } from '../editor-mcp/area-links.js';
+import { editorQueries, roadLength } from '../editor-mcp/editor.queries.js';
+import { DeclaredRoute, declaredPath } from './declared-route.js';
 
 export const mobilityRoutes = Router();
 
@@ -85,6 +89,34 @@ mobilityRoutes.get('/mobility/nodes', async (req, res) => {
   const { nodes, footprints } = await loadAnchorNodes(q.latitude !== undefined ? { latitude: q.latitude, longitude: q.longitude! } : null);
   res.setHeader('Cache-Control', 'no-cache');
   res.json({ buildings: anchorBuildings(nodes, footprints), nodes: pickAnchorNodes(nodes, q) });
+});
+
+// POST /api/v1/mobility/declared-route { nodeKeys, segments?, text?, mode?, assumeUnknownAllowed? } — the declared route
+// (session:start declaredRoute) drawn on the active road graph: the shortest path through the points, leg by leg, for
+// display and validation. Open areas count as walkable (as in check_reachability). Unknown access counts as passable by
+// default: the collector says they walk it. Read-only, no auth (like /mobility/nodes).
+const DeclaredRouteQuery = z.object({
+  route: DeclaredRoute,
+  mode: z.enum(['pedestrian', 'vehicle', 'wheelchair']).default('pedestrian'),
+  assumeUnknownAllowed: z.boolean().default(true),
+});
+
+mobilityRoutes.post('/mobility/declared-route', async (req, res) => {
+  const { mode, assumeUnknownAllowed, ...rest } = (req.body ?? {}) as Record<string, unknown>;
+  const q = DeclaredRouteQuery.parse({ route: rest, mode, assumeUnknownAllowed });
+  const [roads, nodes, areas] = await Promise.all([editorQueries.roads(), editorQueries.nodes(), editorQueries.areas()]);
+  const graph = [...roads.map((r) => ({ ...r, lengthM: roadLength(r) })), ...areaLinks(areas, nodes)];
+  const path = declaredPath(graph, nodes, q.route, q.mode, q.assumeUnknownAllowed);
+  const wgs84 = (c: number[]) => { const ll = tmInverse(c[0], c[1]); return [ll.longitude, ll.latitude, c[2] ?? null]; };
+  res.json({
+    ...path,
+    route: q.route,
+    mode: q.mode,
+    legs: path.legs.map((l) => ('coordinates' in l ? { ...l, coordinates: undefined } : l)),
+    /** EPSG:5186 [x, y, z] and WGS84 [longitude, latitude, MSL height] of the whole path */
+    coordinates: path.coordinates,
+    geometry: { type: 'LineString', coordinates: path.coordinates.map(wgs84) },
+  });
 });
 
 // GET /api/v1/mobility/edits?limit=50 — latest QGIS edits (audit log)

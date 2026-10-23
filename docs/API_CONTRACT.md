@@ -126,7 +126,19 @@ Socket.IO 클라이언트 없이 표준 WebSocket(RFC 6455)으로 붙는 경로.
 - 같은 `clientSessionId` 재전송 → 기존 세션 반환 (idempotent).
 - `strideCalibration`은 선택 입력이다. 서버가 평지 보폭 요약을 검사해 세션 시작 시 고정하며 오류·누락·오래된 자료는 fallback 처리한다. 같은 `clientSessionId` 재전송은 최초 결정을 유지한다. 성공 ACK의 `strideCalibration.status/reason`은 `ACCEPTED` 또는 `FALLBACK` 판정이다. `ACCEPTED`는 모든 걸음에 적용됐다는 뜻이 아니다.
 - 같은 device의 다른 ACTIVE 세션은 `INTERRUPTED`로 바뀜 (앱 크래시 후 새 세션 대비).
-- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE", "resumed": false, "supportedTelemetryFeatures": ["absoluteAltitudeV1"] }`
+- `declaredRoute`는 **선택(추가 필드, 2026-10-23)**: 걷기 전에 수집자가 밝힌 경로(사용자 지정 길). 세션의 정답 경로로 저장한다.
+  ```json
+  "declaredRoute": { "nodeKeys": ["start-node-uuid", "via-node-uuid", "end-node-uuid"],
+    "segments": [ { "mode": "stairs", "direction": "up", "fromFloor": "1F", "toFloor": "3F" }, { "mode": "walk" } ],
+    "text": "본관 1F 정문 → 계단 상행 1F→3F → 3F 복도" }
+  ```
+  - `nodeKeys`: 도로망 노드 id(`GET /api/v1/mobility/nodes`의 `nodeId`)를 걷는 순서대로, 2–50개. 첫째 = 시작 기준점, 마지막 = 끝 기준점.
+  - `segments[i]`: `nodeKeys[i]` → `nodeKeys[i+1]` 구간을 어떻게 가는지. `mode` `walk`(기본) · `stairs`(`direction` `up`/`down` 필수, 층 선택) · `elevator`(`fromFloor`·`toFloor` 필수). 층 이름은 marker와 같은 `1F`/`B1` 규칙. 개수는 구간 수 이하, 빠진 구간은 `walk`.
+  - `text`: 사람이 읽을 설명(선택, 500자).
+  - 잘못된 경로는 세션 시작을 막지 않는다: 버리고(`declaredRoute: null`) 이유를 남긴다. ACK의 `declaredRoute: { status: "NONE" | "ACCEPTED" | "REJECTED", reason }`. 같은 `clientSessionId` 재전송은 저장된 경로가 없을 때만 채우고, 있으면 그대로 둔다.
+  - 앱: Android 1.2가 보낸다. iOS는 아직 보내지 않는다(이 계약만 정해 둠: 같은 필드를 그대로 보내면 된다).
+  - 걷는 중: 경유점 도착은 marker `routeWaypoint`(그 점의 `nodeId`·`buildingId`·`floor`), 경로에서 벗어난 곳은 marker `routeDeviation`(노드 없음, 그때 위치)으로 보낸다. 둘 다 일반 marker이며 `nodeId`가 있는 `routeWaypoint`는 다른 기준점 marker처럼 fusion 위치 고정점이 된다.
+- ACK `{ "ok": true, "sessionId": "server-uuid", "clientSessionId": "...", "startedAt": "...", "status": "ACTIVE", "resumed": false, "supportedTelemetryFeatures": ["absoluteAltitudeV1"], "declaredRoute": { "status": "NONE", "reason": null } }`
 - `supportedTelemetryFeatures`는 서버가 저장하는 선택 스트림 목록이다. 새 세션과 재전송(`resumed: true`) 응답 모두 포함한다. 목록에 없는 선택 스트림은 보내지 않는다(구서버는 모르는 필드를 버리고 ACK만 성공시킨다).
 - 에러: `DEVICE_MISMATCH`(403), `SESSION_CONFLICT`(409, 다른 collector가 쓴 clientSessionId)
 
@@ -226,12 +238,13 @@ Motion / altimeter / pedometer raw data는 preview로 보내지 않는다.
 | `GET /api/v1/collectors/:collectorId` | 삭제 전 확인용 요약 `{ collectorId, createdAt, deviceCount, sessionCount, activeSessionCount, locationCount, markerCount }` |
 | `DELETE /api/v1/collectors/:collectorId` | body `{ "confirmText": "제거하겠습니다." }` 필수 (정확히 일치, 아니면 400 `CONFIRMATION_REQUIRED`). ID와 기기·세션·모든 원본 데이터를 영구 삭제하고 연결된 iPhone socket을 끊음 (재연결 시 `DEVICE_NOT_FOUND`) |
 | `GET /api/v1/sessions?collectorId=C03&status=ACTIVE&limit=50` | 최신순 `SessionView[]` (limit 1–500, 기본 50) |
-| `GET /api/v1/sessions/:sessionId` | `SessionView` |
+| `GET /api/v1/sessions/:sessionId` | `SessionView` (+ raw 통계·finalization). `declaredRoute`(저장된 `{ nodeKeys, segments, text }` 또는 `null`), `declaredRouteStatus`, `declaredRouteReason` 포함(목록도 같음) |
 | `GET /api/v1/sessions/:sessionId/locations` | sequence 순 전체 point |
 | `POST /api/v1/sessions/:sessionId/interrupt` | 수동 인터럽트: ACTIVE → INTERRUPTED 후 최종 재처리. 허용 조건은 `SessionView.manualInterruptBlock === null` — ACTIVE이고, collector 소켓이 끊겨 있고, `syncState`가 `OFFLINE`(최근 수신 없음)일 때만. 아니면 409 `INTERRUPT_NOT_ACTIVE` / `INTERRUPT_COLLECTOR_CONNECTED` / `INTERRUPT_RECENTLY_RECEIVED`. 원시 데이터는 지우지 않고, 이후 올라오는 데이터는 늦은 업로드로 저장되어 다시 최종화된다. 폰에는 알리지 않는다. 추적 이벤트 `SERVER_MANUAL_INTERRUPT` |
 | `GET /api/v1/sessions/:sessionId/diagnostic-events` | 폰 수명주기 이벤트 + 서버 추적(`SERVER_*`, `source: "server"`)을 시각순으로. 서버 추적: `SERVER_FINISH_RECEIVED`(`duplicate`, `manifest`, `finalReplay`), `SERVER_SYNC_COMPLETE_RECEIVED`(`synchronized`, `behind`), `SERVER_FINALIZE_COMPLETED`(`runId`, `outputs`), `SERVER_FINALIZE_FAILED`(`message`). 분석용이며 fusion 입력이 아님 |
 | `GET /api/v1/sessions/:sessionId/markers` | timestamp 순 marker. 기준점 칸과 `node{x, y, z, current}`(EPSG:5186, 바닥 MSL 높이, `current=false`는 지금은 없는 노드의 저장 당시 위치), `fused`(fusion-v4 궤적에 맞춘 위치·높이) 포함 |
 | `GET /api/v1/mobility/nodes?buildingId=&floor=&latitude=&longitude=&limit=50&includeUnknownFloor=true` | 기준점으로 고를 노드(인증 없음). `{ buildings: [{ buildingId, buildingName, nodeCount, floorsWithNodes }], nodes: [{ nodeId, kind, buildingId, floor, structures, label, latitude, longitude, heightM, distanceM }] }`. 건물은 길의 `building_id` → 노드가 든 건물 윤곽 → `outdoor` 순. 층은 노드·길의 `levelId`에서 읽고(`3층`→`3F`), 모르면 `null`. 층을 주면 그 층 노드 먼저, 다음에 층 모르는 노드(끄려면 `includeUnknownFloor=false`), 각각 가까운 순 |
+| `POST /api/v1/mobility/declared-route` | 밝힌 경로를 지금 도로망 위에 그린다(표시·검증용, 인증 없음, 읽기 전용). body = `declaredRoute`와 같은 `{ nodeKeys, segments?, text? }` + 선택 `mode`(`pedestrian` 기본 · `vehicle` · `wheelchair`), `assumeUnknownAllowed`(기본 `true`: 수집자가 걸었다고 밝힌 길이라 접근 `unknown`도 지나감). 구간마다 최단 경로(넓은 영역은 `check_reachability`처럼 걸을 수 있는 면). 응답 `{ reachable, lengthM, legs: [{ index, fromNodeId, toNodeId, segment, reachable, lengthM, roads: [{ roadId, name, structure, lengthM }], warnings } \| { …, reachable: false, reason: "NODE_NOT_IN_NETWORK" \| "NOT_CONNECTED" }], coordinates: [[x, y, z]](EPSG:5186), geometry: GeoJSON LineString(WGS84, [경도, 위도, MSL 높이]) }`. 경고: `DECLARED_STAIRS_NOT_ON_PATH` · `DECLARED_ELEVATOR_NOT_ON_PATH`(밝힌 계단·승강기가 최단 경로에 없음), `UNDECLARED_ELEVATOR_ON_PATH`, `SAME_NODE`. 경로·도로망은 바꾸지 않는다 |
 | `GET /api/v1/sessions/:sessionId/fused-positions?algorithmVersion=fusion-v1` | fusion 결과, timestamp/fusionSequence 순 (기본 version = realtime version). v3.1은 최초 앵커 전까지 위치 출력을 만들지 않으며 상태·판정 이력은 `fusion-events`에서 조회 |
 | `GET /api/v1/sessions/:sessionId/fusion` | 저장된 version별 개수/기간, version별 최신 `fusion_runs`(metrics 포함), realtime state 요약 |
 | `GET /api/v1/sessions/:sessionId/fusion-events?algorithmVersion=fusion-v3.1` | 센서 추적 상태 변화, GPS 앵커 판정, 재획득 사유 등 위치 출력이 없어도 남는 진단 이력 |
