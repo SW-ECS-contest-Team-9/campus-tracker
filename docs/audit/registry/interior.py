@@ -5,7 +5,7 @@ building_registry.py 가 부른다(write·check 에 함께 들어간다). 노트
     기본값: {복도_폭: m, 계단_폭: m, 승강기: [가로, 세로], 방향: 도(가로 변이 동쪽에서 반시계로 돈 각), 등급}
     공간:
       - {종류: 복도|로비|연결|계단실|승강기, 이름, 층: [층_바닥_높이.층 의 이름, ...], 등급, 출처(없어도 됨), 길: [실내 길 id 앞 8자리, ...](없어도 됨),
-         층_표: 층_바닥_높이 안의 표 이름(은주1관 등. 동에 표가 여럿일 때. 없으면 동의 표),
+         층_표: 층_바닥_높이 안의 표 이름(은주1관 등. 동에 표가 여럿일 때. 없으면 동의 표. 그 표를 창에 쓰는 겉모습의 첫 대상이 building),
          모양은 셋 중 하나:
            선: [[x, y], ...] + 폭(없으면 복도·로비·연결은 복도_폭, 계단실은 계단_폭)   # 토막마다 끝을 폭의 반만큼 늘린 띠
            외곽: [[x, y], ...]                                                          # 다각형(닫지 않아도 됨)
@@ -66,6 +66,14 @@ def scene_id(head):
     return str(added or ((head.get('모델_id') or {}).get('서버_건물_id')) or head.get('이름')).split(' ')[0]
 
 
+def part_of(head, table):
+    """The scene part of a named floor table: the first 대상 of the 겉모습 whose 창 uses it (은주2관 -> 은주관#2관), else None."""
+    if not table: return None
+    for e in head.get('겉모습') or []:
+        if isinstance(e, dict) and (e.get('창') or {}).get('층_표') == table and e.get('대상'): return str(e['대상'][0])
+    return None
+
+
 def from_note(head):
     """(features, problems) of the note's 실내_구조; ([], []) when it has none."""
     s = head.get('실내_구조')
@@ -107,7 +115,7 @@ def from_note(head):
             polys = [box(it['중심'], size, float(deg))]
         else:
             problems.append(f'{at}: 모양(선 / 외곽 / 중심) 이 없다'); continue
-        props = {'building': building, 'kind': kind, 'name': it.get('이름'), 'floors': [str(f) for f in floors], 'floorsM': [table[str(f)] for f in floors],
+        props = {'building': part_of(head, it.get('층_표')) or building, 'kind': kind, 'name': it.get('이름'), 'floors': [str(f) for f in floors], 'floorsM': [table[str(f)] for f in floors],
                  'grade': g, **({'source': it['출처']} if it.get('출처') else {}), **({'roads': [str(r) for r in it['길']]} if it.get('길') else {})}
         geometry = {'type': 'Polygon', 'coordinates': polys[0]} if len(polys) == 1 else {'type': 'MultiPolygon', 'coordinates': polys}
         out.append({'type': 'Feature', 'properties': props, 'geometry': geometry})

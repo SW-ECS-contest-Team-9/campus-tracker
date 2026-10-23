@@ -307,6 +307,27 @@ export function lowestTop(solid: Pick<Solid, 'topM' | 'profile'>): number {
 /** The building a scene block or a road belongs to: the id before '#' ("은주관#접합부" is part of "은주관"). */
 export const baseBuildingId = (id: string) => id.split('#')[0];
 
+/**
+ * What is lifted together (scene block id -> part id): a building, or, when its blocks carry different floor tables of the note
+ * (은주관: 은주1관·은주2관, 겉모습.창.층_표), one part per table, each with its own floors. `table` is the block's table
+ * (any key that is equal for the same table), null without one: such a block goes with the nearest block (centre) that has one.
+ * A part's id is the building id for the part that holds that block, else the first of its blocks.
+ */
+export function floorParts(blocks: { id: string; table: string | null; x: number; y: number }[]): Map<string, string> {
+  const out = new Map<string, string>();
+  const byBuilding = new Map<string, typeof blocks>();
+  for (const b of blocks) byBuilding.set(baseBuildingId(b.id), [...(byBuilding.get(baseBuildingId(b.id)) ?? []), b]);
+  for (const [id, list] of byBuilding) {
+    const tabled = list.filter((b) => b.table !== null);
+    if (new Set(tabled.map((b) => b.table)).size < 2) { for (const b of list) out.set(b.id, id); continue; }
+    const tableOf = (b: (typeof list)[number]) => b.table ?? tabled.reduce((a, c) => (Math.hypot(c.x - b.x, c.y - b.y) < Math.hypot(a.x - b.x, a.y - b.y) ? c : a)).table!;
+    const partOf = new Map<string, string>();
+    for (const b of [...list].sort((a, c) => Number(c.id === id) - Number(a.id === id))) if (!partOf.has(tableOf(b))) partOf.set(tableOf(b), b.id);
+    for (const b of list) out.set(b.id, partOf.get(tableOf(b))!);
+  }
+  return out;
+}
+
 /** The floor a text names first: "지하 1층" / "B1" -> -1, "3층" / "3F" -> 3; null when it names none. */
 export function floorInText(text: string | null | undefined): number | null {
   if (!text) return null;
@@ -730,10 +751,10 @@ export function parseInteriors(fc: any): Interior[] {
  * building lies on that floor (the plate is drawn as before). Only the footprint pieces a space reaches get walls: a part
  * with no space on that floor (은주관: 1관 and 2관 have floors at different heights) stays a plain plate.
  */
-export function carvedFloor(interiors: Interior[], buildingId: string, floors: Floor[], i: number, footprint: Polygon[]): { walls: Polygon[]; wallM: number; spaces: { space: Interior; polygons: Polygon[] }[] } | null {
+export function carvedFloor(interiors: Interior[], buildingId: string, floors: Floor[], i: number, footprint: Polygon[], partOf: (id: string) => string = baseBuildingId): { walls: Polygon[]; wallM: number; spaces: { space: Interior; polygons: Polygon[] }[] } | null {
   const floor = floors[i];
   if (!floor || !footprint.length) return null;
-  const here = interiors.filter((s) => baseBuildingId(s.building) === buildingId && s.floorsM.some((m) => Math.abs(m - floor.m) <= LEVEL_VIEW.floorMatchM && floorIndexAt(floors, m) === i));
+  const here = interiors.filter((s) => partOf(s.building) === buildingId && s.floorsM.some((m) => Math.abs(m - floor.m) <= LEVEL_VIEW.floorMatchM && floorIndexAt(floors, m) === i));
   const spaces = here.map((space) => ({ space, polygons: polygonOps('both', space.polygons, footprint) })).filter((s) => s.polygons.length);
   if (!spaces.length) return null;
   const next = floors[i + 1];

@@ -5,7 +5,7 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, floorParts, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
 const { parseStructures, solidMesh } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
@@ -253,4 +253,24 @@ test('사2: a floor is drawn on the parts its roads belong to, even below their 
   assert.deepEqual(blocksOnFloor(items, floor, []).map((x) => x.b.buildingId), ['가관']);
   assert.deepEqual(blocksOnFloor(items, floor, [{ id: 'r1', buildingId: '가관#2관' }, { id: 'r2', buildingId: '가관#탑' }]).map((x) => x.b.buildingId), ['가관', '가관#2관']);
   assert.equal(blocksOnFloor(items, { ...floor, m: 100 }, []).length, 3, 'none spans it: all');
+});
+
+test('사2: a building whose parts have different floor tables is lifted part by part (은주관: 은주1관·은주2관)', () => {
+  const t1 = '[[131.3,137.8],["1층","3층"]]', t2 = '[[132.2,137.8],["1층","2층"]]';
+  const parts = floorParts([
+    { id: '은주관', table: t1, x: 131, y: 264 }, { id: '은주관#2관', table: t2, x: 166, y: 191 }, { id: '은주관#2관-낮은단', table: null, x: 159, y: 183 },
+    { id: '은주관#탑', table: null, x: 132, y: 220 }, { id: '은주관#접합부', table: t1, x: 128, y: 219 }, { id: '은주관#동쪽끝', table: t2, x: 196, y: 164 },
+    { id: '가관', table: t1, x: 0, y: 0 }, { id: '가관#날개', table: null, x: 5, y: 0 }, { id: '나관', table: null, x: 0, y: 0 },
+  ]);
+  assert.deepEqual(Object.fromEntries(parts), {
+    '은주관': '은주관', '은주관#접합부': '은주관', '은주관#탑': '은주관',
+    '은주관#2관': '은주관#2관', '은주관#동쪽끝': '은주관#2관', '은주관#2관-낮은단': '은주관#2관',
+    '가관': '가관', '가관#날개': '가관', '나관': '나관',
+  }, 'one table (or none): the whole building; a part without a table goes with the nearest part that has one');
+  // the spaces of a part are carved on that part only
+  const space = parseInteriors({ features: [{ type: 'Feature', properties: { building: '은주관#2관', kind: 'corridor', name: '복도', floorsM: [137.8], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[X0, Y0], [X0 + 10, Y0], [X0 + 10, Y0 + 2], [X0, Y0 + 2]]] } }] });
+  const floors = [{ m: 137.8, name: '2층', fromTable: true, roadIds: [] }];
+  const partOf = (id: string) => parts.get(id) ?? baseBuildingId(id);
+  assert.ok(carvedFloor(space, '은주관#2관', floors, 0, [[rect(0, 0, 20, 20)]], partOf));
+  assert.equal(carvedFloor(space, '은주관', floors, 0, [[rect(0, 0, 20, 20)]], partOf), null);
 });

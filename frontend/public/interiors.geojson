@@ -4662,7 +4662,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 1층 주 복도",
         "floors": [
@@ -4700,7 +4700,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 1층 주 복도",
         "floors": [
@@ -4738,7 +4738,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 1층 복도 가지: 입구(1)",
         "floors": [
@@ -4764,7 +4764,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 1층 주 복도",
         "floors": [
@@ -4802,7 +4802,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 입구(1) ~ 1층 복도 문턱(층 표시 경계 이음, 높이 차 0.0 m)",
         "floors": [
@@ -4828,7 +4828,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 5층 복도 가지: 입구(2) 운동장",
         "floors": [
@@ -4854,7 +4854,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "corridor",
         "name": "은주2관 입구(2) 운동장 ~ 5층 복도 문턱(층 표시 경계 이음, 높이 차 0.0 m)",
         "floors": [
@@ -4880,7 +4880,7 @@
     {
       "type": "Feature",
       "properties": {
-        "building": "은주관",
+        "building": "은주관#2관",
         "kind": "stair",
         "name": "은주2관 계단 1층→2층",
         "floors": [

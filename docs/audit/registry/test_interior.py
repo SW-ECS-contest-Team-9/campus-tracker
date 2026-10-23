@@ -35,6 +35,14 @@ class Interior(unittest.TestCase):
         self.assertEqual(out, [])
         self.assertIn('1층', bad[0])
 
+    def test_named_table_goes_to_its_part(self):
+        # 은주관: a space of the 2관 table belongs to the scene part whose 겉모습 창 uses that table (층 펼치기 does each part apart)
+        head = {'이름': '가관', '층_바닥_높이': {'가1관': {'층': {'1층': {'값': 100.0}}}, '가2관': {'층': {'1층': {'값': 101.0}}}},
+                '겉모습': [{'대상': ['가관', '가관#접합부'], '창': {'층_표': '가1관'}}, {'대상': ['가관#2관', '가관#끝'], '창': {'층_표': '가2관'}}],
+                '실내_구조': {'공간': [{'종류': '복도', '이름': n, '층': ['1층'], '층_표': t, '선': [[0, 0], [1, 0]], '폭': 2, '등급': '추정'} for n, t in (('a', '가1관'), ('b', '가2관'))]}}
+        out, bad = interior.from_note(head)
+        self.assertEqual((bad, [f['properties']['building'] for f in out]), ([], ['가관', '가관#2관']))
+
     def test_scene_id_prefers_added_building(self):
         self.assertEqual(interior.scene_id({'이름': '다', '모델_id': {'서버_건물_id': '혜인관'}, '모델_추가': {'건물_id': '추가-다'}}), '추가-다')
         self.assertEqual(interior.scene_id({'이름': '라', '모델_id': {'서버_건물_id': '추가-라 (설명)'}}), '추가-라')

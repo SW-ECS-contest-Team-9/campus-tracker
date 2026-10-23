@@ -53,14 +53,15 @@ const PLAN = [
   ['본관', null, STACK], ['본관', '5층', FLOOR], ['본관', '2층', FLOOR],
   ['한림관', null, STACK], ['한림관', '3층', FLOOR], ['한림관', '1층', FLOOR],
   ['은주관', null, STACK], ['은주관', '1층', FLOOR], ['은주관', '3층', FLOOR], ['은주관', '5층', FLOOR],
+  ['은주관#2관', null, STACK], ['은주관#2관', '2층', FLOOR], ['은주관#2관', '6층', FLOOR],
   ['수인관', null, STACK], ['수인관', '1층', FLOOR],
 ];
 for (const [id, floor, view] of PLAN) {
-  if (only.length && !only.includes(id)) continue;
+  if (only.length && !only.includes(id.split('#')[0])) continue;
   for (const carved of [false, true]) {
     console.log(await lift(id, floor, carved));
     await sleep(2500); await look(view); await sleep(4000);
-    await shot(`${id}-${floor ?? '전체'}-${carved ? '후' : '전'}`);
+    await shot(`${id.replace('#', '-')}-${floor ?? '전체'}-${carved ? '후' : '전'}`);
   }
 }
 await ev(`(() => { ${SV}.level.interiors = window.__s2keep; return 1; })()`);
