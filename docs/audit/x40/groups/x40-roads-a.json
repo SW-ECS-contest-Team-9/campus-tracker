@@ -1,0 +1,350 @@
+{
+ "id": "X40-ROADS-A",
+ "comment": "X40 항목 2~5 길(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "현관 참 → 동쪽 옆 아치 → 데크 서쪽 끝: 꺾인 가운데 꼭짓점을 아치 가운데로",
+   "op": "update_road",
+   "args": {
+    "id": "acd80bae-48cf-4ff7-9b08-93a0d4577439",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "name": "대일관 현관 참: 동쪽 옆 아치(트인 통로)로 데크 서쪽 끝까지 (151.3 m, 턱 없음)"
+    },
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201161.69,
+        557310.2
+       ],
+       "z": 151.3
+      }
+     }
+    ]
+   },
+   "grade": "확정(트인 통로: 사용자), 추정(선)",
+   "evidence": "영상 1 frames t068~t076(현관 회랑 끝 아치), 사용자 표시 항공/사용자표시-대일관현관-동쪽-틈.webp, 구조물 X40-PORCH-E-PIER"
+  },
+  {
+   "ref": "옛 굽은 돌계단 길(통 계단으로 바뀜)",
+   "op": "retire_feature",
+   "args": {
+    "type": "road",
+    "id": "040d4571-9207-49f3-a5cd-06fe1d0cb46c",
+    "expectedRevision": 6
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "통 계단 길: 지상 오르막(8e71c240) → 계단 발치 → 마당 144.2 → 갈림 지점 3df2b596",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "문예관 저층부 앞 통 계단 (오르막 141.87 → 차양 앞 마당 144.2 m, 폭 9.4 m 전체가 계단, 21단 추정)",
+    "structure": "stairs",
+    "widthM": 9.4,
+    "path": [
+     {
+      "at": {
+       "roadId": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+       "nearest": [
+        201110.2,
+        557321.46
+       ]
+      }
+     },
+     {
+      "xy": [
+       201110.64,
+       557322.36
+      ],
+      "z": 141.87
+     },
+     {
+      "xy": [
+       201113.6,
+       557328.37
+      ],
+      "z": 144.2
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "통 계단 머리 → 갈림 지점(144.3)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "차양 앞 마당 (144.2 m): 통 계단 머리 → 갈림 지점",
+    "structure": "ordinary",
+    "widthM": 3.0,
+    "path": [
+     {
+      "xy": [
+       201113.6,
+       557328.37
+      ],
+      "z": 144.2
+     },
+     {
+      "at": {
+       "nodeId": "3df2b596-e5b9-4d30-8f10-41189bdb0e94"
+      }
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "옛 길 a7a51d3c(마당 → 평탄부 계단·타일 면 길을 새 계단 자리로)",
+   "op": "retire_feature",
+   "args": {
+    "type": "road",
+    "id": "a7a51d3c-af49-4127-83ef-d4157247f27b",
+    "expectedRevision": 11
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "옛 길 706a4384(마당 → 평탄부 계단·타일 면 길을 새 계단 자리로)",
+   "op": "retire_feature",
+   "args": {
+    "type": "road",
+    "id": "706a4384-31ed-4a9a-b04f-1a2e4078fa42",
+    "expectedRevision": 3
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "마당 85a0ed07 → 난간 계단 → 카페 앞 평탄부",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "차양 앞 마당 144.2 → 카페 앞 평탄부 145.5 m 난간 계단 (8단 추정, 사진)",
+    "structure": "stairs",
+    "widthM": 4.0,
+    "path": [
+     {
+      "at": {
+       "nodeId": "85a0ed07-cb3a-4821-9961-93931f37e876"
+      }
+     },
+     {
+      "xy": [
+       201116.63,
+       557330.45
+      ],
+      "z": 144.2
+     },
+     {
+      "xy": [
+       201118.78,
+       557329.39
+      ],
+      "z": 145.5
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "카페 앞 평탄부 → 타일 면 3단 앞",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "카페 SP 앞 평탄부 (145.5 m)",
+    "structure": "ordinary",
+    "widthM": 3.0,
+    "path": [
+     {
+      "xy": [
+       201118.78,
+       557329.39
+      ],
+      "z": 145.5
+     },
+     {
+      "xy": [
+       201121.45,
+       557324.4
+      ],
+      "z": 145.5
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "평탄부 → 타일 면(3단)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "카페 앞 평탄부 145.5 → 타일 면 145.95 m (3단)",
+    "structure": "stairs",
+    "widthM": 2.5,
+    "path": [
+     {
+      "xy": [
+       201121.45,
+       557324.4
+      ],
+      "z": 145.5
+     },
+     {
+      "xy": [
+       201122.35,
+       557323.96
+      ],
+      "z": 145.95
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "대일관 옆 계단 발치 노드 → 새 아랫단 아래(타일 면 145.95)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+    "to": {
+     "xy": [
+      201136.87,
+      557318.82
+     ],
+     "z": 145.95
+    }
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "대일관 옆 계단 길 이름(34단)",
+   "op": "update_road",
+   "args": {
+    "id": "f50b9ad8-1a87-4136-b323-129dbec3da2b",
+    "expectedRevision": 7,
+    "attrs": {
+     "name": "대일관에서 내려오는 계단 (SP 카페 데크 끝 옆, 34단 추정, 151.3 → 145.95 m: 아랫단 5단은 타일 면 위, 넓은 돌계단·가운데 난간·가운데 참)"
+    }
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "타일 면 길: 3단 머리 → 카페 데크 앞 59f9ab35 → 옆 계단 발치",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "타일 면 (조각 돌 포장, 평평 145.95 m: 카페 SP 데크 앞 ~ 대일관 옆 계단 발치)",
+    "structure": "ordinary",
+    "widthM": 3.0,
+    "path": [
+     {
+      "xy": [
+       201122.35,
+       557323.96
+      ],
+      "z": 145.95
+     },
+     {
+      "xy": [
+       201129.88,
+       557320.7
+      ],
+      "z": 145.95
+     },
+     {
+      "at": {
+       "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad"
+      }
+     }
+    ]
+   },
+   "grade": "확정(통 계단·평평한 타일 면: 사용자), Claude 결정(짜임·높이: 사진), 추정(선)",
+   "evidence": "사용자 편집기 표시(타일면 화살표·통계단), 사진 문예관-저층부-동쪽끝-계단-위에서, 구역 노트 오르막길과 주변 X40 절, 구조물 X40-FULL-STAIR·X40-FORK-TOP-STAIR·X40-TILE·X40-SIDE-STAIR-LOW"
+  },
+  {
+   "ref": "작은 계단 발치 노드 → 계단 앞(v −1.0)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+    "to": {
+     "xy": [
+      201207.97,
+      557292.43
+     ],
+     "z": 151.0
+    }
+   },
+   "grade": "확정(사진), 추정(선)",
+   "evidence": "사진 청운관-정면-운동장에서-상승관계단.webp(참에서 뒤로 곧게 오름), 구조물 X22-SANGSEUNG-STAIR(X40 에서 돌림)"
+  },
+  {
+   "ref": "작은 계단 머리 노드 → 위 끝(v −4.45)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+    "to": {
+     "xy": [
+      201209.38,
+      557295.58
+     ],
+     "z": 153.1
+    }
+   },
+   "grade": "확정(사진), 추정(선)",
+   "evidence": "사진 청운관-정면-운동장에서-상승관계단.webp(참에서 뒤로 곧게 오름), 구조물 X22-SANGSEUNG-STAIR(X40 에서 돌림)"
+  },
+  {
+   "ref": "작은 계단 길 이름",
+   "op": "update_road",
+   "args": {
+    "id": "a5668b4f-722e-45bb-b6c0-379315752554",
+    "expectedRevision": 3,
+    "attrs": {
+     "name": "상승관 쪽 작은 계단 (12단 추정, 151.0 → 153.1 m, 참에서 뒤쪽으로 곧게: 사진 2026-10-23)"
+    }
+   },
+   "grade": "확정(사진), 추정(선)",
+   "evidence": "사진 청운관-정면-운동장에서-상승관계단.webp(참에서 뒤로 곧게 오름), 구조물 X22-SANGSEUNG-STAIR(X40 에서 돌림)"
+  }
+ ]
+}

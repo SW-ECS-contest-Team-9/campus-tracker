@@ -1,0 +1,99 @@
+{
+ "group": "X40-ROADS-C",
+ "comment": "X40 항목 7 중간 옥상 마당 길(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T06:02:27.017Z",
+ "batchId": null,
+ "results": [
+  {
+   "ref": "유리 연결 통로 가운데 → 남쪽 문 → 옥상 마당",
+   "op": "create_road",
+   "changeSetId": "71886d46-f6e8-4e79-b8de-e4eed900690e",
+   "roads": [
+    {
+     "id": "6af731fe-13ac-415c-b1d5-eb9694463c2b",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "본관–한림관 유리 연결 통로 남쪽 문 → 중간 옥상 마당 (137.8 m 평지, 문턱만: 사진 15)",
+     "lengthM": 4.17,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24",
+      "at": [
+       201098.53,
+       557302.41,
+       137.8
+      ],
+      "roadsAtNode": 5
+     },
+     "end": {
+      "nodeId": "ca5355c6-02b1-4b0d-9377-be0616489b74",
+      "at": [
+       201097.4,
+       557298.4,
+       137.8
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "0399773c-4737-4573-a24e-c9e600c9b048",
+     "at": [
+      201098.53,
+      557302.41,
+      137.8
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "2b765aa4-f3d0-4367-9601-bfee28ad06ab",
+     "at": [
+      201098.53,
+      557302.41,
+      137.8
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "f8bb47f5-9ffd-4cd4-9650-1cf933aad31e",
+     "at": [
+      201098.53,
+      557302.41,
+      137.8
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "0c077941-fd87-4745-b9cd-98779ebd3cb1",
+     "at": [
+      201098.53,
+      557302.41,
+      137.8
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 0,
+     "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24",
+     "usedNodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  }
+ ]
+}

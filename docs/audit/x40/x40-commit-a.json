@@ -1,0 +1,855 @@
+{
+ "group": "X40-ROADS-A",
+ "comment": "X40 항목 2~5 길(시험용 DB 만)",
+ "committed": true,
+ "at": "2026-10-23T05:57:03.338Z",
+ "batchId": "9cb79190-cbae-4db5-90bf-06c01c431310",
+ "results": [
+  {
+   "ref": "현관 참 → 동쪽 옆 아치 → 데크 서쪽 끝: 꺾인 가운데 꼭짓점을 아치 가운데로",
+   "op": "update_road",
+   "changeSetId": "0d5a2385-d330-43e4-a464-691a44f01b94",
+   "roads": [
+    {
+     "id": "acd80bae-48cf-4ff7-9b08-93a0d4577439",
+     "revision": 5,
+     "status": "DRAFT",
+     "name": "대일관 현관 참: 동쪽 옆 아치(트인 통로)로 데크 서쪽 끝까지 (151.3 m, 턱 없음)",
+     "lengthM": 7.49,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "3bd52867-c0ab-4a66-96a2-6d77161a1359",
+      "at": [
+       201156.34,
+       557308.77,
+       151.3
+      ],
+      "roadsAtNode": 4
+     },
+     "end": {
+      "nodeId": "1f06689e-087f-478d-aba9-25c3a34abf3e",
+      "at": [
+       201163.61,
+       557309.84,
+       151.3
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "a704ec27-a767-45c5-97c5-057019ffeeb5",
+     "at": [
+      201156.34,
+      557308.77,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "b15ec913-514c-4c00-8e7e-26d571e0cf72",
+     "at": [
+      201163.61,
+      557309.84,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "14a66625-0e8e-4b59-b502-3e44b6be01b9",
+     "at": [
+      201156.34,
+      557308.77,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "8ae8686a-208a-4989-8717-82212f77d16d",
+     "at": [
+      201156.34,
+      557308.77,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  },
+  {
+   "ref": "옛 굽은 돌계단 길(통 계단으로 바뀜)",
+   "op": "retire_feature",
+   "changeSetId": "4e6db272-1127-43c6-9c3c-f60cacd80e57",
+   "retired": {
+    "type": "road",
+    "id": "040d4571-9207-49f3-a5cd-06fe1d0cb46c"
+   },
+   "note": "The row is kept with status RETIRED; revert_changeset restores it"
+  },
+  {
+   "ref": "통 계단 길: 지상 오르막(8e71c240) → 계단 발치 → 마당 144.2 → 갈림 지점 3df2b596",
+   "op": "create_road",
+   "changeSetId": "2beb97d6-763e-4488-86b5-9f38ded9f096",
+   "roads": [
+    {
+     "id": "b1866d0a-1f9c-4eba-ad59-cab078a9a90b",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "lengthM": 5.02,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "4f294196-1128-4f28-a093-9033dcaca073",
+      "at": [
+       201104.64,
+       557321.52,
+       141.01
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "468fcb34-a304-41c5-986d-37bee2c0d84d",
+      "at": [
+       201109.14,
+       557319.31,
+       141.87
+      ],
+      "roadsAtNode": 3
+     }
+    },
+    {
+     "id": "3e1a1d98-65b4-4920-9ddf-bd475ecc3a39",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "혜인관 방향 지상 경사로 연장 (추정)",
+     "lengthM": 31.21,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "468fcb34-a304-41c5-986d-37bee2c0d84d",
+      "at": [
+       201109.14,
+       557319.31,
+       141.87
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "ef5a3c9c-2aa4-43f0-8d2b-09f60e561b84",
+      "at": [
+       201137.15,
+       557305.54,
+       147.39
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "991e806a-c7b1-49d6-ba9b-47f35c7f2be3",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "문예관 저층부 앞 통 계단 (오르막 141.87 → 차양 앞 마당 144.2 m, 폭 9.4 m 전체가 계단, 21단 추정)",
+     "lengthM": 10.1,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "468fcb34-a304-41c5-986d-37bee2c0d84d",
+      "at": [
+       201109.14,
+       557319.31,
+       141.87
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "687b7983-630a-4aae-9a5f-8a7f345143ea",
+      "at": [
+       201113.6,
+       557328.37,
+       144.2
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [
+    {
+     "id": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+     "replacedBy": [
+      "b1866d0a-1f9c-4eba-ad59-cab078a9a90b",
+      "3e1a1d98-65b4-4920-9ddf-bd475ecc3a39"
+     ]
+    }
+   ],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+     "at": [
+      201109.14,
+      557319.31,
+      141.87
+     ],
+     "splitsThatRoad": true,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [
+    {
+     "toRoadId": "8e71c240-dd7e-4b37-9639-50b292751e8a",
+     "at": [
+      201109.14,
+      557319.31,
+      141.87
+     ],
+     "connected": true,
+     "nodeId": "468fcb34-a304-41c5-986d-37bee2c0d84d"
+    }
+   ],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": [
+    "The line crosses itself or other roads, so it was saved as several road pieces"
+   ]
+  },
+  {
+   "ref": "통 계단 머리 → 갈림 지점(144.3)",
+   "op": "create_road",
+   "changeSetId": "9ea854b3-7abe-4035-a92e-553944d4d72d",
+   "roads": [
+    {
+     "id": "8d2783fd-a034-49b4-9a9c-e694c024a28b",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "차양 앞 마당 (144.2 m): 통 계단 머리 → 갈림 지점",
+     "lengthM": 4.95,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "687b7983-630a-4aae-9a5f-8a7f345143ea",
+      "at": [
+       201113.6,
+       557328.37,
+       144.2
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "3df2b596-e5b9-4d30-8f10-41189bdb0e94",
+      "at": [
+       201115.8,
+       557332.8,
+       144.3
+      ],
+      "roadsAtNode": 3
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "3cb404de-438e-45a4-87fe-e1064d2436e7",
+     "at": [
+      201115.8,
+      557332.8,
+      144.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "992af5b0-0016-4499-adc0-c02c61122204",
+     "at": [
+      201115.8,
+      557332.8,
+      144.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "991e806a-c7b1-49d6-ba9b-47f35c7f2be3",
+     "at": [
+      201113.6,
+      557328.37,
+      144.2
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 1,
+     "nodeId": "3df2b596-e5b9-4d30-8f10-41189bdb0e94",
+     "usedNodeId": "3df2b596-e5b9-4d30-8f10-41189bdb0e94",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "옛 길 a7a51d3c(마당 → 평탄부 계단·타일 면 길을 새 계단 자리로)",
+   "op": "retire_feature",
+   "changeSetId": "fe16dc93-7a64-4112-8d9a-e24c4f11bb85",
+   "retired": {
+    "type": "road",
+    "id": "a7a51d3c-af49-4127-83ef-d4157247f27b"
+   },
+   "note": "The row is kept with status RETIRED; revert_changeset restores it"
+  },
+  {
+   "ref": "옛 길 706a4384(마당 → 평탄부 계단·타일 면 길을 새 계단 자리로)",
+   "op": "retire_feature",
+   "changeSetId": "5895e54f-eb38-4cd9-ac55-2038a97e29b1",
+   "retired": {
+    "type": "road",
+    "id": "706a4384-31ed-4a9a-b04f-1a2e4078fa42"
+   },
+   "note": "The row is kept with status RETIRED; revert_changeset restores it"
+  },
+  {
+   "ref": "마당 85a0ed07 → 난간 계단 → 카페 앞 평탄부",
+   "op": "create_road",
+   "changeSetId": "ba4389f7-8c38-4292-912c-2ee7663a806a",
+   "roads": [
+    {
+     "id": "65e09d7b-c4c7-4fcd-b7e8-699f82baebe4",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "차양 앞 마당 144.2 → 카페 앞 평탄부 145.5 m 난간 계단 (8단 추정, 사진)",
+     "lengthM": 4.01,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "85a0ed07-cb3a-4821-9961-93931f37e876",
+      "at": [
+       201115.65,
+       557329.17,
+       144.1
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "024a28a7-7725-4cf1-b4d6-7a08ab66bef0",
+      "at": [
+       201118.78,
+       557329.39,
+       145.5
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "3cb404de-438e-45a4-87fe-e1064d2436e7",
+     "at": [
+      201115.65,
+      557329.17,
+      144.1
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 0,
+     "nodeId": "85a0ed07-cb3a-4821-9961-93931f37e876",
+     "usedNodeId": "85a0ed07-cb3a-4821-9961-93931f37e876",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "카페 앞 평탄부 → 타일 면 3단 앞",
+   "op": "create_road",
+   "changeSetId": "373ecaec-3b83-46ef-ad36-96f09eb78e4a",
+   "roads": [
+    {
+     "id": "4b4a03cb-92dd-4d57-b013-2073d32cff27",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "카페 SP 앞 평탄부 (145.5 m)",
+     "lengthM": 5.66,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "024a28a7-7725-4cf1-b4d6-7a08ab66bef0",
+      "at": [
+       201118.78,
+       557329.39,
+       145.5
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "4e8e9d80-18df-4730-836a-41e5c37c583f",
+      "at": [
+       201121.45,
+       557324.4,
+       145.5
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "65e09d7b-c4c7-4fcd-b7e8-699f82baebe4",
+     "at": [
+      201118.78,
+      557329.39,
+      145.5
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "평탄부 → 타일 면(3단)",
+   "op": "create_road",
+   "changeSetId": "0a86cfc6-9834-43ae-b53b-6e8cd2ef7aaa",
+   "roads": [
+    {
+     "id": "0d071c84-061f-49c3-bd9d-6f2fe208b720",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "카페 앞 평탄부 145.5 → 타일 면 145.95 m (3단)",
+     "lengthM": 1,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "4e8e9d80-18df-4730-836a-41e5c37c583f",
+      "at": [
+       201121.45,
+       557324.4,
+       145.5
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "e4a4d293-2098-48db-bdaa-39021840bd0d",
+      "at": [
+       201122.35,
+       557323.96,
+       145.95
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "4b4a03cb-92dd-4d57-b013-2073d32cff27",
+     "at": [
+      201121.45,
+      557324.4,
+      145.5
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "대일관 옆 계단 발치 노드 → 새 아랫단 아래(타일 면 145.95)",
+   "op": "move_node",
+   "changeSetId": "db66cc91-54a6-4718-9d25-26f6951aa479",
+   "roads": [
+    {
+     "id": "f50b9ad8-1a87-4136-b323-129dbec3da2b",
+     "revision": 7,
+     "status": "DRAFT",
+     "name": "대일관에서 내려오는 계단 (SP 카페 데크 끝 옆, 29단 추정, 151.3 → 146.67 m, 넓은 돌계단·가운데 난간·가운데 참)",
+     "lengthM": 14.57,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "0c2a31b0-969e-4e3f-94d2-dc976c0f33fd",
+      "at": [
+       201150.14,
+       557312.8,
+       151.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+      "at": [
+       201136.87,
+       557318.82,
+       145.95
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+   "at": [
+    201136.87,
+    557318.82,
+    145.95
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "대일관 옆 계단 길 이름(34단)",
+   "op": "update_road",
+   "changeSetId": "b40c3157-b73e-40bf-9b49-586cf29faf19",
+   "roads": [
+    {
+     "id": "f50b9ad8-1a87-4136-b323-129dbec3da2b",
+     "revision": 8,
+     "status": "DRAFT",
+     "name": "대일관에서 내려오는 계단 (SP 카페 데크 끝 옆, 34단 추정, 151.3 → 145.95 m: 아랫단 5단은 타일 면 위, 넓은 돌계단·가운데 난간·가운데 참)",
+     "lengthM": 14.57,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "0c2a31b0-969e-4e3f-94d2-dc976c0f33fd",
+      "at": [
+       201150.14,
+       557312.8,
+       151.3
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+      "at": [
+       201136.87,
+       557318.82,
+       145.95
+      ],
+      "roadsAtNode": 1
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "8ae8686a-208a-4989-8717-82212f77d16d",
+     "at": [
+      201150.14,
+      557312.8,
+      151.3
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  },
+  {
+   "ref": "타일 면 길: 3단 머리 → 카페 데크 앞 59f9ab35 → 옆 계단 발치",
+   "op": "create_road",
+   "changeSetId": "1a31b579-41d3-4784-9ca4-786d601601b9",
+   "roads": [
+    {
+     "id": "c3fc3f09-cd1a-4275-b408-c3592fe513cb",
+     "revision": 1,
+     "status": "DRAFT",
+     "name": "타일 면 (조각 돌 포장, 평평 145.95 m: 카페 SP 데크 앞 ~ 대일관 옆 계단 발치)",
+     "lengthM": 15.44,
+     "vertexCount": 3,
+     "start": {
+      "nodeId": "e4a4d293-2098-48db-bdaa-39021840bd0d",
+      "at": [
+       201122.35,
+       557323.96,
+       145.95
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+      "at": [
+       201136.87,
+       557318.82,
+       145.95
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "0d071c84-061f-49c3-bd9d-6f2fe208b720",
+     "at": [
+      201122.35,
+      557323.96,
+      145.95
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "f50b9ad8-1a87-4136-b323-129dbec3da2b",
+     "at": [
+      201136.87,
+      557318.82,
+      145.95
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "nodeRefs": [
+    {
+     "vertexIndex": 2,
+     "nodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+     "usedNodeId": "2ca531d8-4c94-48bc-a5ce-6a534ecbcaad",
+     "connected": true
+    }
+   ],
+   "sources": [],
+   "warnings": []
+  },
+  {
+   "ref": "작은 계단 발치 노드 → 계단 앞(v −1.0)",
+   "op": "move_node",
+   "changeSetId": "f9ee4e72-9ab2-4ac0-9d4b-e51c8e396290",
+   "roads": [
+    {
+     "id": "a5668b4f-722e-45bb-b6c0-379315752554",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "상승관 쪽 작은 계단 (12단 추정, 151.0 → 153.1 m, 사용자 지정 길)",
+     "lengthM": 2.38,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+      "at": [
+       201207.97,
+       557292.43,
+       151
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+      "at": [
+       201210.15,
+       557293.38,
+       153.1
+      ],
+      "roadsAtNode": 2
+     }
+    },
+    {
+     "id": "fb253ca2-7821-449e-bb30-fe1864e84b7c",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "청운관 앞 참 → 상승관 쪽 작은 계단 발치 (151.0 m, 사용자 지정 길)",
+     "lengthM": 1.74,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "46f69825-a827-46ff-acad-ab1b61d868f7",
+      "at": [
+       201208.18,
+       557290.7,
+       151
+      ],
+      "roadsAtNode": 3
+     },
+     "end": {
+      "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+      "at": [
+       201207.97,
+       557292.43,
+       151
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+   "at": [
+    201207.97,
+    557292.43,
+    151
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "작은 계단 머리 노드 → 위 끝(v −4.45)",
+   "op": "move_node",
+   "changeSetId": "329752c1-7c04-4d1b-a300-5d81ec203909",
+   "roads": [
+    {
+     "id": "41daa06c-20fa-4934-8170-e3250981fcbc",
+     "revision": 2,
+     "status": "DRAFT",
+     "name": "상승관 쪽 작은 계단 머리 → 안쪽 마당 → 상승관 입구 길 (153.1 m, 사용자 지정 길)",
+     "lengthM": 9.38,
+     "vertexCount": 4,
+     "start": {
+      "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+      "at": [
+       201209.38,
+       557295.58,
+       153.1
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "c5a1f043-3a6d-400d-b90c-7721783cc6ea",
+      "at": [
+       201216.6,
+       557298.6,
+       153.1
+      ],
+      "roadsAtNode": 3
+     }
+    },
+    {
+     "id": "a5668b4f-722e-45bb-b6c0-379315752554",
+     "revision": 3,
+     "status": "DRAFT",
+     "name": "상승관 쪽 작은 계단 (12단 추정, 151.0 → 153.1 m, 사용자 지정 길)",
+     "lengthM": 3.45,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+      "at": [
+       201207.97,
+       557292.43,
+       151
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+      "at": [
+       201209.38,
+       557295.58,
+       153.1
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+   "at": [
+    201209.38,
+    557295.58,
+    153.1
+   ],
+   "note": "Crossings created by the move are not connected automatically: run validate_network"
+  },
+  {
+   "ref": "작은 계단 길 이름",
+   "op": "update_road",
+   "changeSetId": "faee5b60-e4f2-416b-a594-588b6d30a4fc",
+   "roads": [
+    {
+     "id": "a5668b4f-722e-45bb-b6c0-379315752554",
+     "revision": 4,
+     "status": "DRAFT",
+     "name": "상승관 쪽 작은 계단 (12단 추정, 151.0 → 153.1 m, 참에서 뒤쪽으로 곧게: 사진 2026-10-23)",
+     "lengthM": 3.45,
+     "vertexCount": 2,
+     "start": {
+      "nodeId": "5d945df0-8647-4c0a-b64d-c5bdcf40b0eb",
+      "at": [
+       201207.97,
+       557292.43,
+       151
+      ],
+      "roadsAtNode": 2
+     },
+     "end": {
+      "nodeId": "bb967025-4760-4a28-abbc-248c4d4c79da",
+      "at": [
+       201209.38,
+       557295.58,
+       153.1
+      ],
+      "roadsAtNode": 2
+     }
+    }
+   ],
+   "replacedRoads": [],
+   "retired": [],
+   "nodesCreated": [],
+   "crossings": [
+    {
+     "roadId": "fb253ca2-7821-449e-bb30-fe1864e84b7c",
+     "at": [
+      201207.97,
+      557292.43,
+      151
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    },
+    {
+     "roadId": "41daa06c-20fa-4934-8170-e3250981fcbc",
+     "at": [
+      201209.38,
+      557295.58,
+      153.1
+     ],
+     "splitsThatRoad": false,
+     "zDeltaM": 0
+    }
+   ],
+   "selfCrossings": 0,
+   "connections": [],
+   "warnings": []
+  }
+ ]
+}
