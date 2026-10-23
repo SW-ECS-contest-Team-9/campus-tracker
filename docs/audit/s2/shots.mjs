@@ -47,7 +47,7 @@ const lift = (id, floor, carved) => ev(`(() => { const L = ${SV}.level; L.interi
   L.showBuilding(${JSON.stringify(id)}); const i = ${JSON.stringify(floor ?? null)} === null ? null : L.unit.floors.findIndex((f) => f.name === ${JSON.stringify(floor ?? null)});
   if (i !== null && i >= 0) L.showBuilding(${JSON.stringify(id)}, i);
   return L.unit.name + ' ' + (i === null ? '전체' : (L.unit.floors[i] || {}).name) + ' 실내 ' + L.interiors.filter((s) => s.building === ${JSON.stringify(id)}).length; })()`);
-const STACK = { heading: -25, pitch: -50, range: 2.2 }, FLOOR = { heading: -25, pitch: -58, range: 2.2, shift: 0.35 };
+const STACK = { heading: -25, pitch: -50, range: 2.6, shift: 0.4 }, FLOOR = { heading: -25, pitch: -60, range: 3.6, shift: 0.5 };
 const PLAN = [
   ['북악관', null, STACK], ['북악관', '2층', FLOOR], ['북악관', '지하 1층', FLOOR], ['북악관', '1층', FLOOR],
   ['본관', null, STACK], ['본관', '5층', FLOOR], ['본관', '2층', FLOOR],
