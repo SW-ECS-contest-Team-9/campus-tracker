@@ -14,7 +14,7 @@ Z = 132.2
 SUIN = [[201102.94, 557190.11], [201125.57, 557204.29], [201192.29, 557144.08], [201174.74, 557125.62], [201148.21, 557110.27]]
 (door, dx, dy, dz), = q("select id, st_x(geom), st_y(geom), st_z(geom) from mobility.network_nodes where id::text like 'e5ea7a83%'")
 (top, tz), = q("select id, st_z(geom) from mobility.network_nodes where id::text like '98909b6c%'")
-assert abs(float(dz) - Z) < 0.01 and abs(float(tz) - 133.93) < 0.01, (dz, tz)
+assert abs(float(dz) - Z) < 0.01 and min(abs(float(tz) - 133.93), abs(float(tz) - 130.92)) < 0.01, (dz, tz)   # 적용 뒤에는 130.92
 # 건물 발자국(수인관 빼고): 시험 서버 장면(읽기만)
 import urllib.request
 from pyproj import Transformer
@@ -61,3 +61,18 @@ ops = [
 (HERE / 'groups').mkdir(exist_ok=True)
 (HERE / 'groups' / 'y01-futsal-yard.json').write_text(json.dumps({'id': 'Y01-FUTSAL-YARD', 'comment': '은주2관–수인관 통로와 풋살장 앞 마당 길, 윗길 끝 솟은 높이 고치기(시험용 DB 만)', 'ops': ops}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
 print(len(ops), 'ops')
+
+# ---- 묶음 2(첫 묶음 적용 뒤): 통로 길(60ef7429)의 N2 에서 남동 끝(C 구역 쪽)까지 가지. 마당·통로 띠가 남동 끝에서 꺾여 면 위 직선으로는 N2 에서 안 보인다 ----
+C1 = HERE / 'y01-commit.json'
+if C1.exists():
+    road = next(r for x in json.loads(C1.read_text(encoding='utf-8'))['results'] if x['op'] == 'create_road' for r in x['roads'])
+    s4 = next(s for s in np.arange(L - 4.0, s3, -0.5) if B.distance(Point(P(s, -1.0))) > 0.3)
+    N4 = P(s4, -1.0)
+    M = P(s3 + 2.0, -1.0)   # 먼저 옥상 북동 변 안쪽(1 m)으로 들어가 변을 따라 감(남동 끝 날개 발자국이 변에 닿음)
+    assert LineString([tuple(N2), tuple(M), tuple(N4)]).intersection(B).length < 0.01, LineString([tuple(N2), tuple(M), tuple(N4)]).intersection(B).length
+    ops2 = [{'ref': '통로 길 N2 → 마당 남동 끝(C 구역 쪽)', 'op': 'create_road', 'grade': G, 'evidence': EV,
+             'args': {'roadClass': 'pedestrian', 'structure': 'ordinary', 'pedestrianAccess': 'allowed', 'vehicleAccess': 'prohibited', 'widthM': 2.5,
+                      'name': '은주2관–수인관 통로 ~ 풋살장 앞 마당 남동 끝 (132.2 m 평평. 사진 판독, 선 추정)', 'zMode': 'explicit', 'densify': False,
+                      'path': [{'at': {'roadId': road['id'], 'nearest': [r2(N2[0]), r2(N2[1])]}}, {'xy': [r2(M[0]), r2(M[1])], 'z': Z}, {'xy': [r2(N4[0]), r2(N4[1])], 'z': Z}]}}]
+    (HERE / 'groups' / 'y01-futsal-yard-2.json').write_text(json.dumps({'id': 'Y01-FUTSAL-YARD-2', 'comment': '통로 길에서 풋살장 앞 마당 남동 끝으로 가지(시험용 DB 만)', 'ops': ops2}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
+    print('N4', N4.round(2), '가지 길이', round(float(np.hypot(*(N4 - N2))), 1))
