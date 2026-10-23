@@ -7,6 +7,9 @@ import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.MotionSamplingRate
+import hoshi.campustracker.model.PlannedRoute
+import hoshi.campustracker.model.RoutePoint
+import hoshi.campustracker.model.RouteSegment
 import hoshi.campustracker.persistence.FileActiveCollectionStore
 import hoshi.campustracker.persistence.LocalSensorDataRepository
 import hoshi.campustracker.sync.FakeSocket
@@ -206,6 +209,68 @@ class CollectionCoordinatorTest {
         // the end marker is queued before the finish
         val kinds = queue.allItems().map { it.kind }
         assertTrue(kinds.lastIndexOf(ItemKind.marker) < kinds.indexOf(ItemKind.finish))
+    }
+
+    @Test
+    fun declaredRouteIsSentWithTheStartAndProgressSurvivesAResume() = runTest {
+        val root = tmp.newFolder()
+        val first = Process(this, root)
+        val points = listOf(
+            RoutePoint("n-a", "정문", "outdoor"), RoutePoint("n-b", "로비", "본관", "1F"), RoutePoint("n-c", "301호", "본관", "3F"),
+        )
+        val route = PlannedRoute(points, listOf(RouteSegment(), RouteSegment(RouteSegment.STAIRS, direction = "up")))
+        // no start anchor: the route's first point is the start
+        first.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0, route = route)
+        first.executor.runAll(); runCurrent()
+        assertEquals(route, first.coordinator.ui.value.activeSession!!.declaredRoute)
+        assertEquals(0, first.coordinator.ui.value.routeReached)
+        // an entrance marker on the next node counts as arriving there; "reached next" records a routeWaypoint on the node after
+        first.coordinator.addMarker(EventMarkerType.entrance, CollectionAnchor(nodeId = "n-b", buildingId = "본관", floor = "1F"))
+        first.coordinator.markOffRoute()
+        first.executor.runAll()
+        assertEquals(1, first.coordinator.ui.value.routeReached)
+        assertEquals(1, first.coordinator.ui.value.routeDeviations)
+        first.advance(1_100); runCurrent()
+        // process dies; the resumed session keeps the route and the progress
+        val second = Process(this, root)
+        second.executor.runAll()
+        second.coordinator.resumeInterrupted(owner)
+        second.executor.runAll(); runCurrent()
+        assertEquals(1, second.coordinator.ui.value.routeReached)
+        assertEquals(1, second.coordinator.ui.value.routeDeviations)
+        second.coordinator.reachNextRoutePoint()
+        second.coordinator.reachNextRoutePoint() // already at the last point: nothing more to record
+        second.executor.runAll()
+        assertEquals(2, second.coordinator.ui.value.routeReached)
+
+        second.socket.connect(); runCurrent()
+        val start = second.socket.last
+        assertEquals("session:start", start.type)
+        val declared = start.payload["declaredRoute"]!!.jsonObject
+        assertEquals(listOf("n-a", "n-b", "n-c"), declared["nodeKeys"]!!.jsonArray.map { it.jsonPrimitive.content })
+        assertEquals(listOf("walk", "stairs"), declared["segments"]!!.jsonArray.map { it.jsonObject.str("mode") })
+        assertEquals("up", declared["segments"]!!.jsonArray[1].jsonObject.str("direction"))
+        assertEquals("정문 → 1F 로비 → 계단 상행 → 3F 301호", declared.str("text"))
+
+        val markers = queue.allItems().filter { it.kind == ItemKind.marker }.map { Json.parseToJsonElement(it.payload).jsonObject }
+        assertEquals(listOf("sessionStart", "entrance", "routeDeviation", "routeWaypoint"), markers.map { it.str("type") })
+        assertEquals("n-a", markers[0].str("nodeId"))
+        assertNull(markers[2].str("nodeId"))
+        assertEquals("n-c", markers[3].str("nodeId"))
+        assertEquals("3F", markers[3].str("floor"))
+    }
+
+    @Test
+    fun aFreeWalkSendsNoRouteAndIgnoresRouteButtons() = runTest {
+        val p = Process(this, tmp.newFolder())
+        p.coordinator.startSession("C02", owner, MotionSamplingRate.hz50, LocationCollectionProfile.highAccuracy, 0.0)
+        p.executor.runAll()
+        p.coordinator.markOffRoute()
+        p.coordinator.reachNextRoutePoint()
+        p.executor.runAll()
+        p.socket.connect(); runCurrent()
+        assertNull(p.socket.last.payload["declaredRoute"])
+        assertTrue(queue.allItems().none { it.kind == ItemKind.marker })
     }
 
     @Test
