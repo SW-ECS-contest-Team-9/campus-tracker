@@ -42,6 +42,7 @@ import hoshi.campustracker.net.CollectorApi
 import hoshi.campustracker.net.RawWebSocketManager
 import hoshi.campustracker.persistence.FileActiveCollectionStore
 import hoshi.campustracker.persistence.LocalSensorDataRepository
+import hoshi.campustracker.persistence.SavedRoutesStore
 import hoshi.campustracker.sensors.AndroidAltimeterSource
 import hoshi.campustracker.sensors.AndroidLocationSource
 import hoshi.campustracker.sensors.AndroidMotionSource
@@ -108,6 +109,7 @@ class AppGraph(app: Application) {
     private val altimeter = AndroidAltimeterSource(app, collectionHandler, clock, corrector)
     private val pedometer = AndroidPedometerSource(app, collectionHandler, clock, corrector)
     private val root = File(app.filesDir, "CampusCollector")
+    val savedRoutes = SavedRoutesStore(root)
 
     private val appState: AppStateTracker = AppStateTracker { state -> coordinator.handleAppState(state) }
 

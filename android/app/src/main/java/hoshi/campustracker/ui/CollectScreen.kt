@@ -43,6 +43,8 @@ fun CollectScreen(
     onResume: () -> Unit,
     onFinishInterrupted: () -> Unit,
     onMarker: (EventMarkerType) -> Unit,
+    /** the declared route card (planning before Start, progress while recording) */
+    routeSection: @Composable () -> Unit = {},
 ) {
     val now = ui.publishedAtMs
     Column(
@@ -112,6 +114,7 @@ fun CollectScreen(
                 Text("The barometer moved more than 3 m since the last stairs/elevator marker. Mark the stairs or elevator you took.")
             }
         }
+        routeSection()
         SectionCard {
             Heading("Markers")
             ui.lastPlace?.let { p -> Caption("Now: ${if (p.buildingId == CollectionAnchor.OUTDOOR) "outside" else listOfNotNull(p.buildingId, p.floor).joinToString(" ")}") }
