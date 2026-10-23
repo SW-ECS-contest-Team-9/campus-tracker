@@ -1,0 +1,43 @@
+{
+ "id": "X40-ROADS-C",
+ "comment": "X40 항목 7 중간 옥상 마당 길(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "유리 연결 통로 가운데 → 남쪽 문 → 옥상 마당",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "본관–한림관 유리 연결 통로 남쪽 문 → 중간 옥상 마당 (137.8 m 평지, 문턱만: 사진 15)",
+    "structure": "ordinary",
+    "widthM": 1.2,
+    "path": [
+     {
+      "at": {
+       "nodeId": "ebb31930-75c2-4ca7-bc86-96eacc902e24"
+      }
+     },
+     {
+      "xy": [
+       201098.05,
+       557300.95
+      ],
+      "z": 137.8
+     },
+     {
+      "xy": [
+       201097.4,
+       557298.4
+      ],
+      "z": 137.8
+     }
+    ]
+   },
+   "grade": "확정(마당이 남쪽 문 밖: 사용자·사진 15), 추정(선)",
+   "evidence": "사진 15, 사용자 항공 항공-카카오-한림관-중간옥상.webp, 구조물 X22-ROOF-YARD·X22-LINK-DOOR-S"
+  }
+ ]
+}

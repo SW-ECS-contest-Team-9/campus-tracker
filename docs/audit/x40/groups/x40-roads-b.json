@@ -1,0 +1,442 @@
+{
+ "id": "X40-ROADS-B",
+ "comment": "X40 항목 6 은주1관 정면 길(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "북쪽 아랫줄 위 끝 노드 → 가운데 참 높이 128.9",
+   "op": "move_node",
+   "args": {
+    "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f",
+    "to": {
+     "xy": [
+      201115.74,
+      557257.53
+     ],
+     "z": 128.9
+    }
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "북쪽 아랫줄 길(높이 다시 나눔)",
+   "op": "update_road",
+   "args": {
+    "id": "850b756f-0dc2-4c0a-b50b-a585daa5ff7e",
+    "expectedRevision": 2,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "name": "은주1관 북쪽 아랫줄 곡선 돌계단 (24단 추정, 굽이 125.2 → 가운데 참 128.9 m, 사용자 지정 길)"
+    },
+    "path": [
+     {
+      "xy": [
+       201112.3,
+       557268.0
+      ],
+      "z": 125.2
+     },
+     {
+      "xy": [
+       201113.2,
+       557264.9
+      ],
+      "z": 126.21
+     },
+     {
+      "xy": [
+       201114.0,
+       557261.0
+      ],
+      "z": 127.86
+     },
+     {
+      "xy": [
+       201115.0,
+       557258.4
+      ],
+      "z": 128.84
+     },
+     {
+      "xy": [
+       201115.74,
+       557257.53
+      ],
+      "z": 128.9
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "옛 테라스 → 입구(1) 길(반원 테라스가 없어짐)",
+   "op": "retire_feature",
+   "args": {
+    "type": "road",
+    "id": "9a5da733-a495-485a-bbd6-5dd02921735e",
+    "expectedRevision": 2
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "가운데 참: 북쪽 아랫줄 머리 → 북쪽 위 줄 앞",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 가운데 참 (128.9 m, 둥근 화단 앞)",
+    "structure": "ordinary",
+    "widthM": 2.0,
+    "path": [
+     {
+      "at": {
+       "nodeId": "20be4c38-0f75-49cc-b8d2-a539bf3e698f"
+      }
+     },
+     {
+      "xy": [
+       201115.07,
+       557256.29
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201114.59,
+       557255.03
+      ],
+      "z": 128.9
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "가운데 참: 북 → 남(둥근 화단 안쪽)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 가운데 참 (128.9 m, 둥근 화단 안쪽)",
+    "structure": "ordinary",
+    "widthM": 2.0,
+    "path": [
+     {
+      "xy": [
+       201114.59,
+       557255.03
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201114.68,
+       557253.87
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201114.2,
+       557252.82
+      ],
+      "z": 128.9
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "북쪽 위 줄 곡선 계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 북쪽 위 곡선 계단 (15단 추정, 가운데 참 128.9 → 위 테라스 131.3 m, 사진)",
+    "structure": "stairs",
+    "widthM": 1.2,
+    "path": [
+     {
+      "xy": [
+       201114.59,
+       557255.03
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201115.84,
+       557254.37
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201116.32,
+       557255.3
+      ],
+      "z": 129.38
+     },
+     {
+      "xy": [
+       201117.03,
+       557256.07
+      ],
+      "z": 129.86
+     },
+     {
+      "xy": [
+       201117.91,
+       557256.63
+      ],
+      "z": 130.34
+     },
+     {
+      "xy": [
+       201118.91,
+       557256.94
+      ],
+      "z": 130.82
+     },
+     {
+      "xy": [
+       201119.95,
+       557256.98
+      ],
+      "z": 131.3
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "북쪽 계단 머리 → 입구(1) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 위 테라스 (131.3 m): 북쪽 계단 머리 → 입구(1) 아치 문",
+    "structure": "ordinary",
+    "widthM": 1.6,
+    "path": [
+     {
+      "xy": [
+       201119.95,
+       557256.98
+      ],
+      "z": 131.3
+     },
+     {
+      "xy": [
+       201118.92,
+       557254.34
+      ],
+      "z": 131.3
+     },
+     {
+      "at": {
+       "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd"
+      }
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "남쪽 위 줄 곡선 계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 남쪽 위 곡선 계단 (15단 추정, 가운데 참 128.9 → 위 테라스 131.3 m, 사진)",
+    "structure": "stairs",
+    "widthM": 1.2,
+    "path": [
+     {
+      "xy": [
+       201114.2,
+       557252.82
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201115.6,
+       557253.0
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201115.74,
+       557251.97
+      ],
+      "z": 129.38
+     },
+     {
+      "xy": [
+       201116.13,
+       557251.0
+      ],
+      "z": 129.86
+     },
+     {
+      "xy": [
+       201116.77,
+       557250.17
+      ],
+      "z": 130.34
+     },
+     {
+      "xy": [
+       201117.6,
+       557249.54
+      ],
+      "z": 130.82
+     },
+     {
+      "xy": [
+       201118.56,
+       557249.14
+      ],
+      "z": 131.3
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "남쪽 계단 머리 → 입구(1) 문",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 위 테라스 (131.3 m): 남쪽 계단 머리 → 입구(1) 아치 문",
+    "structure": "ordinary",
+    "widthM": 1.6,
+    "path": [
+     {
+      "xy": [
+       201118.56,
+       557249.14
+      ],
+      "z": 131.3
+     },
+     {
+      "xy": [
+       201118.5,
+       557251.98
+      ],
+      "z": 131.3
+     },
+     {
+      "at": {
+       "nodeId": "de20cbd7-7e1a-4762-b5ba-1bb40cc90ebd"
+      }
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "남쪽 아랫줄: 가운데 참 남쪽 끝 → 위쪽 갈래 차도",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 남쪽 아랫줄 계단 (가운데 참 128.9 → 위쪽 갈래 차도 128.32 m, 사진: 남쪽으로 벌어져 내려감, 단 수 추정)",
+    "structure": "stairs",
+    "widthM": 2.0,
+    "path": [
+     {
+      "xy": [
+       201114.2,
+       557252.82
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201114.0,
+       557249.51
+      ],
+      "z": 128.9
+     },
+     {
+      "xy": [
+       201111.2,
+       557248.4
+      ],
+      "z": 128.32
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  },
+  {
+   "ref": "남쪽 아랫줄 발치 → 위쪽 갈래 차도(41dc7abe)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 남쪽 아랫줄 발치 → 위쪽 갈래 차도",
+    "structure": "ordinary",
+    "widthM": 2.0,
+    "path": [
+     {
+      "xy": [
+       201111.2,
+       557248.4
+      ],
+      "z": 128.32
+     },
+     {
+      "at": {
+       "roadId": "41dc7abe-c214-45d1-8d1e-982b9bd05afc",
+       "nearest": [
+        201108.31,
+        557248.4
+       ]
+      }
+     }
+    ]
+   },
+   "grade": "확정(짜임·굽이에서 오름: 사진·사용자 화살표), Claude 결정(높이 128.9), 추정(선)",
+   "evidence": "사진 사진/은주1관-정면-바위정원-곡선계단.webp, 카카오 항공(평면), 구조물 X40-EUNJU-*, 건물 노트 은주관 X40 절"
+  }
+ ]
+}

@@ -327,6 +327,19 @@ for nm, b0, b1 in (('A', -1.2, -1.0), ('B', 1.0, 1.2)):
 X6 = {'TC': TC.tolist(), 'ND': ND.tolist(), 'WD': WD.tolist(), 'landingZ': ZW, 'terraceZ': ZTOP, 'southFoot': [r2(c) for c in SE], 'southFootZ': r2(ZR), 'southTop': [r2(c) for c in SA],
       'upN': [[r2(c) for c in PP(4.0, p)] for p in (10, 30, 50, 70, 85)], 'upS': [[r2(c) for c in PP(4.0, -p)] for p in (10, 30, 50, 70, 85)], 'door': [r2(c) for c in TC + ND * 0.4]}
 
+# ===================== 7 본관·한림관 사이 중간 옥상 마당(카카오 항공사진) =====================
+SRC7 = '사용자 항공 항공/항공-카카오-한림관-중간옥상.webp(X27 항공사진에 특징점 673개로 맞춤 georef-more.json), 사진 15(둥근 벽돌 화단 둘·뒤 긴 화단·오른쪽 콘크리트 난간벽)'
+G7 = '확정(옥상 마당 자리: 사용자), 항공사진(화단 자리 ±1.5 m), 추정(크기)'
+x22 = 'x22-photo-fixes.geojson'
+YARD = SH('X22-ROOF-YARD-FLOOR'); ZD = 137.8
+for k, (c, r) in enumerate((((201098.6, 557296.3), 1.0), ((201095.6, 557295.8), 0.8))):
+    d_ = disc(c, r).intersection(YARD)
+    f = F(x22, f'X22-ROOF-YARD-PLANTER-ROUND-{k + 1}'); f['geometry'] = geom(d_); note(f, '카카오 항공사진의 둥근 덩어리 자리로 옮김')
+    for part, hh in (('TRUNK', 0.12), ('CROWN', 0.8), ('TOP', 0.45)):
+        f = F(x22, f'X22-ROOF-YARD-TREE-{k + 1}-{part}'); f['geometry'] = geom(disc(c, hh, 4)); note(f, '화단과 함께 옮김')
+box('X40-ROOF-YARD-PARAPET-E', 'wall', LineString([(201101.2, 557286.0), (201101.17, 557288.41), (201100.77, 557289.05)]).buffer(0.15, cap_style=2).intersection(YARD), ZD, ZD + 1.0,
+    '동쪽 끝(원통 남서쪽, 낮은 틈 쪽으로 트인 곳) 콘크리트 난간벽(사진 15 오른쪽)', SRC7, G7, 'X22-ROOF-YARD-FLOOR', color='#c4c2bb')
+
 # ---------- 겹침 정리: 새 상자는 높이가 겹치는 다른 상자 자리를 비우고, 나무는 겹치면 뺀다 ----------
 def zr(p):
     lo, hi = p['fromM'], p['toM']
