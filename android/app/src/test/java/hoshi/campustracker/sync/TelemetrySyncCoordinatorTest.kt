@@ -1,5 +1,6 @@
 package hoshi.campustracker.sync
 
+import hoshi.campustracker.core.AppJson
 import hoshi.campustracker.core.L
 import hoshi.campustracker.model.LocationFix
 import hoshi.campustracker.model.SensorCapabilities
@@ -11,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -73,7 +75,18 @@ class TelemetrySyncCoordinatorTest {
         }
         assertEquals(listOf("telemetry:batch", "telemetry:batch", "marker:create", "session:finish", "diagnostic:event"), order)
         assertEquals(0, sync.status.value.pending)
-        assertNull(store.session("A")) // finished + empty → row removed
+        // Nothing left on the phone: session:syncComplete with the finish manifest.
+        val check = socket.last
+        assertEquals("session:syncComplete", check.type)
+        assertEquals("srv-1", check.payload.str("sessionId"))
+        assertEquals("A", check.payload.str("clientSessionId"))
+        assertEquals(3L, check.payload["lastSequences"]!!.jsonObject["motion"]!!.jsonPrimitive.long)
+        assertEquals(-1L, check.payload["lastSequences"]!!.jsonObject["location"]!!.jsonPrimitive.long)
+        socket.ackLast("""{"sessionId":"srv-1","collectionState":"FINISHED","synchronized":true,"streams":{}}"""); runCurrent()
+        assertEquals(SyncState.COMPLETE, store.session("A")!!.syncState)
+        assertEquals("diagnostic:event", socket.last.type) // SYNC_COMPLETE_ACK
+        socket.ackLast(); runCurrent()
+        assertNull(store.session("A")) // finished + answered + empty → row removed
     }
 
     @Test
@@ -170,6 +183,9 @@ class TelemetrySyncCoordinatorTest {
         assertEquals("session:finish", socket.last.type)
         assertEquals("B", socket.last.payload.str("clientSessionId"))
         socket.ackLast(); runCurrent()
+        assertEquals("session:syncComplete", socket.last.type)
+        socket.ackLast("""{"synchronized":true}"""); runCurrent()
+        socket.ackLast(); runCurrent() // SYNC_COMPLETE_ACK diagnostic
         assertEquals(1, sync.status.value.pending) // A's finish stays queued
         // A new login retries A's session:start once more.
         sync.setOwner(owner); runCurrent()
@@ -247,5 +263,71 @@ class TelemetrySyncCoordinatorTest {
         assertEquals(2, socket.requests.size)
         ackStart("srv-1")
         assertEquals("srv-1", store.session("A")!!.serverSessionId)
+    }
+
+    private fun TestScope.finishedAndAcked(sync: TelemetrySyncCoordinator, id: String = "A") {
+        sync.start(start(id), owner, active = false)
+        sync.finish(finish(id))
+        runCurrent()
+        socket.connect(); runCurrent()
+        ackStart()
+        assertEquals("session:finish", socket.last.type)
+        socket.ackLast(); runCurrent()
+    }
+
+    @Test
+    fun syncCompleteIncompleteAndProtocolErrorEndTheUploadWithoutCompleteState() = runTest {
+        val sync = sync()
+        finishedAndAcked(sync)
+        assertEquals("session:syncComplete", socket.last.type)
+        socket.ackLast("""{"synchronized":false,"streams":{"motion":{"expected":3,"server":1,"synchronized":false}}}"""); runCurrent()
+        assertEquals(SyncState.INCOMPLETE, store.session("A")!!.syncState)
+        val event = socket.last.payload["events"]!!.jsonArray.single().jsonObject
+        assertEquals("SYNC_INCOMPLETE", event.str("eventType"))
+        socket.ackLast(); runCurrent()
+        assertNull(store.session("A"))
+
+        finishedAndAcked(sync, "B")
+        socket.ackLast("""{"synchronized":"yes"}"""); runCurrent() // not a boolean
+        assertEquals(SyncState.PROTOCOL_ERROR, store.session("B")!!.syncState)
+    }
+
+    @Test
+    fun serverWithoutSyncCompleteRejectsItOnceAndRetryableErrorsRetry() = runTest {
+        val sync = sync()
+        finishedAndAcked(sync)
+        socket.ack(socket.last, ok = false, error = """{"code":"INTERNAL","status":500,"retryable":true}"""); runCurrent()
+        advanceTimeBy(2_001)
+        assertEquals("session:syncComplete", socket.last.type)
+        val sent = socket.requests.size
+        socket.ack(socket.last, ok = false, error = """{"code":"UNKNOWN_TYPE","status":400,"retryable":false}"""); runCurrent()
+        assertNull(store.session("A")) // nothing else queued: row removed right away
+        assertEquals(sent, socket.requests.size) // never asked again
+    }
+
+    @Test
+    fun syncCompleteWaitsForQuarantinedItemsAndHeldBeacons() = runTest {
+        val sync = sync()
+        sync.start(start("A"), owner, active = false)
+        sync.appendMarker(MarkerPayload("m1", clientSessionId = "A", timestamp = "t", type = "stop", latitude = 1.0, longitude = 2.0), false)
+        sync.finish(finish("A"))
+        runCurrent()
+        socket.connect(); runCurrent()
+        ackStart()
+        socket.ack(socket.last, ok = false, error = """{"code":"VALIDATION_ERROR","status":400,"retryable":false}"""); runCurrent()
+        assertEquals("session:finish", socket.last.type)
+        socket.ackLast(); runCurrent()
+        assertEquals("session:finish", socket.last.type) // no syncComplete: a quarantined marker is still on the phone
+        assertNull(store.session("A")!!.syncState)
+
+        // A beacon batch of a server without beacon support does not hold the check back once support is known.
+        store.insertSessionIfAbsent(QueueSession("B", owner.collectorId, owner.serverKey, AppJson.encodeToString(SessionStartPayload.serializer(), start("B")), "srv-b", finishAcked = true, manifest = "{}"))
+        store.insert(QueueItem(kind = ItemKind.beacon, itemId = "bb", clientSessionId = "B", payload = "{}"))
+        sync.setOwner(owner); runCurrent()
+        assertEquals("session:start", socket.last.type) // asks once whether beacons are supported
+        assertEquals("B", socket.last.payload.str("clientSessionId"))
+        socket.ackLast("""{"sessionId":"srv-b","supportedTelemetryFeatures":[]}"""); runCurrent()
+        assertEquals("session:syncComplete", socket.last.type)
+        assertEquals("B", socket.last.payload.str("clientSessionId"))
     }
 }

@@ -81,6 +81,7 @@ class TelemetrySyncCoordinator(
     private sealed class Request {
         data class Start(val clientSessionId: String) : Request()
         data class Item(val item: QueueItem) : Request()
+        data class SyncComplete(val clientSessionId: String) : Request()
     }
 
     private data class InFlight(val requestId: String, val request: Request, val timeout: Job)
@@ -141,7 +142,8 @@ class TelemetrySyncCoordinator(
     }
 
     /** Flushes the remaining buffer as the last batch, then queues `session:finish` (§5.3/§7.1). */
-    fun finish(payload: FinishPayload) = scope.launch {
+    /** [onQueued] runs on the sync thread once the finish row is stored (the last batch is stored before it). */
+    fun finish(payload: FinishPayload, onQueued: () -> Unit = {}) = scope.launch {
         if (payload.clientSessionId == activeClientSessionId) {
             flushBatch()
             stopTimers()
@@ -149,6 +151,7 @@ class TelemetrySyncCoordinator(
         }
         val json = encode(FinishPayload.serializer(), payload, "session:finish", payload.clientSessionId) ?: return@launch
         store.insert(QueueItem(kind = ItemKind.finish, itemId = payload.clientSessionId, clientSessionId = payload.clientSessionId, payload = json))
+        onQueued()
         refreshStatus()
         pump()
     }
@@ -194,12 +197,16 @@ class TelemetrySyncCoordinator(
     }
 
     fun logDiagnostic(clientSessionId: String, eventType: String, metadata: Map<String, String>, timestampMs: Long) = scope.launch {
-        val eventId = newId()
-        val payload = DiagnosticEventPayload(clientSessionId, listOf(DiagnosticEventItem(eventId, eventType, Iso.format(timestampMs), metadata)))
-        val json = encode(DiagnosticEventPayload.serializer(), payload, "diagnostic:event", eventId) ?: return@launch
-        store.insert(QueueItem(kind = ItemKind.diagnostic, itemId = eventId, clientSessionId = clientSessionId, payload = json))
+        logDiagnosticNow(clientSessionId, eventType, metadata, timestampMs)
         refreshStatus()
         pump()
+    }
+
+    private fun logDiagnosticNow(clientSessionId: String, eventType: String, metadata: Map<String, String>, timestampMs: Long = nowMs()) {
+        val eventId = newId()
+        val payload = DiagnosticEventPayload(clientSessionId, listOf(DiagnosticEventItem(eventId, eventType, Iso.format(timestampMs), metadata)))
+        val json = encode(DiagnosticEventPayload.serializer(), payload, "diagnostic:event", eventId) ?: return
+        store.insert(QueueItem(kind = ItemKind.diagnostic, itemId = eventId, clientSessionId = clientSessionId, payload = json))
     }
 
     fun updateCounts(sampleCounts: SampleCounts) = scope.launch { counts = sampleCounts }
@@ -315,7 +322,12 @@ class TelemetrySyncCoordinator(
             sendItem(item, byId.getValue(item.clientSessionId))
             return
         }
-        // 6. beacon batches, only for sessions whose session:start ACK listed beaconObservationsV1 in this process.
+        // 6. session:syncComplete once a finished session has nothing left to send (iOS TelemetryUploadEngine).
+        eligible.firstOrNull { awaitingSyncComplete(it) }?.let {
+            sendSyncComplete(it)
+            return
+        }
+        // 7. beacon batches, only for sessions whose session:start ACK listed beaconObservationsV1 in this process.
         if (!beaconUploadEnabled) return
         val withBeacons = store.oldestPending(ItemKind.beacon, byId.keys, limit = 200).map { it.clientSessionId }.distinct()
         // A session whose support is unknown (restart; started before the server had the feature) asks once more:
@@ -328,6 +340,32 @@ class TelemetrySyncCoordinator(
         store.oldestPending(ItemKind.beacon, byId.keys.filter { it in beaconSupported }).firstOrNull()?.let {
             sendItem(it, byId.getValue(it.clientSessionId))
         }
+    }
+
+    /**
+     * Finish acknowledged, manifest known, not yet answered, and nothing of this session left on the phone except
+     * beacon batches the server will not take (unsupported or the upload switch is off; unknown support still waits).
+     */
+    private fun awaitingSyncComplete(session: QueueSession): Boolean {
+        if (!session.finishAcked || session.manifest == null || session.syncState != null || session.serverSessionId == null) return false
+        val id = session.clientSessionId
+        val beaconsSendable = beaconUploadEnabled && (id in beaconSupported || id !in beaconHandshakeAsked)
+        val ignored = if (beaconsSendable) 0 else store.countItems(id, ItemKind.beacon)
+        return store.countItems(id) - ignored == 0
+    }
+
+    private fun sendSyncComplete(session: QueueSession) {
+        val manifest = runCatching { AppJson.parseToJsonElement(session.manifest!!) }.getOrElse {
+            L.e(TAG, "stored manifest unreadable clientSessionId=${session.clientSessionId}", it)
+            finishSync(session.clientSessionId, SyncState.PROTOCOL_ERROR)
+            return
+        }
+        val payload = buildJsonObject {
+            put("clientSessionId", JsonPrimitive(session.clientSessionId))
+            put("sessionId", JsonPrimitive(session.serverSessionId))
+            put("lastSequences", manifest)
+        }
+        dispatch("session:syncComplete", payload, Request.SyncComplete(session.clientSessionId), session.clientSessionId)
     }
 
     private fun sendStart(session: QueueSession) {
@@ -432,6 +470,7 @@ class TelemetrySyncCoordinator(
         when (val request = current.request) {
             is Request.Start -> handleStartAck(request.clientSessionId, ok, data, error)
             is Request.Item -> handleItemAck(request.item, ok, error)
+            is Request.SyncComplete -> handleSyncCompleteAck(request.clientSessionId, ok, data, error)
         }
     }
 
@@ -466,7 +505,7 @@ class TelemetrySyncCoordinator(
     private fun handleItemAck(item: QueueItem, ok: Boolean, error: AckError?) {
         if (ok) {
             store.delete(item.seq)
-            if (item.kind == ItemKind.finish) store.setFinishAcked(item.clientSessionId)
+            if (item.kind == ItemKind.finish) store.setFinishAcked(item.clientSessionId, manifestOf(item))
             cleanupSession(item.clientSessionId)
             refreshStatus()
             pump()
@@ -500,6 +539,43 @@ class TelemetrySyncCoordinator(
         }
     }
 
+    /** `synchronized` must be a JSON boolean; anything else is a protocol error, never shown as complete. */
+    private fun handleSyncCompleteAck(clientSessionId: String, ok: Boolean, data: JsonObject?, error: AckError?) {
+        if (!ok) {
+            if (isRetryable(error)) {
+                scheduleRetry()
+            } else {
+                L.w(TAG, "session:syncComplete rejected code=${error?.code} clientSessionId=$clientSessionId")
+                finishSync(clientSessionId, SyncState.REJECTED)
+            }
+            return
+        }
+        val synchronized = (data?.get("synchronized") as? JsonPrimitive)?.takeIf { !it.isString }?.booleanOrNull
+        val state = when (synchronized) {
+            true -> SyncState.COMPLETE
+            false -> SyncState.INCOMPLETE
+            null -> SyncState.PROTOCOL_ERROR
+        }
+        L.i(TAG, "session:syncComplete ACK clientSessionId=$clientSessionId state=$state")
+        when (state) {
+            SyncState.COMPLETE -> logDiagnosticNow(clientSessionId, "SYNC_COMPLETE_ACK", emptyMap())
+            SyncState.INCOMPLETE -> logDiagnosticNow(clientSessionId, "SYNC_INCOMPLETE", mapOf("streams" to (data?.get("streams")?.toString() ?: "")))
+            else -> logDiagnosticNow(clientSessionId, "SYNC_COMPLETE_PROTOCOL_ERROR", mapOf("data" to (data?.toString() ?: "missing")))
+        }
+        finishSync(clientSessionId, state)
+    }
+
+    private fun finishSync(clientSessionId: String, state: String) {
+        store.setSyncState(clientSessionId, state)
+        cleanupSession(clientSessionId)
+        refreshStatus()
+        pump()
+    }
+
+    private fun manifestOf(item: QueueItem): String? = runCatching {
+        AppJson.parseToJsonElement(item.payload).jsonObject["lastSequences"]?.takeIf { it is JsonObject }?.toString()
+    }.getOrNull()
+
     private fun quarantine(item: QueueItem, code: String?) {
         L.w(TAG, "quarantined ${item.kind} item=${item.itemId} code=$code")
         store.update(item.copy(state = ItemState.QUARANTINED, lastErrorCode = code ?: "UNKNOWN"))
@@ -512,7 +588,9 @@ class TelemetrySyncCoordinator(
     private fun cleanupSession(clientSessionId: String) {
         if (clientSessionId == activeClientSessionId) return
         val session = store.session(clientSessionId) ?: return
-        if (session.finishAcked && store.countItems(clientSessionId) == 0) store.deleteSession(clientSessionId)
+        // A session finished with a manifest stays until the server answered session:syncComplete.
+        val syncDone = session.manifest == null || session.syncState != null
+        if (session.finishAcked && syncDone && store.countItems(clientSessionId) == 0) store.deleteSession(clientSessionId)
     }
 
     // ---- helpers ----
