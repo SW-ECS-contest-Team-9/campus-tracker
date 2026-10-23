@@ -177,7 +177,7 @@ export class LevelView {
   private parts(): Map<string, string> {
     return floorParts(this.src.buildings().map((b) => {
       const w = b.appearance?.windows, ring = metres(b.geometry.coordinates[0][0]);
-      return { id: b.buildingId, table: w?.floorsM && w.floorNames ? JSON.stringify([w.floorsM, w.floorNames]) : null,
+      return { id: b.buildingId, name: b.name, table: w?.floorsM && w.floorNames ? JSON.stringify([w.floorsM, w.floorNames]) : null,
         x: ring.reduce((t, p) => t + p[0], 0) / ring.length, y: ring.reduce((t, p) => t + p[1], 0) / ring.length };
     }));
   }

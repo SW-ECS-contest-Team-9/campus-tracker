@@ -311,9 +311,9 @@ export const baseBuildingId = (id: string) => id.split('#')[0];
  * What is lifted together (scene block id -> part id): a building, or, when its blocks carry different floor tables of the note
  * (은주관: 은주1관·은주2관, 겉모습.창.층_표), one part per table, each with its own floors. `table` is the block's table
  * (any key that is equal for the same table), null without one: such a block goes with the nearest block (centre) that has one.
- * A part's id is the building id for the part that holds that block, else the first of its blocks.
+ * A part's id is the building id for the part that holds that block, else its first block that has a name (the part label), else its first.
  */
-export function floorParts(blocks: { id: string; table: string | null; x: number; y: number }[]): Map<string, string> {
+export function floorParts(blocks: { id: string; name?: string | null; table: string | null; x: number; y: number }[]): Map<string, string> {
   const out = new Map<string, string>();
   const byBuilding = new Map<string, typeof blocks>();
   for (const b of blocks) byBuilding.set(baseBuildingId(b.id), [...(byBuilding.get(baseBuildingId(b.id)) ?? []), b]);
@@ -322,7 +322,8 @@ export function floorParts(blocks: { id: string; table: string | null; x: number
     if (new Set(tabled.map((b) => b.table)).size < 2) { for (const b of list) out.set(b.id, id); continue; }
     const tableOf = (b: (typeof list)[number]) => b.table ?? tabled.reduce((a, c) => (Math.hypot(c.x - b.x, c.y - b.y) < Math.hypot(a.x - b.x, a.y - b.y) ? c : a)).table!;
     const partOf = new Map<string, string>();
-    for (const b of [...list].sort((a, c) => Number(c.id === id) - Number(a.id === id))) if (!partOf.has(tableOf(b))) partOf.set(tableOf(b), b.id);
+    const rank = (b: (typeof list)[number]) => (b.id === id ? 2 : b.name ? 1 : 0);
+    for (const b of [...list].sort((a, c) => rank(c) - rank(a))) if (!partOf.has(tableOf(b))) partOf.set(tableOf(b), b.id);
     for (const b of list) out.set(b.id, partOf.get(tableOf(b))!);
   }
   return out;
