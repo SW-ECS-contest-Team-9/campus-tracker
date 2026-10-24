@@ -94,7 +94,16 @@ REPORT = []
 
 # ---------- 도형 도우미 ----------
 def ring(poly):
-    p = [[r2(x), r2(y)] for x, y in list(poly.exterior.coords)[:-1]]
+    p = []
+    for x, y in list(poly.exterior.coords)[:-1]:   # 0.01 m 로 반올림하면 겹치거나 한 줄에 서는 점을 뺀다(삼각형 나누기가 깨지지 않게)
+        q = [r2(x), r2(y)]
+        if not p or q != p[-1]: p.append(q)
+    if p[0] == p[-1]: p.pop()
+    k = 0
+    while len(p) > 3 and k < len(p):
+        a, b, c = p[k - 1], p[k], p[(k + 1) % len(p)]
+        if abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) < 2e-4: p.pop(k); k = max(k - 1, 0)
+        else: k += 1
     if Polygon(p).exterior.is_ccw is False: p = p[::-1]
     return p + [p[0]]
 def geom(g):
@@ -141,7 +150,11 @@ WARPED = []
 for i in ids(is_warp):
     f = F(i); g = shape(f['geometry']); sc = ST(g.centroid.coords[0])[0]
     south = ('to', -6.46, -4.6) if (sc >= 69.3 and MST(g.centroid.coords[0])[1] < -3.8) else ('fix', -6.36)
-    f['geometry'] = geom(warp_geom(f['geometry'], south)); WARPED.append(i)
+    if i.startswith('G03-LOGO-'):   # 글자·로고는 모양을 지키며 통째로: 축 차이만큼 돌리고 가운데를 단면 선을 따라 옮김
+        c = g.centroid; w = warp_pt(c.x, c.y, south); ang = math.degrees(math.atan2(A[1], A[0]) - math.atan2(U[1], U[0]))
+        f['geometry'] = geom(affinity.translate(affinity.rotate(g, ang, origin=c), w[0] - c.x, w[1] - c.y))
+    else: f['geometry'] = geom(warp_geom(f['geometry'], south))
+    WARPED.append(i)
     note(f, '오르막 실제 축(방위 113.94°) 단면으로 옮김(t\' 만, s\'·높이 그대로)')
 REPORT.append(f'B1 옮긴 지물 {len(WARPED)}')
 
@@ -226,7 +239,7 @@ for i in ids(lambda i: (i.startswith('G03-NPLANT-') and i != 'G03-NPLANT-DRUM') 
 d87 = F('G02-NPLANT-D87'); g87 = SH('G02-NPLANT-D87'); ts = [ST(c)[1] for c in g87.exterior.coords]
 t_lo, t_hi = max(8.0, min(ts)), max(ts); RAD = (t_hi - t_lo) / 2; S_END = 92.5; SC = S_END - RAD
 d87['geometry'] = geom(big(g87.intersection(R(-50, SC, -50, 50)))); note(d87, f'둥근 끝이 s\' {S_END} 에서 끝나게 동쪽 끝을 s\' {SC:.2f} 로(타일 마당 들머리 틈 s\' {S_END}~)')
-cc = P(SC, (t_lo + t_hi) / 2); disc = Point(*cc).buffer(RAD, 32).intersection(R(SC, SC + 5, -50, 50))
+cc = P(SC, (t_lo + t_hi) / 2); disc = Point(*cc).buffer(RAD, 8).intersection(R(SC, SC + 5, -50, 50))
 rnd = F('X36-FORK-PLANTER-ROUNDEND'); rnd['geometry'] = geom(disc); note(rnd, f'반지름 {RAD:.2f} m, 가운데 s\' {SC:.2f}·t\' {(t_lo + t_hi) / 2:.2f}(D87 화단 깊이의 반)')
 # 나무가 화단 밖으로 나갔는지
 PL = {i: SH(i) for i in ids(lambda i: (i.startswith('G03-NPLANT-') or i.startswith('G02-NPLANT-D') or i in ('X40-WEDGE-PLANTER', 'X36-FORK-PLANTER-ROUNDEND'))) if not F(i)['properties'].get('_drop')}
