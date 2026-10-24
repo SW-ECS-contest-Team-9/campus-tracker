@@ -59,22 +59,24 @@ for fp in sorted(STR.glob('*.geojson')):
     for ft in json.loads(fp.read_text(encoding='utf-8'))['features']: OTHERS[ft['properties'].get('id')] = ft
 def O(i): return shape(OTHERS[i]['geometry']).buffer(0)
 
-def ring(poly):
+def ring1(coords, ccw):
     p = []
-    for x, y in list(poly.exterior.coords)[:-1]:
+    for x, y in list(coords)[:-1]:
         q = [r2(x), r2(y)]
         if not p or q != p[-1]: p.append(q)
     if p[0] == p[-1]: p.pop()
-    if Polygon(p).exterior.is_ccw is False: p = p[::-1]
+    if Polygon(p).exterior.is_ccw is not ccw: p = p[::-1]
     return p + [p[0]]
+def ring(poly):   # 바깥 고리(반시계) + 구멍(시계: 가운데 원 같은 고리 칠)
+    return [ring1(poly.exterior.coords, True)] + [ring1(i.coords, False) for i in poly.interiors if Polygon(i).area > 0.01]
 def geom(g):
     g = g.buffer(0)
     if g.geom_type in ('MultiPolygon', 'GeometryCollection'):
         parts = [q for q in g.geoms if q.geom_type == 'Polygon' and q.area > 0.01]
         if len(parts) == 1: g = parts[0]
-        else: return {'type': 'MultiPolygon', 'coordinates': [[ring(q)] for q in parts]}
+        else: return {'type': 'MultiPolygon', 'coordinates': [ring(q) for q in parts]}
     assert g.geom_type == 'Polygon' and g.area > 0.0005, g
-    return {'type': 'Polygon', 'coordinates': [ring(g)]}
+    return {'type': 'Polygon', 'coordinates': ring(g)}
 def note(f, what):
     p = f['properties']; p['assumption'] = p.get('assumption', '').split(' [R4')[0] + f' [R4 2026-10-25: {what}]'
 def center(g): b = g.bounds; return np.array([(b[0] + b[2]) / 2, (b[1] + b[3]) / 2])
