@@ -483,8 +483,9 @@ export class FirstPerson {
     const { mesh, lines } = roomDrawing({ x: s.x, y: s.y, feetM: s.feetM, zone, indoor, roads: this.data.roads, buildings: this.src.buildings(), interiors: this.src.interiors?.() ?? [] });
     const pos = (p: number[]) => { const g = tmInverse(p[0], p[1]); return C.Cartesian3.fromDegrees(g.longitude, g.latitude, p[2]); };
     const edges = new C.PolylineCollection();
-    const material = C.Material.fromType('Color', { color: C.Color.fromCssColorString(ROOM.edge).withAlpha(0.85) });
-    for (const line of lines) edges.add({ positions: line.points.map(pos), width: line.width, material });
+    // 선마다 재질을 따로 만든다: 하나를 함께 쓰면 걷기를 끝낼 때 같은 재질이 두 번 파괴된다
+    const edgeColor = C.Color.fromCssColorString(ROOM.edge).withAlpha(0.85);
+    for (const line of lines) edges.add({ positions: line.points.map(pos), width: line.width, material: C.Material.fromType('Color', { color: edgeColor }) });
     for (const p of [mesh.primitive(C, pos), edges.length ? edges : null]) if (p) this.room.push(this.viewer.scene.primitives.add(p));
   }
 
