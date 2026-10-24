@@ -120,6 +120,11 @@ export interface FusedPosition {
   stationary?: boolean | null;
   headingSource?: string | null;
   horizontalUncertainty?: number | null;
+  // v4 rev 18: floor estimate (BEACON / BEACON_BAROMETER / BAROMETER)
+  floorLabel?: string | null;
+  floorBuildingId?: string | null;
+  floorSource?: string | null;
+  floorConfidence?: number | null;
   // v2.1 diagnostics
   localX?: number | null;
   localY?: number | null;

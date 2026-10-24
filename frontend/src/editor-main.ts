@@ -15,7 +15,7 @@ import { SceneLayers, bindLayerControls } from './scene-layers';
 import { editorLayerData } from './scene-layer-data';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import { declutter as keepTags, textWidth } from './label-layout';
-import { TRACK, shortName, type LvTrack, type TrackPoint } from './level-view';
+import { TRACK, markerRecords, shortName, type LvTrack, type TrackPoint } from './level-view';
 import { heightOf } from './trajectory';
 import { anchorLabel, isAnchor } from './anchor-label';
 import type { Marker } from './api';
@@ -1713,11 +1713,11 @@ async function loadSessionRaw(sessionId: string) {
   sessionRaw = { sessionId, points: [] };
   if (!sessionId) return;
   try {
-    const list = await request<{ latitude: number; longitude: number; altitude: number | null; ellipsoidalAltitude: number | null; verticalAccuracy: number | null }[]>(`/api/v1/sessions/${sessionId}/locations`);
+    const list = await request<{ latitude: number; longitude: number; altitude: number | null; ellipsoidalAltitude: number | null; verticalAccuracy: number | null; timestamp: string }[]>(`/api/v1/sessions/${sessionId}/locations`);
     if (sessionId !== $('fusion-session').value) return;
     sessionRaw = { sessionId, points: list.map((p) => {
       const q = tmForward(p.latitude, p.longitude), h = heightOf(p);
-      return { x: q.x, y: q.y, h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM) };
+      return { x: q.x, y: q.y, h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM), t: Date.parse(p.timestamp) };
     }) };
   } catch (err) { say(`세션 원본 위치를 불러오지 못했습니다: ${(err as Error).message}`, 'warning'); }
   spaceViews?.level.tracksChanged();
@@ -1765,7 +1765,11 @@ function drawSessionMarkers() {
 function liftedTracks(): LvTrack[] {
   if (!$<HTMLInputElement>('fusion-overlay').checked) return [];
   const out: LvTrack[] = [];
-  if (sessionRaw.points.length) out.push({ id: `${sessionRaw.sessionId}|raw`, kind: 'raw', label: '세션 원본 위치', points: sessionRaw.points });
+  if (sessionRaw.points.length) {
+    // 층별 노드: the floor the session's markers give a sample (level-view.ts markerRecords) wins over its height
+    const records = markerRecords(sessionRaw.points.map((p) => p.t), sessionMarkers.map((m) => ({ ...m, t: Date.parse(m.timestamp) })));
+    out.push({ id: `${sessionRaw.sessionId}|raw`, kind: 'raw', label: '세션 원본 위치', points: sessionRaw.points.map((p, i) => ({ ...p, record: records[i] })) });
+  }
   if (snapPoints.length) out.push({ id: `${$('fusion-run').value}|run`, kind: 'fused', label: 'Fusion 실행', points: snapPoints.map((p) => ({ x: p.x + ORIGIN.x, y: p.y + ORIGIN.y, h: p.h })) });
   return out;
 }

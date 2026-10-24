@@ -439,11 +439,17 @@ export class SessionTrack {
   replaceMarkers(markers: Marker[]) {
     for (const e of this.markers.values()) this.viewer.entities.remove(e);
     this.markers.clear();
+    this.markerList.length = 0;
     markers.forEach((m) => this.addMarker(m));
   }
 
+  /** The session's markers as received (층별 노드: the floors they give the samples). */
+  readonly markerList: Marker[] = [];
+
   addMarker(m: Marker) {
     if (this.markers.has(m.markerId)) return;
+    const i = this.markerList.findIndex((x) => x.markerId === m.markerId);
+    if (i >= 0) this.markerList[i] = m; else this.markerList.push(m);
     const C = Cesium();
     // snapped onto the finished fusion track (position + height at the marker time); the phone's own altitude
     // jumps by tens of meters indoors and is only the fallback while there is no fused track
