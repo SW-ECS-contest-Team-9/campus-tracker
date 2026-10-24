@@ -109,7 +109,7 @@ await sleep(300); await shot('01b-북악관-범례');
 await ev(`(() => { document.querySelector('.level-panel').scrollTop = 0; return 1; })()`);
 const nFloors = info.bukak.floors.length;
 const pick = (name) => info.bukak.floors.findIndex((f) => f.startsWith(name));
-for (const [label, i] of [['02-북악관-지하1층-포커싱', pick('지하 1층')], ['03-북악관-3층-포커싱', pick('3층')], ['04-북악관-7층-포커싱', nFloors - 1]]) if (i >= 0) await lift(`showBuilding(${bid}, ${i})`, label);
+for (const [label, i] of [['02-북악관-지하1층-포커싱', pick('지하 1층')], ['03-북악관-3층-포커싱', pick('3층')], ['04-북악관-맨위층-포커싱', nFloors - 1]]) if (i >= 0) await lift(`showBuilding(${bid}, ${i})`, label);
 await lift(`showZone('b2')`, '05-운동장-지하2층', true);
 await lift(`showZone('b1')`, '06-운동장-지하1층');
 const passageZones = [...new Set(info.passage.map((s) => s.split('/')[0]).filter((z) => z !== '-'))];
