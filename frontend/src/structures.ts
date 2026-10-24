@@ -25,13 +25,17 @@ export const STRUCTURES = {
   /** A `planting` platform (a planted bank or a planter band on a wall): its top is the planted green, its sides are this wall colour. */
   plantingSide: '#a9a59b',
   /** A box whose `material` is one of these is drawn in this colour instead of the colour of its `type` (a concrete slab is not a timber deck; `opening` = a dark panel marking a portal in a wall; brick, glass, stone, roof tiles, railings and the trunk and foliage of a simple tree are what the zone files name). */
-  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551', water: '#7fb9cf', fence: '#5f6a5c' } as Record<string, string>,
+  boxMaterials: { concrete: '#cfcbc0', opening: '#2f3136', brick: '#9a5f4c', glass: '#5f7482', rail: '#6f675d', roof_tile: '#6a6663', roof_red: '#b5563c', foliage: '#6f8f5c', trunk: '#6b5743', stone: '#bdb7a8', white_stone: '#e6e3da', red_railing: '#a8473a', timber: '#a47551', water: '#7fb9cf', fence: '#5f6a5c',
+    // A2 ground surfaces (a2-ground-surfaces.geojson, docs/audit/registry/ground.py): light stone tiles, grey paving blocks, the ring-patterned blocks of the sloping way (as its G03 paint), asphalt (the carriageway black), granite curbs, soil, planting
+    tile: '#cdc6b8', block: '#a8a297', ring_block: '#9c9b95', asphalt: '#1b1d20', curb: '#dcd8cd', soil: '#9c8462', planting: '#7f9a6b' } as Record<string, string>,
   /** The planted top of a planter: a muted green. */
   planterTop: '#7f9a6b',
   /** The joint pattern (paving-pattern.ts: 1 = blocks) of the top of a platform whose material is `paving` and that no road or area colours (Z09). */
   pavingPattern: 1,
   /** A box may name the pattern of its faces with `pattern` (G03: `rings` = the ring paving of the sloping way, paving-pattern.ts kind 3). */
-  boxPatterns: { rings: 3 } as Record<string, number>,
+  boxPatterns: { rings: 3, block: 1, slab: 2, planks: 4 } as Record<string, number>,
+  /** A2: the pattern of a box that names none, by its `type` (a timber deck, or one of no material, is laid in boards). */
+  typePatterns: { deck: 4 } as Record<string, number>,
   /** A material or type this table does not know. */
   unknown: '#b9b4a8',
   /** Voids (shown with the underground ways, and as a hole on the cut face). */
@@ -48,8 +52,8 @@ export const STRUCTURES = {
   sideShade: 0.72,
   sideContrast: 0.12,
   bottomShade: 0.5,
-  /** Thin lines along the top edges of these types, so steps read as steps from straight above too (not platforms: two platforms at one height would show a line across one floor). */
-  outlined: ['stair_step', 'landing', 'deck', 'canopy'],
+  /** Thin lines along the top edges of these types, so steps read as steps from straight above too (not platforms: two platforms at one height would show a line across one floor). A2: a ground surface and a curb too: the line is the boundary of the surface. */
+  outlined: ['stair_step', 'landing', 'deck', 'canopy', 'surface', 'curb'],
   outlineShade: 0.55,
   /**
    * Z08: on the cut face of a cross-section these kinds are named with their height (a platform by its top, a box by
@@ -450,6 +454,27 @@ export function solidColors(solid: Solid): { body: string; top: string } {
   const color = solid.role === 'box' ? own(solid.props?.color) : null;
   const top = (solid.role === 'box' ? own(solid.props?.topColor) : null) ?? (solid.type === 'planter' ? STRUCTURES.planterTop : color ?? body);
   return { body: color ?? body, top };
+}
+
+/**
+ * A2: whether a top edge of a ground surface (a → b, the surface on its left, as solidMesh gives them) is a seam inside
+ * one surface: 5 cm outside its middle lies another surface of the same material at the same height (two platforms of one
+ * plaza, two pieces of one carriageway). Such an edge is not a boundary and gets no line.
+ */
+export function surfaceSeam(edge: number[][], solid: Solid, surfaces: Solid[], toleranceM = 0.05): boolean {
+  const [a, b] = edge;
+  const length = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const x = (a[0] + b[0]) / 2 + ((b[1] - a[1]) / length) * 0.05, y = (a[1] + b[1]) / 2 - ((b[0] - a[0]) / length) * 0.05;
+  const z = (a[2] + b[2]) / 2;
+  return surfaces.some((o) => o !== solid && o.type === 'surface' && o.material === solid.material && polygonContains(x, y, o.polygon) && Math.abs(topHeight(o)(x, y) - z) <= toleranceM);
+}
+
+/** The joint pattern of a box (paving-pattern.ts kind, 0 = none): its own `pattern`, else the one of its type (A2). */
+export function boxPattern(solid: Pick<Solid, 'type' | 'props' | 'material'>): number {
+  const own = STRUCTURES.boxPatterns[String(solid.props?.pattern ?? '')];
+  if (own !== undefined) return own;
+  // a deck of another material (a concrete slab) is not laid in boards
+  return !solid.material || solid.material === 'timber' || solid.material === 'wood' ? STRUCTURES.typePatterns[solid.type] ?? 0 : 0;
 }
 
 /** What a void is called on the cut face: its own `name` (U01: the storeys under the field), else the plain word. */
