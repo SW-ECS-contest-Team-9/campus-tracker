@@ -1,0 +1,2645 @@
+{
+ "type": "FeatureCollection",
+ "name": "r5-underground",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIRWELL",
+    "type": "void",
+    "kind": "void",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.6,
+    "assumption": "R5: 혜인관 북동 어귀 계단실(1주차장 B1 사람 출입구, 학교 지도 \"청운관 동\"): 어귀 틀 안과 남동 옆벽 밖 땅 밑 1.25 m",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "name": "청운관 동 지하통로 계단(1주차장 B1)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.6,
+       557259.07
+      ],
+      [
+       201245.15,
+       557261.64
+      ],
+      [
+       201240.14,
+       557264.66
+      ],
+      [
+       201238.59,
+       557262.09
+      ],
+      [
+       201243.6,
+       557259.07
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-DOORWAY",
+    "type": "void",
+    "kind": "void",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "U02-VOID-B1",
+    "fromM": 143.5,
+    "toM": 146.0,
+    "assumption": "R5: 계단 아래 끝에서 B1 북동 벽을 지나는 문 통로",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "name": "청운관 동 지하통로 문(1주차장 B1)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201239.0,
+       557260.44
+      ],
+      [
+       201239.69,
+       557261.6
+      ],
+      [
+       201238.67,
+       557262.22
+      ],
+      [
+       201237.97,
+       557261.06
+      ],
+      [
+       201239.0,
+       557260.44
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-TOP",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.6,
+    "assumption": "R5: 어귀 입 안 선 자리(149.6 = 어귀 앞 땅)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#8e8f8c"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201239.93,
+       557263.15
+      ],
+      [
+       201240.65,
+       557264.35
+      ],
+      [
+       201240.14,
+       557264.66
+      ],
+      [
+       201239.42,
+       557263.46
+      ],
+      [
+       201239.93,
+       557263.15
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.42,
+    "assumption": "R5: 윗줄 1/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.14,
+       557263.02
+      ],
+      [
+       201240.84,
+       557264.18
+      ],
+      [
+       201240.63,
+       557264.31
+      ],
+      [
+       201239.93,
+       557263.15
+      ],
+      [
+       201240.14,
+       557263.02
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.24,
+    "assumption": "R5: 윗줄 2/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.36,
+       557262.89
+      ],
+      [
+       201241.06,
+       557264.05
+      ],
+      [
+       201240.84,
+       557264.18
+      ],
+      [
+       201240.14,
+       557263.02
+      ],
+      [
+       201240.36,
+       557262.89
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.06,
+    "assumption": "R5: 윗줄 3/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.57,
+       557262.76
+      ],
+      [
+       201241.27,
+       557263.92
+      ],
+      [
+       201241.06,
+       557264.05
+      ],
+      [
+       201240.36,
+       557262.89
+      ],
+      [
+       201240.57,
+       557262.76
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 148.88,
+    "assumption": "R5: 윗줄 4/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.79,
+       557262.63
+      ],
+      [
+       201241.48,
+       557263.79
+      ],
+      [
+       201241.27,
+       557263.92
+      ],
+      [
+       201240.57,
+       557262.76
+      ],
+      [
+       201240.79,
+       557262.63
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 148.7,
+    "assumption": "R5: 윗줄 5/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.0,
+       557262.5
+      ],
+      [
+       201241.7,
+       557263.66
+      ],
+      [
+       201241.48,
+       557263.79
+      ],
+      [
+       201240.79,
+       557262.63
+      ],
+      [
+       201241.0,
+       557262.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 148.52,
+    "assumption": "R5: 윗줄 6/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.21,
+       557262.37
+      ],
+      [
+       201241.91,
+       557263.53
+      ],
+      [
+       201241.7,
+       557263.66
+      ],
+      [
+       201241.0,
+       557262.5
+      ],
+      [
+       201241.21,
+       557262.37
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 148.34,
+    "assumption": "R5: 윗줄 7/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.43,
+       557262.25
+      ],
+      [
+       201242.13,
+       557263.4
+      ],
+      [
+       201241.91,
+       557263.53
+      ],
+      [
+       201241.21,
+       557262.37
+      ],
+      [
+       201241.43,
+       557262.25
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 148.16,
+    "assumption": "R5: 윗줄 8/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.64,
+       557262.12
+      ],
+      [
+       201242.34,
+       557263.27
+      ],
+      [
+       201242.13,
+       557263.4
+      ],
+      [
+       201241.43,
+       557262.25
+      ],
+      [
+       201241.64,
+       557262.12
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.99,
+    "assumption": "R5: 윗줄 9/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.86,
+       557261.99
+      ],
+      [
+       201242.55,
+       557263.14
+      ],
+      [
+       201242.34,
+       557263.27
+      ],
+      [
+       201241.64,
+       557262.12
+      ],
+      [
+       201241.86,
+       557261.99
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.81,
+    "assumption": "R5: 윗줄 10/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.07,
+       557261.86
+      ],
+      [
+       201242.77,
+       557263.01
+      ],
+      [
+       201242.55,
+       557263.14
+      ],
+      [
+       201241.86,
+       557261.99
+      ],
+      [
+       201242.07,
+       557261.86
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.63,
+    "assumption": "R5: 윗줄 11/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.28,
+       557261.73
+      ],
+      [
+       201242.98,
+       557262.89
+      ],
+      [
+       201242.77,
+       557263.01
+      ],
+      [
+       201242.07,
+       557261.86
+      ],
+      [
+       201242.28,
+       557261.73
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.45,
+    "assumption": "R5: 윗줄 12/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.5,
+       557261.6
+      ],
+      [
+       201243.2,
+       557262.76
+      ],
+      [
+       201242.98,
+       557262.89
+      ],
+      [
+       201242.28,
+       557261.73
+      ],
+      [
+       201242.5,
+       557261.6
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A13",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.27,
+    "assumption": "R5: 윗줄 13/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.71,
+       557261.47
+      ],
+      [
+       201243.41,
+       557262.63
+      ],
+      [
+       201243.2,
+       557262.76
+      ],
+      [
+       201242.5,
+       557261.6
+      ],
+      [
+       201242.71,
+       557261.47
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A14",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 147.09,
+    "assumption": "R5: 윗줄 14/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.93,
+       557261.34
+      ],
+      [
+       201243.62,
+       557262.5
+      ],
+      [
+       201243.41,
+       557262.63
+      ],
+      [
+       201242.71,
+       557261.47
+      ],
+      [
+       201242.93,
+       557261.34
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A15",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.91,
+    "assumption": "R5: 윗줄 15/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.14,
+       557261.21
+      ],
+      [
+       201243.84,
+       557262.37
+      ],
+      [
+       201243.62,
+       557262.5
+      ],
+      [
+       201242.93,
+       557261.34
+      ],
+      [
+       201243.14,
+       557261.21
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-A16",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.73,
+    "assumption": "R5: 윗줄 16/17 단(북서 → 남동)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-A",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.36,
+       557261.08
+      ],
+      [
+       201244.05,
+       557262.24
+      ],
+      [
+       201243.84,
+       557262.37
+      ],
+      [
+       201243.14,
+       557261.21
+      ],
+      [
+       201243.36,
+       557261.08
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-LANDING",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.55,
+    "assumption": "R5: 참(146.55, 되돌림. 남동 옆벽 밖 땅 밑까지)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#8e8f8c",
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.68,
+       557259.2
+      ],
+      [
+       201245.12,
+       557261.59
+      ],
+      [
+       201244.05,
+       557262.24
+      ],
+      [
+       201242.61,
+       557259.84
+      ],
+      [
+       201243.68,
+       557259.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.37,
+    "assumption": "R5: 아랫줄 1/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.61,
+       557259.84
+      ],
+      [
+       201243.3,
+       557261.0
+      ],
+      [
+       201243.09,
+       557261.13
+      ],
+      [
+       201242.39,
+       557259.97
+      ],
+      [
+       201242.61,
+       557259.84
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.19,
+    "assumption": "R5: 아랫줄 2/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.39,
+       557259.97
+      ],
+      [
+       201243.09,
+       557261.13
+      ],
+      [
+       201242.88,
+       557261.26
+      ],
+      [
+       201242.18,
+       557260.1
+      ],
+      [
+       201242.39,
+       557259.97
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 146.01,
+    "assumption": "R5: 아랫줄 3/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201242.18,
+       557260.1
+      ],
+      [
+       201242.88,
+       557261.26
+      ],
+      [
+       201242.66,
+       557261.39
+      ],
+      [
+       201241.96,
+       557260.23
+      ],
+      [
+       201242.18,
+       557260.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 145.83,
+    "assumption": "R5: 아랫줄 4/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.96,
+       557260.23
+      ],
+      [
+       201242.66,
+       557261.39
+      ],
+      [
+       201242.45,
+       557261.51
+      ],
+      [
+       201241.75,
+       557260.36
+      ],
+      [
+       201241.96,
+       557260.23
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 145.65,
+    "assumption": "R5: 아랫줄 5/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.75,
+       557260.36
+      ],
+      [
+       201242.45,
+       557261.51
+      ],
+      [
+       201242.23,
+       557261.64
+      ],
+      [
+       201241.54,
+       557260.49
+      ],
+      [
+       201241.75,
+       557260.36
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 145.47,
+    "assumption": "R5: 아랫줄 6/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.54,
+       557260.49
+      ],
+      [
+       201242.23,
+       557261.64
+      ],
+      [
+       201242.02,
+       557261.77
+      ],
+      [
+       201241.32,
+       557260.62
+      ],
+      [
+       201241.54,
+       557260.49
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B07",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 145.29,
+    "assumption": "R5: 아랫줄 7/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.32,
+       557260.62
+      ],
+      [
+       201242.02,
+       557261.77
+      ],
+      [
+       201241.8,
+       557261.9
+      ],
+      [
+       201241.11,
+       557260.75
+      ],
+      [
+       201241.32,
+       557260.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B08",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 145.11,
+    "assumption": "R5: 아랫줄 8/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201241.11,
+       557260.75
+      ],
+      [
+       201241.8,
+       557261.9
+      ],
+      [
+       201241.59,
+       557262.03
+      ],
+      [
+       201240.89,
+       557260.87
+      ],
+      [
+       201241.11,
+       557260.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B09",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.94,
+    "assumption": "R5: 아랫줄 9/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.89,
+       557260.87
+      ],
+      [
+       201241.59,
+       557262.03
+      ],
+      [
+       201241.38,
+       557262.16
+      ],
+      [
+       201240.68,
+       557261.0
+      ],
+      [
+       201240.89,
+       557260.87
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B10",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.76,
+    "assumption": "R5: 아랫줄 10/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.68,
+       557261.0
+      ],
+      [
+       201241.38,
+       557262.16
+      ],
+      [
+       201241.16,
+       557262.29
+      ],
+      [
+       201240.47,
+       557261.13
+      ],
+      [
+       201240.68,
+       557261.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B11",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.58,
+    "assumption": "R5: 아랫줄 11/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.47,
+       557261.13
+      ],
+      [
+       201241.16,
+       557262.29
+      ],
+      [
+       201240.95,
+       557262.42
+      ],
+      [
+       201240.25,
+       557261.26
+      ],
+      [
+       201240.47,
+       557261.13
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B12",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.4,
+    "assumption": "R5: 아랫줄 12/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.25,
+       557261.26
+      ],
+      [
+       201240.95,
+       557262.42
+      ],
+      [
+       201240.73,
+       557262.55
+      ],
+      [
+       201240.04,
+       557261.39
+      ],
+      [
+       201240.25,
+       557261.26
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B13",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.22,
+    "assumption": "R5: 아랫줄 13/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201240.04,
+       557261.39
+      ],
+      [
+       201240.73,
+       557262.55
+      ],
+      [
+       201240.52,
+       557262.68
+      ],
+      [
+       201239.82,
+       557261.52
+      ],
+      [
+       201240.04,
+       557261.39
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B14",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 144.04,
+    "assumption": "R5: 아랫줄 14/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201239.82,
+       557261.52
+      ],
+      [
+       201240.52,
+       557262.68
+      ],
+      [
+       201240.31,
+       557262.81
+      ],
+      [
+       201239.61,
+       557261.65
+      ],
+      [
+       201239.82,
+       557261.52
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B15",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 143.86,
+    "assumption": "R5: 아랫줄 15/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201239.61,
+       557261.65
+      ],
+      [
+       201240.31,
+       557262.81
+      ],
+      [
+       201240.09,
+       557262.93
+      ],
+      [
+       201239.4,
+       557261.78
+      ],
+      [
+       201239.61,
+       557261.65
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-B16",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 143.68,
+    "assumption": "R5: 아랫줄 16/17 단(남동 → 북서, 마지막 단 다음이 B1 바닥 143.5)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#9a9b98",
+    "stair": "R5-HYEIN-NE-STAIR-B",
+    "riseM": 0.179,
+    "runM": 0.25,
+    "widthM": 1.35,
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201239.4,
+       557261.78
+      ],
+      [
+       201240.09,
+       557262.93
+      ],
+      [
+       201239.88,
+       557263.06
+      ],
+      [
+       201239.18,
+       557261.91
+      ],
+      [
+       201239.4,
+       557261.78
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-SPLIT",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 150.5,
+    "assumption": "R5: 두 줄 사이 벽(위 끝 손잡이 높이, 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#b9b8b2",
+    "material": "concrete"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.3,
+       557261.0
+      ],
+      [
+       201243.36,
+       557261.08
+      ],
+      [
+       201239.42,
+       557263.46
+      ],
+      [
+       201239.36,
+       557263.37
+      ],
+      [
+       201243.3,
+       557261.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-PARAPET",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 149.6,
+    "toM": 150.6,
+    "assumption": "R5: 어귀 입의 윗줄 옆 낮은 벽(떨어짐 막이, 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#b9b8b2",
+    "material": "concrete"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201244.05,
+       557262.24
+      ],
+      [
+       201244.13,
+       557262.37
+      ],
+      [
+       201240.7,
+       557264.43
+      ],
+      [
+       201240.63,
+       557264.31
+      ],
+      [
+       201244.05,
+       557262.24
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-WALL-SW",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.3,
+    "assumption": "R5: 계단실 남서 벽(B1 쪽)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#b9b8b2",
+    "material": "concrete",
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.67,
+       557258.79
+      ],
+      [
+       201243.77,
+       557258.96
+      ],
+      [
+       201239.62,
+       557261.47
+      ],
+      [
+       201239.51,
+       557261.3
+      ],
+      [
+       201243.67,
+       557258.79
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-WALL-SE",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.3,
+    "assumption": "R5: 계단실 남동 끝 벽(땅 밑)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#b9b8b2",
+    "material": "concrete",
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201243.67,
+       557258.79
+      ],
+      [
+       201245.4,
+       557261.66
+      ],
+      [
+       201245.23,
+       557261.77
+      ],
+      [
+       201243.5,
+       557258.9
+      ],
+      [
+       201243.67,
+       557258.79
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-STAIR-WALL-NE",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 143.5,
+    "toM": 149.3,
+    "assumption": "R5: 계단실 북동 벽(옆벽 밖 땅 밑)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#b9b8b2",
+    "material": "concrete",
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201245.12,
+       557261.59
+      ],
+      [
+       201245.23,
+       557261.77
+      ],
+      [
+       201244.16,
+       557262.41
+      ],
+      [
+       201244.05,
+       557262.24
+      ],
+      [
+       201245.12,
+       557261.59
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-B1-DOOR",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "있음: 확정에 가까운 추정(사진 02 아래로 내려가는 어귀 + 학교 지하도 지도 초록 점 \"청운관 동\" 7 m), 평면·단 수·참·문 자리 추정",
+    "basePlane": "U02-VOID-B1",
+    "fromM": 143.5,
+    "toM": 145.7,
+    "assumption": "R5: 1주차장 B1 북동 벽의 문(갈색 철문으로 둠: 청운관 쪽 문과 같은 색, 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#6b4a2f",
+    "underground": true,
+    "inVoid": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201238.55,
+       557261.83
+      ],
+      [
+       201239.07,
+       557260.75
+      ],
+      [
+       201239.14,
+       557260.88
+      ],
+      [
+       201238.63,
+       557261.96
+      ],
+      [
+       201238.55,
+       557261.83
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.27,
+    "toM": 115.4,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 1/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2c230"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201086.91,
+       557229.2
+      ],
+      [
+       201086.2,
+       557229.2
+      ],
+      [
+       201086.2,
+       557225.6
+      ],
+      [
+       201086.91,
+       557225.6
+      ],
+      [
+       201086.91,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.26,
+    "toM": 115.39,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 2/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201087.62,
+       557229.2
+      ],
+      [
+       201086.91,
+       557229.2
+      ],
+      [
+       201086.91,
+       557225.6
+      ],
+      [
+       201087.62,
+       557225.6
+      ],
+      [
+       201087.62,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-3",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.25,
+    "toM": 115.38,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 3/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2c230"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201088.33,
+       557229.2
+      ],
+      [
+       201087.62,
+       557229.2
+      ],
+      [
+       201087.62,
+       557225.6
+      ],
+      [
+       201088.33,
+       557225.6
+      ],
+      [
+       201088.33,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-4",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.24,
+    "toM": 115.37,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 4/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201089.04,
+       557229.2
+      ],
+      [
+       201088.33,
+       557229.2
+      ],
+      [
+       201088.33,
+       557225.6
+      ],
+      [
+       201089.04,
+       557225.6
+      ],
+      [
+       201089.04,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-5",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.24,
+    "toM": 115.37,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 5/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2c230"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201089.74,
+       557229.2
+      ],
+      [
+       201089.04,
+       557229.2
+      ],
+      [
+       201089.04,
+       557225.6
+      ],
+      [
+       201089.74,
+       557225.6
+      ],
+      [
+       201089.74,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-6",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.23,
+    "toM": 115.36,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 6/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201090.45,
+       557229.2
+      ],
+      [
+       201089.74,
+       557229.2
+      ],
+      [
+       201089.74,
+       557225.6
+      ],
+      [
+       201090.45,
+       557225.6
+      ],
+      [
+       201090.45,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-7",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.22,
+    "toM": 115.35,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 7/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2c230"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.16,
+       557229.2
+      ],
+      [
+       201090.45,
+       557229.2
+      ],
+      [
+       201090.45,
+       557225.6
+      ],
+      [
+       201091.16,
+       557225.6
+      ],
+      [
+       201091.16,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-YUDAM-BUMP-8",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음·자리: R3 정사 0.025 m/px, 구역 노트 분수 광장과 주변 557219~557229 표), 추정(높이·마디 수)",
+    "basePlane": "Z03-PLATFORM-ROAD-B",
+    "fromM": 115.21,
+    "toM": 115.34,
+    "assumption": "R5: 유담관 옆 차도 과속방지턱(노랑·흰 빗금 띠, 폭 3.6 m, 높이 0.08 추정) 8/8",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.87,
+       557229.2
+      ],
+      [
+       201091.16,
+       557229.2
+      ],
+      [
+       201091.16,
+       557225.6
+      ],
+      [
+       201091.87,
+       557225.6
+      ],
+      [
+       201091.87,
+       557229.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 149.62,
+    "toM": 149.64,
+    "assumption": "R5: 장애인 주차 칸 1(파랑, 3.55 x 5.1 m), 바닥 149.60",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#2f6db5",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201265.8,
+       557256.8
+      ],
+      [
+       201265.8,
+       557260.3
+      ],
+      [
+       201260.7,
+       557260.3
+      ],
+      [
+       201260.7,
+       557256.8
+      ],
+      [
+       201265.8,
+       557256.8
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-1-SIGN",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 149.64,
+    "toM": 149.65,
+    "assumption": "R5: 장애인 칸 1 흰 그림(네모로 줄임), 바닥 149.60",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201263.85,
+       557257.95
+      ],
+      [
+       201263.85,
+       557259.15
+      ],
+      [
+       201262.65,
+       557259.15
+      ],
+      [
+       201262.65,
+       557257.95
+      ],
+      [
+       201263.85,
+       557257.95
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-2-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 149.62,
+    "toM": 149.64,
+    "assumption": "R5: 장애인 주차 칸 2(파랑, 3.55 x 5.1 m), 바닥 149.60",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#2f6db5",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201260.7,
+       557256.0
+      ],
+      [
+       201265.8,
+       557256.0
+      ],
+      [
+       201265.8,
+       557256.8
+      ],
+      [
+       201260.7,
+       557256.8
+      ],
+      [
+       201260.7,
+       557256.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-2-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-HYEIN-HYEIN-GROUND",
+    "fromM": 149.02,
+    "toM": 149.04,
+    "assumption": "R5: 장애인 주차 칸 2(파랑, 3.55 x 5.1 m), 바닥 149.00",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#2f6db5",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201265.8,
+       557253.2
+      ],
+      [
+       201265.8,
+       557256.0
+      ],
+      [
+       201260.7,
+       557256.0
+      ],
+      [
+       201260.7,
+       557253.2
+      ],
+      [
+       201265.8,
+       557253.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-2-SIGN",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-HYEIN-HYEIN-GROUND",
+    "fromM": 149.04,
+    "toM": 149.05,
+    "assumption": "R5: 장애인 칸 2 흰 그림(네모로 줄임), 바닥 149.00",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#f2f2ee",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201263.85,
+       557254.4
+      ],
+      [
+       201263.85,
+       557255.6
+      ],
+      [
+       201262.65,
+       557255.6
+      ],
+      [
+       201262.65,
+       557254.4
+      ],
+      [
+       201263.85,
+       557254.4
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-AISLE-1",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-CHEONGUN-CHEONGUN-GROUND",
+    "fromM": 149.62,
+    "toM": 149.63,
+    "assumption": "R5: 장애인 칸 옆 빗금 통로(회색·흰, 빗금은 민 회색으로 줄임), 바닥 149.60",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#c9cbc7",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201259.5,
+       557256.0
+      ],
+      [
+       201260.7,
+       557256.0
+      ],
+      [
+       201260.7,
+       557260.3
+      ],
+      [
+       201259.5,
+       557260.3
+      ],
+      [
+       201259.5,
+       557256.0
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R5-HYEIN-NE-ACCESSIBLE-AISLE-2",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: S-MAP 정사 10·사진 02), 추정(칸 크기 ±0.3 m, 휠체어 그림은 흰 네모로 줄임)",
+    "basePlane": "Z05-PLATFORM-HYEIN-HYEIN-GROUND",
+    "fromM": 149.02,
+    "toM": 149.03,
+    "assumption": "R5: 장애인 칸 옆 빗금 통로(회색·흰, 빗금은 민 회색으로 줄임), 바닥 149.00",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md(사진 02·학교 지하도 지도·S-MAP 정사 10·R3 정사)",
+    "color": "#c9cbc7",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201260.7,
+       557253.2
+      ],
+      [
+       201260.7,
+       557256.0
+      ],
+      [
+       201259.5,
+       557256.0
+      ],
+      [
+       201259.5,
+       557253.2
+      ],
+      [
+       201260.7,
+       557253.2
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
