@@ -788,6 +788,8 @@ export function trackOnBuilding(points: TrackPoint[], rings: number[][][], floor
   const out: TrackSpot[] = [];
   if (!floorsM.length) return out;
   const nearest = (h: number) => floorsM.reduce((best, m, i) => (Math.abs(m - h) < Math.abs(floorsM[best] - h) ? i : best), 0);
+  // 높이를 아는 점: 지하 구획과 같은 층 띠(바닥 − 1.0 m ~ 윗층 바닥 − 1.0 m). 폰은 바닥 위 1 m 남짓이라 "가장 가까운 층"은 낮은 층고에서 윗층으로 간다
+  const band = (h: number) => { let f = 0; floorsM.forEach((m, i) => { if (h >= m - TRACK.belowFloorM && m >= floorsM[f]) f = i; }); return f; };
   const numbers = own?.floorNames.map((n) => floorInText(n)) ?? [];
   points.forEach((p, index) => {
     if (!num(p.x) || !num(p.y) || !inRings(rings, p.x, p.y)) return;
@@ -799,7 +801,7 @@ export function trackOnBuilding(points: TrackPoint[], rings: number[][][], floor
     }
     const known = knownHeight(p);
     const sure = known && p.h >= Math.min(blocks.baseM, floorsM[0]) - TRACK.buildingSlackM && p.h <= blocks.roofM + TRACK.buildingSlackM;
-    const floor = nearest(known ? p.h : groundAt(p.x, p.y));
+    const floor = known ? band(p.h) : nearest(groundAt(p.x, p.y));
     out.push({ index, z: floorsM[floor], sure, grade: sure ? 'height' : 'unknown', floor });
   });
   return out;
