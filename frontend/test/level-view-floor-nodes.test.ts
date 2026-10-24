@@ -139,7 +139,7 @@ test('층별 노드(구획): 모든 구획(지상·지하 층·경사 지하)에
 });
 
 test('층별 노드: 펼친 마지막 장면에서 점은 제 층 판과 같이 옮겨진다(판마다 위로·옆으로 한 칸)', () => {
-  // 레이어의 점 자리 = onFloor(층)([x, y, 층 높이]) + 0.6 = 그 층 판을 옮기는 것과 같은 fan (화면 확인은 갈무리 스크립트의 trackDots)
+  // 레이어의 점 자리 = onFloor(층)([x, y, 층 높이]) + 실내 벽 높이 + 0.3 = 그 층 판을 옮기는 것과 같은 fan (화면 확인은 갈무리 스크립트의 trackDots)
   const step = [0, 30], fan = fanOut(FLOORS, 300, step, 6);
   const spots = onBuilding(FLOORS.map((m) => ({ x: 5, y: 5, h: m + 1 })));
   for (const s of spots) {

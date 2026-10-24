@@ -470,9 +470,9 @@ export class LevelView {
           });
         }
         if (!fused || pts.length === 1 || grade === 'record') pts.forEach((position, k) => {
-          points.add(grade === 'record' ? { position, color, pixelSize: tpx.dot + 3, outlineColor: C.Color.WHITE, outlineWidth: 1.5 }
-            : grade === 'height' ? { position, color: color.withAlpha(0.5), pixelSize: tpx.dot + 1, outlineColor: C.Color.WHITE.withAlpha(0.6), outlineWidth: 1 }
-            : { position, color: C.Color.WHITE.withAlpha(0.15), pixelSize: tpx.dot + 3, outlineColor: color.withAlpha(0.85), outlineWidth: 1.5 });
+          points.add(grade === 'record' ? { position, color, pixelSize: tpx.dot + 5, outlineColor: C.Color.WHITE, outlineWidth: 2 }
+            : grade === 'height' ? { position, color: color.withAlpha(0.5), pixelSize: tpx.dot + 3, outlineColor: C.Color.WHITE.withAlpha(0.7), outlineWidth: 1 }
+            : { position, color: C.Color.WHITE.withAlpha(0.2), pixelSize: tpx.dot + 4, outlineColor: color.withAlpha(0.9), outlineWidth: 2 });
           dots.push({ track: track.id, index: run[k].index, grade, floor: run[k].floor, at: where[k] });
         });
       }
@@ -709,7 +709,8 @@ export class LevelView {
       for (const track of tracks) {
         const spots = spotsOnFocus(trackOnBuilding(track.points, footprints.flatMap((f) => f.rings), floors.map((f) => f.m), { baseM: Math.min(...blocks.map((b) => b.baseM)), roofM: Math.max(...blocks.map((b) => b.roofM)) }, this.src.groundAt,
           { id: u.id, floorNames: floors.map((f) => f.name), partOf }), u.focus);
-        drawTrack(track, spots, (s) => { const p = track.points[s.index], q = onFloor(s.floor!)([p.x, p.y, floors[s.floor!].m]); return [q[0], q[1], q[2] + 0.6]; });
+        // above the plan-cut walls of a carved floor (a point in a room would be inside the wall block)
+        drawTrack(track, spots, (s) => { const p = track.points[s.index], q = onFloor(s.floor!)([p.x, p.y, floors[s.floor!].m]); return [q[0], q[1], q[2] + INTERIOR.wallM + 0.3]; });
       }
       const top = onFloor(floors.length - 1)([...middle(main), floors[floors.length - 1].m]);
       tag('title', [top[0], top[1], top[2] + 6], u.name, 10, 16);
