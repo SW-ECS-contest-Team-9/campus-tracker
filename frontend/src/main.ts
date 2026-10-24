@@ -1122,7 +1122,9 @@ async function boot() {
         spaceViews = mountSpaceViews(r.viewer, {
           roads: () => [...layerData.roads, ...elevators], areas: () => layerData.areas, buildings: () => r.scene?.scene.buildings ?? [], groundAt: (x, y) => layers.structures.groundAt(x, y),
           places: () => scenePlaces, tracks: liftedTracks,
-          walkInputs: [$<HTMLInputElement>('scene-roads-underground'), $<HTMLInputElement>('scene-xray')],
+          walkInputs: [$<HTMLInputElement>('scene-roads-underground')],
+          // inside: the building one is in is left out (not drawn see-through: that looked like a glass wall across the way)
+          hideBuildings: (ids) => r.scene?.setHidden(ids),
           // inside (underground, indoors): no void boxes over the walk's schematic room, no building names showing through the walls
           onWalk: (on) => { layers.setWalkInside(on); r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked); },
           onLevel: (on) => r.scene?.setShowLabels(!on && !layers.section.active && $<HTMLInputElement>('scene-labels').checked),

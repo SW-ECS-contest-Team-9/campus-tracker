@@ -2131,7 +2131,7 @@ async function startEditor() {
     lockKeys: true, walkInputs: [$<HTMLInputElement>('layer-underground')],
     // F10: the chosen session and run are drawn on what is lifted, and can be chosen from its panel (copies of the two selects)
     tracks: liftedTracks, trackPickers: () => [{ label: '수집 세션', select: $<HTMLSelectElement>('fusion-session') }, { label: 'Fusion 실행', select: $<HTMLSelectElement>('fusion-run') }],
-    onWalk: (on) => { buildingScene?.setOpacity(on ? 0.3 : prefs.buildingOpacity); sceneLayers?.setWalkInside(on); buildingScene?.setShowLabels(!on); }, onLevel: (on) => { buildingScene?.setShowLabels(!on); if (on && $<HTMLSelectElement>('fusion-session').options.length <= 1) void loadSessions(); },
+    onWalk: (on) => { sceneLayers?.setWalkInside(on); buildingScene?.setShowLabels(!on); }, hideBuildings: (ids) => buildingScene?.setHidden(ids), onLevel: (on) => { buildingScene?.setShowLabels(!on); if (on && $<HTMLSelectElement>('fusion-session').options.length <= 1) void loadSessions(); },
     // view only: the editor's own lines, markers and tags are put away meanwhile (they would show through what is lifted)
     onChange: (state) => { const on = state.level || state.walk; spaceViewOn = on; syncEntityVisibility(); if (on) { clearHeldKeys(); setTool('select'); } },
   }, { level: $('view-level'), walk: $('view-walk') });

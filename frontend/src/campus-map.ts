@@ -177,6 +177,7 @@ export class CampusSceneLayer {
   readonly picks = new Map<string, BuildingPick>();
   private readonly overrides = new Map<string, number[][][][]>(); // 표시용 평면 대체(scene-local-corrections, 끄면 원본)
   private section: SectionPlane | null = null;
+  private hidden = new Set<string>(); // left out while the first-person walk is inside them (first-person.ts buildingsToHide)
 
   private readonly enu: any; // east / north / up at the campus -> globe frame (for the normals of the windows and roofs)
 
@@ -215,6 +216,17 @@ export class CampusSceneLayer {
   private footprint(b: SceneBuilding): number[][][][] {
     const polygons = this.overrides.get(b.buildingId) ?? b.geometry.coordinates;
     return this.section ? clipLonLatPolygons(this.section, polygons) : polygons;
+  }
+
+  /** Leaves these buildings out (blocks, windows and roofs, edges, names); [] draws them all again. */
+  setHidden(ids: string[]) {
+    const next = new Set(ids);
+    if (next.size === this.hidden.size && ids.every((id) => this.hidden.has(id))) return;
+    this.hidden = next;
+    this.edges.removeAll();
+    this.labels.removeAll();
+    this.drawEdgesAndLabels();
+    this.rebuild();
   }
 
   setOpacity(opacity: number) {
@@ -282,7 +294,7 @@ export class CampusSceneLayer {
     const instances: any[] = [];
     const scratch = new C.Cartesian3();
     for (const b of this.scene.buildings) {
-      if (!b.appearance) continue;
+      if (!b.appearance || this.hidden.has(b.buildingId)) continue;
       const neighbourTop = (x: number, y: number) => all.reduce((m, o) => (o.b !== b && o.top > m && o.polys.some((poly) => ringContains(x, y, poly[0] as [number, number][])) ? o.top : m), -Infinity);
       const mesh = decorate(xy(this.footprint(b)), { roofM: b.roofM, groundM: b.terrainMinM ?? b.baseM + 1, baseM: b.baseM }, b.appearance, { neighbourTop, cut });
       const n = mesh.positions.length / 3;
@@ -318,6 +330,7 @@ export class CampusSceneLayer {
     const C = this.C;
     const instances: any[] = [];
     for (const b of this.scene.buildings) {
+      if (this.hidden.has(b.buildingId)) continue;
       if (!this.elevation && ownWalls(b.appearance)) continue; // B12: walls inside the footprint (a deep eave) are drawn with the windows and the roof
       const own = !this.elevation && b.appearance ? wallColor(b.appearance) : null;
       const css = b.buildingId === this.selected ? COLORS.selected : own ?? (this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall);
@@ -379,6 +392,7 @@ export class CampusSceneLayer {
     const C = this.C;
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(COLORS.edge) });
     for (const b of this.scene.buildings) {
+      if (this.hidden.has(b.buildingId)) continue;
       let best: number[][] = [];
       for (const poly of this.footprint(b)) {
         const r = poly[0];
