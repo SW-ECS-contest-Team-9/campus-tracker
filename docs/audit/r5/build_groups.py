@@ -42,7 +42,10 @@ misc = {'id': 'R5-3-MISC', 'comment': 'R5 E1 장소, E3 ce84903b 꺾기. 시험�
      'grade': '추정(사진 16: 기둥 동쪽 트임, 빨간 문틀이 일부 가림)', 'evidence': '판독 R5 ④-2·E3, 그림 02, 동 노트 본관 2026-10-25 R5 절'}]}
 if __name__ == '__main__':
     (HERE / 'groups').mkdir(exist_ok=True)
-    w = lambda n, g: (HERE / 'groups' / n).write_text(json.dumps(g, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
+    def w(n, g):   # 적용 기록(applied)이 붙은 파일은 덮지 않는다
+        f = HERE / 'groups' / n
+        if f.exists() and 'applied' in json.loads(f.read_text(encoding='utf-8')): print('그대로(적용됨):', n); return
+        f.write_text(json.dumps(g, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
     w('r5-1-ground.json', ground); w('r5-3-misc.json', misc)
     if '--top' in sys.argv: w('r5-2-stair.json', stair(sys.argv[sys.argv.index('--top') + 1]))
     print('TOP', TOP, 'stair', [p.get('xy') for p in stair_path('X')[1:]], 'R', round(R, 4), 'ZL', round(ZL, 2))
