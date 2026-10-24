@@ -1,0 +1,13 @@
+{
+ "note": "R4 도달 검사 쌍(시험용 DB, n02 state 형식). point 는 가장 가까운 노드(snapRadiusM 안)에 붙는다.",
+ "pairs": [
+  {"id": "field>landing", "label": "운동장(청운관 앞 계단 발치) → 청운관 앞 참", "from": {"point": [201202.52, 557286.88]}, "to": {"point": [201205.84, 557289.88]}, "snapRadiusM": 1},
+  {"id": "landing>sangseung", "label": "청운관 앞 참 → 윗단 → 안쪽 마당 → 상승관 입구(마당 쪽)", "from": {"point": [201205.84, 557289.88]}, "to": {"point": [201220.55, 557306.63]}, "snapRadiusM": 1},
+  {"id": "landing>cheongun1f", "label": "청운관 앞 참 → 오른쪽 계단 → 청운관 1층 현관", "from": {"point": [201205.84, 557289.88]}, "to": {"point": [201216.5, 557279.8]}, "snapRadiusM": 1},
+  {"id": "field>hyeinb1", "label": "운동장(청운관 앞 계단 발치) → 청운관 틀 앞 → 혜인관 B1 지상 연결 → 혜인관 입구(2) B1", "from": {"point": [201202.52, 557286.88]}, "to": {"point": [201247.7, 557255.8]}, "snapRadiusM": 1},
+  {"id": "cheongunfront>hyein", "label": "청운관 틀 앞(02d30f2b 시작) → 혜인관 B1 지상 연결 끝", "from": {"point": [201203.0, 557280.5]}, "to": {"point": [201214.63, 557269.03]}, "snapRadiusM": 1},
+  {"id": "cheongun1f>hyeinb1", "label": "청운관 1층 현관 → 혜인관 입구(2) B1", "from": {"point": [201216.5, 557279.8]}, "to": {"point": [201247.7, 557255.8]}, "snapRadiusM": 1},
+  {"id": "backdoor>walk", "label": "대일관 뒷문 → 뒤 단 → 측면 계단 → 산책로(하부 평탄 접근부)", "from": {"point": [201176.62, 557329.12]}, "to": {"point": [201196.2, 557347.05]}, "snapRadiusM": 1.5},
+  {"id": "backdoor>1f", "label": "대일관 뒷문 → 1층 복도", "from": {"point": [201176.62, 557329.12]}, "to": {"point": [201179.82, 557315.27]}, "snapRadiusM": 1.5}
+ ]
+}
