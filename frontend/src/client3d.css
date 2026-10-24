@@ -1,0 +1,23 @@
+/* 사용자용 3D 페이지(client3d.html). 손가락으로 누르기 쉬운 크기(44 px 이상). */
+html, body { margin: 0; height: 100%; overflow: hidden; background: #f6f8fb; font: 15px/1.4 system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #142235; -webkit-tap-highlight-color: transparent; }
+#map { position: absolute; inset: 0; touch-action: none; }
+/* 미리보기·편집기용 판들은 이 페이지에서 쓰지 않음 */
+.client3d .campus-elevation, .client3d .level-panel { display: none !important; }
+.c3d-status { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); padding: 6px 12px; border-radius: 16px; background: #142235e0; color: #fff; font-size: 13px; pointer-events: none; z-index: 10; }
+.c3d-status[hidden] { display: none; }
+.c3d-tools { position: absolute; right: 12px; top: 12px; display: grid; gap: 8px; z-index: 10; }
+.c3d-tools button, .c3d-floors button { min-width: 44px; min-height: 44px; border: 1px solid #d5dbe5; border-radius: 12px; background: #fffffff2; color: #142235; font: 600 13px/1 inherit; font-family: inherit; box-shadow: 0 2px 8px #14223522; cursor: pointer; padding: 0 10px; }
+.c3d-tools button[aria-pressed="true"] { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+#c3d-home { font-size: 20px; }
+.c3d-floors { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 10; padding: 8px 10px 10px; border-radius: 16px; background: #fffffff5; box-shadow: 0 4px 18px #14223533; }
+.c3d-floors[hidden] { display: none; }
+.c3d-floors header { display: flex; align-items: center; gap: 8px; }
+.c3d-floors header b { font-size: 17px; white-space: nowrap; }
+.c3d-sub { flex: 1; font-size: 13px; color: #5b6b80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c3d-floors header button { min-width: 44px; min-height: 44px; box-shadow: none; font-size: 20px; border: 0; background: transparent; }
+.c3d-list { display: flex; gap: 6px; overflow-x: auto; padding-top: 4px; scrollbar-width: none; }
+.c3d-list button { flex: none; min-width: 52px; box-shadow: none; }
+.c3d-list button.on { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.c3d-list button.here::after { content: " ●"; color: #0f766e; }
+.c3d-list button.on.here::after { color: #fff; }
+.level-chooser button { min-height: 40px; }
