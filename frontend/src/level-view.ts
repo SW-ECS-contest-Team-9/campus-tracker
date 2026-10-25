@@ -535,26 +535,46 @@ export const WALK = {
   slopedAt: 0.03,
   /** A road carries the walker within half its width, at least this. */
   roadReachM: 1.5,
+  /**
+   * Along a stair or ramp road the feet change by at most this in one step (2026-10-25): the highest riser on campus is
+   * 0.219 m (청운관 계단실 위 줄), and one step (strideM) up the steepest stair road segment in the test DB (slope 1.51)
+   * is 0.38 m. So a flight stacked 0.8 m beside or 2 m above (청운관 되돌림 계단) is never taken.
+   */
+  stairStepM: 0.4,
+  /** A walk update moves in pieces of at most this (the narrowest tread on campus, 0.25 m: 청운관 계단실 위 줄), so the feet are found once a step. */
+  strideM: 0.25,
+  /** Two roads whose centre lines are this close to the walker are the same distance away (centre lines are drawn to 0.05 m). */
+  sameDistanceM: 0.1,
 };
 
-/** A walkable surface at a plan point; `sloped`: a stair or ramp road there (it leads through whatever level surface covers it in plan). */
-export type WalkSurface = { z: number; sloped?: boolean };
+/**
+ * A walkable surface at a plan point; `sloped`: a stair or ramp road there, its landings included (it leads through
+ * whatever level surface covers it in plan); `distanceM`: for a road, how far its centre line is.
+ */
+export type WalkSurface = { z: number; sloped?: boolean; distanceM?: number };
 
 /**
- * The height the feet get. Only surfaces at or below feet + stepUpM count (so a slab, a roof or the field above an
- * underground level is never taken). A stair or ramp road within maxDropM below the feet is followed first (the one
- * nearest to the feet): it goes down through the level surface around its head. Otherwise the highest surface,
- * unless that is a drop of more than maxDropM or there is none: then the feet stay.
+ * The height the feet get: a surface that goes on from the feet, never one stacked above or below.
+ * A stair or ramp road (its landings too) within WALK.stairStepM of the feet, up or down, is followed first (it goes down
+ * through the level surface around its head): of those, the one whose centre line is nearest (the flight one is on, not
+ * one 0.8 m beside), and of those as near (sameDistanceM: flights stacked in plan), the one nearest to the feet in height.
+ * A stair or ramp road farther than one step from the feet is not under them.
+ * Otherwise, of the level surfaces at or below feet + stepUpM (so a slab, a roof or the field above an underground level
+ * is never taken), the highest, unless that is a drop of more than maxDropM or there is none: then the feet stay.
  */
 export function feetHeight(candidates: (number | WalkSurface)[], feetM: number): number {
-  let best = -Infinity, slope: number | null = null;
+  let best = -Infinity, follow: WalkSurface | null = null;
   for (const c of candidates) {
     const s = typeof c === 'number' ? { z: c } : c;
-    if (s.z > feetM + WALK.stepUpM) continue;
-    if (s.sloped && feetM - s.z <= WALK.maxDropM && (slope === null || Math.abs(s.z - feetM) < Math.abs(slope - feetM))) slope = s.z;
-    if (s.z > best) best = s.z;
+    if (s.sloped) {
+      if (Math.abs(s.z - feetM) > WALK.stairStepM + 1e-9) continue;
+      const d = s.distanceM ?? 0, fd = follow ? (follow.distanceM ?? 0) : Infinity;
+      if (d < fd - WALK.sameDistanceM || (d <= fd + WALK.sameDistanceM && Math.abs(s.z - feetM) < Math.abs(follow!.z - feetM))) follow = s;
+      continue;
+    }
+    if (s.z <= feetM + WALK.stepUpM && s.z > best) best = s.z;
   }
-  if (slope !== null) return slope;
+  if (follow) return follow.z;
   return best === -Infinity || feetM - best > WALK.maxDropM ? feetM : best;
 }
 
@@ -584,7 +604,7 @@ export function walkSurfaces(x: number, y: number, data: { roads: LvRoad[]; area
   for (const road of data.roads) {
     if (road.structure === 'elevator') continue;
     const h = roadHeightAt(road.geometry.coordinates, x, y);
-    if (h && h.distanceM <= Math.max(WALK.roadReachM, (road.widthM ?? 0) / 2)) out.push({ z: h.z, sloped: h.slope > WALK.slopedAt });
+    if (h && h.distanceM <= Math.max(WALK.roadReachM, (road.widthM ?? 0) / 2)) out.push({ z: h.z, sloped: h.slope > WALK.slopedAt || road.structure === 'stairs' || road.structure === 'ramp', distanceM: h.distanceM });
   }
   for (const area of data.areas) if (area.elevationM != null && area.rings[0] && polygonContains(x, y, area.rings.map(open))) out.push({ z: area.elevationM });
   for (const zone of data.zones) if (zone.floorM !== undefined && inPolygons(zone.polygons, x, y)) out.push({ z: zone.floorM });
@@ -607,22 +627,82 @@ export const TRACK = {
   buildingSlackM: 3,
   /** A height given with a vertical accuracy worse than this (m) is not believed. */
   maxVerticalAccuracyM: 8,
+  /** A sample takes the floor a collection marker gives within this many seconds of it (walking ~1.3 m/s: about 13 m; 추정). */
+  markerWindowS: 10,
 };
 
-/** A point of a track: plan position (EPSG:5186 m) and height (MSL, the model's datum). `h` null or `reliable` false: the height is not known. */
-export type TrackPoint = { x: number; y: number; h: number | null; reliable?: boolean };
+/**
+ * What a record of the collection says of where a point was (층 확정): a floor of a building (`floor` "B2", "3F"), or
+ * outdoors. `source`: 'marker' (a collection anchor of the session) or 'beacon' (a fused point's floor from beacons).
+ */
+export type TrackRecord = { buildingId: string | null; floor: string | null; outdoor?: true; source: 'marker' | 'beacon' };
+/**
+ * A point of a track: plan position (EPSG:5186 m) and height (MSL, the model's datum). `h` null or `reliable` false: the
+ * height is not known. `record`: the floor a record gives it (it wins over the height). `t`: sample time (ms), for records.
+ */
+export type TrackPoint = { x: number; y: number; h: number | null; reliable?: boolean; record?: TrackRecord | null; t?: number };
 /** A track as a lifted view draws it: the raw location samples of a session, or a fused path (a fusion version or run). */
 export type LvTrack = { id: string; kind: 'raw' | 'fused'; label: string; points: TrackPoint[] };
+/** How a point's floor is known: 'record' 확정 (a record names it), 'height' 추정 (its height fits that floor best), 'unknown' 미상 (no height, or one that fits nothing: on the nearest plate). */
+export type TrackGrade = 'record' | 'height' | 'unknown';
 /** A point of a track on what is lifted: its index, the height to draw it at (before the lift), `sure` false: 높이 미상 (drawn faint on the nearest plate); `floor`: the floor of a building. */
-export type TrackSpot = { index: number; z: number; sure: boolean; floor?: number };
+export type TrackSpot = { index: number; z: number; sure: boolean; grade: TrackGrade; floor?: number };
 export type TrackContext = {
   zones: Zone[];
   groundAt: (x: number, y: number) => number;
   /** Buildings (footprint rings in metres, base and roof): a point inside one at a height off the ground belongs to the building, not to the zone. */
-  buildings?: { rings: number[][][]; baseM: number; roofM: number }[];
+  buildings?: { id?: string; rings: number[][][]; baseM: number; roofM: number }[];
   /** For the height of a sloping underground zone at a point (its own roads). */
   roads?: LvRoad[];
+  /** The building id a record's building id is compared as (the lifted view: its base building). Default: as written. */
+  partOf?: (id: string) => string;
 };
+
+/** The floor number a level underground zone names ("운동장 지하 2층" -> -2), null when it names none. */
+export const zoneFloor = (zone: Zone) => (zone.floorM !== undefined ? floorInText(zone.name) : null);
+
+type Marker = { type: string; t: number; buildingId?: string | null; floor?: string | null; fromFloor?: string | null; toFloor?: string | null };
+const OUTDOOR = 'outdoor';
+/**
+ * The floor the collection markers give each sample time (층 확정), null where they give none. Each marker says where
+ * the collector was just before it and just after it: a stairStart / elevatorBoard its fromFloor before (on the stairs
+ * or in the car after it: nothing), a stairEnd / elevatorExit its toFloor after, rampStart / rampEnd nothing on the ramp
+ * side, sessionStart only after, sessionEnd only before, any other marker its building and floor on both sides
+ * (building 'outdoor': outdoors). A sample between two markers takes what both say when they agree (the same building
+ * and floor: no change between them), else what the nearer of them says within TRACK.markerWindowS.
+ */
+export function markerRecords(times: (number | undefined)[], markers: Marker[]): (TrackRecord | null)[] {
+  const place = (buildingId: string | null | undefined, floor: string | null | undefined): TrackRecord | null =>
+    buildingId === OUTDOOR ? { buildingId: null, floor: null, outdoor: true, source: 'marker' } : buildingId && floor ? { buildingId, floor: floor.toUpperCase(), source: 'marker' } : null;
+  const sides = [...markers].filter((m) => num(m.t)).sort((a, b) => a.t - b.t).map((m) => {
+    const here = place(m.buildingId, m.floor);
+    switch (m.type) {
+      case 'stairStart': case 'elevatorBoard': return { t: m.t, before: place(m.buildingId, m.fromFloor ?? m.floor), after: null };
+      case 'stairEnd': case 'elevatorExit': return { t: m.t, before: null, after: place(m.buildingId, m.toFloor ?? m.floor) };
+      case 'rampStart': case 'sessionEnd': return { t: m.t, before: here, after: null };
+      case 'rampEnd': case 'sessionStart': return { t: m.t, before: null, after: here };
+      default: return { t: m.t, before: here, after: here };
+    }
+  });
+  const same = (a: TrackRecord | null, b: TrackRecord | null) => !!a && !!b && a.outdoor === b.outdoor && a.buildingId === b.buildingId && a.floor === b.floor;
+  const windowMs = TRACK.markerWindowS * 1000;
+  return times.map((t) => {
+    if (!num(t) || !sides.length) return null;
+    let k = 0;
+    while (k < sides.length && sides[k].t <= t) k++;
+    const prev = sides[k - 1], next = sides[k];
+    const a = prev?.after ?? null, b = next?.before ?? null;
+    if (same(a, b)) return a;
+    const da = a ? t - prev.t : Infinity, db = b ? next.t - t : Infinity;
+    if (Math.min(da, db) > windowMs) return null;
+    return da <= db ? a : b;
+  });
+}
+
+/** The floor of a fused point as a record: only a floor estimated from beacons (a barometer floor is the height again). */
+export function beaconRecord(p: { floorLabel?: string | null; floorBuildingId?: string | null; floorSource?: string | null }): TrackRecord | null {
+  return p.floorLabel && p.floorBuildingId && /^BEACON/.test(p.floorSource ?? '') ? { buildingId: p.floorBuildingId, floor: p.floorLabel.toUpperCase(), source: 'beacon' } : null;
+}
 
 const knownHeight = (p: TrackPoint): p is TrackPoint & { h: number } => num(p.h) && p.reliable !== false;
 const inRings = (rings: number[][][], x: number, y: number) => rings.some((ring) => polygonContains(x, y, [open(ring)]));
@@ -646,28 +726,53 @@ function slopeHeight(zone: Zone, x: number, y: number, roads: LvRoad[] | undefin
  *  3. a sloping underground zone (tunnel, passage): inside its outline and range and at least 1.5 m under the ground;
  *  4. the ground zone: within ±4 m of the ground as drawn;
  *  5. otherwise the height is implausible: the nearest of those plates, not sure.
+ * Before all of these a record of the collection decides (recordPlace). `grade`: 'record' 확정 (step 0), 'height' 추정
+ * (steps 1–4), 'unknown' 미상 (step 5, or no height).
  */
-export function trackPlace(p: TrackPoint, ctx: TrackContext): { zone: Zone | null; sure: boolean; building?: true; candidates: Zone[] } {
+export function trackPlace(p: TrackPoint, ctx: TrackContext): { zone: Zone | null; sure: boolean; grade: TrackGrade; building?: true; candidates: Zone[] } {
   const here = ctx.zones.filter((z) => inPolygons(z.polygons, p.x, p.y));
   const ground = here.find((z) => z.layer === 'ground') ?? null;
   const levels = here.filter((z) => z.layer === 'underground' && z.floorM !== undefined).sort((a, b) => a.floorM! - b.floorM!);
   const sloping = here.filter((z) => z.layer === 'underground' && z.floorM === undefined);
   const candidates = [...(ground ? [ground] : []), ...levels, ...sloping];
-  if (!knownHeight(p)) return { zone: null, sure: false, candidates };
+  const recorded = recordPlace(p, ctx, ground, levels);
+  if (recorded) return { ...recorded, candidates };
+  const place = heightPlace(p, ctx, ground, levels, sloping, candidates);
+  return { ...place, grade: place.sure ? 'height' : 'unknown', candidates };
+}
+
+/**
+ * 0. a record of the collection (TrackPoint.record) wins: outdoors -> the ground zone there; a floor of a building whose
+ *    footprint holds the point -> that building; a basement floor (B2) -> the level underground zone there that names
+ *    that floor ("지하 2층"). A record that fits nothing at this plan position is left aside (the height decides).
+ */
+function recordPlace(p: TrackPoint, ctx: TrackContext, ground: Zone | null, levels: Zone[]): { zone: Zone | null; sure: true; grade: 'record'; building?: true } | null {
+  const r = p.record;
+  if (!r) return null;
+  if (r.outdoor) return ground ? { zone: ground, sure: true, grade: 'record' } : null;
+  const id = r.buildingId && (ctx.partOf ?? ((s: string) => s))(r.buildingId);
+  if (id && (ctx.buildings ?? []).some((b) => b.id === id && inRings(b.rings, p.x, p.y))) return { zone: null, sure: true, grade: 'record', building: true };
+  const n = floorInText(r.floor);
+  const level = n !== null && n < 0 ? levels.find((z) => zoneFloor(z) === n) : undefined;
+  return level ? { zone: level, sure: true, grade: 'record' } : null;
+}
+
+function heightPlace(p: TrackPoint, ctx: TrackContext, ground: Zone | null, levels: Zone[], sloping: Zone[], candidates: Zone[]): { zone: Zone | null; sure: boolean; building?: true } {
+  if (!knownHeight(p)) return { zone: null, sure: false };
   const h = p.h, g = ctx.groundAt(p.x, p.y);
   for (let i = 0; i < levels.length; i++) {
     const lo = levels[i].floorM! - TRACK.belowFloorM;
-    if (h >= lo && (i + 1 < levels.length ? h < levels[i + 1].floorM! - TRACK.belowFloorM : h <= levels[i].toM!)) return { zone: levels[i], sure: true, candidates };
+    if (h >= lo && (i + 1 < levels.length ? h < levels[i + 1].floorM! - TRACK.belowFloorM : h <= levels[i].toM!)) return { zone: levels[i], sure: true };
   }
-  if (Math.abs(h - g) > TRACK.outdoorM && (ctx.buildings ?? []).some((b) => h >= b.baseM - TRACK.buildingSlackM && h <= b.roofM + TRACK.buildingSlackM && inRings(b.rings, p.x, p.y))) return { zone: null, sure: true, building: true, candidates };
-  for (const z of sloping) if (inRange(z, h) && h < g - TRACK.underGroundM) return { zone: z, sure: true, candidates };
-  if (ground && Math.abs(h - g) <= TRACK.outdoorM) return { zone: ground, sure: true, candidates };
+  if (Math.abs(h - g) > TRACK.outdoorM && (ctx.buildings ?? []).some((b) => h >= b.baseM - TRACK.buildingSlackM && h <= b.roofM + TRACK.buildingSlackM && inRings(b.rings, p.x, p.y))) return { zone: null, sure: true, building: true };
+  for (const z of sloping) if (inRange(z, h) && h < g - TRACK.underGroundM) return { zone: z, sure: true };
+  if (ground && Math.abs(h - g) <= TRACK.outdoorM) return { zone: ground, sure: true };
   let best: Zone | null = null, bestD = Infinity;
   for (const z of candidates) {
     const at = z.layer === 'ground' ? g : z.floorM ?? Math.min(z.toM!, Math.max(z.fromM!, h));
     if (Math.abs(h - at) < bestD) { bestD = Math.abs(h - at); best = z; }
   }
-  return { zone: best, sure: false, candidates };
+  return { zone: best, sure: false };
 }
 
 /**
@@ -680,11 +785,12 @@ export function trackOnZone(points: TrackPoint[], zone: Zone, ctx: TrackContext)
   points.forEach((p, index) => {
     if (!num(p.x) || !num(p.y) || !inPolygons(zone.polygons, p.x, p.y)) return;
     const place = trackPlace(p, ctx);
-    const unknown = !knownHeight(p);
+    const unknown = !knownHeight(p) && place.grade !== 'record';
     if (!unknown && place.zone?.id !== zone.id) return;
     const sure = unknown ? zone.layer === 'ground' && place.candidates.every((c) => c.layer === 'ground') : place.sure;
-    const z = zone.layer === 'ground' ? ctx.groundAt(p.x, p.y) : zone.floorM ?? (sure ? p.h! : slopeHeight(zone, p.x, p.y, ctx.roads));
-    out.push({ index, z, sure });
+    const grade: TrackGrade = place.grade === 'record' ? 'record' : sure ? 'height' : 'unknown';
+    const z = zone.layer === 'ground' ? ctx.groundAt(p.x, p.y) : zone.floorM ?? (sure && knownHeight(p) ? p.h : slopeHeight(zone, p.x, p.y, ctx.roads));
+    out.push({ index, z, sure, grade });
   });
   return out;
 }
@@ -693,27 +799,43 @@ export function trackOnZone(points: TrackPoint[], zone: Zone, ctx: TrackContext)
  * The points of a track inside a building's footprint, each on a floor: the floor nearest to its height. A height
  * that is not known goes to the floor nearest to the ground there, one more than buildingSlackM outside the building
  * to the nearest floor; both not sure (높이 미상).
+ * A record comes first (`own`: this building's id and its floors' names): a record of a floor of this building puts
+ * the point on that floor (확정; a floor the building's floors do not name: the height decides); a record of being
+ * outdoors or in another building leaves the point out (it was not in here, whatever the plan position says).
  */
-export function trackOnBuilding(points: TrackPoint[], rings: number[][][], floorsM: number[], blocks: { baseM: number; roofM: number }, groundAt: (x: number, y: number) => number): TrackSpot[] {
+export function trackOnBuilding(points: TrackPoint[], rings: number[][][], floorsM: number[], blocks: { baseM: number; roofM: number }, groundAt: (x: number, y: number) => number,
+  own?: { id: string; floorNames: (string | null)[]; partOf?: (id: string) => string }): TrackSpot[] {
   const out: TrackSpot[] = [];
   if (!floorsM.length) return out;
   const nearest = (h: number) => floorsM.reduce((best, m, i) => (Math.abs(m - h) < Math.abs(floorsM[best] - h) ? i : best), 0);
+  // 높이를 아는 점: 지하 구획과 같은 층 띠(바닥 − 1.0 m ~ 윗층 바닥 − 1.0 m). 폰은 바닥 위 1 m 남짓이라 "가장 가까운 층"은 낮은 층고에서 윗층으로 간다
+  const band = (h: number) => { let f = 0; floorsM.forEach((m, i) => { if (h >= m - TRACK.belowFloorM && m >= floorsM[f]) f = i; }); return f; };
+  const numbers = own?.floorNames.map((n) => floorInText(n)) ?? [];
   points.forEach((p, index) => {
     if (!num(p.x) || !num(p.y) || !inRings(rings, p.x, p.y)) return;
+    if (p.record && own) {
+      const r = p.record;
+      if (r.outdoor || (r.buildingId && (own.partOf ?? ((s: string) => s))(r.buildingId) !== own.id)) return;
+      const n = floorInText(r.floor), floor = n === null ? -1 : numbers.indexOf(n);
+      if (floor >= 0) { out.push({ index, z: floorsM[floor], sure: true, grade: 'record', floor }); return; }
+    }
     const known = knownHeight(p);
     const sure = known && p.h >= Math.min(blocks.baseM, floorsM[0]) - TRACK.buildingSlackM && p.h <= blocks.roofM + TRACK.buildingSlackM;
-    const floor = nearest(known ? p.h : groundAt(p.x, p.y));
-    out.push({ index, z: floorsM[floor], sure, floor });
+    const floor = known ? band(p.h) : nearest(groundAt(p.x, p.y));
+    out.push({ index, z: floorsM[floor], sure, grade: sure ? 'height' : 'unknown', floor });
   });
   return out;
 }
 
-/** The spots as runs to join with a line: consecutive points of the track that are alike (sure or not). */
+/** The spots of a building to draw with one floor chosen (null: the whole stack): only those of that floor, by the same rule. */
+export const spotsOnFocus = (spots: TrackSpot[], focus: number | null) => (focus === null ? spots : spots.filter((s) => s.floor === focus));
+
+/** The spots as runs to join with a line: consecutive points of the track that are alike (the same grade). */
 export function trackRuns(spots: TrackSpot[]): TrackSpot[][] {
   const runs: TrackSpot[][] = [];
   for (const s of spots) {
     const last = runs[runs.length - 1];
-    if (last && last[last.length - 1].index === s.index - 1 && last[0].sure === s.sure) last.push(s); else runs.push([s]);
+    if (last && last[last.length - 1].index === s.index - 1 && last[0].sure === s.sure && last[0].grade === s.grade && last[0].floor === s.floor) last.push(s); else runs.push([s]);
   }
   return runs;
 }

@@ -1,0 +1,183 @@
+{
+ "note": "R6 도달 검사 전후(시험용 DB, check_reachability, 보행 허용 / unknown 도 허용)",
+ "before": {
+  "at": "2026-10-25T00:56:37.610Z",
+  "validation": {
+   "total": 249,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 17,
+    "UNCONNECTED_CROSSING": 141,
+    "OVERLAPPING_ROADS": 5,
+    "OFF_TERRAIN": 84,
+    "ISOLATED_COMPONENT": 2
+   },
+   "bySeverity": {
+    "warning": 107,
+    "info": 93
+   }
+  }
+ },
+ "after": {
+  "at": "2026-10-25T01:01:26.171Z",
+  "validation": {
+   "total": 254,
+   "byCode": {
+    "DANGLING_END_NEAR_ROAD": 17,
+    "UNCONNECTED_CROSSING": 141,
+    "OVERLAPPING_ROADS": 5,
+    "OFF_TERRAIN": 90,
+    "ISOLATED_COMPONENT": 1
+   },
+   "bySeverity": {
+    "warning": 113,
+    "info": 87
+   }
+  }
+ },
+ "pairs": [
+  {
+   "id": "yudam3>dorm",
+   "label": "유담관 3층 입구(서경스포렉스, 104.0) → 외국인 생활관 문",
+   "walk": [
+    487.18,
+    94.13
+   ],
+   "walkAssumeUnknown": [
+    487.18,
+    94.13
+   ]
+  },
+  {
+   "id": "yudam3>perf",
+   "label": "유담관 3층 입구 → 공연실습소 문",
+   "walk": [
+    477.16,
+    107.6
+   ],
+   "walkAssumeUnknown": [
+    477.16,
+    107.6
+   ]
+  },
+  {
+   "id": "turn>dorm",
+   "label": "회차 공간(130.8) → 외국인 생활관 문",
+   "walk": [
+    523.71,
+    267.15
+   ],
+   "walkAssumeUnknown": [
+    523.71,
+    267.15
+   ]
+  },
+  {
+   "id": "turn>perf",
+   "label": "회차 공간 → 공연실습소 문",
+   "walk": [
+    513.69,
+    280.62
+   ],
+   "walkAssumeUnknown": [
+    513.69,
+    280.62
+   ]
+  },
+  {
+   "id": "gate>dorm",
+   "label": "정문 쪽 서경로 보도 시작 → 외국인 생활관 문 (전과 같아야 함)",
+   "walk": [
+    210.94,
+    208.62
+   ],
+   "walkAssumeUnknown": [
+    210.94,
+    208.62
+   ]
+  },
+  {
+   "id": "yudam3>westgate",
+   "label": "유담관 3층 입구 → 서문 앞 (200979.0, 557404.5)",
+   "walk": [
+    "길 없음(3 m 안 노드 없음)",
+    101.95
+   ],
+   "walkAssumeUnknown": [
+    "길 없음(3 m 안 노드 없음)",
+    101.95
+   ]
+  },
+  {
+   "id": "bukaktrail>westgate",
+   "label": "북악관 뒤 산책로 서쪽 끝(7895ac0d) → 서문 앞 (200979.0, 557404.5)",
+   "walk": [
+    "길 없음(3 m 안 노드 없음)",
+    100.16
+   ],
+   "walkAssumeUnknown": [
+    "길 없음(3 m 안 노드 없음)",
+    100.16
+   ]
+  },
+  {
+   "id": "backdoor>trail",
+   "label": "대일관 뒷문(입구(3)) → 뒤 산책로 동쪽 끝(05b7fa85)",
+   "walk": [
+    458.22,
+    311.72
+   ],
+   "walkAssumeUnknown": [
+    41.03,
+    41.03
+   ]
+  },
+  {
+   "id": "trail>hyeinNE",
+   "label": "뒤 산책로 a03d33c3 동쪽 끝(05b7fa85, 201196.2, 557347.1) → 혜인관 북동 어귀(청운관 동 지하통로 입구 앞)",
+   "walk": [
+    514.77,
+    201.49
+   ],
+   "walkAssumeUnknown": [
+    172.57,
+    172.57
+   ]
+  },
+  {
+   "id": "hyeinNE>B1",
+   "label": "혜인관 북동 어귀 → 1주차장 B1 (R5 계단)",
+   "walk": [
+    13.91,
+    13.91
+   ],
+   "walkAssumeUnknown": [
+    13.91,
+    13.91
+   ]
+  },
+  {
+   "id": "backdoor>B1",
+   "label": "대일관 뒷문 → 뒤 산책로 → 혜인관 북동 어귀 → 1주차장 B1",
+   "walk": [
+    138.63,
+    138.63
+   ],
+   "walkAssumeUnknown": [
+    138.63,
+    138.63
+   ]
+  },
+  {
+   "id": "hyein2>trail",
+   "label": "혜인관 입구(2) 앞 지상 → 뒤 산책로 동쪽 끝(05b7fa85)",
+   "walk": [
+    506.72,
+    193.43
+   ],
+   "walkAssumeUnknown": [
+    164.52,
+    164.52
+   ]
+  }
+ ]
+}

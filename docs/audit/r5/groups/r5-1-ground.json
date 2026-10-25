@@ -1,0 +1,86 @@
+{
+ "id": "R5-1-GROUND",
+ "comment": "R5 E1: 혜인관 입구(2) 길 → 청운관 동 어귀 입 앞(지상, 149.6). 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "E1 7bd626dd 위 점 → 남동 옆벽·둥근 화분 사이 → 어귀 입 앞(계단 위 끝)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "ordinary",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 1.5,
+    "zMode": "explicit",
+    "densify": false,
+    "name": "혜인관 입구(2) 길 ~ 청운관 동 지하통로 입구(혜인관 북동 어귀) 앞 (149.6 m, 선 추정)",
+    "path": [
+     {
+      "at": {
+       "roadId": "7bd626dd-eed9-4673-950c-bb18d0cff17f",
+       "nearest": [
+        201245.3,
+        557256.8
+       ]
+      }
+     },
+     {
+      "xy": [
+       201245.06,
+       557262.27
+      ],
+      "z": 149.6
+     },
+     {
+      "xy": [
+       201240.6,
+       557264.85
+      ],
+      "z": 149.6
+     }
+    ]
+   },
+   "grade": "있음: 확정에 가까운 추정(사진 02·학교 지하도 지도 \"청운관 동\" 7 m), 평면·단 수·선 추정",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R5/판독.md ①·E1, 그림 03·20, 동 노트 혜인관 2026-10-25 R5 절"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 n02-plaza(토큰은 메모리에만, 30분)",
+  "batch": "(single)",
+  "changeSets": {
+   "create_road 6c075c9a, dee75c92, 1a30746d": {
+    "changeSetId": "75fccb02-9986-44cc-9655-8704ec4f0a36",
+    "roads": [
+     {
+      "id": "6c075c9a-3d9c-44ba-811a-f8bff8bfe610",
+      "from": "f86049dd-63b4-49b1-b200-2270efa4a828",
+      "to": "0775ff68-da64-466d-bbd8-1b4deab44ca9",
+      "lengthM": 2.6
+     },
+     {
+      "id": "dee75c92-5a43-498c-86cc-cf133dee4788",
+      "from": "f86049dd-63b4-49b1-b200-2270efa4a828",
+      "to": "e5934213-4b0b-4513-a6b2-a6b71140e931",
+      "lengthM": 10.65
+     },
+     {
+      "id": "1a30746d-8fb2-4edc-a8e1-ea4d21b806ce",
+      "from": "76738a65-748c-4eac-af0f-1c253363b9de",
+      "to": "f86049dd-63b4-49b1-b200-2270efa4a828",
+      "lengthM": 3.25
+     }
+    ],
+    "replacedRoads": [
+     {
+      "id": "7bd626dd-eed9-4673-950c-bb18d0cff17f",
+      "replacedBy": [
+       "1a30746d-8fb2-4edc-a8e1-ea4d21b806ce",
+       "6c075c9a-3d9c-44ba-811a-f8bff8bfe610"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

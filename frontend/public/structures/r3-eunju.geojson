@@ -1,0 +1,413 @@
+{
+ "type": "FeatureCollection",
+ "name": "r3-eunju",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:EPSG::5186"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-FLOOR",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론·S-MAP 옥상 정사), 추정(자리·크기 ±2 m, 기구 모양)",
+    "basePlane": "Y01-PLATFORM-SUIN-YARD",
+    "fromM": 132.2,
+    "toM": 132.23,
+    "assumption": "R3: 풋살파크 북서 끝 놀이터 파란 바닥 칠(작은 코트 C 북서 끝과 옥상 가장자리 사이, 드론: 기구·파란 바닥, 그 북서에 나무 데크)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "color": "#4f9cc8",
+    "surfaceMark": true
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201116.54,
+       557196.57
+      ],
+      [
+       201106.37,
+       557190.21
+      ],
+      [
+       201108.43,
+       557186.92
+      ],
+      [
+       201118.87,
+       557192.85
+      ],
+      [
+       201116.54,
+       557196.57
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-DECK",
+    "type": "deck",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론·S-MAP 옥상 정사), 추정(자리·크기 ±2 m, 기구 모양)",
+    "basePlane": "Y01-PLATFORM-SUIN-YARD",
+    "fromM": 132.2,
+    "toM": 132.35,
+    "assumption": "R3: 놀이터 북서 쪽 나무 데크 띠(폭 1.4 m, 드론)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "color": "#8c6b4f"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201116.54,
+       557196.57
+      ],
+      [
+       201115.91,
+       557197.59
+      ],
+      [
+       201105.74,
+       557191.22
+      ],
+      [
+       201106.37,
+       557190.21
+      ],
+      [
+       201116.54,
+       557196.57
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-TOWER",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론·S-MAP 옥상 정사), 추정(자리·크기 ±2 m, 기구 모양)",
+    "basePlane": "R3-FUTSAL-PLAY-FLOOR",
+    "fromM": 132.23,
+    "toM": 134.6,
+    "assumption": "R3: 놀이 기구(미끄럼틀 탑, 흰·분홍, 네모로 줄임)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "color": "#e9e3e6"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201111.85,
+       557190.51
+      ],
+      [
+       201110.89,
+       557192.03
+      ],
+      [
+       201109.37,
+       557191.08
+      ],
+      [
+       201110.32,
+       557189.55
+      ],
+      [
+       201111.85,
+       557190.51
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-SLIDE",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론·S-MAP 옥상 정사), 추정(자리·크기 ±2 m, 기구 모양)",
+    "basePlane": "R3-FUTSAL-PLAY-TOWER",
+    "fromM": 132.23,
+    "toM": 133.1,
+    "assumption": "R3: 미끄럼틀(낮은 판으로 줄임)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "color": "#d9d2c4"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201113.39,
+       557192.18
+      ],
+      [
+       201113.07,
+       557192.69
+      ],
+      [
+       201111.21,
+       557191.52
+      ],
+      [
+       201111.53,
+       557191.02
+      ],
+      [
+       201113.39,
+       557192.18
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-FRAME",
+    "type": "wall",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론·S-MAP 옥상 정사), 추정(자리·크기 ±2 m, 기구 모양)",
+    "basePlane": "R3-FUTSAL-PLAY-FLOOR",
+    "fromM": 132.23,
+    "toM": 133.8,
+    "assumption": "R3: 놀이 기구(오르기 틀, 흰색, 네모로 줄임)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "color": "#f0eee8"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201115.85,
+       557192.78
+      ],
+      [
+       201114.9,
+       557194.3
+      ],
+      [
+       201113.37,
+       557193.35
+      ],
+      [
+       201114.33,
+       557191.82
+      ],
+      [
+       201115.85,
+       557192.78
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-STAIR-01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론), 추정(자리 ±2 m, 단 수·높이: 옥상 132.2 → 윗길 끝 포장 131.7)",
+    "basePlane": "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH",
+    "fromM": 129.4,
+    "toM": 132.03,
+    "assumption": "R3: 놀이터 북동 끝 → 윗길 끝 포장 계단 1/3(드론 오른쪽 끝 계단, 자리 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "stair": "R3-FUTSAL-PLAY-STAIR",
+    "riseM": 0.17,
+    "runM": 0.3,
+    "material": "stone",
+    "color": "#b9b5ab"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201118.16,
+       557199.65
+      ],
+      [
+       201118.0,
+       557199.9
+      ],
+      [
+       201115.97,
+       557198.63
+      ],
+      [
+       201116.13,
+       557198.37
+      ],
+      [
+       201118.16,
+       557199.65
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-STAIR-02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론), 추정(자리 ±2 m, 단 수·높이: 옥상 132.2 → 윗길 끝 포장 131.7)",
+    "basePlane": "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH",
+    "fromM": 129.4,
+    "toM": 131.87,
+    "assumption": "R3: 놀이터 북동 끝 → 윗길 끝 포장 계단 2/3(드론 오른쪽 끝 계단, 자리 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "stair": "R3-FUTSAL-PLAY-STAIR",
+    "riseM": 0.17,
+    "runM": 0.3,
+    "material": "stone",
+    "color": "#b9b5ab"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201118.0,
+       557199.9
+      ],
+      [
+       201117.84,
+       557200.15
+      ],
+      [
+       201115.81,
+       557198.88
+      ],
+      [
+       201115.97,
+       557198.63
+      ],
+      [
+       201118.0,
+       557199.9
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-STAIR-03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론), 추정(자리 ±2 m, 단 수·높이: 옥상 132.2 → 윗길 끝 포장 131.7)",
+    "basePlane": "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH",
+    "fromM": 129.4,
+    "toM": 131.7,
+    "assumption": "R3: 놀이터 북동 끝 → 윗길 끝 포장 계단 3/3(드론 오른쪽 끝 계단, 자리 추정)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "stair": "R3-FUTSAL-PLAY-STAIR",
+    "riseM": 0.17,
+    "runM": 0.3,
+    "material": "stone",
+    "color": "#b9b5ab"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201117.84,
+       557200.15
+      ],
+      [
+       201117.68,
+       557200.41
+      ],
+      [
+       201115.65,
+       557199.14
+      ],
+      [
+       201115.81,
+       557198.88
+      ],
+      [
+       201117.84,
+       557200.15
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "R3-FUTSAL-PLAY-STAIR-LANDING",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(있음: 드론), 추정(자리 ±2 m, 단 수·높이: 옥상 132.2 → 윗길 끝 포장 131.7)",
+    "basePlane": "Z05-PLATFORM-EUNJU-CENTRAL-SOUTH",
+    "fromM": 129.4,
+    "toM": 131.7,
+    "assumption": "R3: 계단 발치 참(131.7 = 윗길 끝 포장 U1X-02 의 그 자리 높이)",
+    "source": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md(S-MAP 정사 10·11, 카카오·네이버 항공, 드론 풋살파크, 확인/은주관-박스-탑다운-사양, 전경 영상 158~159 s)",
+    "material": "stone",
+    "color": "#b9b5ab"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201119.04,
+       557201.26
+      ],
+      [
+       201118.24,
+       557202.53
+      ],
+      [
+       201114.85,
+       557200.41
+      ],
+      [
+       201115.65,
+       557199.14
+      ],
+      [
+       201119.04,
+       557201.26
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

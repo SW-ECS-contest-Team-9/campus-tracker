@@ -1,0 +1,192 @@
+{
+ "id": "R4-FIELD",
+ "comment": "R4 전수 판독: 청운관 앞–혜인관 B1 지상 연결 높이(D1), 대일관 뒷문 상자 자리(D2). 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "D1 02d30f2b: 가운데 꼭짓점 높이 150.8 → 149.03·149.16(틀 앞 148.9 → 끝 149.3 거리 비례). 평면 그대로",
+   "op": "update_road",
+   "args": {
+    "id": "02d30f2b-98f7-4832-94d6-57dbdd781498",
+    "expectedRevision": 1,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "name": "청운관 앞–혜인관 B1 지상 연결 (운동장 높이 포장 길 148.9 → 149.3 m: R4 판독, 선 추정)"
+    },
+    "vertexOps": [
+     {
+      "op": "move",
+      "index": 1,
+      "point": {
+       "xy": [
+        201208.0,
+        557278.0
+       ],
+       "z": 149.03
+      }
+     },
+     {
+      "op": "move",
+      "index": 2,
+      "point": {
+       "xy": [
+        201210.0,
+        557273.0
+       ],
+       "z": 149.16
+      }
+     }
+    ]
+   },
+   "grade": "확정(운동장 높이 포장 길: 영상2 0~1 s·사진 11·청운관 노트), 추정(선)",
+   "evidence": "판독 R4 ⑪·D1, 동 노트 청운관 2026-10-25 R4 절"
+  },
+  {
+   "ref": "D2 12b35f74: 이름만(문 자리 = 상자 북면)",
+   "op": "update_road",
+   "args": {
+    "id": "12b35f74-0269-4828-b299-962b897a5676",
+    "expectedRevision": 1,
+    "attrs": {
+     "name": "대일관 입구(3) 뒷문 ~ 뒤 단 (152.0 m. 산책로에서 1층 복도로 들어가는 문 = 뒷벽 오목한 자리 서쪽 끝 상자의 북면, R4 판독 ±1 m)"
+    }
+   },
+   "grade": "확정(자리)",
+   "evidence": "판독 R4 ⑨·D2, 동 노트 대일관 2026-10-25 R4 절"
+  },
+  {
+   "ref": "D2 f5e89f52: 상자를 가로지르던 가운데 꼭짓점 → 상자 북면 앞(벽에서 5.1 m) 두 점",
+   "op": "update_road",
+   "args": {
+    "id": "f5e89f52-d2c9-4532-89c7-fe3618999582",
+    "expectedRevision": 3,
+    "zMode": "explicit",
+    "densify": false,
+    "vertexOps": [
+     {
+      "op": "replaceRange",
+      "index": 1,
+      "toIndex": 1,
+      "path": [
+       {
+        "xy": [
+         201180.18,
+         557328.12
+        ],
+        "z": 152.03
+       },
+       {
+        "xy": [
+         201173.94,
+         557331.05
+        ],
+        "z": 151.9
+       }
+      ]
+     }
+    ]
+   },
+   "grade": "추정(선)",
+   "evidence": "판독 R4 D2"
+  },
+  {
+   "ref": "D2 장소 6ba95531 → 상자 북면 문 앞",
+   "op": "update_place",
+   "args": {
+    "id": "6ba95531-550f-41b9-9ac7-5c97c817f203",
+    "expectedRevision": 1,
+    "position": {
+     "xy": [
+      201176.62,
+      557329.12
+     ],
+     "z": 152.0
+    },
+    "description": "N03. 산책로에서 1층 복도로. 높이 152.0 m. 근거 등급: 원천(위치·층), S-MAP(높이). R4 판독(2026-10-25): 문은 뒷벽 오목한 자리 서쪽 끝 작은 상자의 북면(S-MAP 정사·S-MAP 비스듬·사용자 그림 13, 자리 확정 ±1 m). 전 자리 (201182.5, 557321.4)"
+   },
+   "grade": "확정(자리)",
+   "evidence": "판독 R4 ⑨·D2"
+  },
+  {
+   "ref": "D1 노드 62a3ac5d(청운관 틀 앞) 150.8 → 148.9",
+   "op": "move_node",
+   "args": {
+    "nodeId": "62a3ac5d-513c-475f-8d46-e6018e39757a",
+    "to": {
+     "xy": [
+      201203.0,
+      557280.5
+     ],
+     "z": 148.9
+    }
+   },
+   "grade": "확정",
+   "evidence": "판독 R4 D1"
+  },
+  {
+   "ref": "D1 노드 9fb1fd71(02d30f2b·4a434644 끝) 150.66 → 149.3",
+   "op": "move_node",
+   "args": {
+    "nodeId": "9fb1fd71-befe-43b7-ba37-62bfb5658fa8",
+    "to": {
+     "xy": [
+      201214.63,
+      557269.03
+     ],
+     "z": 149.3
+    }
+   },
+   "grade": "확정",
+   "evidence": "판독 R4 D1"
+  },
+  {
+   "ref": "D2 문 노드 118a26b9 → 상자 북면 가운데 앞 0.5 m",
+   "op": "move_node",
+   "args": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2",
+    "to": {
+     "xy": [
+      201176.62,
+      557329.12
+     ],
+     "z": 152.0
+    }
+   },
+   "grade": "확정(자리 ±1 m)",
+   "evidence": "판독 R4 D2"
+  },
+  {
+   "ref": "D2 실내 문턱 노드 af836123(대일관_1F) → 상자 바로 안쪽",
+   "op": "move_node",
+   "args": {
+    "nodeId": "af836123-3c17-4556-ad23-fdae92a75da9",
+    "to": {
+     "xy": [
+      201174.37,
+      557324.33
+     ],
+     "z": 151.8
+    }
+   },
+   "grade": "추정",
+   "evidence": "판독 R4 D2"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 r4-field",
+  "batch": "804bdbe9-6fb9-4af8-8029-4970aa84ac7d",
+  "changeSets": {
+   "02d30f2b(update_road)": "5f472b69-ca46-452b-bbeb-90320a2b9c31",
+   "12b35f74(update_road)": "d409e7e1-6de0-4e51-9ad4-1d19d3acdaf5",
+   "f5e89f52(update_road)": "650bb610-7f5d-43d7-a04a-bcb6be292067",
+   "6ba95531(update_place)": "bbfb161f-50b5-4f3f-8270-89180ed3bdd5",
+   "62a3ac5d(move_node)": "a4f292c2-b2b4-449e-a982-4ea4421a9013",
+   "9fb1fd71(move_node)": "0ec88c5a-0d6c-4f45-bb03-fad18f323530",
+   "118a26b9(move_node)": "0bec2ac5-8737-4330-8d53-ba3aefc62b65",
+   "af836123(move_node)": "7a474f8b-b0b1-4955-8640-d96f0421054a"
+  },
+  "revert": "역순 revert_changeset",
+  "check": "validate_network 오류 0(경고 109 → 106: OFF_TERRAIN −3), 길 945·노드 834 그대로, 지운 길 6f2a4bcd·7408c108 되살리지 않음. 도달(pairs.json) 8쌍 전부 이어짐"
+ }
+}
