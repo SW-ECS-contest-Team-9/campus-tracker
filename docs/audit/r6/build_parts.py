@@ -18,6 +18,7 @@ F3 서문 왼쪽 철 계단(있음 확정: 거리뷰 색인 34·W01 노트, 네�
    왼쪽 날개벽(MASS 서쪽 변) 안쪽 0.3~1.5 m 띠로 공도(문 앞) → 문 위 단 126.8. MASS 에서 계단 자리를 뺌(날개벽 0.3 m 는 남음).
 F10 상승관·청운관 뒤 단: 기단 R6-PLATFORM-BEHIND-SANGSEUNG(판독 외곽, 148.0 → 149.0 서→동 한 경사면). BANK-E(숲 비탈, 그 자리 150.0~151.4)에서 이 자리를 뺌.
 F11·F2 청운관 동쪽 흙길: 기단 R6-PLATFORM-CHEONGUN-EAST-TRAIL(뒤 산책로 선 폭 3 m 띠, 148.9 → 149.4 북→남 한 경사면, 윗면 흙: 지표면 노트).
+   흙길 고리 안 숲(R6-PLATFORM-CHEONGUN-EAST-WOOD, 같은 면, 추정): 비워 두면 지도 화면에서 그 안 지형이 잘려 빈 곳으로 보인다.
 고치는 파일(frontend/public/structures): r6-back(새), p02-parts(옛 얼룩말 걷음), w01-parts(MASS 계단 자리), z05-back-paths(BANK-E 외곽),
   backend/data/terrain/recipes/z05-surface.geojson(새 기단 셋, BANK-E 외곽). docs/audit/r6/model.json(길 변경 묶음이 읽는 점·높이)."""
 import json, pathlib, copy, sys, math
@@ -268,11 +269,20 @@ TP11 = {'origin': [201270.0, 557318.0], 'direction': [0.0, -1.0], 'points': [[0.
 feat('R6-PLATFORM-CHEONGUN-EAST-TRAIL', 'platform', TB, 140.5, 149.4, '청운관 동쪽 흙길(뒤 산책로가 숲 사이로 혜인관 북동 어귀까지 내려오는 길, 폭 3 m, 148.9 → 149.4 북→남). 둘레는 숲 비탈(지형)',
      G11, '', kind='platform', topProfile=TP11, bottomM=140.5, bottomNote='청운관 둘레 기단 bottomM 과 같음', material='paving', surfaceName='R6-CHEONGUN-EAST-TRAIL')
 del NEW[-1]['properties']['fromM'], NEW[-1]['properties']['toM']
+# 흙길·청운관 둘레·뒤 단으로 둘러싸인 숲(약 920 ㎡): 기단으로 채운다. 비워 두면 캠퍼스 영역 + 기단 합집합에 구멍이 생기고
+# 화면은 지형을 바깥 고리로만 잘라(terrain-clip) 그 안이 빈 곳으로 보인다. 높이는 흙길과 같은 면(숲 안 땅 높이는 모름, 추정)
+from shapely.geometry import MultiPoint
+BLD = unary_union([Polygon(b['ring']).buffer(0) for b in json.loads((REPO / 'docs/audit/z04/scene-buildings-before.json').read_text(encoding='utf-8'))['buildings']])
+WD = MultiPoint(list(TRAIL.coords)).convex_hull.difference(TB).difference(CG).difference(SG).difference(BLD.buffer(0.05))
+WD = max((WD.geoms if hasattr(WD, 'geoms') else [WD]), key=lambda q: q.area)
+feat('R6-PLATFORM-CHEONGUN-EAST-WOOD', 'platform', WD, 140.5, 149.4, '청운관 동쪽 흙길 고리 안 숲(흙길과 같은 면으로 둠. 숲 안 땅 높이는 모름)', '추정(높이·외곽: 흙길·청운관 둘레·뒤 단으로 둘러싸인 곳), 확정(나무 덮인 곳: S-MAP 정사 12)', '',
+     kind='platform', topProfile=TP11, bottomM=140.5, bottomNote='청운관 둘레 기단 bottomM 과 같음', material='planting', surfaceName='R6-CHEONGUN-EAST-WOOD')
+del NEW[-1]['properties']['fromM'], NEW[-1]['properties']['toM']
 BK = IDX['Z05-PLATFORM-BACK-BANK-E'][1]; bk0 = shape(BK['geometry']).buffer(0); bk1 = bk0.difference(SG.buffer(-0.5)).difference(TB.buffer(-0.5))
 BK['geometry'] = geom(bk1)
 BK['properties']['assumption'] = BK['properties'].get('assumption', '').split(' [R6')[0] + ' [R6 2026-10-25: 상승관·청운관 뒤 단(R6-PLATFORM-BEHIND-SANGSEUNG) 자리를 뺌(0.5 m 는 새 단 밑으로 겹침)]'
 OTHERS['Z05-PLATFORM-BACK-BANK-E'] = BK
-REPORT.append(f'F10 단 {SG.area:.0f} ㎡, BANK-E {bk0.area:.0f} → {bk1.area:.0f} ㎡; F11 흙길 {TB.area:.0f} ㎡')
+REPORT.append(f'F10 단 {SG.area:.0f} ㎡, BANK-E {bk0.area:.0f} → {bk1.area:.0f} ㎡; F11 흙길 {TB.area:.0f} ㎡, 고리 안 숲 {WD.area:.0f} ㎡')
 # 걸린 나무: BANK-E 를 바탕으로 둔 상자 가운데 새 단 안에 선 것은 새 단 윗면으로 내림
 PLATS = plats() + [(f['properties']['id'], shape(f['geometry']).buffer(0), top_fn(f['properties'])) for f in NEW if f['properties']['kind'] == 'platform']
 moved = []
@@ -333,7 +343,8 @@ def surf_poly(name): return shape(SIDX[name]['geometry']).buffer(0)
 SIDX['Z05-BACK-BANK-E']['geometry'] = geom(surf_poly('Z05-BACK-BANK-E').difference(SG).difference(TB))
 news = {'R6-WESTGATE-TOP': (TOPZONE.difference(surf_poly('Z05-WEST-GATE-BANK')), {'heightM': ZTOP}, '서문 위 단', G9),
         'R6-BEHIND-SANGSEUNG': (SG, {'profile': TP10}, '상승관·청운관 뒤 단', G10),
-        'R6-CHEONGUN-EAST-TRAIL': (TB.difference(surf_poly('Z05-CHEONGUN-CHEONGUN-GROUND')).difference(SG), {'profile': TP11}, '청운관 동쪽 흙길', G11)}
+        'R6-CHEONGUN-EAST-TRAIL': (TB.difference(surf_poly('Z05-CHEONGUN-CHEONGUN-GROUND')).difference(SG), {'profile': TP11}, '청운관 동쪽 흙길', G11),
+        'R6-CHEONGUN-EAST-WOOD': (WD.difference(surf_poly('Z05-CHEONGUN-CHEONGUN-GROUND')), {'profile': TP11}, '청운관 동쪽 흙길 고리 안 숲', '추정')}
 for nm, (g, h, what, grade) in news.items():
     SURF['features'].append({'type': 'Feature', 'properties': {'name': nm, 'srid': 5186, 'reason': 'R6 ' + what, 'grade': grade, 'source': SRC, **h}, 'geometry': geom(g)})
 lowz = lambda f: f['properties'].get('heightM', min([p[1] for p in f['properties'].get('profile', {}).get('points', [[0, 0]])]))
