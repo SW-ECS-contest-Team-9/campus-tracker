@@ -182,6 +182,42 @@ test('길 위의 높이: 계단·경사 길은 선을 따라 높이를 잇고, �
   assert.equal(feetHeight(walkSurfaces(X0 + 12, Y0 + 8, data), feet), 141.4);
 });
 
+test('겹친 되돌림 계단(청운관 계단실 꼴): 아래 줄을 걸으면 0.8 m 옆 위 줄로 올라타지 않음', () => {
+  // 앞방 참 143.5 에서 위 줄(가운데 줄)은 146.35 로 오르고, 아래 줄(북쪽 줄)은 141.75 되돌림 참으로 내려감. 두 길 중심선은 0.8 m 간격.
+  const up = [[X0 + 11.4, Y0 + 2.85, 146.35], [X0 + 8.1, Y0 + 2.85, 143.5]];
+  const low = [[X0 + 8.1, Y0 + 2.85, 143.5], [X0 + 8.1, Y0 + 3.65, 143.5], [X0 + 11.4, Y0 + 3.65, 141.75], [X0 + 11.4, Y0 + 2.05, 141.75], [X0 + 8.1, Y0 + 2.05, 140]];
+  const data = { roads: [road('up', up, { structure: 'stairs' }), road('low', low, { structure: 'stairs' })], areas: [], solids: [], zones: [] };
+  // 아래 줄 위를 중심선에서 0.25 m 남쪽(폭 0.8 m 줄 안)으로 0.14 m 씩(1.4 m/s × 0.1 s) 걸음: 참 → 되돌림 참
+  let feet = 143.5;
+  for (let x = 8.1; x <= 11.4 + 1e-9; x += 0.14) {
+    feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.4, data), feet);
+    const own = roadHeightAt(low, X0 + x, Y0 + 3.4)!.z; // 아래 줄 길의 높이(가장 가까운 마디)
+    assert.ok(Math.abs(feet - own) < 1e-9, `x ${x.toFixed(2)}: 발 ${feet.toFixed(2)}, 아래 줄 ${own.toFixed(2)}`);
+  }
+  // 되돌아 위로 걸어 참으로: 위 줄(내려오는 쪽에서 보면 겹친 위층)로 옮겨 가지 않고 143.5 에 닿음
+  for (let x = 11.4; x >= 8.1 - 1e-9; x -= 0.14) feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.4, data), feet);
+  assert.ok(Math.abs(feet - 143.5) < 0.05);
+  // 위 줄을 내려와 참에 닿음: 아래 줄로 빠지지 않음(참 어귀 0.1 m 안은 아래 줄의 참 마디 143.5 를 디딜 수 있음)
+  feet = 146.35;
+  for (let x = 11.4; x >= 8.1 - 1e-9; x -= 0.14) {
+    feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.1, data), feet);
+    assert.ok(Math.abs(feet - roadHeightAt(up, X0 + x, Y0 + 3.1)!.z) < 0.1, `위 줄 x ${x.toFixed(2)}: 발 ${feet.toFixed(2)}`);
+  }
+});
+
+test('발밑 높이: 계단·경사 길은 한 걸음 한도(±WALK.stairStepM) 안에서 지금 발 높이에 가장 가까운 것', () => {
+  assert.equal(WALK.stairStepM, 0.4);
+  assert.equal(feetHeight([{ z: 143.4, sloped: true }, { z: 143.65, sloped: true }], 143.5), 143.4); // 둘 다 한도 안: 가까운 것
+  assert.equal(feetHeight([{ z: 143.5 }, { z: 144.0, sloped: true }], 143.5), 143.5); // 0.5 m 위 계단 길은 따르지 않음, 바닥 그대로
+  assert.equal(feetHeight([{ z: 143.5 }, { z: 142.9, sloped: true }], 143.5), 143.5); // 0.6 m 아래 계단 길로 떨어지지 않음
+  assert.equal(feetHeight([{ z: 144.0, sloped: true }], 143.5), 143.5); // 한도 밖 계단 길만 있음: 그대로
+  // 한도 안 계단 길이 여럿: 중심선이 가까운 것(서 있는 줄). 청운관 현관 틀 밑 통로(평평한 계단 길 149.2)가 1 m 옆이어도 계단을 내려감
+  assert.equal(feetHeight([{ z: 149.2, sloped: true, distanceM: 1.0 }, { z: 149.08, sloped: true, distanceM: 0 }], 149.2), 149.08);
+  // 중심선 거리가 0.1 m 안으로 같으면(평면에서 포갠 줄) 발 높이에 가까운 것
+  assert.equal(feetHeight([{ z: 143.3, sloped: true, distanceM: 0.3 }, { z: 143.6, sloped: true, distanceM: 0.35 }], 143.5), 143.6);
+  assert.equal(WALK.strideM, 0.25);
+});
+
 test('짧은 이름', () => {
   assert.equal(shortName('본관 2층 복도 (승강기 ~ 유리문 앞)'), '본관 2층 복도');
   assert.equal(shortName('가나다라마바사아자차카타파하', 6), '가나다라마…');

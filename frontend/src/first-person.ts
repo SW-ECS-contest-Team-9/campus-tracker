@@ -2,7 +2,8 @@
 // level-view-layer.ts mountSpaceViews). Enter where the map is clicked, or at what "층 따로 보기" had lifted.
 //   W/S forward / back, A/D sideways, mouse drag or arrow keys or Q/E to look, Shift to run, Esc to leave.
 // The eye is WALK.eyeM above the surface under the feet, and that surface is chosen by level-view.ts feetHeight():
-// the highest walkable surface at or below the feet (+ a step), stairs and ramps followed along their road. So an
+// the highest walkable surface at or below the feet (+ a step), stairs and ramps followed along their road (the flight
+// within one step, WALK.stairStepM, nearest to the feet: never a flight stacked above or below). So an
 // underground level or an indoor floor is walked at its own height and the walker never jumps to a roof or the field.
 // There is no collision with walls. Nothing of the data is touched; the camera is put back on leaving.
 // F09: underground and indoors there is no wall or ceiling model, so the level one stands on is drawn as a schematic
@@ -396,9 +397,14 @@ export class FirstPerson {
     if (length) {
       const speed = (held.has('ShiftLeft') || held.has('ShiftRight') ? WALK.runMps : WALK.walkMps) * dt / length;
       const sin = Math.sin(s.heading), cos = Math.cos(s.heading);
-      s.x += (sin * forward + cos * side) * speed;
-      s.y += (cos * forward - sin * side) * speed;
-      s.feetM = feetHeight([...walkSurfaces(s.x, s.y, this.data), { z: this.src.groundAt(s.x, s.y) }], s.feetM);
+      const dx = (sin * forward + cos * side) * speed, dy = (cos * forward - sin * side) * speed;
+      // one step at a time (WALK.strideM): the feet go on from where they were, a running frame does not skip a tread
+      const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / WALK.strideM));
+      for (let k = 0; k < n; k++) {
+        s.x += dx / n;
+        s.y += dy / n;
+        s.feetM = feetHeight([...walkSurfaces(s.x, s.y, this.data), { z: this.src.groundAt(s.x, s.y) }], s.feetM);
+      }
     }
     // the eye follows the feet smoothly (steps do not jolt)
     this.eyeM += (s.feetM + WALK.eyeM - this.eyeM) * Math.min(1, dt * 10);
