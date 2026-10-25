@@ -5,6 +5,8 @@ import { round2, roundXYZ } from './geometry.js';
 export interface QaRoad {
   id: string; name: string | null; structure: string; vehicleAccess: string; wheelchairAccess: string;
   levelId: string | null; fromNodeId: string; toNodeId: string; coordinates: XYZ[];
+  /** a road of a building (indoor) is never compared with the ground */
+  buildingId?: string | null;
 }
 export interface QaNode { id: string; levelId: string | null; coordinate: XYZ }
 export interface Finding {
@@ -27,6 +29,10 @@ export interface QaOptions {
   offTerrainM: number;
   /** Ground height at an XY point, or null outside the DEM. Omit to skip the terrain check. */
   ground?: (x: number, y: number) => number | null;
+  /** Walkable structure tops (and void floors) at an XY point (structure-surfaces.ts). The terrain check takes the nearest of these and the ground. */
+  structures?: (x: number, y: number) => { id: string; type: string; z: number }[];
+  /** True inside a building footprint. There the grid keeps the old DEM under the building (protectBuildings), not a surface anyone walks on: such vertices (a door, a passage into the building) are not checked. */
+  inBuilding?: (x: number, y: number) => boolean;
   smallComponentM: number;
 }
 export const DEFAULT_QA: QaOptions = { danglingRadiusM: 2, levelToleranceM: NEAR_HEIGHT_M, sameHeightM: SAME_HEIGHT_M, duplicateNodeM: 0.15, offTerrainM: 1.5, smallComponentM: 10 };
@@ -136,16 +142,22 @@ export function validateNetwork(roads: QaRoad[], nodes: QaNode[], checks: readon
   }
 
   if (on('OFF_TERRAIN') && o.ground) {
+    // The built ground is the terrain plus the walkable structure tops (a deck, a landing, a stair step, a platform
+    // the grid does not carry) and the floors of underground voids. Each vertex is held against the nearest of them.
+    // Indoor roads (a level, a building, an indoor corridor) and elevators are not on the ground, nor are vertices inside a building footprint.
     for (const r of roads) {
-      if (r.levelId !== null || r.structure === 'indoor_corridor' || r.structure === 'elevator') continue; // only outdoor ground roads are expected on the DEM
-      let worst = 0, at: XYZ | null = null;
+      if (r.levelId !== null || (r.buildingId ?? null) !== null || r.structure === 'indoor_corridor' || r.structure === 'elevator') continue;
+      let worst = 0, at: XYZ | null = null, onWhat: { id: string; type: string } | null = null;
       for (const p of r.coordinates) {
         const g = o.ground(p[0], p[1]);
-        if (g !== null && Math.abs(p[2] - g) > Math.abs(worst)) { worst = p[2] - g; at = p; }
+        if (g === null || o.inBuilding?.(p[0], p[1])) continue;
+        let d = p[2] - g, what: { id: string; type: string } | null = null;
+        for (const s of o.structures?.(p[0], p[1]) ?? []) if (Math.abs(p[2] - s.z) < Math.abs(d)) { d = p[2] - s.z; what = s; }
+        if (Math.abs(d) > Math.abs(worst)) { worst = d; at = p; onWhat = what; }
       }
       if (at && Math.abs(worst) > o.offTerrainM) findings.push({ code: 'OFF_TERRAIN', severity: 'warning', roadIds: [r.id], location: roundXYZ(at),
-        message: `${label(r)} is ${round2(Math.abs(worst))} m ${worst > 0 ? 'above' : 'below'} the terrain at its worst vertex`,
-        suggestion: 'update_road with drapeToTerrain if it is a ground-level road; ignore for bridges and stairs with measured heights' });
+        message: `${label(r)} is ${round2(Math.abs(worst))} m ${worst > 0 ? 'above' : 'below'} ${!onWhat ? 'the terrain' : onWhat.type === 'void' ? `the floor of void ${onWhat.id}, the nearest surface,` : `the top of structure ${onWhat.id} (${onWhat.type}), the nearest surface,`} at its worst vertex`,
+        suggestion: 'a ground-level road: update_road with drapeToTerrain. On a structure or a bridge with measured heights: check the road height against the structure, or the structure file' });
     }
   }
 
