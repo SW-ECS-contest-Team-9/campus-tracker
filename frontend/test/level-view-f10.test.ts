@@ -166,13 +166,13 @@ test('F10 경사 지하 구획(지하 차도): 범위 안이고 땅보다 1.5 m 
   assert.equal(spot(null)[0][0], false);
 });
 
-test('F10 건물 위의 세션 점: 높이가 가장 가까운 층의 판, 모르는 높이는 지면에 가까운 층에 흐리게', () => {
+test('F10 건물 위의 세션 점: 층 띠(바닥 − 1.0 m ~ 윗층 바닥 − 1.0 m)의 판, 모르는 높이는 지면에 가까운 층에 흐리게', () => {
   const rings = [[[0, 0], [20, 0], [20, 10], [0, 10]]], floors = [128.5, 131.6, 134.6, 137.8];
   const blocks = { baseM: 128.5, roofM: 141 };
   const pts = [{ x: 5, y: 5, h: 129.7 }, { x: 6, y: 5, h: 133.0 }, { x: 7, y: 5, h: 133.2 }, { x: 8, y: 5, h: 139 }, { x: 9, y: 5, h: null }, { x: 10, y: 5, h: 100 }, { x: 11, y: 5, h: 160 }, { x: 50, y: 5, h: 131 }];
   const spots = trackOnBuilding(pts, rings, floors, blocks, () => 131);
-  assert.deepEqual(spots.map((s: any) => [s.index, s.floor, s.sure]), [[0, 0, true], [1, 1, true], [2, 2, true], [3, 3, true], [4, 1, false], [5, 0, false], [6, 3, false]]);
-  assert.deepEqual(spots.map((s: any) => s.z), [128.5, 131.6, 134.6, 137.8, 131.6, 128.5, 137.8]);
+  assert.deepEqual(spots.map((s: any) => [s.index, s.floor, s.sure]), [[0, 0, true], [1, 1, true], [2, 1, true], [3, 3, true], [4, 1, false], [5, 0, false], [6, 3, false]]);
+  assert.deepEqual(spots.map((s: any) => s.z), [128.5, 131.6, 131.6, 137.8, 131.6, 128.5, 137.8]);
   assert.deepEqual(trackOnBuilding(pts, rings, [], blocks, () => 131), []);
 });
 

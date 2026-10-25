@@ -22,7 +22,7 @@ import { initCampusMap, type BuildingPick, type CampusSceneLayer } from './campu
 import { addLocalCorrections } from './scene-local-corrections';
 import { MobilityLayer, MOBILITY_KIND_LABELS, type MobilityPick } from './mobility-map';
 import { SceneLayers, bindLayerControls, loadPublicLayerData } from './scene-layers';
-import { TRACK, type LvPlace, type LvTrack } from './level-view';
+import { TRACK, beaconRecord, markerRecords, type LvPlace, type LvTrack } from './level-view';
 import { tmForward } from './tm';
 import { mountSpaceViews, type SpaceViews } from './level-view-layer';
 import type { LayerData } from './scene-layer-data';
@@ -191,14 +191,16 @@ function liftedTracks(): LvTrack[] {
   for (const [id, track] of tracks) {
     if (!(state.mode === 'live' ? liveSessionIds.has(id) : state.mode === 'history' && selectedSession === id)) continue;
     if (state.layers.rawPoints || state.layers.rawTrajectory) {
-      out.push({ id: `${id}|raw`, kind: 'raw', label: `${track.collectorId} 원본`, points: track.points.map((p) => {
+      // 층별 노드: the floor the session's markers give a sample (level-view.ts markerRecords) wins over its height
+      const records = markerRecords(track.points.map((p) => Date.parse(p.timestamp)), track.markerList.map((m) => ({ ...m, t: Date.parse(m.timestamp) })));
+      out.push({ id: `${id}|raw`, kind: 'raw', label: `${track.collectorId} 원본`, points: track.points.map((p, i) => {
         const h = heightOf(p);
-        return { ...xy(p), h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM) };
+        return { ...xy(p), h: h.source === 'none' ? null : h.h, reliable: p.verticalAccuracy == null || (p.verticalAccuracy >= 0 && p.verticalAccuracy <= TRACK.maxVerticalAccuracyM), record: records[i] };
       }) });
     }
     if (state.layers.fusedTrajectory) for (const version of state.fusion.versions.filter(versionEnabled)) {
       const list = track.fused(version);
-      if (list.length) out.push({ id: `${id}|${version}`, kind: 'fused', label: `${track.collectorId} ${version}`, points: list.map((f) => ({ ...xy(f), h: f.ellipsoidalAltitude != null ? sceneHeight(f.ellipsoidalAltitude) : null })) });
+      if (list.length) out.push({ id: `${id}|${version}`, kind: 'fused', label: `${track.collectorId} ${version}`, points: list.map((f) => ({ ...xy(f), h: f.ellipsoidalAltitude != null ? sceneHeight(f.ellipsoidalAltitude) : null, record: beaconRecord(f) })) });
     }
   }
   return out;

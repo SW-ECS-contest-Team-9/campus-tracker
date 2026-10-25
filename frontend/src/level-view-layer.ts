@@ -15,8 +15,8 @@ import './level-view.css';
 import { declutter as keepTags, textWidth } from './label-layout';
 import {
   FAN, INTERIOR, LEVEL_VIEW, TRACK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, floorParts, fanAxis, fanOut, fanStep, floorIndexAt, inPolygons, isConnector, isWideRoad, levelStack, levelsUnder, nearestOnOutline, parseInteriors, parseZones, shortName, stackLiftM,
-  trackOnBuilding, trackOnZone, trackRuns, zoneAt, zoneContent,
-  type Floor, type Interior, type InteriorKind, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackSpot, type Zone,
+  spotsOnFocus, trackOnBuilding, trackOnZone, trackRuns, zoneAt, zoneContent,
+  type Floor, type Interior, type InteriorKind, type LvArea, type LvPlace, type LvRoad, type LvTrack, type TrackContext, type TrackGrade, type TrackSpot, type Zone,
 } from './level-view';
 import { FirstPerson } from './first-person';
 import { polygonArea, polygonOps, type Polygon } from './polygon-ops';
@@ -113,7 +113,9 @@ export class LevelView {
   /** F10: tracks put in by a test or a script (drawn like the page's own; the test DB has no sessions). */
   extraTracks: LvTrack[] = [];
   /** F10: what of the tracks lies on what is lifted now (points drawn; `loaded`: points the page has). */
-  trackStats = { raw: 0, fused: 0, unsure: 0, loaded: 0 };
+  trackStats = { raw: 0, fused: 0, unsure: 0, loaded: 0, record: 0, height: 0, unknown: 0 };
+  /** 층별 노드: every track dot drawn now, where it stands when the lift has ended (scripted checks). */
+  trackDots: { track: string; index: number; grade: TrackGrade; floor?: number; at: number[] }[] = [];
   private trackSignature = '';
   /** F10: the rules text of the panel is folded away unless the user opened it. */
   private helpOpen = false;
@@ -172,7 +174,7 @@ export class LevelView {
   }
 
   private signature() {
-    return [...this.tracks().map((t) => `${t.id}|${t.kind}|${t.points.length}`), ...(this.src.trackPickers?.() ?? []).map((p) => `${p.select.options.length}:${p.select.value}`)].join(';');
+    return [...this.tracks().map((t) => `${t.id}|${t.kind}|${t.points.length}|${t.points.filter((p) => p.record).length}`), ...(this.src.trackPickers?.() ?? []).map((p) => `${p.select.options.length}:${p.select.value}`)].join(';');
   }
 
   /** Scene block id -> what is lifted with it (level-view.ts floorParts: 은주관 is lifted as 은주1관 and 은주2관, each with its floor table). */
@@ -446,27 +448,37 @@ export class LevelView {
       return [...new Set([pick((p) => p[0]), pick((p) => -p[0]), pick((p) => p[1]), pick((p) => -p[1])])];
     };
     const frame: number[][] = []; // lifted points the camera frames
-    // F10: a session's track on what is lifted. Raw samples: small dots and a thin line; a fused path: a thick bright
-    // line with a white outline; points whose height is not known: faint and dashed, on the nearest plate.
+    // F10: a session's track on what is lifted. Raw samples: dots and a thin line; a fused path: a thick bright line with
+    // a white outline. 층별 노드(2026-10-25): how the floor is known decides the look: 확정 (a record names the floor) a
+    // large solid dot, 추정 (the height fits that floor) a lighter dot, 미상 (no height, or one that fits nothing: on the
+    // nearest plate) a hollow ring and a dashed line. The dots are in `points`, which rises with the plates and stays.
     const tpx = TRACK_PX[style.line];
-    const stats = { raw: 0, fused: 0, unsure: 0, loaded: 0 };
+    const stats = { raw: 0, fused: 0, unsure: 0, loaded: 0, record: 0, height: 0, unknown: 0 };
+    const dots: { track: string; index: number; grade: TrackGrade; floor?: number; at: number[] }[] = [];
     const tracks = this.tracks();
     this.trackSignature = this.signature();
     const drawTrack = (track: LvTrack, spots: TrackSpot[], at: (s: TrackSpot) => number[]) => {
       const fused = track.kind === 'fused', color = C.Color.fromCssColorString(fused ? VIEW_COLORS.trackFused : VIEW_COLORS.trackRaw);
       for (const run of trackRuns(spots)) {
-        const sure = run[0].sure, pts = run.map((s) => this.pos(at(s)));
+        const grade = run[0].grade, where = run.map(at), pts = where.map((p) => this.pos(p));
         if (pts.length > 1) {
+          const alpha = grade === 'record' ? 1 : 0.55;
           lines.add({
-            positions: pts, width: sure ? (fused ? tpx.fused + 4 : tpx.raw) : fused ? tpx.fused : tpx.raw + 0.5,
-            material: !sure ? C.Material.fromType('PolylineDash', { color: color.withAlpha(0.5), dashLength: 12 })
-              : fused ? C.Material.fromType('PolylineOutline', { color, outlineColor: C.Color.WHITE, outlineWidth: 2 }) : C.Material.fromType('Color', { color }),
+            positions: pts, width: grade === 'unknown' ? (fused ? tpx.fused : tpx.raw + 0.5) : fused ? tpx.fused + (grade === 'record' ? 4 : 2) : tpx.raw,
+            material: grade === 'unknown' ? C.Material.fromType('PolylineDash', { color: color.withAlpha(0.5), dashLength: 12 })
+              : fused ? C.Material.fromType('PolylineOutline', { color: color.withAlpha(alpha), outlineColor: C.Color.WHITE.withAlpha(alpha), outlineWidth: 2 }) : C.Material.fromType('Color', { color: color.withAlpha(alpha) }),
           });
         }
-        if (!fused || pts.length === 1) for (const position of pts) points.add({ position, color: color.withAlpha(sure ? 1 : 0.45), pixelSize: tpx.dot, outlineColor: C.Color.WHITE.withAlpha(sure ? 1 : 0.5), outlineWidth: 1 });
+        if (!fused || pts.length === 1 || grade === 'record') pts.forEach((position, k) => {
+          points.add(grade === 'record' ? { position, color, pixelSize: tpx.dot + 5, outlineColor: C.Color.WHITE, outlineWidth: 2 }
+            : grade === 'height' ? { position, color: color.withAlpha(0.5), pixelSize: tpx.dot + 3, outlineColor: C.Color.WHITE.withAlpha(0.7), outlineWidth: 1 }
+            : { position, color: C.Color.WHITE.withAlpha(0.2), pixelSize: tpx.dot + 4, outlineColor: color.withAlpha(0.9), outlineWidth: 2 });
+          dots.push({ track: track.id, index: run[k].index, grade, floor: run[k].floor, at: where[k] });
+        });
       }
       stats[track.kind] += spots.length;
       stats.unsure += spots.filter((s) => !s.sure).length;
+      for (const s of spots) stats[s.grade]++;
     };
     for (const t of tracks) stats.loaded += t.points.length;
     let dropM = 0; // how far the whole drawing starts below its place (the animation)
@@ -577,7 +589,7 @@ export class LevelView {
           f.rings.push(...b.geometry.coordinates.map((poly) => metres(poly[0]))); f.baseM = Math.min(f.baseM, b.baseM); f.roofM = Math.max(f.roofM, b.roofM);
           footprints.set(id, f);
         }
-        const ctx: TrackContext = { zones: this.zones, groundAt: this.src.groundAt, buildings: [...footprints.values()], roads: this.src.roads() };
+        const ctx: TrackContext = { zones: this.zones, groundAt: this.src.groundAt, buildings: [...footprints].map(([id, f]) => ({ id, ...f })), roads: this.src.roads(), partOf: baseBuildingId };
         for (const track of tracks) drawTrack(track, trackOnZone(track.points, zone, ctx), (s) => [track.points[s.index].x, track.points[s.index].y, lift(s.z) + 0.6]);
       }
     } else {
@@ -692,11 +704,13 @@ export class LevelView {
         dot(raised([[place.x, place.y, place.z]], move, 0.5)[0], VIEW_COLORS.place);
         tag('place', raised([[place.x, place.y, place.z]], move, 1.2)[0], shortName(place.name), 5, 12, VIEW_COLORS.place);
       }
-      // F10: the session tracks inside the footprint, each point on the plate of the floor nearest to its height
+      // F10: the session tracks inside the footprint, each point on the plate of its floor: the floor a record names,
+      // else the floor nearest to its height; with one floor chosen only that floor's points (the same rule)
       for (const track of tracks) {
-        const spots = trackOnBuilding(track.points, footprints.flatMap((f) => f.rings), floors.map((f) => f.m), { baseM: Math.min(...blocks.map((b) => b.baseM)), roofM: Math.max(...blocks.map((b) => b.roofM)) }, this.src.groundAt)
-          .filter((s) => focused(s.floor!));
-        drawTrack(track, spots, (s) => { const p = track.points[s.index], q = onFloor(s.floor!)([p.x, p.y, floors[s.floor!].m]); return [q[0], q[1], q[2] + 0.6]; });
+        const spots = spotsOnFocus(trackOnBuilding(track.points, footprints.flatMap((f) => f.rings), floors.map((f) => f.m), { baseM: Math.min(...blocks.map((b) => b.baseM)), roofM: Math.max(...blocks.map((b) => b.roofM)) }, this.src.groundAt,
+          { id: u.id, floorNames: floors.map((f) => f.name), partOf }), u.focus);
+        // above the plan-cut walls of a carved floor (a point in a room would be inside the wall block)
+        drawTrack(track, spots, (s) => { const p = track.points[s.index], q = onFloor(s.floor!)([p.x, p.y, floors[s.floor!].m]); return [q[0], q[1], q[2] + INTERIOR.wallM + 0.3]; });
       }
       const top = onFloor(floors.length - 1)([...middle(main), floors[floors.length - 1].m]);
       tag('title', [top[0], top[1], top[2] + 6], u.name, 10, 16);
@@ -704,6 +718,7 @@ export class LevelView {
     }
 
     this.trackStats = stats;
+    this.trackDots = dots;
     // everything of the campus below is faded by a veil under what is lifted (view-style.ts OTHERS.veil = what still shows)
     const b = buildings.flatMap((x) => x.geometry.coordinates.flatMap((poly) => poly[0]));
     if (b.length) {
@@ -791,7 +806,7 @@ export class LevelView {
     const trackLine = !u || (!this.src.tracks && !this.extraTracks.length) ? ''
       : !t.loaded ? '불러온 세션 없음. 세션을 고르면 원본 위치와 퓨전 궤적이 이 위에 함께 뜹니다.'
       : !(t.raw + t.fused) ? (level ? '이 층을 지나는 세션 점 없음' : '이 구획을 지나는 세션 점 없음')
-      : `세션 점: 원본 ${t.raw} · 퓨전 ${t.fused}${t.unsure ? ` (그중 높이 미상 ${t.unsure})` : ''}`;
+      : `세션 점: 원본 ${t.raw} · 퓨전 ${t.fused} — 층 확정 ${t.record} · 추정 ${t.height} · 미상 ${t.unknown}`;
     const swatch = (color: string, label: string, cls = '') => `<span><i class="${cls}" style="--c:${color}"></i>${label}</span>`;
     this.panel.innerHTML = `
       <div class="level-head"><b>층 따로 보기</b><button type="button" data-action="close" title="제자리로 돌려놓고 끝냄 (Esc)">닫기</button></div>
@@ -805,9 +820,9 @@ export class LevelView {
       ${trackLine ? `<div class="level-track-msg">${esc(trackLine)}</div>` : ''}
       <div class="level-style">${choice('line')}${choice('labels')}${choice('others')}</div>
       ${u?.kind === 'building' && this.interiors.some((s) => this.partOf()(s.building) === u.id) ? `<div class="level-sub">실내 구조(벽·복도·계단실·승강기·로비·연결 통로): 추정. 동 노트 실내_구조 → interiors.geojson, 바닥에서 ${INTERIOR.wallM} m 높이로 잘라 봄</div>` : ''}
-      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(SPACE.wall, '실내 벽(추정)')}${swatch(SPACE.edge.stair, '계단실')}${swatch(SPACE.edge.elevator, '승강기 통로')}${swatch(SPACE.edge.link, '연결 통로')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 원본 위치', 'dot')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}${swatch(VIEW_COLORS.trackFused, '높이 미상(흐린 점선)', 'dash faint')}</div>
+      <div class="level-legend">${swatch(VIEW_COLORS.vehicle, '차도')}${swatch(VIEW_COLORS.pedestrian, '보행로·복도')}${swatch(VIEW_COLORS.stairs, '계단·경사로')}${swatch(VIEW_COLORS.elevator, '승강기')}${swatch(VIEW_COLORS.stub, '이웃으로 이어짐', 'dash')}${swatch(VIEW_COLORS.place, '장소', 'dot')}${swatch(VIEW_COLORS.leader, '제자리 표시선', 'dash')}${swatch(SPACE.wall, '실내 벽(추정)')}${swatch(SPACE.edge.stair, '계단실')}${swatch(SPACE.edge.elevator, '승강기 통로')}${swatch(SPACE.edge.link, '연결 통로')}${swatch(VIEW_COLORS.aisle, '주차장 통로 면')}${swatch(VIEW_COLORS.stall, '주차 칸')}${swatch(VIEW_COLORS.focus, '고른 층')}${swatch(VIEW_COLORS.trackRaw, '세션 점 · 층 확정(기록)', 'dot big')}${swatch(VIEW_COLORS.trackRaw, '층 추정(높이)', 'dot faint')}${swatch(VIEW_COLORS.trackRaw, '층 미상(빈 원·점선)', 'ring')}${swatch(VIEW_COLORS.trackFused, '퓨전 궤적', 'track')}</div>
       <div class="level-hint">↑↓ · PageUp/PageDown: 층(건물)·구획 차례로. Esc: 제자리로.${this.src.lockKeys ? ' 띄운 동안에는 편집이 잠깁니다(보기 전용).' : ''}</div>
-      <details class="level-help"${this.helpOpen ? ' open' : ''}><summary>띄우는 규칙 · 세션 점 규칙</summary>띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게, 윗층은 층 차이 + ${LEVEL_VIEW.floorGapM} m 위). 한 층에는 그 층 바닥에 선 것만 그림. 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).</details>`;
+      <details class="level-help"${this.helpOpen ? ' open' : ''}><summary>띄우는 규칙 · 세션 점 규칙</summary>띄우는 높이: 가장 높은 지붕 + ${LEVEL_VIEW.clearRoofM} m. 땅을 눌렀을 때 그 아래 지하 층이 있으면 고르는 목록이 뜸. 지하 층은 제 높이대로 따로 뜸(아래층이 낮게, 윗층은 층 차이 + ${LEVEL_VIEW.floorGapM} m 위). 한 층에는 그 층 바닥에 선 것만 그림. 다른 층의 것은 내려가는 경사로 면(뚫린 곳 아래 흐리게)과 두 층에 걸친 벽(비치게)만.<br>세션 점의 층: ① 수집 기록이 준 층(기준점 표시의 건물·층, 계단·승강기 시작 전은 출발 층·끝난 뒤는 도착 층, 앞뒤 ${TRACK.markerWindowS}초 안 · 두 표시가 같은 층이면 그 사이 전부, 퓨전 점은 비콘 층) = 확정, ② 없으면 높이로 그 자리 판 중 맞는 층 = 추정, ③ 높이가 없거나 어디에도 맞지 않으면 가까운 판에 = 미상. 펼치기가 끝나면 각 판 위 제자리에 남음. 높이 규칙: 평면이 이 안에 들고 높이가 맞는 것만 그림. 층은 바닥 − ${TRACK.belowFloorM.toFixed(1)} m ~ 윗층 바닥 − ${TRACK.belowFloorM.toFixed(1)} m(맨 위층은 천장까지), 실외 구획은 지면 ± ${TRACK.outdoorM} m, 건물은 높이가 가장 가까운 층. 높이를 모르거나 어디에도 맞지 않는 점은 버리지 않고 가까운 판에 흐린 점선(높이 미상).</details>`;
   }
 
   private onPanelChange(e: Event) {
