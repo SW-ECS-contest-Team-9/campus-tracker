@@ -1,0 +1,31 @@
+{
+ "note": "시험용 DB(2026-10-25 R6 적용 전) 8자리 → 전체 id, 길 revision",
+ "ids": {
+  "52db453d": "52db453d-cf5e-4924-a5dd-bdd5c1834519",
+  "15fa4bfd": "15fa4bfd-adfb-46a9-b89e-591e6e11b3b9",
+  "90324f04": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+  "b623bdce": "b623bdce-2900-464b-b491-ebf24275b7c8",
+  "7895ac0d": "7895ac0d-084b-467f-a57d-75a35e02c435",
+  "f86049dd": "f86049dd-63b4-49b1-b200-2270efa4a828",
+  "b06802b5": "b06802b5-cd78-4db8-a46f-78f837189511",
+  "e0059cce": "e0059cce-d2d6-488c-a6bf-063dd13aaf1d",
+  "a03d33c3": "a03d33c3-08b0-4bc6-ae9f-40b83c3296de",
+  "52db453d-cf5e-4924-a5dd-bdd5c1834519": "52db453d-cf5e-4924-a5dd-bdd5c1834519",
+  "15fa4bfd-adfb-46a9-b89e-591e6e11b3b9": "15fa4bfd-adfb-46a9-b89e-591e6e11b3b9",
+  "90324f04-19e9-46de-91cb-fa6d0407c6f8": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+  "b623bdce-2900-464b-b491-ebf24275b7c8": "b623bdce-2900-464b-b491-ebf24275b7c8",
+  "7895ac0d-084b-467f-a57d-75a35e02c435": "7895ac0d-084b-467f-a57d-75a35e02c435",
+  "f86049dd-63b4-49b1-b200-2270efa4a828": "f86049dd-63b4-49b1-b200-2270efa4a828",
+  "b06802b5-cd78-4db8-a46f-78f837189511": "b06802b5-cd78-4db8-a46f-78f837189511",
+  "e0059cce-d2d6-488c-a6bf-063dd13aaf1d": "e0059cce-d2d6-488c-a6bf-063dd13aaf1d",
+  "a03d33c3-08b0-4bc6-ae9f-40b83c3296de": "a03d33c3-08b0-4bc6-ae9f-40b83c3296de",
+  "b4b71955": "b4b71955-4282-4f9b-a31a-5bf70beeb76a",
+  "b4b71955-4282-4f9b-a31a-5bf70beeb76a": "b4b71955-4282-4f9b-a31a-5bf70beeb76a"
+ },
+ "rev": {
+  "a03d33c3": 7,
+  "b06802b5": 1,
+  "15fa4bfd": 1,
+  "e0059cce": 1
+ }
+}
