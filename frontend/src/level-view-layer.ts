@@ -42,12 +42,14 @@ export type SpaceViewSources = {
   lockKeys?: boolean;
   /** Called when either view starts or ends (a page disables its tools). */
   onChange?: (state: { level: boolean; walk: boolean }) => void;
-  /** Checkboxes switched on while walking and put back afterwards (underground ways, see-through buildings). */
+  /** Checkboxes switched on while walking inside and put back afterwards (underground ways). */
   walkInputs?: HTMLInputElement[];
   /** Called when the lifted view starts and ends (a page hides its own name tags of the campus below, which would show through). */
   onLevel?: (on: boolean) => void;
-  /** Extra page work while walking (the editor fades its buildings). */
+  /** Extra page work while walking inside (underground, indoors). */
   onWalk?: (on: boolean) => void;
+  /** While walking: leave these scene buildings out (the one the walker is in); [] puts them all back. */
+  hideBuildings?: (ids: string[]) => void;
   /**
    * F10: the session tracks the page shows now (its own toggles and selectors decide): raw location samples and fused
    * paths, plan position in metres and height in the model's datum. Read only. The page calls level.tracksChanged()
@@ -883,6 +885,7 @@ export function mountSpaceViews(viewer: any, src: SpaceViewSources, controls: { 
   const level = new LevelView(viewer, src, () => changed());
   const walk = new FirstPerson(viewer, {
     roads: src.roads, areas: () => level.areas(), solids: () => level.solids, zones: () => level.zones, buildings: src.buildings, groundAt: src.groundAt,
+    interiors: () => level.interiors, hideBuildings: src.hideBuildings,
     lockKeys: src.lockKeys, inputs: src.walkInputs ?? [], onWalk: src.onWalk, pickPoint: (position) => level.pickPoint(position),
   }, () => changed());
   views = {
