@@ -535,26 +535,37 @@ export const WALK = {
   slopedAt: 0.03,
   /** A road carries the walker within half its width, at least this. */
   roadReachM: 1.5,
+  /**
+   * Along a stair or ramp road the feet change by at most this in one step (2026-10-25): the highest riser on campus is
+   * 0.219 m (청운관 계단실 위 줄), and one walk update moves at most 0.42 m (run 4.2 m/s × dt 0.1 s), 0.36 m up the
+   * steepest stair road (0.86). So a stacked flight 0.8 m beside (청운관 되돌림 계단) is never taken.
+   */
+  stairStepM: 0.4,
 };
 
-/** A walkable surface at a plan point; `sloped`: a stair or ramp road there (it leads through whatever level surface covers it in plan). */
+/** A walkable surface at a plan point; `sloped`: a stair or ramp road there, its landings included (it leads through whatever level surface covers it in plan). */
 export type WalkSurface = { z: number; sloped?: boolean };
 
 /**
- * The height the feet get. Only surfaces at or below feet + stepUpM count (so a slab, a roof or the field above an
- * underground level is never taken). A stair or ramp road within maxDropM below the feet is followed first (the one
- * nearest to the feet): it goes down through the level surface around its head. Otherwise the highest surface,
- * unless that is a drop of more than maxDropM or there is none: then the feet stay.
+ * The height the feet get: a surface that goes on from the feet, never one stacked above or below.
+ * A stair or ramp road is followed first: of those within WALK.stairStepM of the feet (up or down), the one nearest to
+ * the feet (it goes down through the level surface around its head; of two flights stacked in plan, the one one is on).
+ * Otherwise, of the level surfaces at or below feet + stepUpM (so a slab, a roof or the field above an underground level
+ * is never taken), the highest, unless that is a drop of more than maxDropM or there is none: then the feet stay.
+ * A stair or ramp road farther than one step from the feet is not a surface under them.
  */
 export function feetHeight(candidates: (number | WalkSurface)[], feetM: number): number {
-  let best = -Infinity, slope: number | null = null;
+  let best = -Infinity, follow: number | null = null;
   for (const c of candidates) {
     const s = typeof c === 'number' ? { z: c } : c;
-    if (s.z > feetM + WALK.stepUpM) continue;
-    if (s.sloped && feetM - s.z <= WALK.maxDropM && (slope === null || Math.abs(s.z - feetM) < Math.abs(slope - feetM))) slope = s.z;
-    if (s.z > best) best = s.z;
+    const dz = Math.abs(s.z - feetM);
+    if (s.sloped) {
+      if (dz <= WALK.stairStepM + 1e-9 && (follow === null || dz < Math.abs(follow - feetM))) follow = s.z;
+      continue;
+    }
+    if (s.z <= feetM + WALK.stepUpM && s.z > best) best = s.z;
   }
-  if (slope !== null) return slope;
+  if (follow !== null) return follow;
   return best === -Infinity || feetM - best > WALK.maxDropM ? feetM : best;
 }
 
@@ -584,7 +595,7 @@ export function walkSurfaces(x: number, y: number, data: { roads: LvRoad[]; area
   for (const road of data.roads) {
     if (road.structure === 'elevator') continue;
     const h = roadHeightAt(road.geometry.coordinates, x, y);
-    if (h && h.distanceM <= Math.max(WALK.roadReachM, (road.widthM ?? 0) / 2)) out.push({ z: h.z, sloped: h.slope > WALK.slopedAt });
+    if (h && h.distanceM <= Math.max(WALK.roadReachM, (road.widthM ?? 0) / 2)) out.push({ z: h.z, sloped: h.slope > WALK.slopedAt || road.structure === 'stairs' || road.structure === 'ramp' });
   }
   for (const area of data.areas) if (area.elevationM != null && area.rings[0] && polygonContains(x, y, area.rings.map(open))) out.push({ z: area.elevationM });
   for (const zone of data.zones) if (zone.floorM !== undefined && inPolygons(zone.polygons, x, y)) out.push({ z: zone.floorM });
