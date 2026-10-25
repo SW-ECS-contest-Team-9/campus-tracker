@@ -5,7 +5,7 @@
 //    foundations take its place (why and by which rule: campus-ground.ts).
 // The campus region is defined in ONE place: `campus` of GET /api/v1/scene (the campus outline the ground texture of
 // campus-map.ts already colours ivory), read here in campusRegion().
-import type { SceneBuilding } from './api';
+import type { SceneBuilding, TerrainGrid } from './api';
 import { GROUND, buildCampusGround, type CampusGround, type GroundBuilding, type KnownSurface } from './campus-ground';
 import { pavingAppearance, pavingAttribute } from './paving-pattern';
 import { growPolygons, polygonArea, polygonContains, polygonOps, type Polygon } from './polygon-ops';
@@ -13,6 +13,7 @@ import type { SurfaceContext } from './road-surface-layer';
 import { clipMesh, clipPolyline, planePoint, type Mesh, type SectionPlane } from './section';
 import { PRECEDENCE, SOLID_STRIDE, STRUCTURES, boxPattern, fillPolygons, parseStructures, polygonIntervals, sectionCaps, solidColors, solidMesh, stairWells, surfaceExclusions, surfaceSeam, topHeight, topMesh, voidName, type Solid } from './structures';
 import { setTerrainClip } from './terrain-clip';
+import { cellsInside, sampler } from './terrain-sampler';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
 
@@ -36,6 +37,10 @@ export type StructureSources = {
   campusTint?: (show: boolean) => void;
   /** Where the structure files are (default /structures/). */
   base?: string;
+  /** TP2: the grid of `terrain` and how the map draws it without the cells under the shown platforms (campus-map.ts
+   * setTerrainHide). With both, the ground beside a platform is the ground's own height up to the wall (terrain-sampler.ts). */
+  grid?: TerrainGrid;
+  setTerrainHide?: (hide: Uint8Array | null) => void;
 };
 
 /** Triangles in metres with a colour (0..255) per vertex, and what a click on them selects. */
@@ -71,6 +76,9 @@ export class StructuresLayer {
   private edges: { points: number[][]; rgb: number[] }[] = [];
   private platformPolygons = new Map<Solid, Polygon[]>();
   private buildings: GroundBuilding[] = [];
+  /** The terrain beside the shown platforms (src.terrain without their cells), and which platforms it was made for. */
+  private terrain: (x: number, y: number) => number;
+  private terrainKey = '';
   /** Files read, and features left out (unknown kind without heights, broken geometry). */
   loaded: string[] = [];
   skipped: string[] = [];
@@ -80,6 +88,7 @@ export class StructuresLayer {
   constructor(private readonly viewer: Viewer, private readonly src: StructureSources) {
     this.prims = viewer.scene.primitives.add(new (window as any).Cesium.PrimitiveCollection());
     Object.assign(this.visible, src.visible);
+    this.terrain = src.terrain;
   }
 
   /** Reads the structure files (the list of /structures/index.json). A missing file leaves the layer without it; nothing throws. */
@@ -159,7 +168,7 @@ export class StructuresLayer {
   groundAt(x: number, y: number): number {
     for (const [solid, polygons] of this.platformPolygons) if (polygons.some((p) => polygonContains(x, y, p))) return topHeight(solid)(x, y);
     if (this.visible.ground && this.ground) for (const b of this.buildings) if (polygonContains(x, y, b.polygon)) return b.groundM; // a step at the wall, not a ramp across it
-    return this.visible.ground && this.ground && this.inCampus(x, y) ? this.ground.height(x, y) : this.src.terrain(x, y);
+    return this.visible.ground && this.ground && this.inCampus(x, y) ? this.ground.height(x, y) : this.terrain(x, y);
   }
 
   /** Whether the platforms that are shown are the ground of an open area (rings in longitude / latitude, closed): PRECEDENCE 4. */
@@ -206,6 +215,7 @@ export class StructuresLayer {
     const walls = platforms.length ? growPolygons(buildings.map((b) => b.polygon), 0.05) : [];
     // Q01: nor is it drawn where a stair climbs into it below its top (stairWells): the steps would be buried in the mass
     this.platformPolygons = new Map(platforms.map((s) => [s, polygonOps('minus', [s.polygon], [...walls, ...stairWells(s, shown)])]));
+    this.wallTerrain(platforms);
 
     // the ground first: the platform sides reach down to it
     this.ground = null;
@@ -218,7 +228,7 @@ export class StructuresLayer {
       // a platform that reaches outside the campus (a public street below a retaining wall) belongs to the cleared region too:
       // its outer edge then meets the terrain along a straight line (the apron of campus-ground.ts), not along the terrain cells
       const region = platforms.length ? polygonOps('union', [...this.campusRegion(), ...platforms.map((s) => this.platformPolygons.get(s)!).flat()]) : this.campusRegion();
-      const ground = buildCampusGround({ campus: region, terrain: this.src.terrain, buildings, known });
+      const ground = buildCampusGround({ campus: region, terrain: this.terrain, buildings, known });
       this.ground = ground;
       const floor = css(GROUND.color);
       const outside = css(GROUND.outsideColor);
@@ -321,6 +331,17 @@ export class StructuresLayer {
       asynchronous: false,
       allowPicking: pickable && this.src.pickable !== false,
     }));
+  }
+
+  /** TP2: the terrain beside the platforms ends at their walls (terrain-sampler.ts), here and in the map's terrain. */
+  private wallTerrain(platforms: Solid[]) {
+    const { grid, setTerrainHide } = this.src;
+    const key = platforms.map((s) => s.id).join(' ');
+    if (!grid || key === this.terrainKey) return;
+    this.terrainKey = key;
+    const hide = cellsInside(grid, platforms.map((s) => s.polygon));
+    this.terrain = hide ? sampler(grid, hide) : this.src.terrain;
+    setTerrainHide?.(hide);
   }
 
   private draw() {

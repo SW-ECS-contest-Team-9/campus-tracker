@@ -6,7 +6,7 @@
 // around the structures (sync), and the cross-section cuts all of them.
 // A further layer joins through addLayer(): it is then cut by the cross-section on both pages.
 import { api, type TerrainGrid } from './api';
-import { sampler, type CampusSceneLayer } from './campus-map';
+import { sampler, setTerrainHide, type CampusSceneLayer } from './campus-map';
 import { RoadSurfaceLayer, type RoadSurfacePart } from './road-surface-layer';
 import { layerDataKey, type LayerData } from './scene-layer-data';
 import { SectionTool, type Cuttable } from './section-layer';
@@ -48,7 +48,7 @@ export class SceneLayers {
     const g = options.grid;
     const buildings = () => options.scene?.scene.buildings ?? [];
     // before the road surfaces: the underground ways show through whatever was added to the scene before them
-    this.structures = new StructuresLayer(viewer, { terrain: sampler(g), buildings, campus: () => options.scene?.scene.campus ?? [], visible: options.structures, pickable: options.pickable, campusTint: options.campusTint });
+    this.structures = new StructuresLayer(viewer, { terrain: sampler(g), grid: g, setTerrainHide: (hide) => setTerrainHide(viewer, g, hide), buildings, campus: () => options.scene?.scene.campus ?? [], visible: options.structures, pickable: options.pickable, campusTint: options.campusTint });
     this.surfaces = new RoadSurfaceLayer(viewer, { ground: sampler(g), buildings, visible: options.visible, pickable: options.pickable });
     this.structures.setUnderground(this.surfaces.isVisible('underground'));
     this.section = new SectionTool(viewer, {
