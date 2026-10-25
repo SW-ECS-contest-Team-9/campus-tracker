@@ -397,9 +397,14 @@ export class FirstPerson {
     if (length) {
       const speed = (held.has('ShiftLeft') || held.has('ShiftRight') ? WALK.runMps : WALK.walkMps) * dt / length;
       const sin = Math.sin(s.heading), cos = Math.cos(s.heading);
-      s.x += (sin * forward + cos * side) * speed;
-      s.y += (cos * forward - sin * side) * speed;
-      s.feetM = feetHeight([...walkSurfaces(s.x, s.y, this.data), { z: this.src.groundAt(s.x, s.y) }], s.feetM);
+      const dx = (sin * forward + cos * side) * speed, dy = (cos * forward - sin * side) * speed;
+      // one step at a time (WALK.strideM): the feet go on from where they were, a running frame does not skip a tread
+      const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / WALK.strideM));
+      for (let k = 0; k < n; k++) {
+        s.x += dx / n;
+        s.y += dy / n;
+        s.feetM = feetHeight([...walkSurfaces(s.x, s.y, this.data), { z: this.src.groundAt(s.x, s.y) }], s.feetM);
+      }
     }
     // the eye follows the feet smoothly (steps do not jolt)
     this.eyeM += (s.feetM + WALK.eyeM - this.eyeM) * Math.min(1, dt * 10);
