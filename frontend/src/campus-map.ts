@@ -8,8 +8,11 @@ import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './a
 import { decorate, ownWalls, wallColor, wallTopM } from './building-appearance';
 import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
 import { clipLonLatPolygons, planeSide, type SectionPlane } from './section';
+import { sampler } from './terrain-sampler';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
+
+export { sampler };
 
 type CesiumNS = typeof import('cesium');
 export type BuildingPick = { kind: 'building'; buildingId: string };
@@ -24,23 +27,6 @@ const COLORS = {
   edge: '#a8a29e',
   label: '#374151',
 };
-
-/** Bilinear height at an EPSG:5186 point; outside the grid the nearest edge value (no cliff at the border). */
-export function sampler(g: TerrainGrid) {
-  return (x: number, y: number): number => {
-    let fx = (x - g.originX) / g.resolution - 0.5;
-    let fy = (y - g.originY) / g.resolution - 0.5;
-    if (!Number.isFinite(fx) || !Number.isFinite(fy)) return g.heights[0];
-    fx = Math.min(Math.max(fx, 0), g.width - 1.001);
-    fy = Math.min(Math.max(fy, 0), g.height - 1.001);
-    const ix = Math.floor(fx);
-    const iy = Math.floor(fy);
-    const tx = fx - ix;
-    const ty = fy - iy;
-    const h = (i: number, j: number) => g.heights[j * g.width + i];
-    return h(ix, iy) * (1 - tx) * (1 - ty) + h(ix + 1, iy) * tx * (1 - ty) + h(ix, iy + 1) * (1 - tx) * ty + h(ix + 1, iy + 1) * tx * ty;
-  };
-}
 
 function ringContains(x: number, y: number, ring: number[][]) {
   let inside = false;
@@ -130,9 +116,9 @@ function groundTexture(g: TerrainGrid, campus: CampusScene['campus']): string {
   return canvas.toDataURL('image/png');
 }
 
-/** Heightmap terrain from the DEM grid (heights = orthometric, like the former VWorld scene). */
-function terrainProvider(C: CesiumNS, g: TerrainGrid) {
-  const at = sampler(g);
+/** Heightmap terrain from the DEM grid (heights = orthometric, like the former VWorld scene). `hide`: see sampler. */
+function terrainProvider(C: CesiumNS, g: TerrainGrid, hide?: Uint8Array) {
+  const at = sampler(g, hide);
   const N = 33;
   const b = g.bounds;
   const margin = 0.005;
@@ -162,6 +148,12 @@ function terrainProvider(C: CesiumNS, g: TerrainGrid) {
     },
   });
   return provider;
+}
+
+/** TP2: draw the terrain without interpolating from the cells under the platforms (null: all cells), so that the ground
+ * beside a platform wall does not climb it. A new provider: the terrain tiles load again. */
+export function setTerrainHide(viewer: any, g: TerrainGrid, hide: Uint8Array | null) {
+  viewer.terrainProvider = terrainProvider((window as any).Cesium, g, hide ?? undefined);
 }
 
 /** The campus buildings: one batched primitive (extruded footprints), roof/corner edges and name labels. */
