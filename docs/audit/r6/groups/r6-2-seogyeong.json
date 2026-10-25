@@ -1,0 +1,182 @@
+{
+ "id": "R6-2-SEOGYEONG",
+ "comment": "R6 F4·F5: 서경로 횡단 b06802b5 를 실제 얼룩말 자리로(약 7 m 남동), 유담관 벽 아래 캠퍼스 쪽 보도를 회전교차로까지, e0059cce 이름. 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "F4 b06802b5 이름",
+   "op": "update_road",
+   "args": {
+    "id": "b06802b5-cd78-4db8-a46f-78f837189511",
+    "expectedRevision": 1,
+    "attrs": {
+     "name": "서경로 횡단보도 (공연실습소 동쪽 끝 앞 얼룩말: S-MAP 정사·거리뷰 37 확정, 선 ±1 m)"
+    }
+   },
+   "grade": "확정(얼룩말 자리)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑥·F4"
+  },
+  {
+   "ref": "F5 e0059cce 이름",
+   "op": "update_road",
+   "args": {
+    "id": "e0059cce-d2d6-488c-a6bf-063dd13aaf1d",
+    "expectedRevision": 1,
+    "attrs": {
+     "name": "서경로 남서쪽 길가: 횡단보도 ~ 공연실습소 북서 모서리 문 앞 (차도 가, 턱 있는 보도 없음, 추정. 거리뷰 36~40·항공 사진, 현장 확인 전)"
+    }
+   },
+   "grade": "추정(턱 있는 보도가 사진에 안 보임)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md F5"
+  },
+  {
+   "ref": "F4 횡단 북동 끝(196335d9 끝) → 얼룩말 북동 끝(캠퍼스 쪽 보도)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+    "to": {
+     "xy": [
+      201063.25,
+      557198.34
+     ],
+     "z": 96.13
+    }
+   },
+   "grade": "확정",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑥·F4"
+  },
+  {
+   "ref": "F4 횡단 남서 끝(e0059cce 시작) → 얼룩말 남서 끝(차도 가)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "b623bdce-2900-464b-b491-ebf24275b7c8",
+    "to": {
+     "xy": [
+      201055.8,
+      557195.0
+     ],
+     "z": 95.78
+    }
+   },
+   "grade": "확정",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑥·F4"
+  },
+  {
+   "ref": "F5 N3 얼룩말 북동 끝 → 유담관 벽 아래 보도 → 유담관 남서 모서리 보도(N1·N2 와 만남)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "sidewalk",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 2.0,
+    "name": "서경로 캠퍼스 쪽 보도: 공연실습소 앞 얼룩말 ~ 유담관 벽 아래 ~ 회전교차로 (블록 보도 + 화강석 경계석, 벽 발치 1 m 남서, 높이 공도 + 0.15. 선 ±1 m 추정)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "at": {
+       "nodeId": "90324f04-19e9-46de-91cb-fa6d0407c6f8"
+      }
+     },
+     {
+      "xy": [
+       201051.34,
+       557211.74
+      ],
+      "z": 94.6
+     },
+     {
+      "xy": [
+       201015.36,
+       557235.72
+      ],
+      "z": 92.34
+     },
+     {
+      "xy": [
+       201012.8,
+       557238.3
+      ],
+      "z": 92.51
+     }
+    ]
+   },
+   "grade": "확정(보도: 사진 04·거리뷰 36·37·S-MAP 정사·벽 발치), 추정(선 ±1 m)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ③④⑤·F5"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 n02-plaza(토큰은 메모리에만, 30분)",
+  "batch": "e30e2e11-a8d8-402f-9016-a251dbb7f1dd",
+  "changeSets": {
+   "F4 b06802b5 이름": {
+    "changeSetId": "c5442a10-067f-4b26-95f6-a41c2b9b7994",
+    "roads": [
+     {
+      "id": "b06802b5-cd78-4db8-a46f-78f837189511",
+      "from": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+      "to": "b623bdce-2900-464b-b491-ebf24275b7c8",
+      "lengthM": 7.49
+     }
+    ]
+   },
+   "F5 e0059cce 이름": {
+    "changeSetId": "8de55107-d4c9-4dc1-bcb3-552c9637ecc9",
+    "roads": [
+     {
+      "id": "e0059cce-d2d6-488c-a6bf-063dd13aaf1d",
+      "from": "b623bdce-2900-464b-b491-ebf24275b7c8",
+      "to": "596f31e5-0c7a-424f-9c3c-1ca707424383",
+      "lengthM": 44.87
+     }
+    ]
+   },
+   "F4 횡단 북동 끝(196335d9 끝) → 얼룩말 북동 끝(캠퍼스 쪽 보도)": {
+    "changeSetId": "6b3efe30-0859-482e-b620-fa307be5d927",
+    "roads": [
+     {
+      "id": "b06802b5-cd78-4db8-a46f-78f837189511",
+      "from": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+      "to": "b623bdce-2900-464b-b491-ebf24275b7c8",
+      "lengthM": 11.01
+     },
+     {
+      "id": "196335d9-c152-4757-8117-f8ffa6e09eef",
+      "from": "b460f7c7-7c0b-4a04-baaa-5311affe1bec",
+      "to": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+      "lengthM": 126.43
+     }
+    ]
+   },
+   "F4 횡단 남서 끝(e0059cce 시작) → 얼룩말 남서 끝(차도 가)": {
+    "changeSetId": "1cb85700-c11c-45a2-a2a1-7737f72368f9",
+    "roads": [
+     {
+      "id": "b06802b5-cd78-4db8-a46f-78f837189511",
+      "from": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+      "to": "b623bdce-2900-464b-b491-ebf24275b7c8",
+      "lengthM": 8.16
+     },
+     {
+      "id": "e0059cce-d2d6-488c-a6bf-063dd13aaf1d",
+      "from": "b623bdce-2900-464b-b491-ebf24275b7c8",
+      "to": "596f31e5-0c7a-424f-9c3c-1ca707424383",
+      "lengthM": 51.27
+     }
+    ]
+   },
+   "F5 N3 얼룩말 북동 끝 → 유담관 벽 아래 보도 → 유담관 남서 모서리 보도(N1·N2 와 만남)": {
+    "changeSetId": "d68a2646-77c5-4e61-ad5d-a60fba8d23f4",
+    "roads": [
+     {
+      "id": "7cb88400-9cb3-4849-ab9b-093fc0403a1a",
+      "from": "90324f04-19e9-46de-91cb-fa6d0407c6f8",
+      "to": "d75cf11b-eb24-4a11-8ad5-75855fcc2e65",
+      "lengthM": 64.8
+     }
+    ]
+   }
+  }
+ }
+}
