@@ -1,0 +1,63 @@
+{
+ "crs": "EPSG:5186",
+ "protectBuildings": true,
+ "reason": "TP1: Z05 조리법의 표본·평탄면·차도 띠 단계 + 구조물 파일의 모든 기단에서 만든 surface 하나(platforms-surface.geojson, docs/audit/registry/terrain_surface.py write). 옛 구역별 surface(g02·z02·z03·z05)를 대신한다. 지형 칸은 frontend/public/structures/*.geojson 기단 윗면에서 나온다.",
+ "steps": [
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_5186.json",
+    "../samples/smap_samples_roads_5186.json",
+    "../samples/smap_samples_roadprofile_5186.json"
+   ],
+   "areas": [
+    "field",
+    "road_profile",
+    "gate_road_rest",
+    "s06_rest",
+    "turnaround_rest"
+   ]
+  },
+  {
+   "type": "plateau",
+   "file": "f05-plateaus.geojson",
+   "noBlend": "f05-no-blend.geojson"
+  },
+  {
+   "type": "corridor",
+   "file": "t06-road-corridors.json",
+   "lines": [
+    "V1",
+    "V2",
+    "V3",
+    "V4a",
+    "V4b",
+    "P-LOW",
+    "P-UP"
+   ],
+   "keep": "f05-plateaus.geojson"
+  },
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/smap_samples_z05_edge_5186.json"
+   ],
+   "areas": [
+    "z05_edge_sw"
+   ]
+  },
+  {
+   "type": "local-samples",
+   "files": [
+    "../samples/z09_edge_blend_5186.json"
+   ],
+   "areas": [
+    "z09_edge_blend"
+   ]
+  },
+  {
+   "type": "surface",
+   "file": "platforms-surface.geojson"
+  }
+ ]
+}
