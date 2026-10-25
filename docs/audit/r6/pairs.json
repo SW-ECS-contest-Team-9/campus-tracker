@@ -1,0 +1,133 @@
+{
+ "note": "R6 도달 검사 쌍(시험용 DB, n02 state 형식). xy 는 snapRadiusM 3 안의 길에 붙는다.",
+ "pairs": [
+  {
+   "id": "yudam3>dorm",
+   "label": "유담관 3층 입구(서경스포렉스, 104.0) → 외국인 생활관 문",
+   "from": {
+    "nodeId": "dbc8c7c7-a0c5-470c-8efd-a44c5c73670c"
+   },
+   "to": {
+    "nodeId": "d2f7f158-b787-4363-83fb-b881154c067d"
+   }
+  },
+  {
+   "id": "yudam3>perf",
+   "label": "유담관 3층 입구 → 공연실습소 문",
+   "from": {
+    "nodeId": "dbc8c7c7-a0c5-470c-8efd-a44c5c73670c"
+   },
+   "to": {
+    "nodeId": "7b86558a-0c21-4eec-8ecb-5f5053eb7ad6"
+   }
+  },
+  {
+   "id": "turn>dorm",
+   "label": "회차 공간(130.8) → 외국인 생활관 문",
+   "from": {
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c"
+   },
+   "to": {
+    "nodeId": "d2f7f158-b787-4363-83fb-b881154c067d"
+   }
+  },
+  {
+   "id": "turn>perf",
+   "label": "회차 공간 → 공연실습소 문",
+   "from": {
+    "nodeId": "438353e0-4665-4997-9208-c7cd2286c34c"
+   },
+   "to": {
+    "nodeId": "7b86558a-0c21-4eec-8ecb-5f5053eb7ad6"
+   }
+  },
+  {
+   "id": "gate>dorm",
+   "label": "정문 쪽 서경로 보도 시작 → 외국인 생활관 문 (전과 같아야 함)",
+   "from": {
+    "nodeId": "b460f7c7-7c0b-4a04-baaa-5311affe1bec"
+   },
+   "to": {
+    "nodeId": "d2f7f158-b787-4363-83fb-b881154c067d"
+   }
+  },
+  {
+   "id": "yudam3>westgate",
+   "label": "유담관 3층 입구 → 서문 앞 (200979.0, 557404.5)",
+   "from": {
+    "nodeId": "dbc8c7c7-a0c5-470c-8efd-a44c5c73670c"
+   },
+   "to": {
+    "point": [
+     200979.0,
+     557404.5,
+     118.07
+    ]
+   }
+  },
+  {
+   "id": "bukaktrail>westgate",
+   "label": "북악관 뒤 산책로 서쪽 끝(7895ac0d) → 서문 앞 (200979.0, 557404.5)",
+   "from": {
+    "nodeId": "7895ac0d-084b-467f-a57d-75a35e02c435"
+   },
+   "to": {
+    "point": [
+     200979.0,
+     557404.5,
+     118.07
+    ]
+   }
+  },
+  {
+   "id": "backdoor>trail",
+   "label": "대일관 뒷문(입구(3)) → 뒤 산책로 동쪽 끝(05b7fa85)",
+   "from": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2"
+   },
+   "to": {
+    "nodeId": "05b7fa85-1674-4f68-9e15-19734386be6f"
+   }
+  },
+  {
+   "id": "trail>hyeinNE",
+   "label": "뒤 산책로 a03d33c3 동쪽 끝(05b7fa85, 201196.2, 557347.1) → 혜인관 북동 어귀(청운관 동 지하통로 입구 앞)",
+   "from": {
+    "nodeId": "05b7fa85-1674-4f68-9e15-19734386be6f"
+   },
+   "to": {
+    "nodeId": "e5934213-4b0b-4513-a6b2-a6b71140e931"
+   }
+  },
+  {
+   "id": "hyeinNE>B1",
+   "label": "혜인관 북동 어귀 → 1주차장 B1 (R5 계단)",
+   "from": {
+    "nodeId": "e5934213-4b0b-4513-a6b2-a6b71140e931"
+   },
+   "to": {
+    "nodeId": "4548ffcd-2302-4be9-ab43-a23121169487"
+   }
+  },
+  {
+   "id": "backdoor>B1",
+   "label": "대일관 뒷문 → 뒤 산책로 → 혜인관 북동 어귀 → 1주차장 B1",
+   "from": {
+    "nodeId": "118a26b9-d15c-42e8-84ff-2b99033c22b2"
+   },
+   "to": {
+    "nodeId": "4548ffcd-2302-4be9-ab43-a23121169487"
+   }
+  },
+  {
+   "id": "hyein2>trail",
+   "label": "혜인관 입구(2) 앞 지상 → 뒤 산책로 동쪽 끝(05b7fa85)",
+   "from": {
+    "nodeId": "0775ff68-da64-466d-bbd8-1b4deab44ca9"
+   },
+   "to": {
+    "nodeId": "05b7fa85-1674-4f68-9e15-19734386be6f"
+   }
+  }
+ ]
+}
