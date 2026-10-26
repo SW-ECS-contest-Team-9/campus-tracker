@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>캠퍼스 3D 지도</title>
+  </head>
+  <body class="client3d">
+    <div id="map"></div>
+    <div id="c3d-status" class="c3d-status">3D 지도를 불러오는 중…</div>
+    <div class="c3d-tools">
+      <button id="c3d-home" type="button" aria-label="처음 시점">⌂</button>
+      <button id="c3d-follow" type="button" hidden>현재 위치로</button>
+      <button id="c3d-explode" type="button" aria-pressed="false" title="누른 건물·구역을 층별로 띄워 보기">층 펼치기</button>
+    </div>
+    <section id="c3d-floors" class="c3d-floors" hidden>
+      <header><b id="c3d-floors-title"></b><span id="c3d-floors-sub" class="c3d-sub"></span><button id="c3d-floors-close" type="button" aria-label="닫기">×</button></header>
+      <div id="c3d-floors-list" class="c3d-list"></div>
+    </section>
+    <script type="module" src="/src/client3d-main.ts"></script>
+  </body>
+</html>

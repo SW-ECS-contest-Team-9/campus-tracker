@@ -117,6 +117,8 @@ export class LevelView {
   /** 층별 노드: every track dot drawn now, where it stands when the lift has ended (scripted checks). */
   trackDots: { track: string; index: number; grade: TrackGrade; floor?: number; at: number[] }[] = [];
   private trackSignature = '';
+  /** Where a point of floor i of the lifted building is drawn (client3d.html puts the current location there); null unless a building is lifted. */
+  liftedAt: ((floor: number, p: number[]) => number[]) | null = null;
   /** F10: the rules text of the panel is folded away unless the user opened it. */
   private helpOpen = false;
 
@@ -411,6 +413,7 @@ export class LevelView {
 
   private draw(fly: boolean) {
     this.clear();
+    this.liftedAt = null;
     const u = this.unit;
     if (!u) return;
     const C = this.C, style = viewStyle(), px = LINE_PX[style.line], show = LABELS[style.labels];
@@ -605,6 +608,7 @@ export class LevelView {
       /** A point of floor i: moved with its floor whatever its own height (a plate's underside, a road a little off the floor height). */
       const onFloor = (i: number) => (p: number[]) => { const q = fan([p[0], p[1], floors[i].m]); return [q[0], q[1], q[2] + (p[2] - floors[i].m)]; };
       this.fanHeading = floors.length > 1 ? Math.atan2(axis.dir[0], axis.dir[1]) : null;
+      this.liftedAt = (i, p) => onFloor(Math.max(0, Math.min(floors.length - 1, i)))(p);
       dropM = baseM - floors[0].m;
       veilM = baseM - 2.5;
       const roads = this.src.roads();
