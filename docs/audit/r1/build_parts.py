@@ -107,17 +107,17 @@ def hits(poly, z0, z1, skip=()):
 FEATS = []
 REPORT = []
 # ======================= 1. 정문·2주차장 어귀 =======================
-# G7 정산기 섬: 가운데 선 (201105.4, 557141.2) → (201101.0, 557151.5), 폭 2.0, 윗면 = 차로 + 0.15, 분홍 블록, 둘레 검은 말뚝
+# G7 정산기 화단(사용자 10-26 화단 확인, 걷지 않음): 가운데 선 (201105.4, 557141.2) → (201101.0, 557151.5), 폭 2.0, 윗면 = 차로 + 0.15, 분홍 블록, 둘레 검은 말뚝
 IS0, IS1 = np.array([201105.4, 557141.2]), np.array([201101.0, 557151.5])
 isl = seg(IS0, IS1, 2.0)
 pier = BOXES['Z05-PARKING1-PORTAL-PIER-1'][0]
 isl = isl.difference(unary_union([pier, BOXES['Z05-PARKING1-PORTAL-OPENING'][0]]).buffer(0.05))
 ia = unit(IS1 - IS0); z_s, z_n = ground(*IS0) + 0.15, ground(*IS1) + 0.15
 ISL_PROF = {'origin': [r2(IS0[0]), r2(IS0[1])], 'direction': [r2(ia[0]), r2(ia[1])], 'points': [[0.0, r2(z_s)], [r2(np.hypot(*(IS1 - IS0))), r2(z_n)]]}
-f = feat('R1-P2-ISLAND', 'landing', isl, min(z_s, z_n) - 0.45, max(z_s, z_n),
-         'P2 차로와 진입로 사이 좁은 섬(정산기 섬): 가운데 선 (201105.4, 557141.2) → (201101.0, 557151.5), 폭 2.0 m, 윗면 = 차로 + 0.15 m, 분홍 블록(판독 6). '
-         '주차장 문 동쪽 기둥 자리는 비움. 사람이 걷는지는 모름(사용자 질문 2) — 길은 긋지 않음', G_OK, plat_at(*((IS0 + IS1) / 2))['id'],
-         color='#9c8f86', topColor='#c99a9c', material='stone')
+f = feat('R1-P2-ISLAND', 'planter', isl, min(z_s, z_n) - 0.45, max(z_s, z_n),
+         'P2 차로와 진입로 사이 툭 튀어나온 화단(사용자 확인 2026-10-26: "거기는 화단"): 가운데 선 (201105.4, 557141.2) → (201101.0, 557151.5), 폭 2.0 m, 윗면 = 차로 + 0.15 m(높이 추정), 낮은 돌 테. '
+         '북쪽 끝에 정산기 둘·차단기. 사람이 걷는 곳 아님 — 길 없음. 주차장 문 동쪽 기둥 자리는 비움', G_OK, plat_at(*((IS0 + IS1) / 2))['id'],
+         color='#9c8f86', topColor='#5f7f4a')
 def low(x, y):   # 그 점을 덮는 기단 가운데 가장 낮은 윗면(섬 옆 P2 차로가 내려가므로 섬 밑이 뜨지 않게)
     pt = Point(x, y); return min((p['topM'] if p.get('topM') is not None else prof_z(p['topProfile'], x, y)) for g, p in PLAT if g.buffer(0.3).contains(pt))
 ISL_T = r2(max(prof_z(ISL_PROF, x, y) - low(x, y) for x, y in isl.exterior.coords) + 0.1)
