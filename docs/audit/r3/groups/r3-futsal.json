@@ -1,0 +1,53 @@
+{
+ "id": "R3-FUTSAL-PLAY",
+ "comment": "R3 C5: 풋살파크 옥상 마당 → 북서 끝 놀이터 길(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "C5 은주2관 입구(1) 앞 마당 노드 e5ea7a83 → 옥상 북서 가장자리 띠를 따라 → 놀이터 가운데 (132.2 m 평평)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "structure": "ordinary",
+    "widthM": 2.0,
+    "name": "풋살파크 옥상 마당 → 북서 끝 놀이터 (132.2 m 평평. 놀이터 있음: 드론, 자리·선 추정 ±2 m)",
+    "path": [
+     {
+      "at": {
+       "nodeId": "e5ea7a83-b3e2-4918-84e6-62691bd25b2b"
+      }
+     },
+     {
+      "xy": [
+       201117.6,
+       557196.6
+      ],
+      "z": 132.2
+     },
+     {
+      "xy": [
+       201112.44,
+       557191.82
+      ],
+      "z": 132.2
+     }
+    ]
+   },
+   "grade": "확정(놀이터가 옥상 132.2 위: 드론·옥상 정사), 추정(자리·선 ±2 m)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R3/판독.md ⑨·C5, 드론 항공, 구역 노트 은주관 둘레와 풋살장 2026-10-25 R3 절"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 r3-eunju",
+  "batch": "(single)",
+  "changeSets": {
+   "9f6d21f2(create_road)": "e74ddf52-b46c-4a4c-92ed-33ba1d4e300e"
+  },
+  "check": "validate_network 오류 0(경고 108 → 109: OFF_TERRAIN +1 옥상 위 길, 정보 92 → 91), check_reachability r3-pairs.json 6쌍 전부 이어짐",
+  "revert": "revert_changeset"
+ }
+}

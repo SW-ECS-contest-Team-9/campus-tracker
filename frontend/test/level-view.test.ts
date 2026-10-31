@@ -5,8 +5,8 @@ import test from 'node:test';
 
 // src 모듈의 확장자 없는 상대 import('./tm')를 node 테스트에서 .ts로 해석
 register('data:text/javascript,export async function resolve(s,c,n){try{return await n(s,c)}catch(e){if(s.startsWith(".")&&!s.endsWith(".ts"))return n(s+".ts",c);throw e}}', import.meta.url);
-const { LEVEL_VIEW, WALK, baseBuildingId, buildingFloors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
-const { parseStructures } = await import('../src/structures.ts');
+const { INTERIOR, LEVEL_VIEW, WALK, baseBuildingId, blocksOnFloor, buildingFloors, carvedFloor, floorParts, parseInteriors, cutRoad, explode, feetHeight, floorInText, floorIndexAt, floorOfRoad, isWideRoad, parseZones, roadHeightAt, shortName, walkSurfaces, zoneAt, zoneContent } = await import('../src/level-view.ts');
+const { parseStructures, solidMesh } = await import('../src/structures.ts');
 const { polygonArea, polygonOps } = await import('../src/polygon-ops.ts');
 const { LINE_PX, VIEW_STYLE_DEFAULT, normalizeViewStyle, onViewStyle, setViewStyle, viewStyle } = await import('../src/view-style.ts');
 
@@ -182,6 +182,42 @@ test('길 위의 높이: 계단·경사 길은 선을 따라 높이를 잇고, �
   assert.equal(feetHeight(walkSurfaces(X0 + 12, Y0 + 8, data), feet), 141.4);
 });
 
+test('겹친 되돌림 계단(청운관 계단실 꼴): 아래 줄을 걸으면 0.8 m 옆 위 줄로 올라타지 않음', () => {
+  // 앞방 참 143.5 에서 위 줄(가운데 줄)은 146.35 로 오르고, 아래 줄(북쪽 줄)은 141.75 되돌림 참으로 내려감. 두 길 중심선은 0.8 m 간격.
+  const up = [[X0 + 11.4, Y0 + 2.85, 146.35], [X0 + 8.1, Y0 + 2.85, 143.5]];
+  const low = [[X0 + 8.1, Y0 + 2.85, 143.5], [X0 + 8.1, Y0 + 3.65, 143.5], [X0 + 11.4, Y0 + 3.65, 141.75], [X0 + 11.4, Y0 + 2.05, 141.75], [X0 + 8.1, Y0 + 2.05, 140]];
+  const data = { roads: [road('up', up, { structure: 'stairs' }), road('low', low, { structure: 'stairs' })], areas: [], solids: [], zones: [] };
+  // 아래 줄 위를 중심선에서 0.25 m 남쪽(폭 0.8 m 줄 안)으로 0.14 m 씩(1.4 m/s × 0.1 s) 걸음: 참 → 되돌림 참
+  let feet = 143.5;
+  for (let x = 8.1; x <= 11.4 + 1e-9; x += 0.14) {
+    feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.4, data), feet);
+    const own = roadHeightAt(low, X0 + x, Y0 + 3.4)!.z; // 아래 줄 길의 높이(가장 가까운 마디)
+    assert.ok(Math.abs(feet - own) < 1e-9, `x ${x.toFixed(2)}: 발 ${feet.toFixed(2)}, 아래 줄 ${own.toFixed(2)}`);
+  }
+  // 되돌아 위로 걸어 참으로: 위 줄(내려오는 쪽에서 보면 겹친 위층)로 옮겨 가지 않고 143.5 에 닿음
+  for (let x = 11.4; x >= 8.1 - 1e-9; x -= 0.14) feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.4, data), feet);
+  assert.ok(Math.abs(feet - 143.5) < 0.05);
+  // 위 줄을 내려와 참에 닿음: 아래 줄로 빠지지 않음(참 어귀 0.1 m 안은 아래 줄의 참 마디 143.5 를 디딜 수 있음)
+  feet = 146.35;
+  for (let x = 11.4; x >= 8.1 - 1e-9; x -= 0.14) {
+    feet = feetHeight(walkSurfaces(X0 + x, Y0 + 3.1, data), feet);
+    assert.ok(Math.abs(feet - roadHeightAt(up, X0 + x, Y0 + 3.1)!.z) < 0.1, `위 줄 x ${x.toFixed(2)}: 발 ${feet.toFixed(2)}`);
+  }
+});
+
+test('발밑 높이: 계단·경사 길은 한 걸음 한도(±WALK.stairStepM) 안에서 지금 발 높이에 가장 가까운 것', () => {
+  assert.equal(WALK.stairStepM, 0.4);
+  assert.equal(feetHeight([{ z: 143.4, sloped: true }, { z: 143.65, sloped: true }], 143.5), 143.4); // 둘 다 한도 안: 가까운 것
+  assert.equal(feetHeight([{ z: 143.5 }, { z: 144.0, sloped: true }], 143.5), 143.5); // 0.5 m 위 계단 길은 따르지 않음, 바닥 그대로
+  assert.equal(feetHeight([{ z: 143.5 }, { z: 142.9, sloped: true }], 143.5), 143.5); // 0.6 m 아래 계단 길로 떨어지지 않음
+  assert.equal(feetHeight([{ z: 144.0, sloped: true }], 143.5), 143.5); // 한도 밖 계단 길만 있음: 그대로
+  // 한도 안 계단 길이 여럿: 중심선이 가까운 것(서 있는 줄). 청운관 현관 틀 밑 통로(평평한 계단 길 149.2)가 1 m 옆이어도 계단을 내려감
+  assert.equal(feetHeight([{ z: 149.2, sloped: true, distanceM: 1.0 }, { z: 149.08, sloped: true, distanceM: 0 }], 149.2), 149.08);
+  // 중심선 거리가 0.1 m 안으로 같으면(평면에서 포갠 줄) 발 높이에 가까운 것
+  assert.equal(feetHeight([{ z: 143.3, sloped: true, distanceM: 0.3 }, { z: 143.6, sloped: true, distanceM: 0.35 }], 143.5), 143.6);
+  assert.equal(WALK.strideM, 0.25);
+});
+
 test('짧은 이름', () => {
   assert.equal(shortName('본관 2층 복도 (승강기 ~ 유리문 앞)'), '본관 2층 복도');
   assert.equal(shortName('가나다라마바사아자차카타파하', 6), '가나다라마…');
@@ -200,7 +236,7 @@ test('구획 파일: 지상 구획은 서로 겹치지 않고, 지하 구획은 
   const union = area(polygonOps('union', ground.flatMap((z: any) => z.polygons)));
   assert.ok(Math.abs(sum - union) < 1, `겹침 ${(sum - union).toFixed(2)} ㎡`);
   for (const z of under) assert.ok(z.toM > z.fromM, z.name);
-  assert.ok(under.some((z: any) => z.name === '운동장 지하 1층' && z.floorM === 141.4));
+  assert.ok(under.some((z: any) => z.name === '운동장 지하 1층' && z.floorM === 143.5)); // 2026-10-22 사용자 결정(전 141.4)
 });
 
 test('보기 설정: 기본값, 모르는 값은 기본으로, 바꾸면 알림', () => {
@@ -215,4 +251,62 @@ test('보기 설정: 기본값, 모르는 값은 기본으로, 바꾸면 알림'
   assert.equal(viewStyle().line, 'thin');
   assert.ok(LINE_PX.thick.road > LINE_PX.normal.road && LINE_PX.normal.road > LINE_PX.thin.road);
   setViewStyle(VIEW_STYLE_DEFAULT);
+});
+
+test('사2: interiors.geojson spaces carve a floor (walls = footprint without spaces, plan-cut height)', () => {
+  const sq = (x: number, y: number, w: number, h: number) => [...rect(x, y, w, h), rect(x, y, w, h)[0]];
+  const spaces = parseInteriors({ features: [
+    { type: 'Feature', properties: { building: '가관', kind: 'corridor', name: '복도', floorsM: [100, 103.5], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(0, 4, 40, 2.4)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'elevator', name: '승강기', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [sq(50, 0, 2, 2)] } },
+    { type: 'Feature', properties: { building: '가관', kind: 'nope', floorsM: [100] }, geometry: { type: 'Polygon', coordinates: [sq(0, 0, 1, 1)] } },
+  ] });
+  assert.equal(spaces.length, 2);
+  const floors = [{ m: 100, name: '1층', fromTable: true, roadIds: [] }, { m: 101.5, name: '2층', fromTable: true, roadIds: [] }, { m: 103.5, name: '3층', fromTable: true, roadIds: [] }, { m: 120, name: '5층', fromTable: true, roadIds: [] }];
+  const footprint = [[rect(0, 0, 40, 10)]];
+  const one = carvedFloor(spaces, '가관', floors, 0, footprint)!;
+  assert.equal(one.spaces.length, 1, 'the elevator lies outside the footprint: clipped away');
+  assert.ok(Math.abs(polygonArea(one.walls[0]) + polygonArea(one.walls[1] ?? []) - (400 - 96)) < 0.5, 'walls = 400 m² - corridor 96 m²');
+  assert.equal(one.wallM, 1.2, 'low storey: 0.3 m below the next floor');
+  assert.equal(carvedFloor(spaces, '가관', floors, 2, footprint)!.wallM, INTERIOR.wallM);
+  assert.equal(carvedFloor(spaces, '가관', floors, 1, footprint), null, 'no space on that floor: not carved');
+  assert.equal(carvedFloor(spaces, '나관', floors, 0, footprint), null);
+  const parts = carvedFloor(spaces, '가관', floors, 0, [...footprint, [rect(0, 20, 10, 10)]])!;
+  assert.ok(Math.abs(parts.walls.reduce((t, w) => t + polygonArea(w), 0) - (400 - 96)) < 0.5, 'a part no space reaches gets no walls');
+  // a space whose corner touches the outline (수인관 1층: a corridor end on the wall) must not leave a hole touching the outer ring:
+  // the triangulation then drops the hole and the walls cover the corridors
+  const sooin = [[201174.739, 557125.622], [201192.294, 557144.08], [201125.566, 557204.292], [201102.938, 557190.108], [201148.208, 557110.271]];
+  const touch = parseInteriors({ features: [{ type: 'Feature', properties: { building: '가관', kind: 'corridor', name: 'x', floorsM: [100], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[201155.91, 557149.49], [201155.912, 557149.491], [201152.92, 557154.69], [201152.922, 557154.691], [201148.676, 557162.072], [201126.17, 557149.137], [201124.985, 557151.226], [201147.481, 557164.155], [201130.36, 557193.94], [201132.44, 557195.14], [201150.76, 557163.27], [201150.758, 557163.269], [201156.2, 557153.81], [201156.198, 557153.809], [201159.19, 557148.61], [201159.187, 557148.608], [201170.14, 557129.56], [201168.06, 557128.36]]] } }] });
+  const walls = carvedFloor(touch, '가관', floors, 0, [[sooin]])!.walls;
+  const top = walls.reduce((t, w) => { const m = solidMesh({ id: 'p', file: '', role: 'box', type: 'plate', polygon: w, bottomM: 99, topM: 100, estimated: false, props: {} } as never).mesh;
+    let a = 0; for (let k = 0; k < m.indices.length; k += 3) { const [i, j, l] = [0, 1, 2].map((e) => m.indices[k + e] * 5); if ([i, j, l].every((q) => m.positions[q + 2] === 100)) a += Math.abs((m.positions[j] - m.positions[i]) * (m.positions[l + 1] - m.positions[i + 1]) - (m.positions[l] - m.positions[i]) * (m.positions[j + 1] - m.positions[i + 1])) / 2; }
+    return t + a; }, 0);
+  assert.ok(Math.abs(top - 3545.7) < 0.5, `wall tops 3545.7 m² (got ${top})`);
+});
+
+test('사2: a floor is drawn on the parts its roads belong to, even below their scene base', () => {
+  const items = [{ b: { buildingId: '가관', baseM: 130, roofM: 160 } }, { b: { buildingId: '가관#2관', baseM: 140, roofM: 160 } }, { b: { buildingId: '가관#탑', baseM: 140, roofM: 160 } }];
+  const floor = { m: 132, name: '1층', fromTable: true, roadIds: ['r1'] };
+  assert.deepEqual(blocksOnFloor(items, floor, []).map((x) => x.b.buildingId), ['가관']);
+  assert.deepEqual(blocksOnFloor(items, floor, [{ id: 'r1', buildingId: '가관#2관' }, { id: 'r2', buildingId: '가관#탑' }]).map((x) => x.b.buildingId), ['가관', '가관#2관']);
+  assert.equal(blocksOnFloor(items, { ...floor, m: 100 }, []).length, 3, 'none spans it: all');
+});
+
+test('사2: a building whose parts have different floor tables is lifted part by part (은주관: 은주1관·은주2관)', () => {
+  const t1 = '[[131.3,137.8],["1층","3층"]]', t2 = '[[132.2,137.8],["1층","2층"]]';
+  const parts = floorParts([
+    { id: '은주관#동쪽끝', table: t2, x: 196, y: 164 }, { id: '은주관#접합부', table: t1, x: 128, y: 219 }, { id: '은주관', name: '은주1관', table: t1, x: 131, y: 264 },
+    { id: '은주관#2관', name: '은주2관', table: t2, x: 166, y: 191 }, { id: '은주관#2관-낮은단', table: null, x: 159, y: 183 }, { id: '은주관#탑', table: null, x: 132, y: 220 },
+    { id: '가관', table: t1, x: 0, y: 0 }, { id: '가관#날개', table: null, x: 5, y: 0 }, { id: '나관', table: null, x: 0, y: 0 },
+  ]);
+  assert.deepEqual(Object.fromEntries(parts), {
+    '은주관': '은주관', '은주관#접합부': '은주관', '은주관#탑': '은주관',
+    '은주관#2관': '은주관#2관', '은주관#동쪽끝': '은주관#2관', '은주관#2관-낮은단': '은주관#2관',
+    '가관': '가관', '가관#날개': '가관', '나관': '나관',
+  }, 'one table (or none): the whole building; a part without a table goes with the nearest part that has one; a part is named by its named block');
+  // the spaces of a part are carved on that part only
+  const space = parseInteriors({ features: [{ type: 'Feature', properties: { building: '은주관#2관', kind: 'corridor', name: '복도', floorsM: [137.8], grade: '추정' }, geometry: { type: 'Polygon', coordinates: [[[X0, Y0], [X0 + 10, Y0], [X0 + 10, Y0 + 2], [X0, Y0 + 2]]] } }] });
+  const floors = [{ m: 137.8, name: '2층', fromTable: true, roadIds: [] }];
+  const partOf = (id: string) => parts.get(id) ?? baseBuildingId(id);
+  assert.ok(carvedFloor(space, '은주관#2관', floors, 0, [[rect(0, 0, 20, 20)]], partOf));
+  assert.equal(carvedFloor(space, '은주관', floors, 0, [[rect(0, 0, 20, 20)]], partOf), null);
 });

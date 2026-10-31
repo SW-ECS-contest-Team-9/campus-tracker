@@ -32,7 +32,7 @@ object AnchorRules {
     fun isFloor(value: String?) = value != null && FLOOR.matches(value)
 
     fun needs(type: EventMarkerType): AnchorNeeds = when (type) {
-        EventMarkerType.sessionStart, EventMarkerType.sessionEnd, EventMarkerType.entrance, EventMarkerType.qrAnchor -> AnchorNeeds.PLACE
+        EventMarkerType.sessionStart, EventMarkerType.sessionEnd, EventMarkerType.entrance, EventMarkerType.qrAnchor, EventMarkerType.routeWaypoint -> AnchorNeeds.PLACE
         EventMarkerType.stairStart, EventMarkerType.stairEnd -> AnchorNeeds.STAIRS
         EventMarkerType.elevatorBoard, EventMarkerType.elevatorExit -> AnchorNeeds.ELEVATOR
         EventMarkerType.rampStart, EventMarkerType.rampEnd -> AnchorNeeds.RAMP
@@ -42,7 +42,7 @@ object AnchorRules {
     /**
      * Whether the marker may be recorded. A place needs the building and floor, plus a node when the list for that floor
      * has any (a floor without indoor nodes takes building + floor only); outside, a node is always required.
-     * An entrance is always on a building floor.
+     * An entrance is always on a building floor. A route point is always a node (the route is drawn on the network).
      */
     fun isComplete(type: EventMarkerType, a: CollectionAnchor, nodesOnOffer: Boolean): Boolean = when (needs(type)) {
         AnchorNeeds.NONE -> true
@@ -50,7 +50,7 @@ object AnchorRules {
             a.buildingId == null -> false
             a.buildingId == CollectionAnchor.OUTDOOR -> type != EventMarkerType.entrance && a.nodeId != null
             !isFloor(a.floor) -> false
-            else -> a.nodeId != null || !nodesOnOffer
+            else -> a.nodeId != null || (!nodesOnOffer && type != EventMarkerType.routeWaypoint)
         }
         AnchorNeeds.STAIRS -> (a.direction == "up" || a.direction == "down") && isFloor(a.fromFloor) && isFloor(a.toFloor)
         AnchorNeeds.ELEVATOR -> isFloor(a.fromFloor) && isFloor(a.toFloor)

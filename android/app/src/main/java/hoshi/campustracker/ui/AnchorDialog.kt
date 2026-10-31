@@ -53,7 +53,7 @@ fun AnchorDialog(
     /** prefill: the session's current place (or the open stairs/elevator anchor for its end) */
     initial: CollectionAnchor?,
     loadNodes: suspend (buildingId: String?, floor: String?) -> AnchorNodesResponse,
-    resolveNode: suspend (String) -> AnchorNode,
+    resolveNode: (suspend (String) -> AnchorNode)? = null,
     onConfirm: (CollectionAnchor) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -95,7 +95,7 @@ fun AnchorDialog(
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 when (needs) {
                     AnchorNeeds.PLACE -> {
-                        OutlinedButton(onClick = {
+                        if (resolveNode != null) OutlinedButton(onClick = {
                             GmsBarcodeScanning.getClient(context).startScan().addOnSuccessListener { barcode ->
                                 val value = barcode.rawValue.orEmpty()
                                 val id = parseAnchorQr(value)
@@ -176,7 +176,7 @@ private fun FloorPair(anchor: CollectionAnchor, onChange: (CollectionAnchor) -> 
 }
 
 @Composable
-private fun Picker(label: String, options: List<Pair<String, String>>, selected: String?, onSelect: (String) -> Unit) {
+internal fun Picker(label: String, options: List<Pair<String, String>>, selected: String?, onSelect: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(onClick = { open = true }, enabled = options.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {
@@ -211,5 +211,6 @@ private fun titleOf(type: EventMarkerType) = when (type) {
 private fun confirmOf(type: EventMarkerType) = when (type) {
     EventMarkerType.sessionStart -> "Start"
     EventMarkerType.sessionEnd -> "Stop"
+    EventMarkerType.routeWaypoint -> "Add"
     else -> "Mark"
 }

@@ -13,6 +13,7 @@ import { editorPresence } from '../../../realtime/editor.gateway.js';
 import { editorQueries, projectRoads, roadLength, summarizeRoad } from '../editor.queries.js';
 import { round2, roundXYZ, simplifyIndices } from '../geometry.js';
 import { QA_CHECKS, validateNetwork } from '../network-validate.js';
+import { loadStructureSurfaces, surfacesAt } from '../structure-surfaces.js';
 import { groundAt, terrainContext } from '../terrain-access.js';
 
 const enumOptions = (schema: z.ZodType): string[] => {
@@ -240,7 +241,7 @@ const validateNetworkTool = defineTool({
   name: 'validate_network',
   title: 'Check the network',
   description: 'Topology and attribute QA over the active roads: road ends that stop just short of another road, crossings without a shared '
-    + 'node, duplicate nodes, nodes at one place but 0.3-1.25 m apart in height (never joined automatically), overlapping roads, outdoor roads far from the terrain, contradictory attributes, isolated parts. '
+    + 'node, duplicate nodes, nodes at one place but 0.3-1.25 m apart in height (never joined automatically), overlapping roads, outdoor roads far from the built ground (terrain, walkable structure tops, underground void floors), contradictory attributes, isolated parts. '
     + 'Each finding has a location and a suggested fix. Read-only.',
   input: z.object({
     bbox: Bbox.optional(),
@@ -254,6 +255,8 @@ const validateNetworkTool = defineTool({
     const findings = validateNetwork(roads, nodes, a.checks ?? QA_CHECKS, {
       levelToleranceM: LEVEL_TOLERANCE_M, sameHeightM: SAME_HEIGHT_M, duplicateNodeM: JUNCTION_ENDPOINT_M,
       ground: ctx ? (x, y) => terrain.sampleXY(ctx, x, y)?.height ?? null : undefined,
+      structures: surfacesAt(loadStructureSurfaces()),
+      inBuilding: ctx ? (x, y) => terrain.buildingAt(ctx, x, y).building !== null : undefined,
     });
     const byCode: Record<string, number> = {};
     for (const f of findings) byCode[f.code] = (byCode[f.code] ?? 0) + 1;

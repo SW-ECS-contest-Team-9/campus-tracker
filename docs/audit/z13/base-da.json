@@ -1,0 +1,12800 @@
+{
+ "z03": [
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 112.42,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 2.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 2.71
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.79,
+       557203.5
+      ],
+      [
+       201094.73,
+       557203.85
+      ],
+      [
+       201097.5,
+       557203.85
+      ],
+      [
+       201097.5,
+       557203.5
+      ],
+      [
+       201094.79,
+       557203.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 112.58,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 2.8 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 2.77
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.73,
+       557203.85
+      ],
+      [
+       201094.66,
+       557204.2
+      ],
+      [
+       201097.5,
+       557204.2
+      ],
+      [
+       201097.5,
+       557203.85
+      ],
+      [
+       201094.73,
+       557203.85
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 112.74,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 2.8 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 2.84
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.66,
+       557204.2
+      ],
+      [
+       201094.6,
+       557204.55
+      ],
+      [
+       201097.5,
+       557204.55
+      ],
+      [
+       201097.5,
+       557204.2
+      ],
+      [
+       201094.66,
+       557204.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 112.91,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 2.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 2.9
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.6,
+       557204.55
+      ],
+      [
+       201094.53,
+       557204.9
+      ],
+      [
+       201097.5,
+       557204.9
+      ],
+      [
+       201097.5,
+       557204.55
+      ],
+      [
+       201094.6,
+       557204.55
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 113.07,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 3.0 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 2.97
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.53,
+       557204.9
+      ],
+      [
+       201094.47,
+       557205.25
+      ],
+      [
+       201097.5,
+       557205.25
+      ],
+      [
+       201097.5,
+       557204.9
+      ],
+      [
+       201094.53,
+       557204.9
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F1-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 113.23,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 1: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 3.0 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F1",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 3.03
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.47,
+       557205.25
+      ],
+      [
+       201094.41,
+       557205.6
+      ],
+      [
+       201097.5,
+       557205.6
+      ],
+      [
+       201097.5,
+       557205.25
+      ],
+      [
+       201094.47,
+       557205.25
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-1",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 112.15,
+    "toM": 113.23,
+    "assumption": "계단 묶음 1 위의 참(긴 의자가 놓인 넓은 포장면): 길이 6.9 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.75 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201094.41,
+       557205.6
+      ],
+      [
+       201093.43,
+       557212.45
+      ],
+      [
+       201097.56,
+       557212.45
+      ],
+      [
+       201097.5,
+       557205.6
+      ],
+      [
+       201094.41,
+       557205.6
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 113.39,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.1 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.13
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.43,
+       557212.45
+      ],
+      [
+       201093.39,
+       557212.8
+      ],
+      [
+       201097.6,
+       557212.8
+      ],
+      [
+       201097.56,
+       557212.45
+      ],
+      [
+       201093.43,
+       557212.45
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 113.56,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.2 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.21
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.39,
+       557212.8
+      ],
+      [
+       201093.36,
+       557213.15
+      ],
+      [
+       201097.64,
+       557213.15
+      ],
+      [
+       201097.6,
+       557212.8
+      ],
+      [
+       201093.39,
+       557212.8
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 113.72,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.3 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.29
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.36,
+       557213.15
+      ],
+      [
+       201093.32,
+       557213.5
+      ],
+      [
+       201097.69,
+       557213.5
+      ],
+      [
+       201097.64,
+       557213.15
+      ],
+      [
+       201093.36,
+       557213.15
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 113.88,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.37
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.32,
+       557213.5
+      ],
+      [
+       201093.29,
+       557213.85
+      ],
+      [
+       201097.73,
+       557213.85
+      ],
+      [
+       201097.69,
+       557213.5
+      ],
+      [
+       201093.32,
+       557213.5
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 114.04,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.45
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.29,
+       557213.85
+      ],
+      [
+       201093.25,
+       557214.2
+      ],
+      [
+       201097.78,
+       557214.2
+      ],
+      [
+       201097.73,
+       557213.85
+      ],
+      [
+       201093.29,
+       557213.85
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F2-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 114.21,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 2: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.5 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F2",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.53
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.25,
+       557214.2
+      ],
+      [
+       201093.22,
+       557214.55
+      ],
+      [
+       201097.82,
+       557214.55
+      ],
+      [
+       201097.78,
+       557214.2
+      ],
+      [
+       201093.25,
+       557214.2
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-2",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-A",
+    "fromM": 113.13,
+    "toM": 114.21,
+    "assumption": "계단 묶음 2 위의 참(긴 의자가 놓인 넓은 포장면): 길이 5.5 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.72 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201093.22,
+       557214.55
+      ],
+      [
+       201092.8,
+       557220.03
+      ],
+      [
+       201097.5,
+       557220.03
+      ],
+      [
+       201097.82,
+       557214.55
+      ],
+      [
+       201093.22,
+       557214.55
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 114.37,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.7
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.8,
+       557220.03
+      ],
+      [
+       201092.79,
+       557220.38
+      ],
+      [
+       201097.5,
+       557220.38
+      ],
+      [
+       201097.5,
+       557220.03
+      ],
+      [
+       201092.8,
+       557220.03
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 114.53,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.71
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.79,
+       557220.38
+      ],
+      [
+       201092.77,
+       557220.73
+      ],
+      [
+       201097.5,
+       557220.73
+      ],
+      [
+       201097.5,
+       557220.38
+      ],
+      [
+       201092.79,
+       557220.38
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 114.7,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.73
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.77,
+       557220.73
+      ],
+      [
+       201092.75,
+       557221.08
+      ],
+      [
+       201097.5,
+       557221.08
+      ],
+      [
+       201097.5,
+       557220.73
+      ],
+      [
+       201092.77,
+       557220.73
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 114.86,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.75
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.75,
+       557221.08
+      ],
+      [
+       201092.74,
+       557221.43
+      ],
+      [
+       201097.5,
+       557221.43
+      ],
+      [
+       201097.5,
+       557221.08
+      ],
+      [
+       201092.75,
+       557221.08
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 115.02,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.8 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.76
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.74,
+       557221.43
+      ],
+      [
+       201092.72,
+       557221.78
+      ],
+      [
+       201097.5,
+       557221.78
+      ],
+      [
+       201097.5,
+       557221.43
+      ],
+      [
+       201092.74,
+       557221.43
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F3-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 115.18,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 3: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.8 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F3",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.78
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.72,
+       557221.78
+      ],
+      [
+       201092.71,
+       557222.13
+      ],
+      [
+       201097.5,
+       557222.13
+      ],
+      [
+       201097.5,
+       557221.78
+      ],
+      [
+       201092.72,
+       557221.78
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-3",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 114.11,
+    "toM": 115.18,
+    "assumption": "계단 묶음 3 위의 참(긴 의자가 놓인 넓은 포장면): 길이 4.6 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.67 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.71,
+       557222.13
+      ],
+      [
+       201092.58,
+       557226.68
+      ],
+      [
+       201097.5,
+       557226.68
+      ],
+      [
+       201097.5,
+       557222.13
+      ],
+      [
+       201092.71,
+       557222.13
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 115.35,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.92
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.58,
+       557226.68
+      ],
+      [
+       201092.57,
+       557227.03
+      ],
+      [
+       201097.5,
+       557227.03
+      ],
+      [
+       201097.5,
+       557226.68
+      ],
+      [
+       201092.58,
+       557226.68
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 115.51,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.93
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.57,
+       557227.03
+      ],
+      [
+       201092.56,
+       557227.38
+      ],
+      [
+       201097.5,
+       557227.38
+      ],
+      [
+       201097.5,
+       557227.03
+      ],
+      [
+       201092.57,
+       557227.03
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 115.67,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.94
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.56,
+       557227.38
+      ],
+      [
+       201092.56,
+       557227.73
+      ],
+      [
+       201097.5,
+       557227.73
+      ],
+      [
+       201097.5,
+       557227.38
+      ],
+      [
+       201092.56,
+       557227.38
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 115.83,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 4.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.94
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.56,
+       557227.73
+      ],
+      [
+       201092.55,
+       557228.08
+      ],
+      [
+       201097.52,
+       557228.08
+      ],
+      [
+       201097.5,
+       557227.73
+      ],
+      [
+       201092.56,
+       557227.73
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 116.0,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 5.0 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 4.97
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.55,
+       557228.08
+      ],
+      [
+       201092.55,
+       557228.43
+      ],
+      [
+       201097.61,
+       557228.43
+      ],
+      [
+       201097.52,
+       557228.08
+      ],
+      [
+       201092.55,
+       557228.08
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F4-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 116.16,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 4: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 5.1 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F4",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 5.06
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.55,
+       557228.43
+      ],
+      [
+       201092.54,
+       557228.78
+      ],
+      [
+       201097.7,
+       557228.78
+      ],
+      [
+       201097.61,
+       557228.43
+      ],
+      [
+       201092.55,
+       557228.43
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-4",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 115.08,
+    "toM": 116.16,
+    "assumption": "계단 묶음 4 위의 참(긴 의자가 놓인 넓은 포장면): 길이 4.4 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.66 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.54,
+       557228.78
+      ],
+      [
+       201092.45,
+       557233.14
+      ],
+      [
+       201098.64,
+       557233.14
+      ],
+      [
+       201097.7,
+       557228.78
+      ],
+      [
+       201092.54,
+       557228.78
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 116.32,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.2 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.19
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.45,
+       557233.14
+      ],
+      [
+       201092.44,
+       557233.49
+      ],
+      [
+       201098.69,
+       557233.49
+      ],
+      [
+       201098.64,
+       557233.14
+      ],
+      [
+       201092.45,
+       557233.14
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 116.49,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.2 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.24
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.44,
+       557233.49
+      ],
+      [
+       201092.43,
+       557233.84
+      ],
+      [
+       201098.73,
+       557233.84
+      ],
+      [
+       201098.69,
+       557233.49
+      ],
+      [
+       201092.44,
+       557233.49
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 116.65,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.3 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.3
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.43,
+       557233.84
+      ],
+      [
+       201092.42,
+       557234.19
+      ],
+      [
+       201098.77,
+       557234.19
+      ],
+      [
+       201098.73,
+       557233.84
+      ],
+      [
+       201092.43,
+       557233.84
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 116.81,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.42,
+       557234.19
+      ],
+      [
+       201092.41,
+       557234.54
+      ],
+      [
+       201098.82,
+       557234.54
+      ],
+      [
+       201098.77,
+       557234.19
+      ],
+      [
+       201092.42,
+       557234.19
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 116.97,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.4
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.41,
+       557234.54
+      ],
+      [
+       201092.4,
+       557234.89
+      ],
+      [
+       201098.86,
+       557234.89
+      ],
+      [
+       201098.82,
+       557234.54
+      ],
+      [
+       201092.41,
+       557234.54
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F5-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 117.14,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 5: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.5 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F5",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.46
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.4,
+       557234.89
+      ],
+      [
+       201092.39,
+       557235.24
+      ],
+      [
+       201098.9,
+       557235.24
+      ],
+      [
+       201098.86,
+       557234.89
+      ],
+      [
+       201092.4,
+       557234.89
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-5",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 116.06,
+    "toM": 117.14,
+    "assumption": "계단 묶음 5 위의 참(긴 의자가 놓인 넓은 포장면): 길이 4.1 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.65 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.39,
+       557235.24
+      ],
+      [
+       201092.19,
+       557239.35
+      ],
+      [
+       201098.58,
+       557239.35
+      ],
+      [
+       201098.9,
+       557235.24
+      ],
+      [
+       201092.39,
+       557235.24
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 117.3,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.39
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.19,
+       557239.35
+      ],
+      [
+       201092.17,
+       557239.7
+      ],
+      [
+       201098.54,
+       557239.7
+      ],
+      [
+       201098.58,
+       557239.35
+      ],
+      [
+       201092.19,
+       557239.35
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 117.46,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.36
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.17,
+       557239.7
+      ],
+      [
+       201092.15,
+       557240.05
+      ],
+      [
+       201098.51,
+       557240.05
+      ],
+      [
+       201098.54,
+       557239.7
+      ],
+      [
+       201092.17,
+       557239.7
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 117.63,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.36
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.15,
+       557240.05
+      ],
+      [
+       201092.12,
+       557240.4
+      ],
+      [
+       201098.6,
+       557240.4
+      ],
+      [
+       201098.51,
+       557240.05
+      ],
+      [
+       201092.15,
+       557240.05
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 117.79,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.5 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.48
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.12,
+       557240.4
+      ],
+      [
+       201092.1,
+       557240.75
+      ],
+      [
+       201098.69,
+       557240.75
+      ],
+      [
+       201098.6,
+       557240.4
+      ],
+      [
+       201092.12,
+       557240.4
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 117.95,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.6 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.59
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.1,
+       557240.75
+      ],
+      [
+       201092.07,
+       557241.1
+      ],
+      [
+       201098.78,
+       557241.1
+      ],
+      [
+       201098.69,
+       557240.75
+      ],
+      [
+       201092.1,
+       557240.75
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F6-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 118.11,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 6: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 6.7 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F6",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 6.71
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.07,
+       557241.1
+      ],
+      [
+       201092.04,
+       557241.45
+      ],
+      [
+       201098.86,
+       557241.45
+      ],
+      [
+       201098.78,
+       557241.1
+      ],
+      [
+       201092.07,
+       557241.1
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-6",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 117.04,
+    "toM": 118.11,
+    "assumption": "계단 묶음 6 위의 참(긴 의자가 놓인 넓은 포장면): 길이 4.0 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.64 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201092.04,
+       557241.45
+      ],
+      [
+       201091.64,
+       557245.41
+      ],
+      [
+       201099.85,
+       557245.41
+      ],
+      [
+       201098.86,
+       557241.45
+      ],
+      [
+       201092.04,
+       557241.45
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S01",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 118.28,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.2 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.22
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.64,
+       557245.41
+      ],
+      [
+       201091.59,
+       557245.76
+      ],
+      [
+       201099.94,
+       557245.76
+      ],
+      [
+       201099.85,
+       557245.41
+      ],
+      [
+       201091.64,
+       557245.41
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S02",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 118.44,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.4 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.35
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.59,
+       557245.76
+      ],
+      [
+       201091.54,
+       557246.11
+      ],
+      [
+       201100.03,
+       557246.11
+      ],
+      [
+       201099.94,
+       557245.76
+      ],
+      [
+       201091.59,
+       557245.76
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S03",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 118.6,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.5 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.49
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.54,
+       557246.11
+      ],
+      [
+       201091.49,
+       557246.46
+      ],
+      [
+       201100.12,
+       557246.46
+      ],
+      [
+       201100.03,
+       557246.11
+      ],
+      [
+       201091.54,
+       557246.11
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S04",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 118.76,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.6 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.62
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.49,
+       557246.46
+      ],
+      [
+       201091.44,
+       557246.81
+      ],
+      [
+       201100.2,
+       557246.81
+      ],
+      [
+       201100.12,
+       557246.46
+      ],
+      [
+       201091.49,
+       557246.46
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S05",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 118.93,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.8 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.76
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.44,
+       557246.81
+      ],
+      [
+       201091.39,
+       557247.16
+      ],
+      [
+       201100.29,
+       557247.16
+      ],
+      [
+       201100.2,
+       557246.81
+      ],
+      [
+       201091.44,
+       557246.81
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-STAIR-F7-S06",
+    "type": "stair_step",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단이 아래 끝까지 이어짐: 사용자 2026-10-12), 추정(묶음 수·자리·단 치수)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 119.09,
+    "assumption": "동쪽 계단식 보도의 계단 묶음 7: 6단 x 0.163 m, 디딤 0.35 m, 차도 턱에서 화단 벽 발치까지 폭 8.9 m. 묶음 수 7(거리뷰에서 센 수)·자리는 추정, 한 단 높이는 높이차에서 나눈 값",
+    "source": "거리뷰 Y03·Y04·Y05·Y06·Y07·Y08(streetview-yudam-approach-202602), 사용자 그림 12(사용자-청운관현관·은주1관돌계단-20261012)",
+    "stair": "Z03-EAST-STAIR-F7",
+    "riseM": 0.16,
+    "runM": 0.35,
+    "widthM": 8.9
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.39,
+       557247.16
+      ],
+      [
+       201091.34,
+       557247.51
+      ],
+      [
+       201100.38,
+       557247.51
+      ],
+      [
+       201100.29,
+       557247.16
+      ],
+      [
+       201091.39,
+       557247.16
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "id": "Z03-EAST-LANDING-7",
+    "type": "landing",
+    "kind": "extrude",
+    "estimated": true,
+    "grade": "확정(계단 띠가 이어짐), 추정(자리·길이)",
+    "basePlane": "Z03-ROAD-B",
+    "fromM": 118.01,
+    "toM": 119.09,
+    "assumption": "계단 묶음 7 위의 참(긴 의자가 놓인 넓은 포장면): 길이 4.5 m, 차도가 같은 높이에 닿는 곳까지. 아래쪽 끝은 차도보다 0.65 m 높다(차도 쪽 옆벽)",
+    "source": "거리뷰 Y04·Y05·Y06·Y08(streetview-yudam-approach-202602)"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       201091.34,
+       557247.51
+      ],
+      [
+       201090.43,
+       557252.0
+      ],
+      [
+       201101.5,
+       557252.0
+      ],
+      [
+       201100.38,
+       557247.51
+      ],
+      [
+       201091.34,
+       557247.51
+      ]
+     ]
+    ]
+   }
+  }
+ ],
+ "z12": {
+  "Z12-SIDEWALK-W-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.08,
+      557181.39
+     ],
+     [
+      201091.85,
+      557180.97
+     ],
+     [
+      201091.68,
+      557181.44
+     ],
+     [
+      201091.51,
+      557181.94
+     ],
+     [
+      201091.35,
+      557182.45
+     ],
+     [
+      201091.19,
+      557182.92
+     ],
+     [
+      201092.42,
+      557183.33
+     ],
+     [
+      201092.58,
+      557182.86
+     ],
+     [
+      201092.74,
+      557182.36
+     ],
+     [
+      201092.91,
+      557181.87
+     ],
+     [
+      201093.08,
+      557181.39
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.42,
+      557183.33
+     ],
+     [
+      201091.19,
+      557182.92
+     ],
+     [
+      201091.03,
+      557183.39
+     ],
+     [
+      201090.88,
+      557183.87
+     ],
+     [
+      201090.71,
+      557184.38
+     ],
+     [
+      201090.55,
+      557184.89
+     ],
+     [
+      201091.79,
+      557185.28
+     ],
+     [
+      201091.94,
+      557184.78
+     ],
+     [
+      201092.11,
+      557184.28
+     ],
+     [
+      201092.27,
+      557183.8
+     ],
+     [
+      201092.42,
+      557183.33
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.79,
+      557185.28
+     ],
+     [
+      201090.55,
+      557184.89
+     ],
+     [
+      201090.4,
+      557185.37
+     ],
+     [
+      201090.25,
+      557185.85
+     ],
+     [
+      201090.1,
+      557186.32
+     ],
+     [
+      201089.94,
+      557186.83
+     ],
+     [
+      201091.18,
+      557187.21
+     ],
+     [
+      201091.34,
+      557186.71
+     ],
+     [
+      201091.49,
+      557186.23
+     ],
+     [
+      201091.64,
+      557185.76
+     ],
+     [
+      201091.79,
+      557185.28
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.18,
+      557187.21
+     ],
+     [
+      201089.94,
+      557186.83
+     ],
+     [
+      201089.79,
+      557187.36
+     ],
+     [
+      201089.64,
+      557187.84
+     ],
+     [
+      201089.5,
+      557188.32
+     ],
+     [
+      201089.36,
+      557188.79
+     ],
+     [
+      201090.61,
+      557189.16
+     ],
+     [
+      201090.75,
+      557188.68
+     ],
+     [
+      201090.89,
+      557188.2
+     ],
+     [
+      201091.03,
+      557187.72
+     ],
+     [
+      201091.18,
+      557187.21
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.61,
+      557189.16
+     ],
+     [
+      201089.36,
+      557188.79
+     ],
+     [
+      201089.21,
+      557189.31
+     ],
+     [
+      201089.07,
+      557189.83
+     ],
+     [
+      201088.94,
+      557190.31
+     ],
+     [
+      201088.8,
+      557190.79
+     ],
+     [
+      201090.06,
+      557191.13
+     ],
+     [
+      201090.19,
+      557190.66
+     ],
+     [
+      201090.32,
+      557190.17
+     ],
+     [
+      201090.46,
+      557189.66
+     ],
+     [
+      201090.61,
+      557189.16
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.06,
+      557191.13
+     ],
+     [
+      201088.8,
+      557190.79
+     ],
+     [
+      201088.67,
+      557191.27
+     ],
+     [
+      201088.53,
+      557191.79
+     ],
+     [
+      201088.39,
+      557192.32
+     ],
+     [
+      201088.27,
+      557192.8
+     ],
+     [
+      201089.53,
+      557193.12
+     ],
+     [
+      201089.65,
+      557192.64
+     ],
+     [
+      201089.78,
+      557192.13
+     ],
+     [
+      201089.92,
+      557191.61
+     ],
+     [
+      201090.06,
+      557191.13
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.53,
+      557193.12
+     ],
+     [
+      201088.27,
+      557192.8
+     ],
+     [
+      201088.14,
+      557193.28
+     ],
+     [
+      201088.02,
+      557193.77
+     ],
+     [
+      201087.88,
+      557194.29
+     ],
+     [
+      201087.76,
+      557194.81
+     ],
+     [
+      201089.02,
+      557195.11
+     ],
+     [
+      201089.15,
+      557194.6
+     ],
+     [
+      201089.28,
+      557194.09
+     ],
+     [
+      201089.4,
+      557193.61
+     ],
+     [
+      201089.53,
+      557193.12
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.02,
+      557195.11
+     ],
+     [
+      201087.76,
+      557194.81
+     ],
+     [
+      201087.64,
+      557195.3
+     ],
+     [
+      201087.53,
+      557195.78
+     ],
+     [
+      201087.41,
+      557196.27
+     ],
+     [
+      201087.29,
+      557196.78
+     ],
+     [
+      201088.55,
+      557197.08
+     ],
+     [
+      201088.67,
+      557196.57
+     ],
+     [
+      201088.79,
+      557196.09
+     ],
+     [
+      201088.91,
+      557195.6
+     ],
+     [
+      201089.02,
+      557195.11
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.55,
+      557197.08
+     ],
+     [
+      201087.29,
+      557196.78
+     ],
+     [
+      201087.17,
+      557197.31
+     ],
+     [
+      201087.06,
+      557197.8
+     ],
+     [
+      201086.95,
+      557198.29
+     ],
+     [
+      201086.84,
+      557198.77
+     ],
+     [
+      201088.11,
+      557199.05
+     ],
+     [
+      201088.22,
+      557198.57
+     ],
+     [
+      201088.33,
+      557198.08
+     ],
+     [
+      201088.44,
+      557197.59
+     ],
+     [
+      201088.55,
+      557197.08
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.11,
+      557199.05
+     ],
+     [
+      201086.84,
+      557198.77
+     ],
+     [
+      201086.72,
+      557199.31
+     ],
+     [
+      201086.61,
+      557199.85
+     ],
+     [
+      201086.51,
+      557200.34
+     ],
+     [
+      201086.42,
+      557200.83
+     ],
+     [
+      201087.69,
+      557201.08
+     ],
+     [
+      201087.79,
+      557200.6
+     ],
+     [
+      201087.89,
+      557200.11
+     ],
+     [
+      201087.99,
+      557199.58
+     ],
+     [
+      201088.11,
+      557199.05
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.69,
+      557201.08
+     ],
+     [
+      201086.42,
+      557200.83
+     ],
+     [
+      201086.32,
+      557201.32
+     ],
+     [
+      201086.21,
+      557201.85
+     ],
+     [
+      201086.11,
+      557202.38
+     ],
+     [
+      201086.02,
+      557202.86
+     ],
+     [
+      201087.3,
+      557203.1
+     ],
+     [
+      201087.39,
+      557202.61
+     ],
+     [
+      201087.49,
+      557202.09
+     ],
+     [
+      201087.59,
+      557201.57
+     ],
+     [
+      201087.69,
+      557201.08
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.3,
+      557203.1
+     ],
+     [
+      201086.02,
+      557202.86
+     ],
+     [
+      201085.93,
+      557203.35
+     ],
+     [
+      201085.84,
+      557203.85
+     ],
+     [
+      201085.74,
+      557204.39
+     ],
+     [
+      201085.66,
+      557204.93
+     ],
+     [
+      201086.94,
+      557205.14
+     ],
+     [
+      201087.02,
+      557204.61
+     ],
+     [
+      201087.12,
+      557204.08
+     ],
+     [
+      201087.21,
+      557203.59
+     ],
+     [
+      201087.3,
+      557203.1
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.94,
+      557205.14
+     ],
+     [
+      201085.66,
+      557204.93
+     ],
+     [
+      201085.57,
+      557205.42
+     ],
+     [
+      201085.49,
+      557205.92
+     ],
+     [
+      201085.41,
+      557206.41
+     ],
+     [
+      201085.33,
+      557206.94
+     ],
+     [
+      201086.61,
+      557207.14
+     ],
+     [
+      201086.7,
+      557206.62
+     ],
+     [
+      201086.78,
+      557206.12
+     ],
+     [
+      201086.86,
+      557205.63
+     ],
+     [
+      201086.94,
+      557205.14
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-14": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.61,
+      557207.14
+     ],
+     [
+      201085.33,
+      557206.94
+     ],
+     [
+      201085.25,
+      557207.49
+     ],
+     [
+      201085.18,
+      557207.98
+     ],
+     [
+      201085.11,
+      557208.48
+     ],
+     [
+      201085.04,
+      557208.97
+     ],
+     [
+      201086.33,
+      557209.15
+     ],
+     [
+      201086.4,
+      557208.66
+     ],
+     [
+      201086.47,
+      557208.17
+     ],
+     [
+      201086.54,
+      557207.67
+     ],
+     [
+      201086.61,
+      557207.14
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-15": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.33,
+      557209.15
+     ],
+     [
+      201085.04,
+      557208.97
+     ],
+     [
+      201084.96,
+      557209.5
+     ],
+     [
+      201084.9,
+      557210.04
+     ],
+     [
+      201084.83,
+      557210.53
+     ],
+     [
+      201084.77,
+      557211.02
+     ],
+     [
+      201086.06,
+      557211.19
+     ],
+     [
+      201086.12,
+      557210.7
+     ],
+     [
+      201086.19,
+      557210.2
+     ],
+     [
+      201086.25,
+      557209.68
+     ],
+     [
+      201086.33,
+      557209.15
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-16": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.06,
+      557211.19
+     ],
+     [
+      201084.77,
+      557211.02
+     ],
+     [
+      201084.71,
+      557211.52
+     ],
+     [
+      201084.64,
+      557212.08
+     ],
+     [
+      201084.58,
+      557212.64
+     ],
+     [
+      201084.53,
+      557213.13
+     ],
+     [
+      201085.83,
+      557213.26
+     ],
+     [
+      201085.88,
+      557212.77
+     ],
+     [
+      201085.93,
+      557212.23
+     ],
+     [
+      201086.0,
+      557211.68
+     ],
+     [
+      201086.06,
+      557211.19
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-17": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.83,
+      557213.26
+     ],
+     [
+      201084.53,
+      557213.13
+     ],
+     [
+      201084.48,
+      557213.63
+     ],
+     [
+      201084.43,
+      557214.12
+     ],
+     [
+      201084.38,
+      557214.66
+     ],
+     [
+      201084.33,
+      557215.19
+     ],
+     [
+      201085.63,
+      557215.3
+     ],
+     [
+      201085.67,
+      557214.78
+     ],
+     [
+      201085.73,
+      557214.25
+     ],
+     [
+      201085.78,
+      557213.76
+     ],
+     [
+      201085.83,
+      557213.26
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-18": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.63,
+      557215.3
+     ],
+     [
+      201084.33,
+      557215.19
+     ],
+     [
+      201084.29,
+      557215.69
+     ],
+     [
+      201084.25,
+      557216.19
+     ],
+     [
+      201084.21,
+      557216.69
+     ],
+     [
+      201084.16,
+      557217.24
+     ],
+     [
+      201085.46,
+      557217.33
+     ],
+     [
+      201085.5,
+      557216.8
+     ],
+     [
+      201085.54,
+      557216.3
+     ],
+     [
+      201085.59,
+      557215.8
+     ],
+     [
+      201085.63,
+      557215.3
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-19": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.46,
+      557217.33
+     ],
+     [
+      201084.16,
+      557217.24
+     ],
+     [
+      201084.13,
+      557217.8
+     ],
+     [
+      201084.1,
+      557218.3
+     ],
+     [
+      201084.07,
+      557218.8
+     ],
+     [
+      201084.04,
+      557219.29
+     ],
+     [
+      201085.33,
+      557219.37
+     ],
+     [
+      201085.36,
+      557218.87
+     ],
+     [
+      201085.39,
+      557218.37
+     ],
+     [
+      201085.42,
+      557217.88
+     ],
+     [
+      201085.46,
+      557217.33
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-20": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.33,
+      557219.37
+     ],
+     [
+      201084.04,
+      557219.29
+     ],
+     [
+      201084.0,
+      557219.83
+     ],
+     [
+      201083.98,
+      557220.37
+     ],
+     [
+      201083.96,
+      557220.87
+     ],
+     [
+      201083.94,
+      557221.36
+     ],
+     [
+      201085.24,
+      557221.42
+     ],
+     [
+      201085.26,
+      557220.92
+     ],
+     [
+      201085.28,
+      557220.42
+     ],
+     [
+      201085.3,
+      557219.9
+     ],
+     [
+      201085.33,
+      557219.37
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-21": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.24,
+      557221.42
+     ],
+     [
+      201083.94,
+      557221.36
+     ],
+     [
+      201083.92,
+      557221.86
+     ],
+     [
+      201083.89,
+      557222.39
+     ],
+     [
+      201083.88,
+      557222.92
+     ],
+     [
+      201083.86,
+      557223.41
+     ],
+     [
+      201085.16,
+      557223.45
+     ],
+     [
+      201085.17,
+      557222.96
+     ],
+     [
+      201085.19,
+      557222.44
+     ],
+     [
+      201085.21,
+      557221.92
+     ],
+     [
+      201085.24,
+      557221.42
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-22": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.16,
+      557223.45
+     ],
+     [
+      201083.86,
+      557223.41
+     ],
+     [
+      201083.84,
+      557223.91
+     ],
+     [
+      201083.83,
+      557224.41
+     ],
+     [
+      201083.81,
+      557224.94
+     ],
+     [
+      201083.8,
+      557225.46
+     ],
+     [
+      201085.1,
+      557225.49
+     ],
+     [
+      201085.11,
+      557224.98
+     ],
+     [
+      201085.13,
+      557224.45
+     ],
+     [
+      201085.14,
+      557223.95
+     ],
+     [
+      201085.16,
+      557223.45
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-23": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.1,
+      557225.49
+     ],
+     [
+      201083.8,
+      557225.46
+     ],
+     [
+      201083.79,
+      557225.96
+     ],
+     [
+      201083.78,
+      557226.46
+     ],
+     [
+      201083.77,
+      557226.97
+     ],
+     [
+      201083.76,
+      557227.47
+     ],
+     [
+      201085.06,
+      557227.49
+     ],
+     [
+      201085.07,
+      557226.99
+     ],
+     [
+      201085.08,
+      557226.49
+     ],
+     [
+      201085.09,
+      557225.99
+     ],
+     [
+      201085.1,
+      557225.49
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-24": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.06,
+      557227.49
+     ],
+     [
+      201083.76,
+      557227.47
+     ],
+     [
+      201083.75,
+      557227.98
+     ],
+     [
+      201083.74,
+      557228.48
+     ],
+     [
+      201083.74,
+      557228.98
+     ],
+     [
+      201083.73,
+      557229.47
+     ],
+     [
+      201085.03,
+      557229.49
+     ],
+     [
+      201085.04,
+      557229.0
+     ],
+     [
+      201085.04,
+      557228.5
+     ],
+     [
+      201085.05,
+      557228.0
+     ],
+     [
+      201085.06,
+      557227.49
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-25": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.03,
+      557229.49
+     ],
+     [
+      201083.73,
+      557229.47
+     ],
+     [
+      201083.72,
+      557229.96
+     ],
+     [
+      201083.71,
+      557230.45
+     ],
+     [
+      201083.7,
+      557230.95
+     ],
+     [
+      201083.69,
+      557231.44
+     ],
+     [
+      201084.99,
+      557231.47
+     ],
+     [
+      201085.0,
+      557230.98
+     ],
+     [
+      201085.01,
+      557230.48
+     ],
+     [
+      201085.02,
+      557229.98
+     ],
+     [
+      201085.03,
+      557229.49
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-26": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.99,
+      557231.47
+     ],
+     [
+      201083.69,
+      557231.44
+     ],
+     [
+      201083.68,
+      557231.94
+     ],
+     [
+      201083.67,
+      557232.42
+     ],
+     [
+      201083.66,
+      557232.9
+     ],
+     [
+      201083.64,
+      557233.4
+     ],
+     [
+      201084.94,
+      557233.43
+     ],
+     [
+      201084.96,
+      557232.94
+     ],
+     [
+      201084.97,
+      557232.45
+     ],
+     [
+      201084.98,
+      557231.97
+     ],
+     [
+      201084.99,
+      557231.47
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-27": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.94,
+      557233.43
+     ],
+     [
+      201083.64,
+      557233.4
+     ],
+     [
+      201083.63,
+      557233.9
+     ],
+     [
+      201083.61,
+      557234.39
+     ],
+     [
+      201083.6,
+      557234.86
+     ],
+     [
+      201083.58,
+      557235.33
+     ],
+     [
+      201084.88,
+      557235.38
+     ],
+     [
+      201084.9,
+      557234.91
+     ],
+     [
+      201084.91,
+      557234.43
+     ],
+     [
+      201084.93,
+      557233.93
+     ],
+     [
+      201084.94,
+      557233.43
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-28": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.88,
+      557235.38
+     ],
+     [
+      201083.58,
+      557235.33
+     ],
+     [
+      201083.56,
+      557235.83
+     ],
+     [
+      201083.54,
+      557236.33
+     ],
+     [
+      201083.52,
+      557236.82
+     ],
+     [
+      201083.5,
+      557237.27
+     ],
+     [
+      201084.8,
+      557237.34
+     ],
+     [
+      201084.82,
+      557236.87
+     ],
+     [
+      201084.84,
+      557236.38
+     ],
+     [
+      201084.86,
+      557235.88
+     ],
+     [
+      201084.88,
+      557235.38
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-29": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.8,
+      557237.34
+     ],
+     [
+      201083.5,
+      557237.27
+     ],
+     [
+      201083.48,
+      557237.74
+     ],
+     [
+      201083.45,
+      557238.24
+     ],
+     [
+      201083.42,
+      557238.74
+     ],
+     [
+      201083.39,
+      557239.22
+     ],
+     [
+      201084.69,
+      557239.3
+     ],
+     [
+      201084.72,
+      557238.81
+     ],
+     [
+      201084.75,
+      557238.31
+     ],
+     [
+      201084.77,
+      557237.81
+     ],
+     [
+      201084.8,
+      557237.34
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-30": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.69,
+      557239.3
+     ],
+     [
+      201083.39,
+      557239.22
+     ],
+     [
+      201083.37,
+      557239.67
+     ],
+     [
+      201083.33,
+      557240.13
+     ],
+     [
+      201083.29,
+      557240.62
+     ],
+     [
+      201083.25,
+      557241.12
+     ],
+     [
+      201084.55,
+      557241.22
+     ],
+     [
+      201084.59,
+      557240.72
+     ],
+     [
+      201084.63,
+      557240.23
+     ],
+     [
+      201084.66,
+      557239.76
+     ],
+     [
+      201084.69,
+      557239.3
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-31": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.55,
+      557241.22
+     ],
+     [
+      201083.25,
+      557241.12
+     ],
+     [
+      201083.22,
+      557241.6
+     ],
+     [
+      201083.18,
+      557242.03
+     ],
+     [
+      201083.14,
+      557242.47
+     ],
+     [
+      201083.08,
+      557242.96
+     ],
+     [
+      201084.38,
+      557243.1
+     ],
+     [
+      201084.43,
+      557242.61
+     ],
+     [
+      201084.48,
+      557242.15
+     ],
+     [
+      201084.51,
+      557241.7
+     ],
+     [
+      201084.55,
+      557241.22
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-32": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.38,
+      557243.1
+     ],
+     [
+      201083.08,
+      557242.96
+     ],
+     [
+      201083.03,
+      557243.46
+     ],
+     [
+      201082.98,
+      557243.94
+     ],
+     [
+      201082.93,
+      557244.36
+     ],
+     [
+      201082.87,
+      557244.78
+     ],
+     [
+      201084.16,
+      557244.96
+     ],
+     [
+      201084.22,
+      557244.52
+     ],
+     [
+      201084.27,
+      557244.08
+     ],
+     [
+      201084.32,
+      557243.59
+     ],
+     [
+      201084.38,
+      557243.1
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-33": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.16,
+      557244.96
+     ],
+     [
+      201082.87,
+      557244.78
+     ],
+     [
+      201082.81,
+      557245.28
+     ],
+     [
+      201082.74,
+      557245.77
+     ],
+     [
+      201082.67,
+      557246.25
+     ],
+     [
+      201082.62,
+      557246.63
+     ],
+     [
+      201083.9,
+      557246.84
+     ],
+     [
+      201083.96,
+      557246.43
+     ],
+     [
+      201084.03,
+      557245.95
+     ],
+     [
+      201084.09,
+      557245.45
+     ],
+     [
+      201084.16,
+      557244.96
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-34": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.9,
+      557246.84
+     ],
+     [
+      201082.62,
+      557246.63
+     ],
+     [
+      201082.54,
+      557247.04
+     ],
+     [
+      201082.45,
+      557247.54
+     ],
+     [
+      201082.37,
+      557248.03
+     ],
+     [
+      201082.28,
+      557248.49
+     ],
+     [
+      201083.56,
+      557248.73
+     ],
+     [
+      201083.64,
+      557248.26
+     ],
+     [
+      201083.73,
+      557247.77
+     ],
+     [
+      201083.82,
+      557247.27
+     ],
+     [
+      201083.9,
+      557246.84
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-35": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.56,
+      557248.73
+     ],
+     [
+      201082.28,
+      557248.49
+     ],
+     [
+      201082.21,
+      557248.87
+     ],
+     [
+      201082.12,
+      557249.27
+     ],
+     [
+      201082.01,
+      557249.76
+     ],
+     [
+      201081.9,
+      557250.24
+     ],
+     [
+      201083.17,
+      557250.53
+     ],
+     [
+      201083.28,
+      557250.05
+     ],
+     [
+      201083.39,
+      557249.56
+     ],
+     [
+      201083.48,
+      557249.14
+     ],
+     [
+      201083.56,
+      557248.73
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-36": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.17,
+      557250.53
+     ],
+     [
+      201081.9,
+      557250.24
+     ],
+     [
+      201081.8,
+      557250.7
+     ],
+     [
+      201081.71,
+      557251.05
+     ],
+     [
+      201081.6,
+      557251.43
+     ],
+     [
+      201081.47,
+      557251.91
+     ],
+     [
+      201082.72,
+      557252.26
+     ],
+     [
+      201082.85,
+      557251.79
+     ],
+     [
+      201082.97,
+      557251.38
+     ],
+     [
+      201083.06,
+      557251.0
+     ],
+     [
+      201083.17,
+      557250.53
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-37": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.72,
+      557252.26
+     ],
+     [
+      201081.47,
+      557251.91
+     ],
+     [
+      201081.33,
+      557252.39
+     ],
+     [
+      201081.2,
+      557252.83
+     ],
+     [
+      201081.11,
+      557253.16
+     ],
+     [
+      201080.98,
+      557253.51
+     ],
+     [
+      201082.21,
+      557253.95
+     ],
+     [
+      201082.34,
+      557253.56
+     ],
+     [
+      201082.45,
+      557253.2
+     ],
+     [
+      201082.58,
+      557252.75
+     ],
+     [
+      201082.72,
+      557252.26
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-38": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.21,
+      557253.95
+     ],
+     [
+      201080.98,
+      557253.51
+     ],
+     [
+      201080.81,
+      557253.98
+     ],
+     [
+      201080.65,
+      557254.45
+     ],
+     [
+      201080.5,
+      557254.88
+     ],
+     [
+      201080.38,
+      557255.18
+     ],
+     [
+      201081.59,
+      557255.67
+     ],
+     [
+      201081.72,
+      557255.33
+     ],
+     [
+      201081.87,
+      557254.89
+     ],
+     [
+      201082.04,
+      557254.42
+     ],
+     [
+      201082.21,
+      557253.95
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-39": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201081.59,
+      557255.67
+     ],
+     [
+      201080.38,
+      557255.18
+     ],
+     [
+      201080.23,
+      557255.52
+     ],
+     [
+      201080.03,
+      557255.98
+     ],
+     [
+      201079.84,
+      557256.44
+     ],
+     [
+      201079.66,
+      557256.85
+     ],
+     [
+      201080.84,
+      557257.38
+     ],
+     [
+      201081.03,
+      557256.96
+     ],
+     [
+      201081.23,
+      557256.5
+     ],
+     [
+      201081.43,
+      557256.04
+     ],
+     [
+      201081.59,
+      557255.67
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-40": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201080.84,
+      557257.38
+     ],
+     [
+      201079.66,
+      557256.85
+     ],
+     [
+      201079.52,
+      557257.16
+     ],
+     [
+      201079.34,
+      557257.49
+     ],
+     [
+      201079.12,
+      557257.94
+     ],
+     [
+      201078.89,
+      557258.38
+     ],
+     [
+      201080.04,
+      557258.97
+     ],
+     [
+      201080.27,
+      557258.53
+     ],
+     [
+      201080.5,
+      557258.09
+     ],
+     [
+      201080.69,
+      557257.72
+     ],
+     [
+      201080.84,
+      557257.38
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-41": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201080.04,
+      557258.97
+     ],
+     [
+      201078.89,
+      557258.38
+     ],
+     [
+      201078.68,
+      557258.78
+     ],
+     [
+      201078.52,
+      557259.08
+     ],
+     [
+      201078.32,
+      557259.41
+     ],
+     [
+      201078.07,
+      557259.83
+     ],
+     [
+      201079.18,
+      557260.5
+     ],
+     [
+      201079.44,
+      557260.08
+     ],
+     [
+      201079.65,
+      557259.72
+     ],
+     [
+      201079.83,
+      557259.39
+     ],
+     [
+      201080.04,
+      557258.97
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-42": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201079.18,
+      557260.5
+     ],
+     [
+      201078.07,
+      557259.83
+     ],
+     [
+      201077.81,
+      557260.26
+     ],
+     [
+      201077.58,
+      557260.65
+     ],
+     [
+      201077.39,
+      557260.95
+     ],
+     [
+      201077.17,
+      557261.27
+     ],
+     [
+      201078.24,
+      557262.01
+     ],
+     [
+      201078.48,
+      557261.66
+     ],
+     [
+      201078.69,
+      557261.33
+     ],
+     [
+      201078.93,
+      557260.93
+     ],
+     [
+      201079.18,
+      557260.5
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-W-43": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201078.24,
+      557262.01
+     ],
+     [
+      201077.17,
+      557261.27
+     ],
+     [
+      201076.89,
+      557261.69
+     ],
+     [
+      201076.6,
+      557262.1
+     ],
+     [
+      201076.35,
+      557262.47
+     ],
+     [
+      201076.14,
+      557262.76
+     ],
+     [
+      201077.19,
+      557263.53
+     ],
+     [
+      201077.41,
+      557263.22
+     ],
+     [
+      201077.68,
+      557262.83
+     ],
+     [
+      201077.96,
+      557262.42
+     ],
+     [
+      201078.24,
+      557262.01
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.27,
+      557181.46
+     ],
+     [
+      201093.08,
+      557181.39
+     ],
+     [
+      201092.91,
+      557181.87
+     ],
+     [
+      201092.74,
+      557182.36
+     ],
+     [
+      201092.58,
+      557182.86
+     ],
+     [
+      201092.42,
+      557183.33
+     ],
+     [
+      201092.61,
+      557183.39
+     ],
+     [
+      201092.77,
+      557182.92
+     ],
+     [
+      201092.93,
+      557182.42
+     ],
+     [
+      201093.1,
+      557181.93
+     ],
+     [
+      201093.27,
+      557181.46
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.61,
+      557183.39
+     ],
+     [
+      201092.42,
+      557183.33
+     ],
+     [
+      201092.27,
+      557183.8
+     ],
+     [
+      201092.11,
+      557184.28
+     ],
+     [
+      201091.94,
+      557184.78
+     ],
+     [
+      201091.79,
+      557185.28
+     ],
+     [
+      201091.98,
+      557185.34
+     ],
+     [
+      201092.13,
+      557184.84
+     ],
+     [
+      201092.3,
+      557184.34
+     ],
+     [
+      201092.46,
+      557183.86
+     ],
+     [
+      201092.61,
+      557183.39
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.98,
+      557185.34
+     ],
+     [
+      201091.79,
+      557185.28
+     ],
+     [
+      201091.64,
+      557185.76
+     ],
+     [
+      201091.49,
+      557186.23
+     ],
+     [
+      201091.34,
+      557186.71
+     ],
+     [
+      201091.18,
+      557187.21
+     ],
+     [
+      201091.37,
+      557187.27
+     ],
+     [
+      201091.53,
+      557186.77
+     ],
+     [
+      201091.68,
+      557186.29
+     ],
+     [
+      201091.83,
+      557185.82
+     ],
+     [
+      201091.98,
+      557185.34
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.37,
+      557187.27
+     ],
+     [
+      201091.18,
+      557187.21
+     ],
+     [
+      201091.03,
+      557187.72
+     ],
+     [
+      201090.89,
+      557188.2
+     ],
+     [
+      201090.75,
+      557188.68
+     ],
+     [
+      201090.61,
+      557189.16
+     ],
+     [
+      201090.8,
+      557189.21
+     ],
+     [
+      201090.94,
+      557188.74
+     ],
+     [
+      201091.08,
+      557188.26
+     ],
+     [
+      201091.22,
+      557187.78
+     ],
+     [
+      201091.37,
+      557187.27
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.8,
+      557189.21
+     ],
+     [
+      201090.61,
+      557189.16
+     ],
+     [
+      201090.46,
+      557189.66
+     ],
+     [
+      201090.32,
+      557190.17
+     ],
+     [
+      201090.19,
+      557190.66
+     ],
+     [
+      201090.06,
+      557191.13
+     ],
+     [
+      201090.25,
+      557191.19
+     ],
+     [
+      201090.38,
+      557190.71
+     ],
+     [
+      201090.52,
+      557190.23
+     ],
+     [
+      201090.66,
+      557189.72
+     ],
+     [
+      201090.8,
+      557189.21
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.25,
+      557191.19
+     ],
+     [
+      201090.06,
+      557191.13
+     ],
+     [
+      201089.92,
+      557191.61
+     ],
+     [
+      201089.78,
+      557192.13
+     ],
+     [
+      201089.65,
+      557192.64
+     ],
+     [
+      201089.53,
+      557193.12
+     ],
+     [
+      201089.72,
+      557193.17
+     ],
+     [
+      201089.84,
+      557192.69
+     ],
+     [
+      201089.98,
+      557192.18
+     ],
+     [
+      201090.12,
+      557191.67
+     ],
+     [
+      201090.25,
+      557191.19
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.72,
+      557193.17
+     ],
+     [
+      201089.53,
+      557193.12
+     ],
+     [
+      201089.4,
+      557193.61
+     ],
+     [
+      201089.28,
+      557194.09
+     ],
+     [
+      201089.15,
+      557194.6
+     ],
+     [
+      201089.02,
+      557195.11
+     ],
+     [
+      201089.22,
+      557195.16
+     ],
+     [
+      201089.34,
+      557194.65
+     ],
+     [
+      201089.47,
+      557194.14
+     ],
+     [
+      201089.6,
+      557193.66
+     ],
+     [
+      201089.72,
+      557193.17
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.22,
+      557195.16
+     ],
+     [
+      201089.02,
+      557195.11
+     ],
+     [
+      201088.91,
+      557195.6
+     ],
+     [
+      201088.79,
+      557196.09
+     ],
+     [
+      201088.67,
+      557196.57
+     ],
+     [
+      201088.55,
+      557197.08
+     ],
+     [
+      201088.75,
+      557197.12
+     ],
+     [
+      201088.87,
+      557196.62
+     ],
+     [
+      201088.98,
+      557196.13
+     ],
+     [
+      201089.1,
+      557195.65
+     ],
+     [
+      201089.22,
+      557195.16
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.75,
+      557197.12
+     ],
+     [
+      201088.55,
+      557197.08
+     ],
+     [
+      201088.44,
+      557197.59
+     ],
+     [
+      201088.33,
+      557198.08
+     ],
+     [
+      201088.22,
+      557198.57
+     ],
+     [
+      201088.11,
+      557199.05
+     ],
+     [
+      201088.31,
+      557199.1
+     ],
+     [
+      201088.41,
+      557198.62
+     ],
+     [
+      201088.52,
+      557198.13
+     ],
+     [
+      201088.63,
+      557197.64
+     ],
+     [
+      201088.75,
+      557197.12
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.31,
+      557199.1
+     ],
+     [
+      201088.11,
+      557199.05
+     ],
+     [
+      201087.99,
+      557199.58
+     ],
+     [
+      201087.89,
+      557200.11
+     ],
+     [
+      201087.79,
+      557200.6
+     ],
+     [
+      201087.69,
+      557201.08
+     ],
+     [
+      201087.89,
+      557201.12
+     ],
+     [
+      201087.98,
+      557200.64
+     ],
+     [
+      201088.08,
+      557200.15
+     ],
+     [
+      201088.19,
+      557199.62
+     ],
+     [
+      201088.31,
+      557199.1
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.89,
+      557201.12
+     ],
+     [
+      201087.69,
+      557201.08
+     ],
+     [
+      201087.59,
+      557201.57
+     ],
+     [
+      201087.49,
+      557202.09
+     ],
+     [
+      201087.39,
+      557202.61
+     ],
+     [
+      201087.3,
+      557203.1
+     ],
+     [
+      201087.5,
+      557203.13
+     ],
+     [
+      201087.59,
+      557202.65
+     ],
+     [
+      201087.68,
+      557202.13
+     ],
+     [
+      201087.79,
+      557201.61
+     ],
+     [
+      201087.89,
+      557201.12
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.5,
+      557203.13
+     ],
+     [
+      201087.3,
+      557203.1
+     ],
+     [
+      201087.21,
+      557203.59
+     ],
+     [
+      201087.12,
+      557204.08
+     ],
+     [
+      201087.02,
+      557204.61
+     ],
+     [
+      201086.94,
+      557205.14
+     ],
+     [
+      201087.14,
+      557205.17
+     ],
+     [
+      201087.22,
+      557204.65
+     ],
+     [
+      201087.32,
+      557204.12
+     ],
+     [
+      201087.41,
+      557203.63
+     ],
+     [
+      201087.5,
+      557203.13
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.14,
+      557205.17
+     ],
+     [
+      201086.94,
+      557205.14
+     ],
+     [
+      201086.86,
+      557205.63
+     ],
+     [
+      201086.78,
+      557206.12
+     ],
+     [
+      201086.7,
+      557206.62
+     ],
+     [
+      201086.61,
+      557207.14
+     ],
+     [
+      201086.81,
+      557207.17
+     ],
+     [
+      201086.89,
+      557206.65
+     ],
+     [
+      201086.98,
+      557206.16
+     ],
+     [
+      201087.06,
+      557205.66
+     ],
+     [
+      201087.14,
+      557205.17
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-14": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.81,
+      557207.17
+     ],
+     [
+      201086.61,
+      557207.14
+     ],
+     [
+      201086.54,
+      557207.67
+     ],
+     [
+      201086.47,
+      557208.17
+     ],
+     [
+      201086.4,
+      557208.66
+     ],
+     [
+      201086.33,
+      557209.15
+     ],
+     [
+      201086.52,
+      557209.18
+     ],
+     [
+      201086.59,
+      557208.69
+     ],
+     [
+      201086.66,
+      557208.2
+     ],
+     [
+      201086.73,
+      557207.7
+     ],
+     [
+      201086.81,
+      557207.17
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-15": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.52,
+      557209.18
+     ],
+     [
+      201086.33,
+      557209.15
+     ],
+     [
+      201086.25,
+      557209.68
+     ],
+     [
+      201086.19,
+      557210.2
+     ],
+     [
+      201086.12,
+      557210.7
+     ],
+     [
+      201086.06,
+      557211.19
+     ],
+     [
+      201086.26,
+      557211.21
+     ],
+     [
+      201086.32,
+      557210.72
+     ],
+     [
+      201086.38,
+      557210.23
+     ],
+     [
+      201086.45,
+      557209.7
+     ],
+     [
+      201086.52,
+      557209.18
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-16": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.26,
+      557211.21
+     ],
+     [
+      201086.06,
+      557211.19
+     ],
+     [
+      201086.0,
+      557211.68
+     ],
+     [
+      201085.93,
+      557212.23
+     ],
+     [
+      201085.88,
+      557212.77
+     ],
+     [
+      201085.83,
+      557213.26
+     ],
+     [
+      201086.03,
+      557213.28
+     ],
+     [
+      201086.08,
+      557212.79
+     ],
+     [
+      201086.13,
+      557212.25
+     ],
+     [
+      201086.2,
+      557211.71
+     ],
+     [
+      201086.26,
+      557211.21
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-17": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.03,
+      557213.28
+     ],
+     [
+      201085.83,
+      557213.26
+     ],
+     [
+      201085.78,
+      557213.76
+     ],
+     [
+      201085.73,
+      557214.25
+     ],
+     [
+      201085.67,
+      557214.78
+     ],
+     [
+      201085.63,
+      557215.3
+     ],
+     [
+      201085.83,
+      557215.32
+     ],
+     [
+      201085.87,
+      557214.8
+     ],
+     [
+      201085.93,
+      557214.27
+     ],
+     [
+      201085.98,
+      557213.78
+     ],
+     [
+      201086.03,
+      557213.28
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-18": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.83,
+      557215.32
+     ],
+     [
+      201085.63,
+      557215.3
+     ],
+     [
+      201085.59,
+      557215.8
+     ],
+     [
+      201085.54,
+      557216.3
+     ],
+     [
+      201085.5,
+      557216.8
+     ],
+     [
+      201085.46,
+      557217.33
+     ],
+     [
+      201085.66,
+      557217.35
+     ],
+     [
+      201085.7,
+      557216.81
+     ],
+     [
+      201085.74,
+      557216.31
+     ],
+     [
+      201085.79,
+      557215.82
+     ],
+     [
+      201085.83,
+      557215.32
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-19": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.66,
+      557217.35
+     ],
+     [
+      201085.46,
+      557217.33
+     ],
+     [
+      201085.42,
+      557217.88
+     ],
+     [
+      201085.39,
+      557218.37
+     ],
+     [
+      201085.36,
+      557218.87
+     ],
+     [
+      201085.33,
+      557219.37
+     ],
+     [
+      201085.53,
+      557219.38
+     ],
+     [
+      201085.56,
+      557218.89
+     ],
+     [
+      201085.59,
+      557218.39
+     ],
+     [
+      201085.62,
+      557217.89
+     ],
+     [
+      201085.66,
+      557217.35
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-20": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.53,
+      557219.38
+     ],
+     [
+      201085.33,
+      557219.37
+     ],
+     [
+      201085.3,
+      557219.9
+     ],
+     [
+      201085.28,
+      557220.42
+     ],
+     [
+      201085.26,
+      557220.92
+     ],
+     [
+      201085.24,
+      557221.42
+     ],
+     [
+      201085.44,
+      557221.43
+     ],
+     [
+      201085.46,
+      557220.93
+     ],
+     [
+      201085.48,
+      557220.43
+     ],
+     [
+      201085.5,
+      557219.91
+     ],
+     [
+      201085.53,
+      557219.38
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-21": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.44,
+      557221.43
+     ],
+     [
+      201085.24,
+      557221.42
+     ],
+     [
+      201085.21,
+      557221.92
+     ],
+     [
+      201085.19,
+      557222.44
+     ],
+     [
+      201085.17,
+      557222.96
+     ],
+     [
+      201085.16,
+      557223.45
+     ],
+     [
+      201085.36,
+      557223.46
+     ],
+     [
+      201085.37,
+      557222.97
+     ],
+     [
+      201085.39,
+      557222.45
+     ],
+     [
+      201085.41,
+      557221.93
+     ],
+     [
+      201085.44,
+      557221.43
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-22": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.36,
+      557223.46
+     ],
+     [
+      201085.16,
+      557223.45
+     ],
+     [
+      201085.14,
+      557223.95
+     ],
+     [
+      201085.13,
+      557224.45
+     ],
+     [
+      201085.11,
+      557224.98
+     ],
+     [
+      201085.1,
+      557225.49
+     ],
+     [
+      201085.3,
+      557225.49
+     ],
+     [
+      201085.31,
+      557224.98
+     ],
+     [
+      201085.33,
+      557224.46
+     ],
+     [
+      201085.34,
+      557223.96
+     ],
+     [
+      201085.36,
+      557223.46
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-23": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.3,
+      557225.49
+     ],
+     [
+      201085.1,
+      557225.49
+     ],
+     [
+      201085.09,
+      557225.99
+     ],
+     [
+      201085.08,
+      557226.49
+     ],
+     [
+      201085.07,
+      557226.99
+     ],
+     [
+      201085.06,
+      557227.49
+     ],
+     [
+      201085.26,
+      557227.5
+     ],
+     [
+      201085.27,
+      557227.0
+     ],
+     [
+      201085.28,
+      557226.49
+     ],
+     [
+      201085.29,
+      557225.99
+     ],
+     [
+      201085.3,
+      557225.49
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-24": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.26,
+      557227.5
+     ],
+     [
+      201085.06,
+      557227.49
+     ],
+     [
+      201085.05,
+      557228.0
+     ],
+     [
+      201085.04,
+      557228.5
+     ],
+     [
+      201085.04,
+      557229.0
+     ],
+     [
+      201085.03,
+      557229.49
+     ],
+     [
+      201085.23,
+      557229.49
+     ],
+     [
+      201085.24,
+      557229.0
+     ],
+     [
+      201085.24,
+      557228.5
+     ],
+     [
+      201085.25,
+      557228.0
+     ],
+     [
+      201085.26,
+      557227.5
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-25": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.23,
+      557229.49
+     ],
+     [
+      201085.03,
+      557229.49
+     ],
+     [
+      201085.02,
+      557229.98
+     ],
+     [
+      201085.01,
+      557230.48
+     ],
+     [
+      201085.0,
+      557230.98
+     ],
+     [
+      201084.99,
+      557231.47
+     ],
+     [
+      201085.19,
+      557231.47
+     ],
+     [
+      201085.2,
+      557230.98
+     ],
+     [
+      201085.21,
+      557230.48
+     ],
+     [
+      201085.22,
+      557229.99
+     ],
+     [
+      201085.23,
+      557229.49
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-26": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.19,
+      557231.47
+     ],
+     [
+      201084.99,
+      557231.47
+     ],
+     [
+      201084.98,
+      557231.97
+     ],
+     [
+      201084.97,
+      557232.45
+     ],
+     [
+      201084.96,
+      557232.94
+     ],
+     [
+      201084.94,
+      557233.43
+     ],
+     [
+      201085.14,
+      557233.44
+     ],
+     [
+      201085.16,
+      557232.94
+     ],
+     [
+      201085.17,
+      557232.46
+     ],
+     [
+      201085.18,
+      557231.97
+     ],
+     [
+      201085.19,
+      557231.47
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-27": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.14,
+      557233.44
+     ],
+     [
+      201084.94,
+      557233.43
+     ],
+     [
+      201084.93,
+      557233.93
+     ],
+     [
+      201084.91,
+      557234.43
+     ],
+     [
+      201084.9,
+      557234.91
+     ],
+     [
+      201084.88,
+      557235.38
+     ],
+     [
+      201085.08,
+      557235.39
+     ],
+     [
+      201085.1,
+      557234.91
+     ],
+     [
+      201085.11,
+      557234.43
+     ],
+     [
+      201085.13,
+      557233.94
+     ],
+     [
+      201085.14,
+      557233.44
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-28": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.08,
+      557235.39
+     ],
+     [
+      201084.88,
+      557235.38
+     ],
+     [
+      201084.86,
+      557235.88
+     ],
+     [
+      201084.84,
+      557236.38
+     ],
+     [
+      201084.82,
+      557236.87
+     ],
+     [
+      201084.8,
+      557237.34
+     ],
+     [
+      201085.0,
+      557237.35
+     ],
+     [
+      201085.02,
+      557236.88
+     ],
+     [
+      201085.04,
+      557236.39
+     ],
+     [
+      201085.06,
+      557235.89
+     ],
+     [
+      201085.08,
+      557235.39
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-29": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.0,
+      557237.35
+     ],
+     [
+      201084.8,
+      557237.34
+     ],
+     [
+      201084.77,
+      557237.81
+     ],
+     [
+      201084.75,
+      557238.31
+     ],
+     [
+      201084.72,
+      557238.81
+     ],
+     [
+      201084.69,
+      557239.3
+     ],
+     [
+      201084.89,
+      557239.31
+     ],
+     [
+      201084.92,
+      557238.82
+     ],
+     [
+      201084.94,
+      557238.32
+     ],
+     [
+      201084.97,
+      557237.82
+     ],
+     [
+      201085.0,
+      557237.35
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-30": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.89,
+      557239.31
+     ],
+     [
+      201084.69,
+      557239.3
+     ],
+     [
+      201084.66,
+      557239.76
+     ],
+     [
+      201084.63,
+      557240.23
+     ],
+     [
+      201084.59,
+      557240.72
+     ],
+     [
+      201084.55,
+      557241.22
+     ],
+     [
+      201084.75,
+      557241.23
+     ],
+     [
+      201084.79,
+      557240.74
+     ],
+     [
+      201084.83,
+      557240.24
+     ],
+     [
+      201084.86,
+      557239.77
+     ],
+     [
+      201084.89,
+      557239.31
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-31": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.75,
+      557241.23
+     ],
+     [
+      201084.55,
+      557241.22
+     ],
+     [
+      201084.51,
+      557241.7
+     ],
+     [
+      201084.48,
+      557242.15
+     ],
+     [
+      201084.43,
+      557242.61
+     ],
+     [
+      201084.38,
+      557243.1
+     ],
+     [
+      201084.58,
+      557243.12
+     ],
+     [
+      201084.63,
+      557242.63
+     ],
+     [
+      201084.68,
+      557242.17
+     ],
+     [
+      201084.71,
+      557241.72
+     ],
+     [
+      201084.75,
+      557241.23
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-32": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.58,
+      557243.12
+     ],
+     [
+      201084.38,
+      557243.1
+     ],
+     [
+      201084.32,
+      557243.59
+     ],
+     [
+      201084.27,
+      557244.08
+     ],
+     [
+      201084.22,
+      557244.52
+     ],
+     [
+      201084.16,
+      557244.96
+     ],
+     [
+      201084.36,
+      557244.99
+     ],
+     [
+      201084.42,
+      557244.54
+     ],
+     [
+      201084.47,
+      557244.1
+     ],
+     [
+      201084.52,
+      557243.61
+     ],
+     [
+      201084.58,
+      557243.12
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-33": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.36,
+      557244.99
+     ],
+     [
+      201084.16,
+      557244.96
+     ],
+     [
+      201084.09,
+      557245.45
+     ],
+     [
+      201084.03,
+      557245.95
+     ],
+     [
+      201083.96,
+      557246.43
+     ],
+     [
+      201083.9,
+      557246.84
+     ],
+     [
+      201084.1,
+      557246.87
+     ],
+     [
+      201084.16,
+      557246.46
+     ],
+     [
+      201084.22,
+      557245.98
+     ],
+     [
+      201084.29,
+      557245.48
+     ],
+     [
+      201084.36,
+      557244.99
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-34": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.1,
+      557246.87
+     ],
+     [
+      201083.9,
+      557246.84
+     ],
+     [
+      201083.82,
+      557247.27
+     ],
+     [
+      201083.73,
+      557247.77
+     ],
+     [
+      201083.64,
+      557248.26
+     ],
+     [
+      201083.56,
+      557248.73
+     ],
+     [
+      201083.76,
+      557248.76
+     ],
+     [
+      201083.84,
+      557248.29
+     ],
+     [
+      201083.93,
+      557247.8
+     ],
+     [
+      201084.02,
+      557247.31
+     ],
+     [
+      201084.1,
+      557246.87
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-35": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.76,
+      557248.76
+     ],
+     [
+      201083.56,
+      557248.73
+     ],
+     [
+      201083.48,
+      557249.14
+     ],
+     [
+      201083.39,
+      557249.56
+     ],
+     [
+      201083.28,
+      557250.05
+     ],
+     [
+      201083.17,
+      557250.53
+     ],
+     [
+      201083.36,
+      557250.58
+     ],
+     [
+      201083.47,
+      557250.09
+     ],
+     [
+      201083.58,
+      557249.61
+     ],
+     [
+      201083.68,
+      557249.18
+     ],
+     [
+      201083.76,
+      557248.76
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-36": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.36,
+      557250.58
+     ],
+     [
+      201083.17,
+      557250.53
+     ],
+     [
+      201083.06,
+      557251.0
+     ],
+     [
+      201082.97,
+      557251.38
+     ],
+     [
+      201082.85,
+      557251.79
+     ],
+     [
+      201082.72,
+      557252.26
+     ],
+     [
+      201082.91,
+      557252.32
+     ],
+     [
+      201083.05,
+      557251.84
+     ],
+     [
+      201083.16,
+      557251.43
+     ],
+     [
+      201083.26,
+      557251.04
+     ],
+     [
+      201083.36,
+      557250.58
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-37": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.91,
+      557252.32
+     ],
+     [
+      201082.72,
+      557252.26
+     ],
+     [
+      201082.58,
+      557252.75
+     ],
+     [
+      201082.45,
+      557253.2
+     ],
+     [
+      201082.34,
+      557253.56
+     ],
+     [
+      201082.21,
+      557253.95
+     ],
+     [
+      201082.39,
+      557254.01
+     ],
+     [
+      201082.53,
+      557253.63
+     ],
+     [
+      201082.64,
+      557253.25
+     ],
+     [
+      201082.77,
+      557252.8
+     ],
+     [
+      201082.91,
+      557252.32
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-38": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.39,
+      557254.01
+     ],
+     [
+      201082.21,
+      557253.95
+     ],
+     [
+      201082.04,
+      557254.42
+     ],
+     [
+      201081.87,
+      557254.89
+     ],
+     [
+      201081.72,
+      557255.33
+     ],
+     [
+      201081.59,
+      557255.67
+     ],
+     [
+      201081.77,
+      557255.75
+     ],
+     [
+      201081.9,
+      557255.4
+     ],
+     [
+      201082.06,
+      557254.95
+     ],
+     [
+      201082.23,
+      557254.48
+     ],
+     [
+      201082.39,
+      557254.01
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-39": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201081.77,
+      557255.75
+     ],
+     [
+      201081.59,
+      557255.67
+     ],
+     [
+      201081.43,
+      557256.04
+     ],
+     [
+      201081.23,
+      557256.5
+     ],
+     [
+      201081.03,
+      557256.96
+     ],
+     [
+      201080.84,
+      557257.38
+     ],
+     [
+      201081.03,
+      557257.46
+     ],
+     [
+      201081.21,
+      557257.04
+     ],
+     [
+      201081.41,
+      557256.58
+     ],
+     [
+      201081.61,
+      557256.12
+     ],
+     [
+      201081.77,
+      557255.75
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-40": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201081.03,
+      557257.46
+     ],
+     [
+      201080.84,
+      557257.38
+     ],
+     [
+      201080.69,
+      557257.72
+     ],
+     [
+      201080.5,
+      557258.09
+     ],
+     [
+      201080.27,
+      557258.53
+     ],
+     [
+      201080.04,
+      557258.97
+     ],
+     [
+      201080.22,
+      557259.06
+     ],
+     [
+      201080.45,
+      557258.63
+     ],
+     [
+      201080.68,
+      557258.18
+     ],
+     [
+      201080.87,
+      557257.81
+     ],
+     [
+      201081.03,
+      557257.46
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-41": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201080.22,
+      557259.06
+     ],
+     [
+      201080.04,
+      557258.97
+     ],
+     [
+      201079.83,
+      557259.39
+     ],
+     [
+      201079.65,
+      557259.72
+     ],
+     [
+      201079.44,
+      557260.08
+     ],
+     [
+      201079.18,
+      557260.5
+     ],
+     [
+      201079.35,
+      557260.6
+     ],
+     [
+      201079.61,
+      557260.18
+     ],
+     [
+      201079.83,
+      557259.82
+     ],
+     [
+      201080.01,
+      557259.48
+     ],
+     [
+      201080.22,
+      557259.06
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-42": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201079.35,
+      557260.6
+     ],
+     [
+      201079.18,
+      557260.5
+     ],
+     [
+      201078.93,
+      557260.93
+     ],
+     [
+      201078.69,
+      557261.33
+     ],
+     [
+      201078.48,
+      557261.66
+     ],
+     [
+      201078.24,
+      557262.01
+     ],
+     [
+      201078.41,
+      557262.12
+     ],
+     [
+      201078.65,
+      557261.77
+     ],
+     [
+      201078.86,
+      557261.43
+     ],
+     [
+      201079.1,
+      557261.03
+     ],
+     [
+      201079.35,
+      557260.6
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-W-43": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201078.41,
+      557262.12
+     ],
+     [
+      201078.24,
+      557262.01
+     ],
+     [
+      201077.96,
+      557262.42
+     ],
+     [
+      201077.68,
+      557262.83
+     ],
+     [
+      201077.41,
+      557263.22
+     ],
+     [
+      201077.19,
+      557263.53
+     ],
+     [
+      201077.35,
+      557263.65
+     ],
+     [
+      201077.58,
+      557263.33
+     ],
+     [
+      201077.84,
+      557262.94
+     ],
+     [
+      201078.12,
+      557262.53
+     ],
+     [
+      201078.41,
+      557262.12
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.13,
+      557184.87
+     ],
+     [
+      201089.98,
+      557185.35
+     ],
+     [
+      201089.84,
+      557185.82
+     ],
+     [
+      201089.7,
+      557186.27
+     ],
+     [
+      201090.08,
+      557186.39
+     ],
+     [
+      201090.22,
+      557185.94
+     ],
+     [
+      201090.37,
+      557185.46
+     ],
+     [
+      201090.52,
+      557184.99
+     ],
+     [
+      201090.68,
+      557184.47
+     ],
+     [
+      201090.3,
+      557184.35
+     ],
+     [
+      201090.13,
+      557184.87
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.53,
+      557186.79
+     ],
+     [
+      201089.38,
+      557187.32
+     ],
+     [
+      201089.24,
+      557187.8
+     ],
+     [
+      201089.11,
+      557188.24
+     ],
+     [
+      201089.49,
+      557188.36
+     ],
+     [
+      201089.62,
+      557187.91
+     ],
+     [
+      201089.76,
+      557187.43
+     ],
+     [
+      201089.92,
+      557186.91
+     ],
+     [
+      201090.08,
+      557186.39
+     ],
+     [
+      201089.7,
+      557186.27
+     ],
+     [
+      201089.53,
+      557186.79
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.97,
+      557188.72
+     ],
+     [
+      201088.82,
+      557189.24
+     ],
+     [
+      201088.67,
+      557189.77
+     ],
+     [
+      201088.55,
+      557190.22
+     ],
+     [
+      201088.93,
+      557190.32
+     ],
+     [
+      201089.06,
+      557189.87
+     ],
+     [
+      201089.2,
+      557189.35
+     ],
+     [
+      201089.35,
+      557188.84
+     ],
+     [
+      201089.49,
+      557188.36
+     ],
+     [
+      201089.11,
+      557188.24
+     ],
+     [
+      201088.97,
+      557188.72
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.41,
+      557190.7
+     ],
+     [
+      201088.28,
+      557191.18
+     ],
+     [
+      201088.14,
+      557191.71
+     ],
+     [
+      201088.01,
+      557192.2
+     ],
+     [
+      201088.4,
+      557192.3
+     ],
+     [
+      201088.52,
+      557191.81
+     ],
+     [
+      201088.67,
+      557191.29
+     ],
+     [
+      201088.8,
+      557190.8
+     ],
+     [
+      201088.93,
+      557190.32
+     ],
+     [
+      201088.55,
+      557190.22
+     ],
+     [
+      201088.41,
+      557190.7
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.88,
+      557192.69
+     ],
+     [
+      201087.76,
+      557193.17
+     ],
+     [
+      201087.63,
+      557193.66
+     ],
+     [
+      201087.51,
+      557194.15
+     ],
+     [
+      201087.9,
+      557194.24
+     ],
+     [
+      201088.02,
+      557193.76
+     ],
+     [
+      201088.15,
+      557193.27
+     ],
+     [
+      201088.27,
+      557192.79
+     ],
+     [
+      201088.4,
+      557192.3
+     ],
+     [
+      201088.01,
+      557192.2
+     ],
+     [
+      201087.88,
+      557192.69
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.38,
+      557194.68
+     ],
+     [
+      201087.26,
+      557195.17
+     ],
+     [
+      201087.14,
+      557195.65
+     ],
+     [
+      201087.04,
+      557196.11
+     ],
+     [
+      201087.43,
+      557196.2
+     ],
+     [
+      201087.53,
+      557195.75
+     ],
+     [
+      201087.65,
+      557195.26
+     ],
+     [
+      201087.77,
+      557194.77
+     ],
+     [
+      201087.9,
+      557194.24
+     ],
+     [
+      201087.51,
+      557194.15
+     ],
+     [
+      201087.38,
+      557194.68
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.91,
+      557196.63
+     ],
+     [
+      201086.79,
+      557197.16
+     ],
+     [
+      201086.68,
+      557197.65
+     ],
+     [
+      201086.58,
+      557198.11
+     ],
+     [
+      201086.97,
+      557198.19
+     ],
+     [
+      201087.07,
+      557197.74
+     ],
+     [
+      201087.18,
+      557197.24
+     ],
+     [
+      201087.3,
+      557196.72
+     ],
+     [
+      201087.43,
+      557196.2
+     ],
+     [
+      201087.04,
+      557196.11
+     ],
+     [
+      201086.91,
+      557196.63
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.47,
+      557198.59
+     ],
+     [
+      201086.35,
+      557199.13
+     ],
+     [
+      201086.24,
+      557199.67
+     ],
+     [
+      201086.15,
+      557200.14
+     ],
+     [
+      201086.54,
+      557200.22
+     ],
+     [
+      201086.63,
+      557199.75
+     ],
+     [
+      201086.74,
+      557199.21
+     ],
+     [
+      201086.86,
+      557198.68
+     ],
+     [
+      201086.97,
+      557198.19
+     ],
+     [
+      201086.58,
+      557198.11
+     ],
+     [
+      201086.47,
+      557198.59
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.05,
+      557200.63
+     ],
+     [
+      201085.95,
+      557201.12
+     ],
+     [
+      201085.84,
+      557201.64
+     ],
+     [
+      201085.75,
+      557202.14
+     ],
+     [
+      201086.14,
+      557202.22
+     ],
+     [
+      201086.24,
+      557201.72
+     ],
+     [
+      201086.34,
+      557201.2
+     ],
+     [
+      201086.44,
+      557200.71
+     ],
+     [
+      201086.54,
+      557200.22
+     ],
+     [
+      201086.15,
+      557200.14
+     ],
+     [
+      201086.05,
+      557200.63
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.66,
+      557202.65
+     ],
+     [
+      201085.57,
+      557203.14
+     ],
+     [
+      201085.48,
+      557203.63
+     ],
+     [
+      201085.38,
+      557204.13
+     ],
+     [
+      201085.78,
+      557204.19
+     ],
+     [
+      201085.87,
+      557203.7
+     ],
+     [
+      201085.96,
+      557203.21
+     ],
+     [
+      201086.05,
+      557202.72
+     ],
+     [
+      201086.14,
+      557202.22
+     ],
+     [
+      201085.75,
+      557202.14
+     ],
+     [
+      201085.66,
+      557202.65
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.29,
+      557204.67
+     ],
+     [
+      201085.21,
+      557205.19
+     ],
+     [
+      201085.13,
+      557205.68
+     ],
+     [
+      201085.05,
+      557206.14
+     ],
+     [
+      201085.45,
+      557206.21
+     ],
+     [
+      201085.52,
+      557205.75
+     ],
+     [
+      201085.6,
+      557205.25
+     ],
+     [
+      201085.69,
+      557204.74
+     ],
+     [
+      201085.78,
+      557204.19
+     ],
+     [
+      201085.38,
+      557204.13
+     ],
+     [
+      201085.29,
+      557204.67
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.97,
+      557206.67
+     ],
+     [
+      201084.88,
+      557207.21
+     ],
+     [
+      201084.81,
+      557207.73
+     ],
+     [
+      201084.75,
+      557208.19
+     ],
+     [
+      201085.14,
+      557208.25
+     ],
+     [
+      201085.21,
+      557207.79
+     ],
+     [
+      201085.28,
+      557207.27
+     ],
+     [
+      201085.36,
+      557206.73
+     ],
+     [
+      201085.45,
+      557206.21
+     ],
+     [
+      201085.05,
+      557206.14
+     ],
+     [
+      201084.97,
+      557206.67
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.68,
+      557208.69
+     ],
+     [
+      201084.6,
+      557209.21
+     ],
+     [
+      201084.53,
+      557209.74
+     ],
+     [
+      201084.47,
+      557210.23
+     ],
+     [
+      201084.87,
+      557210.28
+     ],
+     [
+      201084.93,
+      557209.8
+     ],
+     [
+      201085.0,
+      557209.26
+     ],
+     [
+      201085.07,
+      557208.74
+     ],
+     [
+      201085.14,
+      557208.25
+     ],
+     [
+      201084.75,
+      557208.19
+     ],
+     [
+      201084.68,
+      557208.69
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-14": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.41,
+      557210.72
+     ],
+     [
+      201084.34,
+      557211.22
+     ],
+     [
+      201084.28,
+      557211.75
+     ],
+     [
+      201084.22,
+      557212.27
+     ],
+     [
+      201084.62,
+      557212.32
+     ],
+     [
+      201084.67,
+      557211.8
+     ],
+     [
+      201084.74,
+      557211.27
+     ],
+     [
+      201084.8,
+      557210.77
+     ],
+     [
+      201084.87,
+      557210.28
+     ],
+     [
+      201084.47,
+      557210.23
+     ],
+     [
+      201084.41,
+      557210.72
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-15": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.16,
+      557212.81
+     ],
+     [
+      201084.11,
+      557213.31
+     ],
+     [
+      201084.06,
+      557213.8
+     ],
+     [
+      201084.01,
+      557214.28
+     ],
+     [
+      201084.41,
+      557214.32
+     ],
+     [
+      201084.46,
+      557213.84
+     ],
+     [
+      201084.51,
+      557213.35
+     ],
+     [
+      201084.56,
+      557212.85
+     ],
+     [
+      201084.62,
+      557212.32
+     ],
+     [
+      201084.22,
+      557212.27
+     ],
+     [
+      201084.16,
+      557212.81
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-16": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.96,
+      557214.82
+     ],
+     [
+      201083.92,
+      557215.35
+     ],
+     [
+      201083.9,
+      557215.59
+     ],
+     [
+      201084.0,
+      557216.0
+     ],
+     [
+      201084.0,
+      557216.32
+     ],
+     [
+      201084.24,
+      557216.34
+     ],
+     [
+      201084.28,
+      557215.88
+     ],
+     [
+      201084.32,
+      557215.38
+     ],
+     [
+      201084.36,
+      557214.86
+     ],
+     [
+      201084.41,
+      557214.32
+     ],
+     [
+      201084.01,
+      557214.28
+     ],
+     [
+      201083.96,
+      557214.82
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-17": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.0,
+      557216.6
+     ],
+     [
+      201084.21,
+      557216.6
+     ],
+     [
+      201084.24,
+      557216.34
+     ],
+     [
+      201084.0,
+      557216.32
+     ],
+     [
+      201084.0,
+      557216.6
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-18": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.89,
+      557222.47
+     ],
+     [
+      201083.91,
+      557221.98
+     ],
+     [
+      201083.93,
+      557221.47
+     ],
+     [
+      201083.95,
+      557220.97
+     ],
+     [
+      201083.97,
+      557220.6
+     ],
+     [
+      201083.93,
+      557220.6
+     ],
+     [
+      201083.79,
+      557221.71
+     ],
+     [
+      201083.69,
+      557222.46
+     ],
+     [
+      201083.89,
+      557222.47
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-19": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.43,
+      557224.28
+     ],
+     [
+      201083.43,
+      557224.45
+     ],
+     [
+      201083.83,
+      557224.47
+     ],
+     [
+      201083.84,
+      557223.99
+     ],
+     [
+      201083.86,
+      557223.49
+     ],
+     [
+      201083.87,
+      557222.99
+     ],
+     [
+      201083.89,
+      557222.47
+     ],
+     [
+      201083.69,
+      557222.46
+     ],
+     [
+      201083.5,
+      557224.0
+     ],
+     [
+      201083.43,
+      557224.28
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-20": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.41,
+      557224.99
+     ],
+     [
+      201083.4,
+      557225.51
+     ],
+     [
+      201083.39,
+      557226.01
+     ],
+     [
+      201083.38,
+      557226.48
+     ],
+     [
+      201083.78,
+      557226.49
+     ],
+     [
+      201083.79,
+      557226.02
+     ],
+     [
+      201083.8,
+      557225.52
+     ],
+     [
+      201083.81,
+      557225.0
+     ],
+     [
+      201083.83,
+      557224.47
+     ],
+     [
+      201083.43,
+      557224.45
+     ],
+     [
+      201083.41,
+      557224.99
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-21": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.37,
+      557226.98
+     ],
+     [
+      201083.36,
+      557227.49
+     ],
+     [
+      201083.35,
+      557228.0
+     ],
+     [
+      201083.34,
+      557228.47
+     ],
+     [
+      201083.74,
+      557228.47
+     ],
+     [
+      201083.75,
+      557228.01
+     ],
+     [
+      201083.76,
+      557227.5
+     ],
+     [
+      201083.77,
+      557226.99
+     ],
+     [
+      201083.78,
+      557226.49
+     ],
+     [
+      201083.38,
+      557226.48
+     ],
+     [
+      201083.37,
+      557226.98
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-22": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.34,
+      557228.97
+     ],
+     [
+      201083.33,
+      557229.46
+     ],
+     [
+      201083.32,
+      557229.95
+     ],
+     [
+      201083.31,
+      557230.41
+     ],
+     [
+      201083.71,
+      557230.42
+     ],
+     [
+      201083.72,
+      557229.96
+     ],
+     [
+      201083.73,
+      557229.47
+     ],
+     [
+      201083.74,
+      557228.97
+     ],
+     [
+      201083.74,
+      557228.47
+     ],
+     [
+      201083.34,
+      557228.47
+     ],
+     [
+      201083.34,
+      557228.97
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-23": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.3,
+      557230.91
+     ],
+     [
+      201083.29,
+      557231.41
+     ],
+     [
+      201083.28,
+      557231.91
+     ],
+     [
+      201083.27,
+      557232.35
+     ],
+     [
+      201083.67,
+      557232.36
+     ],
+     [
+      201083.68,
+      557231.92
+     ],
+     [
+      201083.69,
+      557231.42
+     ],
+     [
+      201083.7,
+      557230.92
+     ],
+     [
+      201083.71,
+      557230.42
+     ],
+     [
+      201083.31,
+      557230.41
+     ],
+     [
+      201083.3,
+      557230.91
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-24": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.26,
+      557232.83
+     ],
+     [
+      201083.24,
+      557233.33
+     ],
+     [
+      201083.23,
+      557233.83
+     ],
+     [
+      201083.22,
+      557234.3
+     ],
+     [
+      201083.62,
+      557234.31
+     ],
+     [
+      201083.63,
+      557233.84
+     ],
+     [
+      201083.64,
+      557233.34
+     ],
+     [
+      201083.66,
+      557232.84
+     ],
+     [
+      201083.67,
+      557232.36
+     ],
+     [
+      201083.27,
+      557232.35
+     ],
+     [
+      201083.26,
+      557232.83
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-25": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.2,
+      557234.77
+     ],
+     [
+      201083.18,
+      557235.23
+     ],
+     [
+      201083.16,
+      557235.73
+     ],
+     [
+      201083.15,
+      557236.2
+     ],
+     [
+      201083.55,
+      557236.21
+     ],
+     [
+      201083.56,
+      557235.75
+     ],
+     [
+      201083.58,
+      557235.25
+     ],
+     [
+      201083.6,
+      557234.78
+     ],
+     [
+      201083.62,
+      557234.31
+     ],
+     [
+      201083.22,
+      557234.3
+     ],
+     [
+      201083.2,
+      557234.77
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-26": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.13,
+      557236.7
+     ],
+     [
+      201083.11,
+      557237.16
+     ],
+     [
+      201083.08,
+      557237.61
+     ],
+     [
+      201083.06,
+      557238.08
+     ],
+     [
+      201083.46,
+      557238.1
+     ],
+     [
+      201083.48,
+      557237.63
+     ],
+     [
+      201083.51,
+      557237.17
+     ],
+     [
+      201083.53,
+      557236.71
+     ],
+     [
+      201083.55,
+      557236.21
+     ],
+     [
+      201083.15,
+      557236.2
+     ],
+     [
+      201083.13,
+      557236.7
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-27": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.03,
+      557238.57
+     ],
+     [
+      201083.0,
+      557239.07
+     ],
+     [
+      201082.97,
+      557239.52
+     ],
+     [
+      201082.94,
+      557239.94
+     ],
+     [
+      201083.34,
+      557239.97
+     ],
+     [
+      201083.37,
+      557239.55
+     ],
+     [
+      201083.4,
+      557239.1
+     ],
+     [
+      201083.43,
+      557238.6
+     ],
+     [
+      201083.46,
+      557238.1
+     ],
+     [
+      201083.06,
+      557238.08
+     ],
+     [
+      201083.03,
+      557238.57
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-28": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.91,
+      557240.43
+     ],
+     [
+      201082.87,
+      557240.92
+     ],
+     [
+      201082.83,
+      557241.42
+     ],
+     [
+      201082.8,
+      557241.83
+     ],
+     [
+      201083.2,
+      557241.86
+     ],
+     [
+      201083.23,
+      557241.45
+     ],
+     [
+      201083.27,
+      557240.95
+     ],
+     [
+      201083.3,
+      557240.46
+     ],
+     [
+      201083.34,
+      557239.97
+     ],
+     [
+      201082.94,
+      557239.94
+     ],
+     [
+      201082.91,
+      557240.43
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-29": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.76,
+      557242.25
+     ],
+     [
+      201082.71,
+      557242.73
+     ],
+     [
+      201082.65,
+      557243.23
+     ],
+     [
+      201082.6,
+      557243.69
+     ],
+     [
+      201083.0,
+      557243.73
+     ],
+     [
+      201083.05,
+      557243.27
+     ],
+     [
+      201083.1,
+      557242.77
+     ],
+     [
+      201083.15,
+      557242.29
+     ],
+     [
+      201083.2,
+      557241.86
+     ],
+     [
+      201082.8,
+      557241.83
+     ],
+     [
+      201082.76,
+      557242.25
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-30": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.56,
+      557244.12
+     ],
+     [
+      201082.51,
+      557244.53
+     ],
+     [
+      201082.44,
+      557245.01
+     ],
+     [
+      201082.38,
+      557245.47
+     ],
+     [
+      201082.77,
+      557245.53
+     ],
+     [
+      201082.84,
+      557245.06
+     ],
+     [
+      201082.9,
+      557244.59
+     ],
+     [
+      201082.96,
+      557244.17
+     ],
+     [
+      201083.0,
+      557243.73
+     ],
+     [
+      201082.6,
+      557243.69
+     ],
+     [
+      201082.56,
+      557244.12
+     ]
+    ]
+   ]
+  },
+  "Z12-ROCKEDGE-W-31": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.31,
+      557245.97
+     ],
+     [
+      201082.28,
+      557246.21
+     ],
+     [
+      201082.41,
+      557247.25
+     ],
+     [
+      201082.5,
+      557247.26
+     ],
+     [
+      201082.58,
+      557246.83
+     ],
+     [
+      201082.65,
+      557246.44
+     ],
+     [
+      201082.7,
+      557246.02
+     ],
+     [
+      201082.77,
+      557245.53
+     ],
+     [
+      201082.38,
+      557245.47
+     ],
+     [
+      201082.31,
+      557245.97
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.7,
+      557183.79
+     ],
+     [
+      201086.55,
+      557184.27
+     ],
+     [
+      201086.4,
+      557184.75
+     ],
+     [
+      201086.26,
+      557185.2
+     ],
+     [
+      201089.7,
+      557186.27
+     ],
+     [
+      201089.84,
+      557185.82
+     ],
+     [
+      201089.98,
+      557185.35
+     ],
+     [
+      201090.13,
+      557184.87
+     ],
+     [
+      201090.3,
+      557184.35
+     ],
+     [
+      201086.87,
+      557183.25
+     ],
+     [
+      201086.7,
+      557183.79
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.09,
+      557185.75
+     ],
+     [
+      201085.93,
+      557186.3
+     ],
+     [
+      201085.78,
+      557186.78
+     ],
+     [
+      201085.65,
+      557187.23
+     ],
+     [
+      201089.11,
+      557188.24
+     ],
+     [
+      201089.24,
+      557187.8
+     ],
+     [
+      201089.38,
+      557187.32
+     ],
+     [
+      201089.53,
+      557186.79
+     ],
+     [
+      201089.7,
+      557186.27
+     ],
+     [
+      201086.26,
+      557185.2
+     ],
+     [
+      201086.09,
+      557185.75
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.51,
+      557187.71
+     ],
+     [
+      201085.35,
+      557188.26
+     ],
+     [
+      201085.2,
+      557188.81
+     ],
+     [
+      201085.08,
+      557189.26
+     ],
+     [
+      201088.55,
+      557190.22
+     ],
+     [
+      201088.67,
+      557189.77
+     ],
+     [
+      201088.82,
+      557189.24
+     ],
+     [
+      201088.97,
+      557188.72
+     ],
+     [
+      201089.11,
+      557188.24
+     ],
+     [
+      201085.65,
+      557187.23
+     ],
+     [
+      201085.51,
+      557187.71
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.94,
+      557189.74
+     ],
+     [
+      201084.81,
+      557190.22
+     ],
+     [
+      201084.66,
+      557190.78
+     ],
+     [
+      201084.52,
+      557191.3
+     ],
+     [
+      201088.01,
+      557192.2
+     ],
+     [
+      201088.14,
+      557191.71
+     ],
+     [
+      201088.28,
+      557191.18
+     ],
+     [
+      201088.41,
+      557190.7
+     ],
+     [
+      201088.55,
+      557190.22
+     ],
+     [
+      201085.08,
+      557189.26
+     ],
+     [
+      201084.94,
+      557189.74
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.4,
+      557191.79
+     ],
+     [
+      201084.27,
+      557192.28
+     ],
+     [
+      201084.15,
+      557192.76
+     ],
+     [
+      201084.01,
+      557193.27
+     ],
+     [
+      201087.51,
+      557194.15
+     ],
+     [
+      201087.63,
+      557193.66
+     ],
+     [
+      201087.76,
+      557193.17
+     ],
+     [
+      201087.88,
+      557192.69
+     ],
+     [
+      201088.01,
+      557192.2
+     ],
+     [
+      201084.52,
+      557191.3
+     ],
+     [
+      201084.4,
+      557191.79
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.88,
+      557193.83
+     ],
+     [
+      201083.76,
+      557194.33
+     ],
+     [
+      201083.64,
+      557194.81
+     ],
+     [
+      201083.54,
+      557195.27
+     ],
+     [
+      201087.04,
+      557196.11
+     ],
+     [
+      201087.14,
+      557195.65
+     ],
+     [
+      201087.26,
+      557195.17
+     ],
+     [
+      201087.38,
+      557194.68
+     ],
+     [
+      201087.51,
+      557194.15
+     ],
+     [
+      201084.01,
+      557193.27
+     ],
+     [
+      201083.88,
+      557193.83
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.41,
+      557195.81
+     ],
+     [
+      201083.28,
+      557196.37
+     ],
+     [
+      201083.17,
+      557196.87
+     ],
+     [
+      201083.07,
+      557197.32
+     ],
+     [
+      201086.58,
+      557198.11
+     ],
+     [
+      201086.68,
+      557197.65
+     ],
+     [
+      201086.79,
+      557197.16
+     ],
+     [
+      201086.91,
+      557196.63
+     ],
+     [
+      201087.04,
+      557196.11
+     ],
+     [
+      201083.54,
+      557195.27
+     ],
+     [
+      201083.41,
+      557195.81
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.96,
+      557197.81
+     ],
+     [
+      201082.83,
+      557198.37
+     ],
+     [
+      201082.71,
+      557198.96
+     ],
+     [
+      201082.62,
+      557199.43
+     ],
+     [
+      201086.15,
+      557200.14
+     ],
+     [
+      201086.24,
+      557199.67
+     ],
+     [
+      201086.35,
+      557199.13
+     ],
+     [
+      201086.47,
+      557198.59
+     ],
+     [
+      201086.58,
+      557198.11
+     ],
+     [
+      201083.07,
+      557197.32
+     ],
+     [
+      201082.96,
+      557197.81
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.52,
+      557199.92
+     ],
+     [
+      201082.42,
+      557200.41
+     ],
+     [
+      201082.31,
+      557200.96
+     ],
+     [
+      201082.21,
+      557201.48
+     ],
+     [
+      201085.75,
+      557202.14
+     ],
+     [
+      201085.84,
+      557201.64
+     ],
+     [
+      201085.95,
+      557201.12
+     ],
+     [
+      201086.05,
+      557200.63
+     ],
+     [
+      201086.15,
+      557200.14
+     ],
+     [
+      201082.62,
+      557199.43
+     ],
+     [
+      201082.52,
+      557199.92
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.12,
+      557201.99
+     ],
+     [
+      201082.03,
+      557202.49
+     ],
+     [
+      201082.0,
+      557202.63
+     ],
+     [
+      201082.0,
+      557203.52
+     ],
+     [
+      201085.38,
+      557204.13
+     ],
+     [
+      201085.48,
+      557203.63
+     ],
+     [
+      201085.57,
+      557203.14
+     ],
+     [
+      201085.66,
+      557202.65
+     ],
+     [
+      201085.75,
+      557202.14
+     ],
+     [
+      201082.21,
+      557201.48
+     ],
+     [
+      201082.12,
+      557201.99
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557204.0
+     ],
+     [
+      201082.0,
+      557205.64
+     ],
+     [
+      201085.05,
+      557206.14
+     ],
+     [
+      201085.13,
+      557205.68
+     ],
+     [
+      201085.21,
+      557205.19
+     ],
+     [
+      201085.29,
+      557204.67
+     ],
+     [
+      201085.38,
+      557204.13
+     ],
+     [
+      201082.0,
+      557203.52
+     ],
+     [
+      201082.0,
+      557204.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557207.8
+     ],
+     [
+      201084.75,
+      557208.19
+     ],
+     [
+      201084.81,
+      557207.73
+     ],
+     [
+      201084.88,
+      557207.21
+     ],
+     [
+      201084.97,
+      557206.67
+     ],
+     [
+      201085.05,
+      557206.14
+     ],
+     [
+      201082.0,
+      557205.64
+     ],
+     [
+      201082.0,
+      557207.8
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557208.0
+     ],
+     [
+      201082.49,
+      557209.98
+     ],
+     [
+      201084.47,
+      557210.23
+     ],
+     [
+      201084.53,
+      557209.74
+     ],
+     [
+      201084.6,
+      557209.21
+     ],
+     [
+      201084.68,
+      557208.69
+     ],
+     [
+      201084.75,
+      557208.19
+     ],
+     [
+      201082.0,
+      557207.8
+     ],
+     [
+      201082.0,
+      557208.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-14": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.0,
+      557212.0
+     ],
+     [
+      201083.04,
+      557212.15
+     ],
+     [
+      201084.22,
+      557212.27
+     ],
+     [
+      201084.28,
+      557211.75
+     ],
+     [
+      201084.34,
+      557211.22
+     ],
+     [
+      201084.41,
+      557210.72
+     ],
+     [
+      201084.47,
+      557210.23
+     ],
+     [
+      201082.49,
+      557209.98
+     ],
+     [
+      201083.0,
+      557212.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-15": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.24,
+      557212.96
+     ],
+     [
+      201083.5,
+      557214.0
+     ],
+     [
+      201083.56,
+      557214.24
+     ],
+     [
+      201084.01,
+      557214.28
+     ],
+     [
+      201084.06,
+      557213.8
+     ],
+     [
+      201084.11,
+      557213.31
+     ],
+     [
+      201084.16,
+      557212.81
+     ],
+     [
+      201084.22,
+      557212.27
+     ],
+     [
+      201083.04,
+      557212.15
+     ],
+     [
+      201083.24,
+      557212.96
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-16": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.9,
+      557215.59
+     ],
+     [
+      201083.92,
+      557215.35
+     ],
+     [
+      201083.96,
+      557214.82
+     ],
+     [
+      201084.01,
+      557214.28
+     ],
+     [
+      201083.56,
+      557214.24
+     ],
+     [
+      201083.9,
+      557215.59
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-17": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.88,
+      557226.47
+     ],
+     [
+      201083.38,
+      557226.48
+     ],
+     [
+      201083.39,
+      557226.01
+     ],
+     [
+      201083.4,
+      557225.51
+     ],
+     [
+      201083.41,
+      557224.99
+     ],
+     [
+      201083.43,
+      557224.45
+     ],
+     [
+      201083.39,
+      557224.45
+     ],
+     [
+      201082.88,
+      557226.47
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-18": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.5,
+      557228.0
+     ],
+     [
+      201082.44,
+      557228.45
+     ],
+     [
+      201083.34,
+      557228.47
+     ],
+     [
+      201083.35,
+      557228.0
+     ],
+     [
+      201083.36,
+      557227.49
+     ],
+     [
+      201083.37,
+      557226.98
+     ],
+     [
+      201083.38,
+      557226.48
+     ],
+     [
+      201082.88,
+      557226.47
+     ],
+     [
+      201082.5,
+      557228.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-19": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.2,
+      557230.39
+     ],
+     [
+      201083.31,
+      557230.41
+     ],
+     [
+      201083.32,
+      557229.95
+     ],
+     [
+      201083.33,
+      557229.46
+     ],
+     [
+      201083.34,
+      557228.97
+     ],
+     [
+      201083.34,
+      557228.47
+     ],
+     [
+      201082.44,
+      557228.45
+     ],
+     [
+      201082.2,
+      557230.39
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-20": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557232.0
+     ],
+     [
+      201082.0,
+      557232.32
+     ],
+     [
+      201083.27,
+      557232.35
+     ],
+     [
+      201083.28,
+      557231.91
+     ],
+     [
+      201083.29,
+      557231.41
+     ],
+     [
+      201083.3,
+      557230.91
+     ],
+     [
+      201083.31,
+      557230.41
+     ],
+     [
+      201082.2,
+      557230.39
+     ],
+     [
+      201082.0,
+      557232.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-21": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557234.26
+     ],
+     [
+      201083.22,
+      557234.3
+     ],
+     [
+      201083.23,
+      557233.83
+     ],
+     [
+      201083.24,
+      557233.33
+     ],
+     [
+      201083.26,
+      557232.83
+     ],
+     [
+      201083.27,
+      557232.35
+     ],
+     [
+      201082.0,
+      557232.32
+     ],
+     [
+      201082.0,
+      557234.26
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-22": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557236.0
+     ],
+     [
+      201082.0,
+      557236.15
+     ],
+     [
+      201083.15,
+      557236.2
+     ],
+     [
+      201083.16,
+      557235.73
+     ],
+     [
+      201083.18,
+      557235.23
+     ],
+     [
+      201083.2,
+      557234.77
+     ],
+     [
+      201083.22,
+      557234.3
+     ],
+     [
+      201082.0,
+      557234.26
+     ],
+     [
+      201082.0,
+      557236.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-23": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557238.02
+     ],
+     [
+      201083.06,
+      557238.08
+     ],
+     [
+      201083.08,
+      557237.61
+     ],
+     [
+      201083.11,
+      557237.16
+     ],
+     [
+      201083.13,
+      557236.7
+     ],
+     [
+      201083.15,
+      557236.2
+     ],
+     [
+      201082.0,
+      557236.15
+     ],
+     [
+      201082.0,
+      557238.02
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-24": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557239.87
+     ],
+     [
+      201082.94,
+      557239.94
+     ],
+     [
+      201082.97,
+      557239.52
+     ],
+     [
+      201083.0,
+      557239.07
+     ],
+     [
+      201083.03,
+      557238.57
+     ],
+     [
+      201083.06,
+      557238.08
+     ],
+     [
+      201082.0,
+      557238.02
+     ],
+     [
+      201082.0,
+      557239.87
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-25": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557240.0
+     ],
+     [
+      201082.0,
+      557241.76
+     ],
+     [
+      201082.8,
+      557241.83
+     ],
+     [
+      201082.83,
+      557241.42
+     ],
+     [
+      201082.87,
+      557240.92
+     ],
+     [
+      201082.91,
+      557240.43
+     ],
+     [
+      201082.94,
+      557239.94
+     ],
+     [
+      201082.0,
+      557239.87
+     ],
+     [
+      201082.0,
+      557240.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-26": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557243.63
+     ],
+     [
+      201082.6,
+      557243.69
+     ],
+     [
+      201082.65,
+      557243.23
+     ],
+     [
+      201082.71,
+      557242.73
+     ],
+     [
+      201082.76,
+      557242.25
+     ],
+     [
+      201082.8,
+      557241.83
+     ],
+     [
+      201082.0,
+      557241.76
+     ],
+     [
+      201082.0,
+      557243.63
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-27": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.0,
+      557244.0
+     ],
+     [
+      201082.18,
+      557245.44
+     ],
+     [
+      201082.38,
+      557245.47
+     ],
+     [
+      201082.44,
+      557245.01
+     ],
+     [
+      201082.51,
+      557244.53
+     ],
+     [
+      201082.56,
+      557244.12
+     ],
+     [
+      201082.6,
+      557243.69
+     ],
+     [
+      201082.0,
+      557243.63
+     ],
+     [
+      201082.0,
+      557244.0
+     ]
+    ]
+   ]
+  },
+  "Z12-BED-W-28": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201082.31,
+      557245.97
+     ],
+     [
+      201082.38,
+      557245.47
+     ],
+     [
+      201082.18,
+      557245.44
+     ],
+     [
+      201082.28,
+      557246.21
+     ],
+     [
+      201082.31,
+      557245.97
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201100.79,
+      557181.75
+     ],
+     [
+      201100.63,
+      557182.21
+     ],
+     [
+      201100.51,
+      557182.55
+     ],
+     [
+      201103.15,
+      557183.48
+     ],
+     [
+      201103.26,
+      557183.16
+     ],
+     [
+      201103.43,
+      557182.71
+     ],
+     [
+      201103.6,
+      557182.24
+     ],
+     [
+      201103.77,
+      557181.77
+     ],
+     [
+      201101.14,
+      557180.81
+     ],
+     [
+      201100.97,
+      557181.28
+     ],
+     [
+      201100.79,
+      557181.75
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201100.19,
+      557183.47
+     ],
+     [
+      201100.03,
+      557183.94
+     ],
+     [
+      201099.9,
+      557184.31
+     ],
+     [
+      201102.55,
+      557185.22
+     ],
+     [
+      201102.67,
+      557184.85
+     ],
+     [
+      201102.84,
+      557184.38
+     ],
+     [
+      201103.0,
+      557183.91
+     ],
+     [
+      201103.15,
+      557183.48
+     ],
+     [
+      201100.51,
+      557182.55
+     ],
+     [
+      201100.35,
+      557183.0
+     ],
+     [
+      201100.19,
+      557183.47
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201099.59,
+      557185.21
+     ],
+     [
+      201099.44,
+      557185.68
+     ],
+     [
+      201099.32,
+      557186.05
+     ],
+     [
+      201101.98,
+      557186.93
+     ],
+     [
+      201102.1,
+      557186.56
+     ],
+     [
+      201102.25,
+      557186.09
+     ],
+     [
+      201102.4,
+      557185.65
+     ],
+     [
+      201102.55,
+      557185.22
+     ],
+     [
+      201099.9,
+      557184.31
+     ],
+     [
+      201099.74,
+      557184.76
+     ],
+     [
+      201099.59,
+      557185.21
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201099.01,
+      557186.98
+     ],
+     [
+      201098.87,
+      557187.42
+     ],
+     [
+      201098.76,
+      557187.78
+     ],
+     [
+      201101.43,
+      557188.62
+     ],
+     [
+      201101.54,
+      557188.26
+     ],
+     [
+      201101.67,
+      557187.84
+     ],
+     [
+      201101.82,
+      557187.4
+     ],
+     [
+      201101.98,
+      557186.93
+     ],
+     [
+      201099.32,
+      557186.05
+     ],
+     [
+      201099.16,
+      557186.52
+     ],
+     [
+      201099.01,
+      557186.98
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201098.46,
+      557188.74
+     ],
+     [
+      201098.31,
+      557189.2
+     ],
+     [
+      201098.21,
+      557189.54
+     ],
+     [
+      201100.89,
+      557190.35
+     ],
+     [
+      201100.99,
+      557190.02
+     ],
+     [
+      201101.13,
+      557189.57
+     ],
+     [
+      201101.28,
+      557189.1
+     ],
+     [
+      201101.43,
+      557188.62
+     ],
+     [
+      201098.76,
+      557187.78
+     ],
+     [
+      201098.61,
+      557188.26
+     ],
+     [
+      201098.46,
+      557188.74
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201097.94,
+      557190.48
+     ],
+     [
+      201097.79,
+      557190.96
+     ],
+     [
+      201097.69,
+      557191.33
+     ],
+     [
+      201100.37,
+      557192.11
+     ],
+     [
+      201100.48,
+      557191.75
+     ],
+     [
+      201100.62,
+      557191.27
+     ],
+     [
+      201100.76,
+      557190.79
+     ],
+     [
+      201100.89,
+      557190.35
+     ],
+     [
+      201098.21,
+      557189.54
+     ],
+     [
+      201098.08,
+      557190.0
+     ],
+     [
+      201097.94,
+      557190.48
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201097.43,
+      557192.24
+     ],
+     [
+      201097.3,
+      557192.72
+     ],
+     [
+      201097.19,
+      557193.09
+     ],
+     [
+      201099.89,
+      557193.84
+     ],
+     [
+      201099.99,
+      557193.47
+     ],
+     [
+      201100.13,
+      557192.98
+     ],
+     [
+      201100.25,
+      557192.55
+     ],
+     [
+      201100.37,
+      557192.11
+     ],
+     [
+      201097.69,
+      557191.33
+     ],
+     [
+      201097.56,
+      557191.78
+     ],
+     [
+      201097.43,
+      557192.24
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201096.94,
+      557194.03
+     ],
+     [
+      201096.82,
+      557194.48
+     ],
+     [
+      201096.72,
+      557194.85
+     ],
+     [
+      201099.43,
+      557195.55
+     ],
+     [
+      201099.53,
+      557195.18
+     ],
+     [
+      201099.64,
+      557194.75
+     ],
+     [
+      201099.76,
+      557194.32
+     ],
+     [
+      201099.89,
+      557193.84
+     ],
+     [
+      201097.19,
+      557193.09
+     ],
+     [
+      201097.06,
+      557193.57
+     ],
+     [
+      201096.94,
+      557194.03
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201096.47,
+      557195.82
+     ],
+     [
+      201096.35,
+      557196.28
+     ],
+     [
+      201096.27,
+      557196.63
+     ],
+     [
+      201098.99,
+      557197.3
+     ],
+     [
+      201099.07,
+      557196.96
+     ],
+     [
+      201099.19,
+      557196.52
+     ],
+     [
+      201099.31,
+      557196.03
+     ],
+     [
+      201099.43,
+      557195.55
+     ],
+     [
+      201096.72,
+      557194.85
+     ],
+     [
+      201096.6,
+      557195.33
+     ],
+     [
+      201096.47,
+      557195.82
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201096.04,
+      557197.59
+     ],
+     [
+      201095.92,
+      557198.08
+     ],
+     [
+      201095.83,
+      557198.44
+     ],
+     [
+      201098.56,
+      557199.09
+     ],
+     [
+      201098.65,
+      557198.73
+     ],
+     [
+      201098.76,
+      557198.24
+     ],
+     [
+      201098.88,
+      557197.76
+     ],
+     [
+      201098.99,
+      557197.3
+     ],
+     [
+      201096.27,
+      557196.63
+     ],
+     [
+      201096.16,
+      557197.1
+     ],
+     [
+      201096.04,
+      557197.59
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201095.62,
+      557199.37
+     ],
+     [
+      201095.51,
+      557199.86
+     ],
+     [
+      201095.43,
+      557200.23
+     ],
+     [
+      201098.16,
+      557200.84
+     ],
+     [
+      201098.25,
+      557200.47
+     ],
+     [
+      201098.35,
+      557199.98
+     ],
+     [
+      201098.46,
+      557199.53
+     ],
+     [
+      201098.56,
+      557199.09
+     ],
+     [
+      201095.83,
+      557198.44
+     ],
+     [
+      201095.73,
+      557198.9
+     ],
+     [
+      201095.62,
+      557199.37
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201095.22,
+      557201.17
+     ],
+     [
+      201095.13,
+      557201.62
+     ],
+     [
+      201095.05,
+      557202.0
+     ],
+     [
+      201097.8,
+      557202.55
+     ],
+     [
+      201097.88,
+      557202.17
+     ],
+     [
+      201097.96,
+      557201.75
+     ],
+     [
+      201098.05,
+      557201.32
+     ],
+     [
+      201098.16,
+      557200.84
+     ],
+     [
+      201095.43,
+      557200.23
+     ],
+     [
+      201095.32,
+      557200.72
+     ],
+     [
+      201095.22,
+      557201.17
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201094.86,
+      557202.98
+     ],
+     [
+      201094.76,
+      557203.45
+     ],
+     [
+      201094.75,
+      557203.5
+     ],
+     [
+      201097.61,
+      557203.5
+     ],
+     [
+      201097.7,
+      557203.04
+     ],
+     [
+      201097.8,
+      557202.55
+     ],
+     [
+      201095.05,
+      557202.0
+     ],
+     [
+      201094.96,
+      557202.49
+     ],
+     [
+      201094.86,
+      557202.98
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201100.95,
+      557180.75
+     ],
+     [
+      201100.78,
+      557181.22
+     ],
+     [
+      201100.61,
+      557181.68
+     ],
+     [
+      201100.44,
+      557182.14
+     ],
+     [
+      201100.28,
+      557182.58
+     ],
+     [
+      201100.47,
+      557182.64
+     ],
+     [
+      201100.63,
+      557182.21
+     ],
+     [
+      201100.79,
+      557181.75
+     ],
+     [
+      201100.97,
+      557181.28
+     ],
+     [
+      201101.14,
+      557180.81
+     ],
+     [
+      201100.95,
+      557180.75
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201100.28,
+      557182.58
+     ],
+     [
+      201100.13,
+      557183.03
+     ],
+     [
+      201099.97,
+      557183.5
+     ],
+     [
+      201099.8,
+      557183.98
+     ],
+     [
+      201099.64,
+      557184.43
+     ],
+     [
+      201099.83,
+      557184.5
+     ],
+     [
+      201099.99,
+      557184.04
+     ],
+     [
+      201100.15,
+      557183.57
+     ],
+     [
+      201100.32,
+      557183.1
+     ],
+     [
+      201100.47,
+      557182.64
+     ],
+     [
+      201100.28,
+      557182.58
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201099.64,
+      557184.43
+     ],
+     [
+      201099.49,
+      557184.89
+     ],
+     [
+      201099.34,
+      557185.35
+     ],
+     [
+      201099.18,
+      557185.82
+     ],
+     [
+      201099.03,
+      557186.29
+     ],
+     [
+      201099.22,
+      557186.35
+     ],
+     [
+      201099.37,
+      557185.88
+     ],
+     [
+      201099.53,
+      557185.41
+     ],
+     [
+      201099.68,
+      557184.95
+     ],
+     [
+      201099.83,
+      557184.5
+     ],
+     [
+      201099.64,
+      557184.43
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201099.03,
+      557186.29
+     ],
+     [
+      201098.87,
+      557186.75
+     ],
+     [
+      201098.73,
+      557187.2
+     ],
+     [
+      201098.59,
+      557187.66
+     ],
+     [
+      201098.44,
+      557188.13
+     ],
+     [
+      201098.63,
+      557188.19
+     ],
+     [
+      201098.78,
+      557187.72
+     ],
+     [
+      201098.92,
+      557187.26
+     ],
+     [
+      201099.06,
+      557186.81
+     ],
+     [
+      201099.22,
+      557186.35
+     ],
+     [
+      201099.03,
+      557186.29
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201098.44,
+      557188.13
+     ],
+     [
+      201098.29,
+      557188.61
+     ],
+     [
+      201098.14,
+      557189.07
+     ],
+     [
+      201098.01,
+      557189.52
+     ],
+     [
+      201097.88,
+      557189.97
+     ],
+     [
+      201098.07,
+      557190.03
+     ],
+     [
+      201098.2,
+      557189.58
+     ],
+     [
+      201098.34,
+      557189.13
+     ],
+     [
+      201098.48,
+      557188.67
+     ],
+     [
+      201098.63,
+      557188.19
+     ],
+     [
+      201098.44,
+      557188.13
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201097.88,
+      557189.97
+     ],
+     [
+      201097.73,
+      557190.45
+     ],
+     [
+      201097.59,
+      557190.93
+     ],
+     [
+      201097.46,
+      557191.4
+     ],
+     [
+      201097.33,
+      557191.85
+     ],
+     [
+      201097.52,
+      557191.9
+     ],
+     [
+      201097.65,
+      557191.46
+     ],
+     [
+      201097.79,
+      557190.99
+     ],
+     [
+      201097.93,
+      557190.51
+     ],
+     [
+      201098.07,
+      557190.03
+     ],
+     [
+      201097.88,
+      557189.97
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201097.33,
+      557191.85
+     ],
+     [
+      201097.2,
+      557192.32
+     ],
+     [
+      201097.07,
+      557192.8
+     ],
+     [
+      201096.93,
+      557193.28
+     ],
+     [
+      201096.81,
+      557193.74
+     ],
+     [
+      201097.0,
+      557193.79
+     ],
+     [
+      201097.13,
+      557193.33
+     ],
+     [
+      201097.26,
+      557192.85
+     ],
+     [
+      201097.39,
+      557192.37
+     ],
+     [
+      201097.52,
+      557191.9
+     ],
+     [
+      201097.33,
+      557191.85
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201096.81,
+      557193.74
+     ],
+     [
+      201096.68,
+      557194.19
+     ],
+     [
+      201096.56,
+      557194.66
+     ],
+     [
+      201096.44,
+      557195.15
+     ],
+     [
+      201096.32,
+      557195.62
+     ],
+     [
+      201096.51,
+      557195.67
+     ],
+     [
+      201096.63,
+      557195.2
+     ],
+     [
+      201096.76,
+      557194.71
+     ],
+     [
+      201096.88,
+      557194.25
+     ],
+     [
+      201097.0,
+      557193.79
+     ],
+     [
+      201096.81,
+      557193.74
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201096.32,
+      557195.62
+     ],
+     [
+      201096.2,
+      557196.09
+     ],
+     [
+      201096.08,
+      557196.55
+     ],
+     [
+      201095.97,
+      557197.02
+     ],
+     [
+      201095.85,
+      557197.5
+     ],
+     [
+      201096.05,
+      557197.54
+     ],
+     [
+      201096.16,
+      557197.07
+     ],
+     [
+      201096.28,
+      557196.6
+     ],
+     [
+      201096.39,
+      557196.14
+     ],
+     [
+      201096.51,
+      557195.67
+     ],
+     [
+      201096.32,
+      557195.62
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-10": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201095.85,
+      557197.5
+     ],
+     [
+      201095.74,
+      557197.98
+     ],
+     [
+      201095.62,
+      557198.46
+     ],
+     [
+      201095.52,
+      557198.92
+     ],
+     [
+      201095.41,
+      557199.38
+     ],
+     [
+      201095.61,
+      557199.43
+     ],
+     [
+      201095.71,
+      557198.96
+     ],
+     [
+      201095.82,
+      557198.51
+     ],
+     [
+      201095.93,
+      557198.03
+     ],
+     [
+      201096.05,
+      557197.54
+     ],
+     [
+      201095.85,
+      557197.5
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-11": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201095.41,
+      557199.38
+     ],
+     [
+      201095.31,
+      557199.87
+     ],
+     [
+      201095.2,
+      557200.36
+     ],
+     [
+      201095.09,
+      557200.83
+     ],
+     [
+      201095.0,
+      557201.28
+     ],
+     [
+      201095.19,
+      557201.32
+     ],
+     [
+      201095.29,
+      557200.87
+     ],
+     [
+      201095.39,
+      557200.4
+     ],
+     [
+      201095.5,
+      557199.92
+     ],
+     [
+      201095.61,
+      557199.43
+     ],
+     [
+      201095.41,
+      557199.38
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-12": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201095.0,
+      557201.28
+     ],
+     [
+      201094.9,
+      557201.75
+     ],
+     [
+      201094.8,
+      557202.24
+     ],
+     [
+      201094.7,
+      557202.73
+     ],
+     [
+      201094.61,
+      557203.2
+     ],
+     [
+      201094.81,
+      557203.23
+     ],
+     [
+      201094.9,
+      557202.77
+     ],
+     [
+      201095.0,
+      557202.27
+     ],
+     [
+      201095.1,
+      557201.78
+     ],
+     [
+      201095.19,
+      557201.32
+     ],
+     [
+      201095.0,
+      557201.28
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-13": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201094.61,
+      557203.2
+     ],
+     [
+      201094.52,
+      557203.66
+     ],
+     [
+      201094.43,
+      557204.14
+     ],
+     [
+      201094.34,
+      557204.63
+     ],
+     [
+      201094.25,
+      557205.11
+     ],
+     [
+      201094.45,
+      557205.15
+     ],
+     [
+      201094.54,
+      557204.66
+     ],
+     [
+      201094.63,
+      557204.17
+     ],
+     [
+      201094.72,
+      557203.7
+     ],
+     [
+      201094.81,
+      557203.23
+     ],
+     [
+      201094.61,
+      557203.2
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-14": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201094.25,
+      557205.11
+     ],
+     [
+      201094.17,
+      557205.59
+     ],
+     [
+      201094.09,
+      557206.04
+     ],
+     [
+      201094.01,
+      557206.52
+     ],
+     [
+      201093.93,
+      557207.0
+     ],
+     [
+      201094.13,
+      557207.03
+     ],
+     [
+      201094.21,
+      557206.55
+     ],
+     [
+      201094.28,
+      557206.08
+     ],
+     [
+      201094.36,
+      557205.62
+     ],
+     [
+      201094.45,
+      557205.15
+     ],
+     [
+      201094.25,
+      557205.11
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-15": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.93,
+      557207.0
+     ],
+     [
+      201093.85,
+      557207.49
+     ],
+     [
+      201093.77,
+      557207.97
+     ],
+     [
+      201093.7,
+      557208.43
+     ],
+     [
+      201093.63,
+      557208.9
+     ],
+     [
+      201093.83,
+      557208.93
+     ],
+     [
+      201093.9,
+      557208.46
+     ],
+     [
+      201093.97,
+      557208.0
+     ],
+     [
+      201094.05,
+      557207.53
+     ],
+     [
+      201094.13,
+      557207.03
+     ],
+     [
+      201093.93,
+      557207.0
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-16": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.63,
+      557208.9
+     ],
+     [
+      201093.56,
+      557209.39
+     ],
+     [
+      201093.49,
+      557209.89
+     ],
+     [
+      201093.43,
+      557210.37
+     ],
+     [
+      201093.36,
+      557210.83
+     ],
+     [
+      201093.56,
+      557210.86
+     ],
+     [
+      201093.62,
+      557210.4
+     ],
+     [
+      201093.69,
+      557209.92
+     ],
+     [
+      201093.76,
+      557209.42
+     ],
+     [
+      201093.83,
+      557208.93
+     ],
+     [
+      201093.63,
+      557208.9
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-17": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.36,
+      557210.83
+     ],
+     [
+      201093.3,
+      557211.31
+     ],
+     [
+      201093.24,
+      557211.81
+     ],
+     [
+      201093.18,
+      557212.3
+     ],
+     [
+      201093.12,
+      557212.77
+     ],
+     [
+      201093.32,
+      557212.8
+     ],
+     [
+      201093.38,
+      557212.33
+     ],
+     [
+      201093.44,
+      557211.83
+     ],
+     [
+      201093.5,
+      557211.34
+     ],
+     [
+      201093.56,
+      557210.86
+     ],
+     [
+      201093.36,
+      557210.83
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-18": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201093.12,
+      557212.77
+     ],
+     [
+      201093.07,
+      557213.22
+     ],
+     [
+      201093.02,
+      557213.7
+     ],
+     [
+      201092.97,
+      557214.2
+     ],
+     [
+      201092.92,
+      557214.69
+     ],
+     [
+      201093.12,
+      557214.71
+     ],
+     [
+      201093.17,
+      557214.22
+     ],
+     [
+      201093.22,
+      557213.72
+     ],
+     [
+      201093.27,
+      557213.25
+     ],
+     [
+      201093.32,
+      557212.8
+     ],
+     [
+      201093.12,
+      557212.77
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-19": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.92,
+      557214.69
+     ],
+     [
+      201092.87,
+      557215.17
+     ],
+     [
+      201092.83,
+      557215.64
+     ],
+     [
+      201092.79,
+      557216.12
+     ],
+     [
+      201092.74,
+      557216.61
+     ],
+     [
+      201092.94,
+      557216.63
+     ],
+     [
+      201092.98,
+      557216.14
+     ],
+     [
+      201093.03,
+      557215.66
+     ],
+     [
+      201093.07,
+      557215.19
+     ],
+     [
+      201093.12,
+      557214.71
+     ],
+     [
+      201092.92,
+      557214.69
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-20": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.74,
+      557216.61
+     ],
+     [
+      201092.7,
+      557217.11
+     ],
+     [
+      201092.66,
+      557217.59
+     ],
+     [
+      201092.63,
+      557218.05
+     ],
+     [
+      201092.6,
+      557218.51
+     ],
+     [
+      201092.8,
+      557218.53
+     ],
+     [
+      201092.83,
+      557218.06
+     ],
+     [
+      201092.86,
+      557217.61
+     ],
+     [
+      201092.9,
+      557217.13
+     ],
+     [
+      201092.94,
+      557216.63
+     ],
+     [
+      201092.74,
+      557216.61
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-21": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.6,
+      557218.51
+     ],
+     [
+      201092.57,
+      557219.01
+     ],
+     [
+      201092.54,
+      557219.51
+     ],
+     [
+      201092.51,
+      557220.0
+     ],
+     [
+      201092.49,
+      557220.46
+     ],
+     [
+      201092.69,
+      557220.47
+     ],
+     [
+      201092.71,
+      557220.01
+     ],
+     [
+      201092.74,
+      557219.52
+     ],
+     [
+      201092.77,
+      557219.03
+     ],
+     [
+      201092.8,
+      557218.53
+     ],
+     [
+      201092.6,
+      557218.51
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-22": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.49,
+      557220.46
+     ],
+     [
+      201092.46,
+      557220.94
+     ],
+     [
+      201092.44,
+      557221.44
+     ],
+     [
+      201092.42,
+      557221.94
+     ],
+     [
+      201092.4,
+      557222.42
+     ],
+     [
+      201092.6,
+      557222.43
+     ],
+     [
+      201092.62,
+      557221.95
+     ],
+     [
+      201092.64,
+      557221.45
+     ],
+     [
+      201092.66,
+      557220.95
+     ],
+     [
+      201092.69,
+      557220.47
+     ],
+     [
+      201092.49,
+      557220.46
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-23": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.4,
+      557222.42
+     ],
+     [
+      201092.38,
+      557222.9
+     ],
+     [
+      201092.36,
+      557223.39
+     ],
+     [
+      201092.35,
+      557223.89
+     ],
+     [
+      201092.33,
+      557224.38
+     ],
+     [
+      201092.53,
+      557224.39
+     ],
+     [
+      201092.55,
+      557223.9
+     ],
+     [
+      201092.56,
+      557223.4
+     ],
+     [
+      201092.58,
+      557222.91
+     ],
+     [
+      201092.6,
+      557222.43
+     ],
+     [
+      201092.4,
+      557222.42
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-24": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.33,
+      557224.38
+     ],
+     [
+      201092.32,
+      557224.87
+     ],
+     [
+      201092.3,
+      557225.35
+     ],
+     [
+      201092.29,
+      557225.84
+     ],
+     [
+      201092.28,
+      557226.33
+     ],
+     [
+      201092.48,
+      557226.34
+     ],
+     [
+      201092.49,
+      557225.84
+     ],
+     [
+      201092.5,
+      557225.36
+     ],
+     [
+      201092.52,
+      557224.88
+     ],
+     [
+      201092.53,
+      557224.39
+     ],
+     [
+      201092.33,
+      557224.38
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-25": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.28,
+      557226.33
+     ],
+     [
+      201092.27,
+      557226.83
+     ],
+     [
+      201092.26,
+      557227.33
+     ],
+     [
+      201092.26,
+      557227.82
+     ],
+     [
+      201092.25,
+      557228.31
+     ],
+     [
+      201092.45,
+      557228.31
+     ],
+     [
+      201092.46,
+      557227.82
+     ],
+     [
+      201092.46,
+      557227.33
+     ],
+     [
+      201092.47,
+      557226.83
+     ],
+     [
+      201092.48,
+      557226.34
+     ],
+     [
+      201092.28,
+      557226.33
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-26": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.25,
+      557228.31
+     ],
+     [
+      201092.24,
+      557228.81
+     ],
+     [
+      201092.23,
+      557229.31
+     ],
+     [
+      201092.22,
+      557229.81
+     ],
+     [
+      201092.21,
+      557230.31
+     ],
+     [
+      201092.41,
+      557230.31
+     ],
+     [
+      201092.42,
+      557229.81
+     ],
+     [
+      201092.43,
+      557229.31
+     ],
+     [
+      201092.44,
+      557228.81
+     ],
+     [
+      201092.45,
+      557228.31
+     ],
+     [
+      201092.25,
+      557228.31
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-27": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.21,
+      557230.31
+     ],
+     [
+      201092.2,
+      557230.81
+     ],
+     [
+      201092.19,
+      557231.31
+     ],
+     [
+      201092.18,
+      557231.81
+     ],
+     [
+      201092.17,
+      557232.31
+     ],
+     [
+      201092.37,
+      557232.32
+     ],
+     [
+      201092.38,
+      557231.82
+     ],
+     [
+      201092.39,
+      557231.32
+     ],
+     [
+      201092.4,
+      557230.82
+     ],
+     [
+      201092.41,
+      557230.31
+     ],
+     [
+      201092.21,
+      557230.31
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-28": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.17,
+      557232.31
+     ],
+     [
+      201092.16,
+      557232.83
+     ],
+     [
+      201092.15,
+      557233.33
+     ],
+     [
+      201092.13,
+      557233.83
+     ],
+     [
+      201092.12,
+      557234.32
+     ],
+     [
+      201092.32,
+      557234.33
+     ],
+     [
+      201092.33,
+      557233.84
+     ],
+     [
+      201092.35,
+      557233.34
+     ],
+     [
+      201092.36,
+      557232.83
+     ],
+     [
+      201092.37,
+      557232.32
+     ],
+     [
+      201092.17,
+      557232.31
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-29": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.12,
+      557234.32
+     ],
+     [
+      201092.1,
+      557234.83
+     ],
+     [
+      201092.09,
+      557235.35
+     ],
+     [
+      201092.07,
+      557235.86
+     ],
+     [
+      201092.05,
+      557236.36
+     ],
+     [
+      201092.25,
+      557236.36
+     ],
+     [
+      201092.27,
+      557235.87
+     ],
+     [
+      201092.29,
+      557235.36
+     ],
+     [
+      201092.3,
+      557234.84
+     ],
+     [
+      201092.32,
+      557234.33
+     ],
+     [
+      201092.12,
+      557234.32
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-30": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201092.05,
+      557236.36
+     ],
+     [
+      201092.03,
+      557236.85
+     ],
+     [
+      201092.01,
+      557237.37
+     ],
+     [
+      201091.98,
+      557237.9
+     ],
+     [
+      201091.95,
+      557238.4
+     ],
+     [
+      201092.15,
+      557238.41
+     ],
+     [
+      201092.18,
+      557237.91
+     ],
+     [
+      201092.21,
+      557237.38
+     ],
+     [
+      201092.23,
+      557236.86
+     ],
+     [
+      201092.25,
+      557236.36
+     ],
+     [
+      201092.05,
+      557236.36
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-31": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.95,
+      557238.4
+     ],
+     [
+      201091.92,
+      557238.9
+     ],
+     [
+      201091.9,
+      557239.4
+     ],
+     [
+      201091.87,
+      557239.92
+     ],
+     [
+      201091.83,
+      557240.44
+     ],
+     [
+      201092.03,
+      557240.46
+     ],
+     [
+      201092.07,
+      557239.93
+     ],
+     [
+      201092.1,
+      557239.41
+     ],
+     [
+      201092.12,
+      557238.91
+     ],
+     [
+      201092.15,
+      557238.41
+     ],
+     [
+      201091.95,
+      557238.4
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-32": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.83,
+      557240.44
+     ],
+     [
+      201091.79,
+      557240.96
+     ],
+     [
+      201091.75,
+      557241.46
+     ],
+     [
+      201091.71,
+      557241.96
+     ],
+     [
+      201091.67,
+      557242.47
+     ],
+     [
+      201091.87,
+      557242.49
+     ],
+     [
+      201091.91,
+      557241.97
+     ],
+     [
+      201091.95,
+      557241.47
+     ],
+     [
+      201091.99,
+      557240.97
+     ],
+     [
+      201092.03,
+      557240.46
+     ],
+     [
+      201091.83,
+      557240.44
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-33": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.67,
+      557242.47
+     ],
+     [
+      201091.62,
+      557243.02
+     ],
+     [
+      201091.57,
+      557243.54
+     ],
+     [
+      201091.52,
+      557244.04
+     ],
+     [
+      201091.47,
+      557244.52
+     ],
+     [
+      201091.66,
+      557244.54
+     ],
+     [
+      201091.72,
+      557244.06
+     ],
+     [
+      201091.77,
+      557243.56
+     ],
+     [
+      201091.82,
+      557243.04
+     ],
+     [
+      201091.87,
+      557242.49
+     ],
+     [
+      201091.67,
+      557242.47
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-34": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.47,
+      557244.52
+     ],
+     [
+      201091.41,
+      557245.05
+     ],
+     [
+      201091.34,
+      557245.6
+     ],
+     [
+      201091.27,
+      557246.12
+     ],
+     [
+      201091.2,
+      557246.61
+     ],
+     [
+      201091.4,
+      557246.64
+     ],
+     [
+      201091.47,
+      557246.15
+     ],
+     [
+      201091.54,
+      557245.63
+     ],
+     [
+      201091.61,
+      557245.08
+     ],
+     [
+      201091.66,
+      557244.54
+     ],
+     [
+      201091.47,
+      557244.52
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-35": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201091.2,
+      557246.61
+     ],
+     [
+      201091.14,
+      557247.11
+     ],
+     [
+      201091.06,
+      557247.64
+     ],
+     [
+      201090.97,
+      557248.21
+     ],
+     [
+      201090.88,
+      557248.72
+     ],
+     [
+      201091.07,
+      557248.76
+     ],
+     [
+      201091.17,
+      557248.24
+     ],
+     [
+      201091.26,
+      557247.67
+     ],
+     [
+      201091.33,
+      557247.13
+     ],
+     [
+      201091.4,
+      557246.64
+     ],
+     [
+      201091.2,
+      557246.61
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-36": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.88,
+      557248.72
+     ],
+     [
+      201090.79,
+      557249.21
+     ],
+     [
+      201090.7,
+      557249.71
+     ],
+     [
+      201090.6,
+      557250.24
+     ],
+     [
+      201090.49,
+      557250.8
+     ],
+     [
+      201090.68,
+      557250.84
+     ],
+     [
+      201090.8,
+      557250.28
+     ],
+     [
+      201090.9,
+      557249.74
+     ],
+     [
+      201090.99,
+      557249.25
+     ],
+     [
+      201091.07,
+      557248.76
+     ],
+     [
+      201090.88,
+      557248.72
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-37": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.49,
+      557250.8
+     ],
+     [
+      201090.37,
+      557251.32
+     ],
+     [
+      201090.26,
+      557251.81
+     ],
+     [
+      201090.15,
+      557252.29
+     ],
+     [
+      201090.03,
+      557252.83
+     ],
+     [
+      201090.22,
+      557252.87
+     ],
+     [
+      201090.34,
+      557252.34
+     ],
+     [
+      201090.46,
+      557251.85
+     ],
+     [
+      201090.57,
+      557251.36
+     ],
+     [
+      201090.68,
+      557250.84
+     ],
+     [
+      201090.49,
+      557250.8
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.35,
+      557252.33
+     ],
+     [
+      201090.22,
+      557252.87
+     ],
+     [
+      201090.11,
+      557253.33
+     ],
+     [
+      201091.36,
+      557253.67
+     ],
+     [
+      201091.49,
+      557253.18
+     ],
+     [
+      201091.61,
+      557252.62
+     ],
+     [
+      201091.72,
+      557252.13
+     ],
+     [
+      201091.75,
+      557252.0
+     ],
+     [
+      201090.42,
+      557252.0
+     ],
+     [
+      201090.35,
+      557252.33
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.95,
+      557253.88
+     ],
+     [
+      201089.82,
+      557254.36
+     ],
+     [
+      201089.68,
+      557254.84
+     ],
+     [
+      201089.56,
+      557255.24
+     ],
+     [
+      201090.81,
+      557255.61
+     ],
+     [
+      201090.93,
+      557255.2
+     ],
+     [
+      201091.07,
+      557254.71
+     ],
+     [
+      201091.2,
+      557254.23
+     ],
+     [
+      201091.36,
+      557253.67
+     ],
+     [
+      201090.11,
+      557253.33
+     ],
+     [
+      201089.95,
+      557253.88
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.39,
+      557255.83
+     ],
+     [
+      201089.19,
+      557256.4
+     ],
+     [
+      201089.02,
+      557256.87
+     ],
+     [
+      201088.89,
+      557257.24
+     ],
+     [
+      201090.11,
+      557257.68
+     ],
+     [
+      201090.25,
+      557257.3
+     ],
+     [
+      201090.41,
+      557256.83
+     ],
+     [
+      201090.62,
+      557256.24
+     ],
+     [
+      201090.81,
+      557255.61
+     ],
+     [
+      201089.56,
+      557255.24
+     ],
+     [
+      201089.39,
+      557255.83
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.72,
+      557257.71
+     ],
+     [
+      201088.51,
+      557258.3
+     ],
+     [
+      201088.26,
+      557258.88
+     ],
+     [
+      201088.1,
+      557259.24
+     ],
+     [
+      201089.3,
+      557259.76
+     ],
+     [
+      201089.45,
+      557259.4
+     ],
+     [
+      201089.72,
+      557258.78
+     ],
+     [
+      201089.95,
+      557258.15
+     ],
+     [
+      201090.11,
+      557257.68
+     ],
+     [
+      201088.89,
+      557257.24
+     ],
+     [
+      201088.72,
+      557257.71
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.9,
+      557259.7
+     ],
+     [
+      201087.71,
+      557260.16
+     ],
+     [
+      201087.46,
+      557260.71
+     ],
+     [
+      201087.24,
+      557261.16
+     ],
+     [
+      201088.41,
+      557261.74
+     ],
+     [
+      201088.64,
+      557261.26
+     ],
+     [
+      201088.9,
+      557260.68
+     ],
+     [
+      201089.1,
+      557260.22
+     ],
+     [
+      201089.3,
+      557259.76
+     ],
+     [
+      201088.1,
+      557259.24
+     ],
+     [
+      201087.9,
+      557259.7
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.99,
+      557261.64
+     ],
+     [
+      201086.77,
+      557262.08
+     ],
+     [
+      201086.54,
+      557262.53
+     ],
+     [
+      201086.33,
+      557262.93
+     ],
+     [
+      201087.48,
+      557263.54
+     ],
+     [
+      201087.69,
+      557263.13
+     ],
+     [
+      201087.92,
+      557262.68
+     ],
+     [
+      201088.15,
+      557262.24
+     ],
+     [
+      201088.41,
+      557261.74
+     ],
+     [
+      201087.24,
+      557261.16
+     ],
+     [
+      201086.99,
+      557261.64
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.03,
+      557263.47
+     ],
+     [
+      201085.74,
+      557263.96
+     ],
+     [
+      201085.48,
+      557264.39
+     ],
+     [
+      201085.28,
+      557264.73
+     ],
+     [
+      201086.39,
+      557265.4
+     ],
+     [
+      201086.59,
+      557265.06
+     ],
+     [
+      201086.85,
+      557264.63
+     ],
+     [
+      201087.16,
+      557264.12
+     ],
+     [
+      201087.48,
+      557263.54
+     ],
+     [
+      201086.33,
+      557262.93
+     ],
+     [
+      201086.03,
+      557263.47
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.0,
+      557265.18
+     ],
+     [
+      201084.68,
+      557265.69
+     ],
+     [
+      201084.36,
+      557266.17
+     ],
+     [
+      201084.13,
+      557266.5
+     ],
+     [
+      201085.21,
+      557267.23
+     ],
+     [
+      201085.43,
+      557266.91
+     ],
+     [
+      201085.77,
+      557266.4
+     ],
+     [
+      201086.11,
+      557265.86
+     ],
+     [
+      201086.39,
+      557265.4
+     ],
+     [
+      201085.28,
+      557264.73
+     ],
+     [
+      201085.0,
+      557265.18
+     ]
+    ]
+   ]
+  },
+  "Z12-SIDEWALK-E-UP-09": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201083.85,
+      557266.91
+     ],
+     [
+      201083.56,
+      557267.33
+     ],
+     [
+      201083.22,
+      557267.83
+     ],
+     [
+      201082.93,
+      557268.21
+     ],
+     [
+      201083.96,
+      557269.0
+     ],
+     [
+      201084.27,
+      557268.6
+     ],
+     [
+      201084.63,
+      557268.07
+     ],
+     [
+      201084.92,
+      557267.65
+     ],
+     [
+      201085.21,
+      557267.23
+     ],
+     [
+      201084.13,
+      557266.5
+     ],
+     [
+      201083.85,
+      557266.91
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-01": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201090.03,
+      557252.83
+     ],
+     [
+      201089.88,
+      557253.4
+     ],
+     [
+      201089.73,
+      557253.92
+     ],
+     [
+      201089.59,
+      557254.4
+     ],
+     [
+      201089.47,
+      557254.83
+     ],
+     [
+      201089.67,
+      557254.89
+     ],
+     [
+      201089.79,
+      557254.46
+     ],
+     [
+      201089.92,
+      557253.98
+     ],
+     [
+      201090.07,
+      557253.45
+     ],
+     [
+      201090.22,
+      557252.87
+     ],
+     [
+      201090.03,
+      557252.83
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-02": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201089.47,
+      557254.83
+     ],
+     [
+      201089.32,
+      557255.37
+     ],
+     [
+      201089.13,
+      557255.95
+     ],
+     [
+      201088.95,
+      557256.47
+     ],
+     [
+      201088.8,
+      557256.89
+     ],
+     [
+      201088.99,
+      557256.96
+     ],
+     [
+      201089.14,
+      557256.54
+     ],
+     [
+      201089.32,
+      557256.01
+     ],
+     [
+      201089.51,
+      557255.42
+     ],
+     [
+      201089.67,
+      557254.89
+     ],
+     [
+      201089.47,
+      557254.83
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-03": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.8,
+      557256.89
+     ],
+     [
+      201088.63,
+      557257.37
+     ],
+     [
+      201088.45,
+      557257.88
+     ],
+     [
+      201088.22,
+      557258.46
+     ],
+     [
+      201088.02,
+      557258.94
+     ],
+     [
+      201088.2,
+      557259.02
+     ],
+     [
+      201088.41,
+      557258.54
+     ],
+     [
+      201088.64,
+      557257.95
+     ],
+     [
+      201088.82,
+      557257.43
+     ],
+     [
+      201088.99,
+      557256.96
+     ],
+     [
+      201088.8,
+      557256.89
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-04": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201088.02,
+      557258.94
+     ],
+     [
+      201087.82,
+      557259.39
+     ],
+     [
+      201087.62,
+      557259.85
+     ],
+     [
+      201087.41,
+      557260.35
+     ],
+     [
+      201087.18,
+      557260.85
+     ],
+     [
+      201087.36,
+      557260.94
+     ],
+     [
+      201087.59,
+      557260.43
+     ],
+     [
+      201087.8,
+      557259.93
+     ],
+     [
+      201088.0,
+      557259.47
+     ],
+     [
+      201088.2,
+      557259.02
+     ],
+     [
+      201088.02,
+      557258.94
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-05": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201087.18,
+      557260.85
+     ],
+     [
+      201086.91,
+      557261.37
+     ],
+     [
+      201086.68,
+      557261.82
+     ],
+     [
+      201086.45,
+      557262.26
+     ],
+     [
+      201086.24,
+      557262.67
+     ],
+     [
+      201086.41,
+      557262.77
+     ],
+     [
+      201086.63,
+      557262.35
+     ],
+     [
+      201086.86,
+      557261.91
+     ],
+     [
+      201087.09,
+      557261.46
+     ],
+     [
+      201087.36,
+      557260.94
+     ],
+     [
+      201087.18,
+      557260.85
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-06": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201086.24,
+      557262.67
+     ],
+     [
+      201085.95,
+      557263.21
+     ],
+     [
+      201085.64,
+      557263.73
+     ],
+     [
+      201085.39,
+      557264.16
+     ],
+     [
+      201085.16,
+      557264.54
+     ],
+     [
+      201085.33,
+      557264.64
+     ],
+     [
+      201085.56,
+      557264.26
+     ],
+     [
+      201085.81,
+      557263.83
+     ],
+     [
+      201086.12,
+      557263.31
+     ],
+     [
+      201086.41,
+      557262.77
+     ],
+     [
+      201086.24,
+      557262.67
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-07": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201085.16,
+      557264.54
+     ],
+     [
+      201084.89,
+      557264.97
+     ],
+     [
+      201084.58,
+      557265.49
+     ],
+     [
+      201084.25,
+      557265.98
+     ],
+     [
+      201084.0,
+      557266.35
+     ],
+     [
+      201084.16,
+      557266.46
+     ],
+     [
+      201084.41,
+      557266.09
+     ],
+     [
+      201084.75,
+      557265.59
+     ],
+     [
+      201085.07,
+      557265.08
+     ],
+     [
+      201085.33,
+      557264.64
+     ],
+     [
+      201085.16,
+      557264.54
+     ]
+    ]
+   ]
+  },
+  "Z12-KERB-E-UP-08": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      201084.0,
+      557266.35
+     ],
+     [
+      201083.71,
+      557266.76
+     ],
+     [
+      201083.43,
+      557267.17
+     ],
+     [
+      201083.09,
+      557267.67
+     ],
+     [
+      201082.77,
+      557268.09
+     ],
+     [
+      201082.93,
+      557268.21
+     ],
+     [
+      201083.25,
+      557267.78
+     ],
+     [
+      201083.6,
+      557267.29
+     ],
+     [
+      201083.88,
+      557266.87
+     ],
+     [
+      201084.16,
+      557266.46
+     ],
+     [
+      201084.0,
+      557266.35
+     ]
+    ]
+   ]
+  }
+ }
+}

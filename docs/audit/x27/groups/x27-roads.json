@@ -1,0 +1,323 @@
+{
+ "id": "X27-ROADS",
+ "comment": "X27·X29·X34 한림관 정문 계단·문, 로비 안 계단, 은주1관 곡선 돌계단 길(시험용 DB 만)",
+ "ops": [
+  {
+   "ref": "계단 머리 노드 c42974a5 → 새 계단 머리(127.2)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "c42974a5-8c9e-405c-93ae-272aebb6eb34",
+    "to": {
+     "xy": [
+      201110.44,
+      557277.25
+     ],
+     "z": 127.2
+    }
+   },
+   "grade": "확정(정문 계단·회전문: 사용자·사진), 항공사진(자리·방향 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front"
+  },
+  {
+   "ref": "문 노드 b2fd2d5e → 동쪽 회전문(유리 면)",
+   "op": "move_node",
+   "args": {
+    "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620",
+    "to": {
+     "xy": [
+      201111.66,
+      557280.34
+     ],
+     "z": 127.2
+    }
+   },
+   "grade": "확정(정문 계단·회전문: 사용자·사진), 항공사진(자리·방향 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front, 사진 20(회전문 둘)"
+  },
+  {
+   "ref": "정문 계단 길: 굽이 노드 → 계단 발치 → 머리, 이름",
+   "op": "update_road",
+   "grade": "확정(정문 계단·회전문: 사용자·사진), 항공사진(자리·방향 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front",
+   "args": {
+    "id": "33523839-9534-4c39-98ea-27ce6e67c607",
+    "expectedRevision": 3,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "name": "한림관 정문 계단 (15단, 125.1 → 127.2 m, 짙은 화강석 폭 10.5 m. 방위 32.7도로 오름: 사용자 항공사진)",
+     "widthM": 10.0
+    },
+    "vertexOps": [
+     {
+      "op": "insert",
+      "index": 0,
+      "point": {
+       "xy": [
+        201107.07,
+        557271.99
+       ],
+       "z": 125.1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "ref": "참 → 문 길 이름",
+   "op": "update_road",
+   "grade": "확정(정문 계단·회전문: 사용자·사진), 항공사진(자리·방향 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front",
+   "args": {
+    "id": "c51fa3bc-8e9a-43e1-b369-9054299d32b6",
+    "expectedRevision": 4,
+    "zMode": "explicit",
+    "densify": false,
+    "attrs": {
+     "name": "한림관 정문 계단 위 참 → 동쪽 회전문 (127.2 m, 참 깊이 3.2 m)"
+    }
+   }
+  },
+  {
+   "ref": "장소 한림관 입구 → 동쪽 회전문",
+   "op": "update_place",
+   "args": {
+    "id": "ca81f03f-2aca-45b2-9b25-2917229aae35",
+    "expectedRevision": 1,
+    "position": {
+     "xy": [
+      201111.66,
+      557280.34
+     ],
+     "z": 127.2
+    },
+    "description": "한림관 정문(회전문 둘). 자리는 사용자 항공사진(2026-10-22). 학교 표지 자리(201105.7, 557280.5)는 참 서쪽 끝"
+   },
+   "grade": "확정(정문 계단·회전문: 사용자·사진), 항공사진(자리·방향 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front"
+  },
+  {
+   "ref": "로비: 동쪽 회전문 → 부채꼴 계단 발치",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "한림관",
+    "name": "한림관 1층 로비: 정문 회전문 → 부채꼴 계단 발치 (127.2 m)",
+    "structure": "indoor_corridor",
+    "widthM": 2.0,
+    "path": [
+     {
+      "at": {
+       "nodeId": "b2fd2d5e-fa06-46ab-ba72-b0ef7507f620"
+      }
+     },
+     {
+      "xy": [
+       201111.27,
+       557281.96
+      ],
+      "z": 127.2
+     }
+    ]
+   },
+   "grade": "사진 22(회전문 안 부채꼴 계단 5~6단), 추정(6단·높이 128.1·선). 1층은 한 층(사용자 2026-10-22)",
+   "evidence": "사진 22"
+  },
+  {
+   "ref": "로비 부채꼴 계단 6단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "한림관",
+    "name": "한림관 1층 로비 부채꼴 계단 (6단 추정, 127.2 → 128.1 m, 1층 안)",
+    "structure": "stairs",
+    "widthM": 4.0,
+    "path": [
+     {
+      "xy": [
+       201111.27,
+       557281.96
+      ],
+      "z": 127.2
+     },
+     {
+      "xy": [
+       201112.27,
+       557283.52
+      ],
+      "z": 128.1
+     }
+    ]
+   },
+   "grade": "사진 22(회전문 안 부채꼴 계단 5~6단), 추정(6단·높이 128.1·선). 1층은 한 층(사용자 2026-10-22)",
+   "evidence": "사진 22"
+  },
+  {
+   "ref": "안쪽 로비",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "buildingId": "한림관",
+    "name": "한림관 1층 안쪽 로비 (128.1 m 추정)",
+    "structure": "indoor_corridor",
+    "widthM": 3.0,
+    "path": [
+     {
+      "xy": [
+       201112.27,
+       557283.52
+      ],
+      "z": 128.1
+     },
+     {
+      "xy": [
+       201112.7,
+       557284.19
+      ],
+      "z": 128.1
+     }
+    ]
+   },
+   "grade": "사진 22(회전문 안 부채꼴 계단 5~6단), 추정(6단·높이 128.1·선). 1층은 한 층(사용자 2026-10-22)",
+   "evidence": "사진 22"
+  },
+  {
+   "ref": "굽이(위쪽 갈래) → 곡선 계단 발치",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "위쪽 갈래 굽이 → 은주1관 곡선 돌계단 발치 (125.2 m, 사용자 지정 길)",
+    "structure": "ordinary",
+    "widthM": 2.4,
+    "path": [
+     {
+      "at": {
+       "roadId": "6c877e98-dd45-4271-8365-0aa90e568d39",
+       "nearest": [
+        201107.7,
+        557268.0
+       ]
+      }
+     },
+     {
+      "xy": [
+       201112.3,
+       557268.0
+      ],
+      "z": 125.2
+     }
+    ]
+   },
+   "grade": "확정(굽이 → 곡선 계단 → 은주1관 입구(1): 사용자 화살표 ✓), 항공사진·사진(자리 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사진 은주관-곡선계단-차단기·은주관-횡단보도에서-화살표(사용자 화살표), 사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front"
+  },
+  {
+   "ref": "은주1관 곡선 돌계단",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 곡선 돌계단 (41단 추정, 125.2 → 131.3 m: 아래 3단·작은 참·긴 한 줄·위 참, 사용자 지정 길)",
+    "structure": "stairs",
+    "widthM": 2.4,
+    "path": [
+     {
+      "xy": [
+       201112.3,
+       557268.0
+      ],
+      "z": 125.2
+     },
+     {
+      "xy": [
+       201113.2,
+       557264.9
+      ],
+      "z": 126.87
+     },
+     {
+      "xy": [
+       201114.0,
+       557261.0
+      ],
+      "z": 129.58
+     },
+     {
+      "xy": [
+       201115.0,
+       557258.4
+      ],
+      "z": 131.2
+     },
+     {
+      "xy": [
+       201115.74,
+       557257.53
+      ],
+      "z": 131.3
+     }
+    ]
+   },
+   "grade": "확정(굽이 → 곡선 계단 → 은주1관 입구(1): 사용자 화살표 ✓), 항공사진·사진(자리 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사진 은주관-곡선계단-차단기·은주관-횡단보도에서-화살표(사용자 화살표), 사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front"
+  },
+  {
+   "ref": "테라스 → 은주1관 입구(1)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "zMode": "explicit",
+    "densify": false,
+    "name": "은주1관 반원 테라스 → 입구(1) 아치 문 (131.3 m, 사용자 지정 길)",
+    "structure": "ordinary",
+    "widthM": 3.0,
+    "path": [
+     {
+      "xy": [
+       201115.74,
+       557257.53
+      ],
+      "z": 131.3
+     },
+     {
+      "xy": [
+       201118.6,
+       557253.6
+      ],
+      "z": 131.3
+     },
+     {
+      "xy": [
+       201120.8,
+       557252.7
+      ],
+      "z": 131.3
+     }
+    ]
+   },
+   "grade": "확정(굽이 → 곡선 계단 → 은주1관 입구(1): 사용자 화살표 ✓), 항공사진·사진(자리 ±1.5 m), 추정(단 수·높이 나눔)",
+   "evidence": "사진 은주관-곡선계단-차단기·은주관-횡단보도에서-화살표(사용자 화살표), 사용자 항공사진 항공-한림관정문-은주1관.webp(땅 위 표시 셋으로 맞춤 ±1.5 m, docs/audit/x27/aerial-georef.json), 구조물 x27-hanlim-front"
+  }
+ ]
+}

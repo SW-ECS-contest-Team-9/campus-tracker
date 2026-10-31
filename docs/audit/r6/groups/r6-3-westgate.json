@@ -1,0 +1,282 @@
+{
+ "id": "R6-3-WESTGATE",
+ "comment": "R6 F3: 서문 앞 길가 → 얼룩말 → 왼쪽 날개벽 뒤 철 계단(추정) → 문 위 단 → 서문 위 화단 비탈 → 북악관 북서 모서리. 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "F3 서쪽 보도 끝 → 서문 앞 얼룩말 동쪽 끝(차도 가)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "ordinary",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 2.0,
+    "name": "서문 앞 길가: 서쪽 공도 캠퍼스 쪽 보도 끝 ~ 서문 앞 횡단보도 (차도 가, 선 추정, 현장 확인 전)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "xy": [
+       200983.6,
+       557393.9
+      ],
+      "z": 116.61
+     },
+     {
+      "xy": [
+       200979.0,
+       557404.5
+      ],
+      "z": 118.07
+     }
+    ]
+   },
+   "grade": "추정(선)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑪·F3"
+  },
+  {
+   "ref": "F3 서문 앞 얼룩말",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "crossing",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 3.0,
+    "name": "서문 앞 횡단보도 (얼룩말 칠: S-MAP 정사·거리뷰 34 확정, 건너는 선 추정)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "xy": [
+       200979.0,
+       557404.5
+      ],
+      "z": 118.07
+     },
+     {
+      "xy": [
+       200969.5,
+       557405.5
+      ],
+      "z": 118.39
+     }
+    ]
+   },
+   "grade": "확정(칠), 추정(선)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑪·F3"
+  },
+  {
+   "ref": "F3 얼룩말 서쪽 끝 → 철 계단 발치",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "ordinary",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 1.5,
+    "name": "서문 왼쪽 날개벽 앞 ~ 철 계단 발치 (차도 가, 선 추정, 현장 확인 전)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "xy": [
+       200969.5,
+       557405.5
+      ],
+      "z": 118.39
+     },
+     {
+      "xy": [
+       200965.05,
+       557407.06
+      ],
+      "z": 118.69
+     },
+     {
+      "xy": [
+       200964.88,
+       557407.63
+      ],
+      "z": 118.77
+     }
+    ]
+   },
+   "grade": "추정",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑩·F3"
+  },
+  {
+   "ref": "F3 철 계단 118.77 → 126.8 (46 단)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "stairs",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 1.0,
+    "name": "서문 왼쪽 날개벽 뒤 철 계단 (문 앞 118.77 → 문 위 단 126.8 m, 46단. 있음: 거리뷰 색인 34·네이버 길 선·S-MAP 산책로 점선. 철 계단 자리·단 수 추정, 현장 확인 전)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "xy": [
+       200964.88,
+       557407.63
+      ],
+      "z": 118.77
+     },
+     {
+      "xy": [
+       200960.23,
+       557422.52
+      ],
+      "z": 126.8
+     }
+    ]
+   },
+   "grade": "있음 확정(거리뷰 색인 34·W01 노트·네이버 길 선·S-MAP 산책로 점선), 추정(철 계단 자리·단 수, 산책로 선 ±3 m)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑩·F3, 구역 노트 서문과 서쪽 옹벽 2026-10-25 R6 절"
+  },
+  {
+   "ref": "F3 문 위 단 → 서문 위 화단 비탈 → 북악관 북서 모서리(7895ac0d)",
+   "op": "create_road",
+   "args": {
+    "roadClass": "pedestrian",
+    "structure": "ordinary",
+    "pedestrianAccess": "allowed",
+    "vehicleAccess": "prohibited",
+    "widthM": 2.0,
+    "name": "뒤 산책로 서쪽 끝(\"삼양로15길\"): 서문 위 단 ~ 서문 위 화단 비탈 ~ 북악관 북서 모서리 (126.8 → 132.8 m. 있음: 네이버 지도 길 선·S-MAP 산책로 점선, 선 ±3 m 추정, 현장 확인 전)",
+    "zMode": "explicit",
+    "densify": false,
+    "path": [
+     {
+      "xy": [
+       200960.23,
+       557422.52
+      ],
+      "z": 126.8
+     },
+     {
+      "xy": [
+       200961.3,
+       557424.12
+      ],
+      "z": 126.8
+     },
+     {
+      "xy": [
+       200972.0,
+       557421.0
+      ],
+      "z": 126.8
+     },
+     {
+      "xy": [
+       200983.0,
+       557418.0
+      ],
+      "z": 126.8
+     },
+     {
+      "xy": [
+       200991.5,
+       557421.2
+      ],
+      "z": 129.08
+     },
+     {
+      "xy": [
+       200999.6,
+       557423.6
+      ],
+      "z": 131.53
+     },
+     {
+      "xy": [
+       201008.3,
+       557423.6
+      ],
+      "z": 132.0
+     },
+     {
+      "xy": [
+       201016.9,
+       557423.6
+      ],
+      "z": 132.0
+     },
+     {
+      "at": {
+       "nodeId": "7895ac0d-084b-467f-a57d-75a35e02c435"
+      }
+     }
+    ]
+   },
+   "grade": "있음 확정(거리뷰 색인 34·W01 노트·네이버 길 선·S-MAP 산책로 점선), 추정(철 계단 자리·단 수, 산책로 선 ±3 m)",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑨·F3"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 n02-plaza(토큰은 메모리에만, 30분)",
+  "batch": "8c7f306f-2750-4b8a-b424-2806b85a502f",
+  "changeSets": {
+   "F3 서쪽 보도 끝 → 서문 앞 얼룩말 동쪽 끝(차도 가)": {
+    "changeSetId": "f12d1603-6281-4529-a905-ee3f95b189fd",
+    "roads": [
+     {
+      "id": "ff1f737d-e8b3-4496-b574-7e1be6dee0fb",
+      "from": "e8d9b53a-8027-4a79-85c2-6636bf22668b",
+      "to": "b2e0c426-4a33-47ec-a9f1-813da905bd30",
+      "lengthM": 11.56
+     }
+    ]
+   },
+   "F3 서문 앞 얼룩말": {
+    "changeSetId": "95d1912c-ad8f-4eed-ae2d-5946310a88f9",
+    "roads": [
+     {
+      "id": "a5c7513a-f5ed-42d3-ab39-8b1285ff9caf",
+      "from": "b2e0c426-4a33-47ec-a9f1-813da905bd30",
+      "to": "a739b718-7c77-4e24-b421-ca04d761b901",
+      "lengthM": 9.55
+     }
+    ]
+   },
+   "F3 얼룩말 서쪽 끝 → 철 계단 발치": {
+    "changeSetId": "e39d3407-74ac-40d7-931b-71dc6e1d1ad1",
+    "roads": [
+     {
+      "id": "c3faeb28-37bc-4ef5-9690-b4d81bd552c1",
+      "from": "a739b718-7c77-4e24-b421-ca04d761b901",
+      "to": "e5097573-82cb-4331-8ddf-397361d6f059",
+      "lengthM": 5.31
+     }
+    ]
+   },
+   "F3 철 계단 118.77 → 126.8 (46 단)": {
+    "changeSetId": "c1957761-b64d-46b2-910a-671366024764",
+    "roads": [
+     {
+      "id": "7b95d9ff-1f81-407b-8611-141eeb1763cd",
+      "from": "e5097573-82cb-4331-8ddf-397361d6f059",
+      "to": "f9bbf5c9-7a11-46e2-be96-529703469b54",
+      "lengthM": 15.6
+     }
+    ]
+   },
+   "F3 문 위 단 → 서문 위 화단 비탈 → 북악관 북서 모서리(7895ac0d)": {
+    "changeSetId": "7c962d35-888e-4628-a53a-86ba68fcc7f5",
+    "roads": [
+     {
+      "id": "b8b1d983-5988-4794-a8d4-b6f9e42ab0e0",
+      "from": "f9bbf5c9-7a11-46e2-be96-529703469b54",
+      "to": "7895ac0d-084b-467f-a57d-75a35e02c435",
+      "lengthM": 69.7
+     }
+    ]
+   }
+  }
+ }
+}

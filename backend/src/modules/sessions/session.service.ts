@@ -12,6 +12,7 @@ import { fusionService } from '../fusion/fusion.service.js';
 import { evaluateStrideCalibration } from '../fusion/fusion.stride.js';
 import { REALTIME_FUSION_VERSION } from '../fusion/fusion.algorithms.js';
 import { BEACON_FEATURE } from '../positioning/beacon.dto.js';
+import { evaluateDeclaredRoute } from '../mobility/declared-route.js';
 import type {
   DiagnosticEventsRequest,
   ListSessionsQuery,
@@ -128,6 +129,7 @@ export const sessionService = {
     }
     const startedAt = req.startedAt ?? req.clientStartedAt ?? null;
     const strideDecision = evaluateStrideCalibration(req.strideCalibration, startedAt);
+    const routeDecision = evaluateDeclaredRoute(req.declaredRoute);
 
     const result = await withTransaction(async (client) => {
       await collectorRepository.upsertDevice(identity.collectorDatabaseId, identity.clientDeviceId, req, client);
@@ -140,6 +142,9 @@ export const sessionService = {
         strideCalibration: strideDecision.calibration,
         strideCalibrationStatus: strideDecision.status,
         strideCalibrationReason: strideDecision.reason,
+        declaredRoute: routeDecision.route,
+        declaredRouteStatus: routeDecision.status,
+        declaredRouteReason: routeDecision.reason,
       });
       if (inserted) {
         // A device collects one session at a time: other ACTIVE sessions of this device were left behind.
@@ -151,6 +156,7 @@ export const sessionService = {
       if (existing.collector_id !== identity.collectorDatabaseId) {
         throw AppError.conflict('SESSION_CONFLICT', 'clientSessionId already used by another collector');
       }
+      if (routeDecision.route) await sessionRepository.fillDeclaredRoute(client, existing.id, routeDecision.route);
       return { session: existing, created: false, interrupted: [] as string[] };
     });
 
@@ -192,6 +198,8 @@ export const sessionService = {
         status: session.stride_calibration_status,
         reason: session.stride_calibration_reason,
       },
+      // what this start's route did (NONE when it carried none); the stored route is in the session view
+      declaredRoute: { status: routeDecision.status, reason: routeDecision.reason },
     };
   },
 

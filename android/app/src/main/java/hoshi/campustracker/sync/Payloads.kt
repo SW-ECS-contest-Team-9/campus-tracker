@@ -1,5 +1,6 @@
 package hoshi.campustracker.sync
 
+import hoshi.campustracker.model.DeclaredRoute
 import hoshi.campustracker.model.SensorCapabilities
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -109,6 +110,8 @@ data class SessionStartPayload(
     val startedAt: String,
     /** Never sent on Android (§11): null is omitted by the encoder. */
     val strideCalibration: JsonElement? = null,
+    /** optional declared route (API_CONTRACT session:start); null is omitted */
+    val declaredRoute: DeclaredRoute? = null,
 )
 
 @Serializable

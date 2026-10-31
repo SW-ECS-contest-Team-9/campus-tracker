@@ -33,7 +33,7 @@ test('a changed recipe input, a changed overrides file and CRLF overrides are ea
     assert.match(manifestProblems(m, root).join(), /CRLF line endings/);
     fs.writeFileSync(overrides, lf.replace('"', '" '));
     assert.match(manifestProblems(m, root).join(), /building-roofs\.json differs from the manifest/);
-    const surface = path.join(root, 'data/terrain/recipes/g02-surface.geojson'); // an input file of the recipe, not the recipe itself
+    const surface = path.join(root, 'data/terrain/recipes/platforms-surface.geojson'); // an input file of the recipe, not the recipe itself
     fs.writeFileSync(surface, fs.readFileSync(surface, 'utf8').replace(/(\d)\.(\d)/, '$1.9$2'));
     assert.match(manifestProblems(m, root).join(), /recipe .* or one of its input files differs/);
   } finally {

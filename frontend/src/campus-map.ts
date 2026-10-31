@@ -8,8 +8,11 @@ import { api, type CampusScene, type SceneBuilding, type TerrainGrid } from './a
 import { decorate, ownWalls, wallColor, wallTopM } from './building-appearance';
 import { colorizeGeometry, elevationControl, elevationMaterial, elevationRamp, elevationRange, type ElevationRange } from './elevation-colors';
 import { clipLonLatPolygons, planeSide, type SectionPlane } from './section';
+import { sampler } from './terrain-sampler';
 import { tmForward, tmInverse } from './tm';
 import type { Viewer } from './vworld';
+
+export { sampler };
 
 type CesiumNS = typeof import('cesium');
 export type BuildingPick = { kind: 'building'; buildingId: string };
@@ -24,23 +27,6 @@ const COLORS = {
   edge: '#a8a29e',
   label: '#374151',
 };
-
-/** Bilinear height at an EPSG:5186 point; outside the grid the nearest edge value (no cliff at the border). */
-export function sampler(g: TerrainGrid) {
-  return (x: number, y: number): number => {
-    let fx = (x - g.originX) / g.resolution - 0.5;
-    let fy = (y - g.originY) / g.resolution - 0.5;
-    if (!Number.isFinite(fx) || !Number.isFinite(fy)) return g.heights[0];
-    fx = Math.min(Math.max(fx, 0), g.width - 1.001);
-    fy = Math.min(Math.max(fy, 0), g.height - 1.001);
-    const ix = Math.floor(fx);
-    const iy = Math.floor(fy);
-    const tx = fx - ix;
-    const ty = fy - iy;
-    const h = (i: number, j: number) => g.heights[j * g.width + i];
-    return h(ix, iy) * (1 - tx) * (1 - ty) + h(ix + 1, iy) * tx * (1 - ty) + h(ix, iy + 1) * (1 - tx) * ty + h(ix + 1, iy + 1) * tx * ty;
-  };
-}
 
 function ringContains(x: number, y: number, ring: number[][]) {
   let inside = false;
@@ -130,9 +116,9 @@ function groundTexture(g: TerrainGrid, campus: CampusScene['campus']): string {
   return canvas.toDataURL('image/png');
 }
 
-/** Heightmap terrain from the DEM grid (heights = orthometric, like the former VWorld scene). */
-function terrainProvider(C: CesiumNS, g: TerrainGrid) {
-  const at = sampler(g);
+/** Heightmap terrain from the DEM grid (heights = orthometric, like the former VWorld scene). `hide`: see sampler. */
+function terrainProvider(C: CesiumNS, g: TerrainGrid, hide?: Uint8Array) {
+  const at = sampler(g, hide);
   const N = 33;
   const b = g.bounds;
   const margin = 0.005;
@@ -164,6 +150,12 @@ function terrainProvider(C: CesiumNS, g: TerrainGrid) {
   return provider;
 }
 
+/** TP2: draw the terrain without interpolating from the cells under the platforms (null: all cells), so that the ground
+ * beside a platform wall does not climb it. A new provider: the terrain tiles load again. */
+export function setTerrainHide(viewer: any, g: TerrainGrid, hide: Uint8Array | null) {
+  viewer.terrainProvider = terrainProvider((window as any).Cesium, g, hide ?? undefined);
+}
+
 /** The campus buildings: one batched primitive (extruded footprints), roof/corner edges and name labels. */
 export class CampusSceneLayer {
   private primitive: any = null;
@@ -177,6 +169,7 @@ export class CampusSceneLayer {
   readonly picks = new Map<string, BuildingPick>();
   private readonly overrides = new Map<string, number[][][][]>(); // 표시용 평면 대체(scene-local-corrections, 끄면 원본)
   private section: SectionPlane | null = null;
+  private hidden = new Set<string>(); // left out while the first-person walk is inside them (first-person.ts buildingsToHide)
 
   private readonly enu: any; // east / north / up at the campus -> globe frame (for the normals of the windows and roofs)
 
@@ -215,6 +208,17 @@ export class CampusSceneLayer {
   private footprint(b: SceneBuilding): number[][][][] {
     const polygons = this.overrides.get(b.buildingId) ?? b.geometry.coordinates;
     return this.section ? clipLonLatPolygons(this.section, polygons) : polygons;
+  }
+
+  /** Leaves these buildings out (blocks, windows and roofs, edges, names); [] draws them all again. */
+  setHidden(ids: string[]) {
+    const next = new Set(ids);
+    if (next.size === this.hidden.size && ids.every((id) => this.hidden.has(id))) return;
+    this.hidden = next;
+    this.edges.removeAll();
+    this.labels.removeAll();
+    this.drawEdgesAndLabels();
+    this.rebuild();
   }
 
   setOpacity(opacity: number) {
@@ -282,7 +286,7 @@ export class CampusSceneLayer {
     const instances: any[] = [];
     const scratch = new C.Cartesian3();
     for (const b of this.scene.buildings) {
-      if (!b.appearance) continue;
+      if (!b.appearance || this.hidden.has(b.buildingId)) continue;
       const neighbourTop = (x: number, y: number) => all.reduce((m, o) => (o.b !== b && o.top > m && o.polys.some((poly) => ringContains(x, y, poly[0] as [number, number][])) ? o.top : m), -Infinity);
       const mesh = decorate(xy(this.footprint(b)), { roofM: b.roofM, groundM: b.terrainMinM ?? b.baseM + 1, baseM: b.baseM }, b.appearance, { neighbourTop, cut });
       const n = mesh.positions.length / 3;
@@ -318,6 +322,7 @@ export class CampusSceneLayer {
     const C = this.C;
     const instances: any[] = [];
     for (const b of this.scene.buildings) {
+      if (this.hidden.has(b.buildingId)) continue;
       if (!this.elevation && ownWalls(b.appearance)) continue; // B12: walls inside the footprint (a deep eave) are drawn with the windows and the roof
       const own = !this.elevation && b.appearance ? wallColor(b.appearance) : null;
       const css = b.buildingId === this.selected ? COLORS.selected : own ?? (this.showEstimate && b.heightSource !== 'REGISTER' ? COLORS.estimate : COLORS.wall);
@@ -379,6 +384,7 @@ export class CampusSceneLayer {
     const C = this.C;
     const edge = C.Material.fromType('Color', { color: C.Color.fromCssColorString(COLORS.edge) });
     for (const b of this.scene.buildings) {
+      if (this.hidden.has(b.buildingId)) continue;
       let best: number[][] = [];
       for (const poly of this.footprint(b)) {
         const r = poly[0];

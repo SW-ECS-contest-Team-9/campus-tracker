@@ -4,6 +4,7 @@ import android.os.SystemClock
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 /** ISO-8601 UTC with exactly three fractional digits, e.g. `2026-10-07T06:00:00.123Z` (server contract §3.1). */
 object Iso {
@@ -39,24 +40,53 @@ class SystemCollectorClock : CollectorClock {
     override fun elapsedRealtimeNanos(): Long = SystemClock.elapsedRealtimeNanos()
 }
 
+/** Outcome of [SensorTimestampCorrector] calibration (reported once per process). */
+data class ClockCalibration(
+    /** Applied to every later sensor timestamp; 0 when the clocks agree. */
+    val offsetMs: Long,
+    /** `now − event` of the first motion event (delivery delay + clock difference). */
+    val firstResidualMs: Long,
+    /** Smallest `now − event` over the calibration window: the clock difference estimate. */
+    val minResidualMs: Long,
+    val events: Int,
+) {
+    /** The first event looked late although the clocks agree: a delivery delay, not a clock base (iOS name). */
+    val mappingUncertain: Boolean get() = offsetMs == 0L && abs(firstResidualMs) >= SensorTimestampCorrector.TOLERANCE_MS
+}
+
 /**
- * Some devices stamp `SensorEvent.timestamp` on a base other than `elapsedRealtimeNanos`. The first motion
- * event decides a fixed offset for the whole run (§4.0).
+ * Some devices stamp `SensorEvent.timestamp` on a base other than `elapsedRealtimeNanos` (§4.0). A delayed first
+ * callback must not become a permanent offset (2026-10-14 tracking correction, T1): a delivery delay only adds to
+ * `now − event`, a different clock base shifts every event. So the offset is the smallest residual over the first
+ * [calibrationEvents] motion events, applied only when it falls outside 0..2 s. Events of that window are held by the
+ * motion source and released with the decided offset, so no sample changes its time base mid-stream.
  */
-class SensorTimestampCorrector(private val clock: CollectorClock) {
+class SensorTimestampCorrector(private val clock: CollectorClock, private val calibrationEvents: Int = 25) {
+    companion object {
+        const val TOLERANCE_MS = 2_000L
+    }
+
     @Volatile var offsetNanos: Long = 0L
         private set
 
-    @Volatile private var calibrated = false
+    @Volatile var isCalibrated = false
+        private set
 
-    /** Returns the offset in ms when this call applied a non-zero correction, null otherwise. */
-    fun calibrateIfNeeded(eventTimestampNanos: Long): Long? {
-        if (calibrated) return null
-        calibrated = true
-        val diff = clock.elapsedRealtimeNanos() - eventTimestampNanos
-        if (diff in 0L..2_000_000_000L) return null
-        offsetNanos = diff
-        return diff / 1_000_000
+    private var seen = 0
+    private var firstResidual = 0L
+    private var minResidual = Long.MAX_VALUE
+
+    /** Feeds one motion event; returns the decision exactly once, when the window is complete. */
+    fun observe(eventTimestampNanos: Long): ClockCalibration? {
+        if (isCalibrated) return null
+        val residual = clock.elapsedRealtimeNanos() - eventTimestampNanos
+        if (seen == 0) firstResidual = residual
+        minResidual = minOf(minResidual, residual)
+        seen += 1
+        if (seen < calibrationEvents) return null
+        if (minResidual !in 0L..TOLERANCE_MS * 1_000_000) offsetNanos = minResidual
+        isCalibrated = true
+        return ClockCalibration(offsetNanos / 1_000_000, firstResidual / 1_000_000, minResidual / 1_000_000, seen)
     }
 
     fun correct(eventTimestampNanos: Long): Long = eventTimestampNanos + offsetNanos

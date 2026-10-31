@@ -34,6 +34,12 @@ CT_SERVER_HOST=127.0.0.1 CT_COLLECTOR=C02 ./gradlew :app:testDebugUnitTest --tes
 | `persistence/` | per-session NDJSON files, `active_collection.json` for crash recovery | `Persistence/*` |
 | `ui/` | Compose screens: Server Setup, Collect, Sessions, Settings | `ContentView.swift` |
 
+Declared route (1.2): before Start the collector can plan the route (start, via points, end; each leg walk, 계단 상행/하행
+or 승강기 n층→m층) or pick a saved one (`saved_routes.json`, this phone only). Start then uses the first point as the
+start anchor and sends the route as `session:start.declaredRoute`; while recording, "Reached next" records a
+`routeWaypoint` marker on the next node (any marker on that node also counts) and "여기서 벗어남" a `routeDeviation`
+marker. `model/DeclaredRoute.kt`, `ui/RouteScreen.kt`. iOS: not implemented, contract only (`docs/API_CONTRACT.md`).
+
 `AppGraph` (in `CampusTrackerApplication.kt`) owns the singletons: collection runs on one `HandlerThread`, the upload
 queue and the socket each on their own single thread, so Activity recreation never interrupts collection or upload.
 
@@ -45,6 +51,24 @@ queued sessions keep their collector/server owner; "Finish as Interrupted" also 
 `interrupted: true`; resumed sequences skip ahead by 1000; empty streams report `lastSequences = -1`; Start requires the
 location permission; local files keep millisecond timestamps; the login `webSocketURL` is persisted. No HealthKit
 stride equivalent is sent (`strideCalibration` is always omitted).
+
+Not ported from iOS (no Android equivalent, or not on the wire):
+
+- `absoluteAltitude` / `absoluteAltitudeV1`: iOS `CMAbsoluteAltitudeData` (`APPLE_MSL`) has no Android sensor. Android
+  sends the GPS heights only (`ellipsoidalAltitude` = `Location.getAltitude()`, `altitude` = AltitudeConverter MSL on
+  API 34+), never a fake absolute stream; `sensorCapabilities.absoluteAltitudeEnabled` stays absent, so fusion keeps
+  the GPS height policy (`docs/ABSOLUTE_ALTITUDE_SERVER.md`). The iOS absolute-altitude clock repair has no Android
+  counterpart either.
+- ARKit poses and the walking-frame (PCA) estimator: no stream on Android; the server DTO does not take walking-frame
+  fields yet.
+- iOS SQLite ledger, sequence lease and per-session sync-state UI: Android keeps the Room queue and the +1000 resume
+  gap; the `session:syncComplete` answer is stored per queued session and logged as a diagnostic, not shown per session.
+
+Ported from the 2026-10-14 iOS reliability work (`docs/IOS_TRACKING_CORRECTION_PLAN_20261014.md`):
+`session:syncComplete` after the finish ACK once nothing of the session is left (queue schema 2); the sensor clock
+offset is the smallest `now − event` over the first 25 motion events (a late first callback is reported as
+`CLOCK_MAPPING_UNCERTAIN`, not adopted); callbacks of an earlier sensor run are dropped; `SENSOR_CALLBACK_STALLED`
+(motion 2 s, barometer 5 s); the recovery file is removed only after the last batch and the finish are queued.
 
 `PREFER_GAME_ROTATION_VECTOR` in `sensors/AndroidSensors.kt` switches the attitude source to the magnetometer-free
 game rotation vector if indoor tests show ROTATION_VECTOR yaw jumps.

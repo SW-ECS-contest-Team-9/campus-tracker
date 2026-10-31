@@ -1,5 +1,6 @@
 package hoshi.campustracker.collection
 
+import hoshi.campustracker.core.ClockCalibration
 import hoshi.campustracker.core.CollectorClock
 import hoshi.campustracker.core.Iso
 import hoshi.campustracker.core.L
@@ -13,6 +14,8 @@ import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.model.LocationCollectionProfile
 import hoshi.campustracker.model.LocationFix
 import hoshi.campustracker.model.MotionSamplingRate
+import hoshi.campustracker.model.PlannedRoute
+import hoshi.campustracker.model.RouteRules
 import hoshi.campustracker.model.SampleCounts
 import hoshi.campustracker.model.SensorCapabilities
 import hoshi.campustracker.persistence.ActiveCollectionState
@@ -42,6 +45,7 @@ import hoshi.campustracker.sync.TelemetrySyncCoordinator
 import hoshi.campustracker.sync.UploadOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.Locale
 import java.util.UUID
 import kotlin.math.abs
 
@@ -87,6 +91,10 @@ data class CollectorUiState(
     val openVerticalAnchor: CollectionAnchor? = null,
     /** The barometer moved more than 3 m since the last vertical anchor with no stairs/elevator marker open. */
     val verticalReminder: Boolean = false,
+    /** declared route progress: index of the last point reached (0 = the start) */
+    val routeReached: Int = 0,
+    /** "여기서 벗어남" marks in this session */
+    val routeDeviations: Int = 0,
     /** Publish time; makes every 0.5 s snapshot distinct so "last x.xs ago" stays current. */
     val publishedAtMs: Long = 0,
 ) {
@@ -118,6 +126,9 @@ class CollectionCoordinator(
         const val RESUME_SEQUENCE_GAP = 1_000L
         const val UI_REFRESH_MS = 500L
         const val PERSIST_INTERVAL_MS = 1_000L
+        /** No motion / barometer sample for this long while the sensor runs: SENSOR_CALLBACK_STALLED (iOS thresholds). */
+        const val MOTION_STALL_MS = 2_000L
+        const val ALTIMETER_STALL_MS = 5_000L
     }
 
     private val _ui = MutableStateFlow(CollectorUiState())
@@ -151,6 +162,15 @@ class CollectionCoordinator(
     private var openVerticalAnchor: CollectionAnchor? = null
     /** relative altitude at the last vertical anchor (start, stair/elevator/ramp end, entrance) */
     private var verticalReference: Double? = null
+    private var routeReached = 0
+    private var routeDeviations = 0
+    /**
+     * Sensor run generation: every start and stop moves it on, and a callback registered for an older run is dropped,
+     * so a late callback after Stop never lands in the next session (2026-10-14 tracking correction, T3).
+     */
+    private var sensorRun = 0L
+    private var staleCallbacks = 0L
+    private val stalled = mutableSetOf<String>()
 
     init {
         // A state file at process start means the process died while collecting (§5.5). Activity recreation never
@@ -167,7 +187,10 @@ class CollectionCoordinator(
 
     // ---- public API ----
 
-    /** [startAnchor]: where the collector stands (node, building, floor), recorded as the sessionStart marker. */
+    /**
+     * [startAnchor]: where the collector stands (node, building, floor), recorded as the sessionStart marker.
+     * [route]: the declared route (sent with session:start); without a [startAnchor] its first point is the start anchor.
+     */
     fun startSession(
         collectorId: String,
         owner: UploadOwner,
@@ -175,6 +198,7 @@ class CollectionCoordinator(
         locationProfile: LocationCollectionProfile,
         distanceFilter: Double,
         startAnchor: CollectionAnchor? = null,
+        route: PlannedRoute? = null,
     ) {
         val startedAt = clock.nowMs() // the moment Start was pressed; fixed for every re-send
         executor.post {
@@ -187,10 +211,11 @@ class CollectionCoordinator(
             // The declination needs a recent position; wait briefly for it (never recorded as a sample).
             location.lastKnownPosition { position ->
                 executor.post {
-                    beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position)
+                    beginSession(collectorId, owner, motionRate, locationProfile, distanceFilter, startedAt, position, route)
                     val started = session
-                    if (started != null && startAnchor != null) {
-                        recordMarker(started, EventMarkerType.sessionStart, startAnchor, startedAt)
+                    val anchor = startAnchor ?: route?.let(RouteRules::startAnchor)
+                    if (started != null && anchor != null) {
+                        recordMarker(started, EventMarkerType.sessionStart, anchor, startedAt)
                         publish()
                     }
                 }
@@ -204,15 +229,17 @@ class CollectionCoordinator(
         if (endAnchor != null) recordMarker(current, EventMarkerType.sessionEnd, endAnchor, clock.nowMs())
         stopSensors("user_stop")
         val finished = current.copy(status = CollectionStatus.completed, endedAt = clock.nowMs(), sampleCounts = counts)
+        // The recovery file is removed only after the last batch and the finish are in the upload queue: a crash in
+        // between leaves an interrupted session to finish again, never a session the server keeps ACTIVE (T4).
         sync.finish(
             FinishPayload(
                 clientSessionId = finished.id,
                 endedAt = Iso.format(finished.endedAt!!),
                 lastSequences = lastSequences(counts, locationSequence, motionSequence, altimeterSequence, pedometerSequence),
             ),
+            onQueued = { executor.post { clearActiveStoreIf(finished.id) } },
         )
         L.i(TAG, "SESSION_FINISHED session=${finished.id} sequences=$locationSequence/$motionSequence/$altimeterSequence/$pedometerSequence")
-        activeStore.clear()
         repository.update(finished)
         repository.flush()
         platform.stopForegroundCollection()
@@ -225,6 +252,40 @@ class CollectionCoordinator(
         val current = session ?: return@post
         recordMarker(current, type, anchor, clock.nowMs())
         publish()
+    }
+
+    /** Declared route: the collector is at its next point (a routeWaypoint marker on that node). */
+    fun reachNextRoutePoint() = executor.post {
+        val current = session ?: return@post
+        val route = current.declaredRoute ?: return@post
+        val point = RouteRules.next(route, routeReached) ?: return@post
+        recordMarker(current, EventMarkerType.routeWaypoint, CollectionAnchor(nodeId = point.nodeId, buildingId = point.buildingId, floor = point.floor), clock.nowMs())
+        publish()
+    }
+
+    /** Declared route: "여기서 벗어남" — a routeDeviation marker at the current fix; progress is unchanged. */
+    fun markOffRoute() = executor.post {
+        val current = session ?: return@post
+        if (current.declaredRoute == null) return@post
+        recordMarker(current, EventMarkerType.routeDeviation, null, clock.nowMs())
+        routeDeviations++
+        saveRouteProgress()
+        publish()
+    }
+
+    /** Any marker standing on the route's next node (route point, entrance, stairs end, End) moves the progress on. */
+    private fun noteRoute(anchor: CollectionAnchor?) {
+        val route = session?.declaredRoute ?: return
+        val reached = RouteRules.advance(route, routeReached, anchor?.nodeId)
+        if (reached == routeReached) return
+        routeReached = reached
+        saveRouteProgress()
+    }
+
+    private fun saveRouteProgress() {
+        val r = runtime ?: return
+        runtime = r.copy(routeReached = routeReached, routeDeviations = routeDeviations)
+        persist()
     }
 
     private fun recordMarker(current: CollectionSession, type: EventMarkerType, anchor: CollectionAnchor?, at: Long) {
@@ -242,6 +303,7 @@ class CollectionCoordinator(
         counts = counts.copy(marker = counts.marker + 1)
         trackCounts()
         noteAnchor(type, anchor)
+        noteRoute(anchor)
     }
 
     /** Keeps the current place for the pickers and the barometric reference for the stairs/elevator reminder. */
@@ -281,6 +343,8 @@ class CollectionCoordinator(
             diagnostics = recovered.diagnostics.copy(wasInterrupted = true),
         )
         resetLatest()
+        routeReached = recovered.routeReached
+        routeDeviations = recovered.routeDeviations
         repository.update(resumed)
         // Same clientSessionId and startedAt: the server returns the existing session (resumed: true).
         sync.start(startPayload(resumed), owner)
@@ -308,11 +372,16 @@ class CollectionCoordinator(
                 ),
                 interrupted = true,
             ),
+            onQueued = { executor.post { clearActiveStoreIf(finished.id) } },
         )
-        activeStore.clear()
         interrupted = null
         L.i(TAG, "SESSION_FINISHED_AS_INTERRUPTED session=${finished.id}")
         publish()
+    }
+
+    private fun clearActiveStoreIf(clientSessionId: String) {
+        if (session?.id == clientSessionId) return
+        if (activeStore.load()?.session?.id == clientSessionId) activeStore.clear()
     }
 
     fun handleAppState(state: CollectorAppState) = executor.post {
@@ -370,6 +439,7 @@ class CollectionCoordinator(
         distanceFilter: Double,
         startedAt: Long,
         position: KnownPosition?,
+        route: PlannedRoute?,
     ) {
         starting = false
         if (session != null) return
@@ -385,6 +455,7 @@ class CollectionCoordinator(
             deviceModel = device.deviceModel,
             systemVersion = device.systemVersion,
             sensorCapabilities = capabilities,
+            declaredRoute = route?.takeIf(RouteRules::isComplete),
         )
         session = created
         counts = SampleCounts()
@@ -412,9 +483,11 @@ class CollectionCoordinator(
         distanceFilter: Double,
         stepRestore: StepRestore?,
     ) {
+        val run = ++sensorRun
+        stalled.clear()
         if (capabilities.locationAvailable) {
             locationSegmentId = newId()
-            if (location.start(profile, distanceFilter, ::record)) {
+            if (location.start(profile, distanceFilter) { reading -> if (current(run)) record(reading) }) {
                 diagnostic("SENSOR_STARTED", mapOf("sensor" to "location", "sensorSegmentId" to locationSegmentId))
             } else {
                 L.w(TAG, "location did not start (permission?)")
@@ -431,22 +504,22 @@ class CollectionCoordinator(
             motion.start(
                 hz = motionRate.hz,
                 attitude = attitude,
-                onReading = ::record,
+                onReading = { reading -> if (current(run)) record(reading) },
                 onRotationAccuracyChanged = { accuracy -> diagnostic("MAGNETIC_CALIBRATION", mapOf("accuracy" to accuracy.toString())) },
-                onClockOffset = { offsetMs -> diagnostic("SENSOR_CLOCK_OFFSET", mapOf("offsetMs" to offsetMs.toString())) },
+                onClockCalibrated = ::reportClock,
             )
             diagnostic("SENSOR_STARTED", mapOf("sensor" to "motion", "sensorSegmentId" to motionSegmentId, "referenceFrame" to attitude.referenceFrame))
         }
         if (capabilities.altimeterAvailable && altimeter.isAvailable) {
             altimeterSegmentId = newId()
-            altimeter.start(::record)
+            altimeter.start { reading -> if (current(run)) record(reading) }
             diagnostic("SENSOR_STARTED", mapOf("sensor" to "altimeter", "sensorSegmentId" to altimeterSegmentId))
         }
         if (capabilities.stepCountingAvailable) {
             pedometerSegmentId = newId()
             val started = pedometer.start(
                 restore = stepRestore,
-                onReading = ::record,
+                onReading = { reading -> if (current(run)) record(reading) },
                 onProgress = { baseline, total ->
                     runtime = runtime?.copy(stepBaseline = baseline, bootCount = pedometer.currentBootCount(), lastStepTotal = total)
                 },
@@ -456,7 +529,25 @@ class CollectionCoordinator(
         }
     }
 
+    private fun current(run: Long): Boolean {
+        if (run == sensorRun && session != null) return true
+        staleCallbacks += 1
+        L.w(TAG, "late sensor callback dropped run=$run current=$sensorRun total=$staleCallbacks")
+        return false
+    }
+
+    /** SENSOR_CLOCK_OFFSET when a different clock base was verified; CLOCK_MAPPING_UNCERTAIN for a late first event. */
+    private fun reportClock(c: ClockCalibration) {
+        val metadata = mapOf(
+            "sensor" to "motion", "offsetMs" to c.offsetMs.toString(), "firstResidualMs" to c.firstResidualMs.toString(),
+            "minResidualMs" to c.minResidualMs.toString(), "events" to c.events.toString(),
+        )
+        if (c.offsetMs != 0L) diagnostic("SENSOR_CLOCK_OFFSET", metadata)
+        else if (c.mappingUncertain) diagnostic("CLOCK_MAPPING_UNCERTAIN", metadata)
+    }
+
     private fun stopSensors(reason: String) {
+        sensorRun += 1
         if (location.isActive) {
             location.stop()
             diagnostic("SENSOR_STOPPED", mapOf("sensor" to "location", "sensorSegmentId" to locationSegmentId, "reason" to reason))
@@ -612,14 +703,35 @@ class CollectionCoordinator(
         openVertical = null
         openVerticalAnchor = null
         verticalReference = null
+        routeReached = 0
+        routeDeviations = 0
     }
 
     private fun startPayload(s: CollectionSession) = SessionStartPayload(
         clientSessionId = s.id, deviceId = s.deviceId, deviceModel = s.deviceModel, systemVersion = s.systemVersion,
         appVersion = device.appVersion, sensorCapabilities = s.sensorCapabilities, startedAt = Iso.format(s.startedAt),
+        declaredRoute = s.declaredRoute?.let(RouteRules::toWire),
     )
 
+    /** iOS `detectSensorCallbackStalls`: one event per stall, re-armed when samples flow again. */
+    private fun detectStalls(now: Long) {
+        val r = runtime ?: return
+        fun check(sensor: String, active: Boolean, last: Long?, limitMs: Long) {
+            if (!active || last == null) return
+            val silent = now - last
+            if (silent < limitMs) {
+                stalled -= sensor
+            } else if (stalled.add(sensor)) {
+                val seconds = String.format(Locale.ROOT, "%.1f", silent / 1000.0)
+                diagnostic("SENSOR_CALLBACK_STALLED", mapOf("sensor" to sensor, "seconds" to seconds, "appState" to appState().wire))
+            }
+        }
+        check("motion", motion.isActive, r.lastMotionTimestamp, MOTION_STALL_MS)
+        check("altimeter", altimeter.isActive, r.lastAltimeterTimestamp, ALTIMETER_STALL_MS)
+    }
+
     private fun tick() {
+        detectStalls(clock.nowMs())
         trackCounts()
         repository.flushIfDue(clock.nowMs())
         sync.updateCounts(counts)
@@ -640,6 +752,7 @@ class CollectionCoordinator(
             lastPlace = lastPlace, openVertical = openVertical, openVerticalAnchor = openVerticalAnchor,
             verticalReminder = session != null && openVertical == null && verticalReference != null && latestRelativeAltitude != null &&
                 abs(latestRelativeAltitude!! - verticalReference!!) > AnchorRules.VERTICAL_REMINDER_M,
+            routeReached = routeReached, routeDeviations = routeDeviations,
             publishedAtMs = clock.nowMs(),
         )
     }

@@ -1,0 +1,135 @@
+{
+ "features": {
+  "b13-hyein.geojson": {
+   "B13-HYEIN-NE-PORTAL-OPENING": {
+    "type": "Feature",
+    "properties": {
+     "id": "B13-HYEIN-NE-PORTAL-OPENING",
+     "type": "canopy",
+     "kind": "extrude",
+     "estimated": true,
+     "grade": "확정(옆면 오른쪽에 아래로 내려가는 콘크리트 어귀가 있다: 사진 02), 추정(자리·폭 4.6 m·높이, 어디로 이어지는지: 지하 진입로로 보임. 안쪽은 만들지 않음)",
+     "basePlane": "혜인관 둘레 149.0",
+     "fromM": 148.7,
+     "toM": 151.3,
+     "assumption": "어두운 판은 뚫린 곳을 나타내는 표시다(안쪽 빈 곳은 만들지 않음: 안의 선·바닥 높이 모름)",
+     "source": "사용자-혜인관-20261012/02-혜인관-좌측면(정면기준)-현관과-정류장.jpg",
+     "material": "opening"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        201239.83,
+        557264.15
+       ],
+       [
+        201239.89,
+        557264.23
+       ],
+       [
+        201243.82,
+        557261.85
+       ],
+       [
+        201243.77,
+        557261.76
+       ],
+       [
+        201239.83,
+        557264.15
+       ]
+      ]
+     ]
+    }
+   },
+   "B13-HYEIN-NE-PLANTER-EDGE": {
+    "type": "Feature",
+    "properties": {
+     "id": "B13-HYEIN-NE-PLANTER-EDGE",
+     "type": "planter",
+     "kind": "extrude",
+     "estimated": true,
+     "grade": "확정(옆면 앞 왼쪽에 돌 턱 화단과 생울타리, 오른쪽에 둥근 돌 화분과 나무: 사진 02), 추정(외곽·높이·그루 수)",
+     "basePlane": "혜인관 둘레 149.0",
+     "fromM": 148.8,
+     "toM": 149.5,
+     "assumption": "북동 옆면 앞 왼쪽(운동장 반대쪽)의 화단: 돌 턱 0.5 m, 윗면은 심은 곳",
+     "source": "사용자-혜인관-20261012/02-혜인관-좌측면(정면기준)-현관과-정류장.jpg",
+     "material": "stone"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        201259.47,
+        557250.63
+       ],
+       [
+        201263.1,
+        557256.62
+       ],
+       [
+        201268.92,
+        557253.1
+       ],
+       [
+        201265.29,
+        557247.11
+       ],
+       [
+        201259.47,
+        557250.63
+       ]
+      ]
+     ]
+    }
+   },
+   "B13-HYEIN-NE-PLANTER-HEDGE": {
+    "type": "Feature",
+    "properties": {
+     "id": "B13-HYEIN-NE-PLANTER-HEDGE",
+     "type": "planter",
+     "kind": "extrude",
+     "estimated": true,
+     "grade": "확정(옆면 앞 왼쪽에 돌 턱 화단과 생울타리, 오른쪽에 둥근 돌 화분과 나무: 사진 02), 추정(외곽·높이·그루 수)",
+     "basePlane": "B13-HYEIN-NE-PLANTER-EDGE",
+     "fromM": 149.5,
+     "toM": 150.1,
+     "assumption": "화단 위의 생울타리(높이 0.6 m)",
+     "source": "사용자-혜인관-20261012/02-혜인관-좌측면(정면기준)-현관과-정류장.jpg",
+     "material": "foliage"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        201260.08,
+        557250.85
+       ],
+       [
+        201263.18,
+        557255.99
+       ],
+       [
+        201268.31,
+        557252.88
+       ],
+       [
+        201265.21,
+        557247.75
+       ],
+       [
+        201260.08,
+        557250.85
+       ]
+      ]
+     ]
+    }
+   }
+  }
+ }
+}

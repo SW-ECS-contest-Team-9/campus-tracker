@@ -1,6 +1,7 @@
 import { pool, type DbClient } from '../../config/database.js';
 import type { ListSessionsQuery, LocationPointView, SessionStatus, SessionView } from './session.dto.js';
 import type { StrideCalibration, StrideCalibrationReason } from '../fusion/fusion.stride.js';
+import type { DeclaredRoute } from '../mobility/declared-route.js';
 
 export interface SessionRow {
   id: string;
@@ -31,6 +32,7 @@ const SESSION_VIEW_SELECT = `
          s.status,
          s.spatial_map_version_id AS "spatialMapVersionId",
          s.sensor_capabilities AS "sensorCapabilities",
+         s.declared_route AS "declaredRoute", s.declared_route_status AS "declaredRouteStatus", s.declared_route_reason AS "declaredRouteReason",
          (SELECT count(*) FROM location_samples l WHERE l.session_id = s.id) AS "locationCount",
          (SELECT count(*) FROM event_markers m WHERE m.session_id = s.id)    AS "markerCount",
          (SELECT COALESCE(json_agg(json_build_object('type', m.type, 'timestamp', m."timestamp", 'nodeId', m.node_id,
@@ -84,19 +86,33 @@ export const sessionRepository = {
       strideCalibration: StrideCalibration | null;
       strideCalibrationStatus: 'ACCEPTED' | 'FALLBACK';
       strideCalibrationReason: StrideCalibrationReason | null;
+      declaredRoute: DeclaredRoute | null;
+      declaredRouteStatus: 'NONE' | 'ACCEPTED' | 'REJECTED';
+      declaredRouteReason: string | null;
     },
   ): Promise<SessionRow | null> {
     const { rows } = await db.query<SessionRow>(
       `INSERT INTO collection_sessions (client_session_id, collector_id, device_id, started_at, sensor_capabilities,
-                                       spatial_map_version_id, stride_calibration, stride_calibration_status, stride_calibration_reason)
+                                       spatial_map_version_id, stride_calibration, stride_calibration_status, stride_calibration_reason,
+                                       declared_route, declared_route_status, declared_route_reason)
        VALUES ($1, $2, $3, COALESCE($4::timestamptz, now()), $5,
-               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1), $6::jsonb, $7, $8)
+               (SELECT id FROM spatial_map_versions WHERE active LIMIT 1), $6::jsonb, $7, $8, $9::jsonb, $10, $11)
        ON CONFLICT (client_session_id) DO NOTHING
        RETURNING ${SESSION_COLUMNS}`,
       [data.clientSessionId, data.collectorId, data.deviceId, data.startedAt, JSON.stringify(data.sensorCapabilities),
-        data.strideCalibration ? JSON.stringify(data.strideCalibration) : null, data.strideCalibrationStatus, data.strideCalibrationReason],
+        data.strideCalibration ? JSON.stringify(data.strideCalibration) : null, data.strideCalibrationStatus, data.strideCalibrationReason,
+        data.declaredRoute ? JSON.stringify(data.declaredRoute) : null, data.declaredRouteStatus, data.declaredRouteReason],
     );
     return rows[0] ?? null;
+  },
+
+  /** A resumed start (same clientSessionId) may carry the route the first start lacked; a route already stored is kept. */
+  async fillDeclaredRoute(db: DbClient, id: string, route: DeclaredRoute): Promise<void> {
+    await db.query(
+      `UPDATE collection_sessions SET declared_route = $2::jsonb, declared_route_status = 'ACCEPTED', declared_route_reason = NULL, updated_at = now()
+        WHERE id = $1 AND declared_route IS NULL`,
+      [id, JSON.stringify(route)],
+    );
   },
 
   /** A device collects one session at a time: older ACTIVE sessions of the same device become INTERRUPTED. */

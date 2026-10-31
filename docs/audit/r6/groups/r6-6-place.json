@@ -1,0 +1,36 @@
+{
+ "id": "R6-6-PLACE",
+ "comment": "R6 F13: 학교 장소 목록 \"산책로\" 표지. 시험용 DB 만",
+ "ops": [
+  {
+   "ref": "F13 장소 산책로",
+   "op": "create_place",
+   "args": {
+    "name": "산책로 (학교 장소 목록)",
+    "category": "other",
+    "position": {
+     "xy": [
+      201143.0,
+      557352.4
+     ],
+     "z": 142.8
+    },
+    "description": "학교 장소 목록(skuniv_places.json)의 \"산책로\" 표지. 뒤 산책로 a03d33c3 와 0.2 m. R6 판독 ⑬·F13(2026-10-25)"
+   },
+   "grade": "원천",
+   "evidence": "판독 보완자료/학교-전경-20261022/전수판독/R6/판독.md ⑬·F13"
+  }
+ ],
+ "applied": {
+  "at": "2026-10-25",
+  "db": "campus-tracker-test-db 127.0.0.1:5544, 시험 서버 3210 편집기 MCP, 계정 T05, 에이전트 n02-plaza(토큰은 메모리에만, 30분)",
+  "batch": null,
+  "changeSets": {
+   "F13 장소 산책로": {
+    "changeSetId": "a6b61fbd-336d-4ba5-9802-9f307c408573",
+    "roads": [],
+    "placeId": "a3ca98d2-0fb9-4d14-8e5b-fec155a8751d"
+   }
+  }
+ }
+}
