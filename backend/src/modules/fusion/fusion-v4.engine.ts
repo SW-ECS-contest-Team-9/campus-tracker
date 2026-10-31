@@ -1199,7 +1199,7 @@ function makeLiveOutput(s: FusionStateV4, t: number, c: FusionConfigV4): FusedOu
   const w = s.window;
   const headed = w.steps - w.unheadedSteps;
   const beaconUpdates = s.beacon ? s.beacon.windowUpdates : null;
-  const source: PositionSource = w.anchored ? 'GPS_ANCHORED' : w.beaconAnchored ? 'BEACON_ANCHORED' : w.reanchored ? 'GPS_REANCHOR'
+  const source: PositionSource = w.anchored ? 'GPS_ANCHORED' : w.markerAnchored ? 'MARKER_ANCHORED' : w.beaconAnchored ? 'BEACON_ANCHORED' : w.reanchored ? 'GPS_REANCHOR'
     : (w.gpsUsed || beaconUpdates) && headed ? 'FUSED' : w.gpsUsed ? 'GPS_CORRECTED' : beaconUpdates ? 'BEACON_CORRECTED'
       : headed ? 'PDR_PREDICTED' : s.stationary ? 'STATIONARY_HOLD' : 'HELD';
   const out = output(s, t, s.x, sigmaXY(s.P), s.headingKnown ? headingRadToDeg(s.rel + s.x[2]) : null, s.z ?? 0, source, {
@@ -1225,6 +1225,16 @@ function makeLiveOutput(s: FusionStateV4, t: number, c: FusionConfigV4): FusedOu
 // public API
 // ---------------------------------------------------------------------------------------------
 
+function initializeAtMarker(s: FusionStateV4, marker: NonNullable<FusionStateV4['markerAnchors']>[number], t: number, c: FusionConfigV4) {
+  const ll = tmInverseGrid(marker.x, marker.y);
+  s.origin = { latitude: ll.latitude, longitude: ll.longitude, height: 0 };
+  s.initialized = true;
+  s.x = [0, 0, s.x[2]];
+  s.P = diag3(c.markerAnchorSigmaXYM ** 2, c.markerAnchorSigmaXYM ** 2, s.headingKnown ? s.P[8] : 1);
+  s.lastEventT = t;
+  s.window.markerAnchored = true;
+}
+
 export function processObservationV4(s: FusionStateV4, o: Observation, c: FusionConfigV4): StepResultV4 {
   const r: StepResultV4 = { outputs: [], events: [] };
   if (o.kind === 'absoluteAltitude') {
@@ -1248,6 +1258,12 @@ export function processObservationV4(s: FusionStateV4, o: Observation, c: Fusion
     if (o.kind === 'beacon') rejectBeacon(s.beacon ??= createBeaconTracker(), 'STALE');
     return r;
   }
+  // Replay has surveyed marker nodes in its context. Start the frame only once the marker time is reached;
+  // a future QR scan must not invent a live position before it was observed.
+  if (!s.initialized && c.markerAnchorsEnabled) {
+    const marker = s.markerAnchors?.find((a) => a.t <= o.t && [a.t, a.x, a.y, a.z].every(Number.isFinite));
+    if (marker) initializeAtMarker(s, marker, o.t, c);
+  }
   if (s.lastObservationT !== undefined && s.stationary) s.counters.stationaryMs += o.t - s.lastObservationT;
   if (o.kind === 'motion') applyMotion(s, o, c, r);
   else if (o.kind === 'pedometer') applyPedometer(s, o, c);
@@ -1257,7 +1273,7 @@ export function processObservationV4(s: FusionStateV4, o: Observation, c: Fusion
   s.lastObservationT = o.t;
   if (s.initialized && (s.nextOutputAt === undefined || o.t >= s.nextOutputAt)) {
     s.nextOutputAt = (Math.floor(o.t / c.outputIntervalMs) + 1) * c.outputIntervalMs;
-    if (holdsStill(s, s.x, c) && !s.window.anchored && !s.window.reanchored && !s.window.beaconAnchored) s.window = emptyWindowV4();
+    if (holdsStill(s, s.x, c) && !s.window.anchored && !s.window.reanchored && !s.window.beaconAnchored && !s.window.markerAnchored) s.window = emptyWindowV4();
     else {
       r.outputs.push(makeLiveOutput(s, o.t, c));
       s.lastOutputXY = [s.x[0], s.x[1]];
@@ -1285,7 +1301,7 @@ function stillIntervals(s: FusionStateV4, end: number) {
 export function flushFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4 {
   if (!s.initialized || s.lastObservationT === undefined) return { outputs: [], events: [] };
   const w = s.window;
-  const pending = w.steps || w.gpsUsed !== null || w.anchored || w.reanchored || w.beaconAnchored || (s.beacon?.windowUpdates ?? 0) > 0;
+  const pending = w.steps || w.gpsUsed !== null || w.anchored || w.reanchored || w.beaconAnchored || w.markerAnchored || (s.beacon?.windowUpdates ?? 0) > 0;
   return { outputs: pending ? [makeLiveOutput(s, s.lastObservationT, c)] : [], events: [] };
 }
 
@@ -1393,6 +1409,10 @@ function finalResiduals(s: FusionStateV4, points: { x: Vec3; event: SmootherEven
 }
 
 export function finalizeFusionV4(s: FusionStateV4, c: FusionConfigV4): StepResultV4 {
+  if (!s.initialized && c.markerAnchorsEnabled) {
+    const marker = s.markerAnchors?.find((a) => [a.t, a.x, a.y, a.z].every(Number.isFinite));
+    if (marker) initializeAtMarker(s, marker, marker.t, c);
+  }
   if (!s.initialized || !s.origin) return { outputs: [], events: [] };
   let weights = s.fixes.map(() => 1);
   let smoothed: ReturnType<typeof smoothEvents> | null = null;

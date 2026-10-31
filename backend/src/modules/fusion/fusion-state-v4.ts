@@ -200,6 +200,7 @@ export interface FusionStateV4 {
     reanchored: boolean;
     /** rev 18: the local frame started at a beacon in this window */
     beaconAnchored?: boolean;
+    markerAnchored?: boolean;
   };
   lastObservationT?: number;
   skippedLateObservations: number;

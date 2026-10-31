@@ -100,6 +100,10 @@ private fun MainTabs(graph: AppGraph, actions: CollectActions, locationPermissio
                 ui.openVerticalAnchor ?: ui.lastPlace
             } else ui.lastPlace,
             loadNodes = loadNodes,
+            resolveNode = { id ->
+                val server = configuration ?: throw IllegalStateException("No server configured.")
+                withContext(Dispatchers.IO) { graph.api.resolveAnchorNode(server, id) }
+            },
             onConfirm = { anchor ->
                 anchorFor = null
                 when (type) {

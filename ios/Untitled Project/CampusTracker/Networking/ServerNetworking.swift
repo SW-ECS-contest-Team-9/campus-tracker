@@ -401,6 +401,18 @@ struct AnchorNodesResponse: Codable, Equatable {
 }
 
 enum AnchorNodeAPI {
+    static func resolve(configuration: ServerConfiguration, nodeID: UUID, client: APIClient = HTTPAPIClient()) async throws -> AnchorNode {
+        guard let base = configuration.baseURL, var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
+            throw APIClientError.invalidURL
+        }
+        components.path = "/api/v1/mobility/nodes/\(nodeID.uuidString.lowercased())"
+        guard let url = components.url else { throw APIClientError.invalidURL }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+        let data = try await client.send(request)
+        do { return try JSONDecoder().decode(AnchorNode.self, from: data) }
+        catch { throw APIClientError.decodingFailed }
+    }
     static func fetch(configuration: ServerConfiguration, buildingId: String?, floor: String?,
                       latitude: Double?, longitude: Double?, client: APIClient = HTTPAPIClient()) async throws -> AnchorNodesResponse {
         guard let base = configuration.baseURL, var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else {

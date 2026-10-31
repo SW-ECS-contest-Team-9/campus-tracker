@@ -9,6 +9,8 @@ import type { MarkerCreateRequest } from './marker.dto.js';
 import { fusionRepository } from '../fusion/fusion.repository.js';
 import type { FusedPositionView } from '../fusion/fusion.dto.js';
 import { fusionService } from '../fusion/fusion.service.js';
+import { pool } from '../../config/database.js';
+import { tmInverse } from '../../geo/tm.js';
 
 /** Markers are shown on the finished (replayed) fusion track: position and height at the marker time. */
 const SNAP_VERSION = 'fusion-v4';
@@ -47,6 +49,20 @@ function snapToTrack(track: FusedPositionView[], t: number) {
 export const markerService = {
   async create(identity: CollectorIdentity, req: MarkerCreateRequest) {
     const session = await sessionService.resolveOwnedSession(identity, req.sessionId, req.clientSessionId);
+
+    if (req.latitude == null && req.longitude == null && req.nodeId) {
+      const { rows } = await pool.query<{ x: number; y: number }>(
+        `SELECT ST_X(geom)::float8 x, ST_Y(geom)::float8 y FROM mobility.network_nodes WHERE id = $1`, [req.nodeId]);
+      if (!rows[0]) {
+        // A retry remains idempotent even if the editor removed the node after the first insert.
+        const existingSessionId = await markerRepository.findSessionIdByMarkerId(req.markerId);
+        if (existingSessionId === session.id) return { ok: true as const, markerId: req.markerId, duplicate: true };
+        if (existingSessionId) throw AppError.conflict('MARKER_SESSION_CONFLICT', 'markerId was already used for another session');
+        throw AppError.badRequest('NODE_NOT_FOUND', 'The marker node is no longer available.');
+      }
+      const position = tmInverse(rows[0].x, rows[0].y);
+      req = { ...req, latitude: position.latitude, longitude: position.longitude };
+    }
 
     // Single INSERT statement -> atomic on its own, no explicit transaction needed.
     const created = await markerRepository.insert(session.id, req);

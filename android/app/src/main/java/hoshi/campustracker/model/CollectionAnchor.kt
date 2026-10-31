@@ -32,7 +32,7 @@ object AnchorRules {
     fun isFloor(value: String?) = value != null && FLOOR.matches(value)
 
     fun needs(type: EventMarkerType): AnchorNeeds = when (type) {
-        EventMarkerType.sessionStart, EventMarkerType.sessionEnd, EventMarkerType.entrance -> AnchorNeeds.PLACE
+        EventMarkerType.sessionStart, EventMarkerType.sessionEnd, EventMarkerType.entrance, EventMarkerType.qrAnchor -> AnchorNeeds.PLACE
         EventMarkerType.stairStart, EventMarkerType.stairEnd -> AnchorNeeds.STAIRS
         EventMarkerType.elevatorBoard, EventMarkerType.elevatorExit -> AnchorNeeds.ELEVATOR
         EventMarkerType.rampStart, EventMarkerType.rampEnd -> AnchorNeeds.RAMP

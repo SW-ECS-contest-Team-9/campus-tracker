@@ -11,7 +11,7 @@
  */
 export type PositionSource = 'GPS_ANCHORED' | 'GPS_CORRECTED' | 'FUSED' | 'PDR_PREDICTED' | 'GPS_REANCHOR' | 'STATIONARY_HOLD' | 'HELD' | 'MAP_CONSTRAINED'
   /** v4 rev 18: the local frame started at a near beacon (no GPS yet) / beacon range updates without GPS in this window */
-  | 'BEACON_ANCHORED' | 'BEACON_CORRECTED';
+  | 'BEACON_ANCHORED' | 'BEACON_CORRECTED' | 'MARKER_ANCHORED';
 
 export type GpsRejectReason =
   | 'INVALID_ACCURACY'

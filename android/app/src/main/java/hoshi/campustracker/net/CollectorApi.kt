@@ -127,6 +127,12 @@ class CollectorApi(private val baseClient: OkHttpClient) {
         }
     }
 
+    fun resolveAnchorNode(configuration: ServerConfiguration, nodeId: String): AnchorNode {
+        val url = configuration.url("/api/v1/mobility/nodes/$nodeId")
+        val text = execute(healthClient, Request.Builder().url(url).get().build())
+        return try { AppJson.decodeFromString(AnchorNode.serializer(), text) } catch (e: Exception) { throw ApiError.Unreadable() }
+    }
+
     /**
      * `GET /api/v1/positioning/beacon-config` with If-None-Match. Returns (status, etag, body): 304 = cached copy still
      * current. Blocking; call off the main thread. Network errors throw like the other calls.

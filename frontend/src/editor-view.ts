@@ -6,8 +6,6 @@ export type NavPreset = 'cesium' | 'blender' | 'cad';
 export type EndpointMode = 'selected' | 'all' | 'off';
 export type ColorMode = 'floor' | 'type';
 export type ViewPrefs = {
-  /** legacy browser-only colours (before colours were shared); no longer used */
-  roadColors: Record<string, string>;
   /** automatic colour when a road has no shared colour: by floor (default) or by road class */
   colorMode: ColorMode;
   /** floor height used to estimate a floor from Z when the levelId names none */
@@ -27,7 +25,7 @@ export type ViewPrefs = {
 
 const PREFS_KEY = 'campus.editor.viewPrefs';
 export const DEFAULT_PREFS: ViewPrefs = {
-  roadColors: {}, colorMode: 'floor', floorHeightM: 3, solids: true, tubeHeightM: 2.4, dimOthers: true, dimAlpha: 0.25,
+  colorMode: 'floor', floorHeightM: 3, solids: true, tubeHeightM: 2.4, dimOthers: true, dimAlpha: 0.25,
   buildingOpacity: 1, xrayPaths: true,
   depthFade: true, fadeNear: 80, fadeFar: 700, fadeMin: 0.3,
   endpoints: 'selected', hoverHighlight: true,
@@ -39,8 +37,8 @@ export function loadPrefs(): ViewPrefs {
   try {
     const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null');
     if (!raw || typeof raw !== 'object') return structuredClone(DEFAULT_PREFS);
-    return { ...structuredClone(DEFAULT_PREFS), ...raw, sens: { ...DEFAULT_PREFS.sens, ...(raw.sens ?? {}) },
-      roadColors: typeof raw.roadColors === 'object' && raw.roadColors ? raw.roadColors : {} };
+    delete raw.roadColors; // Obsolete browser-only colours are superseded by shared road colours.
+    return { ...structuredClone(DEFAULT_PREFS), ...raw, sens: { ...DEFAULT_PREFS.sens, ...(raw.sens ?? {}) } };
   } catch { return structuredClone(DEFAULT_PREFS); }
 }
 export function savePrefs(p: ViewPrefs) {

@@ -103,6 +103,14 @@ test('RSSI filtering: window median, MAD outlier rejection, throttled updates, o
   assert.equal(Math.round(fresh.range * 100) / 100, Math.round(modelRange(-80, { measuredPower1m: -59, pathLossExponent: 2.2 }) * 100) / 100);
 });
 
+test('an impossible 3-D range cannot be treated as beacon proximity', () => {
+  const tr = createBeaconTracker();
+  const sample = input({ rssi: -40, anchorZ: 60, floorHeightM: 50, anchorHorizontalAccuracyM: 0.1, rssiVariance: 1 });
+  assert.equal(filterBeacon(tr, 1000, sample, cfg), null);
+  assert.equal(tr.counters.rejected.INCONSISTENT_HEIGHT, 1);
+  assert.equal(tr.counters.measurements, 0);
+});
+
 const meas = (over: Partial<BeaconRangeMeasurement>): BeaconRangeMeasurement => ({
   t: 0, beaconId: 'b', gridX: 0, gridY: 0, buildingId: 'B', floor: '1F', dz: 1.5, range: 10, lnRange: Math.log(10), variance: 0.1,
   upperRange: 10 * Math.exp(2 * Math.sqrt(0.1)), upperHorizontal: 10, proximity: false, samples: 1, ...over,

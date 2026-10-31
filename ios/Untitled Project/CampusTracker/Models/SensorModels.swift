@@ -321,7 +321,7 @@ nonisolated struct PedometerSample: Codable, Sendable {
 nonisolated enum EventMarkerType: String, Codable, CaseIterable, Identifiable, Sendable {
     // `elevator` stays decodable for markers recorded by older builds; new ones use board/exit.
     case entrance, intersection, stairStart, stairEnd, rampStart, rampEnd, elevatorBoard, elevatorExit, stop, custom
-    case elevator, sessionStart, sessionEnd
+    case elevator, sessionStart, sessionEnd, qrAnchor
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -338,11 +338,12 @@ nonisolated enum EventMarkerType: String, Codable, CaseIterable, Identifiable, S
         case .custom: return "Custom"
         case .sessionStart: return "Start"
         case .sessionEnd: return "End"
+        case .qrAnchor: return "QR anchor"
         }
     }
     /// The marker buttons; Start/Stop record sessionStart/sessionEnd themselves.
     static var buttons: [EventMarkerType] {
-        [.entrance, .intersection, .stairStart, .stairEnd, .rampStart, .rampEnd, .elevatorBoard, .elevatorExit, .stop, .custom]
+        [.entrance, .intersection, .stairStart, .stairEnd, .rampStart, .rampEnd, .elevatorBoard, .elevatorExit, .stop, .custom, .qrAnchor]
     }
 }
 
@@ -387,7 +388,7 @@ nonisolated enum AnchorRules {
 
     static func needs(_ type: EventMarkerType) -> AnchorNeeds {
         switch type {
-        case .sessionStart, .sessionEnd, .entrance: return .place
+        case .sessionStart, .sessionEnd, .entrance, .qrAnchor: return .place
         case .stairStart, .stairEnd: return .stairs
         case .elevatorBoard, .elevatorExit: return .elevator
         case .rampStart, .rampEnd: return .ramp

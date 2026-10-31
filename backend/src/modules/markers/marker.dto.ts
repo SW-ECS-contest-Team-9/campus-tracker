@@ -13,8 +13,8 @@ export const MarkerCreateRequest = z.object({
   timestamp: SensorTimestamp,
   type: z.string().trim().min(1).max(32),
   note: z.string().max(2000).nullish(),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().min(-90).max(90).nullish(),
+  longitude: z.number().min(-180).max(180).nullish(),
   altitude: OptionalNumber,
   ellipsoidalAltitude: OptionalNumber,
   horizontalAccuracy: OptionalNumber,
@@ -27,7 +27,9 @@ export const MarkerCreateRequest = z.object({
   direction: z.enum(['up', 'down']).nullish(),
   fromFloor: FloorName.nullish(),
   toFloor: FloorName.nullish(),
-}).refine((m) => m.sessionId || m.clientSessionId, { message: 'sessionId or clientSessionId is required', path: ['sessionId'] });
+}).refine((m) => m.sessionId || m.clientSessionId, { message: 'sessionId or clientSessionId is required', path: ['sessionId'] })
+  .refine((m) => (m.latitude != null && m.longitude != null) || (m.latitude == null && m.longitude == null && m.nodeId != null),
+    { message: 'provide both coordinates or a nodeId', path: ['latitude'] });
 export type MarkerCreateRequest = z.infer<typeof MarkerCreateRequest>;
 
 export interface MarkerView {

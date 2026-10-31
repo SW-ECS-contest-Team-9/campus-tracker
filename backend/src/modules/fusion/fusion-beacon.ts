@@ -22,7 +22,7 @@ import type { BeaconMeasurementInput } from './fusion.timeline.js';
 import { gpsUpdate, sigmaXY, type Mat3, type Vec3 } from './fusion-v4.smoother.js';
 
 export type BeaconRejectReason = 'RSSI_OUT_OF_RANGE' | 'RSSI_OUTLIER' | 'TOO_FAR' | 'STALE' | 'NOT_INITIALIZED' | 'PRIOR_TOO_WIDE'
-  | 'FLOOR_MISMATCH' | 'INNOVATION_GATED' | 'DISABLED';
+  | 'FLOOR_MISMATCH' | 'INNOVATION_GATED' | 'DISABLED' | 'INCONSISTENT_HEIGHT';
 
 /** One filtered beacon measurement (what the EKF and the smoother consume). Anchor in local ENU metres. */
 export interface BeaconRangeMeasurement {
@@ -134,6 +134,11 @@ export function filterBeacon(tr: BeaconTracker, t: number, o: BeaconMeasurementI
   const mount = o.floorHeightM !== null && Number.isFinite(o.floorHeightM) ? o.anchorZ - o.floorHeightM : c.beaconDefaultMountAboveFloorM;
   const dz = Math.max(0.3, Math.abs(mount - c.phoneHeightM));
   const upperRange = range * Math.exp(2 * Math.sqrt(variance));
+  // A 3-D range shorter than the vertical separation cannot establish proximity to the anchor.
+  if (upperRange < dz) {
+    rejectBeacon(tr, 'INCONSISTENT_HEIGHT');
+    return null;
+  }
   const upperHorizontal = Math.sqrt(Math.max(0, upperRange ** 2 - dz ** 2));
   const m: BeaconRangeMeasurement = {
     t, beaconId: o.beaconId, gridX: o.anchorX, gridY: o.anchorY, buildingId: o.buildingId, floor: o.floor, dz,

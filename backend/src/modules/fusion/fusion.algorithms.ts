@@ -212,7 +212,7 @@ const makeV4 = (cfg: FusionConfigV4): FusionAlgorithm<FusionStateV4, FusionEvent
   // 15: optional Core Motion absolute altitude; opted-in sessions never assume a ground-level start.
   // 16: APPLE_MSL -> map height through the session's measured device geoid, not the map geoid.
   // 17: collection anchors naming a network node: soft XY fix + height-zero observation in the replay.
-  revision: 18, // registered BLE beacons: log-range / proximity EKF updates (forward + smoother), floor estimate; no beacons = rev 17 outputs
+  revision: 19, // node anchors can initialize replay without GPS; reject physically inconsistent beacon proximity
   usesTerrain: true,
   description: 'Step-level PDR (50 Hz steps, stair- and slope-aware stride) + Kalman filter over position and heading offset with weighted GPS; replay is RTS-smoothed.',
   config: cfg,

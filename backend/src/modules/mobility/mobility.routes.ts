@@ -87,6 +87,16 @@ mobilityRoutes.get('/mobility/nodes', async (req, res) => {
   res.json({ buildings: anchorBuildings(nodes, footprints), nodes: pickAnchorNodes(nodes, q) });
 });
 
+// Resolve the identifier on a printed QR code against the current map, not coordinates supplied by the code.
+mobilityRoutes.get('/mobility/nodes/:id', async (req, res) => {
+  const id = z.uuid().parse(req.params.id);
+  const { nodes } = await loadAnchorNodes(null);
+  const node = nodes.find((n) => n.nodeId.toLowerCase() === id.toLowerCase());
+  res.setHeader('Cache-Control', 'no-store');
+  if (!node) { res.status(404).json({ error: { code: 'NODE_NOT_FOUND', message: 'The map node is no longer available.' } }); return; }
+  res.json(node);
+});
+
 // GET /api/v1/mobility/edits?limit=50 — latest QGIS edits (audit log)
 mobilityRoutes.get('/mobility/edits', async (req, res) => {
   const { limit } = z.object({ limit: z.coerce.number().int().min(1).max(500).default(50) }).parse(req.query);

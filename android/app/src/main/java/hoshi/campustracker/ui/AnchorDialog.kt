@@ -25,15 +25,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import kotlinx.coroutines.launch
 import hoshi.campustracker.model.AnchorNeeds
 import hoshi.campustracker.model.AnchorRules
 import hoshi.campustracker.model.CollectionAnchor
 import hoshi.campustracker.model.EventMarkerType
 import hoshi.campustracker.net.AnchorNodesResponse
+import hoshi.campustracker.net.AnchorNode
+import hoshi.campustracker.positioning.parseAnchorQr
 import java.util.Locale
 
 /**
@@ -47,6 +53,7 @@ fun AnchorDialog(
     /** prefill: the session's current place (or the open stairs/elevator anchor for its end) */
     initial: CollectionAnchor?,
     loadNodes: suspend (buildingId: String?, floor: String?) -> AnchorNodesResponse,
+    resolveNode: suspend (String) -> AnchorNode,
     onConfirm: (CollectionAnchor) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -57,6 +64,8 @@ fun AnchorDialog(
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var attempt by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     if (needs == AnchorNeeds.PLACE) {
         LaunchedEffect(attempt) {
@@ -76,7 +85,8 @@ fun AnchorDialog(
     }
     // a floor without indoor nodes (nothing on that floor in the list) takes building + floor only
     val nodesOnOffer = nodes?.nodes?.isNotEmpty() ?: true
-    val complete = AnchorRules.isComplete(type, anchor, nodesOnOffer) && (needs != AnchorNeeds.PLACE || nodes != null)
+    val complete = AnchorRules.isComplete(type, anchor, nodesOnOffer) && (needs != AnchorNeeds.PLACE || nodes != null) &&
+        (type != EventMarkerType.qrAnchor || anchor.nodeId != null)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -85,6 +95,24 @@ fun AnchorDialog(
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 when (needs) {
                     AnchorNeeds.PLACE -> {
+                        OutlinedButton(onClick = {
+                            GmsBarcodeScanning.getClient(context).startScan().addOnSuccessListener { barcode ->
+                                val value = barcode.rawValue.orEmpty()
+                                val id = parseAnchorQr(value)
+                                if (id == null) error = "This is not a valid campus anchor QR code."
+                                else scope.launch {
+                                    runCatching { resolveNode(id) }.onSuccess { n ->
+                                        if (type == EventMarkerType.entrance && n.buildingId == CollectionAnchor.OUTDOOR) {
+                                            error = "Choose an indoor node for an entrance."
+                                        } else {
+                                            anchor = CollectionAnchor(nodeId = n.nodeId, nodeLabel = n.label, buildingId = n.buildingId, floor = n.floor)
+                                            error = if (n.floor == null && n.buildingId != CollectionAnchor.OUTDOOR) "Choose the floor for this node." else null
+                                        }
+                                    }.onFailure { error = "Could not resolve this anchor on the current server." }
+                                }
+                            }.addOnFailureListener { error = "Could not start the QR scanner. Check Google Play services." }
+                        }, modifier = Modifier.fillMaxWidth()) { Text("Scan anchor QR code") }
+                        anchor.nodeLabel?.let { Caption("Selected: $it") }
                         val list = buildings?.buildings.orEmpty()
                         Picker("Building", list.map { it.buildingId to it.buildingName }, anchor.buildingId) {
                             anchor = anchor.copy(buildingId = it, floor = if (it == CollectionAnchor.OUTDOOR) null else anchor.floor, nodeId = null, nodeLabel = null)
@@ -92,7 +120,9 @@ fun AnchorDialog(
                         if (anchor.buildingId != null && anchor.buildingId != CollectionAnchor.OUTDOOR) {
                             val withNodes = list.firstOrNull { it.buildingId == anchor.buildingId }?.floorsWithNodes.orEmpty()
                             Picker("Floor", AnchorRules.FLOORS.map { it to if (it in withNodes) "$it · nodes" else it }, anchor.floor) {
-                                anchor = anchor.copy(floor = it, nodeId = null, nodeLabel = null)
+                                val retainUnknownFloorNode = anchor.floor == null && anchor.nodeId != null
+                                anchor = anchor.copy(floor = it, nodeId = if (retainUnknownFloorNode) anchor.nodeId else null,
+                                    nodeLabel = if (retainUnknownFloorNode) anchor.nodeLabel else null)
                             }
                         }
                         if (loading) CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))

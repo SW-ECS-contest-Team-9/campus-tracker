@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreImage.CIFilterBuiltins
 
 /// Collection anchor for one marker (server `markers/marker-anchor.ts`). Start, End and Entrance ask
 /// building → floor → node; stairs direction and floors; elevators the floors; ramps the direction.
@@ -15,6 +16,8 @@ struct AnchorPickerView: View {
     @State private var nodes: [AnchorNode]?
     @State private var loading = false
     @State private var error: String?
+    @State private var scanning = false
+    @State private var showingQR = false
 
     init(type: EventMarkerType, initial: CollectionAnchor?, configuration: ServerConfiguration?,
          location: (latitude: Double, longitude: Double)?,
@@ -31,6 +34,7 @@ struct AnchorPickerView: View {
     /// a floor without indoor nodes (nothing in the list) takes building + floor only
     private var complete: Bool {
         AnchorRules.isComplete(type, anchor, nodesOnOffer: !(nodes?.isEmpty ?? false)) && (needs != .place || nodes != nil)
+            && (type != .qrAnchor || anchor.nodeId != nil)
     }
 
     var body: some View {
@@ -61,10 +65,23 @@ struct AnchorPickerView: View {
             .task { if needs == .place { await loadBuildings(); await loadNodes() } }
             .onChange(of: anchor.buildingId) { _ in Task { await loadNodes() } }
             .onChange(of: anchor.floor) { _ in Task { await loadNodes() } }
+            .sheet(isPresented: $scanning) {
+                AnchorQRScanner { value in
+                    scanning = false
+                    Task { await resolveQR(value) }
+                }
+            }
+            .sheet(isPresented: $showingQR) {
+                if let nodeId = anchor.nodeId { AnchorQRCodeView(nodeId: nodeId, label: anchor.nodeLabel ?? nodeId) }
+            }
         }
     }
 
     @ViewBuilder private var placeSection: some View {
+        Section {
+            Button("Scan anchor QR code") { scanning = true }
+            if let label = anchor.nodeLabel { Text("Selected: \(label)").font(.caption) }
+        }
         Section("Building") {
             Picker("Building", selection: Binding(get: { anchor.buildingId ?? "" }, set: { value in
                 anchor.buildingId = value.isEmpty ? nil : value
@@ -77,8 +94,9 @@ struct AnchorPickerView: View {
             if anchor.buildingId != nil && anchor.buildingId != CollectionAnchor.outdoor {
                 let withNodes = Set(buildings?.first { $0.buildingId == anchor.buildingId }?.floorsWithNodes ?? [])
                 Picker("Floor", selection: Binding(get: { anchor.floor ?? "" }, set: { value in
+                    let retainUnknownFloorNode = anchor.floor == nil && anchor.nodeId != nil
                     anchor.floor = value.isEmpty ? nil : value
-                    anchor.nodeId = nil; anchor.nodeLabel = nil
+                    if !retainUnknownFloorNode { anchor.nodeId = nil; anchor.nodeLabel = nil }
                 })) {
                     Text("Choose").tag("")
                     ForEach(AnchorRules.floors, id: \.self) { f in Text(withNodes.contains(f) ? "\(f) · nodes" : f).tag(f) }
@@ -107,6 +125,9 @@ struct AnchorPickerView: View {
                     }
                 }
             }
+        }
+        if anchor.nodeId != nil {
+            Section { Button("Show QR code for selected node") { showingQR = true } }
         }
     }
 
@@ -150,18 +171,36 @@ struct AnchorPickerView: View {
         }
     }
 
+    private func resolveQR(_ value: String) async {
+        let prefix = "campustracker:node:"
+        guard value.hasPrefix(prefix), let id = UUID(uuidString: String(value.dropFirst(prefix.count))), let configuration else {
+            error = "This is not a valid campus anchor QR code."
+            return
+        }
+        do {
+            let node = try await AnchorNodeAPI.resolve(configuration: configuration, nodeID: id)
+            if type == .entrance && node.buildingId == CollectionAnchor.outdoor {
+                error = "Choose an indoor node for an entrance."
+                return
+            }
+            anchor = CollectionAnchor(nodeId: node.nodeId, buildingId: node.buildingId, floor: node.floor, nodeLabel: node.label)
+            error = node.floor == nil && node.buildingId != CollectionAnchor.outdoor ? "Choose the floor for this node." : nil
+        } catch { self.error = "Could not resolve this anchor on the current server: \(error.localizedDescription)" }
+    }
+
     private func loadNodes() async {
         nodes = nil
         guard let configuration, let building = anchor.buildingId else { return }
         let outdoor = building == CollectionAnchor.outdoor
         if !outdoor && anchor.floor == nil { return }
+        let responseFloor = anchor.floor
         loading = true
         defer { loading = false }
         do {
             let response = try await AnchorNodeAPI.fetch(configuration: configuration, buildingId: building, floor: outdoor ? nil : anchor.floor,
                                                          latitude: location?.latitude, longitude: location?.longitude)
             // a later choice may have replaced this one meanwhile
-            if anchor.buildingId == building { nodes = response.nodes }
+            if anchor.buildingId == building && (outdoor || anchor.floor == responseFloor) { nodes = response.nodes }
         } catch let failure {
             error = failure.localizedDescription
         }
@@ -191,6 +230,29 @@ struct AnchorPickerView: View {
             return CollectionAnchor(direction: initial?.direction, fromFloor: initial?.fromFloor ?? initial?.floor, toFloor: initial?.toFloor)
         case .ramp: return CollectionAnchor(direction: initial?.direction)
         case .none: return CollectionAnchor()
+        }
+    }
+}
+
+private struct AnchorQRCodeView: View {
+    let nodeId: String
+    let label: String
+    @Environment(\.dismiss) private var dismiss
+    private var qr: UIImage? {
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data("campustracker:node:\(nodeId.lowercased())".utf8)
+        guard let image = filter.outputImage?.transformed(by: CGAffineTransform(scaleX: 10, y: 10)),
+              let cg = CIContext().createCGImage(image, from: image.extent) else { return nil }
+        return UIImage(cgImage: cg)
+    }
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text(label)
+                if let qr { Image(uiImage: qr).interpolation(.none).resizable().scaledToFit().padding().background(.white) }
+                Text("Print or display this code at the selected map node.").font(.caption)
+            }.padding().navigationTitle("Anchor QR")
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
     }
 }

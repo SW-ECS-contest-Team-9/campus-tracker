@@ -409,3 +409,21 @@ test('rev 17: collection anchors naming a node set the absolute height and pull 
   const after = rms(near(withAnchors));
   assert.ok(after < before - 2, `rms at the anchors ${before.toFixed(1)} -> ${after.toFixed(1)} m`);
 });
+
+test('a node marker initializes a replay without GPS only after the marker time', () => {
+  const xy = tmForward(ORIGIN.latitude, ORIGIN.longitude);
+  const anchor = { markerId: 'm', t: T0 + 1000, type: 'qrAnchor', nodeId: 'n', x: xy.x, y: xy.y, z: 100 };
+  const s = createFusionStateV4({ strideCalibration: null, markerAnchors: [anchor] });
+  const sample = (t: number): Observation => ({ kind: 'altimeter', t, seq: t, relativeAltitude: 0 });
+  assert.equal(processObservationV4(s, sample(T0), cfg).outputs.length, 0);
+  assert.equal(s.initialized, false);
+  const result = processObservationV4(s, sample(T0 + 1000), cfg);
+  assert.equal(s.initialized, true);
+  assert.equal(result.outputs[0]?.source, 'MARKER_ANCHORED');
+  const finalized = finalizeFusionV4(s, cfg);
+  assert.ok(finalized.outputs.length > 0);
+  assert.ok(Math.abs(finalized.outputs[0].latitude - ORIGIN.latitude) < 0.0001);
+  const markerOnly = createFusionStateV4({ strideCalibration: null, markerAnchors: [anchor] });
+  const withoutSensors = finalizeFusionV4(markerOnly, cfg);
+  assert.ok(withoutSensors.outputs.length > 0, 'a final marker does not need a later sensor sample');
+});

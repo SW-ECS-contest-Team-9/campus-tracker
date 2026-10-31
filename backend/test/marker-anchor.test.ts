@@ -2,8 +2,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { floorFromLevelId, floorNumber, trainingLabel, type AnchorFields } from '../src/modules/markers/marker-anchor.js';
-import { anchorBuildings, pickAnchorNodes, toAnchorNode, type AnchorNodeRow } from '../src/modules/mobility/anchor-nodes.js';
 import { MarkerCreateRequest } from '../src/modules/markers/marker.dto.js';
+import { anchorBuildings, pickAnchorNodes, toAnchorNode, type AnchorNodeRow } from '../src/modules/mobility/anchor-nodes.js';
+
+test('node marker can be uploaded without GPS but incomplete coordinates are rejected', () => {
+  const base = { markerId: 'ed0a91e7-2d8d-4db6-ae96-b7de3da70227', clientSessionId: 'd630df8e-e20e-46d7-a249-d44b7d05c236',
+    timestamp: '2026-01-01T00:00:00Z', type: 'qrAnchor', nodeId: '618ca240-2c9a-430d-a1f9-30a040c070d0' };
+  assert.equal(MarkerCreateRequest.safeParse(base).success, true);
+  assert.equal(MarkerCreateRequest.safeParse({ ...base, nodeId: null }).success, false);
+  assert.equal(MarkerCreateRequest.safeParse({ ...base, latitude: 37 }).success, false);
+});
 
 const at = (s: number) => new Date(Date.UTC(2026, 9, 15, 1, 0, s)).toISOString();
 const m = (type: string, s: number, f: Partial<AnchorFields> = {}): AnchorFields => ({ type, timestamp: at(s), nodeId: null, buildingId: null,

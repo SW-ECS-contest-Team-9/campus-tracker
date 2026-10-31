@@ -118,6 +118,7 @@ enum class EventMarkerType(val wire: String, val title: String, val button: Bool
     elevatorExit("elevatorExit", "Elevator Exit"),
     stop("stop", "Stop"),
     custom("custom", "Custom"),
+    qrAnchor("qrAnchor", "QR anchor"),
     sessionStart("sessionStart", "Start", button = false),
     sessionEnd("sessionEnd", "End", button = false),
 }

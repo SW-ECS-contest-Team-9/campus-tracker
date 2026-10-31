@@ -237,7 +237,8 @@ class CollectionCoordinator(
             fromFloor = anchor?.fromFloor, toFloor = anchor?.toFloor,
         )
         repository.appendMarker(marker)
-        sync.appendMarker(marker, needsLocation = fix == null)
+        // The server resolves a named map node when no GPS fix is available.
+        sync.appendMarker(marker, needsLocation = fix == null && anchor?.nodeId == null)
         counts = counts.copy(marker = counts.marker + 1)
         trackCounts()
         noteAnchor(type, anchor)
