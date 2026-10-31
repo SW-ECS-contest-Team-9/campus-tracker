@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Uuid } from '../../common/dto.js';
 import { editorAuth } from './editor.auth.js';
 import { areaRoutes } from './area.routes.js';
+import { qrAnchorRoutes } from './qr-anchor.routes.js';
 import { Anchor, BranchFrom, EditorQuery, JunctionSave, LeaseRelease, LeaseRequest, PlaceSave, RoadSave, RoadStyleSave, XYZ } from './editor.dto.js';
 import { AppError } from '../../common/errors/app-error.js';
 import { CAMPUS_FRAME } from '../../geo/campus-frame.js';
@@ -18,6 +19,7 @@ import { editorBroadcast } from '../../realtime/editor.gateway.js';
 export const editorRoutes = Router();
 editorRoutes.use(editorAuth);
 editorRoutes.use(areaRoutes);
+editorRoutes.use(qrAnchorRoutes);
 const identity = (res: import('express').Response) => res.locals.editorIdentity as CollectorIdentity;
 
 editorRoutes.get('/snapshot', async (req, res) => {

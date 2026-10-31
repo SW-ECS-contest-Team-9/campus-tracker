@@ -52,7 +52,8 @@ export const markerService = {
 
     if (req.latitude == null && req.longitude == null && req.nodeId) {
       const { rows } = await pool.query<{ x: number; y: number }>(
-        `SELECT ST_X(geom)::float8 x, ST_Y(geom)::float8 y FROM mobility.network_nodes WHERE id = $1`, [req.nodeId]);
+        `SELECT ST_X(geom)::float8 x, ST_Y(geom)::float8 y FROM mobility.network_nodes WHERE id = $1
+         UNION ALL SELECT ST_X(geom)::float8 x, ST_Y(geom)::float8 y FROM mobility.qr_anchors WHERE id = $1 LIMIT 1`, [req.nodeId]);
       if (!rows[0]) {
         // A retry remains idempotent even if the editor removed the node after the first insert.
         const existingSessionId = await markerRepository.findSessionIdByMarkerId(req.markerId);

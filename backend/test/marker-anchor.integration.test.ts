@@ -45,6 +45,19 @@ test('anchor markers: stored with the node snapshot, fed to fusion, listed by th
 
       const anchors = await markerRepository.nodeAnchors(session, client);
       assert.deepEqual(anchors.map((a) => [a.nodeId, a.x, a.z, a.current]), [[n1, 200000, 140.5, true], [gone, 200020, 143.5, false]]);
+      const qr = randomUUID();
+      await client.query(`INSERT INTO mobility.qr_anchors(id,label,building_id,floor,geom)
+        VALUES($1,'QR test','북악관','3F',ST_SetSRID(ST_MakePoint(200030,552000,141),5186))`, [qr]);
+      await markerRepository.insert(session, marker('qrAnchor', 50, { nodeId: qr, buildingId: '북악관', floor: '3F' }), client);
+      let qrAnchor = (await markerRepository.nodeAnchors(session, client)).find((a) => a.nodeId === qr)!;
+      assert.deepEqual([qrAnchor.x, qrAnchor.z, qrAnchor.current], [200030, 141, true]);
+      await client.query('UPDATE mobility.qr_anchors SET geom=ST_SetSRID(ST_MakePoint(200031,552000,142),5186) WHERE id=$1', [qr]);
+      qrAnchor = (await markerRepository.nodeAnchors(session, client)).find((a) => a.nodeId === qr)!;
+      assert.deepEqual([qrAnchor.x, qrAnchor.z, qrAnchor.current], [200031, 142, true]);
+      await client.query('DELETE FROM mobility.qr_anchors WHERE id=$1', [qr]);
+      qrAnchor = (await markerRepository.nodeAnchors(session, client)).find((a) => a.nodeId === qr)!;
+      assert.deepEqual([qrAnchor.x, qrAnchor.z, qrAnchor.current], [200030, 141, false]);
+      await client.query('DELETE FROM event_markers WHERE node_id=$1', [qr]);
       const listed = await markerRepository.findBySession(session, client);
       assert.deepEqual(listed.map((m) => m.floor), ['3F', null, null, '4F', null]);
       assert.deepEqual(listed.map((m) => m.node), [{ x: 200000, y: 552000, z: 140.5, current: true }, { x: 200020, y: 552000, z: 143.5, current: false }, null, null, null]);

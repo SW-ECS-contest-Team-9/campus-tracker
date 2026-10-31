@@ -95,7 +95,17 @@ mobilityRoutes.get('/mobility/nodes', async (req, res) => {
 mobilityRoutes.get('/mobility/nodes/:id', async (req, res) => {
   const id = z.uuid().parse(req.params.id);
   const { nodes } = await loadAnchorNodes(null);
-  const node = nodes.find((n) => n.nodeId.toLowerCase() === id.toLowerCase());
+  let node = nodes.find((n) => n.nodeId.toLowerCase() === id.toLowerCase());
+  if (!node) {
+    const { rows } = await pool.query<{ nodeId: string; buildingId: string; floor: string | null; label: string; x: number; y: number; heightM: number }>(
+      `SELECT id AS "nodeId", building_id AS "buildingId", floor, label, ST_X(geom)::float8 x, ST_Y(geom)::float8 y,
+              ST_Z(geom)::float8 AS "heightM" FROM mobility.qr_anchors WHERE id=$1`, [id]);
+    if (rows[0]) {
+      const { x, y, ...q } = rows[0];
+      const ll = tmInverse(x, y);
+      node = { ...q, ...ll, kind: 'qr', structures: [], distanceM: null };
+    }
+  }
   res.setHeader('Cache-Control', 'no-store');
   if (!node) { res.status(404).json({ error: { code: 'NODE_NOT_FOUND', message: 'The map node is no longer available.' } }); return; }
   res.json(node);

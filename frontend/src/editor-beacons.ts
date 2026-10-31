@@ -178,7 +178,7 @@ export class BeaconMapper {
       : '커서를 설치 위치로 옮기고 Space(커서 위치에 놓기) → Enter(저장). 바닥에 커서를 두고 "커서보다 위"에 설치 높이를 넣으면 편합니다.');
   }
 
-  private close() {
+  close() {
     this.selected = null;
     this.following = false;
     this.errors = {};

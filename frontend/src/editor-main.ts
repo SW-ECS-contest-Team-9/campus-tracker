@@ -8,6 +8,7 @@ import { NavController, loadPrefs, savePrefs, smoothstep, distanceToPolyline, ty
 import { floorColor, floorFromHeight, floorFromLevelId, floorLabel } from './floor-colors';
 import { AreaEditor } from './editor-areas';
 import { BeaconMapper } from './editor-beacons';
+import { QrAnchorEditor } from './editor-qr-anchors';
 import type { MapBuilding } from './beacon-map';
 import { cursorAxes, xrayAlpha, XrayPaths } from './editor-visibility';
 import { areaSurfacePart } from './road-surface-layer';
@@ -24,6 +25,7 @@ import { LABELS, MAP_LINE_SCALE, bindViewStyleControls, onViewStyle, viewStyle, 
 
 let areaEditor: AreaEditor | null = null;
 let beaconMapper: BeaconMapper | null = null;
+let qrAnchorEditor: QrAnchorEditor | null = null;
 
 type XYZ = [number, number, number];
 type RoadClass = 'pedestrian' | 'vehicle' | 'shared';
@@ -1923,8 +1925,18 @@ function installControls() {
     request, say, buildings: mapBuildings,
     focus: (p) => { setCursor(p); viewer.camera.flyToBoundingSphere(new C.BoundingSphere(drawPoint(p), 25), { duration: 0.8 }); },
     start: () => {
+      if (qrAnchorEditor?.active) { if (!confirm('QR 기준점 편집을 닫을까요? 저장하지 않은 변경은 사라집니다.')) return false; qrAnchorEditor.close(); }
       if (areaEditor?.active) { if (!confirm('공간 초안을 취소할까요?')) return false; areaEditor.cancel(); }
       if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 비콘을 편집할까요?')) return false;
+      if (roadDraft || placeDraft || tool !== 'select') { clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); }
+      return true;
+    } });
+  qrAnchorEditor = new QrAnchorEditor({ viewer, C, point: drawPoint, cursor: () => ownCursor, buildings: mapBuildings, request, say,
+    focus: (p) => { setCursor(p); viewer.camera.flyToBoundingSphere(new C.BoundingSphere(drawPoint(p), 25), { duration: 0.8 }); },
+    start: () => {
+      if (beaconMapper?.active) { if (!confirm('비콘 편집을 닫을까요? 저장하지 않은 변경은 사라집니다.')) return false; beaconMapper.close(); }
+      if (areaEditor?.active) { if (!confirm('공간 초안을 취소할까요?')) return false; areaEditor.cancel(); }
+      if ((roadDraft || placeDraft) && dirty && !confirm('도로/장소 초안을 취소하고 QR 기준점을 편집할까요?')) return false;
       if (roadDraft || placeDraft || tool !== 'select') { clearDraft(); selectedRoad = null; selectedPlace = null; setTool('select'); }
       return true;
     } });
@@ -2061,6 +2073,9 @@ function installControls() {
     if (sceneLayers?.section.placing) return; // the click places the section line
     if (spaceViews?.handleClick(movement.position)) return; // 층 따로 보기 · 1인칭: no selection, no cursor move
     const hits = viewer.scene.drillPick(movement.position, 8, 8);
+    const qrId = !roadDraft && !placeDraft && !areaEditor?.active ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
+      typeof id === 'string' && id.startsWith('editor:qr:')) : null;
+    if (qrId && qrAnchorEditor?.pick(qrId)) { viewer.scene.canvas.focus(); return; }
     // a beacon of the beacon layer (its point, label or stem) opens it in the 비콘 배치 panel
     const beaconId = !roadDraft && !placeDraft && !areaEditor?.active ? hits.map((h: any) => h.id?.id).find((id: unknown) =>
       typeof id === 'string' && /^editor:beacon(-found)?:/.test(id))?.replace(/:stem$/, '') : null;
@@ -2155,6 +2170,7 @@ async function startEditor() {
   viewer.scene.canvas.addEventListener('click', () => viewer.scene.canvas.focus());
   installControls(); installSocket(); void loadSessions(); await loadSnapshot();
   void beaconMapper?.load();
+  void qrAnchorEditor?.load();
   setTool('select');
   if (result.warning) say(result.warning, 'warning');
   $('editor-logout').title = `${userCode()} · tracker account`;
